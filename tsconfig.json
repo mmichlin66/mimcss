@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"declaration": true,
+		"outDir": "./lib/",
+		"sourceMap": true,
+		"noImplicitAny": false,
+		"strictNullChecks": false,
+		"module": "commonjs",
+		"target": "es6",
+		"lib": [ "es6", "dom" ],
+		"experimentalDecorators": true,
+		"jsx": "react",
+		"jsxFactory": "mim.jsx",
+		"preserveConstEnums": false
+	},
+
+	"include": [
+		"./src/**/*"
+	]
+}

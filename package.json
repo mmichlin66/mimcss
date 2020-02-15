@@ -1,0 +1,46 @@
+{
+	"name": "mimcss",
+	"version": "0.1.1",
+	"description": "Authoring CSS with TypeScript",
+	"homepage": "https://mmichlin66.github.io/mimcss/mimcssAbout.html",
+	"repository": "github:mmichlin66/mimcss",
+	"main": "./lib/mimcss.js",
+	"module": "./lib/mimcss.js",
+	"types": "./lib/mimcssTypes.d.ts",
+	"scripts": {
+		"buildDev": "webpack --display-error-details",
+		"buildProd": "webpack -p --display-error-details"
+	},
+	"author": {
+		"name": "Michael Michlin",
+		"email": "mmulya@outlook.com",
+		"url": "https://mmichlin66.github.io"
+	},
+	"keywords": [
+		"Mimbl",
+		"Component",
+		"Viertual DOM",
+		"Web UI"
+	],
+	"license": "MIT",
+	"devDependencies": {
+		"ifdef-loader": "^2.1.1",
+		"source-map-loader": "^0.2.4",
+		"terser-webpack-plugin": "^2.0.1",
+		"ts-loader": "^5.3.3",
+		"typescript": "^3.2.4",
+		"webpack": "^4.39.3",
+		"webpack-cli": "^3.3.8"
+	},
+	"files": [
+		"lib/mimcss.js",
+		"lib/mimcss.js.map",
+		"lib/mimcssTypes.d.ts",
+		"lib/api/mimcss.d.ts"
+	],
+	"-vs-binding": {
+		"ProjectOpened": [
+			"install_global_deps"
+		]
+	}
+}

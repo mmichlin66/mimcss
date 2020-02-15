@@ -1,0 +1,32 @@
+{
+    "skipTerminateQuickPick": true,
+    "skipSwitchToOutput": false,
+    "skipErrorMessage": true,
+	"commands":
+	[
+        {
+            "text": "mimcss Dev",
+            "color": "white",
+            "commandType": "script",
+            "command": "buildDev",
+            "alignment": "left",
+            "priority": 1
+        },
+        {
+            "text": "mimcss Prod",
+            "color": "yellow",
+            "commandType": "script",
+            "command": "buildProd",
+            "alignment": "left",
+            "priority": 1
+        },
+        {
+            "text": "mimcss Doc",
+            "color": "pink",
+            "commandType": "exec",
+            "command": "doc.bat",
+            "alignment": "left",
+            "priority": 1
+        }
+    ]
+}
