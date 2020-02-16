@@ -1,6 +1,6 @@
 // Type definitions for mimbl
 
-export * from "./mimcss";
-export * from "./selector";
-export * from "./utils";
-export * from "./styles";
+export * from "./cssts/cssts";
+export * from "./cssts/selector";
+export * from "./styles/utils";
+export * from "./styles/styles";

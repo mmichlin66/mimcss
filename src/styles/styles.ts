@@ -844,7 +844,7 @@ export function fontStyleToCssString( val: FontStyleStyleType): string
 
 
 /** Type for font-weight style property */
-export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" | number | utils.SingleAngle_StyleType;
+export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" | number | string | utils.Base_StyleType;
 
 
 
@@ -856,7 +856,7 @@ export type StyleType = "" | string;
  * Interface representing the type of objects that can be assigned to the style property of HTML
  * and SVG elements.
  */
-export interface StylePropType1 {
+export interface StylePropType {
     alignContent?: AlignContentStyleType;
     alignItems?: AlignItemsStyleType;
     alignSelf?: AlignSelfStyleType;
@@ -1336,7 +1336,7 @@ interface StylePropertyInfo<T>
 
 
 
-let styleProperties: { [K in keyof StylePropType1]: StylePropertyInfo<StylePropType1[K]> } =
+let styleProperties: { [K in keyof StylePropType]: StylePropertyInfo<StylePropType[K]> } =
 {
     animation: { convert: animationToCssString },
     animationDelay: { convert: utils.multiTimeToCssString },
@@ -1421,7 +1421,7 @@ let styleProperties: { [K in keyof StylePropType1]: StylePropertyInfo<StylePropT
  * Converts the given style object to the CSS style string
  * @param style 
  */
-export function styleToCssString( style: StylePropType1): string | null
+export function styleToCssString( style: StylePropType): string | null
 {
     if (!style)
         return null;
@@ -1445,10 +1445,10 @@ export function styleToCssString( style: StylePropType1): string | null
 
 
 /**
- * Converts the given style object to the CSS style string
+ * Converts the given style property to the CSS style string
  * @param style 
  */
-function stylePropToCssString( propName: string, propVal: any): string | null
+export function stylePropToCssString( propName: string, propVal: StylePropType): string | null
 {
     if (!propName || propVal == null)
         return null;
@@ -1460,7 +1460,7 @@ function stylePropToCssString( propName: string, propVal: any): string | null
         info = styleProperties[propName];
     }
 
-    let s = propName + ":";
+    let s = utils.camelToDash( propName) + ":";
 
     if (info && info.convert)
         s += info.convert( propVal);

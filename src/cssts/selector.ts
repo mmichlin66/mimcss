@@ -78,8 +78,8 @@ class Selector implements IEmptySelector, ISelector
 	public get adjacent(): IEmptySelector { this.s += " + "; return this; }
 
 	public get all(): ISelector { this.s += "*"; return this; }
-	public id( tagName: string): ISelector { this.s += "*"; return this; }
-	public tag( tagName: string): ISelector { this.s += "*"; return this; }
+	public id( id: string): ISelector { this.s += "#" + id; return this; }
+	public tag( tagName: string): ISelector { this.s += "*" + tagName; return this; }
 	public class( className: string): ISelector { this.s += "." + className; return this; }
 	public attr( attrName: string, op?: AttrSelectorOperation, value?: string, caseInsensitive?: boolean): ISelector
 	{

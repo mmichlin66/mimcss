@@ -2,7 +2,21 @@
  * This file contains definitions of CSS properties adn helper types
  */
 
+/**
+ * Style values that can be used for (almost) any property
+ */
 export type Base_StyleType = "inherit" | "initial" | "unset";
+
+
+
+/**
+ * Converts camelCase to dash-case.
+ * @param s
+ */
+export function camelToDash( s: string)
+{
+  return s.replace( /([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
+}
 
 
 
@@ -317,7 +331,8 @@ export function multiTimeToCssString( val: MultiTime_StyleType): string
 
 /**
  * Enumeration of well-known colors. The values of the enumeration items correspond to the hexadecimal
- * representartion of the RGB separations (without an alpha mask).
+ * representartion of the RGB separations (without an alpha mask). This enumeration is not marked const
+ * because we want to retain the ability to find RGB values by their names.
  */
 export enum Colors
 {
@@ -520,22 +535,38 @@ export type ColorAsObject =
  *   - number:
  *     - positive integer numbers less than or equal to 0xFFFFFF are treated as RGB separations 0xRRGGBB.
  *     - positive integer numbers greater than 0xFFFFFF are treated as RGBA separations 0xRRGGBBAA.
- *     - negative and floating point numbers are rejected and an exception is thrown.
+ *     - negative and floating point numbers are rejected.
  *   - array [[ColorAsArray]] or object [[ColorAsObject]]:
  */
 export type Color_StyleType = "transparent" | "currentcolor" | number | Base_StyleType | ColorAsArray | ColorAsObject | keyof Colors | string;
 
 /**
- * Converts color value from the numeric representation to the CSS time string.
- * @param val Time as a number
+ * Converts color separation value from the numeric representation to the 2-digit hexadecimal string.
+ * @param val Number from 0 to 255
+ */
+export function sepToHex( val: number): string
+{
+    let s = val.toString(16);
+    return s.length === 1 ? "0" + s : s;
+}
+
+/**
+ * Converts color value from the numeric representation to the CSS color string.
+ * @param val Color as a number
  */
 export function colorNumberToCssString( val: number): string
 {
     /// #if DEBUG
         if (val < 0)
-            throw new Error( "A number representing color cannot be negative");
-        else if (val < 0)
-            throw new Error( "A number representing color cannot be floating point");
+        {
+            console.error( "A number representing color cannot be negative: " + val);
+            return "#000";
+        }
+        else if (!Number.isInteger(val))
+        {
+            console.error( "A number representing color cannot be floating point: " + val);
+            return "#000";
+        }
     /// #endif
 
     if (val <= 0xFFFFFF)
@@ -543,7 +574,7 @@ export function colorNumberToCssString( val: number): string
         let r = (val & 0xFF0000) >> 16;
         let g = (val & 0x00FF00) >> 8;
         let b = (val & 0x0000FF);
-        return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+        return `#${sepToHex(r)}${sepToHex(g)}${sepToHex(b)}`;
     }
     else
     {
@@ -551,7 +582,7 @@ export function colorNumberToCssString( val: number): string
         let g = (val & 0x00FF0000) >> 16;
         let b = (val & 0x0000FF00) >> 8;
         let a = (val & 0x000000FF);
-        return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}${a.toString(16)}}`;
+        return `#${sepToHex(r)}${sepToHex(g)}${sepToHex(b)}${sepToHex(a)}}`;
     }
 }
 
