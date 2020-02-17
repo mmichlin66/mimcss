@@ -1,4 +1,4 @@
-import * as cssts from "./cssts"
+import {ISelectorRule, StyleSheetDefinition, ISelector, ExtendedRuleset, rulesetToCssString} from "./cssts"
 import {StyleRule} from "./StyleRule"
 
 
@@ -6,9 +6,9 @@ import {StyleRule} from "./StyleRule"
 /**
  * The SelectorRule type describes a ruleset that applies to elements identified by a class.
  */
-export class SelectorRule extends StyleRule implements cssts.ISelectorRule
+export class SelectorRule extends StyleRule implements ISelectorRule
 {
-	public constructor( owner: cssts.StyleSheetDefinition, selector: cssts.ISelector, ruleset: cssts.ExtendedRuleset)
+	public constructor( owner: StyleSheetDefinition, selector: ISelector, ruleset: ExtendedRuleset)
 	{
 		super( owner, ruleset);
 
@@ -18,7 +18,7 @@ export class SelectorRule extends StyleRule implements cssts.ISelectorRule
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string)
+	public process( styleSheetName: string, ruleName: string): void
 	{
 		super.process( styleSheetName, ruleName);
 
@@ -37,26 +37,26 @@ export class SelectorRule extends StyleRule implements cssts.ISelectorRule
 
 
 
-	// Creates string representation of the 
-	public toString(): string
+	// Converts the rule to CSS string.
+	public toCssString(): string
 	{
-		return `${this.selector.toSelectorString()} ${cssts.rulesetToString( this.ruleset, this.important)}`;
+		return `${this.selector.toCssString()} ${rulesetToCssString( this.ruleset, this.important)}`;
 	}
 
 
 
-	/** Only needed to distinguish from other style rules */
+	/** Only needed to distinguish from other rules */
 	public readonly isSelectorRule: boolean = true;
 
 	// selector object for this rule.
-	public readonly selector: cssts.ISelector;
+	public readonly selector: ISelector;
 }
 
 
 
 /** Returns new ClassRule object as belonging to the given style sheet definition  */
-export function defineSelectorRule( ssDef: cssts.StyleSheetDefinition, selector: cssts.ISelector,
-				ruleset: cssts.ExtendedRuleset): cssts.ISelectorRule
+export function defineSelectorRule( ssDef: StyleSheetDefinition, selector: ISelector,
+				ruleset: ExtendedRuleset): ISelectorRule
 {
 	return new SelectorRule( ssDef, selector, ruleset);
 }

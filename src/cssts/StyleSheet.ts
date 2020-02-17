@@ -1,7 +1,8 @@
-import * as cssts from "./cssts"
+import {IStyleSheetDefinition, IStyleSheet, ClassNames, IDNames, AnimationNames, AllRules} from "./cssts"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
+import {AnimationRule} from "./AnimationRule"
 
 
 
@@ -11,7 +12,7 @@ import {IDRule} from "./IDRule"
  * which provides names of classes, IDs and keyframes defined in the class T, which must be
  * derived from the StyleSheetDefinition class.
  */
-class StyleSheet<T extends cssts.IStyleSheetDefinition> implements cssts.IStyleSheet<T>
+class StyleSheet<T extends IStyleSheetDefinition> implements IStyleSheet<T>
 {
 	public constructor( ssDef: T)
 	{
@@ -28,42 +29,42 @@ class StyleSheet<T extends cssts.IStyleSheetDefinition> implements cssts.IStyleS
 
 
 	/** Names of classes defined in the style sheet */
-	public get classNames(): cssts.ClassNames<T>
+	public get classNames(): ClassNames<T>
 	{
 		if (!this.domSS)
 			this.activate();
 
-		return this._classNames as cssts.ClassNames<T>
+		return this._classNames as ClassNames<T>
 	}
 
 	/** Names of classes defined in the style sheet */
-	public get idNames(): cssts.IDNames<T>
+	public get idNames(): IDNames<T>
 	{
 		if (!this.domSS)
 			this.activate();
 
-		return this._idNames as cssts.IDNames<T>;
+		return this._idNames as IDNames<T>;
 	}
 
 	/** Names of keyframes defined in the style sheet */
-	public get animationNames(): cssts.AnimationNames<T>
+	public get animationNames(): AnimationNames<T>
 	{
 		if (!this.domSS)
 			this.activate();
 
-		return this._animationNames as cssts.AnimationNames<T>;
+		return this._animationNames as AnimationNames<T>;
 	}
 
 	/**
 	 * Map of names of properties of the style definition to the Rule objects. This is used when
 	 * creating an actual style sheet.
 	 */
-	public get rules(): cssts.AllRules<T>
+	public get rules(): AllRules<T>
 	{
 		if (!this.domSS)
 			this.activate();
 
-		return this._rules as cssts.AllRules<T>
+		return this._rules as AllRules<T>
 	}
 
 
@@ -86,6 +87,8 @@ class StyleSheet<T extends cssts.IStyleSheetDefinition> implements cssts.IStyleS
 				this._classNames[ruleName] = rule.combinedName;
 			else if (rule instanceof IDRule)
 				this._idNames[ruleName] = rule.idName;
+			else if (rule instanceof AnimationRule)
+				this._animationNames[ruleName] = rule.animationName;
 		}
 	}
 
@@ -106,7 +109,7 @@ class StyleSheet<T extends cssts.IStyleSheetDefinition> implements cssts.IStyleS
 
 		// go over the rules, convert them to strings and insert them into the style sheet
 		for( let ruleName in this._rules)
-			this.domSS.insertRule( this._rules[ruleName].toString());
+			this.domSS.insertRule( this._rules[ruleName].toCssString());
 	}
 
 
@@ -156,13 +159,13 @@ class StyleSheet<T extends cssts.IStyleSheetDefinition> implements cssts.IStyleS
  * names of IDs, classes and keyframes and allows style manipulations.
  * @param sheetDef 
  */
-export function createStyleSheetImpl<T extends cssts.IStyleSheetDefinition>( ssDef: T): cssts.IStyleSheet<T>
+export function createStyleSheetImpl<T extends IStyleSheetDefinition>( ssDef: T): IStyleSheet<T>
 {
 	// check whether the style sheet definition object has already been processed
 	if (!ssDef.styleSheet)
 		ssDef.styleSheet = new StyleSheet<T>( ssDef);
 
-	return ssDef.styleSheet as cssts.IStyleSheet<T>;
+	return ssDef.styleSheet as IStyleSheet<T>;
 }
 
 

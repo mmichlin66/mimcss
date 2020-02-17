@@ -26,7 +26,7 @@ export class Selector implements IEmptySelector, ISelector
 	public get sibling(): IEmptySelector { this.buf.push( " ~ "); return this; }
 	public get adjacent(): IEmptySelector { this.buf.push( " + "); return this; }
 
-	public get all(): ISelector { this.buf.push( "*"); return this; }
+	public all( ns?: string): ISelector { this.buf.push( ns == null ? "*" : `${ns}|*`); return this; }
 	public tag( tag: string | ITagRule): ISelector
 	{
 		this.buf.push( tag);
@@ -144,7 +144,7 @@ export class Selector implements IEmptySelector, ISelector
 	/**
 	 * Converts the accumulated selector tokens into full selector string.
 	 */
-	public toSelectorString(): string
+	public toCssString(): string
 	{
 		let s = "";
 		for( let token of this.buf)

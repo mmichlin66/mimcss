@@ -10,12 +10,27 @@ export type Base_StyleType = "inherit" | "initial" | "unset";
 
 
 /**
- * Converts camelCase to dash-case.
- * @param s
+ * Converts names with dashes into names in camelCase, where every character after a dash is
+ * capitalized and dashes are removed.
+ * @param dash
  */
-export function camelToDash( s: string)
+export function dashToCamel( dash: string): string
 {
-  return s.replace( /([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
+	if (!dash)
+		return dash;
+
+	return dash.replace( /-([a-zA-Z])/g, (x, $1) => $1.toUpperCase());
+}
+
+
+
+/**
+ * Converts camelCase to dash-case.
+ * @param camel
+ */
+export function camelToDash( camel: string): string
+{
+  return camel.replace( /([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
 }
 
 
@@ -83,6 +98,24 @@ export function stringArrayToCssString( val: string[], separator: string = ","):
 
 
 
+/**
+ * Converts percent value from the numeric representation to the CSS string. If the number is
+ * an Integer, the % sign is added to it. If the number is between 0.0 and 1.0 it is
+ * multiplyed by 100.
+ * @param val Percent as a number
+ */
+export function percentToCssString( val: number): string
+{
+    if (Number.isInteger( val))
+        return `${val}%`;
+    else if (val > -1.0 && val < 1.0)
+        return Math.round( val * 100) + "%";
+    else
+        return Math.round( val) + "%";
+}
+
+
+
 /** Type for single number style property */
 export type SingleNumber_StyleType = number | string | Base_StyleType;
 
@@ -135,7 +168,7 @@ export type MultiLength_StyleType = SingleLength_StyleType | SingleLength_StyleT
  */
 export function lengthNumberToCssString( val: number): string
 {
-    return val === 0 ? val.toString() : Number.isInteger( val) ?  val + "px" : val * 100 + "%";
+    return val === 0 ? val.toString() : Number.isInteger( val) ?  val + "px" : percentToCssString(val);
 }
 
 /**

@@ -1,4 +1,4 @@
-import * as cssts from "./cssts"
+import {IIDRule, StyleSheetDefinition, ExtendedRuleset, generateName, rulesetToCssString} from "./cssts"
 import {StyleRule} from "./StyleRule";
 
 
@@ -6,9 +6,9 @@ import {StyleRule} from "./StyleRule";
 /**
  * The IDRule type describes a ruleset that applies to elements identified by an ID.
  */
-export class IDRule extends StyleRule implements cssts.IIDRule
+export class IDRule extends StyleRule implements IIDRule
 {
-	public constructor( owner: cssts.StyleSheetDefinition, ruleset: cssts.ExtendedRuleset)
+	public constructor( owner: StyleSheetDefinition, ruleset: ExtendedRuleset)
 	{
 		super( owner, ruleset);
 	}
@@ -16,11 +16,11 @@ export class IDRule extends StyleRule implements cssts.IIDRule
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string)
+	public process( styleSheetName: string, ruleName: string): void
 	{
 		super.process( styleSheetName, ruleName);
 
-		this.idName = ruleName;
+		this.idName = generateName( styleSheetName, ruleName);
 
 		// go through all parents; for those who are classes, add their name to the
 		// combined name. For those who are not classes, copy style properties to the
@@ -31,25 +31,25 @@ export class IDRule extends StyleRule implements cssts.IIDRule
 
 
 
-	// Creates string representation of the 
-	public toString(): string
+	// Converts the rule to CSS string.
+	public toCssString(): string
 	{
-		return `#${this.idName} ${cssts.rulesetToString( this.ruleset, this.important)}`;
+		return `#${this.idName} ${rulesetToCssString( this.ruleset, this.important)}`;
 	}
 
 
 
-	/** Only needed to distinguish from tag and class rules */
+	/** Only needed to distinguish from other rules */
 	public readonly isIDRule: boolean = true;
 
-	// Name of the class under which the ruleset will appear in the style sheet.
+	// Name of the element identifier for applying the ruleset.
 	public idName: string;
 }
 
 
 
 /** Returns new IDRule object as belonging to the given style sheet definition  */
-export function defineIDRule( ssDef: cssts.StyleSheetDefinition, ruleset: cssts.ExtendedRuleset): cssts.IIDRule
+export function defineIDRule( ssDef: StyleSheetDefinition, ruleset: ExtendedRuleset): IIDRule
 {
 	return new IDRule( ssDef, ruleset);
 }

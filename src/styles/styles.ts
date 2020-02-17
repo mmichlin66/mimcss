@@ -849,7 +849,7 @@ export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" |
 
 
 
-export type StyleType = "" | string;
+export type StyleType = string | utils.Base_StyleType;
 
 
 
@@ -1313,115 +1313,124 @@ export interface StylePropType
 
 
 
+/** Type defnition of a function that takes property value and converts it to string */
+type PropToStringFunc<T> = (val: T) => string;
+
 /**
- * The StylePropertyInfo represents information that we keep for style properties
+ * The StylePropertyInfo represents information that we keep for style properties. Most commonly,
+ * the information needed for a property is a conversion function, whcih takes a value of a type
+ * allowed for the property and converts it to the CSS compliant string.
  */
-interface StylePropertyInfo<T>
+type StylePropertyInfo<T> = PropToStringFunc<T> |
+    {
+        /**
+         * Indicates the property that our property is alias for. This is used for shortening
+         * frequently used but long property names (e.g. backgroundColor) and for prefixed properties.
+         */
+        aliasOf?: keyof StylePropType;
+
+        /**
+         * Indicates the actual name of property for which our property provides value. This used for
+         * properties with potentially complex structure, which are usually used in a less complex
+         * way. We usually use "string" for complex structures, which doesn't allow the intellisence
+         * to help. The less complex variants may benefit greatly from intellisense. For example, the
+         * cursor property has a bunch of predefined values, for which intellisense would happily
+         * provide prompts; however, it also allows specifying url(), coordinates and a list of
+         * fallbacks. In this case, we specify the cursor property as just having the predefined
+         * values and create another property - cursorRaw - of string type. Developers would use the
+         * cursorRaw property in their code, but to the DOM the standard cursor property will be
+         * passed.
+         */
+        standsFor?: keyof StylePropType;
+
+        /**
+         * Converts from property-specific type representation to string.
+         */
+        convert?: PropToStringFunc<T>;
+    }
+
+
+
+/**
+ * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
+ * convert the property value to the CSS-compliant string.
+ */
+const StylePropertyInfos: { [K in keyof StylePropType]: StylePropertyInfo<StylePropType[K]> } =
 {
-    /**
-     * Indicates the property that our property is alias for. This is used for shortening
-     * frequently used but long property names (e.g. backgroundColor) and for prefixed properties.
-     */
-    aliasOf?: keyof StylePropType;
+    animation: animationToCssString,
+    animationDelay: utils.multiTimeToCssString,
+    animationDuration: utils.multiTimeToCssString,
+    animationIterationCount: utils.singleNumberToCssString,
+    animationTimingFunction: animationTimingFunctionToCssString,
 
-    /**
-     * Indicates the actual name of property for which our property provides value. This used for
-     * properties with potentially complex structure, which are usually used in a less complex
-     * way. We usually use "string" for complex structures, which doesn't allow the intellisence
-     * to help. The less complex variants may benefit greatly from intellisense. For example, the
-     * cursor property has a bunch of predefined values, for which intellisense would happily
-     * provide prompts; however, it also allows specifying url(), coordinates and a list of
-     * fallbacks. In this case, we specify the cursor property as just having the predefined
-     * values and create another property - cursorRaw - of string type. Developers would use the
-     * cursorRaw property in their code, but to the DOM the standard cursor property will be
-     * passed.
-     */
-    standsFor?: keyof StylePropType;
-
-    /**
-     * Converts from property-specific type representation to string.
-     */
-    convert?: (val: T) => string;
-}
-
-
-
-let styleProperties: { [K in keyof StylePropType]: StylePropertyInfo<StylePropType[K]> } =
-{
-    animation: { convert: animationToCssString },
-    animationDelay: { convert: utils.multiTimeToCssString },
-    animationDuration: { convert: utils.multiTimeToCssString },
-    animationIterationCount: { convert: utils.singleNumberToCssString },
-    animationTimingFunction: { convert: animationTimingFunctionToCssString },
-
-    backgroundColor: { convert: utils.colorToCssString },
+    backgroundColor: utils.colorToCssString,
     bgc: { aliasOf: "backgroundColor" },
-    backgroundPosition: { convert: utils.multiPositionToCssString },
-    backgroundSize: { convert: utils.multiSizeToCssString },
-    baselineShift: { convert: utils.singleLengthToCssString },
+    backgroundPosition: utils.multiPositionToCssString,
+    backgroundSize: utils.multiSizeToCssString,
+    baselineShift: utils.singleLengthToCssString,
 
-    border: { convert: borderSideToCssString },
-    borderBottom: { convert: borderSideToCssString },
-    borderBottomColor: { convert: utils.colorToCssString },
-    borderBottomLeftRadius: { convert: singleCornerRadiusToCssString },
-    borderBottomRightRadius: { convert: singleCornerRadiusToCssString },
-    borderBottomWidth: { convert: utils.singleLengthToCssString },
-    borderColor: { convert: borderColorToCssString },
-    borderImageOutset: { convert: borderImageOutsetToCssString },
-    borderImageWidth: { convert: borderWidthToCssString },
-    borderLeft: { convert: borderSideToCssString },
-    borderLeftColor: { convert: utils.colorToCssString },
-    borderLeftWidth: { convert: utils.singleLengthToCssString },
-    borderRadius: { convert: borderRadiusToCssString },
-    borderRight: { convert: borderSideToCssString },
-    borderRightColor: { convert: utils.colorToCssString },
-    borderRightWidth: { convert: utils.singleLengthToCssString },
-    borderStyle: { convert: borderStyleToCssString },
-    borderSpacing: { convert: borderSpacingToCssString },
-    borderTop: { convert: borderSideToCssString },
-    borderTopColor: { convert: utils.colorToCssString },
-    borderTopLeftRadius: { convert: singleCornerRadiusToCssString },
-    borderTopRightRadius: { convert: singleCornerRadiusToCssString },
-    borderTopWidth: { convert: utils.singleLengthToCssString },
-    borderWidth: { convert: borderWidthToCssString },
-    bottom: { convert: utils.singleLengthToCssString },
-    boxShadow: { convert: boxShadowToCssString },
+    border: borderSideToCssString,
+    borderBottom: borderSideToCssString,
+    borderBottomColor: utils.colorToCssString,
+    borderBottomLeftRadius: singleCornerRadiusToCssString,
+    borderBottomRightRadius: singleCornerRadiusToCssString,
+    borderBottomWidth: utils.singleLengthToCssString,
+    borderColor: borderColorToCssString,
+    borderImageOutset: borderImageOutsetToCssString,
+    borderImageWidth: borderWidthToCssString,
+    borderLeft: borderSideToCssString,
+    borderLeftColor: utils.colorToCssString,
+    borderLeftWidth: utils.singleLengthToCssString,
+    borderRadius: borderRadiusToCssString,
+    borderRight: borderSideToCssString,
+    borderRightColor: utils.colorToCssString,
+    borderRightWidth: utils.singleLengthToCssString,
+    borderStyle: borderStyleToCssString,
+    borderSpacing: borderSpacingToCssString,
+    borderTop: borderSideToCssString,
+    borderTopColor: utils.colorToCssString,
+    borderTopLeftRadius: singleCornerRadiusToCssString,
+    borderTopRightRadius: singleCornerRadiusToCssString,
+    borderTopWidth: utils.singleLengthToCssString,
+    borderWidth: borderWidthToCssString,
+    bottom: utils.singleLengthToCssString,
+    boxShadow: boxShadowToCssString,
     shadow: { aliasOf: "boxShadow" },
 
-    caretColor: { convert: utils.colorToCssString },
-    clip: { convert: clipToCssString },
-    color: { convert: utils.colorToCssString },
-    columnGap: { convert: utils.singleLengthToCssString },
-    columnRule: { convert: columnRuleToCssString },
-    columnRuleColor: { convert: utils.colorToCssString },
-    columnRuleStyle: { convert: borderStyleToCssString },
-    columnRuleWidth: { convert: borderWidthToCssString },
-    columns: { convert: columnsToCssString },
+    caretColor: utils.colorToCssString,
+    clip: clipToCssString,
+    color: utils.colorToCssString,
+    columnGap: utils.singleLengthToCssString,
+    columnRule: columnRuleToCssString,
+    columnRuleColor: utils.colorToCssString,
+    columnRuleStyle: borderStyleToCssString,
+    columnRuleWidth: borderWidthToCssString,
+    columns: columnsToCssString,
     cursorRaw: { standsFor: "cursor" },
 
-    flex: { convert: flexToCssString },
-    flexFlow: { convert: flexFlowToCssString },
-    floodColor: { convert: utils.colorToCssString },
-    fontStyle: { convert: fontStyleToCssString },
+    flex: flexToCssString,
+    flexFlow: flexFlowToCssString,
+    floodColor: utils.colorToCssString,
+    fontStyle: fontStyleToCssString,
 
-    gridColumnGap: { convert: utils.singleLengthToCssString },
-    gridRowGap: { convert: utils.singleLengthToCssString },
+    gridColumnGap: utils.singleLengthToCssString,
+    gridRowGap: utils.singleLengthToCssString,
 
-    height: { convert: utils.singleLengthToCssString },
+    height: utils.singleLengthToCssString,
 
-    left: { convert: utils.singleLengthToCssString },
-    lightingColor: { convert: utils.colorToCssString },
+    left: utils.singleLengthToCssString,
+    lightingColor: utils.colorToCssString,
 
-    outlineColor: { convert: utils.colorToCssString },
+    outlineColor: utils.colorToCssString,
 
-    right: { convert: utils.singleLengthToCssString },
-    rowGap: { convert: utils.singleLengthToCssString },
+    right: utils.singleLengthToCssString,
+    rowGap: utils.singleLengthToCssString,
 
-    textDecorationColor: { convert: utils.colorToCssString },
-    textEmphasisColor: { convert: utils.colorToCssString },
-    top: { convert: utils.singleLengthToCssString },
+    textDecorationColor: utils.colorToCssString,
+    textEmphasisColor: utils.colorToCssString,
+    top: utils.singleLengthToCssString,
 
-    width: { convert: utils.singleLengthToCssString },
+    width: utils.singleLengthToCssString,
 };
 
 
@@ -1457,14 +1466,18 @@ export function stylePropToCssString( propName: string, propVal: StylePropType):
         return null;
 
     // find information object for the property
-    let info: StylePropertyInfo<any> = styleProperties[propName];
+    let info = StylePropertyInfos[propName];
+
+    // if the info is just a conversion function use right away
+    if (typeof info === "function")
+        return utils.camelToDash( propName) + ":" + info( propVal);
 
     // go up the chain of aliases if any (we admittedly don't make the effort to detect circular
     // dependencies, because setting up the information objects is our job and not developers').
     while( info && info.aliasOf)
     {
         propName = info.aliasOf;
-        info = styleProperties[propName];
+        info = StylePropertyInfos[propName];
     }
 
     // if this property stands for another, change the property name

@@ -1,4 +1,4 @@
-import * as cssts from "./cssts"
+import {IClassRule, StyleSheetDefinition, ExtendedRuleset, generateName, rulesetToCssString} from "./cssts"
 import {StyleRule} from "./StyleRule";
 
 
@@ -6,9 +6,9 @@ import {StyleRule} from "./StyleRule";
 /**
  * The ClassRule type describes a ruleset that applies to elements identified by a class.
  */
-export class ClassRule extends StyleRule implements cssts.IClassRule
+export class ClassRule extends StyleRule implements IClassRule
 {
-	public constructor( owner: cssts.StyleSheetDefinition, ruleset: cssts.ExtendedRuleset)
+	public constructor( owner: StyleSheetDefinition, ruleset: ExtendedRuleset)
 	{
 		super( owner, ruleset);
 	}
@@ -16,11 +16,11 @@ export class ClassRule extends StyleRule implements cssts.IClassRule
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string)
+	public process( styleSheetName: string, ruleName: string): void
 	{
 		super.process( styleSheetName, ruleName);
 
-		this.properName = cssts.generateName( styleSheetName, ruleName);
+		this.properName = generateName( styleSheetName, ruleName);
 		this.combinedName = this.properName;
 		this.combinedSelectorName = "." + this.properName;
 
@@ -40,15 +40,15 @@ export class ClassRule extends StyleRule implements cssts.IClassRule
 
 
 
-	// Creates string representation of the 
-	public toString(): string
+	// Converts the rule to CSS string.
+	public toCssString(): string
 	{
-		return `.${this.properName} ${cssts.rulesetToString( this.ruleset, this.important)}`;
+		return `.${this.properName} ${rulesetToCssString( this.ruleset, this.important)}`;
 	}
 
 
 
-	/** Only needed to distinguish from tag and ID rules */
+	/** Only needed to distinguish from other rules */
 	public readonly isClassRule: boolean = true;
 
 	// Name of the class under which the ruleset will appear in the style sheet.
@@ -66,7 +66,7 @@ export class ClassRule extends StyleRule implements cssts.IClassRule
 
 
 /** Returns new ClassRule object as belonging to the given style sheet definition  */
-export function defineClassRule( ssDef: cssts.StyleSheetDefinition, ruleset: cssts.ExtendedRuleset): cssts.IClassRule
+export function defineClassRule( ssDef: StyleSheetDefinition, ruleset: ExtendedRuleset): IClassRule
 {
 	return new ClassRule( ssDef, ruleset);
 }

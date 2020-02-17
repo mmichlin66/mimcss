@@ -1,4 +1,4 @@
-import * as cssts from "./cssts";
+import {IStyleRule, StyleSheetDefinition, ExtendedRuleset, Ruleset} from "./cssts";
 import {Rule} from "./Rule";
 
 
@@ -6,9 +6,9 @@ import {Rule} from "./Rule";
 /**
  * The StyleRule class is used as a base class for rules that have a single style rule.
  */
-export abstract class StyleRule extends Rule implements cssts.IStyleRule
+export abstract class StyleRule extends Rule implements IStyleRule
 {
-	public constructor( owner: cssts.StyleSheetDefinition, ruleset: cssts.ExtendedRuleset)
+	public constructor( owner: StyleSheetDefinition, ruleset: ExtendedRuleset)
 	{
 		super( owner);
 
@@ -19,7 +19,7 @@ export abstract class StyleRule extends Rule implements cssts.IStyleRule
 		this.parseExtendedRuleset( ruleset);
 	}
 
-	private parseExtendedRuleset( ruleset: cssts.ExtendedRuleset): void
+	private parseExtendedRuleset( ruleset: ExtendedRuleset): void
 	{
 		if (ruleset instanceof StyleRule)
 		{
@@ -41,7 +41,7 @@ export abstract class StyleRule extends Rule implements cssts.IStyleRule
 				let propVal = ruleset[propName];
 				if (propName === "$inherits")
 				{
-					let inheritsPropVal = propVal as (cssts.IStyleRule | cssts.IStyleRule[]);
+					let inheritsPropVal = propVal as (IStyleRule | IStyleRule[]);
 					if (Array.isArray(inheritsPropVal))
 					{
 						// this is is an array of IStyleRule objects, which we add as our parents
@@ -79,8 +79,8 @@ export abstract class StyleRule extends Rule implements cssts.IStyleRule
 	}
 
 
-	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string)
+	// Processes the rule.
+	public process( styleSheetName: string, ruleName: string): void
 	{
 		// go through all parents and if the parent belongs to a different style sheet
 		// definition, make sure it is processed. We don't worry about circular dependencies
@@ -94,10 +94,10 @@ export abstract class StyleRule extends Rule implements cssts.IStyleRule
 	}
 
 	// Style rule defining style properties.
-	public ruleset: cssts.Ruleset;
+	public ruleset: Ruleset;
 
 	// Style rule defining style properties.
-	public parents: cssts.IStyleRule[];
+	public parents: IStyleRule[];
 
 	// Set of property names from this ruleset that should be !important.
 	important: Set<string>;

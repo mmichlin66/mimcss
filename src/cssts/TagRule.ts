@@ -1,4 +1,4 @@
-import * as cssts from "./cssts"
+import {ITagRule, StyleSheetDefinition, ExtendedRuleset, rulesetToCssString} from "./cssts"
 import {StyleRule} from "./StyleRule";
 
 
@@ -6,9 +6,9 @@ import {StyleRule} from "./StyleRule";
 /**
  * The TagRule type describes a ruleset that applies to elements identified by a tag name.
  */
-export class TagRule extends StyleRule implements cssts.ITagRule
+export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( owner: cssts.StyleSheetDefinition, ruleset: cssts.ExtendedRuleset)
+	public constructor( owner: StyleSheetDefinition, ruleset: ExtendedRuleset)
 	{
 		super( owner, ruleset);
 	}
@@ -16,7 +16,7 @@ export class TagRule extends StyleRule implements cssts.ITagRule
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string)
+	public process( styleSheetName: string, ruleName: string): void
 	{
 		super.process( styleSheetName, ruleName);
 
@@ -31,25 +31,25 @@ export class TagRule extends StyleRule implements cssts.ITagRule
 
 
 
-	// Creates string representation of the 
-	public toString(): string
+	// Converts the rule to CSS string.
+	public toCssString(): string
 	{
-		return `${this.tagName} ${cssts.rulesetToString( this.ruleset, this.important)}`;
+		return `${this.tagName} ${rulesetToCssString( this.ruleset, this.important)}`;
 	}
 
 
 
-	// Name of the class under which the ruleset will appear in the style sheet.
-	public tagName: string;
-
-	/** Only needed to distinguish from class and ID rules */
+	/** Only needed to distinguish from other rules */
 	public readonly isTagRule: boolean = true;
+
+	// Name of the tag to which the ruleset applies.
+	public tagName: string;
 }
 
 
 
 /** Returns new ClassRule object as belonging to the given style sheet definition  */
-export function defineTagRule( ssDef: cssts.StyleSheetDefinition, ruleset: cssts.ExtendedRuleset): cssts.ITagRule
+export function defineTagRule( ssDef: StyleSheetDefinition, ruleset: ExtendedRuleset): ITagRule
 {
 	return new TagRule( ssDef, ruleset);
 }
