@@ -121,7 +121,7 @@ export function multiNumberToCssString( val: MultiNumber_StyleType): string
  * Type for CSS length or percentage. Length can be represented using the following types:
  *   - string (e.g. 20px or 75%)
  *   - number: zero is treated as not having any suffix; integer numbers are treated as pixels;
- *     floating numbers are treated as percents.
+ *     floating numbers are treated as percents: 0.0 to 1.0.
  */
 export type SingleLength_StyleType = "auto" | number | string | Base_StyleType;
 

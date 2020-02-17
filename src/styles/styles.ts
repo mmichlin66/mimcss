@@ -654,14 +654,14 @@ export type SingleGap_StyleType = "normal" | utils.SingleLength_StyleType;
  *   - object - fields specify column rule parts.
  */
 export type ColumnRuleStyleType = string | utils.Base_StyleType |
-{
-    /** Column rule width. */
-    width?: BorderWidthStyleType;
-    /** Column rule style. */
-	style?: BorderStyleStyleType;
-    /** Column rule color. */
-	color?: SingleGap_StyleType;
-};
+    {
+        /** Column rule width. */
+        width?: BorderWidthStyleType;
+        /** Column rule style. */
+        style?: BorderStyleStyleType;
+        /** Column rule color. */
+        color?: SingleGap_StyleType;
+    };
 
 /**
  * Converts column rule style represented as an object with fields corresponding to column rule
@@ -723,7 +723,7 @@ export type CursorStyleType = "auto" | "default" | "none" | "context-menu" | "he
                 "no-drop" | "not-allowed" | "e-resize" | "n-resize" | "ne-resize" | "nw-resize" |
                 "s-resize" | "se-resize" | "sw-resize" | "w-resize" | "ew-resize" | "ns-resize" |
                 "nesw-resize" | "nwse-resize" | "col-resize" | "row-resize" | "all-scroll" | "zoom-in" |
-                "zoom-out" | "grab" | "grabbing" | utils.Base_StyleType | string;
+                "zoom-out" | "grab" | "grabbing" | utils.Base_StyleType;
 
 
 
@@ -844,7 +844,8 @@ export function fontStyleToCssString( val: FontStyleStyleType): string
 
 
 /** Type for font-weight style property */
-export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" | number | string | utils.Base_StyleType;
+export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" |
+                100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | utils.Base_StyleType;
 
 
 
@@ -856,7 +857,8 @@ export type StyleType = "" | string;
  * Interface representing the type of objects that can be assigned to the style property of HTML
  * and SVG elements.
  */
-export interface StylePropType {
+export interface StylePropType
+{
     alignContent?: AlignContentStyleType;
     alignItems?: AlignItemsStyleType;
     alignSelf?: AlignSelfStyleType;
@@ -948,6 +950,7 @@ export interface StylePropType {
     cssFloat?: FloatStyleType;
     cssText?: string;
 	cursor?: CursorStyleType;
+	cursorRaw?: string;
 	
     direction?: DirectionStyleType;
     display?: DisplayStyleType;
@@ -1315,23 +1318,30 @@ export interface StylePropType {
  */
 interface StylePropertyInfo<T>
 {
-    /** If defined, indicates the property that our property is alias for */
-    aliasOf?: string;
+    /**
+     * Indicates the property that our property is alias for. This is used for shortening
+     * frequently used but long property names (e.g. backgroundColor) and for prefixed properties.
+     */
+    aliasOf?: keyof StylePropType;
 
-    /** Function that converts from object representation to CSS string */
+    /**
+     * Indicates the actual name of property for which our property provides value. This used for
+     * properties with potentially complex structure, which are usually used in a less complex
+     * way. We usually use "string" for complex structures, which doesn't allow the intellisence
+     * to help. The less complex variants may benefit greatly from intellisense. For example, the
+     * cursor property has a bunch of predefined values, for which intellisense would happily
+     * provide prompts; however, it also allows specifying url(), coordinates and a list of
+     * fallbacks. In this case, we specify the cursor property as just having the predefined
+     * values and create another property - cursorRaw - of string type. Developers would use the
+     * cursorRaw property in their code, but to the DOM the standard cursor property will be
+     * passed.
+     */
+    standsFor?: keyof StylePropType;
+
+    /**
+     * Converts from property-specific type representation to string.
+     */
     convert?: (val: T) => string;
-
-    // /** Function that converts from number representation to CSS string */
-    // fromNumber?: (val: number) => string;
-
-    // /** Function that converts from Boolean representation to CSS string */
-    // fromBool?: (val: boolean) => string;
-
-    // /** Function that converts from array representation to CSS string */
-    // fromArray?: (val: any[]) => string;
-
-    // /** Function that converts from object representation to CSS string */
-    // fromObject?: (val: any) => string;
 }
 
 
@@ -1345,6 +1355,7 @@ let styleProperties: { [K in keyof StylePropType]: StylePropertyInfo<StylePropTy
     animationTimingFunction: { convert: animationTimingFunctionToCssString },
 
     backgroundColor: { convert: utils.colorToCssString },
+    bgc: { aliasOf: "backgroundColor" },
     backgroundPosition: { convert: utils.multiPositionToCssString },
     backgroundSize: { convert: utils.multiSizeToCssString },
     baselineShift: { convert: utils.singleLengthToCssString },
@@ -1375,6 +1386,7 @@ let styleProperties: { [K in keyof StylePropType]: StylePropertyInfo<StylePropTy
     borderWidth: { convert: borderWidthToCssString },
     bottom: { convert: utils.singleLengthToCssString },
     boxShadow: { convert: boxShadowToCssString },
+    shadow: { aliasOf: "boxShadow" },
 
     caretColor: { convert: utils.colorToCssString },
     clip: { convert: clipToCssString },
@@ -1385,6 +1397,7 @@ let styleProperties: { [K in keyof StylePropType]: StylePropertyInfo<StylePropTy
     columnRuleStyle: { convert: borderStyleToCssString },
     columnRuleWidth: { convert: borderWidthToCssString },
     columns: { convert: columnsToCssString },
+    cursorRaw: { standsFor: "cursor" },
 
     flex: { convert: flexToCssString },
     flexFlow: { convert: flexFlowToCssString },
@@ -1409,10 +1422,6 @@ let styleProperties: { [K in keyof StylePropType]: StylePropertyInfo<StylePropTy
     top: { convert: utils.singleLengthToCssString },
 
     width: { convert: utils.singleLengthToCssString },
-
-    // aliases
-    bgc: { aliasOf: "backgroundColor" },
-    shadow: { aliasOf: "boxShadow" },
 };
 
 
@@ -1427,16 +1436,10 @@ export function styleToCssString( style: StylePropType): string | null
         return null;
 
     let s = "";
-
     for( let propName in style)
     {
         if (style[propName])
-        {
-            if (s.length > 0)
-                s += ";";
-
-            s += stylePropToCssString( propName, style[propName]);
-        }
+            s += stylePropToCssString( propName, style[propName]) + ";";
     }
 
     return s;
@@ -1453,12 +1456,20 @@ export function stylePropToCssString( propName: string, propVal: StylePropType):
     if (!propName || propVal == null)
         return null;
 
+    // find information object for the property
     let info: StylePropertyInfo<any> = styleProperties[propName];
+
+    // go up the chain of aliases if any (we admittedly don't make the effort to detect circular
+    // dependencies, because setting up the information objects is our job and not developers').
     while( info && info.aliasOf)
     {
         propName = info.aliasOf;
         info = styleProperties[propName];
     }
+
+    // if this property stands for another, change the property name
+    if (info && info.standsFor)
+        propName = info.standsFor;
 
     let s = utils.camelToDash( propName) + ":";
 

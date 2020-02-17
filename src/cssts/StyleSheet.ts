@@ -1,5 +1,7 @@
 import * as cssts from "./cssts"
-import {Rule, TagRule, ClassRule} from "./Rules"
+import {Rule} from "./Rule"
+import {ClassRule} from "./ClassRule"
+import {IDRule} from "./IDRule"
 
 
 
@@ -82,6 +84,8 @@ class StyleSheet<T extends cssts.IStyleSheetDefinition> implements cssts.IStyleS
 
 			if (rule instanceof ClassRule)
 				this._classNames[ruleName] = rule.combinedName;
+			else if (rule instanceof IDRule)
+				this._idNames[ruleName] = rule.idName;
 		}
 	}
 

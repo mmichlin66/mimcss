@@ -4,7 +4,6 @@
 
 
 import {StylePropType, stylePropToCssString} from "../styles/styles";
-import {ISelector} from "./selector";
 
 
 /**
@@ -121,25 +120,37 @@ export type ExtendedRuleset =
 /**
  * The ITagRule interface represents a style rule that applies to elements identified by a tag name.
  */
-export interface ITagRule extends IStyleRule {}
+export interface ITagRule extends IStyleRule
+{
+	/** Only needed to distinguish from class and ID rules */
+	readonly isTagRule: boolean;
+}
 
 /**
  * The IClassRule interface represents a style rule that applies to elements identified by a class.
  */
-export interface IClassRule extends IStyleRule {}
+export interface IClassRule extends IStyleRule
+{
+	/** Only needed to distinguish from tag and ID rules */
+	readonly isClassRule: boolean;
+}
 
 /**
  * The IIDRule interface representsa a style rule that applies to elements identified by an ID.
  */
-export interface IIDRule extends IStyleRule {}
+export interface IIDRule extends IStyleRule
+{
+	/** Only needed to distinguish from tag and class rules */
+	readonly isIDRule: boolean;
+}
 
 /**
- * The SelectorRule type describes a ruleset that applies to elements identifies by the
+ * The ISelectorRule interface representsa a ruleset that applies to elements identifies by the
  * given selector.
  */
-export interface SelectorRule extends IStyleRule
+export interface ISelectorRule extends IStyleRule
 {
-	selector: ISelector;
+	readonly selector: ISelector;
 }
 
 /**
@@ -147,7 +158,7 @@ export interface SelectorRule extends IStyleRule
  */
 export interface IAnimationRule extends IRule
 {
-	keyframes: Keyframe[];
+	readonly keyframes: Keyframe[];
 }
 
 /**
@@ -230,13 +241,83 @@ export interface IStyleSheet<T>
 
 
 
+/**
+ * Represents a complete CSS selector that can be either used as is or can be combined with other selectors.
+ */
+export interface ISelector extends IAllowCompoundSelector
+{
+	readonly and: IEmptySelector;
+	readonly child: IEmptySelector;
+	readonly descendand: IEmptySelector;
+	readonly sibling: IEmptySelector;
+	readonly adjacent: IEmptySelector;
+
+	/** Returns a list of all rules participating in the selector. */
+	getRules(): (ITagRule | IClassRule | IIDRule)[];
+
+	/** Returns the string representation of the selector */
+	toSelectorString(): string;
+}
+
+
+
+/**
+ * Represents a starting point in the selector building process. This selector cannot be used as
+ * is because it doesn't contain any selection content yet.
+ */
+export interface IEmptySelector extends IAllowCompoundSelector
+{
+	readonly all: ISelector;
+	tag( tag: string | ITagRule): ISelector;
+	id( id: string | IIDRule): ISelector;
+}
+
+
+
+/**
+ * Represents a point in selector building, which allows class, attribute, pseudo-class and pseudo element selectors
+ */
+interface IAllowCompoundSelector
+{
+	class( cls: string | IClassRule): ISelector;
+	attr( attrName: string, op?: AttrSelectorOperation, value?: string, caseInsensitive?: boolean): ISelector;
+
+	// pseudo classes
+	readonly hover: ISelector;
+	nthChild( a: number | "odd" | "even", b?: number): ISelector;
+
+	// pseudo elements
+	readonly after: ISelector;
+}
+
+
+
+/**
+ * Represents possible operations for attribute selector
+ */
+export enum AttrSelectorOperation
+{
+	Match = "=",
+	Word = "~=",
+	SubCode = "|=",
+	StartsWith = "^=",
+	EndsWith = "$=",
+	Contains = "*=",
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Implementation of createStyleSheet
+// Implementation of StyleSheetDefinition and createStyleSheet
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-import {defineTag, defineClass, defineID, defineAnimation} from "./Rules"
-import {createStyleSheetImpl} from "./StyleSheet"
+import {defineTagRule} from "./TagRule";
+import {defineClassRule} from "./ClassRule";
+import {defineIDRule} from "./IDRule";
+import {defineSelectorRule} from "./SelectorRule";
+import {defineAnimationRule} from "./AnimationRule";
+import {createStyleSheetImpl} from "./StyleSheet";
 
 /**
  * The SheetDefinition class is a base class from which all style sheet definition classes must
@@ -244,24 +325,29 @@ import {createStyleSheetImpl} from "./StyleSheet"
  */
 export abstract class StyleSheetDefinition implements IStyleSheetDefinition
 {
-	protected defineTag( ruleset?: ExtendedRuleset, ...parents: IStyleRule[]): ITagRule
+	protected defineTagRule( ruleset?: ExtendedRuleset): ITagRule
 	{
-		return defineTag( this, ruleset, parents);
+		return defineTagRule( this, ruleset);
 	}
 
-	protected defineClass( ruleset?: ExtendedRuleset, ...parents: IStyleRule[]): IClassRule
+	protected defineClassRule( ruleset?: ExtendedRuleset): IClassRule
 	{
-		return defineClass( this, ruleset, parents);
+		return defineClassRule( this, ruleset);
 	}
 
-	protected defineID( ruleset?: ExtendedRuleset, ...parents: IStyleRule[]): IIDRule
+	protected defineIDRule( ruleset?: ExtendedRuleset): IIDRule
 	{
-		return defineID( this, ruleset, parents);
+		return defineIDRule( this, ruleset);
 	}
 
-	protected defineAnimation( ...keyframes: Keyframe[]): IAnimationRule
+	protected defineSelectorRule( selector: ISelector, ruleset?: ExtendedRuleset): ISelectorRule
 	{
-		return defineAnimation( this, keyframes);
+		return defineSelectorRule( this, selector, ruleset);
+	}
+
+	protected defineAnimationRule( ...keyframes: Keyframe[]): IAnimationRule
+	{
+		return defineAnimationRule( this, keyframes);
 	}
 
 	/**
@@ -282,12 +368,6 @@ export abstract class StyleSheetDefinition implements IStyleSheetDefinition
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Implementation of createStyleSheet
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Processes the given style sheet definition and returns the StyleSheet object that contains
@@ -310,6 +390,25 @@ export function generateName( sheetName: string, ruleName: string): string
 {
 	return `${sheetName}_${ruleName}`;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Implementation of createStyleSheet
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+import {Selector} from "./Selector";
+
+/**
+ * Creates an empty selector from which selector building process starts.
+ */
+export function createSelector(): IEmptySelector { return new Selector(); }
+
+/**
+ * Creates a selector build a selector.
+ */
+export function createRawSelector( raw: string): ISelector { return new Selector( raw); }
 
 
 
