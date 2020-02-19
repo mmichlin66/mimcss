@@ -1,4 +1,4 @@
-import {IStyleSheetDefinition, IStyleSheet, ClassNames, IDNames, AnimationNames, AllRules} from "./cssts"
+import {StyleSheetDefinition, IStyleSheet, ClassNames, IDNames, AnimationNames, AllRules} from "./cssts"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
@@ -12,7 +12,7 @@ import {AnimationRule} from "./AnimationRule"
  * which provides names of classes, IDs and keyframes defined in the class T, which must be
  * derived from the StyleSheetDefinition class.
  */
-class StyleSheet<T extends IStyleSheetDefinition> implements IStyleSheet<T>
+class StyleSheet<T extends StyleSheetDefinition> implements IStyleSheet<T>
 {
 	public constructor( ssDef: T)
 	{
@@ -159,7 +159,7 @@ class StyleSheet<T extends IStyleSheetDefinition> implements IStyleSheet<T>
  * names of IDs, classes and keyframes and allows style manipulations.
  * @param sheetDef 
  */
-export function createStyleSheetImpl<T extends IStyleSheetDefinition>( ssDef: T): IStyleSheet<T>
+export function createStyleSheetImpl<T extends StyleSheetDefinition>( ssDef: T): IStyleSheet<T>
 {
 	// check whether the style sheet definition object has already been processed
 	if (!ssDef.styleSheet)

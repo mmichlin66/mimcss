@@ -35,26 +35,6 @@ export function rulesetToCssString( ruleset: Ruleset, important: Set<string>): s
 
 
 /**
- * The IStyleSheetDefinition interface represent a style sheet definition. Developers never use
- * this interface directly; instead they derive their style sheet definitions from the base call
- * [[StyleSheetDefinition]].
- */
-export interface IStyleSheetDefinition
-{
-	/**
-	 * Processes the style sheet definition and creates a StyleSheet object, which is remembered
-	 * in the styleSheet property. This method can be called many times but it only creates a
-	 * single instance of the StyleSheet object.
-	 */
-	process(): IStyleSheet<IStyleSheetDefinition>;
-
-	/** Reference to the StyleSheet after the definition has been processed */
-	styleSheet?: IStyleSheet<IStyleSheetDefinition>;
-}
-
-
-
-/**
  * The IRule interface is a base interface that is implemented by all rules. Its only purpose is to
  * provide the reference to the style sheet definition that owns it.
  */
@@ -65,7 +45,7 @@ export interface IRule
 	 * in the styleSheet property. This method can be called many times but it only creates a
 	 * single instance of the StyleSheet object.
 	 */
-	owner: IStyleSheetDefinition;
+	owner: StyleSheetDefinition;
 }
 
 
@@ -170,15 +150,6 @@ export type Keyframe = { waypoint: "from" | "to" | number, style: ExtendedRulese
 
 
 
-// /**
-//  * The StyleSheetDef type defines a style sheet (that becomes a <style> element in HTML). Style
-//  * sheet definitions consist of rules that define classes, IDs, animations, selectors, media
-//  * conditions etc.
-//  */
-// export type StyleSheetDef = { [K: string]: ClassRule | IDRule | AnimationRule; };
-
-
-
 /**
  * Utility type that represents all properties of type T that are of type U
  */
@@ -228,10 +199,10 @@ export interface IStyleSheet<T>
 	/** Names of classes defined in the style sheet */
 	readonly classNames: ClassNames<T>;
 
-	/** Names of classes defined in the style sheet */
+	/** Names of element identifiers defined in the style sheet */
 	readonly idNames: IDNames<T>;
 
-	/** Names of keyframes defined in the style sheet */
+	/** Names of animations defined in the style sheet */
 	readonly animationNames: AnimationNames<T>;
 
 	/**
@@ -385,7 +356,7 @@ import {createStyleSheetImpl} from "./StyleSheet";
  * The SheetDefinition class is a base class from which all style sheet definition classes must
  * derive. It provides the methods for defining rules.
  */
-export abstract class StyleSheetDefinition implements IStyleSheetDefinition
+export abstract class StyleSheetDefinition
 {
 	protected defineTagRule( ruleset?: ExtendedRuleset): ITagRule
 	{
@@ -417,7 +388,7 @@ export abstract class StyleSheetDefinition implements IStyleSheetDefinition
 	 * in the styleSheet property. This method can be called many times but it only creates a
 	 * single instance of the StyleSheet object.
 	 */
-	public process(): IStyleSheet<IStyleSheetDefinition>
+	public process(): IStyleSheet<StyleSheetDefinition>
 	{
 		if (!this.styleSheet)
 			this.styleSheet = createStyleSheetImpl( this);
@@ -426,7 +397,7 @@ export abstract class StyleSheetDefinition implements IStyleSheetDefinition
 	}
 
 	/** Reference to the StyleSheet after the definition has been processed */
-	public styleSheet?: IStyleSheet<IStyleSheetDefinition>;
+	public styleSheet?: IStyleSheet<StyleSheetDefinition>;
 }
 
 
@@ -436,7 +407,7 @@ export abstract class StyleSheetDefinition implements IStyleSheetDefinition
  * names of IDs, classes and keyframes and allows style manipulations.
  * @param sheetDef 
  */
-export function createStyleSheet<T extends IStyleSheetDefinition>( sheetDef: T): IStyleSheet<T>
+export function createStyleSheet<T extends StyleSheetDefinition>( sheetDef: T): IStyleSheet<T>
 {
 	return createStyleSheetImpl( sheetDef) as IStyleSheet<T>;
 }
