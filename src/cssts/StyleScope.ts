@@ -1,8 +1,12 @@
-import {StyleSheetDefinition, IStyleSheet, ClassNames, IDNames, AnimationNames, AllRules} from "./cssts"
+import {ExtendedStyleset, IStyleScopeDefinitionClass, IStyleScope, ClassNames, IDNames, AnimationNames, AllRules,
+		IStyleRule, ITagRule, IClassRule, IIDRule, ISelectorRule, ISelector, IAnimationRule, Keyframe} from "./cssts"
 import {Rule} from "./Rule"
+import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
+import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
+import {GroupRule} from "./GroupRule"
 
 
 
@@ -12,18 +16,19 @@ import {AnimationRule} from "./AnimationRule"
  * which provides names of classes, IDs and keyframes defined in the class T, which must be
  * derived from the StyleSheetDefinition class.
  */
-class StyleSheet<T extends StyleSheetDefinition> implements IStyleSheet<T>
+class StyleScope<T> extends GroupRule implements IStyleScope<T>
 {
-	public constructor( ssDef: T)
+	public constructor( styleScopeClass: IStyleScopeDefinitionClass<T>)
 	{
-		this.ssDef = ssDef;
+		// style scope doesn't have owner
+		super( null);
+
+		this.ssDefClass = styleScopeClass;
 
 		this._classNames = {};
 		this._idNames = {};
 		this._animationNames = {};
 		this._rules = {};
-
-		this.process();
 	}
 
 
@@ -69,14 +74,29 @@ class StyleSheet<T extends StyleSheetDefinition> implements IStyleSheet<T>
 
 
 
-	// Parses the style sheet definition and creates names for classes, IDs, keyframes.
-	public process()
+	// Creates the style scope definition instance, parses its properties and creates names for
+	// classes, IDs, animations.
+	public process(): void
 	{
-		this.name = this.ssDef.constructor.name;
+		// check whether this object was already processed
+		if (this.name)
+			return;
 
-		for( let ruleName in this.ssDef)
+		this.name = this.ssDefClass.name;
+
+		// set the global reference to this scope, so that defineXXX functions called during
+		// the definition class instantiation will know which scope to use.
+		let prevStyleScope = g_CurrentStyleScope;
+		g_CurrentStyleScope = this;
+
+		try
 		{
-			let rule = this.ssDef[ruleName];
+		// create instance of the style scope class
+		let ssDef = new this.ssDefClass();
+
+		for( let ruleName in ssDef)
+		{
+			let rule = ssDef[ruleName];
 			if (!(rule instanceof Rule))
 				continue;
 
@@ -90,6 +110,14 @@ class StyleSheet<T extends StyleSheetDefinition> implements IStyleSheet<T>
 			else if (rule instanceof AnimationRule)
 				this._animationNames[ruleName] = rule.animationName;
 		}
+		}
+		catch( err)
+		{
+			console.error( `Error instantiating Style Scope Definition of type '${this.ssDefClass.name}'`);
+		}
+
+		// revert to the previous scope
+		g_CurrentStyleScope = prevStyleScope;
 	}
 
 
@@ -99,6 +127,9 @@ class StyleSheet<T extends StyleSheetDefinition> implements IStyleSheet<T>
 	{
 		if (this.domSS)
 			return;
+
+		// make sure this object is processed
+		this.process();
 
 		// create <style> element and insert it into <head>
 		this.styleElm = document.createElement( "style");
@@ -127,9 +158,9 @@ class StyleSheet<T extends StyleSheetDefinition> implements IStyleSheet<T>
 
 
 
-	// Reference to the style sheet definition, which we processed. This object will contain all
-	// the rulsets belonging to this style sheet.
-	private ssDef: T;
+	// Reference to the style sheet definition class. We will instantiate it within the process
+	// method.
+	private ssDefClass: IStyleScopeDefinitionClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
@@ -154,18 +185,57 @@ class StyleSheet<T extends StyleSheetDefinition> implements IStyleSheet<T>
 
 
 
+let g_CurrentStyleScope: StyleScope<any> = null;
+
 /**
  * Processes the given style sheet definition and returns the StyleSheet object that contains
  * names of IDs, classes and keyframes and allows style manipulations.
  * @param sheetDef 
  */
-export function createStyleSheetImpl<T extends StyleSheetDefinition>( ssDef: T): IStyleSheet<T>
+export function createStyleScope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
 {
-	// check whether the style sheet definition object has already been processed
-	if (!ssDef.styleSheet)
-		ssDef.styleSheet = new StyleSheet<T>( ssDef);
+	// check whether the style sheet definition object has already been processed. This is
+	// indicated by the existence of the instance static property on the class.
+	let styleScope = styleScopeDefinitionClass.styleScope as StyleScope<T>;
+	if (!styleScope)
+	{
+		styleScope = new StyleScope( styleScopeDefinitionClass);
+		styleScopeDefinitionClass.styleScope = styleScope;
+	}
 
-	return ssDef.styleSheet as IStyleSheet<T>;
+	return styleScope;
+}
+
+
+
+/** Creates new TagRule object  */
+export function defineTagRule( styleset: ExtendedStyleset): ITagRule
+{
+	return new TagRule( g_CurrentStyleScope, styleset);
+}
+
+/** Returns new ClassRule object  */
+export function defineClassRule( styleset: ExtendedStyleset): IClassRule
+{
+	return new ClassRule( g_CurrentStyleScope, styleset);
+}
+
+/** Returns new IDRule object  */
+export function defineIDRule( styleset: ExtendedStyleset): IIDRule
+{
+	return new IDRule( g_CurrentStyleScope, styleset);
+}
+
+/** Creates new SelectorRule object  */
+export function defineSelectorRule( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
+{
+	return new SelectorRule( g_CurrentStyleScope, selector, styleset);
+}
+
+/** Returns new AnimationRule object  */
+export function defineAnimationRule( ...keyframes: Keyframe[]): IAnimationRule
+{
+	return new AnimationRule( g_CurrentStyleScope, keyframes);
 }
 
 

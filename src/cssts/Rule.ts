@@ -1,4 +1,4 @@
-import {IRule, StyleSheetDefinition} from "./cssts"
+import {IRule, IStyleScope} from "./cssts"
 
 
 
@@ -7,13 +7,13 @@ import {IRule, StyleSheetDefinition} from "./cssts"
  */
 export abstract class Rule implements IRule
 {
-	public constructor( owner: StyleSheetDefinition)
+	public constructor( owner: IStyleScope)
 	{
 		this.owner = owner;
 	}
 
 	// Style sheet definition to which this rule belongs.
-	public owner: StyleSheetDefinition;
+	public owner: IStyleScope;
 
 	// Processes the rule.
 	public abstract process( styleSheetName: string, ruleName: string): void;

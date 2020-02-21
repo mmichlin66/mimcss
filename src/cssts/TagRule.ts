@@ -1,16 +1,17 @@
-import {ITagRule, StyleSheetDefinition, ExtendedRuleset, rulesetToCssString} from "./cssts"
+import {ITagRule, IStyleScope, ExtendedStyleset} from "./cssts"
+import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 
 
 
 /**
- * The TagRule type describes a ruleset that applies to elements identified by a tag name.
+ * The TagRule type describes a styleset that applies to elements identified by a tag name.
  */
 export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( owner: StyleSheetDefinition, ruleset: ExtendedRuleset)
+	public constructor( owner: IStyleScope, styleset: ExtendedStyleset)
 	{
-		super( owner, ruleset);
+		super( owner, styleset);
 	}
 
 
@@ -24,9 +25,9 @@ export class TagRule extends StyleRule implements ITagRule
 
 		// go through all parents; for those who are classes, add their name to the
 		// combined name. For those who are not classes, copy style properties to the
-		// class's own ruleset.
+		// class's own styleset.
 		for( let parent of this.parents)
-			Object.assign( this.ruleset, parent.ruleset);
+			Object.assign( this.styleset, parent.styleset);
 	}
 
 
@@ -34,7 +35,7 @@ export class TagRule extends StyleRule implements ITagRule
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `${this.tagName} ${rulesetToCssString( this.ruleset, this.important)}`;
+		return `${this.tagName} ${stylesetToCssString( this.styleset, this.important)}`;
 	}
 
 
@@ -42,16 +43,8 @@ export class TagRule extends StyleRule implements ITagRule
 	/** Only needed to distinguish from other rules */
 	public readonly isTagRule: boolean = true;
 
-	// Name of the tag to which the ruleset applies.
+	// Name of the tag to which the styleset applies.
 	public tagName: string;
-}
-
-
-
-/** Returns new ClassRule object as belonging to the given style sheet definition  */
-export function defineTagRule( ssDef: StyleSheetDefinition, ruleset: ExtendedRuleset): ITagRule
-{
-	return new TagRule( ssDef, ruleset);
 }
 
 

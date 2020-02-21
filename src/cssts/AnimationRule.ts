@@ -1,16 +1,17 @@
-import {IAnimationRule, Keyframe, StyleSheetDefinition, generateName, rulesetToCssString} from "./cssts"
-import * as utils from "../styles/utils"
+import {IAnimationRule, Keyframe, IStyleScope, generateName} from "./cssts"
+import {stylesetToCssString} from "../styles/styles"
+import {percentToCssString} from "../styles/utils"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
 
 
 
 /**
- * The TagRule type describes a ruleset that applies to elements identified by a tag name.
+ * The TagRule type describes a styleset that applies to elements identified by a tag name.
  */
 export class AnimationRule extends Rule implements IAnimationRule
 {
-	public constructor( owner: StyleSheetDefinition, keyframes: Keyframe[])
+	public constructor( owner: IStyleScope, keyframes: Keyframe[])
 	{
 		super( owner);
 
@@ -55,7 +56,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 class KeyframeRule extends StyleRule
 {
-	public constructor( owner: StyleSheetDefinition, keyframe: Keyframe)
+	public constructor( owner: IStyleScope, keyframe: Keyframe)
 	{
 		super( owner, keyframe.style);
 
@@ -72,7 +73,7 @@ class KeyframeRule extends StyleRule
 		else if (Number.isInteger( waypoint))
 			return waypoint + "%";
 		else
-			return utils.percentToCssString( waypoint);
+			return percentToCssString( waypoint);
 	}
 
 
@@ -80,21 +81,13 @@ class KeyframeRule extends StyleRule
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `${this.waypointString} ${rulesetToCssString( this.ruleset, this.important)}`;
+		return `${this.waypointString} ${stylesetToCssString( this.styleset, this.important)}`;
 	}
 
 
 
 	/** Only needed to distinguish from class and ID rules */
 	public readonly waypointString: string;
-}
-
-
-
-/** Returns new AnimationRule object as belonging to the given style sheet definition  */
-export function defineAnimationRule( ssDef: StyleSheetDefinition, keyframes: Keyframe[]): IAnimationRule
-{
-	return new AnimationRule( ssDef, keyframes);
 }
 
 

@@ -1,18 +1,20 @@
-import {ISelectorRule, StyleSheetDefinition, ISelector, ExtendedRuleset, rulesetToCssString} from "./cssts"
+import {ISelectorRule, IStyleScope, ISelector, ExtendedStyleset} from "./cssts"
+import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule"
+import {Selector} from "./Selector";
 
 
 
 /**
- * The SelectorRule type describes a ruleset that applies to elements identified by a class.
+ * The SelectorRule type describes a styleset that applies to elements identified by a class.
  */
 export class SelectorRule extends StyleRule implements ISelectorRule
 {
-	public constructor( owner: StyleSheetDefinition, selector: ISelector, ruleset: ExtendedRuleset)
+	public constructor( owner: IStyleScope, selector: ISelector | string, styleset: ExtendedStyleset)
 	{
-		super( owner, ruleset);
+		super( owner, styleset);
 
-		this.selector = selector;
+		this.selector = typeof selector === "string" ? new Selector( selector) : selector;
 	}
 
 
@@ -32,7 +34,7 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 		}
 
 		for( let parent of this.parents)
-			Object.assign( this.ruleset, parent.ruleset);
+			Object.assign( this.styleset, parent.styleset);
 	}
 
 
@@ -40,7 +42,7 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `${this.selector.toCssString()} ${rulesetToCssString( this.ruleset, this.important)}`;
+		return `${this.selector.toCssString()} ${stylesetToCssString( this.styleset, this.important)}`;
 	}
 
 
@@ -50,15 +52,6 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 
 	// selector object for this rule.
 	public readonly selector: ISelector;
-}
-
-
-
-/** Returns new ClassRule object as belonging to the given style sheet definition  */
-export function defineSelectorRule( ssDef: StyleSheetDefinition, selector: ISelector,
-				ruleset: ExtendedRuleset): ISelectorRule
-{
-	return new SelectorRule( ssDef, selector, ruleset);
 }
 
 

@@ -854,10 +854,9 @@ export type StyleType = string | utils.Base_StyleType;
 
 
 /**
- * Interface representing the type of objects that can be assigned to the style property of HTML
- * and SVG elements.
+ * Interface representing a collection of style properties and their values.
  */
-export interface StylePropType
+export interface Styleset
 {
     alignContent?: AlignContentStyleType;
     alignItems?: AlignItemsStyleType;
@@ -1327,7 +1326,7 @@ type StylePropertyInfo<T> = PropToStringFunc<T> |
          * Indicates the property that our property is alias for. This is used for shortening
          * frequently used but long property names (e.g. backgroundColor) and for prefixed properties.
          */
-        aliasOf?: keyof StylePropType;
+        aliasOf?: keyof Styleset;
 
         /**
          * Indicates the actual name of property for which our property provides value. This used for
@@ -1341,7 +1340,7 @@ type StylePropertyInfo<T> = PropToStringFunc<T> |
          * cursorRaw property in their code, but to the DOM the standard cursor property will be
          * passed.
          */
-        standsFor?: keyof StylePropType;
+        standsFor?: keyof Styleset;
 
         /**
          * Converts from property-specific type representation to string.
@@ -1355,7 +1354,7 @@ type StylePropertyInfo<T> = PropToStringFunc<T> |
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in keyof StylePropType]: StylePropertyInfo<StylePropType[K]> } =
+const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]> } =
 {
     animation: animationToCssString,
     animationDelay: utils.multiTimeToCssString,
@@ -1435,23 +1434,21 @@ const StylePropertyInfos: { [K in keyof StylePropType]: StylePropertyInfo<StyleP
 
 
 
-/**
- * Converts the given style object to the CSS style string
- * @param style 
- */
-export function styleToCssString( style: StylePropType): string | null
+/** Converts the given styleset to its string representation */
+export function stylesetToCssString( styleset: Styleset, important?: Set<string>): string
 {
-    if (!style)
-        return null;
-
     let s = "";
-    for( let propName in style)
-    {
-        if (style[propName])
-            s += stylePropToCssString( propName, style[propName]) + ";";
-    }
+	for( let propName in styleset)
+	{
+		// get property value and get its string representation
+		let propVal = styleset[propName];
+		s += stylePropToCssString( propName, propVal);
 
-    return s;
+		// check whether this property is important
+		s += (important && important.has( propName) ? " !important;" : ";");
+	}
+
+    return `{${s}}`;
 }
 
 
@@ -1460,10 +1457,10 @@ export function styleToCssString( style: StylePropType): string | null
  * Converts the given style property to the CSS style string
  * @param style 
  */
-export function stylePropToCssString( propName: string, propVal: StylePropType): string | null
+export function stylePropToCssString( propName: string, propVal: Styleset): string
 {
     if (!propName || propVal == null)
-        return null;
+        return "";
 
     // find information object for the property
     let info = StylePropertyInfos[propName];

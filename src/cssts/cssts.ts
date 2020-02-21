@@ -3,49 +3,39 @@
  */
 
 
-import {StylePropType, stylePropToCssString} from "../styles/styles";
+import {Styleset} from "../styles/styles";
 
 
 /**
- * The StylePropBlock type defines a block of style properties and allows specifying the
- * "!important" modifier for individual properties.
+ * The ExtendedStyleset styleset type extends the Ruleset type with certain properties that provide
+ * additional meaning to the styleset:
+ * - The `$inherits` property specifies one or more parent style rules. This allows specifying
+ *   parent rules using a convenient style-property-like notation. Parents can also be specified
+ *   without a styleset.
+ * - The `$important` property specifies one or more names of styleset properties that shuld be
+ *   considered "important". When the rule is inserted into DOM, the "!important" attribute is
+ *   added to the property value.
  */
-export type Ruleset = { [K in keyof StylePropType]?: StylePropType[K] };
+export type ExtendedStyleset =
+	(Styleset &
+		{
+			$inherits?: IStyleRule | IStyleRule[],
+			$important?: string | string[],
+		}
+	) | IStyleRule | IStyleRule[];
 
 
-
-/** Converts the given ruleset to its string representation */
-export function rulesetToCssString( ruleset: Ruleset, important: Set<string>): string
-{
-    let s = "";
-	for( let propName in ruleset)
-	{
-		// get property value and get its string representation
-		let propVal = ruleset[propName];
-		s += stylePropToCssString( propName, propVal);
-
-		// check whether this property is important
-		if (important.has( propName))
-			s += (important.has( propName) ? " !important;" : ";");
-	}
-
-    return `{${s}}`;
-}
 
 
 
 /**
  * The IRule interface is a base interface that is implemented by all rules. Its only purpose is to
- * provide the reference to the style sheet definition that owns it.
+ * provide the reference to the style scope that owns it.
  */
 export interface IRule
 {
-	/**
-	 * Processes the style sheet definition and creates a StyleSheet object, which is remembered
-	 * in the styleSheet property. This method can be called many times but it only creates a
-	 * single instance of the StyleSheet object.
-	 */
-	owner: StyleSheetDefinition;
+	/** Refrence to the Style Scope object that contains this rule. */
+	owner: IStyleScope;
 }
 
 
@@ -53,8 +43,8 @@ export interface IRule
 /**
  * The IStyleRule interface represents a styling rule in a style sheet. Style rules can be used
  * anywhere where style properties can be defined: class rules, ID rules, selector rules,
- * keyframes, etc. StyleRule defines a ruleset and can optionally point to one or more style rules
- * from which it inherits. A ruleset combines all the properties from its own property block as
+ * keyframes, etc. StyleRule defines a styleset and can optionally point to one or more style rules
+ * from which it inherits. A styleset combines all the properties from its own property block as
  * well as from all of style rules it inherites from.
  * 
  * Note that although the meaning of style rules inheritance is always the same (application of all
@@ -66,34 +56,14 @@ export interface IRule
 export interface IStyleRule extends IRule
 {
 	/**Ruleset that defines property names and values */
-	ruleset: Ruleset;
+	styleset: Styleset;
 
 	/** List of style rules from which this rule should inherit */
 	parents: IStyleRule[];
 
-	/** Set of property names from this ruleset that should be !important */
+	/** Set of property names from this styleset that should be !important */
 	important: Set<string>;
 }
-
-
-
-/**
- * The ExtendedRuleset ruleset type extends the Ruleset type with certain properties that provide
- * additional meaning to the ruleset:
- * - The `$inherits` property specifies one or more parent style rules. This allows specifying
- *   parent rules using a convenient style-property-like notation. Parents can also be specified
- *   without a ruleset.
- * - The `$important` property specifies one or more names of ruleset properties that shuld be
- *   considered "important". When the rule is inserted into DOM, the "!important" attribute is
- *   added to the property value.
- */
-export type ExtendedRuleset =
-	(Ruleset &
-		{
-			$inherits?: IStyleRule | IStyleRule[],
-			$important?: string | string[],
-		}
-	) | IStyleRule | IStyleRule[];
 
 
 
@@ -125,7 +95,7 @@ export interface IIDRule extends IStyleRule
 }
 
 /**
- * The ISelectorRule interface representsa a ruleset that applies to elements identifies by the
+ * The ISelectorRule interface representsa a styleset that applies to elements identifies by the
  * given selector.
  */
 export interface ISelectorRule extends IStyleRule
@@ -146,7 +116,16 @@ export interface IAnimationRule extends IRule
 /**
  * The Keyframe type defines a single keyframe within a @keyframe rule.
  */
-export type Keyframe = { waypoint: "from" | "to" | number, style: ExtendedRuleset }
+export type Keyframe = { waypoint: "from" | "to" | number, style: ExtendedStyleset }
+
+// /**
+//  * The IGroupRule interface represents a rule that can have other rules nested within it.
+//  */
+// export interface IGroupRule extends IRule
+// {
+// 	/** Array of nested rules */
+// 	readonly subRules: IRule[];
+// }
 
 
 
@@ -192,9 +171,9 @@ export type AllRules<T> = { [K in PropNamesOfType<T,IRule>]: T[K] };
  * The StyleSheet type defines the resultant style sheet after the style sheet definition has been
  * processed. The style sheet object contains names of IDs, classes and keyframes, which can be
  * used in the application code. The interface also provides methods that are used to manipulate
- * the style sheet and its rulesets.
+ * the style sheet and its stylesets.
  */
-export interface IStyleSheet<T>
+export interface IStyleScope<T = any>
 {
 	/** Names of classes defined in the style sheet */
 	readonly classNames: ClassNames<T>;
@@ -210,6 +189,22 @@ export interface IStyleSheet<T>
 	 * creating an actual style sheet.
 	 */
 	readonly rules: AllRules<T>;
+
+	/** Processes this rule */
+	process(): void;
+}
+
+
+
+/**
+ * "Constructor" interface defining how style scope definition classes can be created.
+ */
+export interface IStyleScopeDefinitionClass<T>
+{
+	new(): T;
+
+	/** Singleton instance of the Style Scope class created from this definition */
+	styleScope?: IStyleScope<T>;
 }
 
 
@@ -340,77 +335,12 @@ export enum AttrSelectorOperation
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Implementation of StyleSheetDefinition and createStyleSheet
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-import {defineTagRule} from "./TagRule";
-import {defineClassRule} from "./ClassRule";
-import {defineIDRule} from "./IDRule";
-import {defineSelectorRule} from "./SelectorRule";
-import {defineAnimationRule} from "./AnimationRule";
-import {createStyleSheetImpl} from "./StyleSheet";
-
-/**
- * The SheetDefinition class is a base class from which all style sheet definition classes must
- * derive. It provides the methods for defining rules.
- */
-export abstract class StyleSheetDefinition
-{
-	protected defineTagRule( ruleset?: ExtendedRuleset): ITagRule
-	{
-		return defineTagRule( this, ruleset);
-	}
-
-	protected defineClassRule( ruleset?: ExtendedRuleset): IClassRule
-	{
-		return defineClassRule( this, ruleset);
-	}
-
-	protected defineIDRule( ruleset?: ExtendedRuleset): IIDRule
-	{
-		return defineIDRule( this, ruleset);
-	}
-
-	protected defineSelectorRule( selector: ISelector, ruleset?: ExtendedRuleset): ISelectorRule
-	{
-		return defineSelectorRule( this, selector, ruleset);
-	}
-
-	protected defineAnimationRule( ...keyframes: Keyframe[]): IAnimationRule
-	{
-		return defineAnimationRule( this, keyframes);
-	}
-
-	/**
-	 * Processes the style sheet definition and creates a StyleSheet object, which is remembered
-	 * in the styleSheet property. This method can be called many times but it only creates a
-	 * single instance of the StyleSheet object.
-	 */
-	public process(): IStyleSheet<StyleSheetDefinition>
-	{
-		if (!this.styleSheet)
-			this.styleSheet = createStyleSheetImpl( this);
-
-		return this.styleSheet;
-	}
-
-	/** Reference to the StyleSheet after the definition has been processed */
-	public styleSheet?: IStyleSheet<StyleSheetDefinition>;
-}
-
-
-
-/**
- * Processes the given style sheet definition and returns the StyleSheet object that contains
- * names of IDs, classes and keyframes and allows style manipulations.
- * @param sheetDef 
- */
-export function createStyleSheet<T extends StyleSheetDefinition>( sheetDef: T): IStyleSheet<T>
-{
-	return createStyleSheetImpl( sheetDef) as IStyleSheet<T>;
-}
+export {defineTagRule} from "./StyleScope";
+export {defineClassRule} from "./StyleScope";
+export {defineIDRule} from "./StyleScope";
+export {defineSelectorRule} from "./StyleScope";
+export {defineAnimationRule} from "./StyleScope";
+export {createStyleScope} from "./StyleScope";
 
 
 
@@ -428,7 +358,7 @@ export function generateName( sheetName: string, ruleName: string): string
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Implementation of createStyleSheet
+// Implementation of createSelector
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 import {Selector} from "./Selector";
@@ -437,11 +367,6 @@ import {Selector} from "./Selector";
  * Creates an empty selector from which selector building process starts.
  */
 export function createSelector(): IEmptySelector { return new Selector(); }
-
-/**
- * Creates a selector build a selector.
- */
-export function createRawSelector( raw: string): ISelector { return new Selector( raw); }
 
 
 
