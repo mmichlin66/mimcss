@@ -1,4 +1,5 @@
-﻿import {ISelector, IEmptySelector, AttrSelectorOperation, ITagRule, IClassRule, IIDRule} from "./cssts"
+﻿import {ISelector, IEmptySelector, AttrSelectorOperation, AttrSelectorOperationType, ITagRule, IClassRule, IIDRule} from "./cssts"
+import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
 
@@ -42,7 +43,8 @@ export class Selector implements IEmptySelector, ISelector
 		this.buf.push( typeof id === "string" ? "." + id : id);
 		return this;
 	}
-	public attr( attrName: string, op?: AttrSelectorOperation, value?: string, caseInsensitive?: boolean): ISelector
+	public attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType,
+					value?: string, caseInsensitive?: boolean): ISelector
 	{
 		let s = "[" + attrName;
 		if (op)
@@ -149,7 +151,9 @@ export class Selector implements IEmptySelector, ISelector
 		let s = "";
 		for( let token of this.buf)
 		{
-			if (token instanceof ClassRule)
+			if (token instanceof TagRule)
+				s += token.tagName;
+			else if (token instanceof ClassRule)
 				s += token.combinedSelectorName;
 			else if (token instanceof IDRule)
 				s += "#" + token.idName;

@@ -1,5 +1,6 @@
-import {ExtendedStyleset, IStyleScopeDefinitionClass, IStyleScope, ClassNames, IDNames, AnimationNames, AllRules,
-		IStyleRule, ITagRule, IClassRule, IIDRule, ISelectorRule, ISelector, IAnimationRule, Keyframe} from "./cssts"
+import {ExtendedStyleset, IStyleScopeDefinitionClass, IStyleScope, ClassNames, IDNames, AnimationNames,
+		IRule, IStyleRule, ITagRule, IClassRule, IIDRule, ISelectorRule, ISelector, IAnimationRule,
+		Keyframe, PropsOfType} from "./cssts"
 import {Rule} from "./Rule"
 import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
@@ -28,49 +29,46 @@ class StyleScope<T> extends GroupRule implements IStyleScope<T>
 		this._classNames = {};
 		this._idNames = {};
 		this._animationNames = {};
-		this._rules = {};
+		this._allRules = {};
+		this._styleRules = {};
+		this._tagRules = {};
+		this._classRules = {};
+		this._idRules = {};
+		this._selectorRules = {};
+		this._animationRules = {};
 	}
 
 
 
 	/** Names of classes defined in the style sheet */
-	public get classNames(): ClassNames<T>
-	{
-		if (!this.domSS)
-			this.activate();
-
-		return this._classNames as ClassNames<T>
-	}
+	public get classNames(): ClassNames<T> { this.activate(); return this._classNames as ClassNames<T> }
 
 	/** Names of classes defined in the style sheet */
-	public get idNames(): IDNames<T>
-	{
-		if (!this.domSS)
-			this.activate();
-
-		return this._idNames as IDNames<T>;
-	}
+	public get idNames(): IDNames<T> { this.activate(); return this._idNames as IDNames<T>; }
 
 	/** Names of keyframes defined in the style sheet */
-	public get animationNames(): AnimationNames<T>
-	{
-		if (!this.domSS)
-			this.activate();
+	public get animationNames(): AnimationNames<T> { this.activate(); return this._animationNames as AnimationNames<T>; }
 
-		return this._animationNames as AnimationNames<T>;
-	}
+	/** Map of all rules. */
+	public get allRules(): PropsOfType<T,IRule> { this.activate(); return this._allRules as any as Extract<T,IRule>; }
 
-	/**
-	 * Map of names of properties of the style definition to the Rule objects. This is used when
-	 * creating an actual style sheet.
-	 */
-	public get rules(): AllRules<T>
-	{
-		if (!this.domSS)
-			this.activate();
+	/** Map of all style (tag, class, ID and selector) rules. */
+	public get styleRules(): PropsOfType<T,IStyleRule> { this.activate(); return this._styleRules as any as Extract<T,IStyleRule>; }
 
-		return this._rules as AllRules<T>
-	}
+	/** Map of all tag rules. */
+	public get tagRules(): PropsOfType<T,ITagRule> { this.activate(); return this._tagRules as any as Extract<T,ITagRule>; }
+
+	/** Map of all class rules. */
+	public get classRules(): PropsOfType<T,IClassRule> { this.activate(); return this._classRules as any as PropsOfType<T,IClassRule>; }
+
+	/** Map of all ID rules. */
+	public get idRules(): PropsOfType<T,IIDRule> { this.activate(); return this._idRules as any as Extract<T,IIDRule>; }
+
+	/** Map of all selector rules. */
+	public get selectorRules(): PropsOfType<T,ISelectorRule> { this.activate(); return this._selectorRules as any as Extract<T,ISelectorRule>; }
+
+	/** Map of all animation rules. */
+	public get animationRules(): PropsOfType<T,IAnimationRule> { this.activate(); return this._animationRules as any as Extract<T,IAnimationRule>; }
 
 
 
@@ -91,25 +89,45 @@ class StyleScope<T> extends GroupRule implements IStyleScope<T>
 
 		try
 		{
-		// create instance of the style scope class
-		let ssDef = new this.ssDefClass();
+			// create instance of the style scope class
+			let ssDef = new this.ssDefClass();
 
-		for( let ruleName in ssDef)
-		{
-			let rule = ssDef[ruleName];
-			if (!(rule instanceof Rule))
-				continue;
+			for( let ruleName in ssDef)
+			{
+				let rule = ssDef[ruleName];
+				if (!(rule instanceof Rule))
+					continue;
 
-			rule.process( this.name, ruleName);
-			this._rules[ruleName] = rule;
+				rule.process( this.name, ruleName);
+				this._allRules[ruleName] = rule;
 
-			if (rule instanceof ClassRule)
-				this._classNames[ruleName] = rule.combinedName;
-			else if (rule instanceof IDRule)
-				this._idNames[ruleName] = rule.idName;
-			else if (rule instanceof AnimationRule)
-				this._animationNames[ruleName] = rule.animationName;
-		}
+				if (rule instanceof TagRule)
+				{
+					this._styleRules[ruleName] = rule;
+					this._tagRules[ruleName] = rule;
+				}
+				else if (rule instanceof ClassRule)
+				{
+					this._styleRules[ruleName] = rule;
+					this._classRules[ruleName] = rule;
+					this._classNames[ruleName] = rule.combinedName;
+				}
+				else if (rule instanceof IDRule)
+				{
+					this._styleRules[ruleName] = rule;
+					this._idRules[ruleName] = rule;
+					this._idNames[ruleName] = rule.idName;
+				}
+				else if (rule instanceof SelectorRule)
+				{
+					this._styleRules[ruleName] = rule;
+					this._selectorRules[ruleName] = rule;
+				}
+				else if (rule instanceof AnimationRule)
+				{
+					this._animationNames[ruleName] = rule.animationName;
+				}
+			}
 		}
 		catch( err)
 		{
@@ -139,8 +157,8 @@ class StyleScope<T> extends GroupRule implements IStyleScope<T>
 		this.domSS = this.styleElm.sheet as CSSStyleSheet;
 
 		// go over the rules, convert them to strings and insert them into the style sheet
-		for( let ruleName in this._rules)
-			this.domSS.insertRule( this._rules[ruleName].toCssString());
+		for( let ruleName in this._allRules)
+			this.domSS.insertRule( this._allRules[ruleName].toCssString());
 	}
 
 
@@ -158,7 +176,7 @@ class StyleScope<T> extends GroupRule implements IStyleScope<T>
 
 
 
-	// Reference to the style sheet definition class. We will instantiate it within the process
+	// Reference to the style scope definition class. We instantiate it within the process
 	// method.
 	private ssDefClass: IStyleScopeDefinitionClass<T>;
 
@@ -174,7 +192,13 @@ class StyleScope<T> extends GroupRule implements IStyleScope<T>
 
 	// Map of names of properties of the style definition to the Rule objects. This is used when
 	// creating an actual style sheet.
-	private readonly _rules: { [K: string]: Rule }
+	private readonly _allRules: { [K: string]: Rule }
+	private readonly _styleRules: { [K: string]: Rule }
+	private readonly _tagRules: { [K: string]: Rule }
+	private readonly _classRules: { [K: string]: Rule }
+	private readonly _idRules: { [K: string]: Rule }
+	private readonly _selectorRules: { [K: string]: Rule }
+	private readonly _animationRules: { [K: string]: Rule }
 
 	// Style element DOM object. Is defined only when the object is activated.
 	private styleElm?: HTMLStyleElement;

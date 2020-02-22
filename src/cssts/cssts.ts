@@ -129,66 +129,87 @@ export type Keyframe = { waypoint: "from" | "to" | number, style: ExtendedStyles
 
 
 
-/**
- * Utility type that represents all properties of type T that are of type U
- */
-type PropsOfType<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
+/** Utility type that represents all properties of type T that are of type U */
+type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
 
-/**
- * Utility type that represents names of all properties of type T that are of type U
- */
-type PropNamesOfType<T,U> = PropsOfType<T,U>[keyof T];
+/** Utility type that represents names of all properties of type T that are of type U */
+type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
 
-/**
- * Utility type that represents string values mapped to names of properties of type T that are
- * of type U.
- */
+/** Utility type that represents string values mapped to names of properties of type T that are of type U. */
 type NamesOfPropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: string };
 
-/**
- * Type that represents names of all properties of type T that are class rules
- */
+/** Type that represents all properties of type T that are of type U */
+export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
+
+/** Type that represents names of all properties of type T that are class rules */
 export type ClassNames<T> = NamesOfPropsOfType<T,IClassRule>;
 
-/**
- * Type that represents names of all properties of type T that are class rules
- */
+/** Type that represents names of all properties of type T that are class rules */
 export type IDNames<T> = NamesOfPropsOfType<T,IIDRule>;
 
-/**
- * Type that represents names of all properties of type T that are keyframe rules
- */
+/** Type that represents names of all properties of type T that are keyframe rules */
 export type AnimationNames<T> = NamesOfPropsOfType<T,IAnimationRule>;
 
-/**
- * Type that represents all properties of type T that are rules
- */
-export type AllRules<T> = { [K in PropNamesOfType<T,IRule>]: T[K] };
+// /** Type that represents all properties of type T that are rules */
+// export type AllRules<T> = { [K in PropNamesOfType<T,IRule>]: T[K] };
+
+// /** Type that represents all properties of type T that are style (tag, class, ID and selector) rules */
+// export type StyleRules<T> = { [K in PropNamesOfType<T,IStyleRule>]: T[K] };
+
+// /** Type that represents all properties of type T that are tag rules */
+// export type TagRules<T> = { [K in PropNamesOfType<T,ITagRule>]: T[K] };
+
+// /** Type that represents all properties of type T that are class rules */
+// export type ClassRules<T> = { [K in PropNamesOfType<T,IClassRule>]: T[K] };
+
+// /** Type that represents all properties of type T that are ID rules */
+// export type IDRules<T> = { [K in PropNamesOfType<T,IIDRule>]: T[K] };
+
+// /** Type that represents all properties of type T that are selector rules */
+// export type SelectorRules<T> = { [K in PropNamesOfType<T,ISelectorRule>]: T[K] };
+
+// /** Type that represents all properties of type T that are animation rules */
+// export type AnimationRules<T> = { [K in PropNamesOfType<T,IAnimationRule>]: T[K] };
 
 
 
 /**
- * The StyleSheet type defines the resultant style sheet after the style sheet definition has been
- * processed. The style sheet object contains names of IDs, classes and keyframes, which can be
+ * The StyleScope type defines the resultant style scope after the style scope definition has been
+ * processed. The style scope object contains names of IDs, classes and keyframes, which can be
  * used in the application code. The interface also provides methods that are used to manipulate
- * the style sheet and its stylesets.
+ * the rules and their stylesets.
  */
 export interface IStyleScope<T = any>
 {
-	/** Names of classes defined in the style sheet */
+	/** Names of classes defined in the style scope */
 	readonly classNames: ClassNames<T>;
 
-	/** Names of element identifiers defined in the style sheet */
+	/** Names of element identifiers defined in the style scope */
 	readonly idNames: IDNames<T>;
 
-	/** Names of animations defined in the style sheet */
+	/** Names of animations defined in the style scope */
 	readonly animationNames: AnimationNames<T>;
 
-	/**
-	 * Map of property names of the style definition object to the Rule objects. This is used when
-	 * creating an actual style sheet.
-	 */
-	readonly rules: AllRules<T>;
+	/** Map of all rules. */
+	readonly allRules: PropsOfType<T,IRule>;
+
+	/** Map of all style (tag, class, ID and selector) rules. */
+	readonly styleRules: PropsOfType<T,IStyleRule>;
+
+	/** Map of all tag rules. */
+	readonly tagRules: PropsOfType<T,ITagRule>;
+
+	/** Map of all class rules. */
+	readonly classRules: PropsOfType<T,IClassRule>;
+
+	/** Map of all ID rules. */
+	readonly idRules: PropsOfType<T,IIDRule>;
+
+	/** Map of all selector rules. */
+	readonly selectorRules: PropsOfType<T,ISelectorRule>;
+
+	/** Map of all animation rules. */
+	readonly animationRules: PropsOfType<T,IAnimationRule>;
 
 	/** Processes this rule */
 	process(): void;
@@ -248,7 +269,7 @@ interface ICompoundSelector
 {
 	class( cls: string | IClassRule): ISelector;
 	id( id: string | IIDRule): ISelector;
-	attr( attrName: string, op?: AttrSelectorOperation, value?: string, caseInsensitive?: boolean): ISelector;
+	attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType, value?: string, caseInsensitive?: boolean): ISelector;
 
 	// pseudo classes
 	readonly active: ISelector;
@@ -323,6 +344,7 @@ interface ICompoundSelector
 /**
  * Represents possible operations for attribute selector
  */
+export type AttrSelectorOperationType = "=" | "~=" | "|=" | "^=" | "$=" | "*=";
 export enum AttrSelectorOperation
 {
 	Match = "=",
