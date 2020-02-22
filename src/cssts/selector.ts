@@ -1,4 +1,4 @@
-﻿import {ISelector, IEmptySelector, AttrSelectorOperation, AttrSelectorOperationType, ITagRule, IClassRule, IIDRule} from "./cssts"
+﻿import {ISelector, IEmptySelector, AttrSelectorOperation, AttrSelectorOperationType, IStyleRule, ITagRule, IClassRule, IIDRule} from "./cssts"
 import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
@@ -136,9 +136,9 @@ export class Selector implements IEmptySelector, ISelector
 	/**
 	 * Returns a list of all rules participating in the selector.
 	 */
-	public getRules(): (ITagRule | IClassRule | IIDRule)[]
+	public getRules(): IStyleRule[]
 	{
-		return this.buf.filter( (item) => typeof item !== "string") as (ITagRule | IClassRule | IIDRule)[];
+		return this.buf.filter( (item) => typeof item !== "string") as IStyleRule[];
 	}
 
 
@@ -169,6 +169,13 @@ export class Selector implements IEmptySelector, ISelector
 	// Internal buffer, where selector tokens are accumulated.
 	private buf: (string | ITagRule | IClassRule | IIDRule)[];
 }
+
+
+
+/**
+ * Creates an empty selector from which selector building process starts.
+ */
+export function createSelector(): IEmptySelector { return new Selector(); }
 
 
 

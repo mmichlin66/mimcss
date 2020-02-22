@@ -1,7 +1,8 @@
-import {ISelectorRule, IStyleScope, ISelector, ExtendedStyleset} from "./cssts"
+import {ISelectorRule, ISelector, ExtendedStyleset} from "./cssts"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule"
 import {Selector} from "./Selector";
+import {StyleScope} from "./StyleScope"
 
 
 
@@ -10,7 +11,7 @@ import {Selector} from "./Selector";
  */
 export class SelectorRule extends StyleRule implements ISelectorRule
 {
-	public constructor( owner: IStyleScope, selector: ISelector | string, styleset: ExtendedStyleset)
+	public constructor( owner: StyleScope, selector: ISelector | string, styleset: ExtendedStyleset)
 	{
 		super( owner, styleset);
 
@@ -24,14 +25,14 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	{
 		super.process( styleSheetName, ruleName);
 
-		// go through all rules in the selector (if any) and if they belong to a different style
-		// sheet definition, process it.
-		let rulesInSelector = this.selector.getRules();
-		for( let rule of rulesInSelector)
-		{
-			if (rule.owner !== this.owner)
-				rule.owner.process();
-		}
+		// // go through all rules in the selector (if any) and if they belong to a different style
+		// // sheet definition, process it.
+		// let rulesInSelector = this.selector.getRules();
+		// for( let rule of rulesInSelector)
+		// {
+		// 	if (rule.owner !== this.owner)
+		// 		rule.owner.process();
+		// }
 
 		for( let parent of this.parents)
 			Object.assign( this.styleset, parent.styleset);

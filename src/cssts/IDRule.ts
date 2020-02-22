@@ -1,6 +1,7 @@
-import {IIDRule, IStyleScope, ExtendedStyleset, generateName} from "./cssts"
+import {IIDRule, ExtendedStyleset, generateName} from "./cssts"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
+import {StyleScope} from "./StyleScope"
 
 
 
@@ -9,7 +10,7 @@ import {StyleRule} from "./StyleRule";
  */
 export class IDRule extends StyleRule implements IIDRule
 {
-	public constructor( owner: IStyleScope, styleset: ExtendedStyleset)
+	public constructor( owner: StyleScope, styleset: ExtendedStyleset)
 	{
 		super( owner, styleset);
 	}

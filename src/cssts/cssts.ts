@@ -7,7 +7,7 @@ import {Styleset} from "../styles/styles";
 
 
 /**
- * The ExtendedStyleset styleset type extends the Ruleset type with certain properties that provide
+ * The ExtendedStyleset type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset:
  * - The `$inherits` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation. Parents can also be specified
@@ -34,8 +34,8 @@ export type ExtendedStyleset =
  */
 export interface IRule
 {
-	/** Refrence to the Style Scope object that contains this rule. */
-	owner: IStyleScope;
+	/** Only needed to distinguish from other types */
+	readonly isRule: boolean;
 }
 
 
@@ -55,14 +55,8 @@ export interface IRule
  */
 export interface IStyleRule extends IRule
 {
-	/**Ruleset that defines property names and values */
-	styleset: Styleset;
-
-	/** List of style rules from which this rule should inherit */
-	parents: IStyleRule[];
-
-	/** Set of property names from this styleset that should be !important */
-	important: Set<string>;
+	/** Only needed to distinguish from other types */
+	readonly isRule: boolean;
 }
 
 
@@ -150,32 +144,11 @@ export type IDNames<T> = NamesOfPropsOfType<T,IIDRule>;
 /** Type that represents names of all properties of type T that are keyframe rules */
 export type AnimationNames<T> = NamesOfPropsOfType<T,IAnimationRule>;
 
-// /** Type that represents all properties of type T that are rules */
-// export type AllRules<T> = { [K in PropNamesOfType<T,IRule>]: T[K] };
-
-// /** Type that represents all properties of type T that are style (tag, class, ID and selector) rules */
-// export type StyleRules<T> = { [K in PropNamesOfType<T,IStyleRule>]: T[K] };
-
-// /** Type that represents all properties of type T that are tag rules */
-// export type TagRules<T> = { [K in PropNamesOfType<T,ITagRule>]: T[K] };
-
-// /** Type that represents all properties of type T that are class rules */
-// export type ClassRules<T> = { [K in PropNamesOfType<T,IClassRule>]: T[K] };
-
-// /** Type that represents all properties of type T that are ID rules */
-// export type IDRules<T> = { [K in PropNamesOfType<T,IIDRule>]: T[K] };
-
-// /** Type that represents all properties of type T that are selector rules */
-// export type SelectorRules<T> = { [K in PropNamesOfType<T,ISelectorRule>]: T[K] };
-
-// /** Type that represents all properties of type T that are animation rules */
-// export type AnimationRules<T> = { [K in PropNamesOfType<T,IAnimationRule>]: T[K] };
-
 
 
 /**
  * The StyleScope type defines the resultant style scope after the style scope definition has been
- * processed. The style scope object contains names of IDs, classes and keyframes, which can be
+ * processed. The style scope object contains names of IDs, classes and animations, which can be
  * used in the application code. The interface also provides methods that are used to manipulate
  * the rules and their stylesets.
  */
@@ -210,9 +183,6 @@ export interface IStyleScope<T = any>
 
 	/** Map of all animation rules. */
 	readonly animationRules: PropsOfType<T,IAnimationRule>;
-
-	/** Processes this rule */
-	process(): void;
 }
 
 
@@ -242,7 +212,7 @@ export interface ISelector extends ICompoundSelector
 	readonly adjacent: IEmptySelector;
 
 	/** Returns a list of all rules participating in the selector. */
-	getRules(): (ITagRule | IClassRule | IIDRule)[];
+	getRules(): IStyleRule[];
 
 	/** Returns the string representation of the selector */
 	toCssString(): string;
@@ -357,12 +327,14 @@ export enum AttrSelectorOperation
 
 
 
-export {defineTagRule} from "./StyleScope";
-export {defineClassRule} from "./StyleScope";
-export {defineIDRule} from "./StyleScope";
-export {defineSelectorRule} from "./StyleScope";
-export {defineAnimationRule} from "./StyleScope";
-export {createStyleScope} from "./StyleScope";
+// Functions for defining rules
+export {$tag} from "./StyleScope";
+export {$class} from "./StyleScope";
+export {$id} from "./StyleScope";
+export {$selector} from "./StyleScope";
+export {$animation} from "./StyleScope";
+
+export {getStyleScope} from "./StyleScope";
 
 
 
@@ -383,12 +355,12 @@ export function generateName( sheetName: string, ruleName: string): string
 // Implementation of createSelector
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-import {Selector} from "./Selector";
+export {createSelector} from "./Selector";
 
-/**
- * Creates an empty selector from which selector building process starts.
- */
-export function createSelector(): IEmptySelector { return new Selector(); }
+// /**
+//  * Creates an empty selector from which selector building process starts.
+//  */
+// export function createSelector(): IEmptySelector { return new Selector(); }
 
 
 

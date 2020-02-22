@@ -17,7 +17,7 @@ import {GroupRule} from "./GroupRule"
  * which provides names of classes, IDs and keyframes defined in the class T, which must be
  * derived from the StyleSheetDefinition class.
  */
-class StyleScope<T> extends GroupRule implements IStyleScope<T>
+export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
 {
 	public constructor( styleScopeClass: IStyleScopeDefinitionClass<T>)
 	{
@@ -212,11 +212,13 @@ class StyleScope<T> extends GroupRule implements IStyleScope<T>
 let g_CurrentStyleScope: StyleScope<any> = null;
 
 /**
- * Processes the given style sheet definition and returns the StyleSheet object that contains
- * names of IDs, classes and keyframes and allows style manipulations.
+ * Processes the given style scope definition and returns the StyleScope object that contains
+ * names of IDs, classes and keyframes and allows style manipulations. For a given style scope
+ * definition class there is a single style scope object, no matter how many times this function
+ * is invoked.
  * @param sheetDef 
  */
-export function createStyleScope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
+export function getStyleScope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
 {
 	// check whether the style sheet definition object has already been processed. This is
 	// indicated by the existence of the instance static property on the class.
@@ -233,31 +235,31 @@ export function createStyleScope<T>( styleScopeDefinitionClass: IStyleScopeDefin
 
 
 /** Creates new TagRule object  */
-export function defineTagRule( styleset: ExtendedStyleset): ITagRule
+export function $tag( styleset: ExtendedStyleset): ITagRule
 {
 	return new TagRule( g_CurrentStyleScope, styleset);
 }
 
 /** Returns new ClassRule object  */
-export function defineClassRule( styleset: ExtendedStyleset): IClassRule
+export function $class( styleset: ExtendedStyleset): IClassRule
 {
 	return new ClassRule( g_CurrentStyleScope, styleset);
 }
 
 /** Returns new IDRule object  */
-export function defineIDRule( styleset: ExtendedStyleset): IIDRule
+export function $id( styleset: ExtendedStyleset): IIDRule
 {
 	return new IDRule( g_CurrentStyleScope, styleset);
 }
 
 /** Creates new SelectorRule object  */
-export function defineSelectorRule( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
+export function $selector( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
 {
 	return new SelectorRule( g_CurrentStyleScope, selector, styleset);
 }
 
 /** Returns new AnimationRule object  */
-export function defineAnimationRule( ...keyframes: Keyframe[]): IAnimationRule
+export function $animation( ...keyframes: Keyframe[]): IAnimationRule
 {
 	return new AnimationRule( g_CurrentStyleScope, keyframes);
 }

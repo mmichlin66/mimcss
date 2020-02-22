@@ -1,6 +1,7 @@
-import {IStyleRule, IStyleScope, ExtendedStyleset} from "./cssts";
+import {IStyleRule, ExtendedStyleset} from "./cssts";
 import {Styleset} from "../styles/styles";
 import {Rule} from "./Rule";
+import {StyleScope} from "./StyleScope"
 
 
 
@@ -9,7 +10,7 @@ import {Rule} from "./Rule";
  */
 export abstract class StyleRule extends Rule implements IStyleRule
 {
-	public constructor( owner: IStyleScope, styleset: ExtendedStyleset)
+	public constructor( owner: StyleScope, styleset: ExtendedStyleset)
 	{
 		super( owner);
 
@@ -31,7 +32,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		{
 			// styleset is an array of IStyleRule objects, which we add as our parents
 			for( let rule of styleset)
-				this.parents.push( rule);
+				this.parents.push( rule as StyleRule);
 		}
 		else
 		{
@@ -47,12 +48,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					{
 						// this is is an array of IStyleRule objects, which we add as our parents
 						for( let rule of inheritsPropVal)
-							this.parents.push( rule);
+							this.parents.push( rule as StyleRule);
 					}
 					else
 					{
 						// this is a single IStyleRule object, which we add as our parent
-						this.parents.push( inheritsPropVal);
+						this.parents.push( inheritsPropVal as StyleRule);
 					}
 				}
 				else if (propName === "$important")
@@ -94,11 +95,14 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// }
 	}
 
+	/** Only needed to distinguish from other rules */
+	public readonly isStyleRule: boolean = true;
+
 	// Style rule defining style properties.
 	public styleset: Styleset;
 
 	// Style rule defining style properties.
-	public parents: IStyleRule[];
+	public parents: StyleRule[];
 
 	// Set of property names from this styleset that should be !important.
 	important: Set<string>;

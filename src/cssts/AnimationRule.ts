@@ -1,8 +1,9 @@
-import {IAnimationRule, Keyframe, IStyleScope, generateName} from "./cssts"
+import {IAnimationRule, Keyframe, generateName} from "./cssts"
 import {stylesetToCssString} from "../styles/styles"
 import {percentToCssString} from "../styles/utils"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
+import {StyleScope} from "./StyleScope"
 
 
 
@@ -11,7 +12,7 @@ import {StyleRule} from "./StyleRule";
  */
 export class AnimationRule extends Rule implements IAnimationRule
 {
-	public constructor( owner: IStyleScope, keyframes: Keyframe[])
+	public constructor( owner: StyleScope, keyframes: Keyframe[])
 	{
 		super( owner);
 
@@ -56,7 +57,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 class KeyframeRule extends StyleRule
 {
-	public constructor( owner: IStyleScope, keyframe: Keyframe)
+	public constructor( owner: StyleScope, keyframe: Keyframe)
 	{
 		super( owner, keyframe.style);
 

@@ -1,6 +1,7 @@
-import {ITagRule, IStyleScope, ExtendedStyleset} from "./cssts"
+import {ITagRule, ExtendedStyleset} from "./cssts"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
+import {StyleScope} from "./StyleScope"
 
 
 
@@ -9,7 +10,7 @@ import {StyleRule} from "./StyleRule";
  */
 export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( owner: IStyleScope, styleset: ExtendedStyleset)
+	public constructor( owner: StyleScope, styleset: ExtendedStyleset)
 	{
 		super( owner, styleset);
 	}
