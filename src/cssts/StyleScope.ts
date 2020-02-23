@@ -8,6 +8,7 @@ import {IDRule} from "./IDRule"
 import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {GroupRule} from "./GroupRule"
+import {TssManager} from "./TssManager"
 
 
 
@@ -17,15 +18,10 @@ import {GroupRule} from "./GroupRule"
  * which provides names of classes, IDs and keyframes defined in the class T, which must be
  * derived from the StyleSheetDefinition class.
  */
-export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
+export class StyleScope<T = any> implements IStyleScope<T>
 {
-	public constructor( styleScopeClass: IStyleScopeDefinitionClass<T>)
+	public constructor( ssDefClass: IStyleScopeDefinitionClass<T>)
 	{
-		// style scope doesn't have owner
-		super( null);
-
-		this.ssDefClass = styleScopeClass;
-
 		this._classNames = {};
 		this._idNames = {};
 		this._animationNames = {};
@@ -36,6 +32,8 @@ export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
 		this._idRules = {};
 		this._selectorRules = {};
 		this._animationRules = {};
+
+		this.process( ssDefClass);
 	}
 
 
@@ -50,37 +48,35 @@ export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
 	public get animationNames(): AnimationNames<T> { this.activate(); return this._animationNames as AnimationNames<T>; }
 
 	/** Map of all rules. */
-	public get allRules(): PropsOfType<T,IRule> { this.activate(); return this._allRules as any as Extract<T,IRule>; }
+	public get allRules(): PropsOfType<T,IRule> { this.activate(); return this._allRules as any as PropsOfType<T,IRule>; }
 
 	/** Map of all style (tag, class, ID and selector) rules. */
-	public get styleRules(): PropsOfType<T,IStyleRule> { this.activate(); return this._styleRules as any as Extract<T,IStyleRule>; }
+	public get styleRules(): PropsOfType<T,IStyleRule> { this.activate(); return this._styleRules as any as PropsOfType<T,IStyleRule>; }
 
 	/** Map of all tag rules. */
-	public get tagRules(): PropsOfType<T,ITagRule> { this.activate(); return this._tagRules as any as Extract<T,ITagRule>; }
+	public get tagRules(): PropsOfType<T,ITagRule> { this.activate(); return this._tagRules as any as PropsOfType<T,ITagRule>; }
 
 	/** Map of all class rules. */
 	public get classRules(): PropsOfType<T,IClassRule> { this.activate(); return this._classRules as any as PropsOfType<T,IClassRule>; }
 
 	/** Map of all ID rules. */
-	public get idRules(): PropsOfType<T,IIDRule> { this.activate(); return this._idRules as any as Extract<T,IIDRule>; }
+	public get idRules(): PropsOfType<T,IIDRule> { this.activate(); return this._idRules as any as PropsOfType<T,IIDRule>; }
 
 	/** Map of all selector rules. */
-	public get selectorRules(): PropsOfType<T,ISelectorRule> { this.activate(); return this._selectorRules as any as Extract<T,ISelectorRule>; }
+	public get selectorRules(): PropsOfType<T,ISelectorRule> { this.activate(); return this._selectorRules as any as PropsOfType<T,ISelectorRule>; }
 
 	/** Map of all animation rules. */
-	public get animationRules(): PropsOfType<T,IAnimationRule> { this.activate(); return this._animationRules as any as Extract<T,IAnimationRule>; }
+	public get animationRules(): PropsOfType<T,IAnimationRule> { this.activate(); return this._animationRules as any as PropsOfType<T,IAnimationRule>; }
 
 
 
 	// Creates the style scope definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
-	public process(): void
+	private process( ssDefClass: IStyleScopeDefinitionClass<T>): void
 	{
-		// check whether this object was already processed
-		if (this.name)
-			return;
+		this.isMultiplex = !!ssDefClass.isMultiplex;
 
-		this.name = this.ssDefClass.name;
+		this.name = ssDefClass.name;
 
 		// set the global reference to this scope, so that defineXXX functions called during
 		// the definition class instantiation will know which scope to use.
@@ -89,9 +85,9 @@ export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
 
 		try
 		{
-			// create instance of the style scope class
-			let ssDef = new this.ssDefClass();
-
+			// create instance of the style scope definition class and then go over its properties,
+			// which define CSS rules.
+			let ssDef = new ssDefClass();
 			for( let ruleName in ssDef)
 			{
 				let rule = ssDef[ruleName];
@@ -126,16 +122,28 @@ export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
 				else if (rule instanceof AnimationRule)
 				{
 					this._animationNames[ruleName] = rule.animationName;
+					this._animationRules[ruleName] = rule;
 				}
 			}
 		}
 		catch( err)
 		{
-			console.error( `Error instantiating Style Scope Definition of type '${this.ssDefClass.name}'`);
+			console.error( `Error instantiating Style Scope Definition of type '${ssDefClass.name}'`);
 		}
 
 		// revert to the previous scope
 		g_CurrentStyleScope = prevStyleScope;
+	}
+
+
+
+	// Generates a name, whcih will be unique in this style scope
+	public generateScopedName( ruleName: string): string
+	{
+		if (this.isMultiplex)
+			return TssManager.generateUniqueName();
+		else
+			return TssManager.generateName( this.name, ruleName);
 	}
 
 
@@ -146,39 +154,51 @@ export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
 		if (this.domSS)
 			return;
 
-		// make sure this object is processed
-		this.process();
+		if (this.isMultiplex)
+		{
+			// create <style> element and insert it into <head>
+			this.styleElm = document.createElement( "style");
+			document.head.appendChild( this.styleElm);
+			this.setDOMInfo( this.styleElm.sheet as CSSStyleSheet, 0);
 
-		// create <style> element and insert it into <head>
-		this.styleElm = document.createElement( "style");
-		this.styleElm.id = this.name;
-		document.head.appendChild( this.styleElm);
-
-		this.domSS = this.styleElm.sheet as CSSStyleSheet;
-
-		// go over the rules, convert them to strings and insert them into the style sheet
-		for( let ruleName in this._allRules)
-			this.domSS.insertRule( this._allRules[ruleName].toCssString());
+			// go over the rules, convert them to strings and insert them into the style sheet
+			for( let ruleName in this.allRules)
+			{
+				let rule: Rule = this.allRules[ruleName];
+				rule.index = this.domSS.insertRule( rule.toCssString());
+			}
+		}
+		else
+			TssManager.addStyleScope( this);
 	}
 
 
 
-	// Removes this style sheet from DOM
+	// Removes this style scope from DOM - only works for multiplex style scopes
 	public deactivate(): void
 	{
-		if (!this.domSS)
+		if (!this.isMultiplex || !this.domSS)
 			return;
 
 		this.styleElm.remove();
-		this.domSS = undefined;
 		this.styleElm = undefined;
 	}
 
 
 
-	// Reference to the style scope definition class. We instantiate it within the process
-	// method.
-	private ssDefClass: IStyleScopeDefinitionClass<T>;
+	public setDOMInfo( domSS: CSSStyleSheet, firstRuleIndex: number)
+	{
+		this.domSS = domSS;
+		this.firstRuleIndex = firstRuleIndex;
+	}
+
+	public clearDOMInfo()
+	{
+		this.domSS = undefined;
+		this.firstRuleIndex = undefined;
+	}
+
+
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
@@ -200,16 +220,22 @@ export class StyleScope<T = any> extends GroupRule implements IStyleScope<T>
 	private readonly _selectorRules: { [K: string]: Rule }
 	private readonly _animationRules: { [K: string]: Rule }
 
-	// Style element DOM object. Is defined only when the object is activated.
+	// Flag indicating whether this style scope object owns the <style> element. This is true only
+	// for multiplex styles scopes - those that can be creaed multiple times.
+	private isMultiplex: boolean;
+
+	// Style element DOM object which is only relevant for multiplex style scopes, which own their
+	// <style> element.
 	private styleElm?: HTMLStyleElement;
 
 	// When activated, points to the DOM style sheet object inserted into the <head> element
 	private domSS?: CSSStyleSheet;
+
+	// Index of the first rule of this scope in its DOM style sheet object
+	private firstRuleIndex?: number;
 }
 
 
-
-let g_CurrentStyleScope: StyleScope<any> = null;
 
 /**
  * Processes the given style scope definition and returns the StyleScope object that contains
@@ -220,48 +246,69 @@ let g_CurrentStyleScope: StyleScope<any> = null;
  */
 export function getStyleScope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
 {
-	// check whether the style sheet definition object has already been processed. This is
-	// indicated by the existence of the instance static property on the class.
-	let styleScope = styleScopeDefinitionClass.styleScope as StyleScope<T>;
-	if (!styleScope)
+	// if the style scope definition is multiplex, create new StyleScope object every time;
+	// otherwise, check whether the style sheet definition object has already been processed. This
+	// is indicated by the existence of the instance static property on the class.
+	if (styleScopeDefinitionClass.isMultiplex)
+		return new StyleScope( styleScopeDefinitionClass);
+	else
 	{
-		styleScope = new StyleScope( styleScopeDefinitionClass);
-		styleScopeDefinitionClass.styleScope = styleScope;
-	}
+		let styleScope = styleScopeDefinitionClass.styleScope as StyleScope<T>;
+		if (!styleScope)
+		{
+			styleScope = new StyleScope( styleScopeDefinitionClass);
+			styleScopeDefinitionClass.styleScope = styleScope;
+		}
 
-	return styleScope;
+		return styleScope;
+	}
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Functions for creating rules. These functions return undefined if called not from a constructor
+// of an object that is used as a style scope definition (that is, an object that is passed to the
+// getStyleScope function). This is because we need to tie the objects to the StyleScope object to
+// which the rules will belong.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Reference to the StyleScope object currently being processed. This is needed when the defineXXX
+// functions are executed in order to put rules into the proper owner StyleScope.
+let g_CurrentStyleScope: StyleScope<any> = null;
 
 
 
 /** Creates new TagRule object  */
 export function $tag( styleset: ExtendedStyleset): ITagRule
 {
-	return new TagRule( g_CurrentStyleScope, styleset);
+	return g_CurrentStyleScope ? new TagRule( g_CurrentStyleScope, styleset) : undefined;
 }
 
 /** Returns new ClassRule object  */
 export function $class( styleset: ExtendedStyleset): IClassRule
 {
-	return new ClassRule( g_CurrentStyleScope, styleset);
+	return g_CurrentStyleScope ? new ClassRule( g_CurrentStyleScope, styleset) : undefined;
 }
 
 /** Returns new IDRule object  */
 export function $id( styleset: ExtendedStyleset): IIDRule
 {
-	return new IDRule( g_CurrentStyleScope, styleset);
+	return g_CurrentStyleScope ? new IDRule( g_CurrentStyleScope, styleset) : undefined;
 }
 
 /** Creates new SelectorRule object  */
 export function $selector( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
 {
-	return new SelectorRule( g_CurrentStyleScope, selector, styleset);
+	return g_CurrentStyleScope ? new SelectorRule( g_CurrentStyleScope, selector, styleset) : undefined;
 }
 
 /** Returns new AnimationRule object  */
 export function $animation( ...keyframes: Keyframe[]): IAnimationRule
 {
-	return new AnimationRule( g_CurrentStyleScope, keyframes);
+	return g_CurrentStyleScope ? new AnimationRule( g_CurrentStyleScope, keyframes) : undefined;
 }
 
 

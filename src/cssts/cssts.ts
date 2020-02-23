@@ -192,9 +192,22 @@ export interface IStyleScope<T = any>
  */
 export interface IStyleScopeDefinitionClass<T>
 {
+	/** All style scope definition objects should conform to this constructor */
 	new(): T;
 
-	/** Singleton instance of the Style Scope class created from this definition */
+	/**
+	 * Flag inidicating that multiple style scopes can be created for this style scope definition -
+	 * each time with unique rule IDs. This is useful for styles created for a control - e.g. tree
+	 * or accordeon - which can be used multiple times on the same page but with different styles.
+	 * By default, style scope definitions are singular, that is a single instance of a style scope
+	 * object is created for them and inserted into DOM.
+	 */
+	isMultiplex?: boolean;
+
+	/**
+	 * Singleton instance of the Style Scope class created from this definition. This is used only
+	 * for singular style scopes.
+	 */
 	styleScope?: IStyleScope<T>;
 }
 
@@ -335,18 +348,6 @@ export {$selector} from "./StyleScope";
 export {$animation} from "./StyleScope";
 
 export {getStyleScope} from "./StyleScope";
-
-
-
-/**
- * Generates name to use for the given rule from the given style sheet.
- * @param sheetName 
- * @param ruleName 
- */
-export function generateName( sheetName: string, ruleName: string): string
-{
-	return `${sheetName}_${ruleName}`;
-}
 
 
 

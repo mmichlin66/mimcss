@@ -1,4 +1,4 @@
-import {IClassRule, ExtendedStyleset, generateName} from "./cssts"
+import {IClassRule, ExtendedStyleset} from "./cssts"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"
@@ -22,7 +22,7 @@ export class ClassRule extends StyleRule implements IClassRule
 	{
 		super.process( styleSheetName, ruleName);
 
-		this.properName = generateName( styleSheetName, ruleName);
+		this.properName = this.owner.generateScopedName( ruleName);
 		this.combinedName = this.properName;
 		this.combinedSelectorName = "." + this.properName;
 

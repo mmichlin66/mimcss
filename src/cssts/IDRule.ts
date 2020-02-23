@@ -1,4 +1,4 @@
-import {IIDRule, ExtendedStyleset, generateName} from "./cssts"
+import {IIDRule, ExtendedStyleset} from "./cssts"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"
@@ -22,7 +22,7 @@ export class IDRule extends StyleRule implements IIDRule
 	{
 		super.process( styleSheetName, ruleName);
 
-		this.idName = generateName( styleSheetName, ruleName);
+		this.idName = this.owner.generateScopedName( ruleName);
 
 		// go through all parents; for those who are classes, add their name to the
 		// combined name. For those who are not classes, copy style properties to the

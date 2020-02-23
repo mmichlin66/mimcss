@@ -1,4 +1,4 @@
-import {IAnimationRule, Keyframe, generateName} from "./cssts"
+import {IAnimationRule, Keyframe} from "./cssts"
 import {stylesetToCssString} from "../styles/styles"
 import {percentToCssString} from "../styles/utils"
 import {Rule} from "./Rule"
@@ -24,7 +24,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 	// Processes the given rule.
 	public process( styleSheetName: string, ruleName: string)
 	{
-		this.animationName = generateName( styleSheetName, ruleName);
+		this.animationName = this.owner.generateScopedName( ruleName);
 
 		for( let keyframeRule of this.keyframeRules)
 			keyframeRule.process( styleSheetName, ruleName);

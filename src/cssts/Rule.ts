@@ -13,17 +13,31 @@ export abstract class Rule implements IRule
 		this.owner = owner;
 	}
 
-	/** Only needed to distinguish from other types */
-	public readonly isRule: boolean = true;
 
-	// Style sheet definition to which this rule belongs.
-	public owner: StyleScope;
 
 	// Processes the rule.
-	public abstract process( styleSheetName: string, ruleName: string): void;
+	public process( styleSheetName: string, ruleName: string): void
+	{
+		this.ruleName = ruleName;
+	}
 
 	// Converts the rule to CSS string.
 	public abstract toCssString(): string;
+
+
+
+	/** Only needed to distinguish from other types */
+	public get isRule(): boolean { return true; }
+
+	// Style scope to which this rule belongs.
+	public owner: StyleScope;
+
+	// Name of the property of the style scope definition to which this rule was assigned.
+	public ruleName: string;
+
+	// Index of the rule in the DOM style sheet. The DOM style sheet object is held by the
+	// owner StyleScope
+	public index: number;
 }
 
 
