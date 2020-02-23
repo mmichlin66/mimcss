@@ -340,11 +340,15 @@ export enum AttrSelectorOperation
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Functions for defining rules
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 export {$tag} from "./StyleScope";
 export {$class} from "./StyleScope";
 export {$id} from "./StyleScope";
-export {$selector} from "./StyleScope";
+export {$rule} from "./StyleScope";
 export {$animation} from "./StyleScope";
 
 export {getStyleScope} from "./StyleScope";
@@ -356,7 +360,26 @@ export {getStyleScope} from "./StyleScope";
 // Implementation of createSelector
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-export {createSelector} from "./Selector";
+export {$selector} from "./Selector";
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Functions to configure TssManager options
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+import {TssManager} from "./TssManager";
+
+/**
+ * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
+ * will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix "n" will be used.
+ * @param optimize
+ * @param prefix
+ */
+export function useOptimizedStyleNames( optimize: boolean, prefix?: string): void
+	{ TssManager.useOptimizedStyleNames( optimize, prefix); }
 
 
 

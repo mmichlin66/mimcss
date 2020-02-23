@@ -175,7 +175,7 @@ export class Selector implements IEmptySelector, ISelector
 /**
  * Creates an empty selector from which selector building process starts.
  */
-export function createSelector(): IEmptySelector { return new Selector(); }
+export function $selector(): IEmptySelector { return new Selector(); }
 
 
 

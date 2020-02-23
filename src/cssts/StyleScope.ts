@@ -293,7 +293,7 @@ export function $class( styleset: ExtendedStyleset): IClassRule { return new Cla
 export function $id( styleset: ExtendedStyleset): IIDRule { return new IDRule( styleset); }
 
 /** Creates new SelectorRule object  */
-export function $selector( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
+export function $rule( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
 	{ return new SelectorRule( selector, styleset); }
 
 /** Returns new AnimationRule object  */

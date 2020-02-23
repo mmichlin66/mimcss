@@ -14,13 +14,30 @@ export class TssManager
 
 
 	/**
+	 * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
+	 * will be created by appending a unique number to the given prefix. If the prefix is not
+	 * specified, the standard prefix "n" will be used.
+	 * @param optimize
+	 * @param prefix
+	 */
+	public static useOptimizedStyleNames( optimize: boolean, prefix?: string): void
+	{
+		this.useUniqueStyleNames = optimize;
+		this.uniqueStyleNamesPrefix = prefix;
+	}
+
+
+
+	/**
 	 * Generates name to use for the given rule from the given style sheet.
 	 * @param sheetName 
 	 * @param ruleName 
 	 */
 	public static generateName( sheetName: string, ruleName: string): string
 	{
-		return `${sheetName}_${ruleName}`;
+		return this.useOptimizedStyleNames
+			? this.generateUniqueName( this.uniqueStyleNamesPrefix)
+			: `${sheetName}_${ruleName}`;
 	}
 
 
@@ -67,6 +84,14 @@ export class TssManager
 	}
 
 
+
+	// Flag indicating whether to use optimaized names for style elements (class names, animation
+	// names, etc.)
+	private static useUniqueStyleNames: boolean = false;
+
+	// Prefix to use when generating unique style names. If undefined, a standard prefix "n" will
+	// be used.
+	private static uniqueStyleNamesPrefix: string = undefined;
 
 	// Next number to use when generating unique identifiers.
 	private static nextUniqueID: number = 1;
