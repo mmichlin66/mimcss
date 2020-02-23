@@ -10,17 +10,17 @@ import {StyleScope} from "./StyleScope"
  */
 export class ClassRule extends StyleRule implements IClassRule
 {
-	public constructor( owner: StyleScope, styleset: ExtendedStyleset)
+	public constructor( styleset?: ExtendedStyleset)
 	{
-		super( owner, styleset);
+		super( styleset);
 	}
 
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string): void
+	public process( owner: StyleScope, ruleName: string): void
 	{
-		super.process( styleSheetName, ruleName);
+		super.process( owner, ruleName);
 
 		this.properName = this.owner.generateScopedName( ruleName);
 		this.combinedName = this.properName;
@@ -30,7 +30,7 @@ export class ClassRule extends StyleRule implements IClassRule
 		// For those who are not classes, copy their style properties to our own styleset.
 		for( let parent of this.parents)
 		{
-			if (parent instanceof ClassRule)
+			if (parent instanceof ClassRule && parent.isProcessed)
 			{
 				this.combinedName += " " + parent.combinedName;
 				this.combinedSelectorName += parent.combinedSelectorName;
@@ -38,6 +38,16 @@ export class ClassRule extends StyleRule implements IClassRule
 			else
 				Object.assign( this.styleset, parent.styleset);
 		}
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): ClassRule
+	{
+		let newRule = new ClassRule();
+		newRule.copyFrom( this);
+		return newRule;
 	}
 
 
@@ -51,7 +61,7 @@ export class ClassRule extends StyleRule implements IClassRule
 
 
 	/** Only needed to distinguish from other rules */
-	public readonly isClassRule: boolean = true;
+	public get isClassRule(): boolean { return true; }
 
 	// Name of the class under which the styleset will appear in the style sheet.
 	public properName: string;

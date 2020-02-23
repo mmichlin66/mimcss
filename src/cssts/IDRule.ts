@@ -10,17 +10,17 @@ import {StyleScope} from "./StyleScope"
  */
 export class IDRule extends StyleRule implements IIDRule
 {
-	public constructor( owner: StyleScope, styleset: ExtendedStyleset)
+	public constructor( styleset?: ExtendedStyleset)
 	{
-		super( owner, styleset);
+		super( styleset);
 	}
 
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string): void
+	public process( owner: StyleScope, ruleName: string): void
 	{
-		super.process( styleSheetName, ruleName);
+		super.process( owner, ruleName);
 
 		this.idName = this.owner.generateScopedName( ruleName);
 
@@ -33,7 +33,17 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 
-	// Converts the rule to CSS string.
+		// Creates a copy of the rule.
+	public clone(): IDRule
+	{
+		let newRule = new IDRule();
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+// Converts the rule to CSS string.
 	public toCssString(): string
 	{
 		return `#${this.idName} ${stylesetToCssString( this.styleset, this.important)}`;
@@ -42,7 +52,7 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 	/** Only needed to distinguish from other rules */
-	public readonly isIDRule: boolean = true;
+	public get isIDRule(): boolean { return true; }
 
 	// Name of the element identifier for applying the styleset.
 	public idName: string;

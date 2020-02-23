@@ -1464,26 +1464,26 @@ export function stylePropToCssString( propName: string, propVal: Styleset): stri
 
     // find information object for the property
     let info = StylePropertyInfos[propName];
-
-    // if the info is just a conversion function use right away
-    if (typeof info === "function")
-        return utils.camelToDash( propName) + ":" + info( propVal);
-
-    // go up the chain of aliases if any (we admittedly don't make the effort to detect circular
-    // dependencies, because setting up the information objects is our job and not developers').
-    while( info && info.aliasOf)
+    if (typeof info === "object")
     {
-        propName = info.aliasOf;
-        info = StylePropertyInfos[propName];
-    }
+        // go up the chain of aliases if any (we admittedly don't make the effort to detect circular
+        // dependencies, because setting up the information objects is our job and not developers').
+        while( info && info.aliasOf)
+        {
+            propName = info.aliasOf;
+            info = StylePropertyInfos[propName];
+        }
 
-    // if this property stands for another, change the property name
-    if (info && info.standsFor)
-        propName = info.standsFor;
+        // if this property stands for another, change the property name
+        if (info && info.standsFor)
+            propName = info.standsFor;
+    }
 
     let s = utils.camelToDash( propName) + ":";
 
-    if (info && info.convert)
+    if (typeof info === "function")
+        s += info( propVal);
+    else if (info && info.convert)
         s += info.convert( propVal);
     else if (typeof propVal === "string")
         s += propVal;

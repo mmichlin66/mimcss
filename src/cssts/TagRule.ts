@@ -10,25 +10,33 @@ import {StyleScope} from "./StyleScope"
  */
 export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( owner: StyleScope, styleset: ExtendedStyleset)
+	public constructor( styleset?: ExtendedStyleset)
 	{
-		super( owner, styleset);
+		super( styleset);
 	}
 
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string): void
+	public process( owner: StyleScope, ruleName: string): void
 	{
-		super.process( styleSheetName, ruleName);
-
-		this.tagName = ruleName;
+		super.process( owner, ruleName);
 
 		// go through all parents; for those who are classes, add their name to the
 		// combined name. For those who are not classes, copy style properties to the
 		// class's own styleset.
 		for( let parent of this.parents)
 			Object.assign( this.styleset, parent.styleset);
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): TagRule
+	{
+		let newRule = new TagRule();
+		newRule.copyFrom( this);
+		return newRule;
 	}
 
 
@@ -42,10 +50,10 @@ export class TagRule extends StyleRule implements ITagRule
 
 
 	/** Only needed to distinguish from other rules */
-	public readonly isTagRule: boolean = true;
+	public get isTagRule(): boolean { return true; }
 
 	// Name of the tag to which the styleset applies.
-	public tagName: string;
+	public get tagName(): string { return this.ruleName };
 }
 
 

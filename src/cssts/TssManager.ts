@@ -29,9 +29,9 @@ export class TssManager
 	 * Generates a unique name, which can be used either for style element's ID or or class,
 	 * identifier or animation name. Names are generated using a simple incrementing number.
 	 */
-	public static generateUniqueName(): string
+	public static generateUniqueName( prefix?: string): string
 	{
-		return "n" + this.nextUniqueID++;
+		return (prefix ? prefix : "n") + this.nextUniqueID++;
 	}
 
 

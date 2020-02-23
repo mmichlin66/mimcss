@@ -11,31 +11,42 @@ import {StyleScope} from "./StyleScope"
  */
 export class SelectorRule extends StyleRule implements ISelectorRule
 {
-	public constructor( owner: StyleScope, selector: ISelector | string, styleset: ExtendedStyleset)
+	public constructor( selector?: ISelector | string, styleset?: ExtendedStyleset)
 	{
-		super( owner, styleset);
+		super( styleset);
 
-		this.selector = typeof selector === "string" ? new Selector( selector) : selector;
+		if (selector)
+			this.selector = typeof selector === "string" ? new Selector( selector) : selector;
 	}
 
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string): void
+	public process( owner: StyleScope, ruleName: string): void
 	{
-		super.process( styleSheetName, ruleName);
-
-		// // go through all rules in the selector (if any) and if they belong to a different style
-		// // sheet definition, process it.
-		// let rulesInSelector = this.selector.getRules();
-		// for( let rule of rulesInSelector)
-		// {
-		// 	if (rule.owner !== this.owner)
-		// 		rule.owner.process();
-		// }
+		super.process( owner, ruleName);
 
 		for( let parent of this.parents)
 			Object.assign( this.styleset, parent.styleset);
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): SelectorRule
+	{
+		let newRule = new SelectorRule();
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Copies internal data from another rule object.
+	public copyFrom( src: SelectorRule): void
+	{
+		super.copyFrom( src);
+		this.selector = src.selector;
 	}
 
 
@@ -49,10 +60,10 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 
 
 	/** Only needed to distinguish from other rules */
-	public readonly isSelectorRule: boolean = true;
+	public get isSelectorRule(): boolean { return true; }
 
 	// selector object for this rule.
-	public readonly selector: ISelector;
+	public selector: ISelector;
 }
 
 

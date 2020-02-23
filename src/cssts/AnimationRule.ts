@@ -12,22 +12,43 @@ import {StyleScope} from "./StyleScope"
  */
 export class AnimationRule extends Rule implements IAnimationRule
 {
-	public constructor( owner: StyleScope, keyframes: Keyframe[])
+	public constructor( keyframes?: Keyframe[])
 	{
-		super( owner);
+		super();
 
-		this.keyframeRules = keyframes.map( (keyframe) =>new KeyframeRule( owner, keyframe));
+		if (keyframes)
+			this.keyframeRules = keyframes.map( (keyframe) => new KeyframeRule( keyframe));
 	}
 
 
 
 	// Processes the given rule.
-	public process( styleSheetName: string, ruleName: string)
+	public process( owner: StyleScope, ruleName: string)
 	{
+		super.process( owner, ruleName);
+
 		this.animationName = this.owner.generateScopedName( ruleName);
 
 		for( let keyframeRule of this.keyframeRules)
-			keyframeRule.process( styleSheetName, ruleName);
+			keyframeRule.process( owner, ruleName);
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): AnimationRule
+	{
+		let newRule = new AnimationRule();
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Copies internal data from another rule object.
+	public copyFrom( src: AnimationRule): void
+	{
+		this.keyframeRules = src.keyframeRules.map( (keyframeRule) => keyframeRule.clone());
 	}
 
 
@@ -44,10 +65,10 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	/** Only needed to distinguish from other rules */
-	public readonly isAnimationRule: boolean = true;
+	public get isAnimationRule(): boolean { return true; }
 
 	/** Only needed to distinguish from class and ID rules */
-	public readonly keyframeRules: KeyframeRule[];
+	public keyframeRules: KeyframeRule[];
 
 	// Name of the animation to use in animation-name CSS property.
 	public animationName: string;
@@ -55,13 +76,17 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 
+/**
+ * The KeyframeRule class represents a single keyframe clause in the animation rule.
+ */
 class KeyframeRule extends StyleRule
 {
-	public constructor( owner: StyleScope, keyframe: Keyframe)
+	public constructor( keyframe?: Keyframe)
 	{
-		super( owner, keyframe.style);
+		super( keyframe ? keyframe.style : undefined);
 
-		this.waypointString = this.parseWaypoint( keyframe.waypoint);
+		if (keyframe)
+			this.waypointString = this.parseWaypoint( keyframe.waypoint);
 	}
 
 
@@ -79,6 +104,25 @@ class KeyframeRule extends StyleRule
 
 
 
+	// Creates a copy of the rule.
+	public clone(): KeyframeRule
+	{
+		let newRule = new KeyframeRule();
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Copies internal data from another rule object.
+	public copyFrom( src: KeyframeRule): void
+	{
+		super.copyFrom( src);
+		this.waypointString = src.waypointString;
+	}
+
+
+
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
@@ -87,8 +131,8 @@ class KeyframeRule extends StyleRule
 
 
 
-	/** Only needed to distinguish from class and ID rules */
-	public readonly waypointString: string;
+	/** Identifier of the waypoint as a string */
+	public waypointString: string;
 }
 
 

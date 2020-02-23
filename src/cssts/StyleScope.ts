@@ -76,63 +76,74 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	{
 		this.isMultiplex = !!ssDefClass.isMultiplex;
 
+		// in DEBUG, each class has a name unless it was created as an anonymous class. In RELEASE,
+		// (as well as in the anonymous cases), the name is undefined and we generate a unique
+		// name for the style scope.
 		this.name = ssDefClass.name;
+		if (!this.name)
+			this.name = TssManager.generateUniqueName( "s");
 
-		// set the global reference to this scope, so that defineXXX functions called during
-		// the definition class instantiation will know which scope to use.
-		let prevStyleScope = g_CurrentStyleScope;
-		g_CurrentStyleScope = this;
-
+		// create instance of the style scope definition class and then go over its properties,
+		// which define CSS rules.
+		let ssDef: T;
 		try
 		{
 			// create instance of the style scope definition class and then go over its properties,
 			// which define CSS rules.
-			let ssDef = new ssDefClass();
-			for( let ruleName in ssDef)
-			{
-				let rule = ssDef[ruleName];
-				if (!(rule instanceof Rule))
-					continue;
-
-				rule.process( this.name, ruleName);
-				this._allRules[ruleName] = rule;
-
-				if (rule instanceof TagRule)
-				{
-					this._styleRules[ruleName] = rule;
-					this._tagRules[ruleName] = rule;
-				}
-				else if (rule instanceof ClassRule)
-				{
-					this._styleRules[ruleName] = rule;
-					this._classRules[ruleName] = rule;
-					this._classNames[ruleName] = rule.combinedName;
-				}
-				else if (rule instanceof IDRule)
-				{
-					this._styleRules[ruleName] = rule;
-					this._idRules[ruleName] = rule;
-					this._idNames[ruleName] = rule.idName;
-				}
-				else if (rule instanceof SelectorRule)
-				{
-					this._styleRules[ruleName] = rule;
-					this._selectorRules[ruleName] = rule;
-				}
-				else if (rule instanceof AnimationRule)
-				{
-					this._animationNames[ruleName] = rule.animationName;
-					this._animationRules[ruleName] = rule;
-				}
-			}
+			ssDef = new ssDefClass();
 		}
 		catch( err)
 		{
 			console.error( `Error instantiating Style Scope Definition of type '${ssDefClass.name}'`);
+			return;
 		}
 
-		// revert to the previous scope
-		g_CurrentStyleScope = prevStyleScope;
+		// loop over the properties of the definition object and process those that are rules.
+		for( let propName in ssDef)
+		{
+			let propVal = ssDef[propName];
+			if (!(propVal instanceof Rule))
+				continue;
+
+			let ruleName = propName;
+			let rule = propVal as Rule;
+
+			// if the rule object is already assigned to a style scope, we create a clone of the
+			// rule and assign it to our scope.
+			if (rule.owner)
+				rule = rule.clone();
+
+			rule.process( this, ruleName);
+			this._allRules[ruleName] = rule;
+
+			if (rule instanceof TagRule)
+			{
+				this._styleRules[ruleName] = rule;
+				this._tagRules[ruleName] = rule;
+			}
+			else if (rule instanceof ClassRule)
+			{
+				this._styleRules[ruleName] = rule;
+				this._classRules[ruleName] = rule;
+				this._classNames[ruleName] = rule.combinedName;
+			}
+			else if (rule instanceof IDRule)
+			{
+				this._styleRules[ruleName] = rule;
+				this._idRules[ruleName] = rule;
+				this._idNames[ruleName] = rule.idName;
+			}
+			else if (rule instanceof SelectorRule)
+			{
+				this._styleRules[ruleName] = rule;
+				this._selectorRules[ruleName] = rule;
+			}
+			else if (rule instanceof AnimationRule)
+			{
+				this._animationNames[ruleName] = rule.animationName;
+				this._animationRules[ruleName] = rule;
+			}
+		}
 	}
 
 
@@ -268,48 +279,25 @@ export function getStyleScope<T>( styleScopeDefinitionClass: IStyleScopeDefiniti
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Functions for creating rules. These functions return undefined if called not from a constructor
-// of an object that is used as a style scope definition (that is, an object that is passed to the
-// getStyleScope function). This is because we need to tie the objects to the StyleScope object to
-// which the rules will belong.
+// Functions for creating rules.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Reference to the StyleScope object currently being processed. This is needed when the defineXXX
-// functions are executed in order to put rules into the proper owner StyleScope.
-let g_CurrentStyleScope: StyleScope<any> = null;
-
-
-
 /** Creates new TagRule object  */
-export function $tag( styleset: ExtendedStyleset): ITagRule
-{
-	return g_CurrentStyleScope ? new TagRule( g_CurrentStyleScope, styleset) : undefined;
-}
+export function $tag( styleset: ExtendedStyleset): ITagRule { return new TagRule( styleset); }
 
 /** Returns new ClassRule object  */
-export function $class( styleset: ExtendedStyleset): IClassRule
-{
-	return g_CurrentStyleScope ? new ClassRule( g_CurrentStyleScope, styleset) : undefined;
-}
+export function $class( styleset: ExtendedStyleset): IClassRule { return new ClassRule( styleset); }
 
 /** Returns new IDRule object  */
-export function $id( styleset: ExtendedStyleset): IIDRule
-{
-	return g_CurrentStyleScope ? new IDRule( g_CurrentStyleScope, styleset) : undefined;
-}
+export function $id( styleset: ExtendedStyleset): IIDRule { return new IDRule( styleset); }
 
 /** Creates new SelectorRule object  */
 export function $selector( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
-{
-	return g_CurrentStyleScope ? new SelectorRule( g_CurrentStyleScope, selector, styleset) : undefined;
-}
+	{ return new SelectorRule( selector, styleset); }
 
 /** Returns new AnimationRule object  */
-export function $animation( ...keyframes: Keyframe[]): IAnimationRule
-{
-	return g_CurrentStyleScope ? new AnimationRule( g_CurrentStyleScope, keyframes) : undefined;
-}
+export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return new AnimationRule( keyframes); }
 
 
 

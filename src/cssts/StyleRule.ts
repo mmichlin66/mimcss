@@ -10,15 +10,16 @@ import {StyleScope} from "./StyleScope"
  */
 export abstract class StyleRule extends Rule implements IStyleRule
 {
-	public constructor( owner: StyleScope, styleset: ExtendedStyleset)
+	public constructor( styleset?: ExtendedStyleset)
 	{
-		super( owner);
+		super();
 
 		this.styleset = {};
 		this.parents = [];
 		this.important = new Set<string>();
 
-		this.parseExtendedStyleset( styleset);
+		if (styleset)
+			this.parseExtendedStyleset( styleset);
 	}
 
 	private parseExtendedStyleset( styleset: ExtendedStyleset): void
@@ -81,22 +82,19 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	}
 
 
-	// Processes the rule.
-	public process( styleSheetName: string, ruleName: string): void
+
+	// Copies internal data from another rule object.
+	public copyFrom( src: StyleRule): void
 	{
-		// // go through all parents and if the parent belongs to a different style sheet
-		// // definition, make sure it is processed. We don't worry about circular dependencies
-		// // because the parent's owner cannot be our sheet definition if the parent doesn't belong
-		// // to our sheet.
-		// for( let parent of this.parents)
-		// {
-		// 	if (parent.owner !== this.owner)
-		// 		parent.owner.process();
-		// }
+		this.styleset = src.styleset;
+		this.parents = src.parents;
+		this.important = src.important;
 	}
 
+
+
 	/** Only needed to distinguish from other rules */
-	public readonly isStyleRule: boolean = true;
+	public get isStyleRule(): boolean { return true; }
 
 	// Style rule defining style properties.
 	public styleset: Styleset;

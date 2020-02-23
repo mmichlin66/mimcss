@@ -99,7 +99,7 @@ export interface ISelectorRule extends IStyleRule
 }
 
 /**
- * The IAnimationRule interface represents a @keyframe rule as a sequence of keyframes.
+ * The IAnimationRule interface represents a @keyframes rule.
  */
 export interface IAnimationRule extends IRule
 {
@@ -108,7 +108,7 @@ export interface IAnimationRule extends IRule
 }
 
 /**
- * The Keyframe type defines a single keyframe within a @keyframe rule.
+ * The Keyframe type defines a single keyframe within a @keyframes rule.
  */
 export type Keyframe = { waypoint: "from" | "to" | number, style: ExtendedStyleset }
 
@@ -357,11 +357,6 @@ export {getStyleScope} from "./StyleScope";
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 export {createSelector} from "./Selector";
-
-// /**
-//  * Creates an empty selector from which selector building process starts.
-//  */
-// export function createSelector(): IEmptySelector { return new Selector(); }
 
 
 
