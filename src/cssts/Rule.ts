@@ -24,6 +24,11 @@ export abstract class Rule implements IRule
 	// Converts the rule to CSS string.
 	public abstract toCssString(): string;
 
+	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
+	// element. For the majority of Rule-derived classes this is true; however, for some classes,
+	// e.g. for the CustomVar class, this is not so.
+	public get isRealCssRule(): boolean { return true; }
+
 
 
 	/** Only needed to distinguish from other types */

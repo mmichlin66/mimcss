@@ -33,7 +33,7 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 
-		// Creates a copy of the rule.
+	// Creates a copy of the rule.
 	public clone(): IDRule
 	{
 		let newRule = new IDRule();
@@ -43,7 +43,7 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 
-// Converts the rule to CSS string.
+	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
 		return `#${this.idName} ${stylesetToCssString( this.styleset, this.important)}`;

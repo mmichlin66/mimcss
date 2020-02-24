@@ -5,8 +5,45 @@
 /**
  * Style values that can be used for (almost) any property
  */
-export type Base_StyleType = "inherit" | "initial" | "unset";
+export type Base_StyleType = "inherit" | "initial" | "unset" | VarUse;
 
+
+
+/**
+ * The VarUse class encapsulates the use of a CSS custom property via the var() CSS function.
+ */
+export class VarUse
+{
+    constructor( varName: string, fallbackValues?: string[])
+    {
+        this.varName = varName;
+        this.fallbackValues = fallbackValues;
+    }
+
+    public toCssString(): string
+    {
+        let s = `var(--${this.varName})`;
+        for( let fallbackValue of this.fallbackValues)
+            s += "," + fallbackValue;
+
+        return s;
+    }
+
+    private varName: string;
+    private fallbackValues: string[];
+}
+
+
+
+/**
+ * Creates new VarUse object that represents the use of the given CSS custom property.
+ * @param varName
+ * @param fallbackValues 
+ */
+export function useVar( varName: string, ...fallbackValues: string[])
+{
+    return new VarUse( varName, fallbackValues);
+}
 
 
 /**
@@ -64,7 +101,7 @@ export function arrayToCssString<T>( val: T[], func: (v: T) => string, separator
  * Converts array of string values to a single string using the given separator.
  * @param val Array of string values
  */
-export function stringArrayToCssString( val: string[], separator: string = ","): string
+export function stringArrayToCssString( val: (string | Base_StyleType)[], separator: string = ","): string
 {
     let s = "";
     for( let v of val)
@@ -74,7 +111,10 @@ export function stringArrayToCssString( val: string[], separator: string = ","):
             if (s.length > 0)
                 s += separator;
 
-            s += v;
+            if (typeof v === "string")
+                s += v;
+            else if (val instanceof VarUse)
+                s += v.toCssString();
         }
     }
 
@@ -130,6 +170,8 @@ export function singleNumberToCssString( val: SingleNumber_StyleType): string
 {
     if (typeof val === "string")
         return val;
+    else if (val instanceof VarUse)
+        return val.toCssString();
     else
         return val.toString();
 }
@@ -144,6 +186,8 @@ export function multiNumberToCssString( val: MultiNumber_StyleType): string
         return val;
     else if (typeof val === "number")
         return val.toString();
+    else if (val instanceof VarUse)
+        return val.toCssString();
     else
         return arrayToCssString( val, singleNumberToCssString);
 }
@@ -179,6 +223,8 @@ export function singleLengthToCssString( val: SingleLength_StyleType): string
 {
     if (typeof val === "string")
         return val;
+    else if (val instanceof VarUse)
+        return val.toCssString();
     else
 	    return lengthNumberToCssString( val);
 }
@@ -265,6 +311,8 @@ export function singleAngleToCssString( val: SingleAngle_StyleType): string
 {
     if (typeof val === "string")
         return val;
+    else if (val instanceof VarUse)
+        return val.toCssString();
     else
 	    return angleNumberToCssString( val);
 }
@@ -342,6 +390,8 @@ export function singleTimeToCssString( val: SingleTime_StyleType): string
 {
     if (typeof val === "string")
         return val;
+    else if (val instanceof VarUse)
+        return val.toCssString();
     else
 	    return timeNumberToCssString( val);
 }
@@ -356,6 +406,8 @@ export function multiTimeToCssString( val: MultiTime_StyleType): string
         return val;
     else if (typeof val === "number")
         return timeNumberToCssString( val);
+    else if (val instanceof VarUse)
+        return val.toCssString();
     else
         return arrayToCssString( val, singleTimeToCssString);
 }
@@ -686,6 +738,8 @@ export function colorToCssString( val: Color_StyleType): string
         return val;
     else if (typeof val === "number")
 	    return colorNumberToCssString( val);
+    else if (val instanceof VarUse)
+        return val.toCssString();
     else if (Array.isArray( val))
 	    return colorAsArrayToCssString( val);
     else

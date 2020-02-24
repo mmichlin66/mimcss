@@ -121,6 +121,24 @@ export type Keyframe = { waypoint: "from" | "to" | number, style: ExtendedStyles
 // 	readonly subRules: IRule[];
 // }
 
+/**
+ * The ICustomVarRule interface represents a ":root" block with CSS custom property definitions.
+ */
+export interface ICustomVarRule extends IRule
+{
+}
+
+
+
+/**
+ * The ICustomVar interface represents a CSS custom property definitions.
+ */
+export interface ICustomVar
+{
+	/** Only needed to distinguish from other types */
+	readonly isCustomVar?: boolean;
+}
+
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -144,6 +162,9 @@ export type IDNames<T> = NamesOfPropsOfType<T,IIDRule>;
 /** Type that represents names of all properties of type T that are keyframe rules */
 export type AnimationNames<T> = NamesOfPropsOfType<T,IAnimationRule>;
 
+/** Type that represents names of all properties of type T that are definitions of custom CSS properties */
+export type CustomVarNames<T> = NamesOfPropsOfType<T,ICustomVar>;
+
 
 
 /**
@@ -162,6 +183,9 @@ export interface IStyleScope<T = any>
 
 	/** Names of animations defined in the style scope */
 	readonly animationNames: AnimationNames<T>;
+
+	/** Names of custom CSS properties defined in the style scope */
+	readonly varNames: CustomVarNames<T>;
 
 	/** Map of all rules. */
 	readonly allRules: PropsOfType<T,IRule>;
@@ -183,6 +207,9 @@ export interface IStyleScope<T = any>
 
 	/** Map of all animation rules. */
 	readonly animationRules: PropsOfType<T,IAnimationRule>;
+
+ 	/** The ":root" block with CSS custom property definitions. */
+	readonly varRule: ICustomVarRule;
 }
 
 
@@ -210,6 +237,22 @@ export interface IStyleScopeDefinitionClass<T>
 	 */
 	styleScope?: IStyleScope<T>;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Functions for defining rules
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+export {$tag} from "./StyleScope";
+export {$class} from "./StyleScope";
+export {$id} from "./StyleScope";
+export {$rule} from "./StyleScope";
+export {$animation} from "./StyleScope";
+export {$custom} from "./StyleScope";
+
+export {getStyleScope} from "./StyleScope";
 
 
 
@@ -342,22 +385,7 @@ export enum AttrSelectorOperation
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Functions for defining rules
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-export {$tag} from "./StyleScope";
-export {$class} from "./StyleScope";
-export {$id} from "./StyleScope";
-export {$rule} from "./StyleScope";
-export {$animation} from "./StyleScope";
-
-export {getStyleScope} from "./StyleScope";
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Implementation of createSelector
+// Implementation of $elector
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 export {$selector} from "./Selector";
