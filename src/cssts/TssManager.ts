@@ -35,7 +35,7 @@ export class TssManager
 	 */
 	public static generateName( sheetName: string, ruleName: string): string
 	{
-		return this.useOptimizedStyleNames
+		return this.useUniqueStyleNames
 			? this.generateUniqueName( this.uniqueStyleNamesPrefix)
 			: `${sheetName}_${ruleName}`;
 	}
@@ -58,7 +58,7 @@ export class TssManager
 	{
 		this.ensureDOM();
 
-		styleScope.setDOMInfo( this.domSS, this.domSS.rules.length);
+		styleScope.setDOMInfo( this.domSS);
 
 		// go over the rules, convert them to strings and insert them into the style sheet
 		for( let ruleName in styleScope.allRules)

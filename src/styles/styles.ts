@@ -345,7 +345,7 @@ export function borderStyleToCssString( val: BorderStyleStyleType): string
 
 
 
-/** Type for baseline-shift style property */
+/** Type for border side width style property */
 export type BorderSideWidth_StyleType = "thin" | "medium" | "thick" | utils.SingleLength_StyleType;
 
 
@@ -1332,7 +1332,7 @@ export interface Styleset
      *     color: 0xFF0000,
      *     $raw: {
      *       cursor: "url(customCursor.png) 5,5, pointer",
-     *       margin: "1px, 2px, 3px, 4px:
+     *       margin: "1px 2px 3px 4px"
      *     }
      *   }}
      */
@@ -1481,22 +1481,28 @@ export function stylesetToCssString( styleset: Styleset, important?: Set<string>
 	for( let propName in styleset)
 	{
         let propVal = styleset[propName];
-
-        // special handling of the "$raw" property
         if (propName === "$raw")
         {
+            // special handling of the "$raw" property
             for( let rawPropName in propVal)
             {
                 s += utils.camelToDash( rawPropName) + ":" + propVal[rawPropName];
                 s += (important && important.has( propName) ? " !important;" : ";");
             }
         }
+        else if (propName === "$custom")
+        {
+            // special handling of the "$custom" property
+            for( let customPropName in propVal)
+            {
+                s += `--${customPropName}:${propVal[customPropName]}`;
+                s += (important && important.has( propName) ? " !important;" : ";");
+            }
+        }
         else
         {
-            //get the string representation of the property
+            // get the string representation of the property
             s += stylePropToCssString( propName, propVal);
-
-            // check whether this property is important
             s += (important && important.has( propName) ? " !important;" : ";");
         }
 	}

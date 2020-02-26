@@ -1,5 +1,5 @@
 ﻿/**
- * This file contains definitions of CSS properties adn helper types
+ * This file contains basic types and functions used to define CSS property types.
  */
 
 /**
@@ -14,23 +14,23 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | VarUse;
  */
 export class VarUse
 {
-    constructor( varName: string, fallbackValues?: string[])
+    constructor( varName: string, fallbackValue?: string)
     {
         this.varName = varName;
-        this.fallbackValues = fallbackValues;
+        this.fallbackValue = fallbackValue;
     }
 
     public toCssString(): string
     {
-        let s = `var(--${this.varName})`;
-        for( let fallbackValue of this.fallbackValues)
-            s += "," + fallbackValue;
+        let s = `var(--${this.varName}`;
+        if (this.fallbackValue)
+            s += "," + this.fallbackValue;
 
-        return s;
+        return s + ")";
     }
 
     private varName: string;
-    private fallbackValues: string[];
+    private fallbackValue: string;
 }
 
 
@@ -40,10 +40,11 @@ export class VarUse
  * @param varName
  * @param fallbackValues 
  */
-export function useVar( varName: string, ...fallbackValues: string[])
+export function useVar( varName: string, fallbackValue: string): VarUse
 {
-    return new VarUse( varName, fallbackValues);
+    return new VarUse( varName, fallbackValue);
 }
+
 
 
 /**

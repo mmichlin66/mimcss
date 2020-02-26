@@ -1,18 +1,19 @@
-import {ICustomVar, ExtendedStyleset} from "./cssts"
-import {stylesetToCssString} from "../styles/styles"
+import {ICustomVar} from "./cssts"
+import {stylePropToCssString, Styleset} from "../styles/styles"
 import {Rule} from "./Rule";
 import {StyleScope} from "./StyleScope"
 
 
 
 /**
- * The IDRule type describes a styleset that applies to elements identified by an ID.
+ * The CustomVar class describes a custom CSS property.
  */
-export class CustomVar extends Rule implements ICustomVar
+export class CustomVar<T> extends Rule implements ICustomVar<T>
 {
-	public constructor( varValue?: string)
+	public constructor( templatePropName?: keyof Styleset, varValue?: T)
 	{
 		super();
+		this.templatePropName = templatePropName;
 		this.varValue = varValue;
 	}
 
@@ -29,9 +30,9 @@ export class CustomVar extends Rule implements ICustomVar
 
 
 	// Creates a copy of the rule.
-	public clone(): CustomVar
+	public clone(): CustomVar<T>
 	{
-		let newRule = new CustomVar();
+		let newRule = new CustomVar<T>();
 		newRule.copyFrom( this);
 		return newRule;
 	}
@@ -39,15 +40,16 @@ export class CustomVar extends Rule implements ICustomVar
 
 
 	// Copies internal data from another rule object.
-	public copyFrom( src: CustomVar): void
+	public copyFrom( src: CustomVar<T>): void
 	{
+		this.templatePropName = src.templatePropName;
 		this.varValue = src.varValue;
 	}
 
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `--${this.varName}: ${this.varValue}`;
+		return `--${this.varName}: ${stylePropToCssString( this.templatePropName, this.varValue, true)}`;
 	}
 
 	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
@@ -60,8 +62,11 @@ export class CustomVar extends Rule implements ICustomVar
 	/** Only needed to distinguish from other rules */
 	public get isCustomVar(): boolean { return true; }
 
-	// Name of the custom CSS property.
-	public varValue: string;
+	// Name of a non-custom CSS property whose type determines the type of the custom property value.
+	public templatePropName: keyof Styleset;
+
+	// Value of the custom CSS property.
+	public varValue: T;
 
 	// Name of the custom CSS property.
 	public varName: string;

@@ -1,7 +1,6 @@
-import {ExtendedStyleset, IStyleScopeDefinitionClass, IStyleScope, ClassNames, IDNames,
-		AnimationNames, CustomVarNames, IRule, IStyleRule, ITagRule, IClassRule, IIDRule,
-		ISelectorRule, ISelector, IAnimationRule, Keyframe, ICustomVarRule, ICustomVar,
-		PropsOfType} from "./cssts"
+import {IStyleScopeDefinitionClass, IStyleScope, NamesOfPropsOfType, PropsOfType, IRule,
+		IStyleRule, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimationRule, ICustomVar}
+		from "./cssts"
 
 import {Rule} from "./Rule"
 import {TagRule} from "./TagRule"
@@ -12,7 +11,6 @@ import {AnimationRule} from "./AnimationRule"
 import {CustomVar} from "./CustomVar"
 import {GroupRule} from "./GroupRule"
 import {TssManager} from "./TssManager"
-import {Styleset, stylePropToCssString} from "../styles/styles"
 
 
 
@@ -37,7 +35,8 @@ export class StyleScope<T = any> implements IStyleScope<T>
 		this._idRules = {};
 		this._selectorRules = {};
 		this._animationRules = {};
-		this._varRule = new CustomVarRule();
+		this._varRules = {};
+		this.unnamedRules = []
 
 		this.process( ssDefClass);
 	}
@@ -45,40 +44,40 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 
 	/** Names of classes defined in the style sheet */
-	public get classNames(): ClassNames<T> { this.activate(); return this._classNames as ClassNames<T> }
+	public get classNames(): NamesOfPropsOfType<T,IClassRule> { this.activate(); return this._classNames as NamesOfPropsOfType<T,IClassRule> }
 
 	/** Names of classes defined in the style sheet */
-	public get idNames(): IDNames<T> { this.activate(); return this._idNames as IDNames<T>; }
+	public get idNames(): NamesOfPropsOfType<T,IIDRule> { this.activate(); return this._idNames as NamesOfPropsOfType<T,IIDRule>; }
 
 	/** Names of keyframes defined in the style sheet */
-	public get animationNames(): AnimationNames<T> { this.activate(); return this._animationNames as AnimationNames<T>; }
+	public get animationNames(): NamesOfPropsOfType<T,IAnimationRule> { this.activate(); return this._animationNames as NamesOfPropsOfType<T,IAnimationRule>; }
 
 	/** Names of custom CSS properties defined in the style scope */
-	public get varNames(): CustomVarNames<T> { this.activate(); return this._varNames as CustomVarNames<T>; }
+	public get varNames(): NamesOfPropsOfType<T,ICustomVar> { this.activate(); return this._varNames as NamesOfPropsOfType<T,ICustomVar>; }
 
 	/** Map of all rules. */
-	public get allRules(): PropsOfType<T,IRule> { this.activate(); return this._allRules as any as PropsOfType<T,IRule>; }
+	public get allRules(): PropsOfType<T,IRule> { this.activate(); return this._allRules as PropsOfType<T,IRule>; }
 
 	/** Map of all style (tag, class, ID and selector) rules. */
-	public get styleRules(): PropsOfType<T,IStyleRule> { this.activate(); return this._styleRules as any as PropsOfType<T,IStyleRule>; }
+	public get styleRules(): PropsOfType<T,IStyleRule> { this.activate(); return this._styleRules as PropsOfType<T,IStyleRule>; }
 
 	/** Map of all tag rules. */
-	public get tagRules(): PropsOfType<T,ITagRule> { this.activate(); return this._tagRules as any as PropsOfType<T,ITagRule>; }
+	public get tagRules(): PropsOfType<T,ITagRule> { this.activate(); return this._tagRules as PropsOfType<T,ITagRule>; }
 
 	/** Map of all class rules. */
-	public get classRules(): PropsOfType<T,IClassRule> { this.activate(); return this._classRules as any as PropsOfType<T,IClassRule>; }
+	public get classRules(): PropsOfType<T,IClassRule> { this.activate(); return this._classRules as PropsOfType<T,IClassRule>; }
 
 	/** Map of all ID rules. */
-	public get idRules(): PropsOfType<T,IIDRule> { this.activate(); return this._idRules as any as PropsOfType<T,IIDRule>; }
+	public get idRules(): PropsOfType<T,IIDRule> { this.activate(); return this._idRules as PropsOfType<T,IIDRule>; }
 
 	/** Map of all selector rules. */
-	public get selectorRules(): PropsOfType<T,ISelectorRule> { this.activate(); return this._selectorRules as any as PropsOfType<T,ISelectorRule>; }
+	public get selectorRules(): PropsOfType<T,ISelectorRule> { this.activate(); return this._selectorRules as PropsOfType<T,ISelectorRule>; }
 
 	/** Map of all animation rules. */
-	public get animationRules(): PropsOfType<T,IAnimationRule> { this.activate(); return this._animationRules as any as PropsOfType<T,IAnimationRule>; }
+	public get animationRules(): PropsOfType<T,IAnimationRule> { this.activate(); return this._animationRules as PropsOfType<T,IAnimationRule>; }
 
  	/** The ":root" block with CSS custom property definitions. */
-	public get varRule(): ICustomVarRule { return this._varRule; }
+	public get varRules(): PropsOfType<T,ICustomVar> { this.activate(); return this._varRules as PropsOfType<T,ICustomVar>; }
 
 
 	// Creates the style scope definition instance, parses its properties and creates names for
@@ -94,6 +93,9 @@ export class StyleScope<T = any> implements IStyleScope<T>
 		if (!this.name)
 			this.name = TssManager.generateUniqueName( "s");
 
+		// insert our internal rule for custom CSS properties into the list of unnamed rules.
+		this.unnamedRules.push( new CustomVarRule(this));
+
 		// create instance of the style scope definition class and then go over its properties,
 		// which define CSS rules.
 		let ssDef: T;
@@ -108,10 +110,6 @@ export class StyleScope<T = any> implements IStyleScope<T>
 			console.error( `Error instantiating Style Scope Definition of type '${ssDefClass.name}'`);
 			return;
 		}
-
-		// "fake"-process our internal rule for custom CSS properties.
-		this._varRule.process( this, ":root");
-		this._allRules.$root = this._varRule;
 
 		// loop over the properties of the definition object and process those that are rules.
 		for( let propName in ssDef)
@@ -163,14 +161,14 @@ export class StyleScope<T = any> implements IStyleScope<T>
 			else if (rule instanceof CustomVar)
 			{
 				this._varNames[ruleName] = rule.varName;
-				this._varRule.customVars[ruleName] = rule;
+				this._varRules[ruleName] = rule;
 			}
 		}
 	}
 
 
 
-	// Generates a name, whcih will be unique in this style scope
+	// Generates a name, which will be unique in this style scope
 	public generateScopedName( ruleName: string): string
 	{
 		if (this.isMultiplex)
@@ -192,7 +190,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 			// create <style> element and insert it into <head>
 			this.styleElm = document.createElement( "style");
 			document.head.appendChild( this.styleElm);
-			this.setDOMInfo( this.styleElm.sheet as CSSStyleSheet, 0);
+			this.setDOMInfo( this.styleElm.sheet as CSSStyleSheet);
 
 			// go over the rules, convert them to strings and insert them into the style sheet
 			for( let ruleName in this.allRules)
@@ -219,16 +217,27 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 
 
-	public setDOMInfo( domSS: CSSStyleSheet, firstRuleIndex: number)
+	public setDOMInfo( domSS: CSSStyleSheet)
 	{
 		this.domSS = domSS;
-		this.firstRuleIndex = firstRuleIndex;
 	}
 
 	public clearDOMInfo()
 	{
 		this.domSS = undefined;
-		this.firstRuleIndex = undefined;
+	}
+
+
+
+	// Returns CSS string representatin of the :root rule with custom CSS properties. This is
+	// invoked by the "fake" CustomVarRule.
+	public customVarsToCssString(): string
+	{
+		let s = ":root {";
+		for( let varName in this._varRules)
+			s += this._varRules[varName].toCssString() + ";";
+
+		return s + "}";
 	}
 
 
@@ -236,9 +245,9 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
 
-	// Names of classes, IDs and keyframes defined in the style sheet. The keys are property names
-	// used in the style sheet definition; the values are the actual names that will be inserted
-	// into the actual style sheet.
+	// Names of classes, IDs, animations and custom properties defined in the style sheet. The
+	// keys are property names used in the style sheet definition; the values are the actual names
+	// that will be inserted into the actual style sheet.
 	private readonly _classNames: { [K: string]: string }
 	private readonly _idNames: { [K: string]: string }
 	private readonly _animationNames: { [K: string]: string }
@@ -253,7 +262,11 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	private readonly _idRules: { [K: string]: Rule }
 	private readonly _selectorRules: { [K: string]: Rule }
 	private readonly _animationRules: { [K: string]: Rule }
-	private readonly _varRule: CustomVarRule;
+	private readonly _varRules:{ [K: string]: CustomVar<any> };
+
+	// List of rules without names. This rules are inserted into DOM but cannot be accessed
+	// and manipulated programmatically
+	private readonly unnamedRules: Rule[];
 
 	// Flag indicating whether this style scope object owns the <style> element. This is true only
 	// for multiplex styles scopes - those that can be creaed multiple times.
@@ -265,19 +278,21 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 	// When activated, points to the DOM style sheet object inserted into the <head> element
 	private domSS?: CSSStyleSheet;
-
-	// Index of the first rule of this scope in its DOM style sheet object
-	private firstRuleIndex?: number;
 }
 
 
 
 /**
- * The CustomVarBlock class represents a :root rule that is used for defining custom CSS properties.
+ * The CustomVarRule class represents a :root rule that is used for defining custom CSS properties.
  */
-class CustomVarRule extends Rule implements ICustomVarRule
+class CustomVarRule extends Rule
 {
-	public customVars: { [K: string]: CustomVar } = {};
+	constructor( owner: StyleScope)
+	{
+		super();
+		this.owner = owner;
+		this.ruleName = ":root";
+	}
 
 	// Creates a copy of the rule.
 	public clone(): Rule { return null; }
@@ -286,71 +301,8 @@ class CustomVarRule extends Rule implements ICustomVarRule
 	public copyFrom( src: Rule): void {}
 
 	// Converts the rule to CSS string.
-	public toCssString(): string
-	{
-		let s = ":root {";
-		for( let varName in this.customVars)
-			s += this.customVars[varName].toCssString() + ";";
-
-		return s + "}";
-	}
+	public toCssString(): string { return this.owner.customVarsToCssString(); }
 }
-
-
-/**
- * Processes the given style scope definition and returns the StyleScope object that contains
- * names of IDs, classes and keyframes and allows style manipulations. For a given style scope
- * definition class there is a single style scope object, no matter how many times this function
- * is invoked.
- * @param sheetDef 
- */
-export function getStyleScope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
-{
-	// if the style scope definition is multiplex, create new StyleScope object every time;
-	// otherwise, check whether the style sheet definition object has already been processed. This
-	// is indicated by the existence of the instance static property on the class.
-	if (styleScopeDefinitionClass.isMultiplex)
-		return new StyleScope( styleScopeDefinitionClass);
-	else
-	{
-		let styleScope = styleScopeDefinitionClass.styleScope as StyleScope<T>;
-		if (!styleScope)
-		{
-			styleScope = new StyleScope( styleScopeDefinitionClass);
-			styleScopeDefinitionClass.styleScope = styleScope;
-		}
-
-		return styleScope;
-	}
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Functions for creating rules.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/** Creates new TagRule object  */
-export function $tag( styleset: ExtendedStyleset): ITagRule { return new TagRule( styleset); }
-
-/** Returns new ClassRule object  */
-export function $class( styleset: ExtendedStyleset): IClassRule { return new ClassRule( styleset); }
-
-/** Returns new IDRule object  */
-export function $id( styleset: ExtendedStyleset): IIDRule { return new IDRule( styleset); }
-
-/** Creates new SelectorRule object  */
-export function $rule( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
-	{ return new SelectorRule( selector, styleset); }
-
-/** Returns new AnimationRule object  */
-export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return new AnimationRule( keyframes); }
-
-/** Returns new CustomProp object that defines a global CSS custom property */
-export function $custom<K extends keyof Styleset>( propName: K, propVal: Styleset[K]): ICustomVar
-	{ return new CustomVar( stylePropToCssString( propName, propVal, true)); }
 
 
 

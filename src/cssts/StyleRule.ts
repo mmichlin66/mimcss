@@ -37,12 +37,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		}
 		else
 		{
-			// styleset is a set of style properties but can also include the $inherits and
+			// styleset is a set of style properties but can also include the $extends and
 			// $important properties
 			for( let propName in styleset)
 			{
 				let propVal = styleset[propName];
-				if (propName === "$inherits")
+				if (propName === "$extends")
 				{
 					let inheritsPropVal = propVal as (IStyleRule | IStyleRule[]);
 					if (Array.isArray(inheritsPropVal))

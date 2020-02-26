@@ -9,7 +9,7 @@ import {Styleset} from "../styles/styles";
 /**
  * The ExtendedStyleset type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset:
- * - The `$inherits` property specifies one or more parent style rules. This allows specifying
+ * - The `$extends` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation. Parents can also be specified
  *   without a styleset.
  * - The `$important` property specifies one or more names of styleset properties that shuld be
@@ -19,7 +19,7 @@ import {Styleset} from "../styles/styles";
 export type ExtendedStyleset =
 	(Styleset &
 		{
-			$inherits?: IStyleRule | IStyleRule[],
+			$extends?: IStyleRule | IStyleRule[],
 			$important?: string | string[],
 		}
 	) | IStyleRule | IStyleRule[];
@@ -133,7 +133,7 @@ export interface ICustomVarRule extends IRule
 /**
  * The ICustomVar interface represents a CSS custom property definitions.
  */
-export interface ICustomVar
+export interface ICustomVar<T = any>
 {
 	/** Only needed to distinguish from other types */
 	readonly isCustomVar?: boolean;
@@ -148,22 +148,10 @@ type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
 type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
 
 /** Utility type that represents string values mapped to names of properties of type T that are of type U. */
-type NamesOfPropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: string };
+export type NamesOfPropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: string };
 
 /** Type that represents all properties of type T that are of type U */
 export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
-
-/** Type that represents names of all properties of type T that are class rules */
-export type ClassNames<T> = NamesOfPropsOfType<T,IClassRule>;
-
-/** Type that represents names of all properties of type T that are class rules */
-export type IDNames<T> = NamesOfPropsOfType<T,IIDRule>;
-
-/** Type that represents names of all properties of type T that are keyframe rules */
-export type AnimationNames<T> = NamesOfPropsOfType<T,IAnimationRule>;
-
-/** Type that represents names of all properties of type T that are definitions of custom CSS properties */
-export type CustomVarNames<T> = NamesOfPropsOfType<T,ICustomVar>;
 
 
 
@@ -176,16 +164,16 @@ export type CustomVarNames<T> = NamesOfPropsOfType<T,ICustomVar>;
 export interface IStyleScope<T = any>
 {
 	/** Names of classes defined in the style scope */
-	readonly classNames: ClassNames<T>;
+	readonly classNames: NamesOfPropsOfType<T,IClassRule>;
 
 	/** Names of element identifiers defined in the style scope */
-	readonly idNames: IDNames<T>;
+	readonly idNames: NamesOfPropsOfType<T,IIDRule>;
 
 	/** Names of animations defined in the style scope */
-	readonly animationNames: AnimationNames<T>;
+	readonly animationNames: NamesOfPropsOfType<T,IAnimationRule>;
 
 	/** Names of custom CSS properties defined in the style scope */
-	readonly varNames: CustomVarNames<T>;
+	readonly varNames: NamesOfPropsOfType<T,ICustomVar>;
 
 	/** Map of all rules. */
 	readonly allRules: PropsOfType<T,IRule>;
@@ -209,7 +197,7 @@ export interface IStyleScope<T = any>
 	readonly animationRules: PropsOfType<T,IAnimationRule>;
 
  	/** The ":root" block with CSS custom property definitions. */
-	readonly varRule: ICustomVarRule;
+	readonly varRules?: PropsOfType<T,ICustomVar>;
 }
 
 
@@ -237,22 +225,6 @@ export interface IStyleScopeDefinitionClass<T>
 	 */
 	styleScope?: IStyleScope<T>;
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Functions for defining rules
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-export {$tag} from "./StyleScope";
-export {$class} from "./StyleScope";
-export {$id} from "./StyleScope";
-export {$rule} from "./StyleScope";
-export {$animation} from "./StyleScope";
-export {$custom} from "./StyleScope";
-
-export {getStyleScope} from "./StyleScope";
 
 
 
