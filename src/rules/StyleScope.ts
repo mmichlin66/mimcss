@@ -26,22 +26,6 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	public constructor( ssDefClass: IStyleScopeDefinitionClass<T>)
 	{
 		this.Definition = ssDefClass;
-
-		this._classNames = {};
-		this._idNames = {};
-		this._animationNames = {};
-		this._varNames = {};
-		this._namedRules = {};
-		this._styleRules = {};
-		this._tagRules = {};
-		this._classRules = {};
-		this._idRules = {};
-		this._selectorRules = {};
-		this._animationRules = {};
-		this._varRules = {};
-		this._unnamedRules = []
-
-		this.process( ssDefClass);
 	}
 
 
@@ -89,14 +73,33 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 	// Creates the style scope definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
-	private process( ssDefClass: IStyleScopeDefinitionClass<T>): void
+	private process(): void
 	{
-		this.isMultiplex = !!ssDefClass.isMultiplex;
+		// check if the scope definition has already been processed
+		if (this.isProcessed)
+			return;
+
+		this._classNames = {};
+		this._idNames = {};
+		this._animationNames = {};
+		this._varNames = {};
+		this._namedRules = {};
+		this._styleRules = {};
+		this._tagRules = {};
+		this._classRules = {};
+		this._idRules = {};
+		this._selectorRules = {};
+		this._animationRules = {};
+		this._varRules = {};
+		this._namedRules = {};
+		this._unnamedRules = []
+
+		this.isMultiplex = !!this.Definition.isMultiplex;
 
 		// in DEBUG, each class has a name unless it was created as an anonymous class. In RELEASE,
 		// (as well as in the anonymous cases), the name is undefined and we generate a unique
 		// name for the style scope.
-		this.name = ssDefClass.name;
+		this.name = this.Definition.name;
 		if (!this.name)
 			this.name = TssManager.generateUniqueName( "s");
 
@@ -110,11 +113,11 @@ export class StyleScope<T = any> implements IStyleScope<T>
 		{
 			// create instance of the style scope definition class and then go over its properties,
 			// which define CSS rules.
-			ssDef = new ssDefClass();
+			ssDef = new this.Definition();
 		}
 		catch( err)
 		{
-			console.error( `Error instantiating Style Scope Definition of type '${ssDefClass.name}'`);
+			console.error( `Error instantiating Style Scope Definition of type '${this.Definition.name}'`);
 			return;
 		}
 
@@ -189,25 +192,11 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	// Inserts this style sheet into DOM
 	public activate(): void
 	{
-		if (this.domSS)
+		if (this.isActivated)
 			return;
 
-		if (this.isMultiplex)
-		{
-			// create <style> element and insert it into <head>
-			this.styleElm = document.createElement( "style");
-			document.head.appendChild( this.styleElm);
-			this.setDOMInfo( this.styleElm.sheet as CSSStyleSheet);
-
-			// go over the rules, convert them to strings and insert them into the style sheet
-			for( let ruleName in this._namedRules)
-			{
-				let rule: Rule = this._namedRules[ruleName];
-				rule.index = this.domSS.insertRule( rule.toCssString());
-			}
-		}
-		else
-			TssManager.addStyleScope( this);
+		this.process();
+		TssManager.activate( this);
 	}
 
 
@@ -215,23 +204,24 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	// Removes this style scope from DOM - only works for multiplex style scopes
 	public deactivate(): void
 	{
-		if (!this.isMultiplex || !this.domSS)
+		if (!this.isActivated)
 			return;
 
-		this.styleElm.remove();
-		this.styleElm = undefined;
+		TssManager.deactivate( this);
 	}
 
 
 
-	public setDOMInfo( domSS: CSSStyleSheet)
+	public setDOMInfo( styleElm: HTMLStyleElement, domSS: CSSStyleSheet)
 	{
-		this.domSS = domSS;
+		this.styleElm = styleElm;
+		this.styleSheet = domSS;
 	}
 
 	public clearDOMInfo()
 	{
-		this.domSS = undefined;
+		this.styleElm = undefined;
+		this.styleSheet = undefined;
 	}
 
 
@@ -249,6 +239,12 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 
 
+	// Helper properties
+	private get isProcessed(): boolean { return !!this._classNames; }
+	private get isActivated(): boolean { return !!this.styleSheet; }
+
+
+
 	// Class that defined this style scope. This member is used for style scope derivation
 	public readonly Definition: IStyleScopeDefinitionClass<T>;
 
@@ -258,36 +254,37 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	// Names of classes, IDs, animations and custom properties defined in the style sheet. The
 	// keys are property names used in the style sheet definition; the values are the actual names
 	// that will be inserted into the actual style sheet.
-	private readonly _classNames: { [K: string]: string }
-	private readonly _idNames: { [K: string]: string }
-	private readonly _animationNames: { [K: string]: string }
-	private readonly _varNames: { [K: string]: string }
+	private _classNames: { [K: string]: string }
+	private _idNames: { [K: string]: string }
+	private _animationNames: { [K: string]: string }
+	private _varNames: { [K: string]: string }
 
 	// Map of names of properties of the style definition to the Rule objects. This is used when
 	// creating an actual style sheet.
-	private readonly _namedRules: { [K: string]: Rule }
-	private readonly _styleRules: { [K: string]: Rule }
-	private readonly _tagRules: { [K: string]: Rule }
-	private readonly _classRules: { [K: string]: Rule }
-	private readonly _idRules: { [K: string]: Rule }
-	private readonly _selectorRules: { [K: string]: Rule }
-	private readonly _animationRules: { [K: string]: Rule }
-	private readonly _varRules:{ [K: string]: CustomVar<any> };
+	private _styleRules: { [K: string]: Rule }
+	private _tagRules: { [K: string]: Rule }
+	private _classRules: { [K: string]: Rule }
+	private _idRules: { [K: string]: Rule }
+	private _selectorRules: { [K: string]: Rule }
+	private _animationRules: { [K: string]: Rule }
+	private _varRules:{ [K: string]: CustomVar<any> };
+
+	// Map of all named rules
+	public _namedRules: { [K: string]: Rule }
 
 	// List of rules without names. This rules are inserted into DOM but cannot be accessed
 	// and manipulated programmatically
-	private readonly _unnamedRules: Rule[];
+	public _unnamedRules: Rule[];
 
 	// Flag indicating whether this style scope object owns the <style> element. This is true only
 	// for multiplex styles scopes - those that can be creaed multiple times.
-	private isMultiplex: boolean;
+	public isMultiplex: boolean;
 
-	// Style element DOM object which is only relevant for multiplex style scopes, which own their
-	// <style> element.
+	// Style element DOM object.
 	private styleElm?: HTMLStyleElement;
 
 	// When activated, points to the DOM style sheet object inserted into the <head> element
-	private domSS?: CSSStyleSheet;
+	private styleSheet?: CSSStyleSheet;
 }
 
 

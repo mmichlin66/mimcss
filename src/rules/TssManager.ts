@@ -54,40 +54,80 @@ export class TssManager
 
 
 	/** Inserts rules from the given style scope into DOM */
-	public static addStyleScope( styleScope: StyleScope): void
+	public static activate( styleScope: StyleScope): void
 	{
-		this.ensureDOM();
+		if (!styleScope)
+			return;
+			
+		// depending on whether the given scope is multiplex, we either create a new <style> element
+		// or reuse our "global" one
+		let styleElm: HTMLStyleElement;
+		let styleSheet: CSSStyleSheet;
+		if (styleScope.Definition.isMultiplex)
+		{
+			styleElm = document.createElement( "style");
+			document.head.appendChild( styleElm);
+			styleSheet = styleElm.sheet as CSSStyleSheet;
+			this.multiplexScopes.set( styleScope, styleElm);
+		}
+		else
+		{
+			this.ensureDOM();
+			styleElm = this.styleElm;
+			styleSheet = this.styleSheet;
+		}
 
-		styleScope.setDOMInfo( this.domSS);
+		styleScope.setDOMInfo( styleElm, styleSheet);
 
 		// go over the named rules, convert them to strings and insert them into the style sheet
-		for( let ruleName in styleScope.namedRules)
+		for( let ruleName in styleScope._namedRules)
 		{
-			let rule: Rule = styleScope.namedRules[ruleName];
-			rule.index = this.domSS.insertRule( rule.toCssString());
+			let rule: Rule = styleScope._namedRules[ruleName];
+			rule.index = styleSheet.insertRule( rule.toCssString());
 		}
 
 		// do the same for the unnamed rules
-		for( let unnamedRule of styleScope.unnamedRules)
+		for( let unnamedRule of styleScope._unnamedRules)
 		{
 			let rule = unnamedRule as Rule;
-			rule.index = this.domSS.insertRule( rule.toCssString());
+			rule.index = styleSheet.insertRule( rule.toCssString());
+		}
+	}
+
+
+
+	// Removes this style scope from DOM - only works for multiplex style scopes
+	public static deactivate( styleScope: StyleScope): void
+	{
+		if (!styleScope)
+			return;
+
+		if (styleScope.Definition.isMultiplex)
+		{
+			styleScope.clearDOMInfo();
+			
+			// remove the <style> element from the document
+			let styleElm = this.multiplexScopes.get( styleScope);
+			if (styleElm)
+				styleElm.remove();
+
+			this.multiplexScopes.delete( styleScope);
 		}
 	}
 
 
 
 	/** Ensures that the <style> element is inserted into DOM */
-	public static ensureDOM(): void
+	private static ensureDOM(): void
 	{
-		if (this.domSS)
+		if (this.styleSheet)
 			return;
 
 		// create <style> element and insert it into <head>
 		this.styleElm = document.createElement( "style");
 		document.head.appendChild( this.styleElm);
 
-		this.domSS = this.styleElm.sheet as CSSStyleSheet;
+		this.styleSheet = this.styleElm.sheet as CSSStyleSheet;
 	}
 
 
@@ -107,7 +147,10 @@ export class TssManager
 	private static styleElm?: HTMLStyleElement;
 
 	// DOM style sheet object inserted into the <head> element.
-	private static domSS?: CSSStyleSheet;
+	private static styleSheet?: CSSStyleSheet;
+
+	// Map of StyleScope multiplex objects to their <style> element DOM objects.
+	private static multiplexScopes = new Map<StyleScope,HTMLStyleElement>();
 }
 
 
