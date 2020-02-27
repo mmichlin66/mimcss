@@ -1,4 +1,4 @@
-import {IIDRule, ExtendedStyleset} from "./cssts"
+import {ITagRule, ExtendedStyleset} from "../api/rules"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"
@@ -6,9 +6,9 @@ import {StyleScope} from "./StyleScope"
 
 
 /**
- * The IDRule type describes a styleset that applies to elements identified by an ID.
+ * The TagRule type describes a styleset that applies to elements identified by a tag name.
  */
-export class IDRule extends StyleRule implements IIDRule
+export class TagRule extends StyleRule implements ITagRule
 {
 	public constructor( styleset?: ExtendedStyleset)
 	{
@@ -22,8 +22,6 @@ export class IDRule extends StyleRule implements IIDRule
 	{
 		super.process( owner, ruleName);
 
-		this.idName = this.owner.generateScopedName( ruleName);
-
 		// go through all parents; for those who are classes, add their name to the
 		// combined name. For those who are not classes, copy style properties to the
 		// class's own styleset.
@@ -34,9 +32,9 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 	// Creates a copy of the rule.
-	public clone(): IDRule
+	public clone(): TagRule
 	{
-		let newRule = new IDRule();
+		let newRule = new TagRule();
 		newRule.copyFrom( this);
 		return newRule;
 	}
@@ -46,16 +44,16 @@ export class IDRule extends StyleRule implements IIDRule
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `#${this.idName} ${stylesetToCssString( this.styleset, this.important)}`;
+		return `${this.tagName} ${stylesetToCssString( this.styleset, this.important)}`;
 	}
 
 
 
 	/** Only needed to distinguish from other rules */
-	public get isIDRule(): boolean { return true; }
+	public get isTagRule(): boolean { return true; }
 
-	// Name of the element identifier for applying the styleset.
-	public idName: string;
+	// Name of the tag to which the styleset applies.
+	public get tagName(): string { return this.ruleName };
 }
 
 

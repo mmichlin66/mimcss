@@ -1,6 +1,7 @@
-import {IStyleScopeDefinitionClass, IStyleScope, NamesOfPropsOfType, PropsOfType, IRule,
+import {NamesOfPropsOfType, PropsOfType, IRule,
 		IStyleRule, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimationRule, ICustomVar}
-		from "./cssts"
+		from "../api/rules"
+import {IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
 
 import {Rule} from "./Rule"
 import {TagRule} from "./TagRule"
@@ -30,7 +31,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 		this._idNames = {};
 		this._animationNames = {};
 		this._varNames = {};
-		this._allRules = {};
+		this._namedRules = {};
 		this._styleRules = {};
 		this._tagRules = {};
 		this._classRules = {};
@@ -38,7 +39,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 		this._selectorRules = {};
 		this._animationRules = {};
 		this._varRules = {};
-		this.unnamedRules = []
+		this._unnamedRules = []
 
 		this.process( ssDefClass);
 	}
@@ -56,9 +57,6 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 	/** Names of custom CSS properties defined in the style scope */
 	public get varNames(): NamesOfPropsOfType<T,ICustomVar> { this.activate(); return this._varNames as NamesOfPropsOfType<T,ICustomVar>; }
-
-	/** Map of all rules. */
-	public get allRules(): PropsOfType<T,IRule> { this.activate(); return this._allRules as PropsOfType<T,IRule>; }
 
 	/** Map of all style (tag, class, ID and selector) rules. */
 	public get styleRules(): PropsOfType<T,IStyleRule> { this.activate(); return this._styleRules as PropsOfType<T,IStyleRule>; }
@@ -81,6 +79,13 @@ export class StyleScope<T = any> implements IStyleScope<T>
  	/** The ":root" block with CSS custom property definitions. */
 	public get varRules(): PropsOfType<T,ICustomVar> { this.activate(); return this._varRules as PropsOfType<T,ICustomVar>; }
 
+	/** Map of all rules. */
+	public get namedRules(): PropsOfType<T,IRule> { this.activate(); return this._namedRules as PropsOfType<T,IRule>; }
+
+	/** Map of all rules. */
+	public get unnamedRules(): IRule[] { this.activate(); return this._unnamedRules; }
+
+
 
 	// Creates the style scope definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
@@ -96,7 +101,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 			this.name = TssManager.generateUniqueName( "s");
 
 		// insert our internal rule for custom CSS properties into the list of unnamed rules.
-		this.unnamedRules.push( new CustomVarRule(this));
+		this._unnamedRules.push( new CustomVarRule(this));
 
 		// create instance of the style scope definition class and then go over its properties,
 		// which define CSS rules.
@@ -131,7 +136,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 			rule.process( this, ruleName);
 
 			if (rule.isRealCssRule)
-				this._allRules[ruleName] = rule;
+				this._namedRules[ruleName] = rule;
 
 			if (rule instanceof TagRule)
 			{
@@ -195,9 +200,9 @@ export class StyleScope<T = any> implements IStyleScope<T>
 			this.setDOMInfo( this.styleElm.sheet as CSSStyleSheet);
 
 			// go over the rules, convert them to strings and insert them into the style sheet
-			for( let ruleName in this.allRules)
+			for( let ruleName in this._namedRules)
 			{
-				let rule: Rule = this.allRules[ruleName];
+				let rule: Rule = this._namedRules[ruleName];
 				rule.index = this.domSS.insertRule( rule.toCssString());
 			}
 		}
@@ -260,7 +265,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 	// Map of names of properties of the style definition to the Rule objects. This is used when
 	// creating an actual style sheet.
-	private readonly _allRules: { [K: string]: Rule }
+	private readonly _namedRules: { [K: string]: Rule }
 	private readonly _styleRules: { [K: string]: Rule }
 	private readonly _tagRules: { [K: string]: Rule }
 	private readonly _classRules: { [K: string]: Rule }
@@ -271,7 +276,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 	// List of rules without names. This rules are inserted into DOM but cannot be accessed
 	// and manipulated programmatically
-	private readonly unnamedRules: Rule[];
+	private readonly _unnamedRules: Rule[];
 
 	// Flag indicating whether this style scope object owns the <style> element. This is true only
 	// for multiplex styles scopes - those that can be creaed multiple times.

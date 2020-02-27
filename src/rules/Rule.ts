@@ -1,4 +1,4 @@
-import {IRule} from "./cssts"
+import {IRule} from "../api/rules"
 import {StyleScope} from "./StyleScope"
 
 

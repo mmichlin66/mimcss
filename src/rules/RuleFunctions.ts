@@ -1,5 +1,7 @@
-import {ExtendedStyleset, ITagRule, IClassRule, IIDRule, ISelectorRule, ISelector, IAnimationRule,
-		Keyframe, ICustomVar, IStyleScopeDefinitionClass, IStyleScope} from "./cssts"
+import {ExtendedStyleset, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimationRule,
+		Keyframe, ICustomVar} from "../api/rules"
+import {IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
+import {ISelector} from "../api/ISelector"
 
 import {Styleset, stylePropToCssString} from "../styles/styles"
 import {TagRule} from "./TagRule"
@@ -9,6 +11,7 @@ import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {CustomVar} from "./CustomVar"
 import {StyleScope} from "./StyleScope"
+import { StringProxy } from "../styles/utils"
 
 
 
@@ -32,10 +35,34 @@ export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return n
 export function $custom<K extends keyof Styleset>( templatePropName: K, propVal: Styleset[K]): ICustomVar<Styleset[K]>
 	{ return new CustomVar( templatePropName, propVal); }
 
-/** Returns the string representation of the CSS var() function for the given custom property */
-export function $var<T>( customVar: ICustomVar<T>): T
+
+
+/**
+ * Returns the string representation of the CSS var() function for the given custom property.
+ * Example:
+ * ```tsx
+ * let myStyles = $scope( class
+ * {
+ *     defaultColor = $custom( "color", "blue");
+ * 
+ *     sidebar = $class( { color: $var( this.defaultColor, "black") })
+ * });
+ * ```
+ */
+export function $var<T>( customVar: ICustomVar<T>, fallbackValue?: T | ICustomVar<T> | StringProxy): StringProxy
 {
-	return (customVar as CustomVar<T>).varValue;
+	let s = `var(--${(customVar as CustomVar<T>).varName}`;
+	if (fallbackValue)
+	{
+		if (fallbackValue instanceof CustomVar)
+			s += $var( fallbackValue);
+		else if (fallbackValue instanceof StringProxy)
+			s += fallbackValue.toString();
+		else
+			s += stylePropToCssString( (customVar as CustomVar<T>).templatePropName, fallbackValue);
+	}
+
+	return new StringProxy( s + ")");
 }
 
 

@@ -1,4 +1,4 @@
-import {ICustomVar} from "./cssts"
+import {ICustomVar} from "../api/rules"
 import {stylePropToCssString, Styleset} from "../styles/styles"
 import {Rule} from "./Rule";
 import {StyleScope} from "./StyleScope"

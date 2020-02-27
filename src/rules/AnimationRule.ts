@@ -1,4 +1,4 @@
-import {IAnimationRule, Keyframe} from "./cssts"
+import {IAnimationRule, Keyframe} from "../api/rules"
 import {stylesetToCssString} from "../styles/styles"
 import {percentToCssString} from "../styles/utils"
 import {Rule} from "./Rule"

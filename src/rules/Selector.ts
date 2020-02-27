@@ -1,4 +1,5 @@
-﻿import {ISelector, IEmptySelector, AttrSelectorOperation, AttrSelectorOperationType, IStyleRule, ITagRule, IClassRule, IIDRule} from "./cssts"
+﻿import {IStyleRule, ITagRule, IClassRule, IIDRule} from "../api/rules"
+import {ISelector, IEmptySelector, AttrSelectorOperation, AttrSelectorOperationType, } from "../api/ISelector"
 import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"

@@ -60,10 +60,17 @@ export class TssManager
 
 		styleScope.setDOMInfo( this.domSS);
 
-		// go over the rules, convert them to strings and insert them into the style sheet
-		for( let ruleName in styleScope.allRules)
+		// go over the named rules, convert them to strings and insert them into the style sheet
+		for( let ruleName in styleScope.namedRules)
 		{
-			let rule: Rule = styleScope.allRules[ruleName];
+			let rule: Rule = styleScope.namedRules[ruleName];
+			rule.index = this.domSS.insertRule( rule.toCssString());
+		}
+
+		// do the same for the unnamed rules
+		for( let unnamedRule of styleScope.unnamedRules)
+		{
+			let rule = unnamedRule as Rule;
 			rule.index = this.domSS.insertRule( rule.toCssString());
 		}
 	}

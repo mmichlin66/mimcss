@@ -1,4 +1,4 @@
-import {IClassRule, ExtendedStyleset} from "./cssts"
+import {IClassRule, ExtendedStyleset} from "../api/rules"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"

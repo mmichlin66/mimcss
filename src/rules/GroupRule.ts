@@ -1,4 +1,5 @@
-import {IRule, IStyleScope} from "./cssts"
+import {IRule} from "../api/rules"
+import {IStyleScope} from "../api/scope"
 
 
 
