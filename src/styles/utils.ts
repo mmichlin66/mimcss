@@ -2,47 +2,65 @@
  * This file contains basic types and functions used to define CSS property types.
  */
 
+
+
 /**
  * Style values that can be used for (almost) any property
  */
-export type Base_StyleType = "inherit" | "initial" | "unset" | VarUse;
+export type Base_StyleType = "inherit" | "initial" | "unset" | StringProxy;
 
 
 
 /**
- * The VarUse class encapsulates the use of a CSS custom property via the var() CSS function.
+ * The StringProxy class encapsulates a string, which is returned via the standard toString()
+ * method. All CSS properties should accept string as the type of their value even if normally
+ * they accept other types (e.g a set of string literals as `"row" | "column"` for the
+ * flex-dirction) property. This is because in addition to their normal values any property
+ * can use custom CSS property in the form `var(--propname)`. However, if we add string type
+ * to the set of string literals (e.g. `"row" | "column" | string`), this throws off the
+ * Intellisense and it doesn't prompt developers for the possible values. The StringProxy
+ * can be used instead of string (e.g. `"row" | "column" | StringProxy`) and this solves
+ * the Intellisense issue.
  */
-export class VarUse
+export class StringProxy
 {
-    constructor( varName: string, fallbackValue?: string)
+    constructor( s: string | StringProxy)
     {
-        this.varName = varName;
-        this.fallbackValue = fallbackValue;
+        this.s = typeof s === "string" ? s : s.toString();
     }
 
-    public toCssString(): string
-    {
-        let s = `var(--${this.varName}`;
-        if (this.fallbackValue)
-            s += "," + this.fallbackValue;
+    public toString(): string { return this.s; }
 
-        return s + ")";
-    }
+    protected s: string;
+}
 
-    private varName: string;
-    private fallbackValue: string;
+/**
+ * Creates a StringProxy object from the given string or another StringProxy object.
+ */
+export function raw( s:  string | StringProxy): StringProxy
+{
+    return new StringProxy(s);
 }
 
 
 
 /**
- * Creates new VarUse object that represents the use of the given CSS custom property.
+ * Creates a StringProxy object that represents the use of the given CSS custom property. Use it
+ * as in the following:
+ * ```typescript
+ * style={{ color: useVar(--default-color, black) }}
+ * ```
  * @param varName
  * @param fallbackValues 
  */
-export function useVar( varName: string, fallbackValue: string): VarUse
+export function useVar( varName: string, fallbackValue?: string | StringProxy): StringProxy
 {
-    return new VarUse( varName, fallbackValue);
+    let s = `var(--${varName}`;
+    if (fallbackValue)
+        s += "," + fallbackValue;
+
+    s += ")";
+    return new StringProxy(s);
 }
 
 
@@ -114,8 +132,8 @@ export function stringArrayToCssString( val: (string | Base_StyleType)[], separa
 
             if (typeof v === "string")
                 s += v;
-            else if (val instanceof VarUse)
-                s += v.toCssString();
+            else if (val instanceof StringProxy)
+                s += v.toString();
         }
     }
 
@@ -171,8 +189,8 @@ export function singleNumberToCssString( val: SingleNumber_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof VarUse)
-        return val.toCssString();
+    else if (val instanceof StringProxy)
+        return val.toString();
     else
         return val.toString();
 }
@@ -187,8 +205,8 @@ export function multiNumberToCssString( val: MultiNumber_StyleType): string
         return val;
     else if (typeof val === "number")
         return val.toString();
-    else if (val instanceof VarUse)
-        return val.toCssString();
+    else if (val instanceof StringProxy)
+        return val.toString();
     else
         return arrayToCssString( val, singleNumberToCssString);
 }
@@ -201,10 +219,10 @@ export function multiNumberToCssString( val: MultiNumber_StyleType): string
  *   - number: zero is treated as not having any suffix; integer numbers are treated as pixels;
  *     floating numbers are treated as percents: 0.0 to 1.0.
  */
-export type SingleLength_StyleType = "auto" | number | string | Base_StyleType;
+export type SingleLength_StyleType = "auto" | number | Base_StyleType;
 
 /** Type for multi-part length or percentage style property */
-export type MultiLength_StyleType = SingleLength_StyleType | SingleLength_StyleType[] | string;
+export type MultiLength_StyleType = SingleLength_StyleType | SingleLength_StyleType[];
 
 /**
  * Converts length value from the numeric representation to the CSS string. Integer
@@ -224,8 +242,8 @@ export function singleLengthToCssString( val: SingleLength_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof VarUse)
-        return val.toCssString();
+    else if (val instanceof StringProxy)
+        return val.toString();
     else
 	    return lengthNumberToCssString( val);
 }
@@ -254,7 +272,7 @@ export function multiLengthToCssString( val: MultiLength_StyleType): string
 export type SingleSize_StyleType = SingleLength_StyleType | { w: SingleLength_StyleType; h: SingleLength_StyleType };
 
 /** Type for multi-part size style property */
-export type MultiSize_StyleType = SingleSize_StyleType | SingleSize_StyleType[] | string;
+export type MultiSize_StyleType = SingleSize_StyleType | SingleSize_StyleType[];
 
 /**
  * Converts size style value to the CSS string.
@@ -262,7 +280,11 @@ export type MultiSize_StyleType = SingleSize_StyleType | SingleSize_StyleType[] 
  */
 export function singleSizeToCssString( val: SingleSize_StyleType): string
 {
-    if (typeof val === "object")
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof StringProxy)
+        return val.toString();
+    else if (typeof val === "object")
         return objectToCssString( val, false, ["w", singleLengthToCssString], ["h", singleLengthToCssString]);
     // else if (Array.isArray( val))
     //     return lengthToCssString( val[0]) + " " + lengthToCssString( val[1]);
@@ -278,6 +300,8 @@ export function multiSizeToCssString( val: MultiSize_StyleType): string
 {
     if (typeof val === "string")
         return val;
+    else if (val instanceof StringProxy)
+        return val.toString();
     else if (Array.isArray(val))
         return arrayToCssString( val, singleSizeToCssString);
     else
@@ -292,7 +316,7 @@ export function multiSizeToCssString( val: MultiSize_StyleType): string
  *   - number: zero is treated as not having any suffix; integer numbers are treated as degrees;
  *     floating numbers are treated as radians.
  */
-export type SingleAngle_StyleType = number | string | Base_StyleType;
+export type SingleAngle_StyleType = number | Base_StyleType;
 
 /**
  * Converts angle value from the numeric representation to the CSS string. Integer
@@ -312,8 +336,8 @@ export function singleAngleToCssString( val: SingleAngle_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof VarUse)
-        return val.toCssString();
+    else if (val instanceof StringProxy)
+        return val.toString();
     else
 	    return angleNumberToCssString( val);
 }
@@ -329,7 +353,7 @@ export type SinglePosition_StyleType = "center" | "left" | "right" | "top" | "bo
                 Base_StyleType;
 
 /** Type for multi-part position style property */
-export type MultiPosition_StyleType = SinglePosition_StyleType | SinglePosition_StyleType[] | string;
+export type MultiPosition_StyleType = SinglePosition_StyleType | SinglePosition_StyleType[];
 
 /**
  * Converts single position style value to the CSS time string.
@@ -337,7 +361,11 @@ export type MultiPosition_StyleType = SinglePosition_StyleType | SinglePosition_
  */
 export function  singlePositionToCssString( val: SinglePosition_StyleType): string
 {
-    if (typeof val === "object")
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof StringProxy)
+        return val.toString();
+    else if (typeof val === "object")
     {
         if ("xedge" in val)
             return objectToCssString( val, false, "xedge", ["x", singleLengthToCssString], "yedge", ["y", singleLengthToCssString]);
@@ -368,10 +396,10 @@ export function multiPositionToCssString( val: MultiPosition_StyleType): string
  *   - number: integer numbers are treated as milliseconds while floating numbers are treated
  *     as seconds.
  */
-export type SingleTime_StyleType = string | number | Base_StyleType;
+export type SingleTime_StyleType = number | Base_StyleType;
 
 /** Type for multi-part time style property */
-export type MultiTime_StyleType = SingleTime_StyleType | SingleTime_StyleType[] | string;
+export type MultiTime_StyleType = SingleTime_StyleType | SingleTime_StyleType[];
 
 /**
  * Converts time interval value from the numeric representation to the CSS time string. Integer
@@ -391,8 +419,8 @@ export function singleTimeToCssString( val: SingleTime_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof VarUse)
-        return val.toCssString();
+    else if (val instanceof StringProxy)
+        return val.toString();
     else
 	    return timeNumberToCssString( val);
 }
@@ -407,8 +435,8 @@ export function multiTimeToCssString( val: MultiTime_StyleType): string
         return val;
     else if (typeof val === "number")
         return timeNumberToCssString( val);
-    else if (val instanceof VarUse)
-        return val.toCssString();
+    else if (val instanceof StringProxy)
+        return val.toString();
     else
         return arrayToCssString( val, singleTimeToCssString);
 }
@@ -416,161 +444,162 @@ export function multiTimeToCssString( val: MultiTime_StyleType): string
 
 
 /**
- * Enumeration of well-known colors. The values of the enumeration items correspond to the hexadecimal
- * representartion of the RGB separations (without an alpha mask). This enumeration is not marked const
- * because we want to retain the ability to find RGB values by their names.
+ * Object whose property names are names of well-known colors and values correspond to the hexadecimal
+ * representartion of the RGB separations (without an alpha mask).
  */
-export enum Colors
+export class ColorsClass 
 {
-    black = 0x000000,
-    silver = 0xc0c0c0,
-    gray = 0x808080,
-    white = 0xffffff,
-    maroon = 0x800000,
-    red = 0xff0000,
-    purple = 0x800080,
-    fuchsia = 0xff00ff,
-    green = 0x008000,
-    lime = 0x00ff00,
-    olive = 0x808000,
-    yellow = 0xffff00,
-    navy = 0x000080,
-    blue = 0x0000ff,
-    teal = 0x008080,
-    aqua = 0x00ffff,
-    orange = 0xffa500,
-    aliceblue = 0xf0f8ff,
-    antiquewhite = 0xfaebd7,
-    aquamarine = 0x7fffd4,
-    azure = 0xf0ffff,
-    beige = 0xf5f5dc,
-    bisque = 0xffe4c4,
-    blanchedalmond = 0xffebcd,
-    blueviolet = 0x8a2be2,
-    brown = 0xa52a2a,
-    burlywood = 0xdeb887,
-    cadetblue = 0x5f9ea0,
-    chartreuse = 0x7fff00,
-    chocolate = 0xd2691e,
-    coral = 0xff7f50,
-    cornflowerblue = 0x6495ed,
-    cornsilk = 0xfff8dc,
-    crimson = 0xdc143c,
-    cyan = 0x00ffff,
-    darkblue = 0x00008b,
-    darkcyan = 0x008b8b,
-    darkgoldenrod = 0xb8860b,
-    darkgray = 0xa9a9a9,
-    darkgreen = 0x006400,
-    darkgrey = 0xa9a9a9,
-    darkkhaki = 0xbdb76b,
-    darkmagenta = 0x8b008b,
-    darkolivegreen = 0x556b2f,
-    darkorange = 0xff8c00,
-    darkorchid = 0x9932cc,
-    darkred = 0x8b0000,
-    darksalmon = 0xe9967a,
-    darkseagreen = 0x8fbc8f,
-    darkslateblue = 0x483d8b,
-    darkslategray = 0x2f4f4f,
-    darkslategrey = 0x2f4f4f,
-    darkturquoise = 0x00ced1,
-    darkviolet = 0x9400d3,
-    deeppink = 0xff1493,
-    deepskyblue = 0x00bfff,
-    dimgray = 0x696969,
-    dimgrey = 0x696969,
-    dodgerblue = 0x1e90ff,
-    firebrick = 0xb22222,
-    floralwhite = 0xfffaf0,
-    forestgreen = 0x228b22,
-    gainsboro = 0xdcdcdc,
-    ghostwhite = 0xf8f8ff,
-    gold = 0xffd700,
-    goldenrod = 0xdaa520,
-    greenyellow = 0xadff2f,
-    grey = 0x808080,
-    honeydew = 0xf0fff0,
-    hotpink = 0xff69b4,
-    indianred = 0xcd5c5c,
-    indigo = 0x4b0082,
-    ivory = 0xfffff0,
-    khaki = 0xf0e68c,
-    lavender = 0xe6e6fa,
-    lavenderblush = 0xfff0f5,
-    lawngreen = 0x7cfc00,
-    lemonchiffon = 0xfffacd,
-    lightblue = 0xadd8e6,
-    lightcoral = 0xf08080,
-    lightcyan = 0xe0ffff,
-    lightgoldenrodyellow = 0xfafad2,
-    lightgray = 0xd3d3d3,
-    lightgreen = 0x90ee90,
-    lightgrey = 0xd3d3d3,
-    lightpink = 0xffb6c1,
-    lightsalmon = 0xffa07a,
-    lightseagreen = 0x20b2aa,
-    lightskyblue = 0x87cefa,
-    lightslategray = 0x778899,
-    lightslategrey = 0x778899,
-    lightsteelblue = 0xb0c4de,
-    lightyellow = 0xffffe0,
-    limegreen = 0x32cd32,
-    linen = 0xfaf0e6,
-    magenta = 0xff00ff,
-    mediumaquamarine = 0x66cdaa,
-    mediumblue = 0x0000cd,
-    mediumorchid = 0xba55d3,
-    mediumpurple = 0x9370db,
-    mediumseagreen = 0x3cb371,
-    mediumslateblue = 0x7b68ee,
-    mediumspringgreen = 0x00fa9a,
-    mediumturquoise = 0x48d1cc,
-    mediumvioletred = 0xc71585,
-    midnightblue = 0x191970,
-    mintcream = 0xf5fffa,
-    mistyrose = 0xffe4e1,
-    moccasin = 0xffe4b5,
-    navajowhite = 0xffdead,
-    oldlace = 0xfdf5e6,
-    olivedrab = 0x6b8e23,
-    orangered = 0xff4500,
-    orchid = 0xda70d6,
-    palegoldenrod = 0xeee8aa,
-    palegreen = 0x98fb98,
-    paleturquoise = 0xafeeee,
-    palevioletred = 0xdb7093,
-    papayawhip = 0xffefd5,
-    peachpuff = 0xffdab9,
-    peru = 0xcd853f,
-    pink = 0xffc0cb,
-    plum = 0xdda0dd,
-    powderblue = 0xb0e0e6,
-    rosybrown = 0xbc8f8f,
-    royalblue = 0x4169e1,
-    saddlebrown = 0x8b4513,
-    salmon = 0xfa8072,
-    sandybrown = 0xf4a460,
-    seagreen = 0x2e8b57,
-    seashell = 0xfff5ee,
-    sienna = 0xa0522d,
-    skyblue = 0x87ceeb,
-    slateblue = 0x6a5acd,
-    slategray = 0x708090,
-    slategrey = 0x708090,
-    snow = 0xfffafa,
-    springgreen = 0x00ff7f,
-    steelblue = 0x4682b4,
-    tan = 0xd2b48c,
-    thistle = 0xd8bfd8,
-    tomato = 0xff6347,
-    turquoise = 0x40e0d0,
-    violet = 0xee82ee,
-    wheat = 0xf5deb3,
-    whitesmoke = 0xf5f5f5,
-    yellowgreen = 0x9acd32,
+    black = 0x000000;
+    silver = 0xc0c0c0;
+    gray = 0x808080;
+    white = 0xffffff;
+    maroon = 0x800000;
+    red = 0xff0000;
+    purple = 0x800080;
+    fuchsia = 0xff00ff;
+    green = 0x008000;
+    lime = 0x00ff00;
+    olive = 0x808000;
+    yellow = 0xffff00;
+    navy = 0x000080;
+    blue = 0x0000ff;
+    teal = 0x008080;
+    aqua = 0x00ffff;
+    orange = 0xffa500;
+    aliceblue = 0xf0f8ff;
+    antiquewhite = 0xfaebd7;
+    aquamarine = 0x7fffd4;
+    azure = 0xf0ffff;
+    beige = 0xf5f5dc;
+    bisque = 0xffe4c4;
+    blanchedalmond = 0xffebcd;
+    blueviolet = 0x8a2be2;
+    brown = 0xa52a2a;
+    burlywood = 0xdeb887;
+    cadetblue = 0x5f9ea0;
+    chartreuse = 0x7fff00;
+    chocolate = 0xd2691e;
+    coral = 0xff7f50;
+    cornflowerblue = 0x6495ed;
+    cornsilk = 0xfff8dc;
+    crimson = 0xdc143c;
+    cyan = 0x00ffff;
+    darkblue = 0x00008b;
+    darkcyan = 0x008b8b;
+    darkgoldenrod = 0xb8860b;
+    darkgray = 0xa9a9a9;
+    darkgreen = 0x006400;
+    darkgrey = 0xa9a9a9;
+    darkkhaki = 0xbdb76b;
+    darkmagenta = 0x8b008b;
+    darkolivegreen = 0x556b2f;
+    darkorange = 0xff8c00;
+    darkorchid = 0x9932cc;
+    darkred = 0x8b0000;
+    darksalmon = 0xe9967a;
+    darkseagreen = 0x8fbc8f;
+    darkslateblue = 0x483d8b;
+    darkslategray = 0x2f4f4f;
+    darkslategrey = 0x2f4f4f;
+    darkturquoise = 0x00ced1;
+    darkviolet = 0x9400d3;
+    deeppink = 0xff1493;
+    deepskyblue = 0x00bfff;
+    dimgray = 0x696969;
+    dimgrey = 0x696969;
+    dodgerblue = 0x1e90ff;
+    firebrick = 0xb22222;
+    floralwhite = 0xfffaf0;
+    forestgreen = 0x228b22;
+    gainsboro = 0xdcdcdc;
+    ghostwhite = 0xf8f8ff;
+    gold = 0xffd700;
+    goldenrod = 0xdaa520;
+    greenyellow = 0xadff2f;
+    grey = 0x808080;
+    honeydew = 0xf0fff0;
+    hotpink = 0xff69b4;
+    indianred = 0xcd5c5c;
+    indigo = 0x4b0082;
+    ivory = 0xfffff0;
+    khaki = 0xf0e68c;
+    lavender = 0xe6e6fa;
+    lavenderblush = 0xfff0f5;
+    lawngreen = 0x7cfc00;
+    lemonchiffon = 0xfffacd;
+    lightblue = 0xadd8e6;
+    lightcoral = 0xf08080;
+    lightcyan = 0xe0ffff;
+    lightgoldenrodyellow = 0xfafad2;
+    lightgray = 0xd3d3d3;
+    lightgreen = 0x90ee90;
+    lightgrey = 0xd3d3d3;
+    lightpink = 0xffb6c1;
+    lightsalmon = 0xffa07a;
+    lightseagreen = 0x20b2aa;
+    lightskyblue = 0x87cefa;
+    lightslategray = 0x778899;
+    lightslategrey = 0x778899;
+    lightsteelblue = 0xb0c4de;
+    lightyellow = 0xffffe0;
+    limegreen = 0x32cd32;
+    linen = 0xfaf0e6;
+    magenta = 0xff00ff;
+    mediumaquamarine = 0x66cdaa;
+    mediumblue = 0x0000cd;
+    mediumorchid = 0xba55d3;
+    mediumpurple = 0x9370db;
+    mediumseagreen = 0x3cb371;
+    mediumslateblue = 0x7b68ee;
+    mediumspringgreen = 0x00fa9a;
+    mediumturquoise = 0x48d1cc;
+    mediumvioletred = 0xc71585;
+    midnightblue = 0x191970;
+    mintcream = 0xf5fffa;
+    mistyrose = 0xffe4e1;
+    moccasin = 0xffe4b5;
+    navajowhite = 0xffdead;
+    oldlace = 0xfdf5e6;
+    olivedrab = 0x6b8e23;
+    orangered = 0xff4500;
+    orchid = 0xda70d6;
+    palegoldenrod = 0xeee8aa;
+    palegreen = 0x98fb98;
+    paleturquoise = 0xafeeee;
+    palevioletred = 0xdb7093;
+    papayawhip = 0xffefd5;
+    peachpuff = 0xffdab9;
+    peru = 0xcd853f;
+    pink = 0xffc0cb;
+    plum = 0xdda0dd;
+    powderblue = 0xb0e0e6;
+    rosybrown = 0xbc8f8f;
+    royalblue = 0x4169e1;
+    saddlebrown = 0x8b4513;
+    salmon = 0xfa8072;
+    sandybrown = 0xf4a460;
+    seagreen = 0x2e8b57;
+    seashell = 0xfff5ee;
+    sienna = 0xa0522d;
+    skyblue = 0x87ceeb;
+    slateblue = 0x6a5acd;
+    slategray = 0x708090;
+    slategrey = 0x708090;
+    snow = 0xfffafa;
+    springgreen = 0x00ff7f;
+    steelblue = 0x4682b4;
+    tan = 0xd2b48c;
+    thistle = 0xd8bfd8;
+    tomato = 0xff6347;
+    turquoise = 0x40e0d0;
+    violet = 0xee82ee;
+    wheat = 0xf5deb3;
+    whitesmoke = 0xf5f5f5;
+    yellowgreen = 0x9acd32;
     rebeccapurple = 0x663399
 }
+
+export let Colors = new ColorsClass();
 
 /**
  * Type for CSS color represented as an array:
@@ -585,7 +614,7 @@ export enum Colors
  */
 export type ColorAsArray =
                 [string | number] |
-                [keyof Colors | number, number] |
+                [keyof ColorsClass | number, number] |
                 [number, number, number] |
                 [number, number, number, number];
 
@@ -624,7 +653,7 @@ export type ColorAsObject =
  *     - negative and floating point numbers are rejected.
  *   - array [[ColorAsArray]] or object [[ColorAsObject]]:
  */
-export type Color_StyleType = "transparent" | "currentcolor" | number | Base_StyleType | ColorAsArray | ColorAsObject | keyof Colors | string;
+export type Color_StyleType = "transparent" | "currentcolor" | number | Base_StyleType | ColorAsArray | ColorAsObject | keyof ColorsClass;
 
 /**
  * Converts color separation value from the numeric representation to the 2-digit hexadecimal string.
@@ -678,7 +707,9 @@ export function colorNumberToCssString( val: number): string
 export function colorAsArrayToCssString( val: ColorAsArray): string
 {
     if (val.length === 1)
-        return colorToCssString( val[0]);
+    {
+        return typeof val[0] === "string" ? val[0] : colorToCssString( val[0]);
+    }
     else if (val.length === 2)
     {
         let rgb = typeof val[0] === "string" ? Colors[val[0]] : val[0];
@@ -739,8 +770,8 @@ export function colorToCssString( val: Color_StyleType): string
         return val;
     else if (typeof val === "number")
 	    return colorNumberToCssString( val);
-    else if (val instanceof VarUse)
-        return val.toCssString();
+    else if (val instanceof StringProxy)
+        return val.toString();
     else if (Array.isArray( val))
 	    return colorAsArrayToCssString( val);
     else
@@ -758,7 +789,7 @@ export function colorToCssString( val: Color_StyleType): string
  *     it will be used to convert the property's value to the string. If a function is not present, then the
  *     property value should be converted to the string using the toString method.
  */
-export function objectToCssString( val: any, usePropNames: boolean, ...propsAndFuncs: (string | [string, (val:any) => string])[] ): string
+export function objectToCssString( val: any, usePropNames: boolean, ...propsAndFuncs: (string | [string, (val: any) => string])[] ): string
 {
     if (val == null || propsAndFuncs.length === 0)
         return null;

@@ -151,8 +151,8 @@ export function singleAnimationTimingFunctionToCssString( val: SingleAnimationTi
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof utils.VarUse)
-        return val.toCssString();
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else if (val.length < 3)
 	{
 		// this is step function with only the number of steps
@@ -187,8 +187,8 @@ export function animationTimingFunctionToCssString( val: AnimationTimingFunction
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof utils.VarUse)
-        return val.toCssString();
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else if (val.length === 0)
         return "";
     else if (typeof val[0] === "number")
@@ -259,7 +259,11 @@ export type SingleCornerRadius_StyleType = utils.SingleLength_StyleType |
  */
 export function singleCornerRadiusToCssString( val: SingleCornerRadius_StyleType): string
 {
-    if (Array.isArray(val))
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
+    else if (Array.isArray(val))
         return utils.arrayToCssString( val, utils.singleLengthToCssString, " ");
     else
         return utils.singleLengthToCssString( val);
@@ -319,7 +323,7 @@ export type BorderSideStyle_StyleType = "none" | "hidden" | "dotted" | "dashed" 
 
 
 /** Type for border-style style property */
-export type BorderStyleStyleType = BorderSideStyle_StyleType | string |
+export type BorderStyleStyleType = BorderSideStyle_StyleType |
                 [
                     BorderSideStyle_StyleType,
                     BorderSideStyle_StyleType,
@@ -335,8 +339,8 @@ export function borderStyleToCssString( val: BorderStyleStyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof utils.VarUse)
-        return val.toCssString();
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else if (Array.isArray(val))
         return utils.stringArrayToCssString( val, " ");
     else
@@ -365,7 +369,11 @@ export type BorderWidthStyleType = BorderSideWidth_StyleType |
  */
 export function borderWidthToCssString( val: BorderWidthStyleType): string
 {
-    if (Array.isArray(val))
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
+    else if (Array.isArray(val))
         return utils.arrayToCssString( val, utils.singleLengthToCssString, " ");
     else
         return utils.singleLengthToCssString( val);
@@ -414,8 +422,12 @@ export type BorderColorStyleType = utils.Color_StyleType |
  */
 export function borderColorToCssString( val: BorderColorStyleType): string
 {
-    if (Array.isArray(val))
-        return utils.arrayToCssString( val, utils.colorToCssString, " ");
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
+    else if (Array.isArray(val))
+        return utils.arrayToCssString( val as utils.Color_StyleType[], utils.colorToCssString, " ");
     else
         return utils.colorToCssString( val);
 }
@@ -441,10 +453,16 @@ export function borderSideToCssString( val: BorderSide_StyleType): string
         return val;
     else if (typeof val === "number")
         return utils.singleLengthToCssString( val);
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else if (Array.isArray(val))
     {
         let s = "";
-        if (val[0] != null)
+        if (typeof val[0] === "string")
+            return val[0];
+        else if (val[0] instanceof utils.StringProxy)
+            return val[0].toString();
+        else if (val[0] != null)
             s += utils.singleLengthToCssString( val[0]) + " ";
 
         if (val[1])
@@ -481,8 +499,8 @@ export function borderImageOutsetToCssString( val: BorderImageOutsetStyleType): 
         return val;
     else if (typeof val === "number")
         return val.toString();
-    else if (val instanceof utils.VarUse)
-        return val.toCssString();
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else
         return utils.arrayToCssString( val, borderImageOutsetToCssString, " ");
 }
@@ -549,8 +567,8 @@ export function singleBoxShadowToCssString( val: SingleBoxShadow): string
         return "0 0 1em 1em #c0c0c0";
     else if (typeof val === "number")
         return `0 0 ${val}em ${val}1em #c0c0c0`;
-    else if (val instanceof utils.VarUse)
-        return val.toCssString();
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else
     {
         return utils.objectToCssString( val, false,
@@ -634,8 +652,8 @@ export function clipToCssString( val: ClipStyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof utils.VarUse)
-        return val.toCssString();
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else
         return `rect(${utils.arrayToCssString( val, utils.singleLengthToCssString, " ")}`;
 }
@@ -837,8 +855,8 @@ export function flexFlowToCssString( val: FlexFlowStyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof utils.VarUse)
-        return val.toCssString();
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
     else
         return utils.stringArrayToCssString( val);
 }
@@ -854,7 +872,12 @@ export type FontStyleStyleType = "normal" | "italic" | "oblique" | utils.SingleA
  */
 export function fontStyleToCssString( val: FontStyleStyleType): string
 {
-    return utils.singleAngleToCssString( val);
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof utils.StringProxy)
+        return val.toString();
+    else
+        return utils.singleAngleToCssString( val);
 }
 
 
@@ -965,7 +988,6 @@ export interface Styleset
     cssFloat?: FloatStyleType;
     cssText?: string;
 	cursor?: CursorStyleType;
-	cursorRaw?: string;
 	
     direction?: DirectionStyleType;
     display?: DisplayStyleType;
@@ -1326,19 +1348,6 @@ export interface Styleset
     bgc?: utils.Color_StyleType;
 
     /**
-     * Special property that contains several non-typed properties (that is, just strings).
-     * This can be used the following way:
-     *   style={{
-     *     color: 0xFF0000,
-     *     $raw: {
-     *       cursor: "url(customCursor.png) 5,5, pointer",
-     *       margin: "1px 2px 3px 4px"
-     *     }
-     *   }}
-     */
-    $raw?: { [K in keyof Styleset]: string }
-
-    /**
      * Special property that contains several definitions of custom CSS properties.
      * This can be used the following way:
      *   $custom: { mainColor: "black", mainBgColor: "white" }
@@ -1356,37 +1365,14 @@ export interface Styleset
 type PropToStringFunc<T> = (val: T) => string;
 
 /**
- * The StylePropertyInfo represents information that we keep for style properties. Most commonly,
- * the information needed for a property is a conversion function, whcih takes a value of a type
- * allowed for the property and converts it to the CSS compliant string.
+ * The StylePropertyInfo type represents information that we keep for style properties. Most
+ * commonly, the information needed for a property is a conversion function, which takes a value
+ * of a type allowed for the property and converts it to the CSS compliant string. Alternatively,
+ * it can be a name of another Styleset property for which this property is an alias. This is used
+ * for shortening frequently used but long property names (e.g. backgroundColor) and for prefixed
+ * properties.
  */
-type StylePropertyInfo<T> = PropToStringFunc<T> |
-    {
-        /**
-         * Indicates the property that our property is alias for. This is used for shortening
-         * frequently used but long property names (e.g. backgroundColor) and for prefixed properties.
-         */
-        aliasOf?: keyof Styleset;
-
-        /**
-         * Indicates the actual name of property for which our property provides value. This used for
-         * properties with potentially complex structure, which are usually used in a less complex
-         * way. We usually use "string" for complex structures, which doesn't allow the intellisence
-         * to help. The less complex variants may benefit greatly from intellisense. For example, the
-         * cursor property has a bunch of predefined values, for which intellisense would happily
-         * provide prompts; however, it also allows specifying url(), coordinates and a list of
-         * fallbacks. In this case, we specify the cursor property as just having the predefined
-         * values and create another property - cursorRaw - of string type. Developers would use the
-         * cursorRaw property in their code, but to the DOM the standard cursor property will be
-         * passed.
-         */
-        standsFor?: keyof Styleset;
-
-        /**
-         * Converts from property-specific type representation to string.
-         */
-        convert?: PropToStringFunc<T>;
-    }
+type StylePropertyInfo<T> = PropToStringFunc<T> | keyof Styleset;
 
 
 
@@ -1403,7 +1389,7 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
     animationTimingFunction: animationTimingFunctionToCssString,
 
     backgroundColor: utils.colorToCssString,
-    bgc: { aliasOf: "backgroundColor" },
+    bgc: "backgroundColor",
     backgroundPosition: utils.multiPositionToCssString,
     backgroundSize: utils.multiSizeToCssString,
     baselineShift: utils.singleLengthToCssString,
@@ -1434,7 +1420,7 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
     borderWidth: borderWidthToCssString,
     bottom: utils.singleLengthToCssString,
     boxShadow: boxShadowToCssString,
-    shadow: { aliasOf: "boxShadow" },
+    shadow: "boxShadow",
 
     caretColor: utils.colorToCssString,
     clip: clipToCssString,
@@ -1445,7 +1431,6 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
     columnRuleStyle: borderStyleToCssString,
     columnRuleWidth: borderWidthToCssString,
     columns: columnsToCssString,
-    cursorRaw: { standsFor: "cursor" },
 
     flex: flexToCssString,
     flexFlow: flexFlowToCssString,
@@ -1480,17 +1465,8 @@ export function stylesetToCssString( styleset: Styleset, important?: Set<string>
     let s = "";
 	for( let propName in styleset)
 	{
-        let propVal = styleset[propName];
-        if (propName === "$raw")
-        {
-            // special handling of the "$raw" property
-            for( let rawPropName in propVal)
-            {
-                s += utils.camelToDash( rawPropName) + ":" + propVal[rawPropName];
-                s += (important && important.has( propName) ? " !important;" : ";");
-            }
-        }
-        else if (propName === "$custom")
+        let propVal: any = styleset[propName];
+        if (propName === "$custom")
         {
             // special handling of the "$custom" property
             for( let customPropName in propVal)
@@ -1523,31 +1499,25 @@ export function stylePropToCssString( propName: string, propVal: any, valueOnly?
 
     // find information object for the property
     let info = StylePropertyInfos[propName];
-    if (typeof info === "object")
+    if (typeof info === "string")
     {
         // go up the chain of aliases if any (we admittedly don't make the effort to detect circular
         // dependencies, because setting up the information objects is our job and not developers').
-        while( info && info.aliasOf)
+        while( typeof info === "string")
         {
-            propName = info.aliasOf;
+            propName = info;
             info = StylePropertyInfos[propName];
         }
-
-        // if this property stands for another, change the property name
-        if (info && info.standsFor)
-            propName = info.standsFor;
     }
 
     let s = valueOnly ? "" : utils.camelToDash( propName) + ":";
 
     if (typeof info === "function")
         s += info( propVal);
-    else if (info && info.convert)
-        s += info.convert( propVal);
     else if (typeof propVal === "string")
         s += propVal;
-    else if (propVal instanceof utils.VarUse)
-        return propVal.toCssString();
+    else if (propVal instanceof utils.StringProxy)
+        s += propVal.toString();
     else if (Array.isArray( propVal))
         s += utils.arrayToCssString( propVal, item => item == null ? "" : item.toString());
     else

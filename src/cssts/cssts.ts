@@ -20,7 +20,7 @@ export type ExtendedStyleset =
 	(Styleset &
 		{
 			$extends?: IStyleRule | IStyleRule[],
-			$important?: string | string[],
+			$important?: keyof Styleset | (keyof Styleset)[],
 		}
 	) | IStyleRule | IStyleRule[];
 
@@ -56,7 +56,7 @@ export interface IRule
 export interface IStyleRule extends IRule
 {
 	/** Only needed to distinguish from other types */
-	readonly isRule: boolean;
+	readonly isStyleRule: boolean;
 }
 
 
@@ -163,6 +163,15 @@ export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
  */
 export interface IStyleScope<T = any>
 {
+	/**
+	 * Class that defined this style scope. This member is used for style scope derivation:
+	 * ```typescript
+	 * let scope1 = $scope( class ...);
+	 * let scope2 = $scope( class extends scope1.Definition ...);
+	 * ```
+	 */
+	readonly Definition: IStyleScopeDefinitionClass<T>;
+
 	/** Names of classes defined in the style scope */
 	readonly classNames: NamesOfPropsOfType<T,IClassRule>;
 

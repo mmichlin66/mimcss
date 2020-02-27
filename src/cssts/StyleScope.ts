@@ -24,6 +24,8 @@ export class StyleScope<T = any> implements IStyleScope<T>
 {
 	public constructor( ssDefClass: IStyleScopeDefinitionClass<T>)
 	{
+		this.Definition = ssDefClass;
+
 		this._classNames = {};
 		this._idNames = {};
 		this._animationNames = {};
@@ -241,6 +243,9 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	}
 
 
+
+	// Class that defined this style scope. This member is used for style scope derivation
+	public readonly Definition: IStyleScopeDefinitionClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
