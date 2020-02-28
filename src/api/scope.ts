@@ -4,7 +4,48 @@
 
 
 import {NamesOfPropsOfType, PropsOfType, IRule, IStyleRule, ITagRule, IClassRule, IIDRule,
-		ISelectorRule, IAnimationRule, ICustomVar} from "./rules";
+		ISelectorRule, IAnimationRule, ICustomVar, UnnamedRule} from "./rules";
+
+
+/**
+ * Interface defining how style scope definition classes can be created.
+ */
+export type IStyleScopeDefinition =
+{
+	/**
+	 * Optional method within which style scope definition classes can create rules not assigned
+	 * to a member property. These rules cannot be those that require name, such as class, ID,
+	 * animation or custom CSS property.
+	 */
+	createUnnamedRules?: () => UnnamedRule[];
+}
+
+
+
+/**
+ * "Constructor" interface defining how style scope definition classes can be created.
+ */
+export interface IStyleScopeDefinitionClass<T>
+{
+	/** All style scope definition objects should conform to this constructor */
+	new(): T;
+
+	/**
+	 * Flag inidicating that multiple style scopes can be created for this style scope definition -
+	 * each time with unique rule IDs. This is useful for styles created for a control - e.g. tree
+	 * or accordeon - which can be used multiple times on the same page but with different styles.
+	 * By default, style scope definitions are singular, that is a single instance of a style scope
+	 * object is created for them and inserted into DOM.
+	 */
+	isMultiplex?: boolean;
+
+	/**
+	 * Singleton instance of the Style Scope class created from this definition. This is used only
+	 * for singular style scopes.
+	 */
+	styleScope?: IStyleScope<T>;
+}
+
 
 
 /**
@@ -62,32 +103,6 @@ export interface IStyleScope<T = any>
 
 	/** List of all unnamed rules. */
 	readonly unnamedRules: IRule[];
-}
-
-
-
-/**
- * "Constructor" interface defining how style scope definition classes can be created.
- */
-export interface IStyleScopeDefinitionClass<T>
-{
-	/** All style scope definition objects should conform to this constructor */
-	new(): T;
-
-	/**
-	 * Flag inidicating that multiple style scopes can be created for this style scope definition -
-	 * each time with unique rule IDs. This is useful for styles created for a control - e.g. tree
-	 * or accordeon - which can be used multiple times on the same page but with different styles.
-	 * By default, style scope definitions are singular, that is a single instance of a style scope
-	 * object is created for them and inserted into DOM.
-	 */
-	isMultiplex?: boolean;
-
-	/**
-	 * Singleton instance of the Style Scope class created from this definition. This is used only
-	 * for singular style scopes.
-	 */
-	styleScope?: IStyleScope<T>;
 }
 
 

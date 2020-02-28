@@ -15,6 +15,12 @@ export abstract class Rule implements IRule
 		this.ruleName = ruleName;
 	}
 
+	/**
+	 * Determines whether this rule requires name - that is it will be ignored if created within
+	 * the createUnnamedRules
+	 */
+	public get nameIsRequired(): boolean { return false; }
+
 	// Creates a copy of the rule.
 	public abstract clone(): Rule;
 

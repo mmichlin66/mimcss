@@ -139,6 +139,11 @@ export interface ICustomVar<T = any>
 
 
 
+/**
+ * Type that combines interfaces of rules that don't have names; that is, they don't have to be
+ * assigned to a member property and may be created by the createUnnamedRUles method.
+ */
+export type UnnamedRule = ITagRule | ISelectorRule;
 
 
 /** Utility type that represents all properties of type T that are of type U */

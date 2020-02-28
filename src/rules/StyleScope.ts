@@ -1,7 +1,7 @@
-import {NamesOfPropsOfType, PropsOfType, IRule,
-		IStyleRule, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimationRule, ICustomVar}
+import {NamesOfPropsOfType, PropsOfType, IRule, IStyleRule, ITagRule, IClassRule, IIDRule,
+		ISelectorRule, IAnimationRule, ICustomVar, UnnamedRule}
 		from "../api/rules"
-import {IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
+import {IStyleScopeDefinition, IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
 
 import {Rule} from "./Rule"
 import {TagRule} from "./TagRule"
@@ -21,7 +21,7 @@ import {TssManager} from "./TssManager"
  * which provides names of classes, IDs and keyframes defined in the class T, which must be
  * derived from the StyleSheetDefinition class.
  */
-export class StyleScope<T = any> implements IStyleScope<T>
+export class StyleScope<T extends IStyleScopeDefinition = any> implements IStyleScope<T>
 {
 	public constructor( ssDefClass: IStyleScopeDefinitionClass<T>)
 	{
@@ -121,6 +121,32 @@ export class StyleScope<T = any> implements IStyleScope<T>
 			return;
 		}
 
+		this.processNamedRules( ssDef);
+
+		// if the definition class implements the getUnnamedRules method call it now
+		if (ssDef.createUnnamedRules)
+		{
+			let unnamedRules: UnnamedRule[];
+			try
+			{
+				unnamedRules = ssDef.createUnnamedRules();
+			}
+			catch( err)
+			{
+				console.error( `Error invoking createUnnamedRules method of Style Scope Definition of type '${this.Definition.name}'`);
+				return;
+			}
+
+			this.processUnnamedRules( unnamedRules);
+		}
+	}
+
+
+
+	// Creates the style scope definition instance, parses its properties and creates names for
+	// classes, IDs, animations.
+	private processNamedRules( ssDef: T): void
+	{
 		// loop over the properties of the definition object and process those that are rules.
 		for( let propName in ssDef)
 		{
@@ -173,6 +199,41 @@ export class StyleScope<T = any> implements IStyleScope<T>
 				this._varNames[ruleName] = rule.varName;
 				this._varRules[ruleName] = rule;
 			}
+		}
+	}
+
+
+
+	// Creates the style scope definition instance, parses its properties and creates names for
+	// classes, IDs, animations.
+	private processUnnamedRules( unnamedRules: UnnamedRule[]): void
+	{
+		if (!unnamedRules)
+			return;
+		else if (!Array.isArray(unnamedRules))
+		{
+			console.error( `createUnnamedRules method of Style Scope Definition of type '${this.Definition.name}' must return array`);
+			return;
+		}
+
+		// loop over the properties of the definition object and process those that are rules.
+		for( let unnamedRule of unnamedRules)
+		{
+			if (!(unnamedRule instanceof Rule))
+				continue;
+
+			let rule = unnamedRule as Rule;
+			if (rule.nameIsRequired)
+				continue;
+
+			// if the rule object is already assigned to a style scope, we create a clone of the
+			// rule and assign it to our scope.
+			if (rule.owner)
+				rule = rule.clone();
+
+			rule.process( this, null);
+
+			this._unnamedRules.push( rule);
 		}
 	}
 
