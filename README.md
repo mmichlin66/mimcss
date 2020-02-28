@@ -220,7 +220,7 @@ export let MyStyles = $scope( class MyStyles
 
 export let MyStyles = $scope( class MyStyles
 {
-    constrcutor( options: StyleScopeDefinitionOptions)
+    constructor( options: StyleScopeDefinitionOptions)
     {
         options.unnamedRules = [
             $rule( "hr", { width: "100%" }),
