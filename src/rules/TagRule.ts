@@ -1,5 +1,4 @@
 import {ITagRule, ExtendedStyleset} from "../api/rules"
-import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"
 
@@ -10,9 +9,10 @@ import {StyleScope} from "./StyleScope"
  */
 export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( styleset?: ExtendedStyleset)
+	public constructor( tagName?: string, styleset?: ExtendedStyleset)
 	{
 		super( styleset);
+		this.tagName = tagName;
 	}
 
 
@@ -22,9 +22,7 @@ export class TagRule extends StyleRule implements ITagRule
 	{
 		super.process( owner, ruleName);
 
-		// go through all parents; for those who are classes, add their name to the
-		// combined name. For those who are not classes, copy style properties to the
-		// class's own styleset.
+		// go through all parents and copy style properties to the class's own styleset.
 		for( let parent of this.parents)
 			Object.assign( this.styleset, parent.styleset);
 	}
@@ -41,10 +39,19 @@ export class TagRule extends StyleRule implements ITagRule
 
 
 
-	// Converts the rule to CSS string.
-	public toCssString(): string
+	// Copies internal data from another rule object.
+	public copyFrom( src: TagRule): void
 	{
-		return `${this.tagName} ${stylesetToCssString( this.styleset, this.important)}`;
+		super.copyFrom( src)
+		this.tagName = src.tagName;
+	}
+
+
+
+	// Returns the selector part of the style rule.
+	protected geSelectorString(): string
+	{
+		return this.tagName;
 	}
 
 
@@ -53,7 +60,7 @@ export class TagRule extends StyleRule implements ITagRule
 	public get isTagRule(): boolean { return true; }
 
 	// Name of the tag to which the styleset applies.
-	public get tagName(): string { return this.ruleName };
+	public tagName: string;
 }
 
 

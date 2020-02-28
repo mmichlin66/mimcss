@@ -15,7 +15,7 @@ import {StyleScope} from "../rules/StyleScope"
 
 
 /** Creates new TagRule object  */
-export function $tag( styleset: ExtendedStyleset): ITagRule { return new TagRule( styleset); }
+export function $tag( tagName: string, styleset: ExtendedStyleset): ITagRule { return new TagRule( tagName, styleset); }
 
 /** Returns new ClassRule object  */
 export function $class( styleset: ExtendedStyleset): IClassRule { return new ClassRule( styleset); }

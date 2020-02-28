@@ -1,5 +1,4 @@
 import {IIDRule, ExtendedStyleset} from "../api/rules"
-import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"
 
@@ -43,10 +42,10 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 
-	// Converts the rule to CSS string.
-	public toCssString(): string
+	// Returns the selector part of the style rule.
+	protected geSelectorString(): string
 	{
-		return `#${this.idName} ${stylesetToCssString( this.styleset, this.important)}`;
+		return "#" + this.idName;
 	}
 
 

@@ -1,5 +1,4 @@
 import {IClassRule, ExtendedStyleset} from "../api/rules"
-import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"
 
@@ -52,10 +51,10 @@ export class ClassRule extends StyleRule implements IClassRule
 
 
 
-	// Converts the rule to CSS string.
-	public toCssString(): string
+	// Returns the selector part of the style rule.
+	protected geSelectorString(): string
 	{
-		return `.${this.properName} ${stylesetToCssString( this.styleset, this.important)}`;
+		return "." + this.properName;
 	}
 
 

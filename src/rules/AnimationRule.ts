@@ -1,5 +1,4 @@
 import {IAnimationRule, Keyframe} from "../api/rules"
-import {stylesetToCssString} from "../styles/styles"
 import {tsh} from "../styles/tsh"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
@@ -123,10 +122,10 @@ class KeyframeRule extends StyleRule
 
 
 
-	// Converts the rule to CSS string.
-	public toCssString(): string
+	// Returns the selector part of the style rule.
+	protected geSelectorString(): string
 	{
-		return `${this.waypointString} ${stylesetToCssString( this.styleset, this.important)}`;
+		return  this.waypointString;
 	}
 
 

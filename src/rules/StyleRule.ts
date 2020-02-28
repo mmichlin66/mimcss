@@ -1,5 +1,5 @@
 import {IStyleRule, ExtendedStyleset} from "../api/rules";
-import {Styleset} from "../styles/styles";
+import {Styleset, stylesetToCssString} from "../styles/styles"
 import {Rule} from "./Rule";
 
 
@@ -89,6 +89,19 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		this.parents = src.parents;
 		this.important = src.important;
 	}
+
+
+
+	// Converts the rule to CSS string.
+	public toCssString(): string
+	{
+		return `${this.geSelectorString()} ${stylesetToCssString( this.styleset, this.important)}`;
+	}
+
+
+
+	// Returns the selector part of the style rule.
+	protected abstract geSelectorString(): string;
 
 
 
