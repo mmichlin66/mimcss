@@ -1,4 +1,5 @@
 ﻿import * as utils from "./utils"
+import {Color_StyleType, colorToCssString} from "./colors"
 
 
 
@@ -43,7 +44,7 @@ export type SingleAnimation = utils.Base_StyleType |
 };
 
 /** Type for animation style property */
-export type AnimationStyleType = SingleAnimation | SingleAnimation[] | string;
+export type AnimationStyleType = SingleAnimation | SingleAnimation[];
 
 /**
  * Converts animation style represented as an object with fields corresponding to animation
@@ -89,7 +90,7 @@ export function animationToCssString( val: AnimationStyleType): string
 export type SingleAnimationDirection = "normal" | "reverse" | "alternate" | "alternate-reverse" | utils.Base_StyleType;
 
 /** Type for animation-direction style property */
-export type AnimationDirectionStyleType = SingleAnimationDirection | SingleAnimationDirection[] | string;
+export type AnimationDirectionStyleType = SingleAnimationDirection | SingleAnimationDirection[];
 
 
 
@@ -97,7 +98,7 @@ export type AnimationDirectionStyleType = SingleAnimationDirection | SingleAnima
 export type SingleAnimationFillMode = "none" | "forwards" | "backwards" | "both" | utils.Base_StyleType;
 
 /** Type for animation-fill-mode style property */
-export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimationDirection[] | string;
+export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimationDirection[];
 
 
 
@@ -105,7 +106,7 @@ export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimat
 export type SingleAnimationIterationCount = "infinite" | utils.SingleNumber_StyleType | utils.Base_StyleType;
 
 /** Type for animation-iteration-count style property */
-export type AnimationIterationCountStyleType = SingleAnimationIterationCount | SingleAnimationIterationCount[] | string;
+export type AnimationIterationCountStyleType = SingleAnimationIterationCount | SingleAnimationIterationCount[];
 
 
 
@@ -121,7 +122,7 @@ export type AnimationNameStyleType = SingleAnimationName | SingleAnimationName[]
 export type SingleAnimationPlayState = "paused" | "running" | utils.Base_StyleType;
 
 /** Type for animation-play-state style property */
-export type AnimationPlayStateStyleType = SingleAnimationPlayState | SingleAnimationPlayState[] | string;
+export type AnimationPlayStateStyleType = SingleAnimationPlayState | SingleAnimationPlayState[];
 
 
 
@@ -138,10 +139,10 @@ export type AnimationTimingFunction_Step = [number, AnimationTimingFunction_Step
 export type AnimationTimingFunction_Bezier = [number, number, number, number];
 
 /** Type for single animation timing function */
-export type SingleAnimationTimingFunction = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier | utils.Base_StyleType | string;
+export type SingleAnimationTimingFunction = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier | utils.Base_StyleType;
 
 /** Type for animation-timing-function style property */
-export type AnimationTimingFunctionStyleType = SingleAnimationTimingFunction | SingleAnimationTimingFunction[] | string;
+export type AnimationTimingFunctionStyleType = SingleAnimationTimingFunction | SingleAnimationTimingFunction[];
 
 /**
  * Converts single animation timing function value to the CSS time string.
@@ -208,7 +209,7 @@ export type BackfaceVisibilityModeStyleType = "visible" | "hidden" | utils.Base_
 export type SingleBackgroundAttachment = "scroll" | "fixed" | "local" | utils.Base_StyleType;
 
 /** Type for background-attachment style property */
-export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | SingleBackgroundAttachment[] | string;
+export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | SingleBackgroundAttachment[];
 
 
 
@@ -216,7 +217,7 @@ export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | SingleB
 export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" | "text" | utils.Base_StyleType;
 
 /** Type for background-clip style property */
-export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundClip[] | string;
+export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundClip[];
 
 
 
@@ -224,7 +225,7 @@ export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundCli
 export type SingleBackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text" | utils.Base_StyleType;
 
 /** Type for background-origin style property */
-export type BackgroundOriginStyleType = SingleBackgroundOrigin | SingleBackgroundOrigin[] | string;
+export type BackgroundOriginStyleType = SingleBackgroundOrigin | SingleBackgroundOrigin[];
 
 
 
@@ -237,7 +238,7 @@ export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | "repeat" | "space
                 utils.Base_StyleType;
 
 /** Type for background-repeat style property */
-export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroundRepeat[] | string;
+export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroundRepeat[];
 
 
 
@@ -245,13 +246,13 @@ export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroun
 export type SingleBackgroundSize = "cover" | "contain" | utils.SingleSize_StyleType;
 
 /** Type for background-size style property */
-export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSize[] | string;
+export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSize[];
 
 
 
 /** Type for a single corner radius */
 export type SingleCornerRadius_StyleType = utils.SingleLength_StyleType |
-                [utils.SingleLength_StyleType, utils.SingleLength_StyleType] | string;
+                [utils.SingleLength_StyleType, utils.SingleLength_StyleType];
 
 /**
  * Converts corner radius style value to the CSS string.
@@ -408,12 +409,12 @@ export function borderSpacingToCssString( val: BorderSpacingStyleType): string
 
 
 /** Type for border-color style property */
-export type BorderColorStyleType = utils.Color_StyleType |
+export type BorderColorStyleType = Color_StyleType |
                 [
-                    utils.Color_StyleType,
-                    utils.Color_StyleType,
-                    utils.Color_StyleType?,
-                    utils.Color_StyleType?,
+                    Color_StyleType,
+                    Color_StyleType,
+                    Color_StyleType?,
+                    Color_StyleType?,
                 ];
 
 /**
@@ -427,20 +428,20 @@ export function borderColorToCssString( val: BorderColorStyleType): string
     else if (val instanceof utils.StringProxy)
         return val.toString();
     else if (Array.isArray(val))
-        return utils.arrayToCssString( val as utils.Color_StyleType[], utils.colorToCssString, " ");
+        return utils.arrayToCssString( val as Color_StyleType[], colorToCssString, " ");
     else
-        return utils.colorToCssString( val);
+        return colorToCssString( val);
 }
 
 
 
 /** Type for border side style property */
-export type BorderSide_StyleType = utils.SingleLength_StyleType |  BorderSideStyle_StyleType | utils.Color_StyleType |
+export type BorderSide_StyleType = utils.SingleLength_StyleType |  BorderSideStyle_StyleType | Color_StyleType |
                
                 [
                     utils.SingleLength_StyleType?,
                     BorderSideStyle_StyleType?,
-                    utils.Color_StyleType?,
+                    Color_StyleType?,
                 ];
 
 /**
@@ -469,12 +470,12 @@ export function borderSideToCssString( val: BorderSide_StyleType): string
             s += val[1] + " ";
 
         if (val[2])
-            s += utils.colorToCssString( val[2]) + " ";
+            s += colorToCssString( val[2]) + " ";
 
         return s;
     }
     else
-        return utils.colorToCssString( val);
+        return colorToCssString( val);
 }
 
 
@@ -533,7 +534,7 @@ export type BorderImageWidthStyleType = utils.SingleLength_StyleType |
  *   - string - literal CSS box shadow string.
  *   - object - fields specify box shadow parts.
  */
-export type SingleBoxShadow = "none" | boolean | number | string | utils.Base_StyleType |
+export type SingleBoxShadow = "none" | boolean | number | utils.Base_StyleType |
 {
     /** Flag indicating whether the shadow is inside the box (true) or outside it (false). Default is false. */
     inset?: boolean;
@@ -546,7 +547,7 @@ export type SingleBoxShadow = "none" | boolean | number | string | utils.Base_St
     /** Spread radius. Default is 1em. */
     spread?: utils.SingleLength_StyleType;
     /** Shadow color. Default is 0xc0c0c0. */
-	color?: utils.Color_StyleType;
+	color?: Color_StyleType;
 };
 
 /** Type for box shadow style property */
@@ -577,7 +578,7 @@ export function singleBoxShadowToCssString( val: SingleBoxShadow): string
             ["y", utils.singleLengthToCssString],
             ["blur", utils.singleLengthToCssString],
             ["spread", utils.singleLengthToCssString],
-            ["color", utils.colorToCssString]
+            ["color", colorToCssString]
         );
     }
 }
@@ -626,7 +627,7 @@ export type CaptionSideStyleType = "top" | "bottom" | "block-start" | "block-end
 
 
 /** Type for caret-color style property */
-export type CaretColorStyleType = "auto" | utils.Color_StyleType;
+export type CaretColorStyleType = "auto" | Color_StyleType;
 
 
 
@@ -711,7 +712,7 @@ export function columnRuleToCssString( val: ColumnRuleStyleType): string
         return utils.objectToCssString( val, false,
             ["width", borderWidthToCssString],
             ["style", borderStyleToCssString],
-            ["color", utils.colorToCssString]
+            ["color", colorToCssString]
         );
     }
 }
@@ -724,7 +725,7 @@ export type ColumnSpanStyleType = "none" | "all" | utils.Base_StyleType;
 
 
 /** Type for columns style property */
-export type ColumnsStyleType = "auto" | number | string | ["auto" | number, utils.SingleLength_StyleType] | utils.Base_StyleType;
+export type ColumnsStyleType = "auto" | number | ["auto" | number, utils.SingleLength_StyleType] | utils.Base_StyleType;
 
 /**
  * Converts columns style to its CSS string value.
@@ -737,6 +738,8 @@ export function columnsToCssString( val: ColumnsStyleType): string
     else if (typeof val === "string")
         return val;
     else if (typeof val === "number")
+        return val.toString();
+    else if (val instanceof utils.StringProxy)
         return val.toString();
     else
         return val[0].toString() + " " + utils.singleLengthToCssString( val[1]);
@@ -810,6 +813,8 @@ export function flexToCssString( val: FlexStyleType): string
     if (typeof val === "string")
         return val;
     else if (typeof val === "number")
+        return val.toString();
+    else if (val instanceof utils.StringProxy)
         return val.toString();
     else if (Array.isArray(val))
     {
@@ -915,7 +920,7 @@ export interface Styleset
     background?: StyleType;
     backgroundAttachment?: BackgroundAttachmentStyleType;
     backgroundClip?: BackgroundClipStyleType;
-    backgroundColor?: utils.Color_StyleType;
+    backgroundColor?: Color_StyleType;
     backgroundImage?: StyleType;
     backgroundOrigin?: BackgroundOriginStyleType;
     backgroundPosition?: utils.MultiPosition_StyleType;
@@ -926,7 +931,7 @@ export interface Styleset
     baselineShift?: BaselineShiftStyleType;
     border?: BorderSide_StyleType;
     borderBottom?: BorderSide_StyleType;
-    borderBottomColor?: utils.Color_StyleType;
+    borderBottomColor?: Color_StyleType;
     borderBottomLeftRadius?: SingleCornerRadius_StyleType;
     borderBottomRightRadius?: SingleCornerRadius_StyleType;
     borderBottomStyle?: BorderSideStyle_StyleType;
@@ -940,18 +945,18 @@ export interface Styleset
     borderImageSource?: string;
     borderImageWidth?: BorderImageWidthStyleType;
     borderLeft?: BorderSide_StyleType;
-    borderLeftColor?: utils.Color_StyleType;
+    borderLeftColor?: Color_StyleType;
     borderLeftStyle?: BorderSideStyle_StyleType;
     borderLeftWidth?: BorderSideWidth_StyleType;
     borderRadius?: BorderRadiusStyleType;
     borderRight?: BorderSide_StyleType;
-    borderRightColor?: utils.Color_StyleType;
+    borderRightColor?: Color_StyleType;
     borderRightStyle?: BorderSideStyle_StyleType;
     borderRightWidth?: BorderSideWidth_StyleType;
     borderSpacing?: BorderSpacingStyleType;
     borderStyle?: BorderStyleStyleType;
     borderTop?: BorderSide_StyleType;
-    borderTopColor?: utils.Color_StyleType;
+    borderTopColor?: Color_StyleType;
     borderTopLeftRadius?: SingleCornerRadius_StyleType;
     borderTopRightRadius?: SingleCornerRadius_StyleType;
     borderTopStyle?: BorderSideStyle_StyleType;
@@ -970,13 +975,13 @@ export interface Styleset
     clip?: ClipStyleType;
     clipPath?: string;
     clipRule?: string;
-    color?: utils.Color_StyleType;
+    color?: Color_StyleType;
     colorInterpolationFilters?: ColorInterpolationFiltersStyleType;
     columnCount?: ColumnCountStyleType;
     columnFill?: ColumnFillStyleType;
     columnGap?: SingleGap_StyleType;
     columnRule?: ColumnRuleStyleType;
-    columnRuleColor?: utils.Color_StyleType;
+    columnRuleColor?: Color_StyleType;
     columnRuleStyle?: BorderSideStyle_StyleType;
     columnRuleWidth?: BorderSideWidth_StyleType;
     columnSpan?: ColumnSpanStyleType;
@@ -1007,7 +1012,7 @@ export interface Styleset
     flexGrow?: utils.SingleNumber_StyleType;
     flexShrink?: utils.SingleNumber_StyleType;
     flexWrap?: FlexWrapStyleType;
-    floodColor?: utils.Color_StyleType;
+    floodColor?: Color_StyleType;
     floodOpacity?: string;
     font?: string;
     fontFamily?: string;
@@ -1068,7 +1073,7 @@ export interface Styleset
     layoutGridType?: StyleType;
     left?: utils.SingleLength_StyleType;
     letterSpacing?: string;
-    lightingColor?: utils.Color_StyleType;
+    lightingColor?: Color_StyleType;
     lineBreak?: string;
     lineHeight?: StyleType;
     listStyle?: StyleType;
@@ -1151,7 +1156,7 @@ export interface Styleset
     order?: StyleType;
     orphans?: number | utils.Base_StyleType;
     outline?: string;
-    outlineColor?: utils.Color_StyleType;
+    outlineColor?: Color_StyleType;
     outlineOffset?: string;
     outlineStyle?: string;
     outlineWidth?: string;
@@ -1208,11 +1213,11 @@ export interface Styleset
     textAnchor?: StyleType;
     textCombineUpright?: string;
     textDecoration?: string;
-    textDecorationColor?: utils.Color_StyleType;
+    textDecorationColor?: Color_StyleType;
     textDecorationLine?: string;
     textDecorationStyle?: string;
     textEmphasis?: string;
-    textEmphasisColor?: utils.Color_StyleType;
+    textEmphasisColor?: Color_StyleType;
     textEmphasisPosition?: string;
     textEmphasisStyle?: string;
     textIndent?: string;
@@ -1280,7 +1285,7 @@ export interface Styleset
     webkitColumnCount?: ColumnCountStyleType;
     webkitColumnGap?: SingleGap_StyleType;
     webkitColumnRule?: ColumnRuleStyleType;
-    webkitColumnRuleColor?: utils.Color_StyleType;
+    webkitColumnRuleColor?: Color_StyleType;
     webkitColumnRuleStyle?: ColumnRuleStyleType;
     webkitColumnRuleWidth?: BorderWidthStyleType;
     webkitColumnSpan?: StyleType;
@@ -1345,7 +1350,7 @@ export interface Styleset
 
     // custom properties/aliases
     shadow?: BoxShadowStyleType;
-    bgc?: utils.Color_StyleType;
+    bgc?: Color_StyleType;
 
     /**
      * Special property that contains several definitions of custom CSS properties.
@@ -1388,7 +1393,7 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
     animationIterationCount: utils.singleNumberToCssString,
     animationTimingFunction: animationTimingFunctionToCssString,
 
-    backgroundColor: utils.colorToCssString,
+    backgroundColor: colorToCssString,
     bgc: "backgroundColor",
     backgroundPosition: utils.multiPositionToCssString,
     backgroundSize: utils.multiSizeToCssString,
@@ -1396,7 +1401,7 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
 
     border: borderSideToCssString,
     borderBottom: borderSideToCssString,
-    borderBottomColor: utils.colorToCssString,
+    borderBottomColor: colorToCssString,
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
     borderBottomWidth: utils.singleLengthToCssString,
@@ -1404,16 +1409,16 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
     borderImageOutset: borderImageOutsetToCssString,
     borderImageWidth: borderWidthToCssString,
     borderLeft: borderSideToCssString,
-    borderLeftColor: utils.colorToCssString,
+    borderLeftColor: colorToCssString,
     borderLeftWidth: utils.singleLengthToCssString,
     borderRadius: borderRadiusToCssString,
     borderRight: borderSideToCssString,
-    borderRightColor: utils.colorToCssString,
+    borderRightColor: colorToCssString,
     borderRightWidth: utils.singleLengthToCssString,
     borderStyle: borderStyleToCssString,
     borderSpacing: borderSpacingToCssString,
     borderTop: borderSideToCssString,
-    borderTopColor: utils.colorToCssString,
+    borderTopColor: colorToCssString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
     borderTopWidth: utils.singleLengthToCssString,
@@ -1422,19 +1427,19 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
     boxShadow: boxShadowToCssString,
     shadow: "boxShadow",
 
-    caretColor: utils.colorToCssString,
+    caretColor: colorToCssString,
     clip: clipToCssString,
-    color: utils.colorToCssString,
+    color: colorToCssString,
     columnGap: utils.singleLengthToCssString,
     columnRule: columnRuleToCssString,
-    columnRuleColor: utils.colorToCssString,
+    columnRuleColor: colorToCssString,
     columnRuleStyle: borderStyleToCssString,
     columnRuleWidth: borderWidthToCssString,
     columns: columnsToCssString,
 
     flex: flexToCssString,
     flexFlow: flexFlowToCssString,
-    floodColor: utils.colorToCssString,
+    floodColor: colorToCssString,
     fontStyle: fontStyleToCssString,
 
     gridColumnGap: utils.singleLengthToCssString,
@@ -1443,15 +1448,15 @@ const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]
     height: utils.singleLengthToCssString,
 
     left: utils.singleLengthToCssString,
-    lightingColor: utils.colorToCssString,
+    lightingColor: colorToCssString,
 
-    outlineColor: utils.colorToCssString,
+    outlineColor: colorToCssString,
 
     right: utils.singleLengthToCssString,
     rowGap: utils.singleLengthToCssString,
 
-    textDecorationColor: utils.colorToCssString,
-    textEmphasisColor: utils.colorToCssString,
+    textDecorationColor: colorToCssString,
+    textEmphasisColor: colorToCssString,
     top: utils.singleLengthToCssString,
 
     width: utils.singleLengthToCssString,

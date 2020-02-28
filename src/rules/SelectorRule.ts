@@ -1,8 +1,8 @@
 import {ISelectorRule, ExtendedStyleset} from "../api/rules"
-import {ISelector} from "../api/ISelector"
+import {ISelector} from "../api/Selector"
 import {stylesetToCssString} from "../styles/styles"
 import {StyleRule} from "./StyleRule"
-import {Selector} from "./Selector";
+import {Selector} from "../api/Selector";
 import {StyleScope} from "./StyleScope"
 
 

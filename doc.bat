@@ -1,2 +1,2 @@
 @echo off
-typedoc --out lib/reference src/cssts/cssts.ts src/cssts/RuleFunctions.ts src/styles/styles.ts src/styles/utils.ts --readme none --excludeExternals --excludeNotExported --excludePrivate
+typedoc --out lib/reference src/api/rules.ts src/api/RuleFunctions.ts src/api/scope.ts src/api/ISelector.ts src/styles/styles.ts src/styles/utils.ts src/styles/colors.ts src/styles/msh.ts --readme none --excludeExternals --excludeNotExported --excludePrivate

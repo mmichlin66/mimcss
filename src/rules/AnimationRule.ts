@@ -1,6 +1,6 @@
 import {IAnimationRule, Keyframe} from "../api/rules"
 import {stylesetToCssString} from "../styles/styles"
-import {percentToCssString} from "../styles/utils"
+import {tsh} from "../styles/tsh"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
 import {StyleScope} from "./StyleScope"
@@ -99,7 +99,7 @@ class KeyframeRule extends StyleRule
 		else if (Number.isInteger( waypoint))
 			return waypoint + "%";
 		else
-			return percentToCssString( waypoint);
+			return tsh.percent( waypoint);
 	}
 
 
