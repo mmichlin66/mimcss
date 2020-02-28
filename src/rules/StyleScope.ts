@@ -1,7 +1,7 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IStyleRule, ITagRule, IClassRule, IIDRule,
 		ISelectorRule, IAnimationRule, ICustomVar, UnnamedRule}
 		from "../api/rules"
-import {IStyleScopeDefinition, IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
+import {StyleScopeDefinitionOptions, IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
 
 import {Rule} from "./Rule"
 import {TagRule} from "./TagRule"
@@ -21,7 +21,7 @@ import {TssManager} from "./TssManager"
  * which provides names of classes, IDs and keyframes defined in the class T, which must be
  * derived from the StyleSheetDefinition class.
  */
-export class StyleScope<T extends IStyleScopeDefinition = any> implements IStyleScope<T>
+export class StyleScope<T = any> implements IStyleScope<T>
 {
 	public constructor( ssDefClass: IStyleScopeDefinitionClass<T>)
 	{
@@ -109,11 +109,12 @@ export class StyleScope<T extends IStyleScopeDefinition = any> implements IStyle
 		// create instance of the style scope definition class and then go over its properties,
 		// which define CSS rules.
 		let ssDef: T;
+		let options: StyleScopeDefinitionOptions = {};
 		try
 		{
 			// create instance of the style scope definition class and then go over its properties,
 			// which define CSS rules.
-			ssDef = new this.Definition();
+			ssDef = new this.Definition( options);
 		}
 		catch( err)
 		{
@@ -123,22 +124,9 @@ export class StyleScope<T extends IStyleScopeDefinition = any> implements IStyle
 
 		this.processNamedRules( ssDef);
 
-		// if the definition class implements the getUnnamedRules method call it now
-		if (ssDef.createUnnamedRules)
-		{
-			let unnamedRules: UnnamedRule[];
-			try
-			{
-				unnamedRules = ssDef.createUnnamedRules();
-			}
-			catch( err)
-			{
-				console.error( `Error invoking createUnnamedRules method of Style Scope Definition of type '${this.Definition.name}'`);
-				return;
-			}
-
-			this.processUnnamedRules( unnamedRules);
-		}
+		// if the definition class implements unnamedRules process them now
+		if (options.unnamedRules)
+			this.processUnnamedRules( options.unnamedRules);
 	}
 
 

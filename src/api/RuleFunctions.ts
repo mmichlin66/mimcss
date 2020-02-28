@@ -1,6 +1,6 @@
 import {ExtendedStyleset, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimationRule,
 		Keyframe, ICustomVar} from "./rules"
-import {IStyleScopeDefinition, IStyleScopeDefinitionClass, IStyleScope} from "./scope"
+import {IStyleScopeDefinitionClass, IStyleScope} from "./scope"
 import {ISelector} from "./Selector"
 
 import {Styleset} from "../styles/styles"

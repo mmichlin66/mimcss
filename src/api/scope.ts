@@ -10,14 +10,14 @@ import {NamesOfPropsOfType, PropsOfType, IRule, IStyleRule, ITagRule, IClassRule
 /**
  * Interface defining how style scope definition classes can be created.
  */
-export type IStyleScopeDefinition =
+export type StyleScopeDefinitionOptions =
 {
 	/**
 	 * Optional method within which style scope definition classes can create rules not assigned
 	 * to a member property. These rules cannot be those that require name, such as class, ID,
 	 * animation or custom CSS property.
 	 */
-	createUnnamedRules?: () => UnnamedRule[];
+	unnamedRules?: UnnamedRule[];
 }
 
 
@@ -28,7 +28,7 @@ export type IStyleScopeDefinition =
 export interface IStyleScopeDefinitionClass<T>
 {
 	/** All style scope definition objects should conform to this constructor */
-	new(): T;
+	new( options?: StyleScopeDefinitionOptions): T;
 
 	/**
 	 * Flag inidicating that multiple style scopes can be created for this style scope definition -
