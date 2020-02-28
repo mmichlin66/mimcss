@@ -1,6 +1,6 @@
 {
 	"name": "mimcss",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Authoring CSS with TypeScript",
 	"homepage": "https://mmichlin66.github.io/mimcss/mimcssAbout.html",
 	"repository": "github:mmichlin66/mimcss",
@@ -17,9 +17,8 @@
 		"url": "https://mmichlin66.github.io"
 	},
 	"keywords": [
-		"Mimbl",
-		"Component",
-		"Viertual DOM",
+		"CSS",
+		"Type Script",
 		"Web UI"
 	],
 	"license": "MIT",
@@ -27,8 +26,8 @@
 		"ifdef-loader": "^2.1.1",
 		"source-map-loader": "^0.2.4",
 		"terser-webpack-plugin": "^2.0.1",
-		"ts-loader": "^5.3.3",
-		"typescript": "^3.2.4",
+		"ts-loader": "^6.2.1",
+		"typescript": "^3.8.2",
 		"webpack": "^4.39.3",
 		"webpack-cli": "^3.3.8"
 	},
@@ -36,11 +35,14 @@
 		"lib/mimcss.js",
 		"lib/mimcss.js.map",
 		"lib/mimcssTypes.d.ts",
-		"lib/api/mimcss.d.ts"
-	],
-	"-vs-binding": {
-		"ProjectOpened": [
-			"install_global_deps"
-		]
-	}
+		"lib/styles/utils",
+		"lib/styles/colors",
+		"lib/styles/tsh",
+		"lib/styles/styles",
+		"lib/api/Selector",
+		"lib/api/rules",
+		"lib/api/scope",
+		"lib/api/RuleFunctions",
+		"lib/api/Selector"
+	]
 }
