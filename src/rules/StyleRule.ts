@@ -1,6 +1,6 @@
 import {IStyleRule, ExtendedStyleset} from "../api/rules";
 import {Styleset} from "../styles/StyleTypes"
-import {stylesetToCssString} from "../styles/StyleInfo"
+import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule";
 
 

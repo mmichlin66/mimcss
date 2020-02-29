@@ -1,6 +1,6 @@
 import {ICustomVar} from "../api/rules"
 import {Styleset} from "../styles/StyleTypes"
-import {stylePropToCssString} from "../styles/StyleInfo"
+import {tsh} from "../styles/tsh"
 import {Rule} from "./Rule";
 import {StyleScope} from "./StyleScope"
 
@@ -58,7 +58,7 @@ export class CustomVar<T> extends Rule implements ICustomVar<T>
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `--${this.varName}: ${stylePropToCssString( this.templatePropName, this.varValue, true)}`;
+		return `--${this.varName}: ${tsh.val( this.templatePropName, this.varValue)}`;
 	}
 
 	// Determines whether this rule is a real CSS rule that should be inserted under the <style>

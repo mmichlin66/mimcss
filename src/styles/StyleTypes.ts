@@ -951,9 +951,9 @@ export interface Styleset
     zIndex?: "auto" | number | UtilTypes.Base_StyleType;
     zoom?: StyleType;
 
-    // custom properties/aliases
-    shadow?: BoxShadowStyleType;
-    bgc?: ColorTypes.Color_StyleType;
+    // // custom properties/aliases
+    // shadow?: BoxShadowStyleType;
+    // bgc?: ColorTypes.Color_StyleType;
 
     /**
      * Special property that contains several definitions of custom CSS properties.

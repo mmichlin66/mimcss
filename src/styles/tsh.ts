@@ -4,7 +4,7 @@ import * as ColorTypes from "./ColorTypes";
 import * as ColorFuncs from "./ColorFuncs";
 import {ICustomVar} from "../api/rules"
 import {CustomVar} from "../rules/CustomVar"
-import {stylePropToCssString} from "./StyleInfo";
+import {stylePropToCssString} from "./StyleFuncs";
 
 
 
@@ -32,19 +32,12 @@ export class tsh
         return new StringProxy(s);
     }
 
-
-
     /**
      * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
      */
     public static percent( n: number): string
     {
         return UtilFuncs.percentToCssString( n);
-    }
-
-    public static units( n: number, unit: string): UnitValue
-    {
-        return new UnitValue( n, unit);
     }
 
     /**
@@ -57,6 +50,12 @@ export class tsh
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }
+
+    public static units( n: number, unit: string): UnitValue
+    {
+        return new UnitValue( n, unit);
+    }
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +78,7 @@ export class tsh
         return new StringProxy( ColorFuncs.hsl( h, s, l, a));
     }
 
-    public static alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): StringProxy
+    public static alpha( c: number | keyof ColorTypes.ColorsClass, a: number | string): StringProxy
     {
         return new StringProxy( ColorFuncs.alpha( c, a));
     }
