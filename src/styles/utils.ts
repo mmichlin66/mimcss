@@ -222,7 +222,7 @@ export type MultiLength_StyleType = SingleLength_StyleType | SingleLength_StyleT
  * values are treated as pixels while floating numbers are treated as percents from 0.0 to 1.0.
  * @param val Length as a number
  */
-export function lengthUnitsToCssString( n: number, units?: string): string
+export function lengthToCssString( n: number, units?: string): string
 {
     return n === 0 ? "0" : units ? n + units : Number.isInteger( n) ?  n + "px" : percentToCssString(n);
 }
@@ -238,7 +238,7 @@ export function singleLengthToCssString( val: SingleLength_StyleType): string
     else if (val instanceof StringProxy)
         return val.toString();
     else
-	    return lengthUnitsToCssString( val);
+	    return lengthToCssString( val);
 }
 
 /**
@@ -338,6 +338,18 @@ export function singleAngleToCssString( val: SingleAngle_StyleType): string
 
 
 /**
+ * Converts resolution value from the numeric representation to the CSS string. Integer
+ * values are treated as DPI while floating numbers are treated as DPCM.
+ * @param val Resolution as a number
+ */
+export function resolutionToCssString( n: number, units?: string): string
+{
+    return n === 0 ? "0" : units ? n + units : Number.isInteger(n) ?  n + "dpi" : n + "dpcm";
+}
+
+
+
+/**
  * Type for CSS position, which can be expressed as one or two or 3 or 4 values.
  */
 export type SinglePosition_StyleType = "center" | "left" | "right" | "top" | "bottom" | SingleLength_StyleType |
@@ -352,7 +364,7 @@ export type MultiPosition_StyleType = SinglePosition_StyleType | SinglePosition_
  * Converts single position style value to the CSS time string.
  * @param val Size as a style property type
  */
-export function  singlePositionToCssString( val: SinglePosition_StyleType): string
+export function singlePositionToCssString( val: SinglePosition_StyleType): string
 {
     if (typeof val === "string")
         return val;
@@ -388,7 +400,7 @@ export function multiPositionToCssString( val: MultiPosition_StyleType): string
  * values are treated as milliseconds while floating numbers are treated as seconds.
  * @param val Time as a number
  */
-export function timeToCssString( n: number, units?: "s" | "ms"): string
+export function timeToCssString( n: number, units?: string): string
 {
     return n === 0 ? "0s" : units ? n + units : Number.isInteger(n) ?  n + "ms" : n + "s";
 }

@@ -18,7 +18,7 @@ export function aspectRatioToCssString( val: AspectRatioFetaureType): string
 
 export type LengthFetaureType = number | string;
 
-export function lengthToCssString( val: LengthFetaureType): string
+export function lengthFetaureToCssString( val: LengthFetaureType): string
 {
     return typeof val === "string" ? val : val + "px";
 }
@@ -27,7 +27,7 @@ export function lengthToCssString( val: LengthFetaureType): string
 
 export type ResolutionFetaureType = number | string;
 
-export function resolutionToCssString( val: ResolutionFetaureType): string
+export function resolutionFetaureToCssString( val: ResolutionFetaureType): string
 {
     return typeof val === "string" ? val : val + "dpi";
 }
@@ -126,16 +126,16 @@ let mediaFeatures: { [K in keyof MediaFeatureset]?: MediaFeatureInfo<MediaFeatur
     colorIndex: { defaultValue: 0 },
     minColorIndex: "color",
     maxColorIndex: "color",
-    height: { convert: lengthToCssString },
+    height: { convert: utils.singleLengthToCssString },
     minHeight: "height",
     maxHeight: "height",
-    width: { convert: lengthToCssString },
+    width: { convert: utils.singleLengthToCssString },
     minWidth: "width",
     maxWidth:"width",
     monochrome: { defaultValue: 0 },
     minMonochrome: "monochrome",
     maxMonochrome:"monochrome",
-    resolution: { convert: resolutionToCssString },
+    resolution: { convert: utils.resolutionToCssString },
     minResolution: "resolution",
     maxResolution: "resolution",
 };

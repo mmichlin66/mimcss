@@ -1,5 +1,5 @@
-﻿import {StringProxy, UnitValue, lengthUnitsToCssString, percentToCssString,
-        angleToCssString, timeToCssString} from "./utils"
+﻿import {StringProxy, UnitValue, lengthToCssString, percentToCssString,
+        angleToCssString, timeToCssString, resolutionToCssString} from "./utils"
 import {Colors, colorSep, rgb, hsl, alpha} from "./colors";
 import {ICustomVar} from "../api/rules"
 import {CustomVar} from "../rules/CustomVar"
@@ -107,7 +107,7 @@ export class tsh
      */
     public static len( n: number, units?: string): string
     {
-        return lengthUnitsToCssString( n, units);
+        return lengthToCssString( n, units);
     }
 
 
@@ -125,7 +125,6 @@ export class tsh
     /**
      * Converts angle value from the numeric representation to the CSS string. Integer
      * values are treated as degrees while floating numbers are treated as radians.
-     * @param val Angle as a number
      */
     public static angle( n: number, units?: string): string
     {
@@ -145,9 +144,8 @@ export class tsh
     /**
      * Converts time value from the numeric representation to the CSS string. Integer
      * values are treated as milliseconds while floating numbers are treated as seconds.
-     * @param val Time as a number
      */
-    public static time( n: number, units?: "s" | "ms"): string
+    public static time( n: number, units?: string): string
     {
         return timeToCssString(n);
     }
@@ -172,6 +170,17 @@ export class tsh
     public static dpi( n: number) { return this.units( n, "dpi"); }
     public static dpcm( n: number) { return this.units( n, "dpcm"); }
     public static dppx( n: number) { return this.units( n, "dppx"); }
+
+/**
+     * Converts resolution value from the numeric representation to the CSS string. Integer
+     * values are treated as DPI while floating numbers are treated as DPCM.
+     */
+    public static resolution( n: number, units?: string): string
+    {
+        return resolutionToCssString( n, units);
+    }
+
+
 
 
 
