@@ -292,21 +292,7 @@ export type BorderImageWidthStyleType = UtilTypes.SingleLength_StyleType |
  *   - string - literal CSS box shadow string.
  *   - object - fields specify box shadow parts.
  */
-export type SingleBoxShadow = "none" | boolean | number | UtilTypes.Base_StyleType |
-{
-    /** Flag indicating whether the shadow is inside the box (true) or outside it (false). Default is false. */
-    inset?: boolean;
-    /** Horizontal offset where the shadow should begin. Default is 0. */
-	x?: UtilTypes.SingleLength_StyleType;
-    /** Vertical offset where the shadow should begin. Default is 0. */
-    y?: UtilTypes.SingleLength_StyleType;
-    /** Blur radius. Default is 1em. */
-    blur?: UtilTypes.SingleLength_StyleType;
-    /** Spread radius. Default is 1em. */
-    spread?: UtilTypes.SingleLength_StyleType;
-    /** Shadow color. Default is 0xc0c0c0. */
-	color?: ColorTypes.Color_StyleType;
-};
+export type SingleBoxShadow = "none" | string | UtilTypes.Base_StyleType;
 
 /** Type for box shadow style property */
 export type BoxShadowStyleType = SingleBoxShadow | SingleBoxShadow[];
@@ -379,7 +365,10 @@ export type ColumnFillStyleType = "auto" | "balance" | "balance-all" | UtilTypes
 
 
 /** Type for single gap style property */
-export type SingleGap_StyleType = "normal" | UtilTypes.SingleLength_StyleType;
+export type SingleGap_StyleType = UtilTypes.SingleLength_StyleType;
+
+/** Type for single gap style property */
+export type Gap_StyleType = UtilTypes.SingleLength_StyleType | [UtilTypes.SingleLength_StyleType, UtilTypes.SingleLength_StyleType?];
 
 
 
@@ -582,7 +571,7 @@ export interface Styleset
     colorInterpolationFilters?: ColorInterpolationFiltersStyleType;
     columnCount?: ColumnCountStyleType;
     columnFill?: ColumnFillStyleType;
-    columnGap?: SingleGap_StyleType;
+    columnGap?: "normal" | SingleGap_StyleType;
     columnRule?: ColumnRuleStyleType;
     columnRuleColor?: ColorTypes.Color_StyleType;
     columnRuleStyle?: BorderSideStyle_StyleType;
@@ -634,7 +623,7 @@ export interface Styleset
     fontVariantPosition?: string;
 	fontWeight?: FontWeightStyleType;
 	
-    gap?: string;
+    gap?: Gap_StyleType;
     glyphOrientationHorizontal?: StyleType;
     glyphOrientationVertical?: string;
     grid?: StyleType;

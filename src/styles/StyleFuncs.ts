@@ -270,45 +270,17 @@ function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleTyp
 
 
 /**
- * Converts single box shadow style represented as an object with fields corresponding to box shadow
- * properties to its CSS string value.
- * @param val Single box shadow object. 
- */
-function singleBoxShadowToCssString( val: StyleTypes.SingleBoxShadow): string
-{
-    if (!val)
-        return "none";
-    else if (typeof val === "string")
-        return val;
-    else if (typeof val === "boolean")
-        return "0 0 1em 1em #c0c0c0";
-    else if (typeof val === "number")
-        return `0 0 ${val}em ${val}1em #c0c0c0`;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
-    {
-        return UtilFuncs.objectToCssString( val, false,
-            ["inset", v => v === true ? "inset" : ""],
-            ["x", UtilFuncs.singleLengthToCssString],
-            ["y", UtilFuncs.singleLengthToCssString],
-            ["blur", UtilFuncs.singleLengthToCssString],
-            ["spread", UtilFuncs.singleLengthToCssString],
-            ["color", ColorFuncs.colorToCssString]
-        );
-    }
-}
-
-/**
  * Converts box shadow style to its CSS string value.
  * @param obj Box shadow value. 
  */
 function boxShadowToCssString( val: StyleTypes.BoxShadowStyleType): string
 {
-    if (Array.isArray( val))
-        return UtilFuncs.arrayToCssString( val, singleBoxShadowToCssString);
-    else
-        return singleBoxShadowToCssString( val);
+     if (typeof val === "string")
+        return val;
+    else if (val instanceof UtilTypes.StringProxy)
+        return val.toString();
+    else 
+        return UtilFuncs.stringArrayToCssString( val);
 }
 
 
@@ -434,6 +406,30 @@ function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
         return val.toString();
     else
         return UtilFuncs.singleAngleToCssString( val);
+}
+
+
+
+/**
+ * Converts font-style style value to the CSS string.
+ * @param val Font-style value
+ */
+function gapStyleToCssString( val: StyleTypes.Gap_StyleType): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof UtilTypes.StringProxy)
+        return val.toString();
+    else if (Array.isArray(val))
+    {
+        let s = UtilFuncs.singleLengthToCssString( val[0]);
+        if (val.length > 1)
+            s += "," + UtilFuncs.singleLengthToCssString( val[1]);
+
+        return s;
+    }
+    else
+        return UtilFuncs.singleLengthToCssString( val);
 }
 
 
