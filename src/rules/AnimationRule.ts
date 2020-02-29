@@ -90,10 +90,10 @@ class KeyframeRule extends StyleRule
 {
 	public constructor( keyframe?: Keyframe)
 	{
-		super( keyframe ? keyframe.style : undefined);
+		super( keyframe ? keyframe[1] : undefined);
 
 		if (keyframe)
-			this.waypointString = this.parseWaypoint( keyframe.waypoint);
+			this.waypointString = this.parseWaypoint( keyframe[0]);
 	}
 
 

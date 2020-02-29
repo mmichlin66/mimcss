@@ -110,7 +110,7 @@ export interface IAnimationRule extends IRule
 /**
  * The Keyframe type defines a single keyframe within a @keyframes rule.
  */
-export type Keyframe = { waypoint: "from" | "to" | number, style: ExtendedStyleset }
+export type Keyframe = [ "from" | "to" | number, ExtendedStyleset ];
 
 /**
  * The ICustomVar interface represents a CSS custom property definitions.
