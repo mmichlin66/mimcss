@@ -3,7 +3,7 @@
  */
 
 
-import {Styleset} from "../styles/styles";
+import {Styleset} from "../styles/StyleTypes";
 
 
 /**

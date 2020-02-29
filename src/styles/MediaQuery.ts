@@ -1,4 +1,4 @@
-﻿import * as utils from "./utils"
+﻿import * as UtilFuncs from "./UtilFuncs"
 
 
 
@@ -126,16 +126,16 @@ let mediaFeatures: { [K in keyof MediaFeatureset]?: MediaFeatureInfo<MediaFeatur
     colorIndex: { defaultValue: 0 },
     minColorIndex: "color",
     maxColorIndex: "color",
-    height: { convert: utils.singleLengthToCssString },
+    height: { convert: UtilFuncs.singleLengthToCssString },
     minHeight: "height",
     maxHeight: "height",
-    width: { convert: utils.singleLengthToCssString },
+    width: { convert: UtilFuncs.singleLengthToCssString },
     minWidth: "width",
     maxWidth:"width",
     monochrome: { defaultValue: 0 },
     minMonochrome: "monochrome",
     maxMonochrome:"monochrome",
-    resolution: { convert: utils.resolutionToCssString },
+    resolution: { convert: UtilFuncs.resolutionToCssString },
     minResolution: "resolution",
     maxResolution: "resolution",
 };
@@ -198,7 +198,7 @@ function mediaFeatureToCssString( featureName: string, propVal: any, valueOnly?:
     else if (typeof propVal === "string")
         s = propVal;
     else if (Array.isArray( propVal))
-        s = utils.arrayToCssString( propVal, item => item == null ? "" : item.toString());
+        s = UtilFuncs.arrayToCssString( propVal, item => item == null ? "" : item.toString());
     else
         s = propVal.toString();
 

@@ -1,6 +1,8 @@
-﻿import * as utils from "./utils"
-import * as styles from "./styles"
-import * as colors from "./colors"
+﻿import {StringProxy} from "./UtilTypes"
+import * as UtilFuncs from "./UtilFuncs"
+import * as ColorFuncs from "./ColorFuncs";
+import {Styleset} from "./StyleTypes"
+import * as StyleFuncs from "./StyleFuncs"
 
 
 
@@ -15,12 +17,12 @@ type PropToStringFunc<T> = (val: T) => string;
  * for shortening frequently used but long property names (e.g. backgroundColor) and for prefixed
  * properties.
  */
-type StylePropertyInfo<T> = PropToStringFunc<T> | keyof styles.Styleset;
+type StylePropertyInfo<T> = PropToStringFunc<T> | keyof Styleset;
 
 
 
 /** Converts the given styleset to its string representation */
-export function stylesetToCssString( styleset: styles.Styleset, important?: Set<string>): string
+export function stylesetToCssString( styleset: Styleset, important?: Set<string>): string
 {
     let s = "";
 	for( let propName in styleset)
@@ -70,16 +72,16 @@ export function stylePropToCssString( propName: string, propVal: any, valueOnly?
         }
     }
 
-    let s = valueOnly ? "" : utils.camelToDash( propName) + ":";
+    let s = valueOnly ? "" : UtilFuncs.camelToDash( propName) + ":";
 
     if (typeof info === "function")
         s += info( propVal);
     else if (typeof propVal === "string")
         s += propVal;
-    else if (propVal instanceof utils.StringProxy)
+    else if (propVal instanceof StringProxy)
         s += propVal.toString();
     else if (Array.isArray( propVal))
-        s += utils.arrayToCssString( propVal, item => item == null ? "" : item.toString());
+        s += UtilFuncs.arrayToCssString( propVal, item => item == null ? "" : item.toString());
     else
         s += propVal.toString();
 
@@ -92,81 +94,81 @@ export function stylePropToCssString( propName: string, propVal: any, valueOnly?
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in keyof styles.Styleset]: StylePropertyInfo<styles.Styleset[K]> } =
+const StylePropertyInfos: { [K in keyof Styleset]: StylePropertyInfo<Styleset[K]> } =
 {
-    animation: styles.animationToCssString,
-    animationDelay: utils.multiTimeToCssString,
-    animationDuration: utils.multiTimeToCssString,
-    animationIterationCount: utils.singleNumberToCssString,
-    animationTimingFunction: styles.animationTimingFunctionToCssString,
+    animation: StyleFuncs.animationToCssString,
+    animationDelay: UtilFuncs.multiTimeToCssString,
+    animationDuration: UtilFuncs.multiTimeToCssString,
+    animationIterationCount: UtilFuncs.singleNumberToCssString,
+    animationTimingFunction: StyleFuncs.animationTimingFunctionToCssString,
 
-    backgroundColor: colors.colorToCssString,
+    backgroundColor: ColorFuncs.colorToCssString,
     bgc: "backgroundColor",
-    backgroundPosition: utils.multiPositionToCssString,
-    backgroundSize: utils.multiSizeToCssString,
-    baselineShift: utils.singleLengthToCssString,
+    backgroundPosition: UtilFuncs.multiPositionToCssString,
+    backgroundSize: UtilFuncs.multiSizeToCssString,
+    baselineShift: UtilFuncs.singleLengthToCssString,
 
-    border: styles.borderSideToCssString,
-    borderBottom: styles.borderSideToCssString,
-    borderBottomColor: colors.colorToCssString,
-    borderBottomLeftRadius: styles.singleCornerRadiusToCssString,
-    borderBottomRightRadius: styles.singleCornerRadiusToCssString,
-    borderBottomWidth: utils.singleLengthToCssString,
-    borderColor: styles.borderColorToCssString,
-    borderImageOutset: styles.borderImageOutsetToCssString,
-    borderImageWidth: styles.borderWidthToCssString,
-    borderLeft: styles.borderSideToCssString,
-    borderLeftColor: colors.colorToCssString,
-    borderLeftWidth: utils.singleLengthToCssString,
-    borderRadius: styles.borderRadiusToCssString,
-    borderRight: styles.borderSideToCssString,
-    borderRightColor: colors.colorToCssString,
-    borderRightWidth: utils.singleLengthToCssString,
-    borderStyle: styles.borderStyleToCssString,
-    borderSpacing: styles.borderSpacingToCssString,
-    borderTop: styles.borderSideToCssString,
-    borderTopColor: colors.colorToCssString,
-    borderTopLeftRadius: styles.singleCornerRadiusToCssString,
-    borderTopRightRadius: styles.singleCornerRadiusToCssString,
-    borderTopWidth: utils.singleLengthToCssString,
-    borderWidth: styles.borderWidthToCssString,
-    bottom: utils.singleLengthToCssString,
-    boxShadow: styles.boxShadowToCssString,
+    border: StyleFuncs.borderSideToCssString,
+    borderBottom: StyleFuncs.borderSideToCssString,
+    borderBottomColor: ColorFuncs.colorToCssString,
+    borderBottomLeftRadius: StyleFuncs.singleCornerRadiusToCssString,
+    borderBottomRightRadius: StyleFuncs.singleCornerRadiusToCssString,
+    borderBottomWidth: UtilFuncs.singleLengthToCssString,
+    borderColor: StyleFuncs.borderColorToCssString,
+    borderImageOutset: StyleFuncs.borderImageOutsetToCssString,
+    borderImageWidth: StyleFuncs.borderWidthToCssString,
+    borderLeft: StyleFuncs.borderSideToCssString,
+    borderLeftColor: ColorFuncs.colorToCssString,
+    borderLeftWidth: UtilFuncs.singleLengthToCssString,
+    borderRadius: StyleFuncs.borderRadiusToCssString,
+    borderRight: StyleFuncs.borderSideToCssString,
+    borderRightColor: ColorFuncs.colorToCssString,
+    borderRightWidth: UtilFuncs.singleLengthToCssString,
+    borderStyle: StyleFuncs.borderStyleToCssString,
+    borderSpacing: StyleFuncs.borderSpacingToCssString,
+    borderTop: StyleFuncs.borderSideToCssString,
+    borderTopColor: ColorFuncs.colorToCssString,
+    borderTopLeftRadius: StyleFuncs.singleCornerRadiusToCssString,
+    borderTopRightRadius: StyleFuncs.singleCornerRadiusToCssString,
+    borderTopWidth: UtilFuncs.singleLengthToCssString,
+    borderWidth: StyleFuncs.borderWidthToCssString,
+    bottom: UtilFuncs.singleLengthToCssString,
+    boxShadow: StyleFuncs.boxShadowToCssString,
     shadow: "boxShadow",
 
-    caretColor: colors.colorToCssString,
-    clip: styles.clipToCssString,
-    color: colors.colorToCssString,
-    columnGap: utils.singleLengthToCssString,
-    columnRule: styles.columnRuleToCssString,
-    columnRuleColor: colors.colorToCssString,
-    columnRuleStyle: styles.borderStyleToCssString,
-    columnRuleWidth: styles.borderWidthToCssString,
-    columns: styles.columnsToCssString,
+    caretColor: ColorFuncs.colorToCssString,
+    clip: StyleFuncs.clipToCssString,
+    color: ColorFuncs.colorToCssString,
+    columnGap: UtilFuncs.singleLengthToCssString,
+    columnRule: StyleFuncs.columnRuleToCssString,
+    columnRuleColor: ColorFuncs.colorToCssString,
+    columnRuleStyle: StyleFuncs.borderStyleToCssString,
+    columnRuleWidth: StyleFuncs.borderWidthToCssString,
+    columns: StyleFuncs.columnsToCssString,
 
-    flex: styles.flexToCssString,
-    flexFlow: styles.flexFlowToCssString,
-    floodColor: colors.colorToCssString,
-    fontStyle: styles.fontStyleToCssString,
+    flex: StyleFuncs.flexToCssString,
+    flexFlow: StyleFuncs.flexFlowToCssString,
+    floodColor: ColorFuncs.colorToCssString,
+    fontStyle: StyleFuncs.fontStyleToCssString,
 
-    gridColumnGap: utils.singleLengthToCssString,
-    gridRowGap: utils.singleLengthToCssString,
+    gridColumnGap: UtilFuncs.singleLengthToCssString,
+    gridRowGap: UtilFuncs.singleLengthToCssString,
 
-    height: utils.singleLengthToCssString,
+    height: UtilFuncs.singleLengthToCssString,
 
-    left: utils.singleLengthToCssString,
-    lightingColor: colors.colorToCssString,
+    left: UtilFuncs.singleLengthToCssString,
+    lightingColor: ColorFuncs.colorToCssString,
 
-    outlineColor: colors.colorToCssString,
+    outlineColor: ColorFuncs.colorToCssString,
 
-    right: utils.singleLengthToCssString,
-    rowGap: utils.singleLengthToCssString,
+    right: UtilFuncs.singleLengthToCssString,
+    rowGap: UtilFuncs.singleLengthToCssString,
 
-    textDecorationColor: colors.colorToCssString,
-    textEmphasisColor: colors.colorToCssString,
-    top: utils.singleLengthToCssString,
+    textDecorationColor: ColorFuncs.colorToCssString,
+    textEmphasisColor: ColorFuncs.colorToCssString,
+    top: UtilFuncs.singleLengthToCssString,
 
-    width: utils.singleLengthToCssString,
+    width: UtilFuncs.singleLengthToCssString,
 };
 
 

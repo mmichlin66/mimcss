@@ -1,41 +1,43 @@
-﻿import * as utils from "./utils"
-import {Color_StyleType, colorToCssString} from "./colors"
+﻿import * as UtilTypes from "./UtilTypes"
+import * as UtilFuncs from "./UtilFuncs"
+import * as ColorTypes from "./ColorTypes"
+import * as ColorFuncs from "./ColorFuncs";
 
 
 
 /** Type for align-content style property */
 export type AlignContentStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
 				"baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" |
-				"space-between" | "space-around" | "space-evenly" | utils.Base_StyleType;
+				"space-between" | "space-around" | "space-evenly" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for align-items style property */
 export type AlignItemsStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
-				"baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" | utils.Base_StyleType;
+				"baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for align-self style property */
 export type AlignSelfStyleType = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
 				"self-start" | "self-end" | "baseline" | "first baseline" | "last baseline" |
-				"safe center" | "unsafe center" | utils.Base_StyleType;
+				"safe center" | "unsafe center" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for alignment-baseline style property */
 export type AlignmentBaselineStyleType = "auto" | "baseline" | "before-edge" | "text-before-edge" |
 				"middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" |
-				"hanging" | "mathematical" | "top" | "center" | "bottom" | utils.Base_StyleType;
+				"hanging" | "mathematical" | "top" | "center" | "bottom" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for single animation */
-export type SingleAnimation = utils.Base_StyleType |
+export type SingleAnimation = UtilTypes.Base_StyleType |
 {
-	delay?: utils.SingleTime_StyleType;
+	delay?: UtilTypes.SingleTime_StyleType;
 	function?: SingleAnimationTimingFunction;
-	duration?: utils.SingleTime_StyleType;
+	duration?: UtilTypes.SingleTime_StyleType;
 	count?: SingleAnimationIterationCount;
 	direction?: SingleAnimationDirection;
 	state?: SingleAnimationPlayState;
@@ -46,48 +48,10 @@ export type SingleAnimation = utils.Base_StyleType |
 /** Type for animation style property */
 export type AnimationStyleType = SingleAnimation | SingleAnimation[];
 
-/**
- * Converts animation style represented as an object with fields corresponding to animation
- * properties to its CSS string value.
- * @param val Single animation object. 
- */
-export function singleAnimationToCssString( val: SingleAnimation): string
-{
-    if (typeof val === "string")
-        return val;
-    else
-    {
-        return utils.objectToCssString( val, false,
-            ["delay", utils.singleTimeToCssString],
-            ["function", singleAnimationTimingFunctionToCssString],
-            ["duration", utils.singleTimeToCssString],
-            ["count", utils.singleNumberToCssString],
-            "direction",
-            "state",
-            "mode",
-            "name",
-        );
-    }
-}
-
-/**
- * Converts animation style to its CSS string value.
- * @param obj Single animation object. 
- */
-export function animationToCssString( val: AnimationStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray( val))
-        return utils.arrayToCssString( val, singleAnimationToCssString);
-    else
-        return singleAnimationToCssString( val);
-}
-
 
 
 /** Type for single animation direction */
-export type SingleAnimationDirection = "normal" | "reverse" | "alternate" | "alternate-reverse" | utils.Base_StyleType;
+export type SingleAnimationDirection = "normal" | "reverse" | "alternate" | "alternate-reverse" | UtilTypes.Base_StyleType;
 
 /** Type for animation-direction style property */
 export type AnimationDirectionStyleType = SingleAnimationDirection | SingleAnimationDirection[];
@@ -95,7 +59,7 @@ export type AnimationDirectionStyleType = SingleAnimationDirection | SingleAnima
 
 
 /** Type for single animation fill mode */
-export type SingleAnimationFillMode = "none" | "forwards" | "backwards" | "both" | utils.Base_StyleType;
+export type SingleAnimationFillMode = "none" | "forwards" | "backwards" | "both" | UtilTypes.Base_StyleType;
 
 /** Type for animation-fill-mode style property */
 export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimationDirection[];
@@ -103,7 +67,7 @@ export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimat
 
 
 /** Type for single animation iteration count */
-export type SingleAnimationIterationCount = "infinite" | utils.SingleNumber_StyleType | utils.Base_StyleType;
+export type SingleAnimationIterationCount = "infinite" | UtilTypes.SingleNumber_StyleType | UtilTypes.Base_StyleType;
 
 /** Type for animation-iteration-count style property */
 export type AnimationIterationCountStyleType = SingleAnimationIterationCount | SingleAnimationIterationCount[];
@@ -111,15 +75,15 @@ export type AnimationIterationCountStyleType = SingleAnimationIterationCount | S
 
 
 /** Type for single animation name */
-export type SingleAnimationName = "none" | utils.Base_StyleType | string;
+export type SingleAnimationName = "none" | UtilTypes.Base_StyleType | string;
 
 /** Type for animation-name style property */
-export type AnimationNameStyleType = SingleAnimationName | SingleAnimationName[] | string;
+export type AnimationNameStyleType = SingleAnimationName | SingleAnimationName[];
 
 
 
 /** Type for single animation play state */
-export type SingleAnimationPlayState = "paused" | "running" | utils.Base_StyleType;
+export type SingleAnimationPlayState = "paused" | "running" | UtilTypes.Base_StyleType;
 
 /** Type for animation-play-state style property */
 export type AnimationPlayStateStyleType = SingleAnimationPlayState | SingleAnimationPlayState[];
@@ -139,74 +103,20 @@ export type AnimationTimingFunction_Step = [number, AnimationTimingFunction_Step
 export type AnimationTimingFunction_Bezier = [number, number, number, number];
 
 /** Type for single animation timing function */
-export type SingleAnimationTimingFunction = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier | utils.Base_StyleType;
+export type SingleAnimationTimingFunction = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier | UtilTypes.Base_StyleType;
 
 /** Type for animation-timing-function style property */
 export type AnimationTimingFunctionStyleType = SingleAnimationTimingFunction | SingleAnimationTimingFunction[];
 
-/**
- * Converts single animation timing function value to the CSS time string.
- * @param val Single animation timing function value
- */
-export function singleAnimationTimingFunctionToCssString( val: SingleAnimationTimingFunction): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (val.length < 3)
-	{
-		// this is step function with only the number of steps
-
-		/// #if DEBUG
-			if (val[0] <= 0)
-				throw new Error( "Number of steps in animation function must be greater than zero");
-			else if (!Number.isInteger( val[0]))
-				throw new Error( "Number of steps in animation function must be an Integer");
-		/// #endif
-
-		return `step(${val[0]}${val.length === 2 ? "," + val[1] : ""})`;
-	}
-	else
-	{
-		// this is bezier function
-
-		/// #if DEBUG
-			if (val[0] < 0 || val[0] > 1 || val[2] < 0 || val[2] > 1)
-				throw new Error( "First and third parameters of cubic-bezier animation function must be between 0 and 1");
-		/// #endif
-
-		return `cubic-bezier(${val[0]},${val[1]},${val[2]},${val[3]})`;
-	}
-}
-
-/**
- * Converts animation iteration count style value to the CSS time string.
- * @param val Animation iteration count value
- */
-export function animationTimingFunctionToCssString( val: AnimationTimingFunctionStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (val.length === 0)
-        return "";
-    else if (typeof val[0] === "number")
-        return singleAnimationTimingFunctionToCssString( val as SingleAnimationTimingFunction);
-    else
-        return utils.arrayToCssString( val as SingleAnimationTimingFunction[], singleAnimationTimingFunctionToCssString);
-}
-
 
 
 /** Type for backface-visibility style property */
-export type BackfaceVisibilityModeStyleType = "visible" | "hidden" | utils.Base_StyleType;
+export type BackfaceVisibilityModeStyleType = "visible" | "hidden" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for single background attachment */
-export type SingleBackgroundAttachment = "scroll" | "fixed" | "local" | utils.Base_StyleType;
+export type SingleBackgroundAttachment = "scroll" | "fixed" | "local" | UtilTypes.Base_StyleType;
 
 /** Type for background-attachment style property */
 export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | SingleBackgroundAttachment[];
@@ -214,7 +124,7 @@ export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | SingleB
 
 
 /** Type for single background clip */
-export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" | "text" | utils.Base_StyleType;
+export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" | "text" | UtilTypes.Base_StyleType;
 
 /** Type for background-clip style property */
 export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundClip[];
@@ -222,7 +132,7 @@ export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundCli
 
 
 /** Type for single background origin */
-export type SingleBackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text" | utils.Base_StyleType;
+export type SingleBackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text" | UtilTypes.Base_StyleType;
 
 /** Type for background-origin style property */
 export type BackgroundOriginStyleType = SingleBackgroundOrigin | SingleBackgroundOrigin[];
@@ -235,7 +145,7 @@ export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | "repeat" | "space
                 "space repeat" | "space space" | "space round" | "space no-repeat" |
                 "round repeat" | "round space" | "round round" | "round no-repeat" |
                 "no-repeat repeat" | "no-repeat space" | "no-repeat round" | "no-repeat no-repeat" |
-                utils.Base_StyleType;
+                UtilTypes.Base_StyleType;
 
 /** Type for background-repeat style property */
 export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroundRepeat[];
@@ -243,7 +153,7 @@ export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroun
 
 
 /** Type for background size */
-export type SingleBackgroundSize = "cover" | "contain" | utils.SingleSize_StyleType;
+export type SingleBackgroundSize = "cover" | "contain" | UtilTypes.SingleSize_StyleType;
 
 /** Type for background-size style property */
 export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSize[];
@@ -251,75 +161,34 @@ export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSiz
 
 
 /** Type for a single corner radius */
-export type SingleCornerRadius_StyleType = utils.SingleLength_StyleType |
-                [utils.SingleLength_StyleType, utils.SingleLength_StyleType];
-
-/**
- * Converts corner radius style value to the CSS string.
- * @param val Animation delay value
- */
-export function singleCornerRadiusToCssString( val: SingleCornerRadius_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
-        return utils.arrayToCssString( val, utils.singleLengthToCssString, " ");
-    else
-        return utils.singleLengthToCssString( val);
-}
+export type SingleCornerRadius_StyleType = UtilTypes.SingleLength_StyleType |
+                [UtilTypes.SingleLength_StyleType, UtilTypes.SingleLength_StyleType];
 
 
 
 /** Helper type that defines an array of one to 4 elements each defining a length/percentage */
 export type MultiCornerRadius_StyleType =
                 [
-                    utils.SingleLength_StyleType,
-                    utils.SingleLength_StyleType?,
-                    utils.SingleLength_StyleType?,
-                    utils.SingleLength_StyleType?
+                    UtilTypes.SingleLength_StyleType,
+                    UtilTypes.SingleLength_StyleType?,
+                    UtilTypes.SingleLength_StyleType?,
+                    UtilTypes.SingleLength_StyleType?
                 ];
 
 /** Type for border-radius style property */
-export type BorderRadiusStyleType = utils.SingleLength_StyleType | MultiCornerRadius_StyleType |
+export type BorderRadiusStyleType = UtilTypes.SingleLength_StyleType | MultiCornerRadius_StyleType |
                 [MultiCornerRadius_StyleType, MultiCornerRadius_StyleType];
-
-/**
- * Converts border radius style value to the CSS string.
- * @param val Border radius value
- */
-export function borderRadiusToCssString( val: BorderRadiusStyleType): string
-{
-    if (Array.isArray(val))
-    {
-        if (Array.isArray( val[0]))
-        {
-            // two MultiCornerRadius values
-            let s = utils.arrayToCssString( val[0], utils.singleLengthToCssString, " ");
-            s += " / ";
-            return s + utils.arrayToCssString( val[1] as MultiCornerRadius_StyleType, utils.singleLengthToCssString, " ");
-        }
-        else
-        {
-            // single MultiCornerRadius value
-            return utils.arrayToCssString( val as MultiCornerRadius_StyleType, utils.singleLengthToCssString, " ");
-        }
-    }
-    else
-        return utils.singleLengthToCssString( val);
-}
 
 
 
 /** Type for baseline-shift style property */
-export type BaselineShiftStyleType = "sub" | "super" | utils.SingleLength_StyleType;
+export type BaselineShiftStyleType = "sub" | "super" | UtilTypes.SingleLength_StyleType;
 
 
 
 /** Type for single border side style property */
 export type BorderSideStyle_StyleType = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
-                "groove" | "ridge" | "inset" | "outset" | utils.Base_StyleType;
+                "groove" | "ridge" | "inset" | "outset" | UtilTypes.Base_StyleType;
 
 
 
@@ -332,26 +201,10 @@ export type BorderStyleStyleType = BorderSideStyle_StyleType |
                     BorderSideStyle_StyleType?,
                 ];
 
-/**
- * Converts border style style value to the CSS string.
- * @param val Border style value
- */
-export function borderStyleToCssString( val: BorderStyleStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
-        return utils.stringArrayToCssString( val, " ");
-    else
-        return val;
-}
-
 
 
 /** Type for border side width style property */
-export type BorderSideWidth_StyleType = "thin" | "medium" | "thick" | utils.SingleLength_StyleType;
+export type BorderSideWidth_StyleType = "thin" | "medium" | "thick" | UtilTypes.SingleLength_StyleType;
 
 
 
@@ -364,125 +217,46 @@ export type BorderWidthStyleType = BorderSideWidth_StyleType |
                     BorderSideWidth_StyleType?,
                 ];
 
-/**
- * Converts border width style value to the CSS string.
- * @param val Border width value
- */
-export function borderWidthToCssString( val: BorderWidthStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
-        return utils.arrayToCssString( val, utils.singleLengthToCssString, " ");
-    else
-        return utils.singleLengthToCssString( val);
-}
-
 
 
 /** Type for border-collapse style property */
-export type BorderColapseStyleType = "collapse" | "separate" | utils.Base_StyleType;
+export type BorderColapseStyleType = "collapse" | "separate" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for border-spacing style property */
-export type BorderSpacingStyleType = utils.SingleLength_StyleType | utils.Base_StyleType |
+export type BorderSpacingStyleType = UtilTypes.SingleLength_StyleType | UtilTypes.Base_StyleType |
                 [
-                    utils.SingleLength_StyleType,
-                    utils.SingleLength_StyleType,
+                    UtilTypes.SingleLength_StyleType,
+                    UtilTypes.SingleLength_StyleType,
                 ];
-
-/**
- * Converts border spacing style value to the CSS string.
- * @param val Border spacing value
- */
-export function borderSpacingToCssString( val: BorderSpacingStyleType): string
-{
-    if (Array.isArray(val))
-        return utils.arrayToCssString( val, utils.singleLengthToCssString, " ");
-    else
-        return utils.singleLengthToCssString( val);
-}
 
 
 
 /** Type for border-color style property */
-export type BorderColorStyleType = Color_StyleType |
+export type BorderColorStyleType = ColorTypes.Color_StyleType |
                 [
-                    Color_StyleType,
-                    Color_StyleType,
-                    Color_StyleType?,
-                    Color_StyleType?,
+                    ColorTypes.Color_StyleType,
+                    ColorTypes.Color_StyleType,
+                    ColorTypes.Color_StyleType?,
+                    ColorTypes.Color_StyleType?,
                 ];
-
-/**
- * Converts border color style value to the CSS string.
- * @param val Border color value
- */
-export function borderColorToCssString( val: BorderColorStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
-        return utils.arrayToCssString( val as Color_StyleType[], colorToCssString, " ");
-    else
-        return colorToCssString( val);
-}
 
 
 
 /** Type for border side style property */
-export type BorderSide_StyleType = utils.SingleLength_StyleType |  BorderSideStyle_StyleType | Color_StyleType |
+export type BorderSide_StyleType = UtilTypes.SingleLength_StyleType |  BorderSideStyle_StyleType | ColorTypes.Color_StyleType |
                
                 [
-                    utils.SingleLength_StyleType?,
+                    UtilTypes.SingleLength_StyleType?,
                     BorderSideStyle_StyleType?,
-                    Color_StyleType?,
+                    ColorTypes.Color_StyleType?,
                 ];
-
-/**
- * Converts border side style value to the CSS string.
- * @param val Border side value
- */
-export function borderSideToCssString( val: BorderSide_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return utils.singleLengthToCssString( val);
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
-    {
-        let s = "";
-        if (typeof val[0] === "string")
-            return val[0];
-        else if (val[0] instanceof utils.StringProxy)
-            return val[0].toString();
-        else if (val[0] != null)
-            s += utils.singleLengthToCssString( val[0]) + " ";
-
-        if (val[1])
-            s += val[1] + " ";
-
-        if (val[2])
-            s += colorToCssString( val[2]) + " ";
-
-        return s;
-    }
-    else
-        return colorToCssString( val);
-}
 
 
 
 /** Type for border-image-outset style property */
-export type BorderImageOutsetStyleType = string | number | utils.Base_StyleType |
-               
+export type BorderImageOutsetStyleType = string | number | UtilTypes.Base_StyleType |
                 [
                     string | number,
                     string | number,
@@ -490,37 +264,21 @@ export type BorderImageOutsetStyleType = string | number | utils.Base_StyleType 
                     (string | number)?,
                 ];
 
-/**
- * Converts border-image-outset style value to the CSS string.
- * @param val Border image outset value
- */
-export function borderImageOutsetToCssString( val: BorderImageOutsetStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else
-        return utils.arrayToCssString( val, borderImageOutsetToCssString, " ");
-}
-
 
 
 /** Type for border-image-repeat style property */
-export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space" | utils.Base_StyleType;
+export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space" | UtilTypes.Base_StyleType;
 export type BorderImageRepeatStyleType = BorderImageRepeatKeyword | [BorderImageRepeatKeyword, BorderImageRepeatKeyword];
 
 
 
 /** Type for border-image-width style property */
-export type BorderImageWidthStyleType = utils.SingleLength_StyleType |
+export type BorderImageWidthStyleType = UtilTypes.SingleLength_StyleType |
                 [
-                    utils.SingleLength_StyleType,
-                    utils.SingleLength_StyleType,
-                    utils.SingleLength_StyleType?,
-                    utils.SingleLength_StyleType?,
+                    UtilTypes.SingleLength_StyleType,
+                    UtilTypes.SingleLength_StyleType,
+                    UtilTypes.SingleLength_StyleType?,
+                    UtilTypes.SingleLength_StyleType?,
                 ];
 
 
@@ -534,150 +292,94 @@ export type BorderImageWidthStyleType = utils.SingleLength_StyleType |
  *   - string - literal CSS box shadow string.
  *   - object - fields specify box shadow parts.
  */
-export type SingleBoxShadow = "none" | boolean | number | utils.Base_StyleType |
+export type SingleBoxShadow = "none" | boolean | number | UtilTypes.Base_StyleType |
 {
     /** Flag indicating whether the shadow is inside the box (true) or outside it (false). Default is false. */
     inset?: boolean;
     /** Horizontal offset where the shadow should begin. Default is 0. */
-	x?: utils.SingleLength_StyleType;
+	x?: UtilTypes.SingleLength_StyleType;
     /** Vertical offset where the shadow should begin. Default is 0. */
-    y?: utils.SingleLength_StyleType;
+    y?: UtilTypes.SingleLength_StyleType;
     /** Blur radius. Default is 1em. */
-    blur?: utils.SingleLength_StyleType;
+    blur?: UtilTypes.SingleLength_StyleType;
     /** Spread radius. Default is 1em. */
-    spread?: utils.SingleLength_StyleType;
+    spread?: UtilTypes.SingleLength_StyleType;
     /** Shadow color. Default is 0xc0c0c0. */
-	color?: Color_StyleType;
+	color?: ColorTypes.Color_StyleType;
 };
 
 /** Type for box shadow style property */
 export type BoxShadowStyleType = SingleBoxShadow | SingleBoxShadow[];
 
-/**
- * Converts single box shadow style represented as an object with fields corresponding to box shadow
- * properties to its CSS string value.
- * @param val Single box shadow object. 
- */
-export function singleBoxShadowToCssString( val: SingleBoxShadow): string
-{
-    if (!val)
-        return "none";
-    else if (typeof val === "string")
-        return val;
-    else if (typeof val === "boolean")
-        return "0 0 1em 1em #c0c0c0";
-    else if (typeof val === "number")
-        return `0 0 ${val}em ${val}1em #c0c0c0`;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else
-    {
-        return utils.objectToCssString( val, false,
-            ["inset", v => v === true ? "inset" : ""],
-            ["x", utils.singleLengthToCssString],
-            ["y", utils.singleLengthToCssString],
-            ["blur", utils.singleLengthToCssString],
-            ["spread", utils.singleLengthToCssString],
-            ["color", colorToCssString]
-        );
-    }
-}
-
-/**
- * Converts box shadow style to its CSS string value.
- * @param obj Box shadow value. 
- */
-export function boxShadowToCssString( val: BoxShadowStyleType): string
-{
-    if (Array.isArray( val))
-        return utils.arrayToCssString( val, singleBoxShadowToCssString);
-    else
-        return singleBoxShadowToCssString( val);
-}
-
 
 
 /** Type for box-sizing style property */
-export type BoxSizingStyleType = "content-box" | "border-box" | utils.Base_StyleType;
+export type BoxSizingStyleType = "content-box" | "border-box" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for break-after style property */
 export type BreakAfterStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
                 "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
-                "avoid-region" | "region" | utils.Base_StyleType;
+                "avoid-region" | "region" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for break-before style property */
 export type BreakBeforeStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
                 "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
-                "avoid-region" | "region" | utils.Base_StyleType;
+                "avoid-region" | "region" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for break-inside style property */
-export type BreakInsideStyleType = "auto" | "avoid" | "avoid-page" | "avoid-column" | "avoid-region" | utils.Base_StyleType;
+export type BreakInsideStyleType = "auto" | "avoid" | "avoid-page" | "avoid-column" | "avoid-region" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for caption-side style property */
-export type CaptionSideStyleType = "top" | "bottom" | "block-start" | "block-end" | "inline-start" | "inline-end" | utils.Base_StyleType;
+export type CaptionSideStyleType = "top" | "bottom" | "block-start" | "block-end" | "inline-start" | "inline-end" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for caret-color style property */
-export type CaretColorStyleType = "auto" | Color_StyleType;
+export type CaretColorStyleType = "auto" | ColorTypes.Color_StyleType;
 
 
 
 /** Type for clear style property */
-export type ClearStyleType = "none" | "left" | "right" | "both" | "inline-start" | "inline-end" | utils.Base_StyleType;
+export type ClearStyleType = "none" | "left" | "right" | "both" | "inline-start" | "inline-end" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for clear style property */
-export type ClipStyleType = "auto" | utils.Base_StyleType |
+export type ClipStyleType = "auto" | UtilTypes.Base_StyleType |
                 [
-                    utils.SingleLength_StyleType,
-                    utils.SingleLength_StyleType, 
-                    utils.SingleLength_StyleType,
-                    utils.SingleLength_StyleType, 
+                    UtilTypes.SingleLength_StyleType,
+                    UtilTypes.SingleLength_StyleType, 
+                    UtilTypes.SingleLength_StyleType,
+                    UtilTypes.SingleLength_StyleType, 
                 ];
-
-/**
- * Converts clip style value to its CSS string value.
- * @param val Clip value. 
- */
-export function clipToCssString( val: ClipStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else
-        return `rect(${utils.arrayToCssString( val, utils.singleLengthToCssString, " ")}`;
-}
 
 
 
 /** Type for color-interpolation-filters style property */
-export type ColorInterpolationFiltersStyleType = "auto" | "sRGB" | "linearRGB" | utils.Base_StyleType;
+export type ColorInterpolationFiltersStyleType = "auto" | "sRGB" | "linearRGB" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for column-count style property */
-export type ColumnCountStyleType = "auto" | number | utils.Base_StyleType;
+export type ColumnCountStyleType = "auto" | number | UtilTypes.Base_StyleType;
 
 
 
 /** Type for column-fill style property */
-export type ColumnFillStyleType = "auto" | "balance" | "balance-all" | utils.Base_StyleType;
+export type ColumnFillStyleType = "auto" | "balance" | "balance-all" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for single gap style property */
-export type SingleGap_StyleType = "normal" | utils.SingleLength_StyleType;
+export type SingleGap_StyleType = "normal" | UtilTypes.SingleLength_StyleType;
 
 
 
@@ -686,7 +388,7 @@ export type SingleGap_StyleType = "normal" | utils.SingleLength_StyleType;
  *   - string - literal CSS box shadow string.
  *   - object - fields specify column rule parts.
  */
-export type ColumnRuleStyleType = string | utils.Base_StyleType |
+export type ColumnRuleStyleType = string | UtilTypes.Base_StyleType |
     {
         /** Column rule width. */
         width?: BorderWidthStyleType;
@@ -696,59 +398,20 @@ export type ColumnRuleStyleType = string | utils.Base_StyleType |
         color?: SingleGap_StyleType;
     };
 
-/**
- * Converts column rule style represented as an object with fields corresponding to column rule
- * properties to its CSS string value.
- * @param val Column rule style value. 
- */
-export function columnRuleToCssString( val: ColumnRuleStyleType): string
-{
-    if (!val)
-        return null;
-    else if (typeof val === "string")
-        return val;
-    else
-    {
-        return utils.objectToCssString( val, false,
-            ["width", borderWidthToCssString],
-            ["style", borderStyleToCssString],
-            ["color", colorToCssString]
-        );
-    }
-}
-
 
 
 /** Type for column-span style property */
-export type ColumnSpanStyleType = "none" | "all" | utils.Base_StyleType;
+export type ColumnSpanStyleType = "none" | "all" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for columns style property */
-export type ColumnsStyleType = "auto" | number | ["auto" | number, utils.SingleLength_StyleType] | utils.Base_StyleType;
-
-/**
- * Converts columns style to its CSS string value.
- * @param val Columns style value. 
- */
-export function columnsToCssString( val: ColumnsStyleType): string
-{
-    if (!val)
-        return null;
-    else if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else
-        return val[0].toString() + " " + utils.singleLengthToCssString( val[1]);
-}
+export type ColumnsStyleType = "auto" | number | ["auto" | number, UtilTypes.SingleLength_StyleType] | UtilTypes.Base_StyleType;
 
 
 
 /** Type for float (cssFloat) style property */
-export type FloatStyleType = "left" | "right" | "none" | "inline-start" | "inline-end" | utils.Base_StyleType;
+export type FloatStyleType = "left" | "right" | "none" | "inline-start" | "inline-end" | UtilTypes.Base_StyleType;
 
 
 
@@ -758,12 +421,12 @@ export type CursorStyleType = "auto" | "default" | "none" | "context-menu" | "he
                 "no-drop" | "not-allowed" | "e-resize" | "n-resize" | "ne-resize" | "nw-resize" |
                 "s-resize" | "se-resize" | "sw-resize" | "w-resize" | "ew-resize" | "ns-resize" |
                 "nesw-resize" | "nwse-resize" | "col-resize" | "row-resize" | "all-scroll" | "zoom-in" |
-                "zoom-out" | "grab" | "grabbing" | utils.Base_StyleType;
+                "zoom-out" | "grab" | "grabbing" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for direction style property */
-export type DirectionStyleType = "ltr" | "rtl" | utils.Base_StyleType;
+export type DirectionStyleType = "ltr" | "rtl" | UtilTypes.Base_StyleType;
 
 
 
@@ -776,124 +439,64 @@ export type DisplayStyleType = "block" | "inline" | "run-in" | "contents" | "non
                     "ruby-base-container" | "ruby-text-container" |
                 "list-item" | "list-item block" | "list-item inline" | "list-item flow" | "list-item flow-root" |
                     "list-item block flow" | "list-item block flow-root" | "flow list-item block" |
-                utils.Base_StyleType;
+                UtilTypes.Base_StyleType;
 
                 
 
 /** Type for dominant-baseline style property */
 export type DominantBaselineStyleType = "auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
-                "central" | "mathematical" | "hanging" | "text-top" | utils.Base_StyleType;
+                "central" | "mathematical" | "hanging" | "text-top" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for empty-cells style property */
-export type EmptyCellsStyleType = "show" | "hide" | utils.Base_StyleType;
+export type EmptyCellsStyleType = "show" | "hide" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for fill-rule style property */
-export type FillRuleStyleType = "nonzero" | "evenodd" | utils.Base_StyleType;
+export type FillRuleStyleType = "nonzero" | "evenodd" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for flex-basis style property */
-export type FlexBasisStyleType = "auto" | "content" | utils.SingleLength_StyleType | utils.Base_StyleType;
+export type FlexBasisStyleType = "auto" | "content" | UtilTypes.SingleLength_StyleType | UtilTypes.Base_StyleType;
 
 
 
 /** Type for flex style property */
 export type FlexStyleType = FlexBasisStyleType | [number,number] | [number,number,FlexBasisStyleType];
 
-/**
- * Converts flex style value to the CSS string.
- * @param val Flex value
- */
-export function flexToCssString( val: FlexStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
-    {
-        if (val.length === 2)
-            return val.join( " ");
-        else
-        {
-            let s = val[0] + " " + val[1] + " ";
-            let v = val[2];
-            if (typeof v === "string")
-                s += v;
-            else
-              s += utils.singleLengthToCssString( v);
-
-            return s;
-        }
-    }
-    else
-        return utils.singleLengthToCssString( val);
-}
-
 
 
 /** Type for flex-direction style property */
-export type FlexDirectionStyleType = "row" | "row-reverse" | "column" | "column-reverse" | utils.Base_StyleType;
+export type FlexDirectionStyleType = "row" | "row-reverse" | "column" | "column-reverse" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for flex-wrap style property */
-export type FlexWrapStyleType = "nowrap" | "wrap" | "wrap-reverse" | utils.Base_StyleType;
+export type FlexWrapStyleType = "nowrap" | "wrap" | "wrap-reverse" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for flex-flow style property */
 export type FlexFlowStyleType = FlexDirectionStyleType | FlexWrapStyleType |
-                [FlexDirectionStyleType,FlexWrapStyleType] | utils.Base_StyleType;
-
-/**
- * Converts flex-flow style value to the CSS string.
- * @param val Flex-flow value
- */
-export function flexFlowToCssString( val: FlexFlowStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else
-        return utils.stringArrayToCssString( val);
-}
+                [FlexDirectionStyleType,FlexWrapStyleType] | UtilTypes.Base_StyleType;
 
 
 
 /** Type for font-style style property */
-export type FontStyleStyleType = "normal" | "italic" | "oblique" | utils.SingleAngle_StyleType;
-
-/**
- * Converts font-style style value to the CSS string.
- * @param val Font-style value
- */
-export function fontStyleToCssString( val: FontStyleStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof utils.StringProxy)
-        return val.toString();
-    else
-        return utils.singleAngleToCssString( val);
-}
+export type FontStyleStyleType = "normal" | "italic" | "oblique" | UtilTypes.SingleAngle_StyleType;
 
 
 
 /** Type for font-weight style property */
 export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" |
-                100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | utils.Base_StyleType;
+                100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | UtilTypes.Base_StyleType;
 
 
 
-export type StyleType = string | utils.Base_StyleType;
+export type StyleType = string | UtilTypes.Base_StyleType;
 
 
 
@@ -907,9 +510,9 @@ export interface Styleset
     alignSelf?: AlignSelfStyleType;
     alignmentBaseline?: AlignmentBaselineStyleType;
     animation?: AnimationStyleType;
-    animationDelay?: utils.MultiTime_StyleType;
+    animationDelay?: UtilTypes.MultiTime_StyleType;
     animationDirection?: AnimationDirectionStyleType;
-    animationDuration?: utils.MultiTime_StyleType;
+    animationDuration?: UtilTypes.MultiTime_StyleType;
     animationFillMode?: AnimationFillModeStyleType;
     animationIterationCount?: AnimationIterationCountStyleType;
     animationName?: AnimationNameStyleType;
@@ -920,10 +523,10 @@ export interface Styleset
     background?: StyleType;
     backgroundAttachment?: BackgroundAttachmentStyleType;
     backgroundClip?: BackgroundClipStyleType;
-    backgroundColor?: Color_StyleType;
+    backgroundColor?: ColorTypes.Color_StyleType;
     backgroundImage?: StyleType;
     backgroundOrigin?: BackgroundOriginStyleType;
-    backgroundPosition?: utils.MultiPosition_StyleType;
+    backgroundPosition?: UtilTypes.MultiPosition_StyleType;
     backgroundPositionX?: string;
     backgroundPositionY?: string;
     backgroundRepeat?: BackgroundRepeatStyleType;
@@ -931,7 +534,7 @@ export interface Styleset
     baselineShift?: BaselineShiftStyleType;
     border?: BorderSide_StyleType;
     borderBottom?: BorderSide_StyleType;
-    borderBottomColor?: Color_StyleType;
+    borderBottomColor?: ColorTypes.Color_StyleType;
     borderBottomLeftRadius?: SingleCornerRadius_StyleType;
     borderBottomRightRadius?: SingleCornerRadius_StyleType;
     borderBottomStyle?: BorderSideStyle_StyleType;
@@ -945,24 +548,24 @@ export interface Styleset
     borderImageSource?: string;
     borderImageWidth?: BorderImageWidthStyleType;
     borderLeft?: BorderSide_StyleType;
-    borderLeftColor?: Color_StyleType;
+    borderLeftColor?: ColorTypes.Color_StyleType;
     borderLeftStyle?: BorderSideStyle_StyleType;
     borderLeftWidth?: BorderSideWidth_StyleType;
     borderRadius?: BorderRadiusStyleType;
     borderRight?: BorderSide_StyleType;
-    borderRightColor?: Color_StyleType;
+    borderRightColor?: ColorTypes.Color_StyleType;
     borderRightStyle?: BorderSideStyle_StyleType;
     borderRightWidth?: BorderSideWidth_StyleType;
     borderSpacing?: BorderSpacingStyleType;
     borderStyle?: BorderStyleStyleType;
     borderTop?: BorderSide_StyleType;
-    borderTopColor?: Color_StyleType;
+    borderTopColor?: ColorTypes.Color_StyleType;
     borderTopLeftRadius?: SingleCornerRadius_StyleType;
     borderTopRightRadius?: SingleCornerRadius_StyleType;
     borderTopStyle?: BorderSideStyle_StyleType;
     borderTopWidth?: BorderSideWidth_StyleType;
     borderWidth?: BorderWidthStyleType;
-    bottom?: utils.SingleLength_StyleType;
+    bottom?: UtilTypes.SingleLength_StyleType;
     boxShadow?: BoxShadowStyleType;
     boxSizing?: BoxSizingStyleType;
     breakAfter?: BreakAfterStyleType;
@@ -975,17 +578,17 @@ export interface Styleset
     clip?: ClipStyleType;
     clipPath?: string;
     clipRule?: string;
-    color?: Color_StyleType;
+    color?: ColorTypes.Color_StyleType;
     colorInterpolationFilters?: ColorInterpolationFiltersStyleType;
     columnCount?: ColumnCountStyleType;
     columnFill?: ColumnFillStyleType;
     columnGap?: SingleGap_StyleType;
     columnRule?: ColumnRuleStyleType;
-    columnRuleColor?: Color_StyleType;
+    columnRuleColor?: ColorTypes.Color_StyleType;
     columnRuleStyle?: BorderSideStyle_StyleType;
     columnRuleWidth?: BorderSideWidth_StyleType;
     columnSpan?: ColumnSpanStyleType;
-    columnWidth?: utils.SingleLength_StyleType;
+    columnWidth?: UtilTypes.SingleLength_StyleType;
     columns?: ColumnsStyleType;
     content?: string;
     counterIncrement?: StyleType;
@@ -1009,10 +612,10 @@ export interface Styleset
     flexBasis?: FlexBasisStyleType;
     flexDirection?: FlexDirectionStyleType;
     flexFlow?: FlexFlowStyleType;
-    flexGrow?: utils.SingleNumber_StyleType;
-    flexShrink?: utils.SingleNumber_StyleType;
+    flexGrow?: UtilTypes.SingleNumber_StyleType;
+    flexShrink?: UtilTypes.SingleNumber_StyleType;
     flexWrap?: FlexWrapStyleType;
-    floodColor?: Color_StyleType;
+    floodColor?: ColorTypes.Color_StyleType;
     floodOpacity?: string;
     font?: string;
     fontFamily?: string;
@@ -1053,7 +656,7 @@ export interface Styleset
     gridTemplateColumns?: StyleType;
 	gridTemplateRows?: StyleType;
 	
-    height?: utils.SingleLength_StyleType;
+    height?: UtilTypes.SingleLength_StyleType;
 	hyphens?: string;
 	
     imageOrientation?: string;
@@ -1071,9 +674,9 @@ export interface Styleset
     layoutGridLine?: StyleType;
     layoutGridMode?: StyleType;
     layoutGridType?: StyleType;
-    left?: utils.SingleLength_StyleType;
+    left?: UtilTypes.SingleLength_StyleType;
     letterSpacing?: string;
-    lightingColor?: Color_StyleType;
+    lightingColor?: ColorTypes.Color_StyleType;
     lineBreak?: string;
     lineHeight?: StyleType;
     listStyle?: StyleType;
@@ -1154,9 +757,9 @@ export interface Styleset
     objectPosition?: string;
     opacity?: StyleType;
     order?: StyleType;
-    orphans?: number | utils.Base_StyleType;
+    orphans?: number | UtilTypes.Base_StyleType;
     outline?: string;
-    outlineColor?: Color_StyleType;
+    outlineColor?: ColorTypes.Color_StyleType;
     outlineOffset?: string;
     outlineStyle?: string;
     outlineWidth?: string;
@@ -1186,7 +789,7 @@ export interface Styleset
 	quotes?: StyleType;
 	
     resize?: string;
-    right?: utils.SingleLength_StyleType;
+    right?: UtilTypes.SingleLength_StyleType;
     rotate?: StyleType;
     rowGap?: SingleGap_StyleType;
     rubyAlign?: StyleType;
@@ -1213,11 +816,11 @@ export interface Styleset
     textAnchor?: StyleType;
     textCombineUpright?: string;
     textDecoration?: string;
-    textDecorationColor?: Color_StyleType;
+    textDecorationColor?: ColorTypes.Color_StyleType;
     textDecorationLine?: string;
     textDecorationStyle?: string;
     textEmphasis?: string;
-    textEmphasisColor?: Color_StyleType;
+    textEmphasisColor?: ColorTypes.Color_StyleType;
     textEmphasisPosition?: string;
     textEmphasisStyle?: string;
     textIndent?: string;
@@ -1229,7 +832,7 @@ export interface Styleset
     textShadow?: string;
     textTransform?: string;
     textUnderlinePosition?: string;
-    top?: utils.SingleLength_StyleType;
+    top?: UtilTypes.SingleLength_StyleType;
     touchAction?: string;
     transform?: string;
     transformBox?: string;
@@ -1285,7 +888,7 @@ export interface Styleset
     webkitColumnCount?: ColumnCountStyleType;
     webkitColumnGap?: SingleGap_StyleType;
     webkitColumnRule?: ColumnRuleStyleType;
-    webkitColumnRuleColor?: Color_StyleType;
+    webkitColumnRuleColor?: ColorTypes.Color_StyleType;
     webkitColumnRuleStyle?: ColumnRuleStyleType;
     webkitColumnRuleWidth?: BorderWidthStyleType;
     webkitColumnSpan?: StyleType;
@@ -1337,20 +940,20 @@ export interface Styleset
 	webkitWritingMode?: StyleType;
 	
     whiteSpace?: string;
-    widows?: number | utils.Base_StyleType;
-    width?: utils.SingleLength_StyleType;
+    widows?: number | UtilTypes.Base_StyleType;
+    width?: UtilTypes.SingleLength_StyleType;
     willChange?: string;
     wordBreak?: string;
     wordSpacing?: string;
     wordWrap?: string;
 	writingMode?: string;
 	
-    zIndex?: "auto" | number | utils.Base_StyleType;
+    zIndex?: "auto" | number | UtilTypes.Base_StyleType;
     zoom?: StyleType;
 
     // custom properties/aliases
     shadow?: BoxShadowStyleType;
-    bgc?: Color_StyleType;
+    bgc?: ColorTypes.Color_StyleType;
 
     /**
      * Special property that contains several definitions of custom CSS properties.

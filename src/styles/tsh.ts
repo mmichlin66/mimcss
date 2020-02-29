@@ -1,9 +1,9 @@
-﻿import {StringProxy, UnitValue, lengthToCssString, percentToCssString,
-        angleToCssString, timeToCssString, resolutionToCssString} from "./utils"
-import {Colors, colorSep, rgb, hsl, alpha} from "./colors";
+﻿import {StringProxy, UnitValue} from "./UtilTypes"
+import * as UtilFuncs from "./UtilFuncs"
+import * as ColorTypes from "./ColorTypes";
+import * as ColorFuncs from "./ColorFuncs";
 import {ICustomVar} from "../api/rules"
 import {CustomVar} from "../rules/CustomVar"
-import {Styleset} from "./styles";
 import {stylePropToCssString} from "./StyleInfo";
 
 
@@ -25,11 +25,21 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Creates a StringProxy object from the given string or another StringProxy object.
+     */
+    public static raw( s: string | StringProxy): StringProxy
+    {
+        return new StringProxy(s);
+    }
+
+
+
+    /**
      * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
      */
     public static percent( n: number): string
     {
-        return percentToCssString( n);
+        return UtilFuncs.percentToCssString( n);
     }
 
     public static units( n: number, unit: string): UnitValue
@@ -56,22 +66,22 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
     public static colorSep( c: number | string): string
     {
-        return colorSep(c);
+        return ColorFuncs.colorSep(c);
     }
 
     public static rgb( r: number | string, g: number | string, b: number | string, a?: number | string): StringProxy
     {
-        return new StringProxy( rgb( r, g, b, a));
+        return new StringProxy( ColorFuncs.rgb( r, g, b, a));
     }
 
     public static hsl( h: number | string, s: number | string, l: number | string, a?: number | string): StringProxy
     {
-        return new StringProxy( hsl( h, s, l, a));
+        return new StringProxy( ColorFuncs.hsl( h, s, l, a));
     }
 
-    public static alpha( c: number | keyof typeof Colors, a: number | string): StringProxy
+    public static alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): StringProxy
     {
-        return new StringProxy( alpha( c, a));
+        return new StringProxy( ColorFuncs.alpha( c, a));
     }
 
 
@@ -107,7 +117,7 @@ export class tsh
      */
     public static len( n: number, units?: string): string
     {
-        return lengthToCssString( n, units);
+        return UtilFuncs.lengthToCssString( n, units);
     }
 
 
@@ -128,7 +138,7 @@ export class tsh
      */
     public static angle( n: number, units?: string): string
     {
-        return angleToCssString(n);
+        return UtilFuncs.angleToCssString(n);
     }
 
 
@@ -147,7 +157,7 @@ export class tsh
      */
     public static time( n: number, units?: string): string
     {
-        return timeToCssString(n);
+        return UtilFuncs.timeToCssString(n);
     }
 
 
@@ -177,7 +187,7 @@ export class tsh
      */
     public static resolution( n: number, units?: string): string
     {
-        return resolutionToCssString( n, units);
+        return UtilFuncs.resolutionToCssString( n, units);
     }
 
 

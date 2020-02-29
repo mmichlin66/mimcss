@@ -3,7 +3,7 @@ import {ExtendedStyleset, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimati
 import {IStyleScopeDefinitionClass, IStyleScope} from "./scope"
 import {ISelector} from "./Selector"
 
-import {Styleset} from "../styles/styles"
+import {Styleset} from "../styles/StyleTypes"
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"
