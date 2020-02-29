@@ -1,8 +1,10 @@
-﻿import {StringProxy, UnitValue} from "./utils"
-import {Colors} from "./colors";
+﻿import {StringProxy, UnitValue, lengthUnitsToCssString, percentToCssString,
+        angleToCssString, timeToCssString} from "./utils"
+import {Colors, colorSep, rgb, hsl, alpha} from "./colors";
 import {ICustomVar} from "../api/rules"
 import {CustomVar} from "../rules/CustomVar"
-import { stylePropToCssString } from "./styles";
+import {Styleset} from "./styles";
+import {stylePropToCssString} from "./StyleInfo";
 
 
 
@@ -21,9 +23,13 @@ export class tsh
     // Utilities
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
+     */
     public static percent( n: number): string
     {
-        return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%";
+        return percentToCssString( n);
     }
 
     public static units( n: number, unit: string): UnitValue
@@ -31,6 +37,16 @@ export class tsh
         return new UnitValue( n, unit);
     }
 
+    /**
+     * Converts the given value corresponding to the given style property to string.
+     * @param stylePropName Style property name that determines how the value should be converted
+     * to a CSS compliant string.
+     * @param stylePropValue Value to convert.
+     */
+    public static val( stylePropName: string, stylePropValue: any): string
+    {
+        return stylePropToCssString( stylePropName, stylePropValue, true);
+    }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,33 +56,22 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
     public static colorSep( c: number | string): string
     {
-        return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : this.percent(c);
+        return colorSep(c);
     }
 
     public static rgb( r: number | string, g: number | string, b: number | string, a?: number | string): StringProxy
     {
-        r = this.colorSep(r);
-        g = this.colorSep(g);
-        b = this.colorSep(b);
-        a = a == null ? null : typeof a === "string" ? a : this.percent(a);
-
-        return new StringProxy( a == null ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`);
+        return new StringProxy( rgb( r, g, b, a));
     }
 
     public static hsl( h: number | string, s: number | string, l: number | string, a?: number | string): StringProxy
     {
-        h = typeof h === "string" ? h : Number.isInteger( h) ? h + "deg" : h + "rad";
-        s = s == null ? "100%" : typeof s === "string" ? s : this.percent(s);
-        l = l == null ? "100%" : typeof l === "string" ? l : this.percent(l);
-        a = a == null ? null : typeof a === "string" ? a : this.percent(a);
-
-        return new StringProxy( a == null ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`);
+        return new StringProxy( hsl( h, s, l, a));
     }
 
     public static alpha( c: number | keyof typeof Colors, a: number | string): StringProxy
     {
-        let rgb = typeof c === "string" ? Colors[c] : c;
-        return this.rgb( (rgb & 0xFF0000) >> 16, (rgb & 0x00FF00) >> 8, rgb & 0x0000FF, a);
+        return new StringProxy( alpha( c, a));
     }
 
 
@@ -98,13 +103,11 @@ export class tsh
     public static vmin( n: number) { return this.units( n, "vmin"); }
 
     /**
-     * Converts length value from the numeric representation to the CSS string. Integer
-     * values are treated as pixels while floating numbers are treated as percents from 0.0 to 1.0.
-     * @param val Length as a number
+     * Converts length value from the numeric representation to the CSS string.
      */
     public static len( n: number, units?: string): string
     {
-        return n === 0 ? "0" : units ? n + units : Number.isInteger( n) ?  n + "px" : this.percent(n);
+        return lengthUnitsToCssString( n, units);
     }
 
 
@@ -126,7 +129,7 @@ export class tsh
      */
     public static angle( n: number, units?: string): string
     {
-        return n === 0 ? "0" : units ? n + units : Number.isInteger(n) ?  n + "deg" : n + "rad";
+        return angleToCssString(n);
     }
 
 
@@ -146,7 +149,7 @@ export class tsh
      */
     public static time( n: number, units?: "s" | "ms"): string
     {
-        return n === 0 ? "0s" : units ? n + units : Number.isInteger(n) ?  n + "ms" : n + "s";
+        return timeToCssString(n);
     }
 
 
@@ -209,6 +212,7 @@ export class tsh
         let s = `var(--${varName}`;
         if (fallbackValue)
         {
+            s += ",";
             if (fallbackValue instanceof CustomVar)
                 s += this.var( fallbackValue);
             else if (typeof fallbackValue === "string")
@@ -216,7 +220,7 @@ export class tsh
             else if (fallbackValue instanceof StringProxy || typeof customVar === "string")
                 s += fallbackValue;
             else
-                s += stylePropToCssString( (customVar as CustomVar<T>).templatePropName, fallbackValue);
+                s += this.val( (customVar as CustomVar<T>).templatePropName, fallbackValue);
         }
 
         return new StringProxy( s + ")");

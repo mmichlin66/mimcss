@@ -1,7 +1,6 @@
 ﻿/**
  * This file contains basic types and functions used to define CSS property types.
  */
-import {tsh} from "./tsh"
 
 
 /**
@@ -63,27 +62,6 @@ export class UnitValue extends StringProxy
 
     public value: number;
     public unit: string;
-}
-
-
-
-/**
- * Creates a StringProxy object that represents the use of the given CSS custom property. Use it
- * as in the following:
- * ```typescript
- * style={{ color: useVar(--default-color, black) }}
- * ```
- * @param varName
- * @param fallbackValues 
- */
-export function useVar( varName: string, fallbackValue?: string | StringProxy): StringProxy
-{
-    let s = `var(--${varName}`;
-    if (fallbackValue)
-        s += "," + fallbackValue;
-
-    s += ")";
-    return new StringProxy(s);
 }
 
 
@@ -184,7 +162,7 @@ export function stringArrayToCssString( val: (string | Base_StyleType)[], separa
 export type SingleNumber_StyleType = number | string | Base_StyleType;
 
 /** Type for multi-part number style property */
-export type MultiNumber_StyleType = SingleNumber_StyleType | SingleNumber_StyleType[] | string;
+export type MultiNumber_StyleType = SingleNumber_StyleType | SingleNumber_StyleType[];
 
 /**
  * Converts single number style value to the CSS string.
@@ -219,15 +197,35 @@ export function multiNumberToCssString( val: MultiNumber_StyleType): string
 
 
 /**
+ * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
+ */
+export function percentToCssString( n: number): string
+{
+    return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%";
+}
+
+
+
+/**
  * Type for CSS length or percentage. Length can be represented using the following types:
  *   - string (e.g. 20px or 75%)
  *   - number: zero is treated as not having any suffix; integer numbers are treated as pixels;
  *     floating numbers are treated as percents: 0.0 to 1.0.
  */
-export type SingleLength_StyleType = "auto" | number | Base_StyleType;
+export type SingleLength_StyleType = "auto" | number | string | Base_StyleType;
 
 /** Type for multi-part length or percentage style property */
 export type MultiLength_StyleType = SingleLength_StyleType | SingleLength_StyleType[];
+
+/**
+ * Converts length value from the numeric representation to the CSS string. Integer
+ * values are treated as pixels while floating numbers are treated as percents from 0.0 to 1.0.
+ * @param val Length as a number
+ */
+export function lengthUnitsToCssString( n: number, units?: string): string
+{
+    return n === 0 ? "0" : units ? n + units : Number.isInteger( n) ?  n + "px" : percentToCssString(n);
+}
 
 /**
  * Converts length style value to the CSS time string.
@@ -240,7 +238,7 @@ export function singleLengthToCssString( val: SingleLength_StyleType): string
     else if (val instanceof StringProxy)
         return val.toString();
     else
-	    return tsh.len( val);
+	    return lengthUnitsToCssString( val);
 }
 
 /**
@@ -306,6 +304,16 @@ export function multiSizeToCssString( val: MultiSize_StyleType): string
 
 
 /**
+ * Converts angle value from the numeric representation to the CSS string. Integer
+ * values are treated as degrees while floating numbers are treated as radians.
+ * @param val Angle as a number
+ */
+export function angleToCssString( n: number, units?: string): string
+{
+    return n === 0 ? "0" : units ? n + units : Number.isInteger(n) ?  n + "deg" : n + "rad";
+}
+
+/**
  * Type for CSS angle. Length can be represented using the following types:
  *   - string (e.g. 20deg or 1.4rad)
  *   - number: zero is treated as not having any suffix; integer numbers are treated as degrees;
@@ -324,7 +332,7 @@ export function singleAngleToCssString( val: SingleAngle_StyleType): string
     else if (val instanceof StringProxy)
         return val.toString();
     else
-	    return tsh.angle( val);
+	    return angleToCssString( val);
 }
 
 
@@ -376,6 +384,16 @@ export function multiPositionToCssString( val: MultiPosition_StyleType): string
 
 
 /**
+ * Converts time value from the numeric representation to the CSS string. Integer
+ * values are treated as milliseconds while floating numbers are treated as seconds.
+ * @param val Time as a number
+ */
+export function timeToCssString( n: number, units?: "s" | "ms"): string
+{
+    return n === 0 ? "0s" : units ? n + units : Number.isInteger(n) ?  n + "ms" : n + "s";
+}
+
+/**
  * Type for CSS time. Time can be represented using the following types:
  *   - string (e.g. 2s or 250ms)
  *   - number: integer numbers are treated as milliseconds while floating numbers are treated
@@ -397,7 +415,7 @@ export function singleTimeToCssString( val: SingleTime_StyleType): string
     else if (val instanceof StringProxy)
         return val.toString();
     else
-	    return tsh.time( val);
+	    return timeToCssString( val);
 }
 
 /**
@@ -409,7 +427,7 @@ export function multiTimeToCssString( val: MultiTime_StyleType): string
     if (typeof val === "string")
         return val;
     else if (typeof val === "number")
-        return tsh.time( val);
+        return timeToCssString( val);
     else if (val instanceof StringProxy)
         return val.toString();
     else

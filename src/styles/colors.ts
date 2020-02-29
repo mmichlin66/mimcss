@@ -2,8 +2,7 @@
  * This file contains types and functions used to work with CSS colors.
  */
 
-import {Base_StyleType, StringProxy} from "./utils"
-import {tsh} from "./tsh";
+import {Base_StyleType} from "./utils"
 
 
 
@@ -253,6 +252,43 @@ export function colorNumberToCssString( val: number): string
 
 
 
+export function colorSep( c: number | string): string
+{
+    return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : this.percent(c);
+}
+
+
+
+export function rgb( r: number | string, g: number | string, b: number | string, a?: number | string): string
+{
+    r = this.colorSep(r);
+    g = this.colorSep(g);
+    b = this.colorSep(b);
+    a = a == null ? null : typeof a === "string" ? a : this.percent(a);
+
+    return a == null ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;
+}
+
+
+
+export function hsl( h: number | string, s: number | string, l: number | string, a?: number | string): string
+{
+    h = typeof h === "string" ? h : Number.isInteger( h) ? h + "deg" : h + "rad";
+    s = s == null ? "100%" : typeof s === "string" ? s : this.percent(s);
+    l = l == null ? "100%" : typeof l === "string" ? l : this.percent(l);
+    a = a == null ? null : typeof a === "string" ? a : this.percent(a);
+
+    return a == null ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
+}
+
+export function alpha( c: number | keyof typeof Colors, a: number | string): string
+{
+    let rgbVal = typeof c === "string" ? Colors[c] : c;
+    return rgb( (rgbVal & 0xFF0000) >> 16, (rgbVal & 0x00FF00) >> 8, rgbVal & 0x0000FF, a);
+}
+
+
+
 /**
  * Converts color value from the array representation to the CSS time string.
  */
@@ -261,11 +297,11 @@ export function colorAsArrayToCssString( val: ColorAsArray): string
     if (val.length === 1)
         return colorToCssString( val[0]);
     else if (val.length === 2)
-        return tsh.alpha( val[0], val[1]).toString();
+        return alpha( val[0], val[1]).toString();
     else if (val.length === 3)
-        return tsh.rgb( val[0], val[1], val[2]).toString();
+        return rgb( val[0], val[1], val[2]).toString();
     else
-        return tsh.rgb( val[0], val[1], val[2], val[3]).toString();
+        return rgb( val[0], val[1], val[2], val[3]).toString();
 }
 
 /**

@@ -1,5 +1,6 @@
 import {ICustomVar} from "../api/rules"
-import {stylePropToCssString, Styleset} from "../styles/styles"
+import {Styleset} from "../styles/styles"
+import {stylePropToCssString} from "../styles/StyleInfo"
 import {Rule} from "./Rule";
 import {StyleScope} from "./StyleScope"
 

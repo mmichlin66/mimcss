@@ -10,7 +10,6 @@
 		"lib": [ "es6", "dom" ],
 		"experimentalDecorators": true,
 		"jsx": "react",
-		"jsxFactory": "mim.jsx",
 		"preserveConstEnums": false
 	},
 
