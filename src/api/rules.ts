@@ -6,6 +6,20 @@
 import {Styleset} from "../styles/StyleTypes";
 
 
+/** Utility type that represents all properties of type T that are of type U */
+type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
+
+/** Utility type that represents names of all properties of type T that are of type U */
+type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
+
+/** Utility type that represents string values mapped to names of properties of type T that are of type U. */
+export type NamesOfPropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: string };
+
+/** Type that represents all properties of type T that are of type U */
+export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
+
+
+
 /**
  * The ExtendedStyleset type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset:
@@ -70,6 +84,8 @@ export interface ITagRule extends IStyleRule
 	readonly isTagRule: boolean;
 }
 
+
+
 /**
  * The IClassRule interface represents a style rule that applies to elements identified by a class.
  */
@@ -78,6 +94,8 @@ export interface IClassRule extends IStyleRule
 	/** Only needed to distinguish from other rules */
 	readonly isClassRule: boolean;
 }
+
+
 
 /**
  * The IIDRule interface representsa a style rule that applies to elements identified by an ID.
@@ -88,6 +106,8 @@ export interface IIDRule extends IStyleRule
 	readonly isIDRule: boolean;
 }
 
+
+
 /**
  * The ISelectorRule interface representsa a styleset that applies to elements identifies by the
  * given selector.
@@ -97,6 +117,8 @@ export interface ISelectorRule extends IStyleRule
 	/** Only needed to distinguish from other rules */
 	readonly isSelectorRule: boolean;
 }
+
+
 
 /**
  * The IAnimationRule interface represents a @keyframes rule.
@@ -112,6 +134,30 @@ export interface IAnimationRule extends IRule
  */
 export type Keyframe = [ "from" | "to" | number, ExtendedStyleset ];
 
+
+
+/**
+ * The IGroupRule interface represents a CSS grouping rule.
+ */
+export interface IGroupRule<T = any> extends IRuleContainer<T>
+{
+	/** Only needed to distinguish from other rules */
+	readonly isGroupRule: boolean;
+}
+
+
+
+/**
+ * The ISupportRule interface represents a CSS @supports rule.
+ */
+export interface ISupportRule<T = any> extends IGroupRule<T>
+{
+	/** Only needed to distinguish from other rules */
+	readonly isSupportRule: boolean;
+}
+
+
+
 /**
  * The ICustomVar interface represents a CSS custom property definitions.
  */
@@ -121,43 +167,92 @@ export interface ICustomVar<T = any>
 	readonly isCustomVar?: boolean;
 }
 
-// /**
-//  * The IGroupRule interface represents a rule that can have other rules nested within it.
-//  */
-// export interface IGroupRule extends IRule
-// {
-// 	/** Array of nested rules */
-// 	readonly subRules: IRule[];
-// }
 
-// /**
-//  * The ICustomVarRule interface represents a ":root" block with CSS custom property definitions.
-//  */
-// export interface ICustomVarRule extends IRule
-// {
-// }
+
+/**
+ * The ICustomVarRule interface represents a ":root" block with CSS custom property definitions.
+ */
+export interface ICustomVarRule<T = any> extends IRule
+{
+	/** Map of custom property names */
+	readonly vars: PropsOfType<T,ICustomVar>;
+
+	/** Only needed to distinguish from other types */
+	readonly isCustomVarRule?: boolean;
+}
 
 
 
 /**
- * Type that combines interfaces of rules that don't have names; that is, they don't have to be
- * assigned to a member property and may be created by the createUnnamedRUles method.
+ * Type that combines interfaces of rules that have names; auch rules have to be assigned to a
+ * member property and cannot be be created by the addUnnamedRUles method.
  */
-export type UnnamedRule = ITagRule | ISelectorRule | ISupportRule;
+export type NamedRule = IIDRule | IClassRule | IAnimationRule | ICustomVar;
+
+/**
+ * Type that combines interfaces of rules that don't have names; that is, they don't have to be
+ * assigned to a member property and may be created by the addUnnamedRUles method.
+ */
+export type UnnamedRule = ITagRule | ISelectorRule | IGroupRule;
 
 
 
-/** Utility type that represents all properties of type T that are of type U */
-type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
+/**
+ * The IRuleContainer interface represents an object that contains CSS rules.
+ */
+export interface IRuleContainer<T = any>
+{
+	/** Class that defined this style scope. This member is used for style scope derivation. */
+	readonly RuleDefinitionClass: IRuleDefinitionClass<T>;
 
-/** Utility type that represents names of all properties of type T that are of type U */
-type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
+	/** Names of all named rules. */
+	readonly allNames: NamesOfPropsOfType<T,NamedRule>;
 
-/** Utility type that represents string values mapped to names of properties of type T that are of type U. */
-export type NamesOfPropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: string };
+	/** Names of classes. */
+	readonly classNames: NamesOfPropsOfType<T,IClassRule>;
 
-/** Type that represents all properties of type T that are of type U */
-export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
+	/** Names of element identifiers. */
+	readonly idNames: NamesOfPropsOfType<T,IIDRule>;
+
+	/** Names of animations. */
+	readonly animationNames: NamesOfPropsOfType<T,IAnimationRule>;
+
+	/** Names of custom CSS properties */
+	readonly varNames: NamesOfPropsOfType<T,ICustomVar>;
+
+	/** List of all rules. */
+	readonly allRules: IRule[];
+
+	/** Map of all named rules. */
+	readonly namedRules: PropsOfType<T,NamedRule>;
+
+	/** List of all unnamed rules. */
+	readonly unnamedRules: UnnamedRule[];
+
+	/** Map of all style (tag, class, ID and selector) rules. */
+	readonly styleRules: PropsOfType<T,IStyleRule>;
+
+	/** Map of all tag rules. */
+	readonly tagRules: PropsOfType<T,ITagRule>;
+
+	/** Map of all class rules. */
+	readonly classRules: PropsOfType<T,IClassRule>;
+
+	/** Map of all ID rules. */
+	readonly idRules: PropsOfType<T,IIDRule>;
+
+	/** Map of all selector rules. */
+	readonly selectorRules: PropsOfType<T,ISelectorRule>;
+
+	/** Map of all animation rules. */
+	readonly animationRules: PropsOfType<T,IAnimationRule>;
+
+	/** Map of all support rules. */
+	readonly supportRules: PropsOfType<T,ISupportRule>;
+
+	/** Rule that combines all custom variables defined in this container. */
+	readonly customVarRule: ICustomVarRule<T>;
+}
 
 
 
@@ -183,78 +278,6 @@ export interface IRuleDefinitionClass<T>
 {
 	/** All rule definition classes should conform to this constructor */
 	new( options?: RuleDefinitionOptions): T;
-}
-
-
-
-/**
- * The IRuleContainer interface represents an object that contains CSS rules.
- */
-export interface IRuleContainer<T = any>
-{
-	/** Class that defined this style scope. This member is used for style scope derivation. */
-	readonly RuleDefinitionClass: IRuleDefinitionClass<T>;
-
-	/** Names of classes defined in the style scope */
-	readonly classNames: NamesOfPropsOfType<T,IClassRule>;
-
-	/** Names of element identifiers defined in the style scope */
-	readonly idNames: NamesOfPropsOfType<T,IIDRule>;
-
-	/** Names of animations defined in the style scope */
-	readonly animationNames: NamesOfPropsOfType<T,IAnimationRule>;
-
-	/** Names of custom CSS properties defined in the style scope */
-	readonly varNames: NamesOfPropsOfType<T,ICustomVar>;
-
-	/** Map of all style (tag, class, ID and selector) rules. */
-	readonly styleRules: PropsOfType<T,IStyleRule>;
-
-	/** Map of all tag rules. */
-	readonly tagRules: PropsOfType<T,ITagRule>;
-
-	/** Map of all class rules. */
-	readonly classRules: PropsOfType<T,IClassRule>;
-
-	/** Map of all ID rules. */
-	readonly idRules: PropsOfType<T,IIDRule>;
-
-	/** Map of all selector rules. */
-	readonly selectorRules: PropsOfType<T,ISelectorRule>;
-
-	/** Map of all animation rules. */
-	readonly animationRules: PropsOfType<T,IAnimationRule>;
-
- 	/** Map of CSS custom property definitions. */
-	readonly varRules: PropsOfType<T,ICustomVar>;
-
-	/** Map of all named rules. */
-	readonly namedRules: PropsOfType<T,IRule>;
-
-	/** List of all unnamed rules. */
-	readonly unnamedRules: IRule[];
-}
-
-
-
-/**
- * The ISupportRule interface represents a @supports rule.
- */
-export interface IGroupRule<T = any> extends IRuleContainer<T>
-{
-	/** Only needed to distinguish from other rules */
-	readonly isGroupRule: boolean;
-}
-
-
-
-/**
- * The ISupportRule interface represents a @supports rule.
- */
-export interface ISupportRule<T = any> extends IGroupRule<T>
-{
-	/** Only needed to distinguish from other rules */
-	readonly isSupportRule: boolean;
 }
 
 

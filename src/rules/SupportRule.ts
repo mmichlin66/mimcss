@@ -7,7 +7,7 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The SupportRule type describes a CSS @supports rule.
  */
-export class SupportRule<T> extends GroupRule<T> implements ISupportRule<T>
+export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T>
 {
 	public constructor( query?: string, definitionClass?: IRuleDefinitionClass<T>)
 	{
@@ -31,7 +31,7 @@ export class SupportRule<T> extends GroupRule<T> implements ISupportRule<T>
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		// determine whether the query is supported and if it is not, don't insertthe rule
+		// determine whether the query is supported and if it is not, don't insert the rule
 		if (!CSS.supports( this.query))
 			return;
 			
