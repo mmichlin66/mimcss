@@ -23,8 +23,7 @@ export class ClassRule extends StyleRule implements IClassRule
 
 		this.className = this.owner.getScopedRuleNamed( ruleName);
 
-		// go through all parents; for those who are classes, add their names to the combined name.
-		// For those who are not classes, copy their style properties to our own styleset.
+		// go through all parents and copy their style properties to our own styleset.
 		for( let parent of this.parents)
 			Object.assign( this.styleset, parent.styleset);
 	}

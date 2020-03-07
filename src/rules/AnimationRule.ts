@@ -96,7 +96,7 @@ class KeyframeRule extends StyleRule
 
 
 	// Processes the given rule.
-	public parseWaypoint( waypoint: "from" | "to" | number): string
+	private parseWaypoint( waypoint: "from" | "to" | number): string
 	{
 		if (typeof waypoint === "string")
 			return waypoint;
@@ -104,6 +104,18 @@ class KeyframeRule extends StyleRule
 			return waypoint + "%";
 		else
 			return tsh.percent( waypoint);
+	}
+
+
+
+	// Processes the given rule.
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
+	{
+		super.process( container, owner, ruleName);
+
+		// go through all parents and copy their style properties to our own styleset.
+		for( let parent of this.parents)
+			Object.assign( this.styleset, parent.styleset);
 	}
 
 
