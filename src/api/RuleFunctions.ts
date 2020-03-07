@@ -32,7 +32,7 @@ export function $rule( selector: ISelector | string, styleset: ExtendedStyleset)
 /** Returns new AnimationRule object  */
 export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return new AnimationRule( keyframes); }
 
-/** Returns new CustomProp object that defines a custom CSS property */
+/** Returns new CustomVar object that defines a custom CSS property */
 export function $custom<K extends keyof Styleset>( templatePropName: K, propVal: Styleset[K]): ICustomVar<Styleset[K]>
 	{ return new CustomVar( templatePropName, propVal); }
 

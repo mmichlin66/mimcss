@@ -946,14 +946,16 @@ export interface Styleset
 
     /**
      * Special property that contains several definitions of custom CSS properties.
-     * This can be used the following way:
-     *   $custom: { mainColor: "black", mainBgColor: "white" }
-     * The first name (mainColor) determines the custom property name. The second name (color) is
-     * one of Styleset properties and is only used to determine the type of value for the custom
-     * property.
+     * This can be used as in the following example:
+     * ```typescript
+     *   $custom: { mainColor: "black", mainBgColor: tsh.custom( "color", "white") }
+     * ```
+     * The first declaration (mainColor) uses a simple string value. The second declaration
+     * (mainBgColor) uses the `tsh.custom` method that provides string typing by specifying
+     * one of Styleset properties and ensuring that only valid values for this property could
+     * be specified.
      */
-    $custom?: { [K: string]: string }
-    // $custom?: { [K: string]: [P: keyof Styleset, Styleset[P]] } }
+    $custom?: { [K: string]: string | UtilTypes.StringProxy }
 }
 
 

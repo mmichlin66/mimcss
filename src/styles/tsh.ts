@@ -4,6 +4,7 @@ import * as ColorTypes from "./ColorTypes";
 import * as ColorFuncs from "./ColorFuncs";
 import {ICustomVar} from "../api/rules"
 import {CustomVar} from "../rules/CustomVar"
+import {Styleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "./StyleFuncs";
 
 
@@ -209,8 +210,26 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Returns a StringProxy object that defines a custom CSS property as part of a Styleset.
+     * Use it as in the following example:
+     * ```tsx
+     * let myStyles = $scope( class
+     * {
+     *     div = $tag( "div", { $custom: {
+     *         defaultColor: tsh.custom( "color", "black"),
+     *         defaultBgColor: tsh.custom( "color", "white"),
+     *     }})
+     * });
+     * ```
+     */
+    public static custom<K extends keyof Styleset>( templatePropName: K, propVal: Styleset[K]): StringProxy
+    {
+		return new StringProxy( `${tsh.val( templatePropName, propVal)}`);
+    }
+
+    /**
      * Returns the string representation of the CSS var() function for the given custom property.
-     * Example:
+     * Use it as in the following example:
      * ```tsx
      * let myStyles = $scope( class
      * {
@@ -233,9 +252,7 @@ export class tsh
             s += ",";
             if (fallbackValue instanceof CustomVar)
                 s += this.var( fallbackValue);
-            else if (typeof fallbackValue === "string")
-                s += fallbackValue.toString();
-            else if (fallbackValue instanceof StringProxy || typeof customVar === "string")
+            else if (typeof fallbackValue === "string" || fallbackValue instanceof StringProxy || typeof customVar === "string")
                 s += fallbackValue;
             else
                 s += this.val( (customVar as CustomVar<T>).templatePropName, fallbackValue);
