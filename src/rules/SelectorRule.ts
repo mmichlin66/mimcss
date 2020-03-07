@@ -2,7 +2,7 @@ import {ISelectorRule, ExtendedStyleset} from "../api/rules"
 import {ISelector} from "../api/Selector"
 import {StyleRule} from "./StyleRule"
 import {Selector} from "../api/Selector";
-import {StyleScope} from "./StyleScope"
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -22,9 +22,9 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 
 
 	// Processes the given rule.
-	public process( owner: StyleScope, ruleName: string): void
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
 		for( let parent of this.parents)
 			Object.assign( this.styleset, parent.styleset);
@@ -37,16 +37,8 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	{
 		let newRule = new SelectorRule();
 		newRule.copyFrom( this);
+		newRule.selector = this.selector;
 		return newRule;
-	}
-
-
-
-	// Copies internal data from another rule object.
-	public copyFrom( src: SelectorRule): void
-	{
-		super.copyFrom( src);
-		this.selector = src.selector;
 	}
 
 

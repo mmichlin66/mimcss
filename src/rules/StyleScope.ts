@@ -1,31 +1,21 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IStyleRule, ITagRule, IClassRule, IIDRule,
-		ISelectorRule, IAnimationRule, ICustomVar, UnnamedRule}
-		from "../api/rules"
-import {StyleScopeDefinitionOptions, IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
-
+		ISelectorRule, IAnimationRule, ICustomVar} from "../api/rules"
+import {IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
 import {Rule} from "./Rule"
-import {TagRule} from "./TagRule"
-import {ClassRule} from "./ClassRule"
-import {IDRule} from "./IDRule"
-import {SelectorRule} from "./SelectorRule"
-import {AnimationRule} from "./AnimationRule"
-import {CustomVar} from "./CustomVar"
-import {GroupRule} from "./GroupRule"
 import {TssManager} from "./TssManager"
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
 /**
- * The StyleSheet class represents a parsed form of a StyleSheetDefinition-derived class. This
- * class doesn't have a template parameter, but it conforms to the IStyleSheet<T> interface,
- * which provides names of classes, IDs and keyframes defined in the class T, which must be
- * derived from the StyleSheetDefinition class.
+ * The StyleScope class represents a parsed form of a IStyleScopeDefinition-derived class.
  */
-export class StyleScope<T = any> implements IStyleScope<T>
+export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>, IRuleContainerOwner
 {
-	public constructor( ssDefClass: IStyleScopeDefinitionClass<T>)
+	public constructor( defClass: IStyleScopeDefinitionClass<T>)
 	{
-		this.Definition = ssDefClass;
+		super( defClass)
+		this.Definition = defClass;
 	}
 
 
@@ -71,28 +61,30 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 
 
+	// Creates a copy of the rule.
+	public clone(): Rule { return null; }
+
+
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	{
+		super.insertRules();
+	}
+
+
+
 	// Creates the style scope definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
-	private process(): void
+	private processScope(): void
 	{
 		// check if the scope definition has already been processed
 		if (this.isProcessed)
 			return;
 
-		this._classNames = {};
-		this._idNames = {};
-		this._animationNames = {};
-		this._varNames = {};
-		this._namedRules = {};
-		this._styleRules = {};
-		this._tagRules = {};
-		this._classRules = {};
-		this._idRules = {};
-		this._selectorRules = {};
-		this._animationRules = {};
-		this._varRules = {};
-		this._namedRules = {};
-		this._unnamedRules = []
+		// the container and the owner properties of the Rule base class point to the StyleScope
+		// object itself
+		super.process( this, this, null);
 
 		this.isMultiplex = !!this.Definition.isMultiplex;
 
@@ -103,129 +95,22 @@ export class StyleScope<T = any> implements IStyleScope<T>
 		if (!this.name)
 			this.name = TssManager.generateUniqueName( "s");
 
-		// insert our internal rule for custom CSS properties into the list of unnamed rules.
-		this._unnamedRules.push( new CustomVarRule(this));
-
-		// create instance of the style scope definition class and then go over its properties,
-		// which define CSS rules.
-		let ssDef: T;
-		let options: StyleScopeDefinitionOptions = {};
-		try
-		{
-			// create instance of the style scope definition class and then go over its properties,
-			// which define CSS rules.
-			ssDef = new this.Definition( options);
-		}
-		catch( err)
-		{
-			console.error( `Error instantiating Style Scope Definition of type '${this.Definition.name}'`);
-			return;
-		}
-
-		this.processNamedRules( ssDef);
-
-		// if the definition class implements unnamedRules process them now
-		if (options.unnamedRules)
-			this.processUnnamedRules( options.unnamedRules);
+		// process sub-rules rules.
+		this.processRules();
 	}
 
 
 
-	// Creates the style scope definition instance, parses its properties and creates names for
-	// classes, IDs, animations.
-	private processNamedRules( ssDef: T): void
+	/** Generates a name, which will be unique in this style scope */
+	public getScopedRuleNamed( ruleName: string): string
 	{
-		// loop over the properties of the definition object and process those that are rules.
-		for( let propName in ssDef)
-		{
-			let propVal = ssDef[propName];
-			if (!(propVal instanceof Rule))
-				continue;
-
-			let ruleName = propName;
-			let rule = propVal as Rule;
-
-			// if the rule object is already assigned to a style scope, we create a clone of the
-			// rule and assign it to our scope.
-			if (rule.owner)
-				rule = rule.clone();
-
-			rule.process( this, ruleName);
-
-			if (rule.isRealCssRule)
-				this._namedRules[ruleName] = rule;
-
-			if (rule instanceof TagRule)
-			{
-				this._styleRules[ruleName] = rule;
-				this._tagRules[ruleName] = rule;
-			}
-			else if (rule instanceof ClassRule)
-			{
-				this._styleRules[ruleName] = rule;
-				this._classRules[ruleName] = rule;
-				this._classNames[ruleName] = rule.combinedName;
-			}
-			else if (rule instanceof IDRule)
-			{
-				this._styleRules[ruleName] = rule;
-				this._idRules[ruleName] = rule;
-				this._idNames[ruleName] = rule.idName;
-			}
-			else if (rule instanceof SelectorRule)
-			{
-				this._styleRules[ruleName] = rule;
-				this._selectorRules[ruleName] = rule;
-			}
-			else if (rule instanceof AnimationRule)
-			{
-				this._animationNames[ruleName] = rule.animationName;
-				this._animationRules[ruleName] = rule;
-			}
-			else if (rule instanceof CustomVar)
-			{
-				this._varNames[ruleName] = rule.varName;
-				this._varRules[ruleName] = rule;
-			}
-		}
+		// check whether we already have this rule name: if yes, return the already assigned
+		// unique scoped name
+		if (ruleName in this._allNames)
+			return this._allNames[ruleName];
+		else
+			return this.generateScopedName( ruleName);
 	}
-
-
-
-	// Creates the style scope definition instance, parses its properties and creates names for
-	// classes, IDs, animations.
-	private processUnnamedRules( unnamedRules: UnnamedRule[]): void
-	{
-		if (!unnamedRules)
-			return;
-		else if (!Array.isArray(unnamedRules))
-		{
-			console.error( `createUnnamedRules method of Style Scope Definition of type '${this.Definition.name}' must return array`);
-			return;
-		}
-
-		// loop over the properties of the definition object and process those that are rules.
-		for( let unnamedRule of unnamedRules)
-		{
-			if (!(unnamedRule instanceof Rule))
-				continue;
-
-			let rule = unnamedRule as Rule;
-			if (rule.nameIsRequired)
-				continue;
-
-			// if the rule object is already assigned to a style scope, we create a clone of the
-			// rule and assign it to our scope.
-			if (rule.owner)
-				rule = rule.clone();
-
-			rule.process( this, null);
-
-			this._unnamedRules.push( rule);
-		}
-	}
-
-
 
 	// Generates a name, which will be unique in this style scope
 	public generateScopedName( ruleName: string): string
@@ -244,7 +129,7 @@ export class StyleScope<T = any> implements IStyleScope<T>
 		if (this.isActivated)
 			return;
 
-		this.process();
+		this.processScope();
 		TssManager.activate( this);
 	}
 
@@ -261,36 +146,20 @@ export class StyleScope<T = any> implements IStyleScope<T>
 
 
 
-	public setDOMInfo( styleElm: HTMLStyleElement, domSS: CSSStyleSheet)
+	public setDOMInfo( styleSheet: CSSStyleSheet)
 	{
-		this.styleElm = styleElm;
-		this.styleSheet = domSS;
+		this.cssRule = styleSheet;
 	}
 
 	public clearDOMInfo()
 	{
-		this.styleElm = undefined;
-		this.styleSheet = undefined;
-	}
-
-
-
-	// Returns CSS string representatin of the :root rule with custom CSS properties. This is
-	// invoked by the "fake" CustomVarRule.
-	public customVarsToCssString(): string
-	{
-		let s = ":root {";
-		for( let varName in this._varRules)
-			s += this._varRules[varName].toCssString() + ";";
-
-		return s + "}";
+		this.cssRule = undefined;
 	}
 
 
 
 	// Helper properties
-	private get isProcessed(): boolean { return !!this._classNames; }
-	private get isActivated(): boolean { return !!this.styleSheet; }
+	private get isActivated(): boolean { return !!this.cssRule; }
 
 
 
@@ -300,64 +169,9 @@ export class StyleScope<T = any> implements IStyleScope<T>
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
 
-	// Names of classes, IDs, animations and custom properties defined in the style sheet. The
-	// keys are property names used in the style sheet definition; the values are the actual names
-	// that will be inserted into the actual style sheet.
-	private _classNames: { [K: string]: string }
-	private _idNames: { [K: string]: string }
-	private _animationNames: { [K: string]: string }
-	private _varNames: { [K: string]: string }
-
-	// Map of names of properties of the style definition to the Rule objects. This is used when
-	// creating an actual style sheet.
-	private _styleRules: { [K: string]: Rule }
-	private _tagRules: { [K: string]: Rule }
-	private _classRules: { [K: string]: Rule }
-	private _idRules: { [K: string]: Rule }
-	private _selectorRules: { [K: string]: Rule }
-	private _animationRules: { [K: string]: Rule }
-	private _varRules:{ [K: string]: CustomVar<any> };
-
-	// Map of all named rules
-	public _namedRules: { [K: string]: Rule }
-
-	// List of rules without names. This rules are inserted into DOM but cannot be accessed
-	// and manipulated programmatically
-	public _unnamedRules: Rule[];
-
 	// Flag indicating whether this style scope object owns the <style> element. This is true only
 	// for multiplex styles scopes - those that can be creaed multiple times.
 	public isMultiplex: boolean;
-
-	// Style element DOM object.
-	private styleElm?: HTMLStyleElement;
-
-	// When activated, points to the DOM style sheet object inserted into the <head> element
-	private styleSheet?: CSSStyleSheet;
-}
-
-
-
-/**
- * The CustomVarRule class represents a :root rule that is used for defining custom CSS properties.
- */
-class CustomVarRule extends Rule
-{
-	constructor( owner: StyleScope)
-	{
-		super();
-		this.owner = owner;
-		this.ruleName = ":root";
-	}
-
-	// Creates a copy of the rule.
-	public clone(): Rule { return null; }
-
-	// Copies internal data from another rule object.
-	public copyFrom( src: Rule): void {}
-
-	// Converts the rule to CSS string.
-	public toCssString(): string { return this.owner.customVarsToCssString(); }
 }
 
 

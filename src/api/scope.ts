@@ -3,29 +3,28 @@
  */
 
 
-import {NamesOfPropsOfType, PropsOfType, IRule, IStyleRule, ITagRule, IClassRule, IIDRule,
-		ISelectorRule, IAnimationRule, ICustomVar, UnnamedRule} from "./rules";
+import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionOptions} from "./rules";
 
 
 /**
  * Interface defining how style scope definition classes can be created.
  */
-export type StyleScopeDefinitionOptions =
-{
-	/**
-	 * Optional method within which style scope definition classes can create rules not assigned
-	 * to a member property. These rules cannot be those that require name, such as class, ID,
-	 * animation or custom CSS property.
-	 */
-	unnamedRules?: UnnamedRule[];
-}
+export type StyleScopeDefinitionOptions = RuleDefinitionOptions;
+// {
+// 	/**
+// 	 * Optional method within which style scope definition classes can create rules not assigned
+// 	 * to a member property. These rules cannot be those that require name, such as class, ID,
+// 	 * animation or custom CSS property.
+// 	 */
+// 	unnamedRules?: UnnamedRule[];
+// }
 
 
 
 /**
  * "Constructor" interface defining how style scope definition classes can be created.
  */
-export interface IStyleScopeDefinitionClass<T>
+export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
 {
 	/** All style scope definition objects should conform to this constructor */
 	new( options?: StyleScopeDefinitionOptions): T;
@@ -49,60 +48,21 @@ export interface IStyleScopeDefinitionClass<T>
 
 
 /**
- * The StyleScope type defines the resultant style scope after the style scope definition has been
- * processed. The style scope object contains names of IDs, classes and animations, which can be
- * used in the application code. The interface also provides methods that are used to manipulate
- * the rules and their stylesets.
+ * The IStyleScope interface represents the resultant style scope after the style scope definition
+ * has been processed. The style scope object contains names of IDs, classes and animations, which
+ * can be used in the application code. The interface also provides methods that are used to
+ * manipulate the rules and their stylesets.
  */
-export interface IStyleScope<T = any>
+export interface IStyleScope<T = any> extends IRuleContainer<T>
 {
 	/**
 	 * Class that defined this style scope. This member is used for style scope derivation:
 	 * ```typescript
-	 * let scope1 = $scope( class ...);
-	 * let scope2 = $scope( class extends scope1.Definition ...);
+	 * let scope1 = $scope( class {...});
+	 * let scope2 = $scope( class extends scope1.Definition {...});
 	 * ```
 	 */
 	readonly Definition: IStyleScopeDefinitionClass<T>;
-
-	/** Names of classes defined in the style scope */
-	readonly classNames: NamesOfPropsOfType<T,IClassRule>;
-
-	/** Names of element identifiers defined in the style scope */
-	readonly idNames: NamesOfPropsOfType<T,IIDRule>;
-
-	/** Names of animations defined in the style scope */
-	readonly animationNames: NamesOfPropsOfType<T,IAnimationRule>;
-
-	/** Names of custom CSS properties defined in the style scope */
-	readonly varNames: NamesOfPropsOfType<T,ICustomVar>;
-
-	/** Map of all style (tag, class, ID and selector) rules. */
-	readonly styleRules: PropsOfType<T,IStyleRule>;
-
-	/** Map of all tag rules. */
-	readonly tagRules: PropsOfType<T,ITagRule>;
-
-	/** Map of all class rules. */
-	readonly classRules: PropsOfType<T,IClassRule>;
-
-	/** Map of all ID rules. */
-	readonly idRules: PropsOfType<T,IIDRule>;
-
-	/** Map of all selector rules. */
-	readonly selectorRules: PropsOfType<T,ISelectorRule>;
-
-	/** Map of all animation rules. */
-	readonly animationRules: PropsOfType<T,IAnimationRule>;
-
- 	/** Map of CSS custom property definitions. */
-	readonly varRules?: PropsOfType<T,ICustomVar>;
-
-	/** Map of all named rules. */
-	readonly namedRules: PropsOfType<T,IRule>;
-
-	/** List of all unnamed rules. */
-	readonly unnamedRules: IRule[];
 }
 
 

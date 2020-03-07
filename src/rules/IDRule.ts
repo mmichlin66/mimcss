@@ -1,6 +1,6 @@
 import {IIDRule, ExtendedStyleset} from "../api/rules"
 import {StyleRule} from "./StyleRule";
-import {StyleScope} from "./StyleScope"
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -17,11 +17,11 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 	// Processes the given rule.
-	public process( owner: StyleScope, ruleName: string): void
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
-		this.idName = this.owner.generateScopedName( ruleName);
+		this.idName = this.owner.getScopedRuleNamed( ruleName);
 
 		// go through all parents; for those who are classes, add their name to the
 		// combined name. For those who are not classes, copy style properties to the

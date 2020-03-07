@@ -2,7 +2,7 @@ import {ICustomVar} from "../api/rules"
 import {Styleset} from "../styles/StyleTypes"
 import {tsh} from "../styles/tsh"
 import {Rule} from "./Rule";
-import {StyleScope} from "./StyleScope"
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -21,11 +21,11 @@ export class CustomVar<T> extends Rule implements ICustomVar<T>
 
 
 	// Processes the given rule.
-	public process( owner: StyleScope, ruleName: string): void
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
-		this.varName = this.owner.generateScopedName( ruleName);
+		this.varName = this.owner.getScopedRuleNamed( ruleName);
 	}
 
 
@@ -42,24 +42,27 @@ export class CustomVar<T> extends Rule implements ICustomVar<T>
 	public clone(): CustomVar<T>
 	{
 		let newRule = new CustomVar<T>();
-		newRule.copyFrom( this);
+		newRule.templatePropName = this.templatePropName;
+		newRule.varValue = this.varValue;
 		return newRule;
 	}
 
 
 
-	// Copies internal data from another rule object.
-	public copyFrom( src: CustomVar<T>): void
-	{
-		this.templatePropName = src.templatePropName;
-		this.varValue = src.varValue;
-	}
+	// Inserts this rule into the given parent rule or stylesheet.
+	// Since CustomVar is not a real CSS rule, this implementation does nothing. Instead, the
+	// RuleContainer uses the toCssString method of our class.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
+
+
 
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
 		return `--${this.varName}: ${tsh.val( this.templatePropName, this.varValue)}`;
 	}
+
+
 
 	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
 	// element. For the majority of Rule-derived classes this is true; however, for some classes,

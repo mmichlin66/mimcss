@@ -1,8 +1,9 @@
 import {IAnimationRule, Keyframe} from "../api/rules"
 import {tsh} from "../styles/tsh"
+import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
-import {StyleScope} from "./StyleScope"
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -22,14 +23,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process( owner: StyleScope, ruleName: string)
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string)
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
-		this.animationName = this.owner.generateScopedName( ruleName);
+		this.animationName = this.owner.getScopedRuleNamed( ruleName);
 
 		for( let keyframeRule of this.keyframeRules)
-			keyframeRule.process( owner, ruleName);
+			keyframeRule.process( container, owner, ruleName);
 	}
 
 
@@ -46,27 +47,23 @@ export class AnimationRule extends Rule implements IAnimationRule
 	public clone(): AnimationRule
 	{
 		let newRule = new AnimationRule();
-		newRule.copyFrom( this);
+		newRule.keyframeRules = this.keyframeRules.map( (keyframeRule) => keyframeRule.clone());
 		return newRule;
 	}
 
 
 
-	// Copies internal data from another rule object.
-	public copyFrom( src: AnimationRule): void
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		this.keyframeRules = src.keyframeRules.map( (keyframeRule) => keyframeRule.clone());
-	}
-
-
-
-	// Converts the rule to CSS string.
-	public toCssString(): string
-	{
-		let s = `@keyframes ${this.animationName}{ `;
+		let index = parent.insertRule( `@keyframes ${this.animationName} {}`, parent.cssRules.length);
+		this.cssRule = parent.cssRules[index];
+		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
+		
 		for( let keyframeRule of this.keyframeRules)
-			s += keyframeRule.toCssString();
-		return s + "}";
+		{
+			cssKeyframesRule.appendRule( keyframeRule.toCssString())
+		}
 	}
 
 
@@ -116,16 +113,16 @@ class KeyframeRule extends StyleRule
 	{
 		let newRule = new KeyframeRule();
 		newRule.copyFrom( this);
+		newRule.waypointString = this.waypointString;
 		return newRule;
 	}
 
 
 
-	// Copies internal data from another rule object.
-	public copyFrom( src: KeyframeRule): void
+	// Inserts this rule into the given parent rule or stylesheet.
+	public toCssString(): string
 	{
-		super.copyFrom( src);
-		this.waypointString = src.waypointString;
+		return `${this.waypointString} ${stylesetToCssString( this.styleset, this.important)}`;
 	}
 
 
@@ -133,7 +130,7 @@ class KeyframeRule extends StyleRule
 	// Returns the selector part of the style rule.
 	protected geSelectorString(): string
 	{
-		return  this.waypointString;
+		return this.waypointString;
 	}
 
 

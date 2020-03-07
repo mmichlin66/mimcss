@@ -282,7 +282,7 @@ export class Selector implements IEmptySelector, ISelector
 			if (token instanceof TagRule)
 				s += token.tagName;
 			else if (token instanceof ClassRule)
-				s += token.combinedSelectorName;
+				s += "." + token.className;
 			else if (token instanceof IDRule)
 				s += "#" + token.idName;
 			else

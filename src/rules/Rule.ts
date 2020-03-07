@@ -1,34 +1,36 @@
 import {IRule} from "../api/rules"
-import {StyleScope} from "./StyleScope"
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
 /**
- * The RuleWithStyle class is used as a base class for rules that have a single style rule.
+ * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
+ * class is also an ancestor for StyleScope; however, most of its the fields are undefined in
+ * te StyleScope instances.
  */
 export abstract class Rule implements IRule
 {
 	// Processes the rule.
-	public process( owner: StyleScope, ruleName: string): void
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
+		this.container = container;
 		this.owner = owner;
 		this.ruleName = ruleName;
 	}
 
 	/**
 	 * Determines whether this rule requires name - that is it will be ignored if created within
-	 * the createUnnamedRules
+	 * the addUnnamedRules function.
 	 */
 	public get nameIsRequired(): boolean { return false; }
 
 	// Creates a copy of the rule.
 	public abstract clone(): Rule;
 
-	// Copies internal data from another rule object.
-	public abstract copyFrom( src: Rule): void;
+	// Inserts this rule into the given parent rule or stylesheet.
+	public abstract insert( parent: CSSStyleSheet | CSSGroupingRule): void;
 
-	// Converts the rule to CSS string.
-	public abstract toCssString(): string;
+
 
 	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
 	// element. For the majority of Rule-derived classes this is true; however, for some classes,
@@ -40,18 +42,19 @@ export abstract class Rule implements IRule
 	/** Only needed to distinguish from other types */
 	public get isRule(): boolean { return true; }
 
-	// Style scope to which this rule belongs.
-	public owner: StyleScope;
+	// Rule container to which this rule belongs. This is "this" for StyleScope.
+	public container: RuleContainer;
 
-	// Name of the property of the style scope definition to which this rule was assigned.
+	// Style scope to which this rule belongs. This is "this" for StyleScope.
+	public owner: IRuleContainerOwner;
+
+	// Name of the property of the style scope definition to which this rule was assigned. This is
+	// null for StyleScope.
 	public ruleName: string;
 
-	/** Determines whether this rule hs already been processed */
-	public get isProcessed(): boolean { return !!this.owner; }
-
-	// Index of the rule in the DOM style sheet. The DOM style sheet object is held by the
-	// owner StyleScope
-	public index: number;
+	// CSSStyleSheet or CSSRule-derived object corresponding to the actuall CSS rule inserted into
+	// the styles heet or the parent rule. This is CSSStyleSheet for StyleScope objects.
+	public cssRule: CSSStyleSheet | CSSRule;
 }
 
 

@@ -191,7 +191,7 @@ export let MyStyles = $scope( class MyStyles
 The `classStyle` property (in our example, of the `LibStyles` object) contains class rules defined in that scope. Note, again, that these are not strings, but strongly types objects.
 
 ### Types of Rules
-So far we have been playing with mostly class and ID styling rules. CSS has many different types of rules in addition to classes and IDs: tag-based, selector-based, custom properties, animations (@keyframes), @media, @support, etc.
+So far we have been playing with mostly class and ID styling rules. CSS has many different types of rules in addition to classes and IDs: tag-based, selector-based, custom properties, animations (@keyframes), @media, @supports, etc.
 
 Mimcss supports these types with a syntax similar to that of classes. There are two distinct kinds of rules that Mimcss recognizes: those that produce names and those that don't. Rules that produce names are: classes, IDs, animations and custom properties. The names that these rules produce are accessed as properties under the `classNames`, `idNames`, `animationNames` and `varNames` objects respectively. In order to properly produce a name, the rules should be used as an assignment to a class member:
 

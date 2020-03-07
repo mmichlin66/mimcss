@@ -84,7 +84,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Copies internal data from another rule object.
-	public copyFrom( src: StyleRule): void
+	protected copyFrom( src: StyleRule): void
 	{
 		this.styleset = src.styleset;
 		this.parents = src.parents;
@@ -93,10 +93,14 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
-	// Converts the rule to CSS string.
-	public toCssString(): string
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		return `${this.geSelectorString()} ${stylesetToCssString( this.styleset, this.important)}`;
+		let index = parent.insertRule(
+			`${this.geSelectorString()} ${stylesetToCssString( this.styleset, this.important)}`,
+			parent.cssRules.length);
+
+		this.cssRule = parent.cssRules[index];
 	}
 
 

@@ -61,11 +61,10 @@ export class TssManager
 			
 		// depending on whether the given scope is multiplex, we either create a new <style> element
 		// or reuse our "global" one
-		let styleElm: HTMLStyleElement;
 		let styleSheet: CSSStyleSheet;
 		if (styleScope.Definition.isMultiplex)
 		{
-			styleElm = document.createElement( "style");
+			let styleElm = document.createElement( "style");
 			document.head.appendChild( styleElm);
 			styleSheet = styleElm.sheet as CSSStyleSheet;
 			this.multiplexScopes.set( styleScope, styleElm);
@@ -73,25 +72,11 @@ export class TssManager
 		else
 		{
 			this.ensureDOM();
-			styleElm = this.styleElm;
 			styleSheet = this.styleSheet;
 		}
 
-		styleScope.setDOMInfo( styleElm, styleSheet);
-
-		// go over the named rules, convert them to strings and insert them into the style sheet
-		for( let ruleName in styleScope._namedRules)
-		{
-			let rule: Rule = styleScope._namedRules[ruleName];
-			rule.index = styleSheet.insertRule( rule.toCssString());
-		}
-
-		// do the same for the unnamed rules
-		for( let unnamedRule of styleScope._unnamedRules)
-		{
-			let rule = unnamedRule as Rule;
-			rule.index = styleSheet.insertRule( rule.toCssString());
-		}
+		styleScope.setDOMInfo( styleSheet);
+		styleScope.insert( styleSheet);
 	}
 
 
@@ -99,20 +84,17 @@ export class TssManager
 	// Removes this style scope from DOM - only works for multiplex style scopes
 	public static deactivate( styleScope: StyleScope): void
 	{
-		if (!styleScope)
+		if (!styleScope || !styleScope.Definition.isMultiplex)
 			return;
 
-		if (styleScope.Definition.isMultiplex)
-		{
-			styleScope.clearDOMInfo();
-			
-			// remove the <style> element from the document
-			let styleElm = this.multiplexScopes.get( styleScope);
-			if (styleElm)
-				styleElm.remove();
+		styleScope.clearDOMInfo();
+		
+		// remove the <style> element from the document
+		let styleElm = this.multiplexScopes.get( styleScope);
+		if (styleElm)
+			styleElm.remove();
 
-			this.multiplexScopes.delete( styleScope);
-		}
+		this.multiplexScopes.delete( styleScope);
 	}
 
 

@@ -1,6 +1,6 @@
 import {ITagRule, ExtendedStyleset} from "../api/rules"
 import {StyleRule} from "./StyleRule";
-import {StyleScope} from "./StyleScope"
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -18,9 +18,9 @@ export class TagRule extends StyleRule implements ITagRule
 
 
 	// Processes the given rule.
-	public process( owner: StyleScope, ruleName: string): void
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
 		// go through all parents and copy style properties to the class's own styleset.
 		for( let parent of this.parents)
@@ -34,16 +34,8 @@ export class TagRule extends StyleRule implements ITagRule
 	{
 		let newRule = new TagRule();
 		newRule.copyFrom( this);
+		newRule.tagName = this.tagName;
 		return newRule;
-	}
-
-
-
-	// Copies internal data from another rule object.
-	public copyFrom( src: TagRule): void
-	{
-		super.copyFrom( src)
-		this.tagName = src.tagName;
 	}
 
 

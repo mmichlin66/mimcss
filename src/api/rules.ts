@@ -143,7 +143,8 @@ export interface ICustomVar<T = any>
  * Type that combines interfaces of rules that don't have names; that is, they don't have to be
  * assigned to a member property and may be created by the createUnnamedRUles method.
  */
-export type UnnamedRule = ITagRule | ISelectorRule;
+export type UnnamedRule = ITagRule | ISelectorRule | ISupportRule;
+
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -157,6 +158,104 @@ export type NamesOfPropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: string };
 
 /** Type that represents all properties of type T that are of type U */
 export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
+
+
+
+/**
+ * Interface defining options passed to the constructor of rule definition classes
+ */
+export type RuleDefinitionOptions =
+{
+	/**
+	 * Optional method within which rule definition classes can create rules not assigned
+	 * to a member property. These rules cannot be those that require name, such as class, ID,
+	 * animation or custom CSS property.
+	 */
+	unnamedRules?: UnnamedRule[];
+}
+
+
+
+/**
+ * "Constructor" interface defining how rule definition classes can be created.
+ */
+export interface IRuleDefinitionClass<T>
+{
+	/** All rule definition classes should conform to this constructor */
+	new( options?: RuleDefinitionOptions): T;
+}
+
+
+
+/**
+ * The IRuleContainer interface represents an object that contains CSS rules.
+ */
+export interface IRuleContainer<T = any>
+{
+	/** Class that defined this style scope. This member is used for style scope derivation. */
+	readonly RuleDefinitionClass: IRuleDefinitionClass<T>;
+
+	/** Names of classes defined in the style scope */
+	readonly classNames: NamesOfPropsOfType<T,IClassRule>;
+
+	/** Names of element identifiers defined in the style scope */
+	readonly idNames: NamesOfPropsOfType<T,IIDRule>;
+
+	/** Names of animations defined in the style scope */
+	readonly animationNames: NamesOfPropsOfType<T,IAnimationRule>;
+
+	/** Names of custom CSS properties defined in the style scope */
+	readonly varNames: NamesOfPropsOfType<T,ICustomVar>;
+
+	/** Map of all style (tag, class, ID and selector) rules. */
+	readonly styleRules: PropsOfType<T,IStyleRule>;
+
+	/** Map of all tag rules. */
+	readonly tagRules: PropsOfType<T,ITagRule>;
+
+	/** Map of all class rules. */
+	readonly classRules: PropsOfType<T,IClassRule>;
+
+	/** Map of all ID rules. */
+	readonly idRules: PropsOfType<T,IIDRule>;
+
+	/** Map of all selector rules. */
+	readonly selectorRules: PropsOfType<T,ISelectorRule>;
+
+	/** Map of all animation rules. */
+	readonly animationRules: PropsOfType<T,IAnimationRule>;
+
+ 	/** Map of CSS custom property definitions. */
+	readonly varRules: PropsOfType<T,ICustomVar>;
+
+	/** Map of all named rules. */
+	readonly namedRules: PropsOfType<T,IRule>;
+
+	/** List of all unnamed rules. */
+	readonly unnamedRules: IRule[];
+}
+
+
+
+/**
+ * The ISupportRule interface represents a @supports rule.
+ */
+export interface IGroupRule<T = any> extends IRuleContainer<T>
+{
+	/** Only needed to distinguish from other rules */
+	readonly isGroupRule: boolean;
+}
+
+
+
+/**
+ * The ISupportRule interface represents a @supports rule.
+ */
+export interface ISupportRule<T = any> extends IGroupRule<T>
+{
+	/** Only needed to distinguish from other rules */
+	readonly isSupportRule: boolean;
+}
 
 
 
