@@ -37,7 +37,7 @@ export function $custom<K extends keyof Styleset>( templatePropName: K, propVal:
 	{ return new CustomVar( templatePropName, propVal); }
 
 /** Returns new SupportRule object  */
-export function $support<T>( query: string, definitionClass: IRuleDefinitionClass<T>): ISupportRule
+export function $support<T>( query: string, definitionClass: IRuleDefinitionClass<T>): ISupportRule<T>
 	{ return new SupportRule( query, definitionClass); }
 
 

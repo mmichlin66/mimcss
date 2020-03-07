@@ -54,7 +54,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 	public get varNames(): NamesOfPropsOfType<T,ICustomVar> { this.activate(); return this._varNames as NamesOfPropsOfType<T,ICustomVar>; }
 
 	/** Map of all rules. */
-	public get allRules(): IRule[] { this.activate(); return this._unnamedRules as IRule[]; }
+	public get allRules(): IRule[] { this.activate(); return this._allRules as IRule[]; }
 
 	/** Map of all rules. */
 	public get namedRules(): PropsOfType<T,NamedRule> { this.activate(); return this._namedRules as PropsOfType<T,NamedRule>; }
