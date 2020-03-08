@@ -48,8 +48,36 @@ export type ExtendedStyleset =
  */
 export interface IRule
 {
+	/**
+	 * Name of the property on the rule definition object to which this rule is assigned.
+	 */
+	readonly ruleName: string;
+
 	/** Only needed to distinguish from other types */
 	readonly isRule: boolean;
+}
+
+
+
+/**
+ * The INamedRule interface is a base interface implemented by all rules that have a name; that is,
+ * class, ID, animation and custom CSS property.
+ */
+export interface INamedRule extends IRule
+{
+	/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	readonly name: string;
+
+	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	readonly cssName: string;
 }
 
 
@@ -89,7 +117,7 @@ export interface ITagRule extends IStyleRule
 /**
  * The IClassRule interface represents a style rule that applies to elements identified by a class.
  */
-export interface IClassRule extends IStyleRule
+export interface IClassRule extends IStyleRule, INamedRule
 {
 	/** Only needed to distinguish from other rules */
 	readonly isClassRule: boolean;
@@ -100,7 +128,7 @@ export interface IClassRule extends IStyleRule
 /**
  * The IIDRule interface representsa a style rule that applies to elements identified by an ID.
  */
-export interface IIDRule extends IStyleRule
+export interface IIDRule extends IStyleRule, INamedRule
 {
 	/** Only needed to distinguish from other rules */
 	readonly isIDRule: boolean;
@@ -123,7 +151,7 @@ export interface ISelectorRule extends IStyleRule
 /**
  * The IAnimationRule interface represents a @keyframes rule.
  */
-export interface IAnimationRule extends IRule
+export interface IAnimationRule extends INamedRule
 {
 	/** Only needed to distinguish from other rules */
 	readonly isAnimationRule: boolean;
@@ -161,7 +189,7 @@ export interface ISupportRule<T = any> extends IGroupRule<T>
 /**
  * The ICustomVar interface represents a CSS custom property definitions.
  */
-export interface ICustomVar<T = any>
+export interface ICustomVar<T = any> extends INamedRule
 {
 	/** Only needed to distinguish from other types */
 	readonly isCustomVar?: boolean;
@@ -187,7 +215,7 @@ export interface ICustomVarRule<T = any> extends IRule
  * Type that combines interfaces of rules that have names; auch rules have to be assigned to a
  * member property and cannot be be created by the addUnnamedRUles method.
  */
-export type NamedRule = IIDRule | IClassRule | IAnimationRule | ICustomVar;
+export type NamedRule = INamedRule;
 
 /**
  * Type that combines interfaces of rules that don't have names; that is, they don't have to be

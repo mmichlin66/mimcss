@@ -35,7 +35,23 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 
+		/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public get name(): string { return this.animationName; }
+
 	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	public get cssName(): string { return this.animationName; }
+
+
+
+/**
 	 * Determines whether this rule requires name - that is it will be ignored if created within
 	 * the createUnnamedRules
 	 */
