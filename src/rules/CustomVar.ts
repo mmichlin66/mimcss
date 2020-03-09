@@ -1,5 +1,5 @@
 import {ICustomVar} from "../api/rules"
-import {Styleset} from "../styles/StyleTypes"
+import {PureStyleset, Styleset} from "../styles/StyleTypes"
 import {tsh} from "../styles/tsh"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
@@ -9,9 +9,9 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The CustomVar class describes a custom CSS property.
  */
-export class CustomVar<T> extends Rule implements ICustomVar<T>
+export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICustomVar<K>
 {
-	public constructor( templatePropName?: keyof Styleset, varValue?: T)
+	public constructor( templatePropName?: K, varValue?: PureStyleset[K])
 	{
 		super();
 		this.templatePropName = templatePropName;
@@ -55,9 +55,9 @@ export class CustomVar<T> extends Rule implements ICustomVar<T>
 
 
 	// Creates a copy of the rule.
-	public clone(): CustomVar<T>
+	public clone(): CustomVar<K>
 	{
-		let newRule = new CustomVar<T>();
+		let newRule = new CustomVar<K>();
 		newRule.templatePropName = this.templatePropName;
 		newRule.varValue = this.varValue;
 		return newRule;
@@ -91,10 +91,10 @@ export class CustomVar<T> extends Rule implements ICustomVar<T>
 	public get isCustomVar(): boolean { return true; }
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
-	public templatePropName: keyof Styleset;
+	public templatePropName: K;
 
 	// Value of the custom CSS property.
-	public varValue: T;
+	public varValue: PureStyleset[K];
 
 	// Name of the custom CSS property.
 	public varName: string;

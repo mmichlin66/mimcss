@@ -3,6 +3,7 @@ import * as UtilFuncs from "./UtilFuncs"
 import * as ColorTypes from "./ColorTypes"
 import * as ColorFuncs from "./ColorFuncs";
 import * as StyleTypes from "./StyleTypes"
+import { ICustomVal } from "../api/rules";
 
 
 
@@ -455,20 +456,36 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset, important?: 
     let s = "";
 	for( let propName in styleset)
 	{
-        let propVal: any = styleset[propName];
         if (propName === "$custom")
         {
             // special handling of the "$custom" property
-            for( let customPropName in propVal)
+            let propVal = styleset[propName] as ICustomVal[];
+            for( let customVal of propVal)
             {
-                s += `--${customPropName}:${propVal[customPropName]}`;
+                let customPropName: string;
+                let templatePropName: string;
+                if (typeof customVal.varDef === "string")
+                {
+                    customPropName = customVal.varDef;
+                    templatePropName = customVal.templatePropName;
+                }
+                else
+                {
+                    customPropName = customVal.varDef.name;
+                    templatePropName = customVal.varDef.templatePropName;
+                }
+
+                if (!customPropName || !templatePropName)
+                    continue;
+                    
+                s += `--${customPropName}:${stylePropToCssString( templatePropName, customVal.varValue, true)}`;
                 s += (important && important.has( propName) ? " !important;" : ";");
             }
         }
         else
         {
             // get the string representation of the property
-            s += stylePropToCssString( propName, propVal);
+            s += stylePropToCssString( propName, styleset[propName]);
             s += (important && important.has( propName) ? " !important;" : ";");
         }
 	}

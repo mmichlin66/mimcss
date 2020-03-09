@@ -2,9 +2,9 @@
 import * as UtilFuncs from "./UtilFuncs"
 import * as ColorTypes from "./ColorTypes";
 import * as ColorFuncs from "./ColorFuncs";
-import {ICustomVar} from "../api/rules"
+import {ICustomVar, ICustomVal} from "../api/rules"
 import {CustomVar} from "../rules/CustomVar"
-import {Styleset} from "../styles/StyleTypes"
+import {PureStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "./StyleFuncs";
 
 
@@ -210,21 +210,20 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Returns a StringProxy object that defines a custom CSS property as part of a Styleset.
+     * Returns an ICustomVal object that defines a custom CSS property as part of a Styleset.
      * Use it as in the following example:
      * ```tsx
      * let myStyles = $scope( class
      * {
-     *     div = $tag( "div", { $custom: {
-     *         defaultColor: tsh.custom( "color", "black"),
-     *         defaultBgColor: tsh.custom( "color", "white"),
-     *     }})
+     *     mainColor = $custom( "color", Colors.black);
+     * 
+     *     div = $tag( "div", { $custom: [ tsh.custom( this.mainColor, "brown") ] })
      * });
      * ```
      */
-    public static custom<K extends keyof Styleset>( templatePropName: K, propVal: Styleset[K]): StringProxy
+    public static custom<K extends keyof PureStyleset>( varDef: ICustomVar<K>, varValue: PureStyleset[K]): ICustomVal<K>
     {
-		return new StringProxy( `${tsh.val( templatePropName, propVal)}`);
+		return { varDef, varValue };
     }
 
     /**
@@ -243,23 +242,49 @@ export class tsh
      * <div style={{ color: tsh.var( "default-color", "black") }}
      * ```
      */
-    public static var<T>( customVar: ICustomVar<T> | string, fallbackValue?: T | ICustomVar<T> | string | StringProxy): StringProxy
+    public static var<K extends keyof PureStyleset>( varDef: ICustomVar<K> | string,
+                    fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy): VarValue<K>
     {
-        let varName = typeof customVar === "string" ? customVar : (customVar as CustomVar<T>).varName;
+        return new VarValue( varDef, fallbackValue);
+    }
+}
+
+
+
+/**
+ * The VarValue class encapsulates a usage of the CSS `var` function for getting a value of a
+ * custom CSS property.
+ */
+export class VarValue<K extends keyof PureStyleset> extends StringProxy
+{
+    constructor( varDef: ICustomVar<K> | string,
+                    fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy)
+    {
+        super();
+        this.varDef = varDef;
+        this.fallbackValue = fallbackValue;
+    }
+
+    public toString(): string
+    {
+        let varName = typeof this.varDef === "string" ? this.varDef : (this.varDef as CustomVar<K>).varName;
         let s = `var(--${varName}`;
-        if (fallbackValue)
+        if (this.fallbackValue)
         {
             s += ",";
-            if (fallbackValue instanceof CustomVar)
-                s += this.var( fallbackValue);
-            else if (typeof fallbackValue === "string" || fallbackValue instanceof StringProxy || typeof customVar === "string")
-                s += fallbackValue;
+            if (this.fallbackValue instanceof CustomVar)
+                s += tsh.var( this.fallbackValue);
+            else if (typeof this.fallbackValue === "string" || this.fallbackValue instanceof StringProxy || typeof this.varDef === "string")
+                s += this.fallbackValue;
             else
-                s += this.val( (customVar as CustomVar<T>).templatePropName, fallbackValue);
+                s += tsh.val( (this.varDef as CustomVar<K>).templatePropName, this.fallbackValue);
         }
 
-        return new StringProxy( s + ")");
+        return s + ")";
     }
+
+    public varDef: ICustomVar<K> | string;
+    public fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy;
 }
 
 

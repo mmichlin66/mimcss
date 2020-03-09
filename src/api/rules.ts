@@ -3,7 +3,7 @@
  */
 
 
-import {Styleset} from "../styles/StyleTypes";
+import {Styleset, PureStyleset} from "../styles/StyleTypes";
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -189,8 +189,14 @@ export interface ISupportRule<T = any> extends IGroupRule<T>
 /**
  * The ICustomVar interface represents a CSS custom property definitions.
  */
-export interface ICustomVar<T = any> extends INamedRule
+export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRule
 {
+	/**
+	 * Name of a non-custom CSS property whose type determines the type of the custom property
+	 * value.
+	 */
+	readonly templatePropName: K;
+
 	/** Only needed to distinguish from other types */
 	readonly isCustomVar?: boolean;
 }
@@ -207,6 +213,31 @@ export interface ICustomVarRule<T = any> extends IRule
 
 	/** Only needed to distinguish from other types */
 	readonly isCustomVarRule?: boolean;
+}
+
+
+
+/**
+ * The ICustomVal interface represents a custom CSS property name and value that can be used to
+ * define custom properties in the Styleset.
+ */
+export interface ICustomVal<K extends keyof PureStyleset = any>
+{
+	/**
+	 * Either name of a custom CSS property or a ICustomVar object representing a custom CSS
+	 * property.
+	 */
+	readonly varDef: string | ICustomVar<K>;
+
+	/**
+	 * Name of a non-custom CSS property whose type determines the type of the custom property
+	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
+	 * object, since the latter already has the template property name defined.
+	 */
+	readonly templatePropName?: K;
+
+	/** Value of the custom CSS property. */
+	readonly varValue: PureStyleset[K];
 }
 
 

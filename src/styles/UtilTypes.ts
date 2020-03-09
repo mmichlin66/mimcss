@@ -25,12 +25,16 @@ export class StringProxy
 {
     constructor( s?: string | StringProxy)
     {
-        this.s = typeof s === "string" ? s : s != null ? s.toString() : undefined;
+        if (s != null)
+            this.s = s;
     }
 
-    public toString(): string { return this.s; }
+    public toString(): string
+    {
+        return this.s == null ? "" : typeof this.s === "string" ? this.s : this.s.toString();
+    }
 
-    private s: string;
+    private s?: string | StringProxy;
 }
 
 

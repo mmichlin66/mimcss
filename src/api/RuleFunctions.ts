@@ -4,7 +4,7 @@ import {ExtendedStyleset, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimati
 import {IStyleScopeDefinitionClass, IStyleScope} from "./scope"
 import {ISelector} from "./Selector"
 
-import {Styleset} from "../styles/StyleTypes"
+import {PureStyleset, Styleset} from "../styles/StyleTypes"
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"
@@ -33,7 +33,7 @@ export function $rule( selector: ISelector | string, styleset: ExtendedStyleset)
 export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return new AnimationRule( keyframes); }
 
 /** Returns new CustomVar object that defines a custom CSS property */
-export function $custom<K extends keyof Styleset>( templatePropName: K, propVal: Styleset[K]): ICustomVar<Styleset[K]>
+export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K]): ICustomVar<K>
 	{ return new CustomVar( templatePropName, propVal); }
 
 /** Returns new SupportRule object  */

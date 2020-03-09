@@ -1,7 +1,5 @@
 ﻿import * as UtilTypes from "./UtilTypes"
-import * as UtilFuncs from "./UtilFuncs"
 import * as ColorTypes from "./ColorTypes"
-import * as ColorFuncs from "./ColorFuncs";
 
 
 
@@ -492,7 +490,7 @@ export type StyleType = string | UtilTypes.Base_StyleType;
 /**
  * Interface representing a collection of style properties and their values.
  */
-export interface Styleset
+export type PureStyleset =
 {
     alignContent?: AlignContentStyleType;
     alignItems?: AlignItemsStyleType;
@@ -840,37 +838,9 @@ export interface Styleset
     verticalAlign?: StyleType;
 	visibility?: StyleType;
 	
-    /** @deprecated */ webkitAlignContent?: string;
-    /** @deprecated */ webkitAlignItems?: string;
-    /** @deprecated */ webkitAlignSelf?: string;
-    /** @deprecated */ webkitAnimation?: string;
-    /** @deprecated */ webkitAnimationDelay?: string;
-    /** @deprecated */ webkitAnimationDirection?: string;
-    /** @deprecated */ webkitAnimationDuration?: string;
-    /** @deprecated */ webkitAnimationFillMode?: string;
-    /** @deprecated */ webkitAnimationIterationCount?: string;
-    /** @deprecated */ webkitAnimationName?: string;
-    /** @deprecated */ webkitAnimationPlayState?: string;
-    /** @deprecated */ webkitAnimationTimingFunction?: string;
-    /** @deprecated */ webkitAppearance?: string;
-    /** @deprecated */ webkitBackfaceVisibility?: string;
-    /** @deprecated */ webkitBackgroundClip?: string;
-    /** @deprecated */ webkitBackgroundOrigin?: string;
-    /** @deprecated */ webkitBackgroundSize?: string;
-    /** @deprecated */ webkitBorderBottomLeftRadius?: string;
-    /** @deprecated */ webkitBorderBottomRightRadius?: string;
     webkitBorderImage?: StyleType;
-    /** @deprecated */ webkitBorderRadius?: string;
-    /** @deprecated */ webkitBorderTopLeftRadius?: string;
-    /** @deprecated */ webkitBorderTopRightRadius?: string;
-    /** @deprecated */ webkitBoxAlign?: string;
     webkitBoxDirection?: StyleType;
-    /** @deprecated */ webkitBoxFlex?: string;
-    /** @deprecated */ webkitBoxOrdinalGroup?: string;
     webkitBoxOrient?: StyleType;
-    /** @deprecated */ webkitBoxPack?: string;
-    /** @deprecated */webkitBoxShadow?: string;
-    /** @deprecated */ webkitBoxSizing?: string;
     webkitColumnBreakAfter?: StyleType;
     webkitColumnBreakBefore?: StyleType;
     webkitColumnBreakInside?: StyleType;
@@ -883,47 +853,8 @@ export interface Styleset
     webkitColumnSpan?: StyleType;
     webkitColumnWidth?: any;
     webkitColumns?: StyleType;
-    /** @deprecated */ webkitFilter?: string;
-    /** @deprecated */ webkitFlex?: string;
-    /** @deprecated */ webkitFlexBasis?: string;
-    /** @deprecated */ webkitFlexDirection?: string;
-    /** @deprecated */ webkitFlexFlow?: string;
-    /** @deprecated */ webkitFlexGrow?: string;
-    /** @deprecated */ webkitFlexShrink?: string;
-    /** @deprecated */ webkitFlexWrap?: string;
-    /** @deprecated */ webkitJustifyContent?: string;
     webkitLineClamp?: string;
-    /** @deprecated */ webkitMask?: string;
-    /** @deprecated */ webkitMaskBoxImage?: string;
-    /** @deprecated */ webkitMaskBoxImageOutset?: string;
-    /** @deprecated */ webkitMaskBoxImageRepeat?: string;
-    /** @deprecated */ webkitMaskBoxImageSlice?: string;
-    /** @deprecated */ webkitMaskBoxImageSource?: string;
-    /** @deprecated */ webkitMaskBoxImageWidth?: string;
-    /** @deprecated */ webkitMaskClip?: string;
-    /** @deprecated */ webkitMaskComposite?: string;
-    /** @deprecated */ webkitMaskImage?: string;
-    /** @deprecated */ webkitMaskOrigin?: string;
-    /** @deprecated */ webkitMaskPosition?: string;
-    /** @deprecated */ webkitMaskRepeat?: string;
-    /** @deprecated */ webkitMaskSize?: string;
-    /** @deprecated */ webkitOrder?: string;
-    /** @deprecated */ webkitPerspective?: string;
-    /** @deprecated */ webkitPerspectiveOrigin?: string;
     webkitTapHighlightColor?: StyleType;
-    /** @deprecated */ webkitTextFillColor?: string;
-    /** @deprecated */ webkitTextSizeAdjust?: string;
-    /** @deprecated */ webkitTextStroke?: string;
-    /** @deprecated */ webkitTextStrokeColor?: string;
-    /** @deprecated */ webkitTextStrokeWidth?: string;
-    /** @deprecated */ webkitTransform?: string;
-    /** @deprecated */ webkitTransformOrigin?: string;
-    /** @deprecated */ webkitTransformStyle?: string;
-    /** @deprecated */ webkitTransition?: string;
-    /** @deprecated */ webkitTransitionDelay?: string;
-    /** @deprecated */ webkitTransitionDuration?: string;
-    /** @deprecated */ webkitTransitionProperty?: string;
-    /** @deprecated */ webkitTransitionTimingFunction?: string;
     webkitUserModify?: StyleType;
     webkitUserSelect?: StyleType;
 	webkitWritingMode?: StyleType;
@@ -939,23 +870,34 @@ export interface Styleset
 	
     zIndex?: "auto" | number | UtilTypes.Base_StyleType;
     zoom?: StyleType;
+}
 
-    // // custom properties/aliases
-    // shadow?: BoxShadowStyleType;
-    // bgc?: ColorTypes.Color_StyleType;
 
+
+import {ICustomVal} from "../api/rules";
+
+/**
+ * Interface representing a collection of style properties and their values.
+ */
+export type Styleset = PureStyleset &
+{
     /**
-     * Special property that contains several definitions of custom CSS properties.
+     * Special property is an array that contains several definitions of custom CSS properties.
+     * Each property is defined by an ICustomIVal object.
      * This can be used as in the following example:
      * ```typescript
-     *   $custom: { mainColor: "black", mainBgColor: tsh.custom( "color", "white") }
+     *     $custom: [
+     *         { var: "mainColor", templatePropName: "color", varValue: "black" },
+     *         { var: MyStyles.varRules.mainBgColor, varValue: "white"),
+     *         tsh.custom( MyStyles.varRules.mainSelectionColor, "blue")
+     *     ]
      * ```
      * The first declaration (mainColor) uses a simple string value. The second declaration
      * (mainBgColor) uses the `tsh.custom` method that provides string typing by specifying
      * one of Styleset properties and ensuring that only valid values for this property could
      * be specified.
      */
-    $custom?: { [K: string]: string | UtilTypes.StringProxy }
+    $custom?: ICustomVal[];
 }
 
 
