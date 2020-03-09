@@ -187,6 +187,17 @@ export interface ISupportRule<T = any> extends IGroupRule<T>
 
 
 /**
+ * The ISupportRule interface represents a CSS @media rule.
+ */
+export interface IMediaRule<T = any> extends IGroupRule<T>
+{
+	/** Only needed to distinguish from other rules */
+	readonly isMediaRule: boolean;
+}
+
+
+
+/**
  * The ICustomVar interface represents a CSS custom property definitions.
  */
 export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRule

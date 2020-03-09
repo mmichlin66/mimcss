@@ -1,12 +1,12 @@
-import {ISupportRule, IRuleDefinitionClass} from "../api/rules"
+import {IMediaRule, IRuleDefinitionClass} from "../api/rules"
 import {GroupRule} from "./GroupRule"
 
 
 
 /**
- * The SupportRule type describes a CSS @supports rule.
+ * The MediaRule type describes a CSS @media rule.
  */
-export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T>
+export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 {
 	public constructor( query?: string, definitionClass?: IRuleDefinitionClass<T>)
 	{
@@ -18,9 +18,9 @@ export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T
 
 
 	// Creates a copy of the rule.
-	public clone(): SupportRule<T>
+	public clone(): MediaRule<T>
 	{
-		let newRule = new SupportRule<T>();
+		let newRule = new MediaRule<T>();
 		newRule.query = this.query;
 		return newRule;
 	}
@@ -30,11 +30,7 @@ export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		// determine whether the query is supported and if it is not, don't insert the rule
-		if (!CSS.supports( this.query))
-			return;
-			
-		let index = parent.insertRule( `@supports ${this.query} {}`, parent.cssRules.length);
+		let index = parent.insertRule( `@media ${this.query} {}`, parent.cssRules.length);
 		this.cssRule = parent.cssRules[index];
 
 		// insert sub-rules
@@ -44,9 +40,9 @@ export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T
 
 
 	/** Only needed to distinguish from other rules */
-	public get isSupportRule(): boolean { return true; }
+	public get isMediaRule(): boolean { return true; }
 
-	// support query for this rule.
+	// media query for this rule.
 	public query: string;
 }
 
