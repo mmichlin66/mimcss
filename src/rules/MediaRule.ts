@@ -1,5 +1,7 @@
 import {IMediaRule, IRuleDefinitionClass} from "../api/rules"
 import {GroupRule} from "./GroupRule"
+import {MediaQuery} from "../styles/MediaTypes"
+import {mediaQueryToCssString} from "../styles/MediaFuncs";
 
 
 
@@ -8,7 +10,7 @@ import {GroupRule} from "./GroupRule"
  */
 export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( query?: string, definitionClass?: IRuleDefinitionClass<T>)
+	public constructor( query?: string | MediaQuery, definitionClass?: IRuleDefinitionClass<T>)
 	{
 		super( definitionClass);
 
@@ -30,7 +32,9 @@ export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let index = parent.insertRule( `@media ${this.query} {}`, parent.cssRules.length);
+		let queryString = typeof this.query === "string" ? this.query : mediaQueryToCssString( this.query);
+
+		let index = parent.insertRule( `@media ${queryString} {}`, parent.cssRules.length);
 		this.cssRule = parent.cssRules[index];
 
 		// insert sub-rules
@@ -43,7 +47,7 @@ export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 	public get isMediaRule(): boolean { return true; }
 
 	// media query for this rule.
-	public query: string;
+	public query: string | MediaQuery;
 }
 
 

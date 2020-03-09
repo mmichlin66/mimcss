@@ -3,8 +3,8 @@ import {ExtendedStyleset, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimati
 		IRuleDefinitionClass} from "./rules"
 import {IStyleScopeDefinitionClass, IStyleScope} from "./scope"
 import {ISelector} from "./Selector"
-
 import {PureStyleset, Styleset} from "../styles/StyleTypes"
+import {MediaQuery} from "../styles/MediaTypes"
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"
@@ -42,7 +42,7 @@ export function $support<T>( query: string, definitionClass: IRuleDefinitionClas
 	{ return new SupportRule( query, definitionClass); }
 
 /** Returns new MediaRule object  */
-export function $media<T>( query: string, definitionClass: IRuleDefinitionClass<T>): IMediaRule<T>
+export function $media<T>( query: string | MediaQuery, definitionClass: IRuleDefinitionClass<T>): IMediaRule<T>
 	{ return new MediaRule( query, definitionClass); }
 
 

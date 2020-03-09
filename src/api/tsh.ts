@@ -1,11 +1,11 @@
-﻿import {StringProxy, UnitValue} from "./UtilTypes"
-import * as UtilFuncs from "./UtilFuncs"
-import * as ColorTypes from "./ColorTypes";
-import * as ColorFuncs from "./ColorFuncs";
-import {ICustomVar, ICustomVal} from "../api/rules"
+﻿import {StringProxy, UnitValue} from "../styles/UtilTypes"
+import * as UtilFuncs from "../styles/UtilFuncs"
+import * as ColorTypes from "../styles/ColorTypes";
+import * as ColorFuncs from "../styles/ColorFuncs";
+import {ICustomVar, ICustomVal} from "./rules"
 import {CustomVar} from "../rules/CustomVar"
 import {PureStyleset} from "../styles/StyleTypes"
-import {stylePropToCssString} from "./StyleFuncs";
+import {stylePropToCssString} from "../styles/StyleFuncs";
 
 
 

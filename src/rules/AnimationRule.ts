@@ -1,5 +1,5 @@
 import {IAnimationRule, Keyframe} from "../api/rules"
-import {tsh} from "../styles/tsh"
+import {tsh} from "../api/tsh"
 import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
