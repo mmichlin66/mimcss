@@ -81,7 +81,7 @@ export function hsl( h: number | string, s: number | string, l: number | string,
     return a == null ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
 }
 
-export function alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): string
+export function alpha( c: number | keyof ColorTypes.Colors, a: number | string): string
 {
     let rgbVal = typeof c === "string" ? ColorTypes.Colors[c] : c;
     return rgb( (rgbVal & 0xFF0000) >> 16, (rgbVal & 0x00FF00) >> 8, rgbVal & 0x0000FF, a);
