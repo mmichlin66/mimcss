@@ -4,19 +4,12 @@
 
 
 /**
- * Style values that can be used for (almost) any property
- */
-export type Base_StyleType = "inherit" | "initial" | "unset" | StringProxy;
-
-
-
-/**
  * The StringProxy class encapsulates a string, which is returned via the standard toString()
  * method. All CSS properties should accept string as the type of their value even if normally
- * they accept other types (e.g a set of string literals as `"row" | "column"` for the
- * flex-dirction) property. This is because in addition to their normal values any property
+ * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
+ * color) property. This is because in addition to their normal values any property
  * can use custom CSS property in the form `var(--propname)`. However, if we add string type
- * to the set of string literals (e.g. `"row" | "column" | string`), this throws off the
+ * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
  * Intellisense and it doesn't prompt developers for the possible values. The StringProxy
  * can be used instead of string (e.g. `"row" | "column" | StringProxy`) and this solves
  * the Intellisense issue.
@@ -25,8 +18,7 @@ export class StringProxy
 {
     constructor( s?: string | StringProxy)
     {
-        if (s != null)
-            this.s = s;
+        this.s = s;
     }
 
     public toString(): string
@@ -40,92 +32,143 @@ export class StringProxy
 
 
 /**
- * The UnitValue class encapsulates a numeric value and a unit. It is used to represents such
- * values as lengths, angles, time, etc.
+ * Style values that can be used for (almost) any property
  */
-export class UnitValue extends StringProxy
-{
-    constructor( value?: number, unit?: string)
-    {
-        super();
-        this.value = value;
-        this.unit = unit;
-    }
-
-    public toString(): string { return this.value + this.unit; }
-
-    public value: number;
-    public unit: string;
-}
+export type Base_StyleType = "inherit" | "initial" | "unset" | StringProxy;
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Number
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for single number style property */
-export type SingleNumber_StyleType = number | string | Base_StyleType;
+export type Number_StyleType = number | Base_StyleType;
 
 /** Type for multi-part number style property */
-export type MultiNumber_StyleType = SingleNumber_StyleType | SingleNumber_StyleType[];
+export type MultiNumber_StyleType = Number_StyleType | Number_StyleType[];
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Percent
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Type for CSS percentage. Percent can be represented using the following types:
+ *   - string (e.g. "75%")
+ *   - number: integer numbers are treated as percents; floating numbers within -1 and 1
+ *     are multilied by 100.
+ */
+export type Percent_StyleType = number | string | Base_StyleType;
+
+/** Type for multi-part percentage style property */
+export type MultiPercent_StyleType = Percent_StyleType | Percent_StyleType[];
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Length
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Units of length */
+export type LengthUnits = "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" | "mm" | "pc" |
+                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "%";
 
 /**
  * Type for CSS length or percentage. Length can be represented using the following types:
- *   - string (e.g. 20px or 75%)
- *   - number: zero is treated as not having any suffix; integer numbers are treated as pixels;
- *     floating numbers are treated as percents: 0.0 to 1.0.
+ *   - string (e.g. "20px" or "75%")
+ *   - number: integer values are treated as pixels while floating numbers within -1 and 1 are
+ *     treated as percents and floating numbers outside -1 and 1 are treated as "em".
  */
-export type SingleLength_StyleType = "auto" | number | string | Base_StyleType;
+export type Length_StyleType = "auto" | number | string | Base_StyleType;
 
 /** Type for multi-part length or percentage style property */
-export type MultiLength_StyleType = SingleLength_StyleType | SingleLength_StyleType[];
+export type MultiLength_StyleType = Length_StyleType | Length_StyleType[];
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Angle
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Units of angle */
+export type AngleUnits = "deg" | "rad" | "grad" | "turn";
+
+/**
+ * Type for CSS angle. Angle can be represented using the following types:
+ *   - string (e.g. 20deg or 1.4rad)
+ *   - number: zero is treated as not having any suffix; integer numbers are treated as degrees;
+ *     floating numbers are treated as radians.
+ */
+export type Angle_StyleType = number | string | Base_StyleType;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Time
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Units of time */
+export type TimeUnits = "s" | "ms";
+
+/**
+ * Type for CSS time. Time can be represented using the following types:
+ *   - string (e.g. "2s" or "250ms")
+ *   - number: integer numbers are treated as milliseconds while floating numbers are treated
+ *     as seconds.
+ */
+export type Time_StyleType = number | string | Base_StyleType;
+
+/** Type for multi-part time style property */
+export type MultiTime_StyleType = Time_StyleType | Time_StyleType[];
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Size
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Type for CSS size, which can be expressed as one or two values each of each is of the
  * Length_StyleType type. Two values are given as an object with 'w' (width) and 'h' (height)
  * properties.
  */
-export type SingleSize_StyleType = SingleLength_StyleType | { w: SingleLength_StyleType; h: SingleLength_StyleType };
+export type Size_StyleType = Length_StyleType | { w: Length_StyleType; h: Length_StyleType };
 
 /** Type for multi-part size style property */
-export type MultiSize_StyleType = SingleSize_StyleType | SingleSize_StyleType[];
+export type MultiSize_StyleType = Size_StyleType | Size_StyleType[];
 
 
 
-/**
- * Type for CSS angle. Length can be represented using the following types:
- *   - string (e.g. 20deg or 1.4rad)
- *   - number: zero is treated as not having any suffix; integer numbers are treated as degrees;
- *     floating numbers are treated as radians.
- */
-export type SingleAngle_StyleType = number | Base_StyleType;
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Position
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Type for CSS position, which can be expressed as one or two or 3 or 4 values.
  */
-export type SinglePosition_StyleType = "center" | "left" | "right" | "top" | "bottom" | SingleLength_StyleType |
-                { x: "center" | "left" | "right" | SingleLength_StyleType; y: "center" | "top" | "bottom" | SingleLength_StyleType } |
-                { xedge: string; x?: SingleLength_StyleType; yedge: string; y?: SingleLength_StyleType } |
+export type Position_StyleType = "center" | "left" | "right" | "top" | "bottom" | Length_StyleType |
+                { x: "center" | "left" | "right" | Length_StyleType; y: "center" | "top" | "bottom" | Length_StyleType } |
+                { xedge: string; x?: Length_StyleType; yedge: string; y?: Length_StyleType } |
                 Base_StyleType;
 
 /** Type for multi-part position style property */
-export type MultiPosition_StyleType = SinglePosition_StyleType | SinglePosition_StyleType[];
-
-
-
-/**
- * Type for CSS time. Time can be represented using the following types:
- *   - string (e.g. 2s or 250ms)
- *   - number: integer numbers are treated as milliseconds while floating numbers are treated
- *     as seconds.
- */
-export type SingleTime_StyleType = number | Base_StyleType;
-
-/** Type for multi-part time style property */
-export type MultiTime_StyleType = SingleTime_StyleType | SingleTime_StyleType[];
+export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];
 
 
 

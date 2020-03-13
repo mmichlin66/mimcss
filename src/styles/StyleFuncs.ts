@@ -10,7 +10,6 @@ import { ICustomVal } from "../api/rules";
 /**
  * Converts animation style represented as an object with fields corresponding to animation
  * properties to its CSS string value.
- * @param val Single animation object. 
  */
 function singleAnimationToCssString( val: StyleTypes.SingleAnimation): string
 {
@@ -19,10 +18,10 @@ function singleAnimationToCssString( val: StyleTypes.SingleAnimation): string
     else
     {
         return UtilFuncs.objectToCssString( val, false,
-            ["delay", UtilFuncs.singleTimeToCssString],
+            ["delay", UtilFuncs.timeToCssString],
             ["function", singleAnimationTimingFunctionToCssString],
-            ["duration", UtilFuncs.singleTimeToCssString],
-            ["count", UtilFuncs.singleNumberToCssString],
+            ["duration", UtilFuncs.timeToCssString],
+            ["count", UtilFuncs.numberToCssString],
             "direction",
             "state",
             "mode",
@@ -33,14 +32,13 @@ function singleAnimationToCssString( val: StyleTypes.SingleAnimation): string
 
 /**
  * Converts animation style to its CSS string value.
- * @param obj Single animation object. 
  */
 function animationToCssString( val: StyleTypes.AnimationStyleType): string
 {
     if (typeof val === "string")
         return val;
     else if (Array.isArray( val))
-        return UtilFuncs.arrayToCssString( val, singleAnimationToCssString);
+        return UtilFuncs.arrayToCssString( val, singleAnimationToCssString, ",");
     else
         return singleAnimationToCssString( val);
 }
@@ -49,7 +47,6 @@ function animationToCssString( val: StyleTypes.AnimationStyleType): string
 
 /**
  * Converts single animation timing function value to the CSS time string.
- * @param val Single animation timing function value
  */
 function singleAnimationTimingFunctionToCssString( val: StyleTypes.SingleAnimationTimingFunction): string
 {
@@ -85,7 +82,6 @@ function singleAnimationTimingFunctionToCssString( val: StyleTypes.SingleAnimati
 
 /**
  * Converts animation iteration count style value to the CSS time string.
- * @param val Animation iteration count value
  */
 function animationTimingFunctionToCssString( val: StyleTypes.AnimationTimingFunctionStyleType): string
 {
@@ -98,14 +94,14 @@ function animationTimingFunctionToCssString( val: StyleTypes.AnimationTimingFunc
     else if (typeof val[0] === "number")
         return singleAnimationTimingFunctionToCssString( val as StyleTypes.SingleAnimationTimingFunction);
     else
-        return UtilFuncs.arrayToCssString( val as StyleTypes.SingleAnimationTimingFunction[], singleAnimationTimingFunctionToCssString);
+        return UtilFuncs.arrayToCssString( val as StyleTypes.SingleAnimationTimingFunction[],
+        singleAnimationTimingFunctionToCssString, ",");
 }
 
 
 
 /**
  * Converts corner radius style value to the CSS string.
- * @param val Animation delay value
  */
 function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_StyleType): string
 {
@@ -114,16 +110,15 @@ function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_Style
     else if (val instanceof UtilTypes.StringProxy)
         return val.toString();
     else if (Array.isArray(val))
-        return UtilFuncs.arrayToCssString( val, UtilFuncs.singleLengthToCssString, " ");
+        return UtilFuncs.arrayToCssString( val, UtilFuncs.lengthToCssString, " ");
     else
-        return UtilFuncs.singleLengthToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
 }
 
 
 
 /**
  * Converts border radius style value to the CSS string.
- * @param val Border radius value
  */
 function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
 {
@@ -132,25 +127,24 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
         if (Array.isArray( val[0]))
         {
             // two MultiCornerRadius values
-            let s = UtilFuncs.arrayToCssString( val[0], UtilFuncs.singleLengthToCssString, " ");
+            let s = UtilFuncs.arrayToCssString( val[0], UtilFuncs.lengthToCssString, " ");
             s += " / ";
-            return s + UtilFuncs.arrayToCssString( val[1] as StyleTypes.MultiCornerRadius_StyleType, UtilFuncs.singleLengthToCssString, " ");
+            return s + UtilFuncs.arrayToCssString( val[1] as StyleTypes.MultiCornerRadius_StyleType, UtilFuncs.lengthToCssString, " ");
         }
         else
         {
             // single MultiCornerRadius value
-            return UtilFuncs.arrayToCssString( val as StyleTypes.MultiCornerRadius_StyleType, UtilFuncs.singleLengthToCssString, " ");
+            return UtilFuncs.arrayToCssString( val as StyleTypes.MultiCornerRadius_StyleType, UtilFuncs.lengthToCssString, " ");
         }
     }
     else
-        return UtilFuncs.singleLengthToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
 }
 
 
 
 /**
  * Converts border style style value to the CSS string.
- * @param val Border style value
  */
 function borderStyleToCssString( val: StyleTypes.BorderStyleStyleType): string
 {
@@ -168,7 +162,6 @@ function borderStyleToCssString( val: StyleTypes.BorderStyleStyleType): string
 
 /**
  * Converts border width style value to the CSS string.
- * @param val Border width value
  */
 function borderWidthToCssString( val: StyleTypes.BorderWidthStyleType): string
 {
@@ -177,23 +170,22 @@ function borderWidthToCssString( val: StyleTypes.BorderWidthStyleType): string
     else if (val instanceof UtilTypes.StringProxy)
         return val.toString();
     else if (Array.isArray(val))
-        return UtilFuncs.arrayToCssString( val, UtilFuncs.singleLengthToCssString, " ");
+        return UtilFuncs.arrayToCssString( val, UtilFuncs.lengthToCssString, " ");
     else
-        return UtilFuncs.singleLengthToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
 }
 
 
 
 /**
  * Converts border spacing style value to the CSS string.
- * @param val Border spacing value
  */
 function borderSpacingToCssString( val: StyleTypes.BorderSpacingStyleType): string
 {
     if (Array.isArray(val))
-        return UtilFuncs.arrayToCssString( val, UtilFuncs.singleLengthToCssString, " ");
+        return UtilFuncs.arrayToCssString( val, UtilFuncs.lengthToCssString, " ");
     else
-        return UtilFuncs.singleLengthToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
 }
 
 
@@ -218,14 +210,13 @@ function borderColorToCssString( val: StyleTypes.BorderColorStyleType): string
 
 /**
  * Converts border side style value to the CSS string.
- * @param val Border side value
  */
 function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
 {
     if (typeof val === "string")
         return val;
     else if (typeof val === "number")
-        return UtilFuncs.singleLengthToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
     else if (val instanceof UtilTypes.StringProxy)
         return val.toString();
     else if (Array.isArray(val))
@@ -236,7 +227,7 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
         else if (val[0] instanceof UtilTypes.StringProxy)
             return val[0].toString();
         else if (val[0] != null)
-            s += UtilFuncs.singleLengthToCssString( val[0]) + " ";
+            s += UtilFuncs.lengthToCssString( val[0]) + " ";
 
         if (val[1])
             s += val[1] + " ";
@@ -254,7 +245,6 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
 
 /**
  * Converts border-image-outset style value to the CSS string.
- * @param val Border image outset value
  */
 function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleType): string
 {
@@ -272,7 +262,6 @@ function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleTyp
 
 /**
  * Converts box shadow style to its CSS string value.
- * @param obj Box shadow value. 
  */
 function boxShadowToCssString( val: StyleTypes.BoxShadowStyleType): string
 {
@@ -288,7 +277,6 @@ function boxShadowToCssString( val: StyleTypes.BoxShadowStyleType): string
 
 /**
  * Converts clip style value to its CSS string value.
- * @param val Clip value. 
  */
 function clipToCssString( val: StyleTypes.ClipStyleType): string
 {
@@ -297,7 +285,7 @@ function clipToCssString( val: StyleTypes.ClipStyleType): string
     else if (val instanceof UtilTypes.StringProxy)
         return val.toString();
     else
-        return `rect(${UtilFuncs.arrayToCssString( val, UtilFuncs.singleLengthToCssString, " ")}`;
+        return `rect(${UtilFuncs.arrayToCssString( val, UtilFuncs.lengthToCssString, " ")}`;
 }
 
 
@@ -305,7 +293,6 @@ function clipToCssString( val: StyleTypes.ClipStyleType): string
 /**
  * Converts column rule style represented as an object with fields corresponding to column rule
  * properties to its CSS string value.
- * @param val Column rule style value. 
  */
 function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 {
@@ -327,7 +314,6 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 
 /**
  * Converts columns style to its CSS string value.
- * @param val Columns style value. 
  */
 function columnsToCssString( val: StyleTypes.ColumnsStyleType): string
 {
@@ -340,14 +326,13 @@ function columnsToCssString( val: StyleTypes.ColumnsStyleType): string
     else if (val instanceof UtilTypes.StringProxy)
         return val.toString();
     else
-        return val[0].toString() + " " + UtilFuncs.singleLengthToCssString( val[1]);
+        return val[0].toString() + " " + UtilFuncs.lengthToCssString( val[1]);
 }
 
 
 
 /**
  * Converts flex style value to the CSS string.
- * @param val Flex value
  */
 function flexToCssString( val: StyleTypes.FlexStyleType): string
 {
@@ -368,69 +353,58 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
             if (typeof v === "string")
                 s += v;
             else
-              s += UtilFuncs.singleLengthToCssString( v);
+              s += UtilFuncs.lengthToCssString( v);
 
             return s;
         }
     }
     else
-        return UtilFuncs.singleLengthToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
 }
 
 
 
 /**
- * Converts flex-flow style value to the CSS string.
- * @param val Flex-flow value
+ * Converts text-emphasis style value to the CSS string.
  */
-function flexFlowToCssString( val: StyleTypes.FlexFlowStyleType): string
+function textEmphasisPositionToCssString( val: StyleTypes.TextEmphasisPositionStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
+    if (Array.isArray( val))
         return UtilFuncs.stringArrayToCssString( val);
-}
-
-
-
-/**
- * Converts font-style style value to the CSS string.
- * @param val Font-style value
- */
-function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
     else
-        return UtilFuncs.singleAngleToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
 }
 
 
 
 /**
- * Converts font-style style value to the CSS string.
- * @param val Font-style value
+ * Converts text-indent style value to the CSS string.
  */
-function gapStyleToCssString( val: StyleTypes.Gap_StyleType): string
+function textIndentToCssString( val: StyleTypes.TextIndentStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
+    if (Array.isArray(val))
     {
-        let s = UtilFuncs.singleLengthToCssString( val[0]);
-        if (val.length > 1)
-            s += "," + UtilFuncs.singleLengthToCssString( val[1]);
+        let s = `${UtilFuncs.lengthToCssString( val[0])} ${val[1]}`;
+        if (val[2])
+            s += " " + val[2];
 
         return s;
     }
     else
-        return UtilFuncs.singleLengthToCssString( val);
+        return UtilFuncs.lengthToCssString( val);
+}
+
+
+
+/**
+ * Converts translate style value to the CSS string.
+ */
+function translateToCssString( val: StyleTypes.TranslateStyleType): string
+{
+    if (Array.isArray(val))
+        return UtilFuncs.multiLengthToCssString( val);
+    else
+        return UtilFuncs.lengthToCssString( val);
 }
 
 
@@ -443,8 +417,8 @@ type PropToStringFunc<T> = (val: T) => string;
  * commonly, the information needed for a property is a conversion function, which takes a value
  * of a type allowed for the property and converts it to the CSS compliant string. Alternatively,
  * it can be a name of another Styleset property for which this property is an alias. This is used
- * for shortening frequently used but long property names (e.g. backgroundColor) and for prefixed
- * properties.
+ * for shortening frequently used but long property names (e.g. "bgc" for "backgroundColor") and
+ * for vendor-prefixed properties.
  */
 type StylePropertyInfo<T> = PropToStringFunc<T> | keyof StyleTypes.Styleset;
 
@@ -544,47 +518,46 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     animation: animationToCssString,
     animationDelay: UtilFuncs.multiTimeToCssString,
     animationDuration: UtilFuncs.multiTimeToCssString,
-    animationIterationCount: UtilFuncs.singleNumberToCssString,
+    animationIterationCount: UtilFuncs.numberToCssString,
     animationTimingFunction: animationTimingFunctionToCssString,
 
     backgroundColor: ColorFuncs.colorToCssString,
     // bgc: "backgroundColor",
     backgroundPosition: UtilFuncs.multiPositionToCssString,
     backgroundSize: UtilFuncs.multiSizeToCssString,
-    baselineShift: UtilFuncs.singleLengthToCssString,
+    baselineShift: UtilFuncs.lengthToCssString,
 
     border: borderSideToCssString,
     borderBottom: borderSideToCssString,
     borderBottomColor: ColorFuncs.colorToCssString,
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
-    borderBottomWidth: UtilFuncs.singleLengthToCssString,
+    borderBottomWidth: UtilFuncs.lengthToCssString,
     borderColor: borderColorToCssString,
     borderImageOutset: borderImageOutsetToCssString,
     borderImageWidth: borderWidthToCssString,
     borderLeft: borderSideToCssString,
     borderLeftColor: ColorFuncs.colorToCssString,
-    borderLeftWidth: UtilFuncs.singleLengthToCssString,
+    borderLeftWidth: UtilFuncs.lengthToCssString,
     borderRadius: borderRadiusToCssString,
     borderRight: borderSideToCssString,
     borderRightColor: ColorFuncs.colorToCssString,
-    borderRightWidth: UtilFuncs.singleLengthToCssString,
+    borderRightWidth: UtilFuncs.lengthToCssString,
     borderStyle: borderStyleToCssString,
     borderSpacing: borderSpacingToCssString,
     borderTop: borderSideToCssString,
     borderTopColor: ColorFuncs.colorToCssString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
-    borderTopWidth: UtilFuncs.singleLengthToCssString,
+    borderTopWidth: UtilFuncs.lengthToCssString,
     borderWidth: borderWidthToCssString,
-    bottom: UtilFuncs.singleLengthToCssString,
+    bottom: UtilFuncs.lengthToCssString,
     boxShadow: boxShadowToCssString,
-    // shadow: "boxShadow",
 
     caretColor: ColorFuncs.colorToCssString,
     clip: clipToCssString,
     color: ColorFuncs.colorToCssString,
-    columnGap: UtilFuncs.singleLengthToCssString,
+    columnGap: UtilFuncs.lengthToCssString,
     columnRule: columnRuleToCssString,
     columnRuleColor: ColorFuncs.colorToCssString,
     columnRuleStyle: borderStyleToCssString,
@@ -592,28 +565,59 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     columns: columnsToCssString,
 
     flex: flexToCssString,
-    flexFlow: flexFlowToCssString,
     floodColor: ColorFuncs.colorToCssString,
-    fontStyle: fontStyleToCssString,
+    fontStyle: UtilFuncs.angleToCssString,
 
-    gridColumnGap: UtilFuncs.singleLengthToCssString,
-    gridRowGap: UtilFuncs.singleLengthToCssString,
+    gap: UtilFuncs.multiLengthToCssString,
+    gridColumnGap: UtilFuncs.lengthToCssString,
+    gridRowGap: UtilFuncs.lengthToCssString,
 
-    height: UtilFuncs.singleLengthToCssString,
+    height: UtilFuncs.lengthToCssString,
 
-    left: UtilFuncs.singleLengthToCssString,
+    left: UtilFuncs.lengthToCssString,
+    letterSpacing: UtilFuncs.lengthToCssString,
     lightingColor: ColorFuncs.colorToCssString,
 
+    margin: UtilFuncs.multiLengthToCssString,
+    marginBottom: UtilFuncs.lengthToCssString,
+    marginLeft: UtilFuncs.lengthToCssString,
+    marginRight: UtilFuncs.lengthToCssString,
+    marginTop: UtilFuncs.lengthToCssString,
+    maxHeight: UtilFuncs.lengthToCssString,
+    maxWidth: UtilFuncs.lengthToCssString,
+    minHeight: UtilFuncs.lengthToCssString,
+	minWidth: UtilFuncs.lengthToCssString,
+
+    objectPosition: UtilFuncs.positionToCssString,
     outlineColor: ColorFuncs.colorToCssString,
+    outlineOffset: UtilFuncs.lengthToCssString,
+    outlineStyle: borderStyleToCssString,
 
-    right: UtilFuncs.singleLengthToCssString,
-    rowGap: UtilFuncs.singleLengthToCssString,
+    padding: UtilFuncs.multiLengthToCssString,
+    paddingBottom: UtilFuncs.lengthToCssString,
+    paddingLeft: UtilFuncs.lengthToCssString,
+    paddingRight: UtilFuncs.lengthToCssString,
+    paddingTop: UtilFuncs.lengthToCssString,
+    perspective: UtilFuncs.lengthToCssString,
+    perspectiveOrigin: UtilFuncs.positionToCssString,
 
+    right: UtilFuncs.lengthToCssString,
+    rowGap: UtilFuncs.lengthToCssString,
+
+    stopColor: ColorFuncs.colorToCssString,
+
+    tabSize: UtilFuncs.lengthToCssString,
     textDecorationColor: ColorFuncs.colorToCssString,
+    textDecorationThickness: UtilFuncs.lengthToCssString,
     textEmphasisColor: ColorFuncs.colorToCssString,
-    top: UtilFuncs.singleLengthToCssString,
+    textEmphasisPosition: textEmphasisPositionToCssString,
+    textIndent: textIndentToCssString,
+    top: UtilFuncs.lengthToCssString,
+    translate: translateToCssString,
 
-    width: UtilFuncs.singleLengthToCssString,
+    width: UtilFuncs.lengthToCssString,
+
+    zoom: UtilFuncs.lengthToCssString,
 };
 
 

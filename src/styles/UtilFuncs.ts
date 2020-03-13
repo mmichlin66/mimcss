@@ -33,22 +33,9 @@ export function camelToDash( camel: string): string
  * Elements of the array are converted to strings using the given function.
  * @param val Array of time values
  */
-export function arrayToCssString<T>( val: T[], func: (v: T) => string, separator: string = ","): string
+export function arrayToCssString<T>( val: T[], func: (v: T) => string, separator: string = " "): string
 {
-    let s = "";
-    for( let v of val)
-    {
-        let item = func( v);
-        if (item != null)
-        {
-            if (s.length > 0)
-                s += separator;
-
-            s += item;
-        }
-    }
-
-    return s;
+    return !val || val.length === 0 ? "" : val.map( (item) => func(item)).join( separator);
 }
 
 
@@ -57,24 +44,9 @@ export function arrayToCssString<T>( val: T[], func: (v: T) => string, separator
  * Converts array of string values to a single string using the given separator.
  * @param val Array of string values
  */
-export function stringArrayToCssString( val: (string | UtilTypes.Base_StyleType)[], separator: string = ","): string
+export function stringArrayToCssString( val: (string | UtilTypes.StringProxy)[], separator: string = " "): string
 {
-    let s = "";
-    for( let v of val)
-    {
-        if (v != null)
-        {
-            if (s.length > 0)
-                s += separator;
-
-            if (typeof v === "string")
-                s += v;
-            else if (val instanceof UtilTypes.StringProxy)
-                s += v.toString();
-        }
-    }
-
-    return s;
+    return arrayToCssString( val, (v) => typeof v === "string" ? v : v.toString());
 }
 
 
@@ -94,146 +66,198 @@ export function stringArrayToCssString( val: (string | UtilTypes.Base_StyleType)
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Number
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Converts single number style value to the CSS string.
- * @param val Single number or string value
+ * @param val Single number value
  */
-export function singleNumberToCssString( val: UtilTypes.SingleNumber_StyleType): string
+export function numberToCssString( val: UtilTypes.Number_StyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
-        return val.toString();
+    return typeof val === "string" ? val : val.toString();
 }
 
 /**
  * Converts multi-part number style value to the CSS string.
- * @param val Animation delay value
+ * @param val Multi-part number value
  */
 export function multiNumberToCssString( val: UtilTypes.MultiNumber_StyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
+    if (Array.isArray(val))
+        return arrayToCssString( val, numberToCssString);
     else
-        return arrayToCssString( val, singleNumberToCssString);
+        return numberToCssString( val);
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Percent
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
  */
-export function percentToCssString( n: number): string
+export function percentNumberToCssString( n: number): string
 {
     return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%";
 }
 
-
-
 /**
- * Converts length value from the numeric representation to the CSS string. Integer
- * values are treated as pixels while floating numbers are treated as percents from 0.0 to 1.0.
- * @param val Length as a number
+ * Converts single percent style value to the CSS string.
+ * @param val Single percent value
  */
-export function lengthToCssString( n: number, units?: string): string
-{
-    return n === 0 ? "0" : units ? n + units : Number.isInteger( n) ?  n + "px" : percentToCssString(n);
-}
-
-/**
- * Converts length style value to the CSS time string.
- * @param val Length as a style property type
- */
-export function singleLengthToCssString( val: UtilTypes.SingleLength_StyleType): string
+export function percentToCssString( val: UtilTypes.Percent_StyleType): string
 {
     if (typeof val === "string")
         return val;
     else if (val instanceof UtilTypes.StringProxy)
         return val.toString();
     else
-	    return lengthToCssString( val);
+	    return percentNumberToCssString( val);
+}
+
+/**
+ * Converts multi-part percent style value to the CSS string.
+ * @param val Multi-part percent value
+ */
+export function multiPercentToCssString( val: UtilTypes.MultiPercent_StyleType, separator: string = " "): string
+{
+    if (Array.isArray(val))
+        return arrayToCssString( val, percentToCssString, separator);
+    else
+        return percentToCssString( val);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Length
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts length value from the numeric representation to the CSS string. Integer
+ * values are treated as pixels while floating numbers within -1 and 1 are treated as
+ * percents and floating numbers outside -1 and 1 are treated as "em".
+ * @param val Length as a number
+ */
+export function lengthNumberToCssString( n: number, units?: UtilTypes.LengthUnits): string
+{
+    return units ? n + units : Number.isInteger( n) ?  n + "px" : n > -1.0 && n < 1.0 ? Math.round( n * 100) + "%" : n + "em";
+}
+
+/**
+ * Converts length style value to the CSS string.
+ * @param val Length as a style property type
+ */
+export function lengthToCssString( val: UtilTypes.Length_StyleType): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof UtilTypes.StringProxy)
+        return val.toString();
+    else
+	    return lengthNumberToCssString( val);
 }
 
 /**
  * Converts multi-part length or percentage style property to the CSS string.
  * @param val Array of length style values
  */
-export function multiLengthToCssString( val: UtilTypes.MultiLength_StyleType): string
+export function multiLengthToCssString( val: UtilTypes.MultiLength_StyleType, separator: string = " "): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-        return arrayToCssString( val, singleLengthToCssString);
+    if (Array.isArray(val))
+        return arrayToCssString( val, lengthToCssString, separator);
     else
-        return singleLengthToCssString( val);
+        return lengthToCssString( val);
 }
 
 
 
-/**
- * Converts size style value to the CSS string.
- * @param val Size as a style property type
- */
-export function singleSizeToCssString( val: UtilTypes.SingleSize_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else if (typeof val === "object")
-        return objectToCssString( val, false, ["w", singleLengthToCssString], ["h", singleLengthToCssString]);
-    // else if (Array.isArray( val))
-    //     return lengthToCssString( val[0]) + " " + lengthToCssString( val[1]);
-    else
-	    return singleLengthToCssString( val);
-}
-
-/**
- * Converts multi-part size style property to the CSS string.
- * @param val Array of length style values
- */
-export function multiSizeToCssString( val: UtilTypes.MultiSize_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else if (Array.isArray(val))
-        return arrayToCssString( val, singleSizeToCssString);
-    else
-        return singleSizeToCssString( val);
-}
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Angle
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Converts angle value from the numeric representation to the CSS string. Integer
  * values are treated as degrees while floating numbers are treated as radians.
  * @param val Angle as a number
  */
-export function angleToCssString( n: number, units?: string): string
+export function angleNumberToCssString( n: number, units?: UtilTypes.AngleUnits): string
 {
     return n === 0 ? "0" : units ? n + units : Number.isInteger(n) ?  n + "deg" : n + "rad";
 }
 
 /**
- * Converts length style value to the CSS time string.
+ * Converts length style value to the CSS string.
  * @param val Length as a style property type
  */
-export function singleAngleToCssString( val: UtilTypes.SingleAngle_StyleType): string
+export function angleToCssString( val: UtilTypes.Angle_StyleType): string
 {
     if (typeof val === "string")
         return val;
     else if (val instanceof UtilTypes.StringProxy)
         return val.toString();
     else
-	    return angleToCssString( val);
+	    return angleNumberToCssString( val);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Time
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts time value from the numeric representation to the CSS string. Integer
+ * values are treated as milliseconds while floating numbers are treated as seconds.
+ * @param val Time as a number
+ */
+export function timeNumberToCssString( n: number, units?: UtilTypes.TimeUnits): string
+{
+    return n === 0 ? "0s" : units ? n + units : Number.isInteger(n) ?  n + "ms" : n + "s";
+}
+
+/**
+ * Converts time style value to the CSS string.
+ * @param val Time as a style property type
+ */
+export function timeToCssString( val: UtilTypes.Time_StyleType): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof UtilTypes.StringProxy)
+        return val.toString();
+    else
+	    return timeNumberToCssString( val);
+}
+
+/**
+ * Converts animation delay style value to the CSS string.
+ * @param val Animation delay value
+ */
+export function multiTimeToCssString( val: UtilTypes.MultiTime_StyleType): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (typeof val === "number")
+        return timeNumberToCssString( val);
+    else if (val instanceof UtilTypes.StringProxy)
+        return val.toString();
+    else
+        return arrayToCssString( val, timeToCssString);
 }
 
 
@@ -251,10 +275,46 @@ export function resolutionToCssString( n: number, units?: string): string
 
 
 /**
- * Converts single position style value to the CSS time string.
+ * Converts size style value to the CSS string.
  * @param val Size as a style property type
  */
-export function singlePositionToCssString( val: UtilTypes.SinglePosition_StyleType): string
+export function sizeToCssString( val: UtilTypes.Size_StyleType): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof UtilTypes.StringProxy)
+        return val.toString();
+    else if (typeof val === "object")
+        return objectToCssString( val, false, ["w", lengthToCssString], ["h", lengthToCssString]);
+    // else if (Array.isArray( val))
+    //     return lengthToCssString( val[0]) + " " + lengthToCssString( val[1]);
+    else
+	    return lengthToCssString( val);
+}
+
+/**
+ * Converts multi-part size style property to the CSS string.
+ * @param val Array of length style values
+ */
+export function multiSizeToCssString( val: UtilTypes.MultiSize_StyleType): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (val instanceof UtilTypes.StringProxy)
+        return val.toString();
+    else if (Array.isArray(val))
+        return arrayToCssString( val, sizeToCssString);
+    else
+        return sizeToCssString( val);
+}
+
+
+
+/**
+ * Converts single position style value to the CSS string.
+ * @param val Size as a style property type
+ */
+export function positionToCssString( val: UtilTypes.Position_StyleType): string
 {
     if (typeof val === "string")
         return val;
@@ -263,12 +323,12 @@ export function singlePositionToCssString( val: UtilTypes.SinglePosition_StyleTy
     else if (typeof val === "object")
     {
         if ("xedge" in val)
-            return objectToCssString( val, false, "xedge", ["x", singleLengthToCssString], "yedge", ["y", singleLengthToCssString]);
+            return objectToCssString( val, false, "xedge", ["x", lengthToCssString], "yedge", ["y", lengthToCssString]);
         else
-            return objectToCssString( val, false, ["x", singleLengthToCssString], ["y", singleLengthToCssString]);
+            return objectToCssString( val, false, ["x", lengthToCssString], ["y", lengthToCssString]);
     }
     else
-	    return singleLengthToCssString( val);
+	    return lengthToCssString( val);
 }
 
 /**
@@ -278,51 +338,9 @@ export function singlePositionToCssString( val: UtilTypes.SinglePosition_StyleTy
 export function multiPositionToCssString( val: UtilTypes.MultiPosition_StyleType): string
 {
     if (Array.isArray(val))
-        return arrayToCssString( val,  singlePositionToCssString);
+        return arrayToCssString( val, positionToCssString);
     else
-        return  singlePositionToCssString( val);
-}
-
-
-
-/**
- * Converts time value from the numeric representation to the CSS string. Integer
- * values are treated as milliseconds while floating numbers are treated as seconds.
- * @param val Time as a number
- */
-export function timeToCssString( n: number, units?: string): string
-{
-    return n === 0 ? "0s" : units ? n + units : Number.isInteger(n) ?  n + "ms" : n + "s";
-}
-
-/**
- * Converts time style value to the CSS time string.
- * @param val Time as a style property type
- */
-export function singleTimeToCssString( val: UtilTypes.SingleTime_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
-	    return timeToCssString( val);
-}
-
-/**
- * Converts animation delay style value to the CSS time string.
- * @param val Animation delay value
- */
-export function multiTimeToCssString( val: UtilTypes.MultiTime_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return timeToCssString( val);
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
-        return arrayToCssString( val, singleTimeToCssString);
+        return  positionToCssString( val);
 }
 
 

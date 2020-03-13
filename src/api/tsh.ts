@@ -1,4 +1,4 @@
-﻿import {StringProxy, UnitValue} from "../styles/UtilTypes"
+﻿import {StringProxy, LengthUnits, AngleUnits, TimeUnits} from "../styles/UtilTypes"
 import * as UtilFuncs from "../styles/UtilFuncs"
 import * as ColorTypes from "../styles/ColorTypes";
 import * as ColorFuncs from "../styles/ColorFuncs";
@@ -34,14 +34,6 @@ export class tsh
     }
 
     /**
-     * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
-     */
-    public static percent( n: number): string
-    {
-        return UtilFuncs.percentToCssString( n);
-    }
-
-    /**
      * Converts the given value corresponding to the given style property to string.
      * @param stylePropName Style property name that determines how the value should be converted
      * to a CSS compliant string.
@@ -52,9 +44,9 @@ export class tsh
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }
 
-    public static units( n: number, unit: string): UnitValue
+    public static units<T extends string>( n: number, unit: T): string
     {
-        return new UnitValue( n, unit);
+        return n + unit;
     }
 
 
@@ -88,6 +80,22 @@ export class tsh
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
+    // Percent
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
+     */
+    public static percent( n: number): string
+    {
+        return UtilFuncs.percentNumberToCssString( n);
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
     // Length units
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,9 +123,9 @@ export class tsh
     /**
      * Converts length value from the numeric representation to the CSS string.
      */
-    public static len( n: number, units?: string): string
+    public static len( n: number, units?: LengthUnits): string
     {
-        return UtilFuncs.lengthToCssString( n, units);
+        return UtilFuncs.lengthNumberToCssString( n, units);
     }
 
 
@@ -127,18 +135,26 @@ export class tsh
     // Angle units
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /** Creates angle value in degrees */
     public static deg( n: number) { return this.units( n, "deg"); }
+
+    /** Creates angle value in radians */
     public static rad( n: number) { return this.units( n, "rad"); }
+
+    /** Creates angle value in gradians */
     public static grad( n: number) { return this.units( n, "grad"); }
+
+    /** Creates angle value in turns */
     public static turn( n: number) { return this.units( n, "turn"); }
 
     /**
      * Converts angle value from the numeric representation to the CSS string. Integer
      * values are treated as degrees while floating numbers are treated as radians.
      */
-    public static angle( n: number, units?: string): string
+    public static angle( n: number, units?: AngleUnits): string
     {
-        return UtilFuncs.angleToCssString(n);
+        return UtilFuncs.angleNumberToCssString( n, units);
     }
 
 
@@ -148,16 +164,20 @@ export class tsh
     // Time units
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /** Creates time value in seconds */
     public static s( n: number) { return this.units( n, "s"); }
+
+    /** Creates time value in milliseconds */
     public static ms( n: number) { return this.units( n, "ms"); }
 
     /**
      * Converts time value from the numeric representation to the CSS string. Integer
      * values are treated as milliseconds while floating numbers are treated as seconds.
      */
-    public static time( n: number, units?: string): string
+    public static time( n: number, units?: TimeUnits): string
     {
-        return UtilFuncs.timeToCssString(n);
+        return UtilFuncs.timeNumberToCssString( n, units);
     }
 
 
@@ -192,8 +212,6 @@ export class tsh
 
 
 
-
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Fraction units (for flex)
@@ -220,6 +238,15 @@ export class tsh
      *     div = $tag( "div", { $custom: [ tsh.custom( this.mainColor, "brown") ] })
      * });
      * ```
+     * This is equivalent to the following CSS rule (where *mainColorVarName* is the unique name
+     * assigned by Mimcss to the `mainColor` custom CSS property):
+     * ```css
+     * div {
+     *     --mainColorVarName: "brown";
+     * }
+     * ```
+     * The `custom` method will produce a compilation error if an invalid type is used for the
+     * property value.
      */
     public static custom<K extends keyof PureStyleset>( varDef: ICustomVar<K>, varValue: PureStyleset[K]): ICustomVal<K>
     {
@@ -284,7 +311,8 @@ export class VarValue<K extends keyof PureStyleset> extends StringProxy
     }
 
     public varDef: ICustomVar<K> | string;
-    public fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy;
+    // public fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy;
+    public fallbackValue?: any;
 }
 
 

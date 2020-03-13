@@ -5,43 +5,43 @@ import * as ColorTypes from "./ColorTypes"
 
 /** Type for align-content style property */
 export type AlignContentStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
-				"baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" |
-				"space-between" | "space-around" | "space-evenly" | UtilTypes.Base_StyleType;
+    "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" |
+    "space-between" | "space-around" | "space-evenly" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for align-items style property */
 export type AlignItemsStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
-				"baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" | UtilTypes.Base_StyleType;
+    "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for align-self style property */
 export type AlignSelfStyleType = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
-				"self-start" | "self-end" | "baseline" | "first baseline" | "last baseline" |
-				"safe center" | "unsafe center" | UtilTypes.Base_StyleType;
+    "self-start" | "self-end" | "baseline" | "first baseline" | "last baseline" |
+    "safe center" | "unsafe center" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for alignment-baseline style property */
 export type AlignmentBaselineStyleType = "auto" | "baseline" | "before-edge" | "text-before-edge" |
-				"middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" |
-				"hanging" | "mathematical" | "top" | "center" | "bottom" | UtilTypes.Base_StyleType;
+    "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" |
+    "hanging" | "mathematical" | "top" | "center" | "bottom" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for single animation */
 export type SingleAnimation = UtilTypes.Base_StyleType |
-{
-	delay?: UtilTypes.SingleTime_StyleType;
-	function?: SingleAnimationTimingFunction;
-	duration?: UtilTypes.SingleTime_StyleType;
-	count?: SingleAnimationIterationCount;
-	direction?: SingleAnimationDirection;
-	state?: SingleAnimationPlayState;
-	mode?: SingleAnimationFillMode;
-	name?: SingleAnimationName;
-};
+    {
+        delay?: UtilTypes.Time_StyleType;
+        function?: SingleAnimationTimingFunction;
+        duration?: UtilTypes.Time_StyleType;
+        count?: SingleAnimationIterationCount;
+        direction?: SingleAnimationDirection;
+        state?: SingleAnimationPlayState;
+        mode?: SingleAnimationFillMode;
+        name?: SingleAnimationName;
+    };
 
 /** Type for animation style property */
 export type AnimationStyleType = SingleAnimation | SingleAnimation[];
@@ -65,7 +65,7 @@ export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimat
 
 
 /** Type for single animation iteration count */
-export type SingleAnimationIterationCount = "infinite" | UtilTypes.SingleNumber_StyleType | UtilTypes.Base_StyleType;
+export type SingleAnimationIterationCount = "infinite" | UtilTypes.Number_StyleType | UtilTypes.Base_StyleType;
 
 /** Type for animation-iteration-count style property */
 export type AnimationIterationCountStyleType = SingleAnimationIterationCount | SingleAnimationIterationCount[];
@@ -139,11 +139,11 @@ export type BackgroundOriginStyleType = SingleBackgroundOrigin | SingleBackgroun
 
 /** Type for single background repeat */
 export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | "repeat" | "space" | "round" | "no-repeat" |
-                "repeat repeat" | "repeat space" | "repeat round" | "repeat no-repeat" |
-                "space repeat" | "space space" | "space round" | "space no-repeat" |
-                "round repeat" | "round space" | "round round" | "round no-repeat" |
-                "no-repeat repeat" | "no-repeat space" | "no-repeat round" | "no-repeat no-repeat" |
-                UtilTypes.Base_StyleType;
+    "repeat repeat" | "repeat space" | "repeat round" | "repeat no-repeat" |
+    "space repeat" | "space space" | "space round" | "space no-repeat" |
+    "round repeat" | "round space" | "round round" | "round no-repeat" |
+    "no-repeat repeat" | "no-repeat space" | "no-repeat round" | "no-repeat no-repeat" |
+    UtilTypes.Base_StyleType;
 
 /** Type for background-repeat style property */
 export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroundRepeat[];
@@ -151,7 +151,7 @@ export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroun
 
 
 /** Type for background size */
-export type SingleBackgroundSize = "cover" | "contain" | UtilTypes.SingleSize_StyleType;
+export type SingleBackgroundSize = "cover" | "contain" | UtilTypes.Size_StyleType;
 
 /** Type for background-size style property */
 export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSize[];
@@ -159,61 +159,47 @@ export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSiz
 
 
 /** Type for a single corner radius */
-export type SingleCornerRadius_StyleType = UtilTypes.SingleLength_StyleType |
-                [UtilTypes.SingleLength_StyleType, UtilTypes.SingleLength_StyleType];
+export type SingleCornerRadius_StyleType = UtilTypes.Length_StyleType |
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
 
 
 
 /** Helper type that defines an array of one to 4 elements each defining a length/percentage */
 export type MultiCornerRadius_StyleType =
-                [
-                    UtilTypes.SingleLength_StyleType,
-                    UtilTypes.SingleLength_StyleType?,
-                    UtilTypes.SingleLength_StyleType?,
-                    UtilTypes.SingleLength_StyleType?
-                ];
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?
+    ];
 
 /** Type for border-radius style property */
-export type BorderRadiusStyleType = UtilTypes.SingleLength_StyleType | MultiCornerRadius_StyleType |
-                [MultiCornerRadius_StyleType, MultiCornerRadius_StyleType];
+export type BorderRadiusStyleType = UtilTypes.Length_StyleType | MultiCornerRadius_StyleType |
+    [MultiCornerRadius_StyleType, MultiCornerRadius_StyleType];
 
 
 
 /** Type for baseline-shift style property */
-export type BaselineShiftStyleType = "sub" | "super" | UtilTypes.SingleLength_StyleType;
+export type BaselineShiftStyleType = "sub" | "super" | UtilTypes.Length_StyleType;
 
 
 
 /** Type for single border side style property */
 export type BorderSideStyle_StyleType = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
-                "groove" | "ridge" | "inset" | "outset" | UtilTypes.Base_StyleType;
+    "groove" | "ridge" | "inset" | "outset" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for border-style style property */
 export type BorderStyleStyleType = BorderSideStyle_StyleType |
-                [
-                    BorderSideStyle_StyleType,
-                    BorderSideStyle_StyleType,
-                    BorderSideStyle_StyleType?,
-                    BorderSideStyle_StyleType?,
-                ];
+    [BorderSideStyle_StyleType, BorderSideStyle_StyleType, BorderSideStyle_StyleType?, BorderSideStyle_StyleType?];
 
 
 
 /** Type for border side width style property */
-export type BorderSideWidth_StyleType = "thin" | "medium" | "thick" | UtilTypes.SingleLength_StyleType;
+export type BorderSideWidth_StyleType = "thin" | "medium" | "thick" | UtilTypes.Length_StyleType;
 
 
 
 /** Type for border-width style property */
 export type BorderWidthStyleType = BorderSideWidth_StyleType |
-                [
-                    BorderSideWidth_StyleType,
-                    BorderSideWidth_StyleType,
-                    BorderSideWidth_StyleType?,
-                    BorderSideWidth_StyleType?,
-                ];
+    [BorderSideWidth_StyleType, BorderSideWidth_StyleType, BorderSideWidth_StyleType?, BorderSideWidth_StyleType?];
 
 
 
@@ -223,44 +209,26 @@ export type BorderColapseStyleType = "collapse" | "separate" | UtilTypes.Base_St
 
 
 /** Type for border-spacing style property */
-export type BorderSpacingStyleType = UtilTypes.SingleLength_StyleType | UtilTypes.Base_StyleType |
-                [
-                    UtilTypes.SingleLength_StyleType,
-                    UtilTypes.SingleLength_StyleType,
-                ];
+export type BorderSpacingStyleType = UtilTypes.Length_StyleType | UtilTypes.Base_StyleType |
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
 
 
 
 /** Type for border-color style property */
 export type BorderColorStyleType = ColorTypes.Color_StyleType |
-                [
-                    ColorTypes.Color_StyleType,
-                    ColorTypes.Color_StyleType,
-                    ColorTypes.Color_StyleType?,
-                    ColorTypes.Color_StyleType?,
-                ];
+    [ColorTypes.Color_StyleType, ColorTypes.Color_StyleType, ColorTypes.Color_StyleType?, ColorTypes.Color_StyleType?];
 
 
 
 /** Type for border side style property */
-export type BorderSide_StyleType = UtilTypes.SingleLength_StyleType |  BorderSideStyle_StyleType | ColorTypes.Color_StyleType |
-               
-                [
-                    UtilTypes.SingleLength_StyleType?,
-                    BorderSideStyle_StyleType?,
-                    ColorTypes.Color_StyleType?,
-                ];
+export type BorderSide_StyleType = UtilTypes.Length_StyleType |  BorderSideStyle_StyleType | ColorTypes.Color_StyleType |
+    [UtilTypes.Length_StyleType?, BorderSideStyle_StyleType?, ColorTypes.Color_StyleType?];
 
 
 
 /** Type for border-image-outset style property */
 export type BorderImageOutsetStyleType = string | number | UtilTypes.Base_StyleType |
-                [
-                    string | number,
-                    string | number,
-                    (string | number)?,
-                    (string | number)?,
-                ];
+    [string | number, string | number, (string | number)?, (string | number)?];
 
 
 
@@ -271,13 +239,8 @@ export type BorderImageRepeatStyleType = BorderImageRepeatKeyword | [BorderImage
 
 
 /** Type for border-image-width style property */
-export type BorderImageWidthStyleType = UtilTypes.SingleLength_StyleType |
-                [
-                    UtilTypes.SingleLength_StyleType,
-                    UtilTypes.SingleLength_StyleType,
-                    UtilTypes.SingleLength_StyleType?,
-                    UtilTypes.SingleLength_StyleType?,
-                ];
+export type BorderImageWidthStyleType = UtilTypes.Length_StyleType |
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?];
 
 
 
@@ -304,15 +267,15 @@ export type BoxSizingStyleType = "content-box" | "border-box" | UtilTypes.Base_S
 
 /** Type for break-after style property */
 export type BreakAfterStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
-                "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
-                "avoid-region" | "region" | UtilTypes.Base_StyleType;
+    "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
+    "avoid-region" | "region" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for break-before style property */
 export type BreakBeforeStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
-                "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
-                "avoid-region" | "region" | UtilTypes.Base_StyleType;
+    "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
+    "avoid-region" | "region" | UtilTypes.Base_StyleType;
 
 
 
@@ -338,12 +301,7 @@ export type ClearStyleType = "none" | "left" | "right" | "both" | "inline-start"
 
 /** Type for clear style property */
 export type ClipStyleType = "auto" | UtilTypes.Base_StyleType |
-                [
-                    UtilTypes.SingleLength_StyleType,
-                    UtilTypes.SingleLength_StyleType, 
-                    UtilTypes.SingleLength_StyleType,
-                    UtilTypes.SingleLength_StyleType, 
-                ];
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
 
 
 
@@ -362,14 +320,6 @@ export type ColumnFillStyleType = "auto" | "balance" | "balance-all" | UtilTypes
 
 
 
-/** Type for single gap style property */
-export type SingleGap_StyleType = UtilTypes.SingleLength_StyleType;
-
-/** Type for single gap style property */
-export type Gap_StyleType = UtilTypes.SingleLength_StyleType | [UtilTypes.SingleLength_StyleType, UtilTypes.SingleLength_StyleType?];
-
-
-
 /**
  * Type for column rule. Column rule can be presented by the following types:
  *   - string - literal CSS box shadow string.
@@ -382,7 +332,7 @@ export type ColumnRuleStyleType = string | UtilTypes.Base_StyleType |
         /** Column rule style. */
         style?: BorderStyleStyleType;
         /** Column rule color. */
-        color?: SingleGap_StyleType;
+        color?: ColorTypes.Color_StyleType;
     };
 
 
@@ -393,7 +343,7 @@ export type ColumnSpanStyleType = "none" | "all" | UtilTypes.Base_StyleType;
 
 
 /** Type for columns style property */
-export type ColumnsStyleType = "auto" | number | ["auto" | number, UtilTypes.SingleLength_StyleType] | UtilTypes.Base_StyleType;
+export type ColumnsStyleType = "auto" | number | ["auto" | number, UtilTypes.Length_StyleType] | UtilTypes.Base_StyleType;
 
 
 
@@ -404,11 +354,11 @@ export type FloatStyleType = "left" | "right" | "none" | "inline-start" | "inlin
 
 /** Type for cursor style property */
 export type CursorStyleType = "auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
-                "wait" | "cell" | "crosshair" | "text" | "vertical-text" | "alias" | "copy" | "move" |
-                "no-drop" | "not-allowed" | "e-resize" | "n-resize" | "ne-resize" | "nw-resize" |
-                "s-resize" | "se-resize" | "sw-resize" | "w-resize" | "ew-resize" | "ns-resize" |
-                "nesw-resize" | "nwse-resize" | "col-resize" | "row-resize" | "all-scroll" | "zoom-in" |
-                "zoom-out" | "grab" | "grabbing" | UtilTypes.Base_StyleType;
+    "wait" | "cell" | "crosshair" | "text" | "vertical-text" | "alias" | "copy" | "move" |
+    "no-drop" | "not-allowed" | "e-resize" | "n-resize" | "ne-resize" | "nw-resize" |
+    "s-resize" | "se-resize" | "sw-resize" | "w-resize" | "ew-resize" | "ns-resize" |
+    "nesw-resize" | "nwse-resize" | "col-resize" | "row-resize" | "all-scroll" | "zoom-in" |
+    "zoom-out" | "grab" | "grabbing" | UtilTypes.Base_StyleType;
 
 
 
@@ -419,20 +369,20 @@ export type DirectionStyleType = "ltr" | "rtl" | UtilTypes.Base_StyleType;
 
 /** Type for display style property */
 export type DisplayStyleType = "block" | "inline" | "run-in" | "contents" | "none" |
-                "inline-block" | "inline-list-item" | "inline-table" | "inline-flex" | "inline-grid" |
-                "flow" | "flow-root" | "table" | "flex" | "grid" | "ruby" |
-                "table-row-group" | "table-header-group" | "table-footer-group" | "table-row" | "table-cell" |
-                    "table-column-group" | "table-column" | "table-caption" | "ruby-base" | "ruby-text" |
-                    "ruby-base-container" | "ruby-text-container" |
-                "list-item" | "list-item block" | "list-item inline" | "list-item flow" | "list-item flow-root" |
-                    "list-item block flow" | "list-item block flow-root" | "flow list-item block" |
-                UtilTypes.Base_StyleType;
+    "inline-block" | "inline-list-item" | "inline-table" | "inline-flex" | "inline-grid" |
+    "flow" | "flow-root" | "table" | "flex" | "grid" | "ruby" |
+    "table-row-group" | "table-header-group" | "table-footer-group" | "table-row" | "table-cell" |
+        "table-column-group" | "table-column" | "table-caption" | "ruby-base" | "ruby-text" |
+        "ruby-base-container" | "ruby-text-container" |
+    "list-item" | "list-item block" | "list-item inline" | "list-item flow" | "list-item flow-root" |
+        "list-item block flow" | "list-item block flow-root" | "flow list-item block" |
+    UtilTypes.Base_StyleType;
 
                 
 
 /** Type for dominant-baseline style property */
 export type DominantBaselineStyleType = "auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
-                "central" | "mathematical" | "hanging" | "text-top" | UtilTypes.Base_StyleType;
+    "central" | "mathematical" | "hanging" | "text-top" | UtilTypes.Base_StyleType;
 
 
 
@@ -447,7 +397,7 @@ export type FillRuleStyleType = "nonzero" | "evenodd" | UtilTypes.Base_StyleType
 
 
 /** Type for flex-basis style property */
-export type FlexBasisStyleType = "auto" | "content" | UtilTypes.SingleLength_StyleType | UtilTypes.Base_StyleType;
+export type FlexBasisStyleType = "auto" | "content" | UtilTypes.Length_StyleType | UtilTypes.Base_StyleType;
 
 
 
@@ -468,18 +418,331 @@ export type FlexWrapStyleType = "nowrap" | "wrap" | "wrap-reverse" | UtilTypes.B
 
 /** Type for flex-flow style property */
 export type FlexFlowStyleType = FlexDirectionStyleType | FlexWrapStyleType |
-                [FlexDirectionStyleType,FlexWrapStyleType] | UtilTypes.Base_StyleType;
+    [FlexDirectionStyleType, FlexWrapStyleType] | UtilTypes.Base_StyleType;
 
 
 
 /** Type for font-style style property */
-export type FontStyleStyleType = "normal" | "italic" | "oblique" | UtilTypes.SingleAngle_StyleType;
+export type FontStyleStyleType = "normal" | "italic" | "oblique" | UtilTypes.Angle_StyleType;
+
+
+
+/** Type for font-kerning style property */
+export type FontKerningStyleType = "auto" | "normal" | "none" | UtilTypes.Base_StyleType;
 
 
 
 /** Type for font-weight style property */
 export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" |
-                100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | UtilTypes.Base_StyleType;
+    100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | UtilTypes.Base_StyleType;
+
+
+
+/** Type for a row-gap or column-gap style property */
+export type SingleGapStyleType = "normal" | UtilTypes.Length_StyleType;
+
+/** Type for a row-gap or column-gap style property */
+export type GapStyleType = SingleGapStyleType | [SingleGapStyleType, SingleGapStyleType];
+
+
+
+/** Type for hyphens style property */
+export type HyphensStyleType = "none" | "manual" | "auto" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for image-rendering style property */
+export type ImageRenderingStyleType = "auto" | "crisp-edges" | "pixelated" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for justify-content style property */
+export type JustifyContentStyleType = "normal" | "space-between" | "space-around" | "space-evenly" | "stretch" |
+    "center" | "start" | "end" | "flex-start" | "flex-end" | "left" | "right" |
+    "safe center" | "safe start" | "safe end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
+    "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" |
+    UtilTypes.Base_StyleType;
+
+
+
+/** Type for justify-items style property */
+export type JustifyItemsStyleType = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
+    "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" |
+    "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
+    "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" |
+    "legacy" | "legacy left" | "legacy right" | "legacy center" |
+    UtilTypes.Base_StyleType;
+
+
+
+/** Type for justify-self style property */
+export type JustifySelfStyleType = "auto" | "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
+    "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" |
+    "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
+    "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" |
+    UtilTypes.Base_StyleType;
+
+
+
+/** Type for letter-spacing style property */
+export type LetterSpacingStyleType = "normal" | UtilTypes.Length_StyleType;
+
+
+
+/** Type for line-break style property */
+export type LineBreakStyleType = "auto" | "loose" | "normal" | "strict" | "anywhere" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for line-height style property */
+export type LineHeightStyleType = number | string | UtilTypes.Base_StyleType;
+
+
+
+/** Type for list-style-type style property */
+export type ListStyleTypeStyleType = "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
+    "cjk-decimal" | "cjk-earthly-branch" | "cjk-heavenly-stem" | "cjk-ideographic" |
+    "lower-roman" | "upper-roman" | "lower-greek" | "lower-alpha" | "lower-latin" | "upper-alpha" | "upper-latin" |
+    "arabic-indic" | "armenian" | "bengali" | "cambodian" | "devanagari" | "georgian" | "gujarati" | "gurmukhi" | "hebrew" |
+    "hiragana" | "hiragana-iroha" | "japanese-formal" | "japanese-informal" | "kannada" | "katakana" | "katakana-iroha" |
+    "khmer" | "korean-hangul-formal" | "korean-hanja-formal" | "korean-hanja-informal" | "lao" | "lower-armenian" |
+    "malayalam" | "mongolian" | "myanmar" | "oriya" | "persian" | "simp-chinese-formal" | "simp-chinese-informal" |
+    "tamil" | "telugu" | "thai" | "tibetan" | "trad-chinese-formal" | "trad-chinese-informal" | "upper-armenian" |
+    "disclosure-open" | "disclosure-closed" |
+    UtilTypes.Base_StyleType;
+
+/** Type for list-style-position style property */
+export type ListStylePositionStyleType = "inside" | "outside" | UtilTypes.Base_StyleType;
+
+/** Type for list-style-position style property */
+export type ListStyleStyleType = ListStyleTypeStyleType | ListStylePositionStyleType |
+    [ListStyleTypeStyleType, ListStylePositionStyleType, string?] | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the margin style property */
+export type MarginStyleType = UtilTypes.Length_StyleType |
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?];
+
+
+
+/** Type for the object-fit style property */
+export type ObjectFitStyleType = "fill" | "contain" | "cover" | "none" | "scale-down" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the overflow-anchor style property */
+export type OverflowAnchorStyleType = "auto" | "none" | UtilTypes.Base_StyleType;
+
+/** Type for the overflow-wrap style property */
+export type OverflowWrapStyleType = "normal" | "break-word" | "anywhere" | UtilTypes.Base_StyleType;
+
+/** Type for the overflow-x/y style property */
+export type SingleOverflowStyleType = "visible" | "hidden" | "clip" | "scroll" | "auto" | UtilTypes.Base_StyleType;
+
+/** Type for the overflow- style property */
+export type OverflowStyleType = SingleOverflowStyleType | [SingleOverflowStyleType, SingleOverflowStyleType];
+
+
+
+/** Type for the padding style property */
+export type PaddingStyleType = UtilTypes.Length_StyleType |
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?];
+
+
+
+/** Type for the place-content style property */
+export type PlaceContentStyleType = AlignContentStyleType | [AlignContentStyleType, JustifyContentStyleType];
+
+/** Type for the place-items style property */
+export type PlaceItemsStyleType = AlignItemsStyleType | [AlignItemsStyleType, JustifyItemsStyleType];
+
+/** Type for the place-self style property */
+export type PlaceSelfStyleType = AlignSelfStyleType | [AlignSelfStyleType, JustifySelfStyleType];
+
+
+
+/** Type for the pointer-events style property */
+export type PointerEventsStyleType = "auto" | "none" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" |
+    "painted" | "fill" | "stroke" | "all" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the position style property */
+export type PositionStyleType = "static" | "relative" | "absolute" | "sticky" | "fixed" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the resize style property */
+export type ResizeStyleType = "none" | "both" | "horizontal" | "vertical" | "block" | "inline" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the scroll-behavior style property */
+export type ScrollBehaviorStyleType = "auto" | "smooth" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the stop-opacity style property */
+export type StopOpacityStyleType = number | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the table-layout style property */
+export type TableLayoutStyleType = "auto" | "fixed" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the text-align style property */
+export type TextAlignStyleType = "start" | "end" | "left" | "right" | "center" | "justify" | "match-parent" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the text-align-last style property */
+export type TextAlignLastStyleType = "auto" | "start" | "end" | "left" | "right" | "center" | "justify" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the text-anchor style property */
+export type TextAnchorStyleType = "start" | "middle" | "end" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the text-decoration-line style property */
+export type TextDecorationLineStyleType = "none" | "underline" | "overline" | "line-through" | "blink" |
+    "spelling-error" | "grammar-error" | UtilTypes.Base_StyleType;
+
+/** Type for the text-decoration-style style property */
+export type TextDecorationStyleStyleType = "solid" | "double" | "dotted" | "dashed" | "wavy" | UtilTypes.Base_StyleType;
+
+/** Type for the text-decoration-thickness style property */
+export type TextDecorationThicknessStyleType = "auto" | "from-font" | UtilTypes.Length_StyleType;
+
+// /** Type for the text-decoration-line style property */
+// export type TextDecorationStyleType = TextDecorationLineStyleType | TextDecorationStyleStyleType |
+//     ColorTypes.Color_StyleType | TextDecorationThicknessStyleType |
+//     [TextDecorationLineStyleType, TextDecorationStyleStyleType?, ColorTypes.Color_StyleType?, TextDecorationThicknessStyleType?];
+
+
+
+/** Type for the text-emphasis-position style property */
+export type TextEmphasisPositionStyleType = ["over" | "under", "left" | "right"] | UtilTypes.Length_StyleType;
+
+/** Type for the text-emphasis-style style property */
+export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame";
+
+/** Type for the text-emphasis-style style property */
+export type TextEmphasisStyleStyleType = "none" | number | TextEmphasisShape | ["filled" | "open", TextEmphasisShape] | UtilTypes.Base_StyleType;
+
+// /** Type for the text-emphasis style property */
+// export type TextEmphasisStyleType = TextEmphasisStyleStyleType | ColorTypes.Color_StyleType | [TextEmphasisStyleStyleType, ColorTypes.Color_StyleType];
+
+
+
+/** Type for the text-indent style property */
+export type TextIndentStyleType = UtilTypes.Length_StyleType |
+    [UtilTypes.Length_StyleType, "each-line", "hanging"?] | [UtilTypes.Length_StyleType, "hanging", "each-line"?];
+
+
+
+/** Type for the text-justify style property */
+export type TextJustifyStyleType = "auto" | "inter-character" | "inter-word" | "none" | UtilTypes.Length_StyleType;
+
+
+
+/** Type for the text-orientation style property */
+export type TextOrientationStyleType = "mixed" | "upright" | "sideways" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the text-overflow style property */
+export type SingleTextOverflowStyleType = "clip" | "ellipsis" | "fade" | UtilTypes.Length_StyleType;
+
+/** Type for the text-overflow style property */
+export type TextOverflowStyleType = SingleTextOverflowStyleType | [SingleTextOverflowStyleType, SingleTextOverflowStyleType];
+
+
+
+// /** Type for the text-shadow style property */
+// export type TextShadowStyleType = string | UtilTypes.Base_StyleType |
+//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType] |
+//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType] |
+//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, ColorTypes.Color_StyleType] |
+//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, ColorTypes.Color_StyleType];
+
+
+
+// /** Type for the text-transform style property */
+export type TextTransformStyleType = "none" | "capitalize" | "uppercase" | "lowercase" | "full-width" | "full-size-kana" | UtilTypes.Base_StyleType;
+
+
+
+// /** Type for the text-underlinePosition style property */
+export type TextUnderlinePositionStyleType = "auto" | "under" | "left" | "right" | "auto-pos" | "above" | "below" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the touch-action style property */
+export type TouchActionStyleType = "auto" | "none" | "manipulation" | "pan-x" | "pan-left" | "pan-right" | "pan-y" | "pan-up" | "pan-down" | "pinch-zoom" |
+    "pan-x pinch-zoom" | "pan-left pinch-zoom" | "pan-right pinch-zoom" | "pan-y pinch-zoom" | "pan-up pinch-zoom" | "pan-down pinch-zoom" |
+    "pan-x pan-y" | "pan-x pan-y pinch-zoom" | "pan-x pan-up" | "pan-x pan-up pinch-zoom" | "pan-x pan-down" | "pan-x pan-down pinch-zoom" |
+    "pan-y pan-left" | "pan-y pan-left pinch-zoom" | "pan-y pan-right" | "pan-y pan-right pinch-zoom" |
+    "pan-left pan-up" | "pan-left pan-up pinch-zoom" | "pan-left pan-down" | "pan-left pan-down pinch-zoom" |
+    "pan-right pan-up" | "pan-right pan-up pinch-zoom" | "pan-right pan-down" | "pan-right pan-down pinch-zoom" |
+    "pan-up pan-left" | "pan-up pan-left pinch-zoom" | "pan-up pan-right" | "pan-up pan-right pinch-zoom" |
+    "pan-down pan-left" | "pan-down pan-left pinch-zoom" | "pan-down pan-right" | "pan-down pan-right pinch-zoom" |
+    UtilTypes.Base_StyleType;
+
+
+
+/** Type for the translate style property */
+export type TranslateStyleType = "none" | UtilTypes.Length_StyleType |
+    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?];
+
+
+
+/** Type for the unicode-bidi style property */
+export type UnicodeBidiStyleType = "normal" | "embed" | "isolate" | "bidi-override" | "isolate-override" | "plaintext" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the user-select style property */
+export type UserSelectStyleType = "auto" | "text" | "none" | "contain" | "all" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the white-space style property */
+export type WhiteSpaceStyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "pre-line" | "break-spaces" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for widows style property */
+export type WidowsStyleType = number | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the word-break style property */
+export type WordBreakStyleType = "normal" | "break-all" | "keep-all" | "break-word" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the word-spacing style property */
+export type WordSpacingStyleType = "normal" | UtilTypes.Length_StyleType;
+
+
+
+/** Type for the writing-mode style property */
+export type WritingModeStyleType = "horizontal-tb" | "vertical-rl" | "vertical-lr" | "sideways-rl" | "sideways-lr" | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the z-index style property */
+export type ZIndexStyleType = "auto" | number | UtilTypes.Base_StyleType;
+
+
+
+/** Type for the zoom style property */
+export type ZoomStylePrivet = "normal" | "reset" | UtilTypes.Length_StyleType;
 
 
 
@@ -514,8 +777,8 @@ export type PureStyleset =
     backgroundImage?: StyleType;
     backgroundOrigin?: BackgroundOriginStyleType;
     backgroundPosition?: UtilTypes.MultiPosition_StyleType;
-    backgroundPositionX?: string;
-    backgroundPositionY?: string;
+    backgroundPositionX?: StyleType;
+    backgroundPositionY?: StyleType;
     backgroundRepeat?: BackgroundRepeatStyleType;
     backgroundSize?: BackgroundSizeStyleType;
     baselineShift?: BaselineShiftStyleType;
@@ -528,11 +791,11 @@ export type PureStyleset =
     borderBottomWidth?: BorderSideWidth_StyleType;
     borderCollapse?: BorderColapseStyleType;
     borderColor?: BorderColorStyleType;
-    borderImage?: string;
+    borderImage?: StyleType;
     borderImageOutset?: BorderImageOutsetStyleType;
     borderImageRepeat?: BorderImageRepeatStyleType;
-    borderImageSlice?: string;
-    borderImageSource?: string;
+    borderImageSlice?: StyleType;
+    borderImageSource?: StyleType;
     borderImageWidth?: BorderImageWidthStyleType;
     borderLeft?: BorderSide_StyleType;
     borderLeftColor?: ColorTypes.Color_StyleType;
@@ -552,7 +815,7 @@ export type PureStyleset =
     borderTopStyle?: BorderSideStyle_StyleType;
     borderTopWidth?: BorderSideWidth_StyleType;
     borderWidth?: BorderWidthStyleType;
-    bottom?: UtilTypes.SingleLength_StyleType;
+    bottom?: UtilTypes.Length_StyleType;
     boxShadow?: BoxShadowStyleType;
     boxSizing?: BoxSizingStyleType;
     breakAfter?: BreakAfterStyleType;
@@ -563,25 +826,25 @@ export type PureStyleset =
     caretColor?: CaretColorStyleType;
     clear?: ClearStyleType;
     clip?: ClipStyleType;
-    clipPath?: string;
-    clipRule?: string;
+    clipPath?: StyleType;
+    clipRule?: StyleType;
     color?: ColorTypes.Color_StyleType;
     colorInterpolationFilters?: ColorInterpolationFiltersStyleType;
     columnCount?: ColumnCountStyleType;
     columnFill?: ColumnFillStyleType;
-    columnGap?: "normal" | SingleGap_StyleType;
+    columnGap?: "normal" | SingleGapStyleType;
     columnRule?: ColumnRuleStyleType;
     columnRuleColor?: ColorTypes.Color_StyleType;
     columnRuleStyle?: BorderSideStyle_StyleType;
     columnRuleWidth?: BorderSideWidth_StyleType;
     columnSpan?: ColumnSpanStyleType;
-    columnWidth?: UtilTypes.SingleLength_StyleType;
+    columnWidth?: UtilTypes.Length_StyleType;
     columns?: ColumnsStyleType;
-    content?: string;
+    content?: StyleType;
     counterIncrement?: StyleType;
     counterReset?: StyleType;
-    cssFloat?: FloatStyleType;
-    cssText?: string;
+    // cssFloat?: FloatStyleType;
+    // cssText?: StyleType;
 	cursor?: CursorStyleType;
 	
     direction?: DirectionStyleType;
@@ -589,41 +852,42 @@ export type PureStyleset =
     dominantBaseline?: DominantBaselineStyleType;
 
     emptyCells?: EmptyCellsStyleType;
-	enableBackground?: string;
+	enableBackground?: StyleType;
 	
     fill?: StyleType;
     fillOpacity?: StyleType;
     fillRule?: FillRuleStyleType;
-    filter?: string;
+    filter?: StyleType;
     flex?: FlexStyleType;
     flexBasis?: FlexBasisStyleType;
     flexDirection?: FlexDirectionStyleType;
     flexFlow?: FlexFlowStyleType;
-    flexGrow?: UtilTypes.SingleNumber_StyleType;
-    flexShrink?: UtilTypes.SingleNumber_StyleType;
+    flexGrow?: UtilTypes.Number_StyleType;
+    flexShrink?: UtilTypes.Number_StyleType;
     flexWrap?: FlexWrapStyleType;
+    float?: FloatStyleType;
     floodColor?: ColorTypes.Color_StyleType;
-    floodOpacity?: string;
-    font?: string;
-    fontFamily?: string;
-    fontFeatureSettings?: string;
-    fontKerning?: string;
-    fontSize?: string;
-    fontSizeAdjust?: string;
-    fontStretch?: string;
+    floodOpacity?: StyleType;
+    font?: StyleType;
+    fontFamily?: StyleType;
+    fontFeatureSettings?: StyleType;
+    fontKerning?: FontKerningStyleType;
+    fontSize?: StyleType;
+    fontSizeAdjust?: StyleType;
+    fontStretch?: StyleType;
     fontStyle?: FontStyleStyleType;
-    fontSynthesis?: string;
-    fontVariant?: string;
-    fontVariantCaps?: string;
-    fontVariantEastAsian?: string;
-    fontVariantLigatures?: string;
-    fontVariantNumeric?: string;
-    fontVariantPosition?: string;
+    fontSynthesis?: StyleType;
+    fontVariant?: StyleType;
+    fontVariantCaps?: StyleType;
+    fontVariantEastAsian?: StyleType;
+    fontVariantLigatures?: StyleType;
+    fontVariantNumeric?: StyleType;
+    fontVariantPosition?: StyleType;
 	fontWeight?: FontWeightStyleType;
 	
-    gap?: Gap_StyleType;
+    gap?: GapStyleType;
     glyphOrientationHorizontal?: StyleType;
-    glyphOrientationVertical?: string;
+    glyphOrientationVertical?: StyleType;
     grid?: StyleType;
     gridArea?: StyleType;
     gridAutoColumns?: StyleType;
@@ -631,71 +895,71 @@ export type PureStyleset =
     gridAutoRows?: StyleType;
     gridColumn?: StyleType;
     gridColumnEnd?: StyleType;
-    gridColumnGap?: SingleGap_StyleType;
+    gridColumnGap?: SingleGapStyleType;
     gridColumnStart?: StyleType;
-    gridGap?: string;
+    gridGap?: StyleType;
     gridRow?: StyleType;
     gridRowEnd?: StyleType;
-    gridRowGap?: SingleGap_StyleType;
+    gridRowGap?: SingleGapStyleType;
     gridRowStart?: StyleType;
     gridTemplate?: StyleType;
     gridTemplateAreas?: StyleType;
     gridTemplateColumns?: StyleType;
 	gridTemplateRows?: StyleType;
 	
-    height?: UtilTypes.SingleLength_StyleType;
-	hyphens?: string;
+    height?: UtilTypes.Length_StyleType;
+	hyphens?: HyphensStyleType;
 	
-    imageOrientation?: string;
-    imageRendering?: string;
+    imageOrientation?: StyleType;
+    imageRendering?: ImageRenderingStyleType;
 	imeMode?: StyleType;
 	
-    justifyContent?: string;
-    justifyItems?: string;
-	justifySelf?: string;
+    justifyContent?: JustifyContentStyleType;
+    justifyItems?: JustifyItemsStyleType;
+	justifySelf?: JustifySelfStyleType;
 	
-	kerning?: StyleType;
+	kerning?: FontKerningStyleType;
 	
     layoutGrid?: StyleType;
     layoutGridChar?: StyleType;
     layoutGridLine?: StyleType;
     layoutGridMode?: StyleType;
     layoutGridType?: StyleType;
-    left?: UtilTypes.SingleLength_StyleType;
-    letterSpacing?: string;
+    left?: UtilTypes.Length_StyleType;
+    letterSpacing?: LetterSpacingStyleType;
     lightingColor?: ColorTypes.Color_StyleType;
-    lineBreak?: string;
-    lineHeight?: StyleType;
-    listStyle?: StyleType;
+    lineBreak?: LineBreakStyleType;
+    lineHeight?: LineHeightStyleType;
+    listStyle?: ListStyleStyleType;
     listStyleImage?: StyleType;
-    listStylePosition?: StyleType;
-	listStyleType?: StyleType;
+    listStylePosition?: ListStylePositionStyleType;
+	listStyleType?: ListStyleTypeStyleType;
 	
-    margin?: StyleType;
-    marginBottom?: StyleType;
-    marginLeft?: StyleType;
-    marginRight?: StyleType;
-    marginTop?: StyleType;
+    margin?: MarginStyleType;
+    marginBottom?: UtilTypes.Length_StyleType;
+    marginLeft?: UtilTypes.Length_StyleType;
+    marginRight?: UtilTypes.Length_StyleType;
+    marginTop?: UtilTypes.Length_StyleType;
     marker?: StyleType;
     markerEnd?: StyleType;
     markerMid?: StyleType;
     markerStart?: StyleType;
-    mask?: string;
-    maskComposite?: string;
-    maskImage?: string;
-    maskPosition?: string;
-    maskRepeat?: string;
-    maskSize?: string;
-    maskType?: string;
-    maxHeight?: StyleType;
-    maxWidth?: StyleType;
-    minHeight?: StyleType;
-	minWidth?: StyleType;
+    mask?: StyleType;
+    maskComposite?: StyleType;
+    maskImage?: StyleType;
+    maskPosition?: StyleType;
+    maskRepeat?: StyleType;
+    maskSize?: StyleType;
+    maskType?: StyleType;
+    maxHeight?: UtilTypes.Length_StyleType;
+    maxWidth?: UtilTypes.Length_StyleType;
+    minHeight?: UtilTypes.Length_StyleType;
+	minWidth?: UtilTypes.Length_StyleType;
 	
     msContentZoomChaining?: StyleType;
     msContentZoomLimit?: StyleType;
-    msContentZoomLimitMax?: any;
-    msContentZoomLimitMin?: any;
+    msContentZoomLimitMax?: StyleType;
+    msContentZoomLimitMin?: StyleType;
     msContentZoomSnap?: StyleType;
     msContentZoomSnapPoints?: StyleType;
     msContentZoomSnapType?: StyleType;
@@ -703,27 +967,27 @@ export type PureStyleset =
     msFlowFrom?: StyleType;
     msFlowInto?: StyleType;
     msFontFeatureSettings?: StyleType;
-    msGridColumn?: any;
+    msGridColumn?: StyleType;
     msGridColumnAlign?: StyleType;
-    msGridColumnSpan?: any;
+    msGridColumnSpan?: StyleType;
     msGridColumns?: StyleType;
-    msGridRow?: any;
+    msGridRow?: StyleType;
     msGridRowAlign?: StyleType;
-    msGridRowSpan?: any;
+    msGridRowSpan?: StyleType;
     msGridRows?: StyleType;
     msHighContrastAdjust?: StyleType;
     msHyphenateLimitChars?: StyleType;
-    msHyphenateLimitLines?: any;
-    msHyphenateLimitZone?: any;
+    msHyphenateLimitLines?: StyleType;
+    msHyphenateLimitZone?: StyleType;
     msHyphens?: StyleType;
     msImeAlign?: StyleType;
     msOverflowStyle?: StyleType;
     msScrollChaining?: StyleType;
     msScrollLimit?: StyleType;
-    msScrollLimitXMax?: any;
-    msScrollLimitXMin?: any;
-    msScrollLimitYMax?: any;
-    msScrollLimitYMin?: any;
+    msScrollLimitXMax?: StyleType;
+    msScrollLimitXMin?: StyleType;
+    msScrollLimitYMax?: StyleType;
+    msScrollLimitYMin?: StyleType;
     msScrollRails?: StyleType;
     msScrollSnapPointsX?: StyleType;
     msScrollSnapPointsY?: StyleType;
@@ -732,61 +996,63 @@ export type PureStyleset =
     msScrollSnapY?: StyleType;
     msScrollTranslation?: StyleType;
     msTextCombineHorizontal?: StyleType;
-    msTextSizeAdjust?: any;
+    msTextSizeAdjust?: StyleType;
     msTouchAction?: StyleType;
     msTouchSelect?: StyleType;
     msUserSelect?: StyleType;
-    msWrapFlow?: string;
-    msWrapMargin?: any;
-	msWrapThrough?: string;
+    msWrapFlow?: StyleType;
+    msWrapMargin?: StyleType;
+	msWrapThrough?: StyleType;
 	
-    objectFit?: string;
-    objectPosition?: string;
-    opacity?: StyleType;
-    order?: StyleType;
-    orphans?: number | UtilTypes.Base_StyleType;
-    outline?: string;
+    objectFit?: ObjectFitStyleType;
+    objectPosition?: UtilTypes.Position_StyleType;
+    opacity?: UtilTypes.Number_StyleType;
+    order?: UtilTypes.Number_StyleType;
+    orphans?: UtilTypes.Number_StyleType;
+    outline?: BorderSide_StyleType;
     outlineColor?: ColorTypes.Color_StyleType;
-    outlineOffset?: string;
-    outlineStyle?: string;
-    outlineWidth?: string;
-    overflow?: string;
-    overflowAnchor?: string;
-    overflowWrap?: string;
-    overflowX?: string;
-	overflowY?: string;
+    outlineOffset?: UtilTypes.Length_StyleType;
+    outlineStyle?: BorderStyleStyleType;
+    outlineWidth?: BorderSideWidth_StyleType;
+    overflow?: OverflowStyleType;
+    overflowAnchor?: OverflowAnchorStyleType;
+    overflowWrap?: OverflowWrapStyleType;
+    overflowX?: SingleOverflowStyleType;
+	overflowY?: SingleOverflowStyleType;
+	overflowInline?: SingleOverflowStyleType;
+    overflowBlock?: SingleOverflowStyleType;
 	
-    padding?: StyleType;
-    paddingBottom?: StyleType;
-    paddingLeft?: StyleType;
-    paddingRight?: StyleType;
-    paddingTop?: StyleType;
+    padding?: PaddingStyleType;
+    paddingBottom?: UtilTypes.Length_StyleType;
+    paddingLeft?: UtilTypes.Length_StyleType;
+    paddingRight?: UtilTypes.Length_StyleType;
+    paddingTop?: UtilTypes.Length_StyleType;
     pageBreakAfter?: BreakAfterStyleType;
     pageBreakBefore?: BreakBeforeStyleType;
     pageBreakInside?: BreakInsideStyleType;
     penAction?: StyleType;
-    perspective?: StyleType;
-    perspectiveOrigin?: StyleType;
-    placeContent?: string;
-    placeItems?: string;
-    placeSelf?: string;
-    pointerEvents?: StyleType;
-	position?: StyleType;
+    perspective?: UtilTypes.Length_StyleType;
+    perspectiveOrigin?: UtilTypes.Position_StyleType;
+    placeContent?: PlaceContentStyleType;
+    placeItems?: PlaceItemsStyleType;
+    placeSelf?: PlaceSelfStyleType;
+    pointerEvents?: PointerEventsStyleType;
+	position?: PositionStyleType;
 	
 	quotes?: StyleType;
 	
-    resize?: string;
-    right?: UtilTypes.SingleLength_StyleType;
+    resize?: ResizeStyleType;
+    right?: UtilTypes.Length_StyleType;
     rotate?: StyleType;
-    rowGap?: SingleGap_StyleType;
+    rowGap?: SingleGapStyleType;
     rubyAlign?: StyleType;
     rubyOverhang?: StyleType;
 	rubyPosition?: StyleType;
 	
     scale?: StyleType;
-    scrollBehavior?: string;
-    stopColor?: StyleType;
-    stopOpacity?: StyleType;
+    scrollBehavior?: ScrollBehaviorStyleType;
+    stopColor?: ColorTypes.Color_StyleType;
+    stopOpacity?: StopOpacityStyleType;
     stroke?: StyleType;
     strokeDasharray?: StyleType;
     strokeDashoffset?: StyleType;
@@ -796,44 +1062,45 @@ export type PureStyleset =
     strokeOpacity?: StyleType;
 	strokeWidth?: StyleType;
 	
-    tabSize?: string;
-    tableLayout?: StyleType;
-    textAlign?: string;
-    textAlignLast?: string;
-    textAnchor?: StyleType;
-    textCombineUpright?: string;
-    textDecoration?: string;
+    tabSize?: UtilTypes.Length_StyleType;
+    tableLayout?: TableLayoutStyleType;
+    textAlign?: TextAlignStyleType;
+    textAlignLast?: TextAlignLastStyleType;
+    textAnchor?: TextAnchorStyleType;
+    textCombineUpright?: StyleType;
+    textDecoration?: StyleType;
     textDecorationColor?: ColorTypes.Color_StyleType;
-    textDecorationLine?: string;
-    textDecorationStyle?: string;
-    textEmphasis?: string;
+    textDecorationLine?: TextDecorationLineStyleType;
+    textDecorationStyle?: TextDecorationStyleStyleType;
+    textDecorationThickness?: TextDecorationThicknessStyleType;
+    textEmphasis?: StyleType;
     textEmphasisColor?: ColorTypes.Color_StyleType;
-    textEmphasisPosition?: string;
-    textEmphasisStyle?: string;
-    textIndent?: string;
-    textJustify?: string;
+    textEmphasisPosition?: TextEmphasisPositionStyleType;
+    textEmphasisStyle?: TextEmphasisStyleStyleType;
+    textIndent?: TextIndentStyleType;
+    textJustify?: TextJustifyStyleType;
     textKashida?: StyleType;
     textKashidaSpace?: StyleType;
-    textOrientation?: string;
-    textOverflow?: string;
-    textShadow?: string;
-    textTransform?: string;
-    textUnderlinePosition?: string;
-    top?: UtilTypes.SingleLength_StyleType;
-    touchAction?: string;
-    transform?: string;
-    transformBox?: string;
-    transformOrigin?: string;
+    textOrientation?: TextOrientationStyleType;
+    textOverflow?: TextOverflowStyleType;
+    textShadow?: StyleType;
+    textTransform?: TextTransformStyleType;
+    textUnderlinePosition?: TextUnderlinePositionStyleType;
+    top?: UtilTypes.Length_StyleType;
+    touchAction?: TouchActionStyleType;
+    transform?: StyleType;
+    transformBox?: StyleType;
+    transformOrigin?: StyleType;
     transformStyle?: StyleType;
-    transition?: string;
-    transitionDelay?: string;
-    transitionDuration?: string;
-    transitionProperty?: string;
-    transitionTimingFunction?: string;
-	translate?: StyleType;
+    transition?: StyleType;
+    transitionDelay?: StyleType;
+    transitionDuration?: StyleType;
+    transitionProperty?: StyleType;
+    transitionTimingFunction?: StyleType;
+	translate?: TranslateStyleType;
 	
-    unicodeBidi?: string;
-	userSelect?: string;
+    unicodeBidi?: UnicodeBidiStyleType;
+	userSelect?: UserSelectStyleType;
 	
     verticalAlign?: StyleType;
 	visibility?: StyleType;
@@ -845,31 +1112,31 @@ export type PureStyleset =
     webkitColumnBreakBefore?: StyleType;
     webkitColumnBreakInside?: StyleType;
     webkitColumnCount?: ColumnCountStyleType;
-    webkitColumnGap?: SingleGap_StyleType;
+    webkitColumnGap?: SingleGapStyleType;
     webkitColumnRule?: ColumnRuleStyleType;
     webkitColumnRuleColor?: ColorTypes.Color_StyleType;
     webkitColumnRuleStyle?: ColumnRuleStyleType;
     webkitColumnRuleWidth?: BorderWidthStyleType;
     webkitColumnSpan?: StyleType;
-    webkitColumnWidth?: any;
+    webkitColumnWidth?: StyleType;
     webkitColumns?: StyleType;
-    webkitLineClamp?: string;
+    webkitLineClamp?: StyleType;
     webkitTapHighlightColor?: StyleType;
     webkitUserModify?: StyleType;
     webkitUserSelect?: StyleType;
 	webkitWritingMode?: StyleType;
 	
-    whiteSpace?: string;
-    widows?: number | UtilTypes.Base_StyleType;
-    width?: UtilTypes.SingleLength_StyleType;
-    willChange?: string;
-    wordBreak?: string;
-    wordSpacing?: string;
-    wordWrap?: string;
-	writingMode?: string;
+    whiteSpace?: WhiteSpaceStyleType;
+    widows?: WidowsStyleType;
+    width?: UtilTypes.Length_StyleType;
+    willChange?: StyleType;
+    wordBreak?: WordBreakStyleType;
+    wordSpacing?: WordSpacingStyleType;
+    wordWrap?: StyleType;
+	writingMode?: WritingModeStyleType;
 	
-    zIndex?: "auto" | number | UtilTypes.Base_StyleType;
-    zoom?: StyleType;
+    zIndex?: ZIndexStyleType;
+    zoom?: ZoomStylePrivet;
 }
 
 
@@ -882,7 +1149,7 @@ import {ICustomVal} from "../api/rules";
 export type Styleset = PureStyleset &
     {
         /**
-         * Special property is an array that contains several definitions of custom CSS properties.
+         * Special property is an array that contains definitions of custom CSS properties.
          * Each property is defined by an ICustomIVal object.
          * This can be used as in the following example:
          * ```typescript
@@ -892,10 +1159,6 @@ export type Styleset = PureStyleset &
          *         tsh.custom( MyStyles.varRules.mainSelectionColor, "blue")
          *     ]
          * ```
-         * The first declaration (mainColor) uses a simple string value. The second declaration
-         * (mainBgColor) uses the `tsh.custom` method that provides string typing by specifying
-         * one of Styleset properties and ensuring that only valid values for this property could
-         * be specified.
          */
         $custom?: ICustomVal[];
     }
