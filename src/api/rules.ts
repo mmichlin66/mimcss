@@ -43,6 +43,34 @@ export type ExtendedStyleset =
 
 
 /**
+ * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
+ * class is also an ancestor for StyleScope; however, most of its the fields are undefined in
+ * te StyleScope instances.
+ */
+export const enum RuleType
+{
+    TAG = 1,
+    CLASS,
+    ID,
+    SELECTOR,
+    ANIMATION,
+    KEYFRAME,
+    SUPPORTS,
+    MEDIA,
+    FONTFACE,
+    IMPORT,
+    NAMESPACE,
+    PAGE,
+    VIEWPORT,
+
+	// not real rules but derive from Rule object
+    VAR = 50,
+    SCOPE = 51,
+}
+
+
+
+/**
  * The IRule interface is a base interface that is implemented by all rules. Its only purpose is to
  * provide the reference to the style scope that owns it.
  */
@@ -53,8 +81,8 @@ export interface IRule
 	 */
 	readonly ruleName: string;
 
-	/** Only needed to distinguish from other types */
-	readonly isRule: boolean;
+	/** Type of the rule */
+	readonly type: RuleType;
 }
 
 
@@ -219,7 +247,7 @@ export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRu
  */
 export interface ICustomVarRule<T = any> extends IRule
 {
-	/** Map of custom property names */
+	/** Map of custom property names to property definitions */
 	readonly vars: PropsOfType<T,ICustomVar>;
 
 	/** Only needed to distinguish from other types */
@@ -272,53 +300,20 @@ export type UnnamedRule = ITagRule | ISelectorRule | IGroupRule;
  */
 export interface IRuleContainer<T = any>
 {
-	/** Class that defined this style scope. This member is used for style scope derivation. */
-	readonly RuleDefinitionClass: IRuleDefinitionClass<T>;
-
-	/** Names of all named rules. */
-	readonly allNames: NamesOfPropsOfType<T,NamedRule>;
-
 	/** Names of classes. */
-	readonly classNames: NamesOfPropsOfType<T,IClassRule>;
+	readonly classes: NamesOfPropsOfType<T,IClassRule>;
 
 	/** Names of element identifiers. */
-	readonly idNames: NamesOfPropsOfType<T,IIDRule>;
+	readonly ids: NamesOfPropsOfType<T,IIDRule>;
 
 	/** Names of animations. */
-	readonly animationNames: NamesOfPropsOfType<T,IAnimationRule>;
+	readonly animations: NamesOfPropsOfType<T,IAnimationRule>;
 
 	/** Names of custom CSS properties */
-	readonly varNames: NamesOfPropsOfType<T,ICustomVar>;
+	readonly vars: NamesOfPropsOfType<T,ICustomVar>;
 
-	/** List of all rules. */
-	readonly allRules: IRule[];
-
-	/** Map of all named rules. */
-	readonly namedRules: PropsOfType<T,NamedRule>;
-
-	/** List of all unnamed rules. */
-	readonly unnamedRules: UnnamedRule[];
-
-	/** Map of all style (tag, class, ID and selector) rules. */
-	readonly styleRules: PropsOfType<T,IStyleRule>;
-
-	/** Map of all tag rules. */
-	readonly tagRules: PropsOfType<T,ITagRule>;
-
-	/** Map of all class rules. */
-	readonly classRules: PropsOfType<T,IClassRule>;
-
-	/** Map of all ID rules. */
-	readonly idRules: PropsOfType<T,IIDRule>;
-
-	/** Map of all selector rules. */
-	readonly selectorRules: PropsOfType<T,ISelectorRule>;
-
-	/** Map of all animation rules. */
-	readonly animationRules: PropsOfType<T,IAnimationRule>;
-
-	/** Map of all support rules. */
-	readonly supportRules: PropsOfType<T,ISupportRule>;
+	/** Map of all rules that have assigned name. */
+	readonly rules: PropsOfType<T,IRule>;
 
 	/** Rule that combines all custom variables defined in this container. */
 	readonly customVarRule: ICustomVarRule<T>;
@@ -333,7 +328,7 @@ export type RuleDefinitionOptions =
 {
 	/**
 	 * Optional method within which rule definition classes can create rules not assigned
-	 * to a member property. These rules cannot be those that require name, such as class, ID,
+	 * to a member property. These rules cannot be those that require names, such as class, ID,
 	 * animation or custom CSS property.
 	 */
 	unnamedRules?: UnnamedRule[];

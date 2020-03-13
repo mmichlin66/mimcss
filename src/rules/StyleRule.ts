@@ -1,4 +1,4 @@
-import {IStyleRule, ExtendedStyleset} from "../api/rules";
+import {IStyleRule, ExtendedStyleset, RuleType} from "../api/rules";
 import {Styleset} from "../styles/StyleTypes"
 import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule";
@@ -10,9 +10,9 @@ import {Rule} from "./Rule";
  */
 export abstract class StyleRule extends Rule implements IStyleRule
 {
-	public constructor( styleset?: ExtendedStyleset)
+	public constructor( type: RuleType, styleset?: ExtendedStyleset)
 	{
-		super();
+		super( type);
 
 		this.styleset = {};
 		this.parents = [];

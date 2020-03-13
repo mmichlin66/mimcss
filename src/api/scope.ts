@@ -40,14 +40,14 @@ export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
  */
 export interface IStyleScope<T = any> extends IRuleContainer<T>
 {
-	/**
-	 * Class that defined this style scope. This member is used for style scope derivation:
-	 * ```typescript
-	 * let scope1 = $scope( class {...});
-	 * let scope2 = $scope( class extends scope1.Definition {...});
-	 * ```
-	 */
-	readonly Definition: IStyleScopeDefinitionClass<T>;
+	// /**
+	//  * Class that defined this style scope. This member is used for style scope derivation:
+	//  * ```typescript
+	//  * let scope1 = $scope( class {...});
+	//  * let scope2 = $scope( class extends scope1.Definition {...});
+	//  * ```
+	//  */
+	// readonly Definition: IStyleScopeDefinitionClass<T>;
 }
 
 

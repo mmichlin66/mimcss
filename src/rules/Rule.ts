@@ -1,4 +1,4 @@
-import {IRule} from "../api/rules"
+import {IRule, RuleType} from "../api/rules"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -10,6 +10,13 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export abstract class Rule implements IRule
 {
+	constructor( type: RuleType)
+	{
+		this.type = type;
+	}
+
+
+
 	// Processes the rule.
 	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
@@ -39,8 +46,8 @@ export abstract class Rule implements IRule
 
 
 
-	/** Only needed to distinguish from other types */
-	public get isRule(): boolean { return true; }
+	/** Type of the rule */
+	public readonly type: RuleType;
 
 	// Rule container to which this rule belongs. This is "this" for StyleScope.
 	public container: RuleContainer;

@@ -1,4 +1,4 @@
-import {ISelectorRule, ExtendedStyleset} from "../api/rules"
+import {ISelectorRule, ExtendedStyleset, RuleType} from "../api/rules"
 import {ISelector} from "../api/Selector"
 import {StyleRule} from "./StyleRule"
 import {Selector} from "../api/Selector";
@@ -13,7 +13,7 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 {
 	public constructor( selector?: ISelector | string, styleset?: ExtendedStyleset)
 	{
-		super( styleset);
+		super( RuleType.SELECTOR, styleset);
 
 		if (selector)
 			this.selector = typeof selector === "string" ? new Selector( selector) : selector;

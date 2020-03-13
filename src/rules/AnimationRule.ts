@@ -1,4 +1,4 @@
-import {IAnimationRule, Keyframe} from "../api/rules"
+import {IAnimationRule, Keyframe, RuleType} from "../api/rules"
 import {tsh} from "../api/tsh"
 import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule"
@@ -14,7 +14,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 {
 	public constructor( keyframes?: Keyframe[])
 	{
-		super();
+		super( RuleType.ANIMATION);
 
 		if (keyframes)
 			this.keyframeRules = keyframes.map( (keyframe) => new KeyframeRule( keyframe));
@@ -103,7 +103,7 @@ class KeyframeRule extends StyleRule
 {
 	public constructor( keyframe?: Keyframe)
 	{
-		super( keyframe ? keyframe[1] : undefined);
+		super( RuleType.KEYFRAME, keyframe ? keyframe[1] : undefined);
 
 		if (keyframe)
 			this.waypointString = this.parseWaypoint( keyframe[0]);

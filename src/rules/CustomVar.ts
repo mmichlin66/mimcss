@@ -1,4 +1,4 @@
-import {ICustomVar} from "../api/rules"
+import {ICustomVar, RuleType} from "../api/rules"
 import {PureStyleset, Styleset} from "../styles/StyleTypes"
 import {tsh} from "../api/tsh"
 import {Rule} from "./Rule";
@@ -13,7 +13,8 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 {
 	public constructor( templatePropName?: K, varValue?: PureStyleset[K])
 	{
-		super();
+		super( RuleType.VAR);
+
 		this.templatePropName = templatePropName;
 		this.varValue = varValue;
 	}

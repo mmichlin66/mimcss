@@ -1,4 +1,4 @@
-import {IMediaRule, IRuleDefinitionClass} from "../api/rules"
+import {IMediaRule, IRuleDefinitionClass, RuleType} from "../api/rules"
 import {GroupRule} from "./GroupRule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
@@ -12,7 +12,7 @@ export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 {
 	public constructor( query?: string | MediaQuery, definitionClass?: IRuleDefinitionClass<T>)
 	{
-		super( definitionClass);
+		super( RuleType.MEDIA, definitionClass);
 
 		this.query = query;
 	}

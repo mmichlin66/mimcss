@@ -1,4 +1,5 @@
 import {IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
+import {RuleType} from "../api/rules"
 import {Rule} from "./Rule"
 import {TssManager} from "./TssManager"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
@@ -12,8 +13,9 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 {
 	public constructor( defClass: IStyleScopeDefinitionClass<T>)
 	{
-		super( defClass)
-		this.Definition = defClass;
+		super( RuleType.SCOPE, defClass)
+
+		this.definitionClass = defClass;
 	}
 
 
@@ -43,12 +45,12 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 		// object itself
 		super.process( this, this, null);
 
-		this.isMultiplex = !!this.Definition.isMultiplex;
+		this.isMultiplex = !!this.definitionClass.isMultiplex;
 
 		// in DEBUG, each class has a name unless it was created as an anonymous class. In RELEASE,
 		// (as well as in the anonymous cases), the name is undefined and we generate a unique
 		// name for the style scope.
-		this.name = this.Definition.name;
+		this.name = this.definitionClass.name;
 		if (!this.name)
 			this.name = TssManager.generateUniqueName( "s");
 
@@ -121,7 +123,7 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 
 
 	// Class that defined this style scope. This member is used for style scope derivation
-	public readonly Definition: IStyleScopeDefinitionClass<T>;
+	protected readonly definitionClass: IStyleScopeDefinitionClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;

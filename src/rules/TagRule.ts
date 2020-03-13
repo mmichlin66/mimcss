@@ -1,4 +1,4 @@
-import {ITagRule, ExtendedStyleset} from "../api/rules"
+import {ITagRule, ExtendedStyleset, RuleType} from "../api/rules"
 import {StyleRule} from "./StyleRule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
@@ -11,7 +11,7 @@ export class TagRule extends StyleRule implements ITagRule
 {
 	public constructor( tagName?: string, styleset?: ExtendedStyleset)
 	{
-		super( styleset);
+		super( RuleType.TAG, styleset);
 		this.tagName = tagName;
 	}
 

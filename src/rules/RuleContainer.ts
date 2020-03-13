@@ -1,15 +1,12 @@
-import {NamesOfPropsOfType, PropsOfType, IRule, IStyleRule, ITagRule, IClassRule, IIDRule,
-		ISelectorRule, IAnimationRule, ICustomVar, ICustomVarRule, NamedRule, UnnamedRule,
-		RuleDefinitionOptions, IRuleDefinitionClass, IRuleContainer, ISupportRule} from "../api/rules"
+import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, ICustomVar,
+		ICustomVarRule, NamedRule, UnnamedRule,
+		RuleDefinitionOptions, IRuleDefinitionClass, IRuleContainer
+		} from "../api/rules"
 import {Rule} from "./Rule"
-import {StyleRule} from "./StyleRule"
-import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
-import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {CustomVar} from "./CustomVar"
-import {SupportRule} from "./SupportRule"
 
 
 
@@ -30,58 +27,34 @@ export interface IRuleContainerOwner
  */
 export abstract class RuleContainer<T = any> extends Rule implements IRuleContainer
 {
-	public constructor( definitionClass: IRuleDefinitionClass<T>)
+	public constructor( type: number, definitionClass: IRuleDefinitionClass<T>)
 	{
-		super();
-		this.RuleDefinitionClass = definitionClass;
+		super( type);
+		this.definitionClass = definitionClass;
 	}
 
 
 
-	/** Names of all named rules defined in the style sheet */
-	public get allNames(): NamesOfPropsOfType<T,NamedRule> { this.activate(); return this._allNames as NamesOfPropsOfType<T,NamedRule> }
+	// /** Names of all named rules defined in the style sheet */
+	// public get allNames(): NamesOfPropsOfType<T,NamedRule> { this.activate(); return this._allNames as NamesOfPropsOfType<T,NamedRule> }
 
 	/** Names of classes defined in the style sheet */
-	public get classNames(): NamesOfPropsOfType<T,IClassRule> { this.activate(); return this._classNames as NamesOfPropsOfType<T,IClassRule> }
+	public get classes(): NamesOfPropsOfType<T,IClassRule> { this.activate(); return this._classes as NamesOfPropsOfType<T,IClassRule> }
 
 	/** Names of classes defined in the style sheet */
-	public get idNames(): NamesOfPropsOfType<T,IIDRule> { this.activate(); return this._idNames as NamesOfPropsOfType<T,IIDRule>; }
+	public get ids(): NamesOfPropsOfType<T,IIDRule> { this.activate(); return this._ids as NamesOfPropsOfType<T,IIDRule>; }
 
 	/** Names of keyframes defined in the style sheet */
-	public get animationNames(): NamesOfPropsOfType<T,IAnimationRule> { this.activate(); return this._animationNames as NamesOfPropsOfType<T,IAnimationRule>; }
+	public get animations(): NamesOfPropsOfType<T,IAnimationRule> { this.activate(); return this._animations as NamesOfPropsOfType<T,IAnimationRule>; }
 
 	/** Names of custom CSS properties defined in the style scope */
-	public get varNames(): NamesOfPropsOfType<T,ICustomVar> { this.activate(); return this._varNames as NamesOfPropsOfType<T,ICustomVar>; }
-
-	/** Map of all rules. */
-	public get allRules(): IRule[] { this.activate(); return this._allRules as IRule[]; }
-
-	/** Map of all rules. */
-	public get namedRules(): PropsOfType<T,NamedRule> { this.activate(); return this._namedRules as PropsOfType<T,NamedRule>; }
-
-	/** Map of all rules. */
-	public get unnamedRules(): UnnamedRule[] { this.activate(); return this._unnamedRules as any as UnnamedRule[]; }
-
-	/** Map of all style (tag, class, ID and selector) rules. */
-	public get styleRules(): PropsOfType<T,IStyleRule> { this.activate(); return this._styleRules as PropsOfType<T,IStyleRule>; }
+	public get vars(): NamesOfPropsOfType<T,ICustomVar> { this.activate(); return this._vars as NamesOfPropsOfType<T,ICustomVar>; }
 
 	/** Map of all tag rules. */
-	public get tagRules(): PropsOfType<T,ITagRule> { this.activate(); return this._tagRules as PropsOfType<T,ITagRule>; }
+	public get rules(): PropsOfType<T,IRule> { this.activate(); return this._rules as PropsOfType<T,IRule>; }
 
-	/** Map of all class rules. */
-	public get classRules(): PropsOfType<T,IClassRule> { this.activate(); return this._classRules as PropsOfType<T,IClassRule>; }
-
-	/** Map of all ID rules. */
-	public get idRules(): PropsOfType<T,IIDRule> { this.activate(); return this._idRules as PropsOfType<T,IIDRule>; }
-
-	/** Map of all selector rules. */
-	public get selectorRules(): PropsOfType<T,ISelectorRule> { this.activate(); return this._selectorRules as PropsOfType<T,ISelectorRule>; }
-
-	/** Map of all animation rules. */
-	public get animationRules(): PropsOfType<T,IAnimationRule> { this.activate(); return this._animationRules as PropsOfType<T,IAnimationRule>; }
-
-	/** Map of all support rules. */
-	public get supportRules(): PropsOfType<T,ISupportRule> { this.activate(); return this._supportRules as PropsOfType<T,ISupportRule>; }
+	// /** Map of all rules. */
+	// public get allRules(): IRule[] { this.activate(); return this._allRules as IRule[]; }
 
  	/** The ":root" block with CSS custom property definitions. */
 	public get customVarRule(): ICustomVarRule { this.activate(); return this._customVarRule; }
@@ -102,27 +75,18 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 			return;
 
 		this._allNames = {};
-		this._classNames = {};
-		this._idNames = {};
-		this._animationNames = {};
-		this._varNames = {};
+		this._classes = {};
+		this._ids = {};
+		this._animations = {};
+		this._vars = {};
 
+		this._rules = {};
 		this._allRules = [];
-		this._namedRules = {};
-		this._unnamedRules = []
-		this._styleRules = {};
-		this._tagRules = {};
-		this._classRules = {};
-		this._idRules = {};
-		this._selectorRules = {};
-		this._animationRules = {};
-		this._supportRules = {};
 
 		// create our internal rule for custom CSS properties
 		this._customVarRule = new CustomVarRule<T>();
 		this._customVarRule.process( this, this.owner, null)
 		this._allRules.push( this._customVarRule);
-		this._unnamedRules.push( this._customVarRule);
 
 		// create instance of the rules definition class and then go over its properties,
 		// which define CSS rules.
@@ -132,11 +96,11 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 		{
 			// create instance of the style scope definition class and then go over its properties,
 			// which define CSS rules.
-			rulesDef = new this.RuleDefinitionClass( options);
+			rulesDef = new this.definitionClass( options);
 		}
 		catch( err)
 		{
-			console.error( `Error instantiating Group Rule Definition of type '${this.RuleDefinitionClass.name}'`);
+			console.error( `Error instantiating Group Rule Definition of type '${this.definitionClass.name}'`);
 			return;
 		}
 
@@ -172,48 +136,29 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 			if (rule.isRealCssRule)
 			{
+				this._rules[ruleName] = rule;
 				this._allRules.push( rule);
-				this._namedRules[ruleName] = rule;
 			}
 
-			if (rule instanceof TagRule)
+			if (rule instanceof ClassRule)
 			{
-				this._styleRules[ruleName] = rule;
-				this._tagRules[ruleName] = rule;
-			}
-			else if (rule instanceof ClassRule)
-			{
-				this._styleRules[ruleName] = rule;
-				this._classRules[ruleName] = rule;
 				this._allNames[ruleName] = rule.className;
-				this._classNames[ruleName] = rule.className;
+				this._classes[ruleName] = rule.className;
 			}
 			else if (rule instanceof IDRule)
 			{
-				this._styleRules[ruleName] = rule;
-				this._idRules[ruleName] = rule;
 				this._allNames[ruleName] = rule.idName;
-				this._idNames[ruleName] = rule.idName;
-			}
-			else if (rule instanceof SelectorRule)
-			{
-				this._styleRules[ruleName] = rule;
-				this._selectorRules[ruleName] = rule;
+				this._ids[ruleName] = rule.idName;
 			}
 			else if (rule instanceof AnimationRule)
 			{
 				this._allNames[ruleName] = rule.animationName;
-				this._animationNames[ruleName] = rule.animationName;
-				this._animationRules[ruleName] = rule;
-			}
-			else if (rule instanceof SupportRule)
-			{
-				this._supportRules[ruleName] = rule;
+				this._animations[ruleName] = rule.animationName;
 			}
 			else if (rule instanceof CustomVar)
 			{
 				this._allNames[ruleName] = rule.varName;
-				this._varNames[ruleName] = rule.varName;
+				this._vars[ruleName] = rule.varName;
 				this._customVarRule._vars[ruleName] = rule;
 			}
 		}
@@ -229,7 +174,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 			return;
 		else if (!Array.isArray(unnamedRules))
 		{
-			console.error( `createUnnamedRules method of Style Scope Definition of type '${this.RuleDefinitionClass.name}' must return array`);
+			console.error( `createUnnamedRules method of Style Scope Definition of type '${this.definitionClass.name}' must return array`);
 			return;
 		}
 
@@ -251,7 +196,6 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 			rule.process( this, this.owner, null);
 
 			this._allRules.push( rule);
-			this._unnamedRules.push( rule);
 		}
 	}
 
@@ -279,7 +223,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 
 	// Class that defined this style scope. This member is used for style scope derivation
-	public readonly RuleDefinitionClass: IRuleDefinitionClass<T>;
+	protected readonly definitionClass: IRuleDefinitionClass<T>;
 
 	// Names of all classes, IDs, animations and custom properties defined in this container.
 	protected _allNames: { [K: string]: string };
@@ -287,31 +231,19 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 	// Names of classes, IDs, animations and custom properties defined in this container. The
 	// keys are property names used in the rule definition; the values are the actual names
 	// that will be inserted into the actual style sheet.
-	protected _classNames: { [K: string]: string };
-	protected _idNames: { [K: string]: string };
-	protected _animationNames: { [K: string]: string };
-	protected _varNames: { [K: string]: string };
-
-	// List of all rules
-	public _allRules: Rule[];
-
-	// Map of all named rules
-	public _namedRules: { [K: string]: Rule };
-
-	// List of rules without names.
-	public _unnamedRules: Rule[];
+	protected _classes: { [K: string]: string };
+	protected _ids: { [K: string]: string };
+	protected _animations: { [K: string]: string };
+	protected _vars: { [K: string]: string };
 
 	// Map of names of properties of the rule definitions to the Rule objects.
-	protected _styleRules: { [K: string]: StyleRule };
-	protected _tagRules: { [K: string]: TagRule };
-	protected _classRules: { [K: string]: ClassRule };
-	protected _idRules: { [K: string]: IDRule };
-	protected _selectorRules: { [K: string]: SelectorRule };
-	protected _animationRules: { [K: string]: AnimationRule };
-	protected _supportRules: { [K: string]: SupportRule };
+	protected _rules: { [K: string]: IRule };
 
 	// Rule that combines all custom variables defined in this container.
 	protected _customVarRule: CustomVarRule;
+
+	// List of all rules
+	public _allRules: Rule[];
 }
 
 
@@ -321,6 +253,13 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
  */
 class CustomVarRule<T = any> extends Rule implements ICustomVarRule<T>
 {
+	constructor()
+	{
+		super( CSSRule.STYLE_RULE);
+	}
+
+
+
  	/** The ":root" block with CSS custom property definitions. */
 	public get vars(): PropsOfType<T,ICustomVar> { return this._vars as PropsOfType<T,ICustomVar>; }
 

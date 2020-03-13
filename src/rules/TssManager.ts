@@ -62,7 +62,7 @@ export class TssManager
 		// depending on whether the given scope is multiplex, we either create a new <style> element
 		// or reuse our "global" one
 		let styleSheet: CSSStyleSheet;
-		if (styleScope.Definition.isMultiplex)
+		if (styleScope.isMultiplex)
 		{
 			let styleElm = document.createElement( "style");
 			document.head.appendChild( styleElm);
@@ -84,7 +84,7 @@ export class TssManager
 	// Removes this style scope from DOM - only works for multiplex style scopes
 	public static deactivate( styleScope: StyleScope): void
 	{
-		if (!styleScope || !styleScope.Definition.isMultiplex)
+		if (!styleScope || !styleScope.isMultiplex)
 			return;
 
 		styleScope.clearDOMInfo();

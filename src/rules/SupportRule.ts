@@ -1,4 +1,4 @@
-import {ISupportRule, IRuleDefinitionClass} from "../api/rules"
+import {ISupportRule, IRuleDefinitionClass, RuleType} from "../api/rules"
 import {GroupRule} from "./GroupRule"
 
 
@@ -10,7 +10,7 @@ export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T
 {
 	public constructor( query?: string, definitionClass?: IRuleDefinitionClass<T>)
 	{
-		super( definitionClass);
+		super( RuleType.SUPPORTS, definitionClass);
 
 		this.query = query;
 	}

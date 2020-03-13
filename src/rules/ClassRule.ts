@@ -1,4 +1,4 @@
-import {IClassRule, ExtendedStyleset} from "../api/rules"
+import {IClassRule, ExtendedStyleset, RuleType} from "../api/rules"
 import {StyleRule} from "./StyleRule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
@@ -11,7 +11,7 @@ export class ClassRule extends StyleRule implements IClassRule
 {
 	public constructor( styleset?: ExtendedStyleset)
 	{
-		super( styleset);
+		super( RuleType.CLASS, styleset);
 	}
 
 

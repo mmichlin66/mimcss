@@ -1,5 +1,4 @@
-import {IRuleDefinitionClass, IGroupRule}
-		from "../api/rules"
+import {IRuleDefinitionClass, IGroupRule, RuleType} from "../api/rules"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -12,9 +11,9 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export abstract class GroupRule<T = any> extends RuleContainer<T> implements IGroupRule<T>
 {
-	public constructor( definitionClass: IRuleDefinitionClass<T>)
+	public constructor( type: RuleType, definitionClass: IRuleDefinitionClass<T>)
 	{
-		super( definitionClass);
+		super( type, definitionClass);
 	}
 
 
