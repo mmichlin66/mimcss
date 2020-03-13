@@ -1,5 +1,4 @@
 ﻿import {IStyleRule, ITagRule, IClassRule, IIDRule} from "./rules"
-// import {ISelector, IEmptySelector, AttrSelectorOperation, AttrSelectorOperationType, } from "./ISelector"
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"
@@ -39,13 +38,15 @@ export interface IEmptySelector extends ICompoundSelector
 
 
 /**
- * Represents a point in selector building, which allows class, attribute, pseudo-class and pseudo element selectors
+ * Represents a point in selector building, which allows class, ID, attribute, pseudo-class and
+ * pseudo element selectors.
  */
-interface ICompoundSelector
+export interface ICompoundSelector
 {
 	class( cls: string | IClassRule): ISelector;
 	id( id: string | IIDRule): ISelector;
-	attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType, value?: string, caseInsensitive?: boolean): ISelector;
+	attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType,
+					value?: string, caseInsensitive?: boolean): ISelector;
 
 	// pseudo classes
 	readonly active: ISelector;
@@ -168,19 +169,14 @@ export class Selector implements IEmptySelector, ISelector
 	}
 	public id( id: string | IIDRule): ISelector
 	{
-		this.buf.push( typeof id === "string" ? "." + id : id);
+		this.buf.push( typeof id === "string" ? "#" + id : id);
 		return this;
 	}
 	public attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType,
 					value?: string, caseInsensitive?: boolean): ISelector
 	{
-		let s = "[" + attrName;
-		if (op)
-			s += op + value;
-		if (caseInsensitive)
-			s += " i";
-		s += "]";
-		this.buf.push(s);
+		let opAndVal = op ? `${op}"${value}"` : "";
+		this.buf.push( `[${attrName}${opAndVal}${caseInsensitive ? " i" : ""}]`);
 		return this;
 	}
 
@@ -276,20 +272,15 @@ export class Selector implements IEmptySelector, ISelector
 	 */
 	public toCssString(): string
 	{
-		let s = "";
-		for( let token of this.buf)
-		{
-			if (token instanceof TagRule)
-				s += token.tagName;
-			else if (token instanceof ClassRule)
-				s += "." + token.className;
-			else if (token instanceof IDRule)
-				s += "#" + token.idName;
-			else
-				s += token;
-		}
-
-		return s;
+		return this.buf.map( (token) =>
+			token instanceof TagRule
+				? token.tagName
+				: token instanceof ClassRule
+					? "." + token.className
+					: token instanceof IDRule
+						? "#" + token.idName
+						: token
+		).join("");
 	}
 
 
