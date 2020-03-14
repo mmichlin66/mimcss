@@ -1,4 +1,4 @@
-import {IRule, RuleType} from "../api/rules"
+import {IRule, RuleType} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 

@@ -3,7 +3,7 @@
  */
 
 
-import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionOptions} from "./rules";
+import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionOptions} from "../rules/RuleTypes";
 
 
 /**
@@ -52,12 +52,45 @@ export interface IStyleScope<T = any> extends IRuleContainer<T>
 
 
 
+import {StyleScope} from "./StyleScope"
+
+
+
+/**
+ * Processes the given style scope definition and returns the StyleScope object that contains
+ * names of IDs, classes and keyframes and allows style manipulations. For a given style scope
+ * definition class there is a single style scope object, no matter how many times this function
+ * is invoked.
+ * @param sheetDef 
+ */
+export function $scope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
+{
+	// if the style scope definition is multiplex, create new StyleScope object every time;
+	// otherwise, check whether the style sheet definition object has already been processed. This
+	// is indicated by the existence of the instance static property on the class.
+	if (styleScopeDefinitionClass.isMultiplex)
+		return new StyleScope( styleScopeDefinitionClass);
+	else
+	{
+		let styleScope = styleScopeDefinitionClass.styleScope as StyleScope<T>;
+		if (!styleScope)
+		{
+			styleScope = new StyleScope( styleScopeDefinitionClass);
+			styleScopeDefinitionClass.styleScope = styleScope;
+		}
+
+		return styleScope;
+	}
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Functions to configure TssManager options
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-import {TssManager} from "../rules/TssManager";
+import {TssManager} from "./TssManager";
 
 /**
  * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names

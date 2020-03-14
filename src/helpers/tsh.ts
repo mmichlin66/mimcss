@@ -2,7 +2,7 @@
 import * as UtilFuncs from "../styles/UtilFuncs"
 import * as ColorTypes from "../styles/ColorTypes";
 import * as ColorFuncs from "../styles/ColorFuncs";
-import {ICustomVar, ICustomVal} from "./rules"
+import {ICustomVar, ICustomVal} from "../rules/RuleTypes"
 import {CustomVar} from "../rules/CustomVar"
 import {PureStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs";

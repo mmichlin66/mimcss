@@ -3,7 +3,7 @@ import * as UtilFuncs from "./UtilFuncs"
 import * as ColorTypes from "./ColorTypes"
 import * as ColorFuncs from "./ColorFuncs";
 import * as StyleTypes from "./StyleTypes"
-import { ICustomVal } from "../api/rules";
+import { ICustomVal } from "../rules/RuleTypes";
 
 
 

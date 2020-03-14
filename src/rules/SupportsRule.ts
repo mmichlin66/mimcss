@@ -1,4 +1,4 @@
-import {ISupportsRule, IRuleDefinitionClass, RuleType} from "../api/rules"
+import {ISupportsRule, IRuleDefinitionClass, RuleType} from "./RuleTypes"
 import {GroupRule} from "./GroupRule"
 
 

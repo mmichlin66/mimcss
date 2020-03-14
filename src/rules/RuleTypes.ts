@@ -344,3 +344,46 @@ export interface IRuleDefinitionClass<T>
 
 
 
+import {ISelector} from "../helpers/Selector"
+import {TagRule} from "./TagRule"
+import {ClassRule} from "./ClassRule"
+import {IDRule} from "./IDRule"
+import {SelectorRule} from "./SelectorRule"
+import {AnimationRule} from "./AnimationRule"
+import {CustomVar} from "./CustomVar"
+import {SupportsRule} from "./SupportsRule"
+import {MediaQuery} from "../styles/MediaTypes"
+import {MediaRule} from "./MediaRule"
+
+
+
+/** Creates new TagRule object  */
+export function $tag( tagName: string, styleset: ExtendedStyleset): ITagRule { return new TagRule( tagName, styleset); }
+
+/** Returns new ClassRule object  */
+export function $class( styleset: ExtendedStyleset): IClassRule { return new ClassRule( styleset); }
+
+/** Returns new IDRule object  */
+export function $id( styleset: ExtendedStyleset): IIDRule { return new IDRule( styleset); }
+
+/** Creates new SelectorRule object  */
+export function $rule( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
+	{ return new SelectorRule( selector, styleset); }
+
+/** Returns new AnimationRule object  */
+export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return new AnimationRule( keyframes); }
+
+/** Returns new CustomVar object that defines a custom CSS property */
+export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K]): ICustomVar<K>
+	{ return new CustomVar( templatePropName, propVal); }
+
+/** Returns new SupportsRule object  */
+export function $supports<T>( query: string, definitionClass: IRuleDefinitionClass<T>): ISupportsRule<T>
+	{ return new SupportsRule( query, definitionClass); }
+
+/** Returns new MediaRule object  */
+export function $media<T>( query: string | MediaQuery, definitionClass: IRuleDefinitionClass<T>): IMediaRule<T>
+	{ return new MediaRule( query, definitionClass); }
+
+
+

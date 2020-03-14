@@ -1,6 +1,6 @@
-import {ICustomVar, RuleType} from "../api/rules"
+import {ICustomVar, RuleType} from "./RuleTypes"
 import {PureStyleset, Styleset} from "../styles/StyleTypes"
-import {tsh} from "../api/tsh"
+import {tsh} from "../helpers/tsh"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 

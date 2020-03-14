@@ -1,7 +1,7 @@
-import {ISelectorRule, ExtendedStyleset, RuleType} from "../api/rules"
-import {ISelector} from "../api/Selector"
+import {ISelectorRule, ExtendedStyleset, RuleType} from "./RuleTypes"
+import {ISelector} from "../helpers/Selector"
 import {StyleRule} from "./StyleRule"
-import {Selector} from "../api/Selector";
+import {Selector} from "../helpers/Selector";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 

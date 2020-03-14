@@ -1,4 +1,4 @@
-﻿import {IStyleRule, ITagRule, IClassRule, IIDRule} from "./rules"
+﻿import {IStyleRule, ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"

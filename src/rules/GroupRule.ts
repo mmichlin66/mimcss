@@ -1,4 +1,4 @@
-import {IRuleDefinitionClass, IGroupRule, RuleType} from "../api/rules"
+import {IRuleDefinitionClass, IGroupRule, RuleType} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 

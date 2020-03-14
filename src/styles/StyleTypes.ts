@@ -1141,7 +1141,7 @@ export type PureStyleset =
 
 
 
-import {ICustomVal} from "../api/rules";
+import {ICustomVal} from "../rules/RuleTypes";
 
 /**
  * Interface representing a collection of style properties and their values.

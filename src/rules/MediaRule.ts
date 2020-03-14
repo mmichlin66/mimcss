@@ -1,4 +1,4 @@
-import {IMediaRule, IRuleDefinitionClass, RuleType} from "../api/rules"
+import {IMediaRule, IRuleDefinitionClass, RuleType} from "./RuleTypes"
 import {GroupRule} from "./GroupRule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";

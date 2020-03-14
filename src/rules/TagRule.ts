@@ -1,4 +1,4 @@
-import {ITagRule, ExtendedStyleset, RuleType} from "../api/rules"
+import {ITagRule, ExtendedStyleset, RuleType} from "./RuleTypes"
 import {StyleRule} from "./StyleRule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 

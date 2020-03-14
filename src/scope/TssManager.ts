@@ -1,5 +1,5 @@
 import {StyleScope} from "./StyleScope"
-import {Rule} from "./Rule"
+import {Rule} from "../rules/Rule"
 
 
 

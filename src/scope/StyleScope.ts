@@ -1,8 +1,8 @@
-import {IStyleScopeDefinitionClass, IStyleScope} from "../api/scope"
-import {RuleType} from "../api/rules"
-import {Rule} from "./Rule"
+import {IStyleScopeDefinitionClass, IStyleScope} from "./ScopeTypes"
+import {RuleType} from "../rules/RuleTypes"
+import {Rule} from "../rules/Rule"
 import {TssManager} from "./TssManager"
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {RuleContainer, IRuleContainerOwner} from "../rules/RuleContainer"
 
 
 

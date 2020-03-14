@@ -1,4 +1,4 @@
-import {IStyleRule, ExtendedStyleset, RuleType} from "../api/rules";
+import {IStyleRule, ExtendedStyleset, RuleType} from "./RuleTypes";
 import {Styleset} from "../styles/StyleTypes"
 import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule";
