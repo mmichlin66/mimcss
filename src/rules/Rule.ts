@@ -59,9 +59,9 @@ export abstract class Rule implements IRule
 	// null for StyleScope.
 	public ruleName: string;
 
-	// CSSStyleSheet or CSSRule-derived object corresponding to the actuall CSS rule inserted into
-	// the styles heet or the parent rule. This is CSSStyleSheet for StyleScope objects.
-	public cssRule: CSSStyleSheet | CSSRule;
+	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
+	// the styles sheet or the parent rule. This is undefined for StyleScope objects.
+	public cssRule: CSSRule;
 }
 
 

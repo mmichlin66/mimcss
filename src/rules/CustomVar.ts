@@ -88,17 +88,14 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 
 
 
-	/** Only needed to distinguish from other rules */
-	public get isCustomVar(): boolean { return true; }
-
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
 	public templatePropName: K;
 
-	// Value of the custom CSS property.
-	public varValue: PureStyleset[K];
-
 	// Name of the custom CSS property.
 	public varName: string;
+
+	// Value of the custom CSS property.
+	public varValue: PureStyleset[K];
 }
 
 

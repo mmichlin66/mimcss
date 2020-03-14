@@ -74,8 +74,8 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 
-	/** Only needed to distinguish from other rules */
-	public get isIDRule(): boolean { return true; }
+	/** ID of the HTML element */
+	public get id(): string { return this.idName; }
 
 	// Name of the element identifier for applying the styleset.
 	public idName: string;

@@ -73,7 +73,7 @@ export class ClassRule extends StyleRule implements IClassRule
 
 
 	/** Only needed to distinguish from other rules */
-	public get isClassRule(): boolean { return true; }
+	public get class(): string { return this.className; }
 
 	// Name of the class under which the styleset will appear in the style sheet.
 	public className: string;

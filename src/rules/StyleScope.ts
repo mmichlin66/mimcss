@@ -28,7 +28,7 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		super.insertRules();
+		super.insertRules( this.cssStyleSheet);
 	}
 
 
@@ -107,18 +107,18 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 
 	public setDOMInfo( styleSheet: CSSStyleSheet)
 	{
-		this.cssRule = styleSheet;
+		this.cssStyleSheet = styleSheet;
 	}
 
 	public clearDOMInfo()
 	{
-		this.cssRule = undefined;
+		this.cssStyleSheet = undefined;
 	}
 
 
 
 	// Helper properties
-	private get isActivated(): boolean { return !!this.cssRule; }
+	private get isActivated(): boolean { return !!this.cssStyleSheet; }
 
 
 
@@ -131,6 +131,9 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 	// Flag indicating whether this style scope object owns the <style> element. This is true only
 	// for multiplex styles scopes - those that can be creaed multiple times.
 	public isMultiplex: boolean;
+
+	// CSS style sheet
+	public cssStyleSheet: CSSStyleSheet;
 }
 
 

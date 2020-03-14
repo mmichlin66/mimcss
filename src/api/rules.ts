@@ -83,6 +83,9 @@ export interface IRule
 
 	/** Type of the rule */
 	readonly type: RuleType;
+
+	/** SOM rule */
+	readonly cssRule: CSSRule;
 }
 
 
@@ -116,17 +119,11 @@ export interface INamedRule extends IRule
  * keyframes, etc. StyleRule defines a styleset and can optionally point to one or more style rules
  * from which it inherits. A styleset combines all the properties from its own property block as
  * well as from all of style rules it inherites from.
- * 
- * Note that although the meaning of style rules inheritance is always the same (application of all
- * style properties throughout the inheritance chain), the implementation is different for
- * different contexts. In particular, if it is a class rule and it only inherits from other class
- * rules, the resultant rule doesn't repeat the style properties from the parent rules; instead,
- * the class name becomes a combination of several class names.
  */
 export interface IStyleRule extends IRule
 {
-	/** Only needed to distinguish from other types */
-	readonly isStyleRule: boolean;
+	/** SOM style rule */
+	readonly cssStyleRule: CSSStyleRule;
 }
 
 
@@ -136,8 +133,8 @@ export interface IStyleRule extends IRule
  */
 export interface ITagRule extends IStyleRule
 {
-	/** Only needed to distinguish from other rules */
-	readonly isTagRule: boolean;
+	/** Name of the HTML tag */
+	readonly tag: string;
 }
 
 
@@ -147,8 +144,8 @@ export interface ITagRule extends IStyleRule
  */
 export interface IClassRule extends IStyleRule, INamedRule
 {
-	/** Only needed to distinguish from other rules */
-	readonly isClassRule: boolean;
+	/** Name of the CSS class */
+	readonly class: string;
 }
 
 
@@ -158,8 +155,8 @@ export interface IClassRule extends IStyleRule, INamedRule
  */
 export interface IIDRule extends IStyleRule, INamedRule
 {
-	/** Only needed to distinguish from other rules */
-	readonly isIDRule: boolean;
+	/** ID of the HTML element */
+	readonly id: string;
 }
 
 
@@ -170,8 +167,8 @@ export interface IIDRule extends IStyleRule, INamedRule
  */
 export interface ISelectorRule extends IStyleRule
 {
-	/** Only needed to distinguish from other rules */
-	readonly isSelectorRule: boolean;
+	/** CSS rule selector string */
+	readonly selectorText: string;
 }
 
 
@@ -181,8 +178,8 @@ export interface ISelectorRule extends IStyleRule
  */
 export interface IAnimationRule extends INamedRule
 {
-	/** Only needed to distinguish from other rules */
-	readonly isAnimationRule: boolean;
+	/** SOM keyframes rule */
+	readonly cssKeyframesRule: CSSKeyframesRule;
 }
 
 /**
@@ -197,8 +194,8 @@ export type Keyframe = [ "from" | "to" | number, ExtendedStyleset ];
  */
 export interface IGroupRule<T = any> extends IRuleContainer<T>
 {
-	/** Only needed to distinguish from other rules */
-	readonly isGroupRule: boolean;
+	/** SOM grouping rule */
+	readonly cssGroupRule: CSSGroupingRule;
 }
 
 
@@ -206,21 +203,21 @@ export interface IGroupRule<T = any> extends IRuleContainer<T>
 /**
  * The ISupportRule interface represents a CSS @supports rule.
  */
-export interface ISupportRule<T = any> extends IGroupRule<T>
+export interface ISupportsRule<T = any> extends IGroupRule<T>
 {
-	/** Only needed to distinguish from other rules */
-	readonly isSupportRule: boolean;
+	/** SOM supports rule */
+	readonly cssSupportsRule: CSSSupportsRule;
 }
 
 
 
 /**
- * The ISupportRule interface represents a CSS @media rule.
+ * The IMediaRule interface represents a CSS @media rule.
  */
 export interface IMediaRule<T = any> extends IGroupRule<T>
 {
-	/** Only needed to distinguish from other rules */
-	readonly isMediaRule: boolean;
+	/** SOM media rule */
+	readonly cssMediaRule: CSSMediaRule;
 }
 
 
@@ -236,8 +233,8 @@ export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRu
 	 */
 	readonly templatePropName: K;
 
-	/** Only needed to distinguish from other types */
-	readonly isCustomVar?: boolean;
+	/** Name of the CSS custom property */
+	readonly varName: string;
 }
 
 
@@ -250,8 +247,8 @@ export interface ICustomVarRule<T = any> extends IRule
 	/** Map of custom property names to property definitions */
 	readonly vars: PropsOfType<T,ICustomVar>;
 
-	/** Only needed to distinguish from other types */
-	readonly isCustomVarRule?: boolean;
+	/** SOM style rule */
+	readonly cssStyleRule?: CSSStyleRule;
 }
 
 
@@ -312,11 +309,11 @@ export interface IRuleContainer<T = any>
 	/** Names of custom CSS properties */
 	readonly vars: NamesOfPropsOfType<T,ICustomVar>;
 
-	/** Map of all rules that have assigned name. */
+	/** Map of property names to rule objects. */
 	readonly rules: PropsOfType<T,IRule>;
 
 	/** Rule that combines all custom variables defined in this container. */
-	readonly customVarRule: ICustomVarRule<T>;
+	readonly varRule: ICustomVarRule<T>;
 }
 
 
@@ -327,11 +324,11 @@ export interface IRuleContainer<T = any>
 export type RuleDefinitionOptions =
 {
 	/**
-	 * Optional method within which rule definition classes can create rules not assigned
-	 * to a member property. These rules cannot be those that require names, such as class, ID,
-	 * animation or custom CSS property.
+	 * Method that rule definition classes can call to create rules not assigned to a member
+	 * property. These rules cannot be those that require names, such as class, ID, animation
+	 * or custom CSS property.
 	 */
-	unnamedRules?: UnnamedRule[];
+	addRules: ( ...rules: UnnamedRule[]) => void;
 }
 
 

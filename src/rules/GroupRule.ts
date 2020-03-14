@@ -29,8 +29,8 @@ export abstract class GroupRule<T = any> extends RuleContainer<T> implements IGr
 
 
 
-	/** Only needed to distinguish from other types */
-	public get isGroupRule(): boolean { return true; }
+	/** SOM grouping rule */
+	public get cssGroupRule(): CSSGroupingRule { return this.cssRule as CSSGroupingRule; }
 }
 
 

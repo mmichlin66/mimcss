@@ -1,5 +1,5 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, ICustomVar,
-		ICustomVarRule, NamedRule, UnnamedRule,
+		ICustomVarRule, UnnamedRule,
 		RuleDefinitionOptions, IRuleDefinitionClass, IRuleContainer
 		} from "../api/rules"
 import {Rule} from "./Rule"
@@ -35,9 +35,6 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 
 
-	// /** Names of all named rules defined in the style sheet */
-	// public get allNames(): NamesOfPropsOfType<T,NamedRule> { this.activate(); return this._allNames as NamesOfPropsOfType<T,NamedRule> }
-
 	/** Names of classes defined in the style sheet */
 	public get classes(): NamesOfPropsOfType<T,IClassRule> { this.activate(); return this._classes as NamesOfPropsOfType<T,IClassRule> }
 
@@ -53,11 +50,8 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 	/** Map of all tag rules. */
 	public get rules(): PropsOfType<T,IRule> { this.activate(); return this._rules as PropsOfType<T,IRule>; }
 
-	// /** Map of all rules. */
-	// public get allRules(): IRule[] { this.activate(); return this._allRules as IRule[]; }
-
  	/** The ":root" block with CSS custom property definitions. */
-	public get customVarRule(): ICustomVarRule { this.activate(); return this._customVarRule; }
+	public get varRule(): ICustomVarRule { this.activate(); return this._varRule; }
 
 
 
@@ -84,14 +78,23 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 		this._allRules = [];
 
 		// create our internal rule for custom CSS properties
-		this._customVarRule = new CustomVarRule<T>();
-		this._customVarRule.process( this, this.owner, null)
-		this._allRules.push( this._customVarRule);
+		this._varRule = new CustomVarRule<T>();
+		this._varRule.process( this, this.owner, null)
+		this._allRules.push( this._varRule);
+
+		// prepare for unnamed rules that can be called from the definition bject's constructor
+		let unnamedRules: UnnamedRule[] = [];
+		let options: RuleDefinitionOptions = {
+			addRules: ( ...rules: UnnamedRule[]): void =>
+			{
+				if (rules && rules.length > 0)
+					unnamedRules = unnamedRules.concat( rules);
+			}
+		};
 
 		// create instance of the rules definition class and then go over its properties,
 		// which define CSS rules.
 		let rulesDef: T;
-		let options: RuleDefinitionOptions = {};
 		try
 		{
 			// create instance of the style scope definition class and then go over its properties,
@@ -107,8 +110,8 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 		this.processNamedRules( rulesDef);
 
 		// if the definition class implements unnamedRules process them now
-		if (options.unnamedRules)
-			this.processUnnamedRules( options.unnamedRules);
+		if (unnamedRules)
+			this.processUnnamedRules( unnamedRules);
 	}
 
 
@@ -159,7 +162,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 			{
 				this._allNames[ruleName] = rule.varName;
 				this._vars[ruleName] = rule.varName;
-				this._customVarRule._vars[ruleName] = rule;
+				this._varRule._vars[ruleName] = rule;
 			}
 		}
 	}
@@ -209,16 +212,16 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 
 	// Inserts all rules defined in this container to either the style sheet or grouping rule.
-	protected insertRules(): void
+	protected insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
 		for( let rule of this._allRules)
-			rule.insert( this.cssRule as CSSStyleSheet | CSSGroupingRule);
+			rule.insert( parent);
 	}
 
 
 
 	// Helper properties
-	public get isProcessed(): boolean { return !!this._allNames; }
+	public get isProcessed(): boolean { return !!this._rules; }
 
 
 
@@ -240,7 +243,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 	protected _rules: { [K: string]: IRule };
 
 	// Rule that combines all custom variables defined in this container.
-	protected _customVarRule: CustomVarRule;
+	protected _varRule: CustomVarRule;
 
 	// List of all rules
 	public _allRules: Rule[];

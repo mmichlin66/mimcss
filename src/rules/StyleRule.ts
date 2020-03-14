@@ -110,8 +110,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
-	/** Only needed to distinguish from other rules */
-	public get isStyleRule(): boolean { return true; }
+	/** SOM style rule */
+	public get cssStyleRule(): CSSStyleRule { return this.cssRule as CSSStyleRule; }
 
 	// Style rule defining style properties.
 	public styleset: Styleset;

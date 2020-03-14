@@ -48,8 +48,8 @@ export class TagRule extends StyleRule implements ITagRule
 
 
 
-	/** Only needed to distinguish from other rules */
-	public get isTagRule(): boolean { return true; }
+	/** Name of the HTML tag */
+	public get tag(): string { return this.tagName; }
 
 	// Name of the tag to which the styleset applies.
 	public tagName: string;

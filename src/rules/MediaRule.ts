@@ -38,13 +38,13 @@ export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 		this.cssRule = parent.cssRules[index];
 
 		// insert sub-rules
-		this.insertRules();
+		this.insertRules( this.cssMediaRule);
 	}
 
 
 
-	/** Only needed to distinguish from other rules */
-	public get isMediaRule(): boolean { return true; }
+	/** SOM media rule */
+	public get cssMediaRule(): CSSMediaRule { return this.cssRule as CSSMediaRule; }
 
 	// media query for this rule.
 	public query: string | MediaQuery;

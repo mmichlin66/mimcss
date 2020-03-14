@@ -1,4 +1,4 @@
-import {ISupportRule, IRuleDefinitionClass, RuleType} from "../api/rules"
+import {ISupportsRule, IRuleDefinitionClass, RuleType} from "../api/rules"
 import {GroupRule} from "./GroupRule"
 
 
@@ -6,7 +6,7 @@ import {GroupRule} from "./GroupRule"
 /**
  * The SupportRule type describes a CSS @supports rule.
  */
-export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T>
+export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule<T>
 {
 	public constructor( query?: string, definitionClass?: IRuleDefinitionClass<T>)
 	{
@@ -18,9 +18,9 @@ export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T
 
 
 	// Creates a copy of the rule.
-	public clone(): SupportRule<T>
+	public clone(): SupportsRule<T>
 	{
-		let newRule = new SupportRule<T>();
+		let newRule = new SupportsRule<T>();
 		newRule.query = this.query;
 		return newRule;
 	}
@@ -38,13 +38,13 @@ export class SupportRule<T = any> extends GroupRule<T> implements ISupportRule<T
 		this.cssRule = parent.cssRules[index];
 
 		// insert sub-rules
-		this.insertRules();
+		this.insertRules( this.cssSupportsRule);
 	}
 
 
 
-	/** Only needed to distinguish from other rules */
-	public get isSupportRule(): boolean { return true; }
+	/** SOM supports rule */
+	public get cssSupportsRule(): CSSSupportsRule { return this.cssRule as CSSSupportsRule; }
 
 	// support query for this rule.
 	public query: string;

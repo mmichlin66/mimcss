@@ -77,15 +77,13 @@ export class AnimationRule extends Rule implements IAnimationRule
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
 		
 		for( let keyframeRule of this.keyframeRules)
-		{
 			cssKeyframesRule.appendRule( keyframeRule.toCssString())
-		}
 	}
 
 
 
-	/** Only needed to distinguish from other rules */
-	public get isAnimationRule(): boolean { return true; }
+	/** SOM keyframes rule */
+	public get cssKeyframesRule(): CSSKeyframesRule { return this.cssRule as CSSKeyframesRule; }
 
 	/** Only needed to distinguish from class and ID rules */
 	public keyframeRules: KeyframeRule[];

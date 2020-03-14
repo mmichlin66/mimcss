@@ -1,5 +1,5 @@
 import {ExtendedStyleset, ITagRule, IClassRule, IIDRule, ISelectorRule, IAnimationRule,
-		Keyframe, ICustomVar, ISupportRule, IMediaRule,
+		Keyframe, ICustomVar, ISupportsRule, IMediaRule,
 		IRuleDefinitionClass} from "./rules"
 import {IStyleScopeDefinitionClass, IStyleScope} from "./scope"
 import {ISelector} from "./Selector"
@@ -11,7 +11,7 @@ import {IDRule} from "../rules/IDRule"
 import {SelectorRule} from "../rules/SelectorRule"
 import {AnimationRule} from "../rules/AnimationRule"
 import {CustomVar} from "../rules/CustomVar"
-import {SupportRule} from "../rules/SupportRule"
+import {SupportsRule} from "../rules/SupportsRule"
 import {MediaRule} from "../rules/MediaRule"
 import {StyleScope} from "../rules/StyleScope"
 
@@ -37,9 +37,9 @@ export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return n
 export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K]): ICustomVar<K>
 	{ return new CustomVar( templatePropName, propVal); }
 
-/** Returns new SupportRule object  */
-export function $support<T>( query: string, definitionClass: IRuleDefinitionClass<T>): ISupportRule<T>
-	{ return new SupportRule( query, definitionClass); }
+/** Returns new SupportsRule object  */
+export function $supports<T>( query: string, definitionClass: IRuleDefinitionClass<T>): ISupportsRule<T>
+	{ return new SupportsRule( query, definitionClass); }
 
 /** Returns new MediaRule object  */
 export function $media<T>( query: string | MediaQuery, definitionClass: IRuleDefinitionClass<T>): IMediaRule<T>
