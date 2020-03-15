@@ -43,9 +43,7 @@ export type ExtendedStyleset =
 
 
 /**
- * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
- * class is also an ancestor for StyleScope; however, most of its the fields are undefined in
- * te StyleScope instances.
+ * The RuleType enumeration lists types of rules that Mimcss library works with.
  */
 export const enum RuleType
 {
@@ -63,7 +61,7 @@ export const enum RuleType
     PAGE,
     VIEWPORT,
 
-	// not real rules but derive from Rule object
+	// not real rules but derive from the Rule object
     VAR = 50,
     SCOPE = 51,
 }
@@ -344,10 +342,10 @@ export interface IRuleDefinitionClass<T>
 
 
 
-import {ISelector} from "../helpers/Selector"
 import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
+import {SelectorType} from "../helpers/SelectorTypes"
 import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {CustomVar} from "./CustomVar"
@@ -367,7 +365,7 @@ export function $class( styleset: ExtendedStyleset): IClassRule { return new Cla
 export function $id( styleset: ExtendedStyleset): IIDRule { return new IDRule( styleset); }
 
 /** Creates new SelectorRule object  */
-export function $rule( selector: ISelector | string, styleset: ExtendedStyleset): ISelectorRule
+export function $rule( selector: SelectorType, styleset: ExtendedStyleset): ISelectorRule
 	{ return new SelectorRule( selector, styleset); }
 
 /** Returns new AnimationRule object  */
