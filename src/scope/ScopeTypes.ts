@@ -48,6 +48,12 @@ export interface IStyleScope<T = any> extends IRuleContainer<T>
 	//  * ```
 	//  */
 	// readonly Definition: IStyleScopeDefinitionClass<T>;
+
+	/** Inserts this style scope into DOM. */
+	activate(): void;
+
+	/** Removes this style scope from DOM - only works for multiplex style scopes. */
+	deactivate(): void;
 }
 
 

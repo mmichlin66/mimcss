@@ -74,12 +74,12 @@ export function singleMediaQueryToCssString( query: MediaTypes.SingleMediaQuery)
         return null;
 
     let mediaType = query.$mediaType;
-    let only = mediaType && query.$only;
+    let only = query.$only;
     let negate = query.$negate;
 
     let items: string[] = [];
     if (mediaType)
-        items.push( only ? "only " : "" + mediaType);
+        items.push( (only ? "only " : "") + mediaType);
 
     for( let propName in query)
     {

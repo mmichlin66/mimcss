@@ -16,7 +16,19 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 		super( RuleType.SCOPE, defClass)
 
 		this.definitionClass = defClass;
+
+		this.activationRefCount = 0;
+		this.importedScopes = [];
+
+		this.processScope();
 	}
+
+
+
+	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
+	// element. For the majority of Rule-derived classes this is true; however, for some classes,
+	// e.g. for the CustomVar class, this is not so.
+	public get isRealCssRule(): boolean { return false; }
 
 
 
@@ -60,6 +72,14 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 
 
 
+	/** Adds a style scope this style scope */
+	public addImportedScope( scope: IStyleScope): void
+	{
+		this.importedScopes.push( scope);
+	}
+
+
+
 	/** Generates a name, which will be unique in this style scope */
 	public getScopedRuleNamed( ruleName: string): string
 	{
@@ -70,6 +90,8 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 		else
 			return this.generateScopedName( ruleName);
 	}
+
+
 
 	// Generates a name, which will be unique in this style scope
 	public generateScopedName( ruleName: string): string
@@ -82,25 +104,32 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 
 
 
-	// Inserts this style sheet into DOM
+	/** Inserts this style scope into DOM. */
 	public activate(): void
 	{
-		if (this.isActivated)
-			return;
+		// activate imported scopes
+		for( let scope of this.importedScopes)
+			scope.activate();
 
-		this.processScope();
-		TssManager.activate( this);
+		if (++this.activationRefCount === 1 && !this.isActivated)
+			TssManager.activate( this);
 	}
 
 
 
-	// Removes this style scope from DOM - only works for multiplex style scopes
+	/** Removes this style scope from DOM - only works for multiplex style scopes. */
 	public deactivate(): void
 	{
-		if (!this.isActivated)
+		// guard from extra deactivate calls
+		if (this.activationRefCount === 0)
 			return;
 
-		TssManager.deactivate( this);
+		// deactivate imported scopes
+		for( let scope of this.importedScopes)
+			scope.deactivate();
+
+		if (--this.activationRefCount === 0 && this.isActivated)
+			TssManager.deactivate( this);
 	}
 
 
@@ -109,6 +138,8 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 	{
 		this.cssStyleSheet = styleSheet;
 	}
+
+
 
 	public clearDOMInfo()
 	{
@@ -134,6 +165,12 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 
 	// CSS style sheet
 	public cssStyleSheet: CSSStyleSheet;
+
+	// Reference count of activation requests.
+	private activationRefCount: number;
+
+	// List of imported style scope objects that will be activated when our scope is activated.
+	private importedScopes: IStyleScope[];
 }
 
 

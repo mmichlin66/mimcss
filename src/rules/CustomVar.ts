@@ -47,6 +47,13 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 
 
 
+	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
+	// element. For the majority of Rule-derived classes this is true; however, for some classes,
+	// e.g. for the CustomVar class, this is not so.
+	public get isRealCssRule(): boolean { return false; }
+
+
+
 	/**
 	 * Determines whether this rule requires name - that is it will be ignored if created within
 	 * the createUnnamedRules
@@ -78,13 +85,6 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 	{
 		return `--${this.varName}: ${tsh.val( this.templatePropName, this.varValue)}`;
 	}
-
-
-
-	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
-	// element. For the majority of Rule-derived classes this is true; however, for some classes,
-	// e.g. for the CustomVar class, this is not so.
-	public get isRealCssRule(): boolean { return false; }
 
 
 

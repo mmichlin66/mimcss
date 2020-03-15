@@ -1,7 +1,8 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, ICustomVar,
 		ICustomVarRule, UnnamedRule,
-		RuleDefinitionOptions, IRuleDefinitionClass, IRuleContainer
+		RuleDefinitionOptions, IRuleDefinitionClass, IRuleContainer, RuleType
 		} from "./RuleTypes"
+import {IStyleScope} from "../scope/ScopeTypes"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
@@ -16,6 +17,9 @@ import {CustomVar} from "./CustomVar"
  */
 export interface IRuleContainerOwner
 {
+	/** Adds a style scope this style scope */
+	addImportedScope( scope: IStyleScope): void;
+
 	/** Generates a name, which will be unique in this style scope */
 	getScopedRuleNamed( ruleName: string): string;
 }
@@ -36,27 +40,22 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 
 	/** Names of classes defined in the style sheet */
-	public get classes(): NamesOfPropsOfType<T,IClassRule> { this.activate(); return this._classes as NamesOfPropsOfType<T,IClassRule> }
+	public get classes(): NamesOfPropsOfType<T,IClassRule> { return this._classes as NamesOfPropsOfType<T,IClassRule> }
 
 	/** Names of classes defined in the style sheet */
-	public get ids(): NamesOfPropsOfType<T,IIDRule> { this.activate(); return this._ids as NamesOfPropsOfType<T,IIDRule>; }
+	public get ids(): NamesOfPropsOfType<T,IIDRule> { return this._ids as NamesOfPropsOfType<T,IIDRule>; }
 
 	/** Names of keyframes defined in the style sheet */
-	public get animations(): NamesOfPropsOfType<T,IAnimationRule> { this.activate(); return this._animations as NamesOfPropsOfType<T,IAnimationRule>; }
+	public get animations(): NamesOfPropsOfType<T,IAnimationRule> { return this._animations as NamesOfPropsOfType<T,IAnimationRule>; }
 
 	/** Names of custom CSS properties defined in the style scope */
-	public get vars(): NamesOfPropsOfType<T,ICustomVar> { this.activate(); return this._vars as NamesOfPropsOfType<T,ICustomVar>; }
+	public get vars(): NamesOfPropsOfType<T,ICustomVar> { return this._vars as NamesOfPropsOfType<T,ICustomVar>; }
 
 	/** Map of all tag rules. */
-	public get rules(): PropsOfType<T,IRule> { this.activate(); return this._rules as PropsOfType<T,IRule>; }
+	public get rules(): PropsOfType<T,IRule> { return this._rules as PropsOfType<T,IRule>; }
 
  	/** The ":root" block with CSS custom property definitions. */
-	public get varRule(): ICustomVarRule { this.activate(); return this._varRule; }
-
-
-
-	// Performs whatever actions necessary to insert the rules defined i the container to DOM.
-	protected activate(): void {}
+	public get varRule(): ICustomVarRule { return this._varRule; }
 
 
 
@@ -97,8 +96,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 		let rulesDef: T;
 		try
 		{
-			// create instance of the style scope definition class and then go over its properties,
-			// which define CSS rules.
+			// create instance of the style scope definition class
 			rulesDef = new this.definitionClass( options);
 		}
 		catch( err)
@@ -107,9 +105,10 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 			return;
 		}
 
+		// process rules that are assigned to the properties of the definition class
 		this.processNamedRules( rulesDef);
 
-		// if the definition class implements unnamedRules process them now
+		// if the definition class added rules via the option's addRules method, process them
 		if (unnamedRules)
 			this.processUnnamedRules( unnamedRules);
 	}
@@ -129,6 +128,15 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 			let ruleName = propName;
 			let rule = propVal as Rule;
+
+			// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
+			// We inform our owner style scope about the "imported" scope so that when the owner
+			// scope is activated, the imported one is activated too.
+			if (rule.type === RuleType.SCOPE)
+			{
+				this.owner.addImportedScope( rule as any as IStyleScope);
+				continue;
+			}
 
 			// if the rule object is already assigned to a style scope, we create a clone of the
 			// rule and assign it to our scope.
