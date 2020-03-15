@@ -71,7 +71,7 @@ export class tsh
         return new StringProxy( ColorFuncs.hsl( h, s, l, a));
     }
 
-    public static alpha( c: number | keyof ColorTypes.Colors, a: number | string): StringProxy
+    public static alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): StringProxy
     {
         return new StringProxy( ColorFuncs.alpha( c, a));
     }
