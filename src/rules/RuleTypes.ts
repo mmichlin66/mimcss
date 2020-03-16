@@ -221,6 +221,17 @@ export interface IMediaRule<T = any> extends IGroupRule<T>
 
 
 /**
+ * The IImportRule interface represents a CSS @import rule.
+ */
+export interface IImportRule extends IRule
+{
+	/** SOM import rule */
+	readonly cssImportRule: CSSImportRule;
+}
+
+
+
+/**
  * The ICustomVar interface represents a CSS custom property definitions.
  */
 export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRule
@@ -352,24 +363,29 @@ import {CustomVar} from "./CustomVar"
 import {SupportsRule} from "./SupportsRule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {MediaRule} from "./MediaRule"
+import {ImportRule} from "./ImportRule"
 
 
 
 /** Creates new TagRule object  */
-export function $tag( tagName: string, styleset: ExtendedStyleset): ITagRule { return new TagRule( tagName, styleset); }
+export function $tag( tagName: string, styleset: ExtendedStyleset): ITagRule
+	{ return new TagRule( tagName, styleset); }
 
 /** Returns new ClassRule object  */
-export function $class( styleset: ExtendedStyleset): IClassRule { return new ClassRule( styleset); }
+export function $class( styleset: ExtendedStyleset): IClassRule
+	{ return new ClassRule( styleset); }
 
 /** Returns new IDRule object  */
-export function $id( styleset: ExtendedStyleset): IIDRule { return new IDRule( styleset); }
+export function $id( styleset: ExtendedStyleset): IIDRule
+	{ return new IDRule( styleset); }
 
 /** Creates new SelectorRule object  */
 export function $rule( selector: SelectorType, styleset: ExtendedStyleset): ISelectorRule
 	{ return new SelectorRule( selector, styleset); }
 
 /** Returns new AnimationRule object  */
-export function $animation( ...keyframes: Keyframe[]): IAnimationRule { return new AnimationRule( keyframes); }
+export function $animation( ...keyframes: Keyframe[]): IAnimationRule
+	{ return new AnimationRule( keyframes); }
 
 /** Returns new CustomVar object that defines a custom CSS property */
 export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K]): ICustomVar<K>
@@ -382,6 +398,10 @@ export function $supports<T>( query: string, definitionClass: IRuleDefinitionCla
 /** Returns new MediaRule object  */
 export function $media<T>( query: string | MediaQuery, definitionClass: IRuleDefinitionClass<T>): IMediaRule<T>
 	{ return new MediaRule( query, definitionClass); }
+
+/** Returns new ImportRule object  */
+export function $import( url: string, query?: string | MediaQuery): IImportRule
+	{ return new ImportRule( url, query); }
 
 
 

@@ -99,6 +99,16 @@ export class TssManager
 
 
 
+	// Removes this style scope from DOM - only works for multiplex style scopes
+	public static addImportRule( importRule: string): CSSImportRule
+	{
+		this.ensureDOM();
+		let index = this.styleSheetForImports.insertRule( importRule, this.styleSheetForImports.cssRules.length);
+		return this.styleSheetForImports.cssRules[index] as CSSImportRule;
+	}
+
+
+
 	/** Ensures that the <style> element is inserted into DOM */
 	private static ensureDOM(): void
 	{
@@ -106,9 +116,15 @@ export class TssManager
 			return;
 
 		// create <style> element and insert it into <head>
-		this.styleElm = document.createElement( "style");
-		document.head.appendChild( this.styleElm);
+		this.styleElmForImports = document.createElement( "style");
+		this.styleElmForImports.id = "mimcssImports";
+		document.head.appendChild( this.styleElmForImports);
+		this.styleSheetForImports = this.styleElmForImports.sheet as CSSStyleSheet;
 
+		// create <style> element and insert it into <head>
+		this.styleElm = document.createElement( "style");
+		this.styleElm.id = "mimcssStyles";
+		document.head.appendChild( this.styleElm);
 		this.styleSheet = this.styleElm.sheet as CSSStyleSheet;
 	}
 
@@ -125,10 +141,16 @@ export class TssManager
 	// Next number to use when generating unique identifiers.
 	private static nextUniqueID: number = 1;
 
-	// Style element DOM object where all rules from all StyleScope objects are creaed.
+	// Style element DOM object where all @import rules from all StyleScope objects are creaed.
+	private static styleElmForImports?: HTMLStyleElement;
+
+	// DOM style sheet object for @import rules.
+	private static styleSheetForImports?: CSSStyleSheet;
+
+	// Style element DOM object where all rules except @import from all StyleScope objects are creaed.
 	private static styleElm?: HTMLStyleElement;
 
-	// DOM style sheet object inserted into the <head> element.
+	// DOM style sheet object for all rules except @import.
 	private static styleSheet?: CSSStyleSheet;
 
 	// Map of StyleScope multiplex objects to their <style> element DOM objects.
