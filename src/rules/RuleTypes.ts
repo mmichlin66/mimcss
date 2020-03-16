@@ -232,6 +232,17 @@ export interface IImportRule extends IRule
 
 
 /**
+ * The IFontFaceRule interface represents a CSS @font-face rule.
+ */
+export interface IFontFaceRule extends IRule
+{
+	/** SOM font-face rule */
+	readonly cssFontFaceRule: CSSFontFaceRule;
+}
+
+
+
+/**
  * The ICustomVar interface represents a CSS custom property definitions.
  */
 export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRule
@@ -364,6 +375,8 @@ import {SupportsRule} from "./SupportsRule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {MediaRule} from "./MediaRule"
 import {ImportRule} from "./ImportRule"
+import {Fontface} from "../styles/FontFaceTypes";
+import {FontFaceRule} from "./FontFaceRule"
 
 
 
@@ -402,6 +415,10 @@ export function $media<T>( query: string | MediaQuery, definitionClass: IRuleDef
 /** Returns new ImportRule object  */
 export function $import( url: string, query?: string | MediaQuery): IImportRule
 	{ return new ImportRule( url, query); }
+
+/** Returns new FonFaceRule object  */
+export function $fontface( fontface: Fontface): IFontFaceRule
+	{ return new FontFaceRule( fontface); }
 
 
 

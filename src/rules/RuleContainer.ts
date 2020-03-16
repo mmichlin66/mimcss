@@ -199,6 +199,15 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 			if (rule.nameIsRequired)
 				continue;
 
+			// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
+			// We inform our owner style scope about the "imported" scope so that when the owner
+			// scope is activated, the imported one is activated too.
+			if (rule.type === RuleType.SCOPE)
+			{
+				this.owner.addImportedScope( rule as any as IStyleScope);
+				continue;
+			}
+
 			// if the rule object is already assigned to a style scope, we create a clone of the
 			// rule and assign it to our scope.
 			if (rule.owner)
