@@ -293,7 +293,7 @@ export type UnnamedRule = ITagRule | ISelectorRule | IGroupRule;
 /**
  * The IRuleContainer interface represents an object that contains CSS rules.
  */
-export interface IRuleContainer<T = any>
+export interface IRuleContainer<T = any> extends IRule
 {
 	/** Names of classes. */
 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
