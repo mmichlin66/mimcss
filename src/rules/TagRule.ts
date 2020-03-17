@@ -9,22 +9,10 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( tagName?: string, styleset?: ExtendedStyleset)
+	public constructor( tagName?: string, style?: ExtendedStyleset)
 	{
-		super( RuleType.TAG, styleset);
+		super( RuleType.TAG, style);
 		this.tagName = tagName;
-	}
-
-
-
-	// Processes the given rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
-	{
-		super.process( container, owner, ruleName);
-
-		// go through all parents and copy style properties to the class's own styleset.
-		for( let parent of this.parents)
-			Object.assign( this.styleset, parent.styleset);
 	}
 
 

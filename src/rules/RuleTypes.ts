@@ -34,7 +34,7 @@ export type ExtendedStyleset =
 	(Styleset &
 		{
 			$extends?: IStyleRule | IStyleRule[],
-			$important?: keyof Styleset | (keyof Styleset)[],
+			$important?: keyof PureStyleset | (keyof PureStyleset)[],
 		}
 	) | IStyleRule | IStyleRule[];
 
@@ -183,7 +183,7 @@ export interface IAnimationRule extends INamedRule
 /**
  * The Keyframe type defines a single keyframe within a @keyframes rule.
  */
-export type Keyframe = [ "from" | "to" | number, ExtendedStyleset ];
+export type Keyframe = ["from" | "to" | number, ExtendedStyleset];
 
 
 
@@ -381,20 +381,20 @@ import {FontFaceRule} from "./FontFaceRule"
 
 
 /** Creates new TagRule object  */
-export function $tag( tagName: string, styleset: ExtendedStyleset): ITagRule
-	{ return new TagRule( tagName, styleset); }
+export function $tag( tagName: string, style: ExtendedStyleset): ITagRule
+	{ return new TagRule( tagName, style); }
 
 /** Returns new ClassRule object  */
-export function $class( styleset: ExtendedStyleset): IClassRule
-	{ return new ClassRule( styleset); }
+export function $class( style: ExtendedStyleset): IClassRule
+	{ return new ClassRule( style); }
 
 /** Returns new IDRule object  */
-export function $id( styleset: ExtendedStyleset): IIDRule
-	{ return new IDRule( styleset); }
+export function $id( style: ExtendedStyleset): IIDRule
+	{ return new IDRule( style); }
 
 /** Creates new SelectorRule object  */
-export function $rule( selector: SelectorType, styleset: ExtendedStyleset): ISelectorRule
-	{ return new SelectorRule( selector, styleset); }
+export function $rule( selector: SelectorType, style: ExtendedStyleset): ISelectorRule
+	{ return new SelectorRule( selector, style); }
 
 /** Returns new AnimationRule object  */
 export function $animation( ...keyframes: Keyframe[]): IAnimationRule

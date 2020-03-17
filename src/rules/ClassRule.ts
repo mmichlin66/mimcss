@@ -9,9 +9,9 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class ClassRule extends StyleRule implements IClassRule
 {
-	public constructor( styleset?: ExtendedStyleset)
+	public constructor( style?: ExtendedStyleset)
 	{
-		super( RuleType.CLASS, styleset);
+		super( RuleType.CLASS, style);
 	}
 
 
@@ -22,10 +22,6 @@ export class ClassRule extends StyleRule implements IClassRule
 		super.process( container, owner, ruleName);
 
 		this.className = this.owner.getScopedRuleNamed( ruleName);
-
-		// go through all parents and copy their style properties to our own styleset.
-		for( let parent of this.parents)
-			Object.assign( this.styleset, parent.styleset);
 	}
 
 

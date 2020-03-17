@@ -81,7 +81,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 		this._varRule.process( this, this.owner, null)
 		this._allRules.push( this._varRule);
 
-		// prepare for unnamed rules that can be called from the definition bject's constructor
+		// prepare for unnamed rules that can be called from the definition object's constructor
 		let unnamedRules: UnnamedRule[] = [];
 		let options: RuleDefinitionOptions = {
 			addRules: ( ...rules: UnnamedRule[]): void =>
@@ -96,12 +96,12 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 		let rulesDef: T;
 		try
 		{
-			// create instance of the style scope definition class
+			// create instance of the rules definition class
 			rulesDef = new this.definitionClass( options);
 		}
 		catch( err)
 		{
-			console.error( `Error instantiating Group Rule Definition of type '${this.definitionClass.name}'`);
+			console.error( `Error instantiating Rule Definition of type '${this.definitionClass.name}'`);
 			return;
 		}
 

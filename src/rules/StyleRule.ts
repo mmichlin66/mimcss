@@ -2,6 +2,7 @@ import {IStyleRule, ExtendedStyleset, RuleType} from "./RuleTypes";
 import {Styleset} from "../styles/StyleTypes"
 import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule";
+import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -10,7 +11,7 @@ import {Rule} from "./Rule";
  */
 export abstract class StyleRule extends Rule implements IStyleRule
 {
-	public constructor( type: RuleType, styleset?: ExtendedStyleset)
+	public constructor( type: RuleType, style?: ExtendedStyleset)
 	{
 		super( type);
 
@@ -18,30 +19,31 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		this.parents = [];
 		this.important = new Set<string>();
 
-		if (styleset)
-			this.parseExtendedStyleset( styleset);
+		if (style)
+			this.parseExtendedStyleset( style);
 	}
 
-	private parseExtendedStyleset( styleset: ExtendedStyleset): void
+	private parseExtendedStyleset( style: ExtendedStyleset): void
 	{
-		if (styleset instanceof StyleRule)
+		if (style instanceof StyleRule)
 		{
 			// styleset is a single IStyleRule object, which we add as our parent
-			this.parents.push( styleset);
+			this.parents.push( style);
 		}
-		else if (Array.isArray(styleset))
+		else if (Array.isArray(style))
 		{
 			// styleset is an array of IStyleRule objects, which we add as our parents
-			for( let rule of styleset)
+			for( let rule of style)
 				this.parents.push( rule as StyleRule);
 		}
 		else
 		{
-			// styleset is a set of style properties but can also include the $extends and
-			// $important properties
-			for( let propName in styleset)
+			// extendedStyleset is a set of style properties but can also include the $extends and
+			// $important properties. Remember parents and important names and copy the rest of
+			// style properties to our internal Styleset object.
+			for( let propName in style)
 			{
-				let propVal = styleset[propName];
+				let propVal = style[propName];
 				if (propName === "$extends")
 				{
 					let inheritsPropVal = propVal as (IStyleRule | IStyleRule[]);
@@ -83,6 +85,29 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
+	// Processes the given rule.
+	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
+	{
+		super.process( container, owner, ruleName);
+
+		// if we have parents, we need to first copy their stylesets, so that our styleset can
+		// override their values.
+		if (this.parents.length > 0)
+		{
+			let tempStyleset = this.styleset;
+			this.styleset = {};
+
+			// go through all parents and copy their style properties to our own styleset.
+			for( let parent of this.parents)
+				Object.assign( this.styleset, parent.styleset);
+
+			// copy our styles over those of the parents
+			Object.assign( this.styleset, tempStyleset);
+		}
+	}
+
+
+
 	// Copies internal data from another rule object.
 	protected copyFrom( src: StyleRule): void
 	{
@@ -114,13 +139,13 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public get cssStyleRule(): CSSStyleRule { return this.cssRule as CSSStyleRule; }
 
 	// Style rule defining style properties.
-	public styleset: Styleset;
-
-	// Style rule defining style properties.
 	public parents: StyleRule[];
 
 	// Set of property names from this styleset that should be !important.
 	important: Set<string>;
+
+	// Resultant Styleset object defining properties to be inserted into DOM.
+	public styleset: Styleset;
 }
 
 

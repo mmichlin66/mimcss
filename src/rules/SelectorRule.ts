@@ -11,22 +11,11 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class SelectorRule extends StyleRule implements ISelectorRule
 {
-	public constructor( selector?: SelectorType, styleset?: ExtendedStyleset)
+	public constructor( selector?: SelectorType, style?: ExtendedStyleset)
 	{
-		super( RuleType.SELECTOR, styleset);
+		super( RuleType.SELECTOR, style);
 
 		this.selector = new Selector( selector);
-	}
-
-
-
-	// Processes the given rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
-	{
-		super.process( container, owner, ruleName);
-
-		for( let parent of this.parents)
-			Object.assign( this.styleset, parent.styleset);
 	}
 
 
