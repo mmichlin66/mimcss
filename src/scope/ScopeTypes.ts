@@ -3,7 +3,7 @@
  */
 
 
-import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionOptions} from "../rules/RuleTypes";
+import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionParams} from "../rules/RuleTypes";
 
 
 /**
@@ -12,7 +12,7 @@ import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionOptions} from "../ru
 export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
 {
 	/** All style scope definition objects should conform to this constructor */
-	new( options?: RuleDefinitionOptions): T;
+	new( options?: RuleDefinitionParams): T;
 
 	/**
 	 * Flag inidicating that multiple style scopes can be created for this style scope definition -

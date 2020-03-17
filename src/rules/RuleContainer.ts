@@ -1,6 +1,6 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, ICustomVar,
 		ICustomVarRule, UnnamedRule,
-		RuleDefinitionOptions, IRuleDefinitionClass, IRuleContainer, RuleType
+		RuleDefinitionParams, IRuleDefinitionClass, IRuleContainer, RuleType
 		} from "./RuleTypes"
 import {IStyleScope} from "../scope/ScopeTypes"
 import {Rule} from "./Rule"
@@ -83,7 +83,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 		// prepare for unnamed rules that can be called from the definition object's constructor
 		let unnamedRules: UnnamedRule[] = [];
-		let options: RuleDefinitionOptions = {
+		let params: RuleDefinitionParams = {
 			addRules: ( ...rules: UnnamedRule[]): void =>
 			{
 				if (rules && rules.length > 0)
@@ -97,7 +97,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 		try
 		{
 			// create instance of the rules definition class
-			rulesDef = new this.definitionClass( options);
+			rulesDef = new this.definitionClass( params);
 		}
 		catch( err)
 		{

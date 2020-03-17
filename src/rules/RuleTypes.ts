@@ -339,9 +339,9 @@ export interface IRuleContainer<T = any> extends IRule
 
 
 /**
- * Interface defining options passed to the constructor of rule definition classes
+ * Interface defining parameters passed to the constructor of rule definition classes.
  */
-export type RuleDefinitionOptions =
+export type RuleDefinitionParams =
 {
 	/**
 	 * Method that rule definition classes can call to create rules not assigned to a member
@@ -359,7 +359,7 @@ export type RuleDefinitionOptions =
 export interface IRuleDefinitionClass<T>
 {
 	/** All rule definition classes should conform to this constructor */
-	new( options?: RuleDefinitionOptions): T;
+	new( params?: RuleDefinitionParams): T;
 }
 
 
