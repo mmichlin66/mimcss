@@ -1,4 +1,4 @@
-import {ICustomVar, RuleType} from "./RuleTypes"
+import {ICustomVar, RuleType, INamedRule} from "./RuleTypes"
 import {PureStyleset, Styleset} from "../styles/StyleTypes"
 import {tsh} from "../helpers/tsh"
 import {Rule} from "./Rule";
@@ -11,12 +11,13 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICustomVar<K>
 {
-	public constructor( templatePropName?: K, varValue?: PureStyleset[K])
+	public constructor( templatePropName?: K, varValue?: PureStyleset[K], nameOverride?: string | INamedRule)
 	{
 		super( RuleType.VAR);
 
 		this.templatePropName = templatePropName;
 		this.varValue = varValue;
+		this.nameOverride = nameOverride;
 	}
 
 
@@ -26,7 +27,12 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 	{
 		super.process( container, owner, ruleName);
 
-		this.varName = this.owner.getScopedRuleNamed( ruleName);
+		if (!this.nameOverride)
+			this.varName = this.owner.getScopedRuleNamed( ruleName);
+		else if (typeof this.nameOverride === "string")
+			this.varName = this.nameOverride;
+		else
+			this.varName = this.nameOverride.cssName;
 	}
 
 
@@ -68,6 +74,7 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 		let newRule = new CustomVar<K>();
 		newRule.templatePropName = this.templatePropName;
 		newRule.varValue = this.varValue;
+		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
 
@@ -96,6 +103,10 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 
 	// Value of the custom CSS property.
 	public varValue: PureStyleset[K];
+
+	// Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	private nameOverride?: string | INamedRule;
 }
 
 

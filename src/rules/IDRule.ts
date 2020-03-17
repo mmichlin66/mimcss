@@ -1,4 +1,4 @@
-import {IIDRule, ExtendedStyleset, RuleType} from "./RuleTypes"
+import {IIDRule, ExtendedStyleset, RuleType, INamedRule} from "./RuleTypes"
 import {StyleRule} from "./StyleRule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
@@ -9,9 +9,11 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class IDRule extends StyleRule implements IIDRule
 {
-	public constructor( style?: ExtendedStyleset)
+	public constructor( style?: ExtendedStyleset, nameOverride?: string | INamedRule)
 	{
 		super( RuleType.ID, style);
+
+		this.nameOverride = nameOverride;
 	}
 
 
@@ -21,7 +23,12 @@ export class IDRule extends StyleRule implements IIDRule
 	{
 		super.process( container, owner, ruleName);
 
-		this.idName = this.owner.getScopedRuleNamed( ruleName);
+		if (!this.nameOverride)
+			this.idName = this.owner.getScopedRuleNamed( ruleName);
+		else if (typeof this.nameOverride === "string")
+			this.idName = this.nameOverride;
+		else
+			this.idName = this.nameOverride.cssName;
 	}
 
 
@@ -55,6 +62,7 @@ export class IDRule extends StyleRule implements IIDRule
 	{
 		let newRule = new IDRule();
 		newRule.copyFrom( this);
+		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
 
@@ -73,6 +81,10 @@ export class IDRule extends StyleRule implements IIDRule
 
 	// Name of the element identifier for applying the styleset.
 	public idName: string;
+
+	// Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	private nameOverride?: string | INamedRule;
 }
 
 

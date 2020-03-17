@@ -1,4 +1,4 @@
-import {IAnimationRule, Keyframe, RuleType} from "./RuleTypes"
+import {IAnimationRule, Keyframe, RuleType, INamedRule} from "./RuleTypes"
 import {tsh} from "../helpers/tsh"
 import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule"
@@ -12,12 +12,14 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class AnimationRule extends Rule implements IAnimationRule
 {
-	public constructor( keyframes?: Keyframe[])
+	public constructor( keyframes?: Keyframe[], nameOverride?: string | INamedRule)
 	{
 		super( RuleType.ANIMATION);
 
 		if (keyframes)
 			this.keyframeRules = keyframes.map( (keyframe) => new KeyframeRule( keyframe));
+
+		this.nameOverride = nameOverride;
 	}
 
 
@@ -27,7 +29,12 @@ export class AnimationRule extends Rule implements IAnimationRule
 	{
 		super.process( container, owner, ruleName);
 
-		this.animationName = this.owner.getScopedRuleNamed( ruleName);
+		if (!this.nameOverride)
+			this.animationName = this.owner.getScopedRuleNamed( ruleName);
+		else if (typeof this.nameOverride === "string")
+			this.animationName = this.nameOverride;
+		else
+			this.animationName = this.nameOverride.cssName;
 
 		for( let keyframeRule of this.keyframeRules)
 			keyframeRule.process( container, owner, ruleName);
@@ -64,6 +71,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 	{
 		let newRule = new AnimationRule();
 		newRule.keyframeRules = this.keyframeRules.map( (keyframeRule) => keyframeRule.clone());
+		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
 
@@ -90,6 +98,10 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 	// Name of the animation to use in animation-name CSS property.
 	public animationName: string;
+
+	// Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	private nameOverride?: string | INamedRule;
 }
 
 

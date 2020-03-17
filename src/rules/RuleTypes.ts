@@ -385,24 +385,25 @@ export function $tag( tagName: string, style: ExtendedStyleset): ITagRule
 	{ return new TagRule( tagName, style); }
 
 /** Returns new ClassRule object  */
-export function $class( style: ExtendedStyleset): IClassRule
-	{ return new ClassRule( style); }
+export function $class( style: ExtendedStyleset, nameOverride?: string | INamedRule): IClassRule
+	{ return new ClassRule( style, nameOverride); }
 
 /** Returns new IDRule object  */
-export function $id( style: ExtendedStyleset): IIDRule
-	{ return new IDRule( style); }
+export function $id( style: ExtendedStyleset, nameOverride?: string | INamedRule): IIDRule
+	{ return new IDRule( style, nameOverride); }
 
 /** Creates new SelectorRule object  */
 export function $rule( selector: SelectorType, style: ExtendedStyleset): ISelectorRule
 	{ return new SelectorRule( selector, style); }
 
 /** Returns new AnimationRule object  */
-export function $animation( ...keyframes: Keyframe[]): IAnimationRule
-	{ return new AnimationRule( keyframes); }
+export function $animation( keyframes: Keyframe[], nameOverride?: string | INamedRule): IAnimationRule
+	{ return new AnimationRule( keyframes, nameOverride); }
 
 /** Returns new CustomVar object that defines a custom CSS property */
-export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K]): ICustomVar<K>
-	{ return new CustomVar( templatePropName, propVal); }
+export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K],
+				nameOverride?: string | INamedRule): ICustomVar<K>
+	{ return new CustomVar( templatePropName, propVal, nameOverride); }
 
 /** Returns new SupportsRule object  */
 export function $supports<T>( query: string, definitionClass: IRuleDefinitionClass<T>): ISupportsRule<T>

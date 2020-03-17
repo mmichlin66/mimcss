@@ -228,24 +228,20 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Returns an ICustomVal object that defines a custom CSS property as part of a Styleset.
-     * Use it as in the following example:
+     * Defines a custom CSS property as part of a Styleset. Use it as in the following example:
      * ```tsx
      * let myStyles = $scope( class
      * {
-     *     mainColor = $custom( "color", Colors.black);
-     * 
+     *     mainColor = $custom( "color", "black");
      *     div = $tag( "div", { $custom: [ tsh.custom( this.mainColor, "brown") ] })
      * });
      * ```
-     * This is equivalent to the following CSS rule (where *mainColorVarName* is the unique name
-     * assigned by Mimcss to the `mainColor` custom CSS property):
+     * This is equivalent to the following CSS:
      * ```css
-     * div {
-     *     --mainColorVarName: "brown";
-     * }
+     * :root { --mainColor: "black"; }
+     * div { --mainColor: "brown"; }
      * ```
-     * The `custom` method will produce a compilation error if an invalid type is used for the
+     * The `tsh.custom` method will produce a compilation error if an invalid type is used for the
      * property value.
      */
     public static custom<K extends keyof PureStyleset>( varDef: ICustomVar<K>, varValue: PureStyleset[K]): ICustomVal<K>
