@@ -8,9 +8,9 @@ import {GroupRule} from "./GroupRule"
  */
 export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( query?: string, definitionClass?: IRuleDefinitionClass<T>)
+	public constructor( query?: string, definition?: T)
 	{
-		super( RuleType.SUPPORTS, definitionClass);
+		super( RuleType.SUPPORTS, definition);
 
 		this.query = query;
 	}

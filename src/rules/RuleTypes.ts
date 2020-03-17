@@ -406,12 +406,12 @@ export function $custom<K extends keyof PureStyleset>( templatePropName: K, prop
 	{ return new CustomVar( templatePropName, propVal, nameOverride); }
 
 /** Returns new SupportsRule object  */
-export function $supports<T>( query: string, definitionClass: IRuleDefinitionClass<T>): ISupportsRule<T>
-	{ return new SupportsRule( query, definitionClass); }
+export function $supports<T>( query: string, definition: T): ISupportsRule<T>
+	{ return new SupportsRule( query, definition); }
 
 /** Returns new MediaRule object  */
-export function $media<T>( query: string | MediaQuery, definitionClass: IRuleDefinitionClass<T>): IMediaRule<T>
-	{ return new MediaRule( query, definitionClass); }
+export function $media<T>( query: string | MediaQuery, definition: T): IMediaRule<T>
+	{ return new MediaRule( query, definition); }
 
 /** Returns new ImportRule object  */
 export function $import( url: string, query?: string | MediaQuery): IImportRule

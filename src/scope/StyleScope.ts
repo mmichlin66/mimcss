@@ -15,7 +15,7 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 	{
 		super( RuleType.SCOPE, defClass)
 
-		this.definitionClass = defClass;
+		this.definition = defClass;
 
 		this.activationRefCount = 0;
 		this.importedScopes = [];
@@ -57,12 +57,12 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 		// object itself
 		super.process( this, this, null);
 
-		this.isMultiplex = !!this.definitionClass.isMultiplex;
+		this.isMultiplex = !!this.definition.isMultiplex;
 
 		// in DEBUG, each class has a name unless it was created as an anonymous class. In RELEASE,
 		// (as well as in the anonymous cases), the name is undefined and we generate a unique
 		// name for the style scope.
-		this.name = this.definitionClass.name;
+		this.name = this.definition.name;
 		if (!this.name)
 			this.name = TssManager.generateUniqueName( "s");
 
@@ -154,7 +154,7 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 
 
 	// Class that defined this style scope. This member is used for style scope derivation
-	protected readonly definitionClass: IStyleScopeDefinitionClass<T>;
+	protected readonly definition: IStyleScopeDefinitionClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;

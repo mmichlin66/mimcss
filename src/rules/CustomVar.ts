@@ -32,7 +32,7 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 		else if (typeof this.nameOverride === "string")
 			this.varName = this.nameOverride;
 		else
-			this.varName = this.nameOverride.cssName;
+			this.varName = this.nameOverride.name;
 	}
 
 

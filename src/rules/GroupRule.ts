@@ -11,9 +11,9 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export abstract class GroupRule<T = any> extends RuleContainer<T> implements IGroupRule<T>
 {
-	public constructor( type: RuleType, definitionClass: IRuleDefinitionClass<T>)
+	public constructor( type: RuleType, definition: T)
 	{
-		super( type, definitionClass);
+		super( type, definition);
 	}
 
 

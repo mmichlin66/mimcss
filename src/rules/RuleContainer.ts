@@ -29,12 +29,12 @@ export interface IRuleContainerOwner
 /**
  * The RuleContainer class represents a parsed form of a rule definition class.
  */
-export abstract class RuleContainer<T = any> extends Rule implements IRuleContainer
+export abstract class RuleContainer<T = any> extends Rule implements IRuleContainer<T>
 {
-	public constructor( type: number, definitionClass: IRuleDefinitionClass<T>)
+	public constructor( type: number, definition: IRuleDefinitionClass<T> | T)
 	{
 		super( type);
-		this.definitionClass = definitionClass;
+		this.definition = definition;
 	}
 
 
@@ -83,33 +83,38 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 		// prepare for unnamed rules that can be called from the definition object's constructor
 		let unnamedRules: UnnamedRule[] = [];
-		let params: RuleDefinitionParams = {
-			addRules: ( ...rules: UnnamedRule[]): void =>
-			{
-				if (rules && rules.length > 0)
-					unnamedRules = unnamedRules.concat( rules);
-			}
-		};
-
 		// create instance of the rules definition class and then go over its properties,
 		// which define CSS rules.
 		let rulesDef: T;
-		try
+		if (typeof this.definition === "function")
 		{
-			// create instance of the rules definition class
-			rulesDef = new this.definitionClass( params);
+			let params: RuleDefinitionParams = {
+				addRules: ( ...rules: UnnamedRule[]): void =>
+				{
+					if (rules && rules.length > 0)
+						unnamedRules = unnamedRules.concat( rules);
+				}
+			};
+
+			try
+			{
+				// create instance of the rules definition class
+				rulesDef = new (this.definition as IRuleDefinitionClass<T>)( params);
+			}
+			catch( err)
+			{
+				console.error( `Error instantiating Rule Definition of type '${this.definition.name}'`);
+				return;
+			}
 		}
-		catch( err)
-		{
-			console.error( `Error instantiating Rule Definition of type '${this.definitionClass.name}'`);
-			return;
-		}
+		else
+			rulesDef = this.definition;
 
 		// process rules that are assigned to the properties of the definition class
 		this.processNamedRules( rulesDef);
 
 		// if the definition class added rules via the option's addRules method, process them
-		if (unnamedRules)
+		if (unnamedRules.length > 0)
 			this.processUnnamedRules( unnamedRules);
 	}
 
@@ -185,7 +190,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 			return;
 		else if (!Array.isArray(unnamedRules))
 		{
-			console.error( `createUnnamedRules method of Style Scope Definition of type '${this.definitionClass.name}' must return array`);
+			// console.error( `createUnnamedRules method of Style Scope Definition of type '${this.definition.name}' must return array`);
 			return;
 		}
 
@@ -243,7 +248,7 @@ export abstract class RuleContainer<T = any> extends Rule implements IRuleContai
 
 
 	// Class that defined this style scope. This member is used for style scope derivation
-	protected readonly definitionClass: IRuleDefinitionClass<T>;
+	protected readonly definition: IRuleDefinitionClass<T> | T;
 
 	// Names of all classes, IDs, animations and custom properties defined in this container.
 	protected _allNames: { [K: string]: string };

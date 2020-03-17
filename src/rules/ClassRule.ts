@@ -28,7 +28,7 @@ export class ClassRule extends StyleRule implements IClassRule
 		else if (typeof this.nameOverride === "string")
 			this.className = this.nameOverride;
 		else
-			this.className = this.nameOverride.cssName;
+			this.className = this.nameOverride.name;
 	}
 
 

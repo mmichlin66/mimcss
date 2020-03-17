@@ -10,9 +10,9 @@ import {mediaQueryToCssString} from "../styles/MediaFuncs";
  */
 export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( query?: string | MediaQuery, definitionClass?: IRuleDefinitionClass<T>)
+	public constructor( query?: string | MediaQuery, definition?: T)
 	{
-		super( RuleType.MEDIA, definitionClass);
+		super( RuleType.MEDIA, definition);
 
 		this.query = query;
 	}

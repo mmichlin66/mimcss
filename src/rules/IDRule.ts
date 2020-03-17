@@ -28,7 +28,7 @@ export class IDRule extends StyleRule implements IIDRule
 		else if (typeof this.nameOverride === "string")
 			this.idName = this.nameOverride;
 		else
-			this.idName = this.nameOverride.cssName;
+			this.idName = this.nameOverride.name;
 	}
 
 

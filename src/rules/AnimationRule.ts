@@ -34,7 +34,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 		else if (typeof this.nameOverride === "string")
 			this.animationName = this.nameOverride;
 		else
-			this.animationName = this.nameOverride.cssName;
+			this.animationName = this.nameOverride.name;
 
 		for( let keyframeRule of this.keyframeRules)
 			keyframeRule.process( container, owner, ruleName);
