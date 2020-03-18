@@ -315,7 +315,7 @@ export type UnnamedRule = ITagRule | ISelectorRule | IGroupRule;
 /**
  * The IRuleContainer interface represents an object that contains CSS rules.
  */
-export interface IRuleContainer<T = any> extends IRule
+export interface IRuleContainer<T = IRuleDefinition> extends IRule
 {
 	/** Names of classes. */
 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
@@ -339,16 +339,12 @@ export interface IRuleContainer<T = any> extends IRule
 
 
 /**
- * Interface defining parameters passed to the constructor of rule definition classes.
+ * "Constructor" interface defining how rule definition classes can be created.
  */
-export type RuleDefinitionParams =
+export interface IRuleDefinition
 {
-	/**
-	 * Method that rule definition classes can call to create rules not assigned to a member
-	 * property. These rules cannot be those that require names, such as class, ID, animation
-	 * or custom CSS property.
-	 */
-	addRules: ( ...rules: UnnamedRule[]) => void;
+	/** Array of unnamed rules */
+	$unnamed?: IRule[];
 }
 
 
@@ -356,10 +352,10 @@ export type RuleDefinitionParams =
 /**
  * "Constructor" interface defining how rule definition classes can be created.
  */
-export interface IRuleDefinitionClass<T>
+export interface IRuleDefinitionClass<T extends IRuleDefinition>
 {
 	/** All rule definition classes should conform to this constructor */
-	new( params?: RuleDefinitionParams): T;
+	new(): T;
 }
 
 

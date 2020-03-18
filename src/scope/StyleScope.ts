@@ -1,5 +1,5 @@
 import {IStyleScopeDefinitionClass, IStyleScope} from "./ScopeTypes"
-import {RuleType} from "../rules/RuleTypes"
+import {RuleType, IRuleDefinition, IRuleDefinitionClass} from "../rules/RuleTypes"
 import {Rule} from "../rules/Rule"
 import {TssManager} from "./TssManager"
 import {RuleContainer, IRuleContainerOwner} from "../rules/RuleContainer"
@@ -9,13 +9,13 @@ import {RuleContainer, IRuleContainerOwner} from "../rules/RuleContainer"
 /**
  * The StyleScope class represents a parsed form of a IStyleScopeDefinition-derived class.
  */
-export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>, IRuleContainerOwner
+export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements IStyleScope<T>, IRuleContainerOwner
 {
-	public constructor( defClass: IStyleScopeDefinitionClass<T>)
+	public constructor( definitionClass: IStyleScopeDefinitionClass<T>)
 	{
-		super( RuleType.SCOPE, defClass)
+		super( RuleType.SCOPE, definitionClass)
 
-		this.definition = defClass;
+		this.definitionClass = definitionClass;
 
 		this.activationRefCount = 0;
 		this.importedScopes = [];
@@ -57,12 +57,12 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 		// object itself
 		super.process( this, this, null);
 
-		this.isMultiplex = !!this.definition.isMultiplex;
+		this.isMultiplex = !!this.definitionClass.isMultiplex;
 
 		// in DEBUG, each class has a name unless it was created as an anonymous class. In RELEASE,
 		// (as well as in the anonymous cases), the name is undefined and we generate a unique
 		// name for the style scope.
-		this.name = this.definition.name;
+		this.name = this.definitionClass.name;
 		if (!this.name)
 			this.name = TssManager.generateUniqueName( "s");
 
@@ -154,7 +154,7 @@ export class StyleScope<T = any> extends RuleContainer implements IStyleScope<T>
 
 
 	// Class that defined this style scope. This member is used for style scope derivation
-	protected readonly definition: IStyleScopeDefinitionClass<T>;
+	protected readonly definitionClass: IStyleScopeDefinitionClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;

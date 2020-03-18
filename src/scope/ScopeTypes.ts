@@ -3,7 +3,7 @@
  */
 
 
-import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionParams} from "../rules/RuleTypes";
+import {IRuleContainer, IRuleDefinitionClass, IRuleDefinition} from "../rules/RuleTypes";
 
 
 /**
@@ -12,7 +12,7 @@ import {IRuleContainer, IRuleDefinitionClass, RuleDefinitionParams} from "../rul
 export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
 {
 	/** All style scope definition objects should conform to this constructor */
-	new( options?: RuleDefinitionParams): T;
+	new(): T;
 
 	/**
 	 * Flag inidicating that multiple style scopes can be created for this style scope definition -
@@ -67,9 +67,8 @@ import {StyleScope} from "./StyleScope"
  * names of IDs, classes and keyframes and allows style manipulations. For a given style scope
  * definition class there is a single style scope object, no matter how many times this function
  * is invoked.
- * @param sheetDef 
  */
-export function $scope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
+export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
 {
 	// if the style scope definition is multiplex, create new StyleScope object every time;
 	// otherwise, check whether the style sheet definition object has already been processed. This
@@ -87,6 +86,21 @@ export function $scope<T>( styleScopeDefinitionClass: IStyleScopeDefinitionClass
 
 		return styleScope;
 	}
+}
+
+
+
+/**
+ * Processes the given style scope definition, inserts the CSS rules into DOM and returns the
+ * StyleScope object that contains names of IDs, classes and keyframes and allows style
+ * manipulations. For a given style scope definition class there is a single style scope object,
+ * no matter how many times this function is invoked.
+ */
+export function $activate<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
+{
+	let scope = $use( styleScopeDefinitionClass);
+	scope.activate();
+	return scope;
 }
 
 

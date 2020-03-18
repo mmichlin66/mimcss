@@ -49,14 +49,6 @@ export class IDRule extends StyleRule implements IIDRule
 
 
 
-	/**
-	 * Determines whether this rule requires name - that is it will be ignored if created within
-	 * the createUnnamedRules
-	 */
-	public get nameIsRequired(): boolean { return true; }
-
-
-
 	// Creates a copy of the rule.
 	public clone(): IDRule
 	{

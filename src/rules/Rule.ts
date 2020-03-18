@@ -30,12 +30,6 @@ export abstract class Rule implements IRule
 	// e.g. for the CustomVar class, this is not so.
 	public get isRealCssRule(): boolean { return true; }
 
-	/**
-	 * Determines whether this rule requires name - that is it will be ignored if created within
-	 * the addRules function.
-	 */
-	public get nameIsRequired(): boolean { return false; }
-
 	// Creates a copy of the rule.
 	public abstract clone(): Rule;
 
