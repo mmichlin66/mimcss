@@ -3,21 +3,21 @@ import * as MediaTypes from "./MediaTypes"
 
 
 
-function aspectRatioToCssString( val: MediaTypes.AspectRatioFetaureType): string
+function aspectRatioToCssString( val: MediaTypes.AspectRatioFeatureType): string
 {
     return typeof val === "string" ? val : val[0] + "/" + val[1];
 }
 
 
 
-function lengthFetaureToCssString( val: MediaTypes.LengthFetaureType): string
+function lengthFeatureToCssString( val: MediaTypes.LengthFeatureType): string
 {
     return typeof val === "string" ? val : val + "px";
 }
 
 
 
-function resolutionFetaureToCssString( val: MediaTypes.ResolutionFetaureType): string
+function resolutionFeatureToCssString( val: MediaTypes.ResolutionFeatureType): string
 {
     return typeof val === "string" ? val : val + "dpi";
 }
@@ -149,16 +149,16 @@ let mediaFeatures: { [K in keyof MediaTypes.MediaFeatureset]?: MediaFeatureInfo<
     colorIndex: { defaultValue: 0 },
     minColorIndex: "color",
     maxColorIndex: "color",
-    height: lengthFetaureToCssString,
+    height: lengthFeatureToCssString,
     minHeight: "height",
     maxHeight: "height",
     monochrome: { defaultValue: 0 },
     minMonochrome: "monochrome",
     maxMonochrome:"monochrome",
-    resolution: resolutionFetaureToCssString,
+    resolution: resolutionFeatureToCssString,
     minResolution: "resolution",
     maxResolution: "resolution",
-    width: lengthFetaureToCssString,
+    width: lengthFeatureToCssString,
     minWidth: "width",
     maxWidth:"width",
 };

@@ -1,5 +1,5 @@
 ﻿/**
- * This module defines types od CSS rules.
+ * This module defines types of object that represent CSS rules.
  */
 
 
@@ -243,7 +243,7 @@ export interface IFontFaceRule extends IRule
 
 
 /**
- * The ICustomVar interface represents a CSS custom property definitions.
+ * The ICustomVar interface represents a CSS custom property definition.
  */
 export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRule
 {
