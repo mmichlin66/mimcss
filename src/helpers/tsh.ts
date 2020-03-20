@@ -2,10 +2,10 @@
 import * as UtilFuncs from "../styles/UtilFuncs"
 import * as ColorTypes from "../styles/ColorTypes";
 import * as ColorFuncs from "../styles/ColorFuncs";
-import {ICustomVar, ICustomVal} from "../rules/RuleTypes"
-import {CustomVar} from "../rules/CustomVar"
-import {PureStyleset} from "../styles/StyleTypes"
+import {PureStyleset, ICustomVal} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs";
+import {ICustomVar} from "../rules/RuleTypes"
+import {CustomVar} from "../rules/CustomVar"
 
 
 
@@ -13,7 +13,7 @@ import {stylePropToCssString} from "../styles/StyleFuncs";
  * The msh class contains static helper functions that are used whenever there is a need to produce
  * CSS string value based on more complicated type(s). The majority of these functions return
  * StringProxy object so that they can be used in styleset properties assignments, for example:
- * ```tsx
+ * ```typescript
  * <div style={{ color: tsh.rgb( 255, 128, 64) }}
  * ```
  */
@@ -56,21 +56,61 @@ export class tsh
     // Colors
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    public static colorSep( c: number | string): string
-    {
-        return ColorFuncs.colorSep(c);
-    }
-
+    
+    /**
+     * Converts the color specified as red, green, blue separation values and an optional alpha
+     * mask to a CSS color representation. This method should be used when defining CSS color
+     * values in styleset properties. Each color separation cna be represented as a number or a
+     * string with the following meaning:
+     *   - Integer number 0 to 255.
+     *   - Floating number 0.0 to 1.0 non-inclusive, whcih is treated as percentage.
+     *   - String which is treated as is.
+     * 
+     * The alpha mask can be one of the following:
+     *   - Number 0 to 1 inclusive, which is treated as percentage.
+     *   - String which is treated as is.
+     * 
+     * @param r Red separation value.
+     * @param g Green separation vaue.
+     * @param b Blue separation value.
+     * @param a Optional alpha mask as a percentage value.
+     */
     public static rgb( r: number | string, g: number | string, b: number | string, a?: number | string): StringProxy
     {
         return new StringProxy( ColorFuncs.rgb( r, g, b, a));
     }
 
+    /**
+     * Converts the color specified as hue-saturation-lightness components and an optional alpha
+     * mask to a CSS color representation. This method should be used when defining CSS color
+     * values in styleset properties.
+     * 
+     * The alpha mask can be one of the following:
+     *   - Number 0 to 1 inclusive, which is treated as percentage.
+     *   - String which is treated as is.
+     * 
+     * @param h Hue component as an angle value.
+     * @param s Saturation as a percentage value.
+     * @param l Lightness component as a percentage value.
+     * @param a Optional alpha mask as a percentage value.
+     */
     public static hsl( h: number | string, s: number | string, l: number | string, a?: number | string): StringProxy
     {
         return new StringProxy( ColorFuncs.hsl( h, s, l, a));
     }
 
+    /**
+     * Converts the given color and an optional alpha mask to the CSS Color representation. This
+     * method should be used when defining CSS color values in styleset properties.
+     * The color can be specified as a numeric value or as a string color name.
+     * 
+     * The alpha mask can be one of the following:
+     *   - Number 0 to 1 inclusive, which is treated as percentage.
+     *   - String which is treated as is.
+     * 
+     * @param c 
+     * @param a 
+     */
     public static alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): StringProxy
     {
         return new StringProxy( ColorFuncs.alpha( c, a));
@@ -99,26 +139,66 @@ export class tsh
     // Length units
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    public static Q( n: number) { return this.units( n, "Q"); }
-    public static ch( n: number) { return this.units( n, "ch"); }
-    public static cm( n: number) { return this.units( n, "cm"); }
-    public static em( n: number) { return this.units( n, "em"); }
-    public static ex( n: number) { return this.units( n, "ex"); }
-    public static ic( n: number) { return this.units( n, "ic"); }
-    public static in( n: number) { return this.units( n, "in"); }
-    public static lh( n: number) { return this.units( n, "lh"); }
-    public static mm( n: number) { return this.units( n, "mm"); }
-    public static pc( n: number) { return this.units( n, "pc"); }
-    public static pt( n: number) { return this.units( n, "pt"); }
-    public static px( n: number) { return this.units( n, "px"); }
-    public static vb( n: number) { return this.units( n, "vb"); }
-    public static vh( n: number) { return this.units( n, "vh"); }
-    public static vi( n: number) { return this.units( n, "vi"); }
-    public static vw( n: number) { return this.units( n, "vw"); }
-    public static rem( n: number) { return this.units( n, "rem"); }
-    public static rlh( n: number) { return this.units( n, "rlh"); }
-    public static vmax( n: number) { return this.units( n, "vmax"); }
-    public static vmin( n: number) { return this.units( n, "vmin"); }
+
+    /** Creates length value in vmin */
+    public static Q( n: number) { return n + "Q"; }
+
+    /** Creates length value in ch */
+    public static ch( n: number) { return n + "ch"; }
+
+    /** Creates length value in cm */
+    public static cm( n: number) { return n + "cm"; }
+
+    /** Creates length value in em */
+    public static em( n: number) { return n + "em"; }
+
+    /** Creates length value in ex */
+    public static ex( n: number) { return n + "ex"; }
+
+    /** Creates length value in ic */
+    public static ic( n: number) { return n + "ic"; }
+
+    /** Creates length value in in */
+    public static in( n: number) { return n + "in"; }
+
+    /** Creates length value in lh */
+    public static lh( n: number) { return n + "lh"; }
+
+    /** Creates length value in mm */
+    public static mm( n: number) { return n + "mm"; }
+
+    /** Creates length value in pc */
+    public static pc( n: number) { return n + "pc"; }
+
+    /** Creates length value in pt */
+    public static pt( n: number) { return n + "pt"; }
+
+    /** Creates length value in px */
+    public static px( n: number) { return n + "px"; }
+
+    /** Creates length value in vb */
+    public static vb( n: number) { return n + "vb"; }
+
+    /** Creates length value in vh */
+    public static vh( n: number) { return n + "vh"; }
+
+    /** Creates length value in vi */
+    public static vi( n: number) { return n + "vi"; }
+
+    /** Creates length value in vw */
+    public static vw( n: number) { return n + "vw"; }
+
+    /** Creates length value in rem */
+    public static rem( n: number) { return n + "rem"; }
+
+    /** Creates length value in rlh */
+    public static rlh( n: number) { return n + "rlh"; }
+
+    /** Creates length value in vmax */
+    public static vmax( n: number) { return n + "vmax"; }
+
+    /** Creates length value in vmin */
+    public static vmin( n: number) { return n + "vmin"; }
 
     /**
      * Converts length value from the numeric representation to the CSS string.
@@ -137,16 +217,16 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /** Creates angle value in degrees */
-    public static deg( n: number) { return this.units( n, "deg"); }
+    public static deg( n: number) { return n + "deg"; }
 
     /** Creates angle value in radians */
-    public static rad( n: number) { return this.units( n, "rad"); }
+    public static rad( n: number) { return n + "rad"; }
 
     /** Creates angle value in gradians */
-    public static grad( n: number) { return this.units( n, "grad"); }
+    public static grad( n: number) { return n + "grad"; }
 
     /** Creates angle value in turns */
-    public static turn( n: number) { return this.units( n, "turn"); }
+    public static turn( n: number) { return n + "turn"; }
 
     /**
      * Converts angle value from the numeric representation to the CSS string. Integer
@@ -166,10 +246,10 @@ export class tsh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /** Creates time value in seconds */
-    public static s( n: number) { return this.units( n, "s"); }
+    public static s( n: number) { return n + "s"; }
 
     /** Creates time value in milliseconds */
-    public static ms( n: number) { return this.units( n, "ms"); }
+    public static ms( n: number) { return n + "ms"; }
 
     /**
      * Converts time value from the numeric representation to the CSS string. Integer
@@ -187,8 +267,12 @@ export class tsh
     // Frequency units
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    public static hz( n: number) { return this.units( n, "Hz"); }
-    public static khz( n: number) { return this.units( n, "kHz"); }
+
+    /** Creates frequency value in Hertz */
+    public static hz( n: number) { return n + "Hz"; }
+
+    /** Creates frequency value in Kilo-Hertz */
+    public static khz( n: number) { n + "kHz"; }
 
 
 
@@ -197,9 +281,15 @@ export class tsh
     // Resolution units
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    public static dpi( n: number) { return this.units( n, "dpi"); }
-    public static dpcm( n: number) { return this.units( n, "dpcm"); }
-    public static dppx( n: number) { return this.units( n, "dppx"); }
+
+    /** Creates resolution value in DPI */
+    public static dpi( n: number) { return n + "dpi"; }
+
+    /** Creates resolution value in DPCM */
+    public static dpcm( n: number) { return n + "dpcm"; }
+
+    /** Creates resolution value in DPPX */
+    public static dppx( n: number) { return n + "dppx"; }
 
 /**
      * Converts resolution value from the numeric representation to the CSS string. Integer
@@ -217,7 +307,9 @@ export class tsh
     // Fraction units (for flex)
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    public static fr( n: number) { return this.units( n, "fr"); }
+
+    /** Creates fraction value for flex */
+    public static fr( n: number) { return n + "fr"; }
 
 
 
@@ -229,7 +321,7 @@ export class tsh
 
     /**
      * Defines a custom CSS property as part of a Styleset. Use it as in the following example:
-     * ```tsx
+     * ```typescript
      * let myStyles = $scope( class
      * {
      *     mainColor = $custom( "color", "black");
@@ -252,7 +344,7 @@ export class tsh
     /**
      * Returns the string representation of the CSS var() function for the given custom property.
      * Use it as in the following example:
-     * ```tsx
+     * ```typescript
      * let myStyles = $scope( class
      * {
      *     defaultColor = $custom( "color", "blue");
@@ -261,12 +353,12 @@ export class tsh
      * });
      * ```
      * The var method can also be used with simple string values:
-     * ```tsx
+     * ```typescript
      * <div style={{ color: tsh.var( "default-color", "black") }}
      * ```
      */
     public static var<K extends keyof PureStyleset>( varDef: ICustomVar<K> | string,
-                    fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy): VarValue<K>
+                    fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy): StringProxy
     {
         return new VarValue( varDef, fallbackValue);
     }
@@ -278,7 +370,7 @@ export class tsh
  * The VarValue class encapsulates a usage of the CSS `var` function for getting a value of a
  * custom CSS property.
  */
-export class VarValue<K extends keyof PureStyleset> extends StringProxy
+class VarValue<K extends keyof PureStyleset> extends StringProxy
 {
     constructor( varDef: ICustomVar<K> | string,
                     fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy)

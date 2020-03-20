@@ -276,31 +276,6 @@ export interface ICustomVarRule<T = any> extends IRule
 
 
 /**
- * The ICustomVal interface represents a custom CSS property name and value that can be used to
- * define custom properties in the Styleset.
- */
-export interface ICustomVal<K extends keyof PureStyleset = any>
-{
-	/**
-	 * Either name of a custom CSS property or a ICustomVar object representing a custom CSS
-	 * property.
-	 */
-	readonly varDef: string | ICustomVar<K>;
-
-	/**
-	 * Name of a non-custom CSS property whose type determines the type of the custom property
-	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
-	 * object, since the latter already has the template property name defined.
-	 */
-	readonly templatePropName?: K;
-
-	/** Value of the custom CSS property. */
-	readonly varValue: PureStyleset[K];
-}
-
-
-
-/**
  * Type that combines interfaces of rules that have names; auch rules have to be assigned to a
  * member property and cannot be be created by the addUnnamedRUles method.
  */

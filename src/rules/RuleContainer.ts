@@ -80,14 +80,13 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		this._varRule.process( this, this.owner, null)
 		this._allRules.push( this._varRule);
 
-		// create instance of the rules definition class and then go over its properties,
-		// which define CSS rules.
+		// get the "rule definition" object whose properties are the rule objects
 		let rulesDef: IRuleDefinition;
 		if (typeof this.definitionClass === "function")
 		{
+			// if the "definition" is a class then create an instance of it
 			try
 			{
-				// create instance of the rules definition class
 				rulesDef = new (this.definitionClass as IRuleDefinitionClass<IRuleDefinition>)();
 			}
 			catch( err)
@@ -97,7 +96,10 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 			}
 		}
 		else
+		{
+			// if the "definition" is an object (not a class) then use it directly
 			rulesDef = this.definitionClass;
+		}
 
 		// process rules that are assigned to the properties of the definition class
 		this.processNamedRules( rulesDef);

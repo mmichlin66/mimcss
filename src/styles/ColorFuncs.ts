@@ -52,7 +52,7 @@ export function colorNumberToCssString( val: number): string
 
 
 
-export function colorSep( c: number | string): string
+export function colorSeparation( c: number | string): string
 {
     return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : this.percent(c);
 }
@@ -80,6 +80,8 @@ export function hsl( h: number | string, s: number | string, l: number | string,
 
     return a == null ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
 }
+
+
 
 export function alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): string
 {

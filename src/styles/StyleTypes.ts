@@ -1141,24 +1141,57 @@ export type PureStyleset =
 
 
 
-import {ICustomVal} from "../rules/RuleTypes";
+import {ICustomVar} from "../rules/RuleTypes";
 
 /**
- * Interface representing a collection of style properties and their values.
+ * The ICustomVal interface represents a custom CSS property name and value that are used to
+ * define custom properties in a Styleset. This object is used in conjunction with the
+ * {@link Styleset.$custom | $custom} property of the Styleset type.
+ * 
+ * ICustomVal objects should be mostly used to override custom properties that have previously
+ * been defined at the top-level using the $custom function. That way you can have a "global"
+ * value of a custom property and assign a different value to it under a certain CSS selector.
+ */
+export interface ICustomVal<K extends keyof PureStyleset = any>
+{
+	/**
+	 * Either name of a custom CSS property or a ICustomVar object representing a custom CSS
+	 * property.
+	 */
+	readonly varDef: string | ICustomVar<K>;
+
+	/**
+	 * Name of a non-custom CSS property whose type determines the type of the custom property
+	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
+	 * object, since the latter already has the template property name defined.
+	 */
+	readonly templatePropName?: K;
+
+	/** Value of the custom CSS property. */
+	readonly varValue: PureStyleset[K];
+}
+
+
+
+/**
+ * Interface representing a collection of style properties and their values. In addition to the
+ * properties representing the standard CSS styles, this type also includes the $custom property,
+ * which is an array of ICustomIVal objects. This can be used as in the following example:
+ * ```typescript
+ * let styleset = {
+ *     $custom: [
+ *         { var: "mainColor", templatePropName: "color", varValue: "black" },
+ *         { var: MyStyles.varRules.mainBgColor, varValue: "white"),
+ *         tsh.custom( MyStyles.varRules.mainSelectionColor, "blue")
+ *     ]
+ * }
+ * ```
  */
 export type Styleset = PureStyleset &
     {
         /**
-         * Special property is an array that contains definitions of custom CSS properties.
-         * Each property is defined by an ICustomIVal object.
-         * This can be used as in the following example:
-         * ```typescript
-         *     $custom: [
-         *         { var: "mainColor", templatePropName: "color", varValue: "black" },
-         *         { var: MyStyles.varRules.mainBgColor, varValue: "white"),
-         *         tsh.custom( MyStyles.varRules.mainSelectionColor, "blue")
-         *     ]
-         * ```
+         * Special property is an array that contains ICustomIVal objects each representing a
+         * definition of a custom CSS property.
          */
         $custom?: ICustomVal[];
     }

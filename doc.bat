@@ -1,2 +1,2 @@
 @echo off
-typedoc --out lib/reference src/styles/UtilTypes.ts src/styles/ColorTypes.ts src/styles/StyleTypes.ts src/styles/MediaTypes.ts src/styles/FontFaceTypes.ts src/rules/RuleTypes.ts src/scope/ScopeTypes.ts src/helpers/SelectorTypes.ts src/helpers/tsh.ts --readme none --excludeExternals --excludeNotExported --excludePrivate
+typedoc --mode library --out lib/reference src/styles/UtilTypes.ts src/styles/ColorTypes.ts src/styles/StyleTypes.ts src/styles/MediaTypes.ts src/styles/FontFaceTypes.ts src/rules/RuleTypes.ts src/scope/ScopeTypes.ts src/helpers/SelectorTypes.ts src/helpers/tsh.ts --readme none --excludeExternals --excludeNotExported --excludePrivate

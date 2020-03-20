@@ -22,12 +22,6 @@ export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
 	 * object is created for them and inserted into DOM.
 	 */
 	isMultiplex?: boolean;
-
-	/**
-	 * Singleton instance of the Style Scope class created from this definition. This is used only
-	 * for singular style scopes.
-	 */
-	styleScope?: IStyleScope<T>;
 }
 
 
@@ -40,15 +34,6 @@ export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
  */
 export interface IStyleScope<T = any> extends IRuleContainer<T>
 {
-	// /**
-	//  * Class that defined this style scope. This member is used for style scope derivation:
-	//  * ```typescript
-	//  * let scope1 = $scope( class {...});
-	//  * let scope2 = $scope( class extends scope1.Definition {...});
-	//  * ```
-	//  */
-	// readonly Definition: IStyleScopeDefinitionClass<T>;
-
 	/** Inserts this style scope into DOM. */
 	activate(): void;
 
@@ -77,11 +62,13 @@ export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScop
 		return new StyleScope( styleScopeDefinitionClass);
 	else
 	{
-		let styleScope = styleScopeDefinitionClass.styleScope as StyleScope<T>;
+		// we don't want the class styleScope property to be exposed on the publicly available
+		// interface; therefore, we access it via "as any".
+		let styleScope = (styleScopeDefinitionClass as any).styleScope as StyleScope<T>;
 		if (!styleScope)
 		{
 			styleScope = new StyleScope( styleScopeDefinitionClass);
-			styleScopeDefinitionClass.styleScope = styleScope;
+			(styleScopeDefinitionClass as any).styleScope = styleScope;
 		}
 
 		return styleScope;

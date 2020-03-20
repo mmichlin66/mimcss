@@ -3,7 +3,6 @@ import * as UtilFuncs from "./UtilFuncs"
 import * as ColorTypes from "./ColorTypes"
 import * as ColorFuncs from "./ColorFuncs";
 import * as StyleTypes from "./StyleTypes"
-import { ICustomVal } from "../rules/RuleTypes";
 
 
 
@@ -433,7 +432,7 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset, important?: 
         if (propName === "$custom")
         {
             // special handling of the "$custom" property
-            let propVal = styleset[propName] as ICustomVal[];
+            let propVal = styleset[propName] as StyleTypes.ICustomVal[];
             for( let customVal of propVal)
             {
                 let customPropName: string;
