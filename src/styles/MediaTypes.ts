@@ -74,8 +74,9 @@ export type MediaFeatureset =
 
 
 /**
- * Interface representing the type of objects that can be assigned to the style property of HTML
- * and SVG elements.
+ * Type representing a single set of styles as part of the @media rules. The styles in the
+ * styleset are combined with the "and" operator. The entire styleset can be negated, which will
+ * result in placing the "not" operator that will act on all styles in the query.
  */
 export type SingleMediaQuery = MediaFeatureset &
 {
@@ -87,8 +88,9 @@ export type SingleMediaQuery = MediaFeatureset &
 
 
 /**
- * Interface representing the type of objects that can be assigned to the style property of HTML
- * and SVG elements.
+ * Type representing one or more queries as part of the @media rule. While multiple queries in
+ * an array are combined with the "," operator, the styles within each styleset are combined with
+ * the "and" operator.
  */
 export type MediaQuery = SingleMediaQuery | SingleMediaQuery[];
 

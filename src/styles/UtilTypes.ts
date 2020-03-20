@@ -60,11 +60,10 @@ export type MultiNumber_StyleType = Number_StyleType | Number_StyleType[];
 
 /**
  * Type for CSS percentage. Percent can be represented using the following types:
- *   - string (e.g. "75%")
  *   - number: integer numbers are treated as percents; floating numbers within -1 and 1
  *     are multilied by 100.
  */
-export type Percent_StyleType = number | string | Base_StyleType;
+export type Percent_StyleType = number | Base_StyleType;
 
 /** Type for multi-part percentage style property */
 export type MultiPercent_StyleType = Percent_StyleType | Percent_StyleType[];

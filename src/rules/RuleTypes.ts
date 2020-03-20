@@ -3,7 +3,9 @@
  */
 
 
-import {Styleset, PureStyleset} from "../styles/StyleTypes";
+import {Styleset, PureStyleset, SupportsQuery} from "../styles/StyleTypes";
+import {MediaQuery} from "../styles/MediaTypes"
+import {Fontface} from "../styles/FontFaceTypes";
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -368,10 +370,8 @@ import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {CustomVar} from "./CustomVar"
 import {SupportsRule} from "./SupportsRule"
-import {MediaQuery} from "../styles/MediaTypes"
 import {MediaRule} from "./MediaRule"
 import {ImportRule} from "./ImportRule"
-import {Fontface} from "../styles/FontFaceTypes";
 import {FontFaceRule} from "./FontFaceRule"
 
 
@@ -402,7 +402,7 @@ export function $custom<K extends keyof PureStyleset>( templatePropName: K, prop
 	{ return new CustomVar( templatePropName, propVal, nameOverride); }
 
 /** Returns new SupportsRule object  */
-export function $supports<T>( query: string, definition: T): ISupportsRule<T>
+export function $supports<T>( query: SupportsQuery, definition: T): ISupportsRule<T>
 	{ return new SupportsRule( query, definition); }
 
 /** Returns new MediaRule object  */

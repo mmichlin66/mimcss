@@ -622,3 +622,36 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
 
 
 
+/** Converts the given supports query to its string representation */
+export function supportQueryToCssString( query: StyleTypes.SupportsQuery): string
+{
+    if (!query)
+        return "";
+    else if (typeof query === "string")
+        return query;
+    else if (Array.isArray( query))
+        return query.map( (singleQuery) => singleSupportQueryToCssString( singleQuery)).join(" or ");
+    else
+        return singleSupportQueryToCssString( query);
+}
+
+
+
+/** Converts the given supports query to its string representation */
+export function singleSupportQueryToCssString( query: StyleTypes.SingleSupportsQuery): string
+{
+    if (!query)
+        return "";
+    else if (typeof query === "string")
+        return query;
+
+    let propNames = Object.keys( query).filter( (propName) => propName != "$negate");
+    if (propNames.length === 0)
+        return "";
+
+    let not = query.$negate ? "not" : "";
+    return  `${not} (${propNames.map( (propName) => stylePropToCssString( propName, query[propName])).join( ") and (")})`;
+}
+
+
+

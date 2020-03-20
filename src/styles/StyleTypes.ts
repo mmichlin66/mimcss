@@ -742,7 +742,7 @@ export type ZIndexStyleType = "auto" | number | UtilTypes.Base_StyleType;
 
 
 /** Type for the zoom style property */
-export type ZoomStylePrivet = "normal" | "reset" | UtilTypes.Length_StyleType;
+export type ZoomStyleType = "normal" | "reset" | UtilTypes.Percent_StyleType;
 
 
 
@@ -1136,7 +1136,7 @@ export type PureStyleset =
 	writingMode?: WritingModeStyleType;
 	
     zIndex?: ZIndexStyleType;
-    zoom?: ZoomStylePrivet;
+    zoom?: ZoomStyleType;
 }
 
 
@@ -1162,6 +1162,29 @@ export type Styleset = PureStyleset &
          */
         $custom?: ICustomVal[];
     }
+
+
+
+/**
+ * Type representing a single set of styles as part of the @supports rules. The styles in the
+ * styleset are combined with the "and" operator. The entire styleset can be negated, which will
+ * result in placing the "not" operator that will act on all styles in the query.
+ * 
+ * Note that using PureStyleset object doesn't allow for checking whether two or more values of
+ * a given property are supported. For example, although we can test that the "display" property
+ * supports the "flex" value, we cannot check whether both "flex" and "grid" values are supported.
+ * To check such criteria you must specify the query as a string.
+ */
+export type SingleSupportsQuery = string | PureStyleset & { $negate?: boolean; };
+
+
+
+/**
+ * Type representing one or more queries as part of the @supports rule. While multiple queries in
+ * an array are combined with the "or" operator, the styles within each styleset are combined with
+ * the "and" operator.
+ */
+export type SupportsQuery = SingleSupportsQuery | SingleSupportsQuery[];
 
 
 

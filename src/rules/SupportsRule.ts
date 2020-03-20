@@ -1,5 +1,7 @@
 import {ISupportsRule, IRuleDefinitionClass, RuleType} from "./RuleTypes"
 import {GroupRule} from "./GroupRule"
+import {SupportsQuery} from "../styles/StyleTypes"
+import {supportQueryToCssString} from "../styles/StyleFuncs"
 
 
 
@@ -8,11 +10,12 @@ import {GroupRule} from "./GroupRule"
  */
 export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( query?: string, definition?: T)
+	public constructor( query?: SupportsQuery, definition?: T)
 	{
 		super( RuleType.SUPPORTS, definition);
 
-		this.query = query;
+		// convert the query to its string form
+		this.queryString = supportQueryToCssString( query);
 	}
 
 
@@ -21,7 +24,7 @@ export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule
 	public clone(): SupportsRule<T>
 	{
 		let newRule = new SupportsRule<T>();
-		newRule.query = this.query;
+		newRule.queryString = this.queryString;
 		return newRule;
 	}
 
@@ -31,10 +34,10 @@ export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
 		// determine whether the query is supported and if it is not, don't insert the rule
-		if (!CSS.supports( this.query))
+		if (!CSS.supports( this.queryString))
 			return;
 			
-		let index = parent.insertRule( `@supports ${this.query} {}`, parent.cssRules.length);
+		let index = parent.insertRule( `@supports ${this.queryString} {}`, parent.cssRules.length);
 		this.cssRule = parent.cssRules[index];
 
 		// insert sub-rules
@@ -46,8 +49,8 @@ export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule
 	/** SOM supports rule */
 	public get cssSupportsRule(): CSSSupportsRule { return this.cssRule as CSSSupportsRule; }
 
-	// support query for this rule.
-	public query: string;
+	// support query for this rule in a string form.
+	public queryString: string;
 }
 
 
