@@ -4,29 +4,29 @@ import * as ColorTypes from "./ColorTypes"
 
 
 /** Type for align-content style property */
-export type AlignContentStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignContentStyleType = UtilTypes.ExtendedPropType<"normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" |
-    "space-between" | "space-around" | "space-evenly" | UtilTypes.Base_StyleType;
+    "space-between" | "space-around" | "space-evenly">;
 
 
 
 /** Type for align-items style property */
-export type AlignItemsStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
-    "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" | UtilTypes.Base_StyleType;
+export type AlignItemsStyleType = UtilTypes.ExtendedPropType<"normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+    "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center">;
 
 
 
 /** Type for align-self style property */
-export type AlignSelfStyleType = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignSelfStyleType = UtilTypes.ExtendedPropType<"auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "self-start" | "self-end" | "baseline" | "first baseline" | "last baseline" |
-    "safe center" | "unsafe center" | UtilTypes.Base_StyleType;
+    "safe center" | "unsafe center">;
 
 
 
 /** Type for alignment-baseline style property */
-export type AlignmentBaselineStyleType = "auto" | "baseline" | "before-edge" | "text-before-edge" |
+export type AlignmentBaselineStyleType = UtilTypes.ExtendedPropType<"auto" | "baseline" | "before-edge" | "text-before-edge" |
     "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" |
-    "hanging" | "mathematical" | "top" | "center" | "bottom" | UtilTypes.Base_StyleType;
+    "hanging" | "mathematical" | "top" | "center" | "bottom">;
 
 
 
@@ -49,7 +49,7 @@ export type AnimationStyleType = SingleAnimation | SingleAnimation[];
 
 
 /** Type for single animation direction */
-export type SingleAnimationDirection = "normal" | "reverse" | "alternate" | "alternate-reverse" | UtilTypes.Base_StyleType;
+export type SingleAnimationDirection = UtilTypes.ExtendedPropType<"normal" | "reverse" | "alternate" | "alternate-reverse">;
 
 /** Type for animation-direction style property */
 export type AnimationDirectionStyleType = SingleAnimationDirection | SingleAnimationDirection[];
@@ -57,7 +57,7 @@ export type AnimationDirectionStyleType = SingleAnimationDirection | SingleAnima
 
 
 /** Type for single animation fill mode */
-export type SingleAnimationFillMode = "none" | "forwards" | "backwards" | "both" | UtilTypes.Base_StyleType;
+export type SingleAnimationFillMode = UtilTypes.ExtendedPropType<"none" | "forwards" | "backwards" | "both">;
 
 /** Type for animation-fill-mode style property */
 export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimationDirection[];
@@ -65,7 +65,7 @@ export type AnimationFillModeStyleType = SingleAnimationDirection | SingleAnimat
 
 
 /** Type for single animation iteration count */
-export type SingleAnimationIterationCount = "infinite" | UtilTypes.Number_StyleType | UtilTypes.Base_StyleType;
+export type SingleAnimationIterationCount = UtilTypes.ExtendedPropType<"infinite"> | UtilTypes.Number_StyleType;
 
 /** Type for animation-iteration-count style property */
 export type AnimationIterationCountStyleType = SingleAnimationIterationCount | SingleAnimationIterationCount[];
@@ -73,7 +73,7 @@ export type AnimationIterationCountStyleType = SingleAnimationIterationCount | S
 
 
 /** Type for single animation name */
-export type SingleAnimationName = "none" | UtilTypes.Base_StyleType | string;
+export type SingleAnimationName = UtilTypes.ExtendedPropType<"none" | string>;
 
 /** Type for animation-name style property */
 export type AnimationNameStyleType = SingleAnimationName | SingleAnimationName[];
@@ -81,7 +81,7 @@ export type AnimationNameStyleType = SingleAnimationName | SingleAnimationName[]
 
 
 /** Type for single animation play state */
-export type SingleAnimationPlayState = "paused" | "running" | UtilTypes.Base_StyleType;
+export type SingleAnimationPlayState = UtilTypes.ExtendedPropType<"paused" | "running">;
 
 /** Type for animation-play-state style property */
 export type AnimationPlayStateStyleType = SingleAnimationPlayState | SingleAnimationPlayState[];
@@ -101,7 +101,7 @@ export type AnimationTimingFunction_Step = [number, AnimationTimingFunction_Step
 export type AnimationTimingFunction_Bezier = [number, number, number, number];
 
 /** Type for single animation timing function */
-export type SingleAnimationTimingFunction = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier | UtilTypes.Base_StyleType;
+export type SingleAnimationTimingFunction = UtilTypes.ExtendedPropType<AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier>;
 
 /** Type for animation-timing-function style property */
 export type AnimationTimingFunctionStyleType = SingleAnimationTimingFunction | SingleAnimationTimingFunction[];
@@ -109,12 +109,12 @@ export type AnimationTimingFunctionStyleType = SingleAnimationTimingFunction | S
 
 
 /** Type for backface-visibility style property */
-export type BackfaceVisibilityModeStyleType = "visible" | "hidden" | UtilTypes.Base_StyleType;
+export type BackfaceVisibilityModeStyleType = UtilTypes.ExtendedPropType<"visible" | "hidden">;
 
 
 
 /** Type for single background attachment */
-export type SingleBackgroundAttachment = "scroll" | "fixed" | "local" | UtilTypes.Base_StyleType;
+export type SingleBackgroundAttachment = UtilTypes.ExtendedPropType<"scroll" | "fixed" | "local">;
 
 /** Type for background-attachment style property */
 export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | SingleBackgroundAttachment[];
@@ -122,7 +122,7 @@ export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | SingleB
 
 
 /** Type for single background clip */
-export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" | "text" | UtilTypes.Base_StyleType;
+export type SingleBackgroundClip = UtilTypes.ExtendedPropType<"border-box" | "padding-box" | "content-box" | "text">;
 
 /** Type for background-clip style property */
 export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundClip[];
@@ -130,7 +130,7 @@ export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundCli
 
 
 /** Type for single background origin */
-export type SingleBackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text" | UtilTypes.Base_StyleType;
+export type SingleBackgroundOrigin = UtilTypes.ExtendedPropType<"border-box" | "padding-box" | "content-box" | "text">;
 
 /** Type for background-origin style property */
 export type BackgroundOriginStyleType = SingleBackgroundOrigin | SingleBackgroundOrigin[];
@@ -138,12 +138,11 @@ export type BackgroundOriginStyleType = SingleBackgroundOrigin | SingleBackgroun
 
 
 /** Type for single background repeat */
-export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | "repeat" | "space" | "round" | "no-repeat" |
+export type SingleBackgroundRepeat = UtilTypes.ExtendedPropType<"repeat-x" | "repeat-y" | "repeat" | "space" | "round" | "no-repeat" |
     "repeat repeat" | "repeat space" | "repeat round" | "repeat no-repeat" |
     "space repeat" | "space space" | "space round" | "space no-repeat" |
     "round repeat" | "round space" | "round round" | "round no-repeat" |
-    "no-repeat repeat" | "no-repeat space" | "no-repeat round" | "no-repeat no-repeat" |
-    UtilTypes.Base_StyleType;
+    "no-repeat repeat" | "no-repeat space" | "no-repeat round" | "no-repeat no-repeat">;
 
 /** Type for background-repeat style property */
 export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroundRepeat[];
@@ -151,7 +150,7 @@ export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroun
 
 
 /** Type for background size */
-export type SingleBackgroundSize = "cover" | "contain" | UtilTypes.Size_StyleType;
+export type SingleBackgroundSize = UtilTypes.ExtendedPropType<"cover" | "contain"> | UtilTypes.Size_StyleType;
 
 /** Type for background-size style property */
 export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSize[];
@@ -176,13 +175,13 @@ export type BorderRadiusStyleType = UtilTypes.Length_StyleType | MultiCornerRadi
 
 
 /** Type for baseline-shift style property */
-export type BaselineShiftStyleType = "sub" | "super" | UtilTypes.Length_StyleType;
+export type BaselineShiftStyleType = UtilTypes.ExtendedPropType<"sub" | "super"> | UtilTypes.Length_StyleType;
 
 
 
 /** Type for single border side style property */
-export type BorderSideStyle_StyleType = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
-    "groove" | "ridge" | "inset" | "outset" | UtilTypes.Base_StyleType;
+export type BorderSideStyle_StyleType = UtilTypes.ExtendedPropType<"none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
+    "groove" | "ridge" | "inset" | "outset">;
 
 
 
@@ -193,7 +192,7 @@ export type BorderStyleStyleType = BorderSideStyle_StyleType |
 
 
 /** Type for border side width style property */
-export type BorderSideWidth_StyleType = "thin" | "medium" | "thick" | UtilTypes.Length_StyleType;
+export type BorderSideWidth_StyleType = UtilTypes.ExtendedPropType<"thin" | "medium" | "thick"> | UtilTypes.Length_StyleType;
 
 
 
@@ -204,12 +203,12 @@ export type BorderWidthStyleType = BorderSideWidth_StyleType |
 
 
 /** Type for border-collapse style property */
-export type BorderColapseStyleType = "collapse" | "separate" | UtilTypes.Base_StyleType;
+export type BorderColapseStyleType = UtilTypes.ExtendedPropType<"collapse" | "separate">;
 
 
 
 /** Type for border-spacing style property */
-export type BorderSpacingStyleType = UtilTypes.Length_StyleType | UtilTypes.Base_StyleType |
+export type BorderSpacingStyleType = UtilTypes.Length_StyleType |
     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
 
 
@@ -227,13 +226,15 @@ export type BorderSide_StyleType = UtilTypes.Length_StyleType |  BorderSideStyle
 
 
 /** Type for border-image-outset style property */
-export type BorderImageOutsetStyleType = string | number | UtilTypes.Base_StyleType |
+export type BorderImageOutsetStyleType = UtilTypes.ExtendedPropType<string | number> |
     [string | number, string | number, (string | number)?, (string | number)?];
 
 
 
+/** Type for border-image-repeat keywords */
+export type BorderImageRepeatKeyword = UtilTypes.ExtendedPropType<"stretch" | "repeat" | "round" | "space">;
+
 /** Type for border-image-repeat style property */
-export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space" | UtilTypes.Base_StyleType;
 export type BorderImageRepeatStyleType = BorderImageRepeatKeyword | [BorderImageRepeatKeyword, BorderImageRepeatKeyword];
 
 
@@ -244,16 +245,8 @@ export type BorderImageWidthStyleType = UtilTypes.Length_StyleType |
 
 
 
-/**
- * Type for single box shadow. Box shadow can be presented by the following types:
- *   - "none" - no shadow.
- *   - boolean - false - no shadow; true - default shadow: "0 0 1em 1em #c0c0c0".
- *   - number - "0 0 Nem Nem #c0c0c0"; that is, the number defines the value of blur and spread
- *     radii in "em" units.
- *   - string - literal CSS box shadow string.
- *   - object - fields specify box shadow parts.
- */
-export type SingleBoxShadow = "none" | string | UtilTypes.Base_StyleType;
+/** Type for single box shadow. */
+export type SingleBoxShadow = UtilTypes.ExtendedPropType<"none" | string>;
 
 /** Type for box shadow style property */
 export type BoxShadowStyleType = SingleBoxShadow | SingleBoxShadow[];
@@ -261,62 +254,62 @@ export type BoxShadowStyleType = SingleBoxShadow | SingleBoxShadow[];
 
 
 /** Type for box-sizing style property */
-export type BoxSizingStyleType = "content-box" | "border-box" | UtilTypes.Base_StyleType;
+export type BoxSizingStyleType = UtilTypes.ExtendedPropType<"content-box" | "border-box">;
 
 
 
 /** Type for break-after style property */
-export type BreakAfterStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
+export type BreakAfterStyleType = UtilTypes.ExtendedPropType<"auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
     "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
-    "avoid-region" | "region" | UtilTypes.Base_StyleType;
+    "avoid-region" | "region">;
 
 
 
 /** Type for break-before style property */
-export type BreakBeforeStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
+export type BreakBeforeStyleType = UtilTypes.ExtendedPropType<"auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
     "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
-    "avoid-region" | "region" | UtilTypes.Base_StyleType;
+    "avoid-region" | "region">;
 
 
 
 /** Type for break-inside style property */
-export type BreakInsideStyleType = "auto" | "avoid" | "avoid-page" | "avoid-column" | "avoid-region" | UtilTypes.Base_StyleType;
+export type BreakInsideStyleType = UtilTypes.ExtendedPropType<"auto" | "avoid" | "avoid-page" | "avoid-column" | "avoid-region">;
 
 
 
 /** Type for caption-side style property */
-export type CaptionSideStyleType = "top" | "bottom" | "block-start" | "block-end" | "inline-start" | "inline-end" | UtilTypes.Base_StyleType;
+export type CaptionSideStyleType = UtilTypes.ExtendedPropType<"top" | "bottom" | "block-start" | "block-end" | "inline-start" | "inline-end">;
 
 
 
 /** Type for caret-color style property */
-export type CaretColorStyleType = "auto" | ColorTypes.Color_StyleType;
+export type CaretColorStyleType = UtilTypes.ExtendedPropType<"auto"> | ColorTypes.Color_StyleType;
 
 
 
 /** Type for clear style property */
-export type ClearStyleType = "none" | "left" | "right" | "both" | "inline-start" | "inline-end" | UtilTypes.Base_StyleType;
+export type ClearStyleType = UtilTypes.ExtendedPropType<"none" | "left" | "right" | "both" | "inline-start" | "inline-end">;
 
 
 
 /** Type for clear style property */
-export type ClipStyleType = "auto" | UtilTypes.Base_StyleType |
+export type ClipStyleType = UtilTypes.ExtendedPropType<"auto"> |
     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
 
 
 
 /** Type for color-interpolation-filters style property */
-export type ColorInterpolationFiltersStyleType = "auto" | "sRGB" | "linearRGB" | UtilTypes.Base_StyleType;
+export type ColorInterpolationFiltersStyleType = UtilTypes.ExtendedPropType<"auto" | "sRGB" | "linearRGB">;
 
 
 
 /** Type for column-count style property */
-export type ColumnCountStyleType = "auto" | number | UtilTypes.Base_StyleType;
+export type ColumnCountStyleType = UtilTypes.ExtendedPropType<"auto" | number>;
 
 
 
 /** Type for column-fill style property */
-export type ColumnFillStyleType = "auto" | "balance" | "balance-all" | UtilTypes.Base_StyleType;
+export type ColumnFillStyleType = UtilTypes.ExtendedPropType<"auto" | "balance" | "balance-all">;
 
 
 
@@ -325,7 +318,7 @@ export type ColumnFillStyleType = "auto" | "balance" | "balance-all" | UtilTypes
  *   - string - literal CSS box shadow string.
  *   - object - fields specify column rule parts.
  */
-export type ColumnRuleStyleType = string | UtilTypes.Base_StyleType |
+export type ColumnRuleStyleType = UtilTypes.ExtendedPropType<string> |
     {
         /** Column rule width. */
         width?: BorderWidthStyleType;
@@ -338,66 +331,65 @@ export type ColumnRuleStyleType = string | UtilTypes.Base_StyleType |
 
 
 /** Type for column-span style property */
-export type ColumnSpanStyleType = "none" | "all" | UtilTypes.Base_StyleType;
+export type ColumnSpanStyleType = UtilTypes.ExtendedPropType<"none" | "all">;
 
 
 
 /** Type for columns style property */
-export type ColumnsStyleType = "auto" | number | ["auto" | number, UtilTypes.Length_StyleType] | UtilTypes.Base_StyleType;
+export type ColumnsStyleType = UtilTypes.ExtendedPropType<"auto" | number | ["auto" | number, UtilTypes.Length_StyleType]>;
 
 
 
 /** Type for float (cssFloat) style property */
-export type FloatStyleType = "left" | "right" | "none" | "inline-start" | "inline-end" | UtilTypes.Base_StyleType;
+export type FloatStyleType = UtilTypes.ExtendedPropType<"left" | "right" | "none" | "inline-start" | "inline-end">;
 
 
 
 /** Type for cursor style property */
-export type CursorStyleType = "auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
+export type CursorStyleType = UtilTypes.ExtendedPropType<"auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
     "wait" | "cell" | "crosshair" | "text" | "vertical-text" | "alias" | "copy" | "move" |
     "no-drop" | "not-allowed" | "e-resize" | "n-resize" | "ne-resize" | "nw-resize" |
     "s-resize" | "se-resize" | "sw-resize" | "w-resize" | "ew-resize" | "ns-resize" |
     "nesw-resize" | "nwse-resize" | "col-resize" | "row-resize" | "all-scroll" | "zoom-in" |
-    "zoom-out" | "grab" | "grabbing" | UtilTypes.Base_StyleType;
+    "zoom-out" | "grab" | "grabbing">;
 
 
 
 /** Type for direction style property */
-export type DirectionStyleType = "ltr" | "rtl" | UtilTypes.Base_StyleType;
+export type DirectionStyleType = UtilTypes.ExtendedPropType<"ltr" | "rtl">;
 
 
 
 /** Type for display style property */
-export type DisplayStyleType = "block" | "inline" | "run-in" | "contents" | "none" |
+export type DisplayStyleType = UtilTypes.ExtendedPropType<"block" | "inline" | "run-in" | "contents" | "none" |
     "inline-block" | "inline-list-item" | "inline-table" | "inline-flex" | "inline-grid" |
     "flow" | "flow-root" | "table" | "flex" | "grid" | "ruby" |
     "table-row-group" | "table-header-group" | "table-footer-group" | "table-row" | "table-cell" |
         "table-column-group" | "table-column" | "table-caption" | "ruby-base" | "ruby-text" |
         "ruby-base-container" | "ruby-text-container" |
     "list-item" | "list-item block" | "list-item inline" | "list-item flow" | "list-item flow-root" |
-        "list-item block flow" | "list-item block flow-root" | "flow list-item block" |
-    UtilTypes.Base_StyleType;
+        "list-item block flow" | "list-item block flow-root" | "flow list-item block">;
 
                 
 
 /** Type for dominant-baseline style property */
-export type DominantBaselineStyleType = "auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
-    "central" | "mathematical" | "hanging" | "text-top" | UtilTypes.Base_StyleType;
+export type DominantBaselineStyleType = UtilTypes.ExtendedPropType<"auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
+    "central" | "mathematical" | "hanging" | "text-top">;
 
 
 
 /** Type for empty-cells style property */
-export type EmptyCellsStyleType = "show" | "hide" | UtilTypes.Base_StyleType;
+export type EmptyCellsStyleType = UtilTypes.ExtendedPropType<"show" | "hide">;
 
 
 
 /** Type for fill-rule style property */
-export type FillRuleStyleType = "nonzero" | "evenodd" | UtilTypes.Base_StyleType;
+export type FillRuleStyleType = UtilTypes.ExtendedPropType<"nonzero" | "evenodd">;
 
 
 
 /** Type for flex-basis style property */
-export type FlexBasisStyleType = "auto" | "content" | UtilTypes.Length_StyleType | UtilTypes.Base_StyleType;
+export type FlexBasisStyleType = UtilTypes.ExtendedPropType<"auto" | "content"> | UtilTypes.Length_StyleType;
 
 
 
@@ -407,39 +399,39 @@ export type FlexStyleType = FlexBasisStyleType | [number,number] | [number,numbe
 
 
 /** Type for flex-direction style property */
-export type FlexDirectionStyleType = "row" | "row-reverse" | "column" | "column-reverse" | UtilTypes.Base_StyleType;
+export type FlexDirectionStyleType = UtilTypes.ExtendedPropType<"row" | "row-reverse" | "column" | "column-reverse">;
 
 
 
 /** Type for flex-wrap style property */
-export type FlexWrapStyleType = "nowrap" | "wrap" | "wrap-reverse" | UtilTypes.Base_StyleType;
+export type FlexWrapStyleType = UtilTypes.ExtendedPropType<"nowrap" | "wrap" | "wrap-reverse">;
 
 
 
 /** Type for flex-flow style property */
 export type FlexFlowStyleType = FlexDirectionStyleType | FlexWrapStyleType |
-    [FlexDirectionStyleType, FlexWrapStyleType] | UtilTypes.Base_StyleType;
+    [FlexDirectionStyleType, FlexWrapStyleType];
 
 
 
 /** Type for font-style style property */
-export type FontStyleStyleType = "normal" | "italic" | "oblique" | UtilTypes.Angle_StyleType;
+export type FontStyleStyleType = UtilTypes.ExtendedPropType<"normal" | "italic" | "oblique"> | UtilTypes.Angle_StyleType;
 
 
 
 /** Type for font-kerning style property */
-export type FontKerningStyleType = "auto" | "normal" | "none" | UtilTypes.Base_StyleType;
+export type FontKerningStyleType = UtilTypes.ExtendedPropType<"auto" | "normal" | "none">;
 
 
 
 /** Type for font-weight style property */
-export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" |
-    100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | UtilTypes.Base_StyleType;
+export type FontWeightStyleType = UtilTypes.ExtendedPropType<"normal" | "bold" | "bolder" | "lighter" |
+    100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900>;
 
 
 
 /** Type for a row-gap or column-gap style property */
-export type SingleGapStyleType = "normal" | UtilTypes.Length_StyleType;
+export type SingleGapStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Length_StyleType;
 
 /** Type for a row-gap or column-gap style property */
 export type GapStyleType = SingleGapStyleType | [SingleGapStyleType, SingleGapStyleType];
@@ -447,60 +439,57 @@ export type GapStyleType = SingleGapStyleType | [SingleGapStyleType, SingleGapSt
 
 
 /** Type for hyphens style property */
-export type HyphensStyleType = "none" | "manual" | "auto" | UtilTypes.Base_StyleType;
+export type HyphensStyleType = UtilTypes.ExtendedPropType<"none" | "manual" | "auto">;
 
 
 
 /** Type for image-rendering style property */
-export type ImageRenderingStyleType = "auto" | "crisp-edges" | "pixelated" | UtilTypes.Base_StyleType;
+export type ImageRenderingStyleType = UtilTypes.ExtendedPropType<"auto" | "crisp-edges" | "pixelated">;
 
 
 
 /** Type for justify-content style property */
-export type JustifyContentStyleType = "normal" | "space-between" | "space-around" | "space-evenly" | "stretch" |
+export type JustifyContentStyleType = UtilTypes.ExtendedPropType<"normal" | "space-between" | "space-around" | "space-evenly" | "stretch" |
     "center" | "start" | "end" | "flex-start" | "flex-end" | "left" | "right" |
     "safe center" | "safe start" | "safe end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
-    "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" |
-    UtilTypes.Base_StyleType;
+    "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right">;
 
 
 
 /** Type for justify-items style property */
-export type JustifyItemsStyleType = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
+export type JustifyItemsStyleType = UtilTypes.ExtendedPropType<"normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
     "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" |
     "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
     "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" |
-    "legacy" | "legacy left" | "legacy right" | "legacy center" |
-    UtilTypes.Base_StyleType;
+    "legacy" | "legacy left" | "legacy right" | "legacy center">;
 
 
 
 /** Type for justify-self style property */
-export type JustifySelfStyleType = "auto" | "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
+export type JustifySelfStyleType = UtilTypes.ExtendedPropType<"auto" | "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
     "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" |
     "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
-    "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" |
-    UtilTypes.Base_StyleType;
+    "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right">;
 
 
 
 /** Type for letter-spacing style property */
-export type LetterSpacingStyleType = "normal" | UtilTypes.Length_StyleType;
+export type LetterSpacingStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Length_StyleType;
 
 
 
 /** Type for line-break style property */
-export type LineBreakStyleType = "auto" | "loose" | "normal" | "strict" | "anywhere" | UtilTypes.Base_StyleType;
+export type LineBreakStyleType = UtilTypes.ExtendedPropType<"auto" | "loose" | "normal" | "strict" | "anywhere">;
 
 
 
 /** Type for line-height style property */
-export type LineHeightStyleType = number | string | UtilTypes.Base_StyleType;
+export type LineHeightStyleType = UtilTypes.ExtendedPropType<number | string>;
 
 
 
 /** Type for list-style-type style property */
-export type ListStyleTypeStyleType = "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
+export type ListStyleTypeStyleType = UtilTypes.ExtendedPropType<"disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
     "cjk-decimal" | "cjk-earthly-branch" | "cjk-heavenly-stem" | "cjk-ideographic" |
     "lower-roman" | "upper-roman" | "lower-greek" | "lower-alpha" | "lower-latin" | "upper-alpha" | "upper-latin" |
     "arabic-indic" | "armenian" | "bengali" | "cambodian" | "devanagari" | "georgian" | "gujarati" | "gurmukhi" | "hebrew" |
@@ -508,15 +497,14 @@ export type ListStyleTypeStyleType = "disc" | "circle" | "square" | "decimal" | 
     "khmer" | "korean-hangul-formal" | "korean-hanja-formal" | "korean-hanja-informal" | "lao" | "lower-armenian" |
     "malayalam" | "mongolian" | "myanmar" | "oriya" | "persian" | "simp-chinese-formal" | "simp-chinese-informal" |
     "tamil" | "telugu" | "thai" | "tibetan" | "trad-chinese-formal" | "trad-chinese-informal" | "upper-armenian" |
-    "disclosure-open" | "disclosure-closed" |
-    UtilTypes.Base_StyleType;
+    "disclosure-open" | "disclosure-closed">;
 
 /** Type for list-style-position style property */
-export type ListStylePositionStyleType = "inside" | "outside" | UtilTypes.Base_StyleType;
+export type ListStylePositionStyleType = UtilTypes.ExtendedPropType<"inside" | "outside">;
 
 /** Type for list-style-position style property */
 export type ListStyleStyleType = ListStyleTypeStyleType | ListStylePositionStyleType |
-    [ListStyleTypeStyleType, ListStylePositionStyleType, string?] | UtilTypes.Base_StyleType;
+    [ListStyleTypeStyleType, ListStylePositionStyleType, string?];
 
 
 
@@ -527,18 +515,18 @@ export type MarginStyleType = UtilTypes.Length_StyleType |
 
 
 /** Type for the object-fit style property */
-export type ObjectFitStyleType = "fill" | "contain" | "cover" | "none" | "scale-down" | UtilTypes.Base_StyleType;
+export type ObjectFitStyleType = UtilTypes.ExtendedPropType<"fill" | "contain" | "cover" | "none" | "scale-down">;
 
 
 
 /** Type for the overflow-anchor style property */
-export type OverflowAnchorStyleType = "auto" | "none" | UtilTypes.Base_StyleType;
+export type OverflowAnchorStyleType = UtilTypes.ExtendedPropType<"auto" | "none">;
 
 /** Type for the overflow-wrap style property */
-export type OverflowWrapStyleType = "normal" | "break-word" | "anywhere" | UtilTypes.Base_StyleType;
+export type OverflowWrapStyleType = UtilTypes.ExtendedPropType<"normal" | "break-word" | "anywhere">;
 
 /** Type for the overflow-x/y style property */
-export type SingleOverflowStyleType = "visible" | "hidden" | "clip" | "scroll" | "auto" | UtilTypes.Base_StyleType;
+export type SingleOverflowStyleType = UtilTypes.ExtendedPropType<"visible" | "hidden" | "clip" | "scroll" | "auto">;
 
 /** Type for the overflow- style property */
 export type OverflowStyleType = SingleOverflowStyleType | [SingleOverflowStyleType, SingleOverflowStyleType];
@@ -563,60 +551,60 @@ export type PlaceSelfStyleType = AlignSelfStyleType | [AlignSelfStyleType, Justi
 
 
 /** Type for the pointer-events style property */
-export type PointerEventsStyleType = "auto" | "none" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" |
-    "painted" | "fill" | "stroke" | "all" | UtilTypes.Base_StyleType;
+export type PointerEventsStyleType = UtilTypes.ExtendedPropType<"auto" | "none" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" |
+    "painted" | "fill" | "stroke" | "all">;
 
 
 
 /** Type for the position style property */
-export type PositionStyleType = "static" | "relative" | "absolute" | "sticky" | "fixed" | UtilTypes.Base_StyleType;
+export type PositionStyleType = UtilTypes.ExtendedPropType<"static" | "relative" | "absolute" | "sticky" | "fixed">;
 
 
 
 /** Type for the resize style property */
-export type ResizeStyleType = "none" | "both" | "horizontal" | "vertical" | "block" | "inline" | UtilTypes.Base_StyleType;
+export type ResizeStyleType = UtilTypes.ExtendedPropType<"none" | "both" | "horizontal" | "vertical" | "block" | "inline">;
 
 
 
 /** Type for the scroll-behavior style property */
-export type ScrollBehaviorStyleType = "auto" | "smooth" | UtilTypes.Base_StyleType;
+export type ScrollBehaviorStyleType = UtilTypes.ExtendedPropType<"auto" | "smooth">;
 
 
 
 /** Type for the stop-opacity style property */
-export type StopOpacityStyleType = number | UtilTypes.Base_StyleType;
+export type StopOpacityStyleType = UtilTypes.ExtendedPropType<number>;
 
 
 
 /** Type for the table-layout style property */
-export type TableLayoutStyleType = "auto" | "fixed" | UtilTypes.Base_StyleType;
+export type TableLayoutStyleType = UtilTypes.ExtendedPropType<"auto" | "fixed">;
 
 
 
 /** Type for the text-align style property */
-export type TextAlignStyleType = "start" | "end" | "left" | "right" | "center" | "justify" | "match-parent" | UtilTypes.Base_StyleType;
+export type TextAlignStyleType = UtilTypes.ExtendedPropType<"start" | "end" | "left" | "right" | "center" | "justify" | "match-parent">;
 
 
 
 /** Type for the text-align-last style property */
-export type TextAlignLastStyleType = "auto" | "start" | "end" | "left" | "right" | "center" | "justify" | UtilTypes.Base_StyleType;
+export type TextAlignLastStyleType = UtilTypes.ExtendedPropType<"auto" | "start" | "end" | "left" | "right" | "center" | "justify">;
 
 
 
 /** Type for the text-anchor style property */
-export type TextAnchorStyleType = "start" | "middle" | "end" | UtilTypes.Base_StyleType;
+export type TextAnchorStyleType = UtilTypes.ExtendedPropType<"start" | "middle" | "end">;
 
 
 
 /** Type for the text-decoration-line style property */
-export type TextDecorationLineStyleType = "none" | "underline" | "overline" | "line-through" | "blink" |
-    "spelling-error" | "grammar-error" | UtilTypes.Base_StyleType;
+export type TextDecorationLineStyleType = UtilTypes.ExtendedPropType<"none" | "underline" | "overline" | "line-through" | "blink" |
+    "spelling-error" | "grammar-error">;
 
 /** Type for the text-decoration-style style property */
-export type TextDecorationStyleStyleType = "solid" | "double" | "dotted" | "dashed" | "wavy" | UtilTypes.Base_StyleType;
+export type TextDecorationStyleStyleType = UtilTypes.ExtendedPropType<"solid" | "double" | "dotted" | "dashed" | "wavy">;
 
 /** Type for the text-decoration-thickness style property */
-export type TextDecorationThicknessStyleType = "auto" | "from-font" | UtilTypes.Length_StyleType;
+export type TextDecorationThicknessStyleType = UtilTypes.ExtendedPropType<"auto" | "from-font"> | UtilTypes.Length_StyleType;
 
 // /** Type for the text-decoration-line style property */
 // export type TextDecorationStyleType = TextDecorationLineStyleType | TextDecorationStyleStyleType |
@@ -632,7 +620,7 @@ export type TextEmphasisPositionStyleType = ["over" | "under", "left" | "right"]
 export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame";
 
 /** Type for the text-emphasis-style style property */
-export type TextEmphasisStyleStyleType = "none" | number | TextEmphasisShape | ["filled" | "open", TextEmphasisShape] | UtilTypes.Base_StyleType;
+export type TextEmphasisStyleStyleType = UtilTypes.ExtendedPropType<"none" | number | TextEmphasisShape | ["filled" | "open", TextEmphasisShape]>;
 
 // /** Type for the text-emphasis style property */
 // export type TextEmphasisStyleType = TextEmphasisStyleStyleType | ColorTypes.Color_StyleType | [TextEmphasisStyleStyleType, ColorTypes.Color_StyleType];
@@ -646,17 +634,17 @@ export type TextIndentStyleType = UtilTypes.Length_StyleType |
 
 
 /** Type for the text-justify style property */
-export type TextJustifyStyleType = "auto" | "inter-character" | "inter-word" | "none" | UtilTypes.Length_StyleType;
+export type TextJustifyStyleType = UtilTypes.ExtendedPropType<"auto" | "inter-character" | "inter-word" | "none"> | UtilTypes.Length_StyleType;
 
 
 
 /** Type for the text-orientation style property */
-export type TextOrientationStyleType = "mixed" | "upright" | "sideways" | UtilTypes.Base_StyleType;
+export type TextOrientationStyleType = UtilTypes.ExtendedPropType<"mixed" | "upright" | "sideways">;
 
 
 
 /** Type for the text-overflow style property */
-export type SingleTextOverflowStyleType = "clip" | "ellipsis" | "fade" | UtilTypes.Length_StyleType;
+export type SingleTextOverflowStyleType = UtilTypes.ExtendedPropType<"clip" | "ellipsis" | "fade"> | UtilTypes.Length_StyleType;
 
 /** Type for the text-overflow style property */
 export type TextOverflowStyleType = SingleTextOverflowStyleType | [SingleTextOverflowStyleType, SingleTextOverflowStyleType];
@@ -664,7 +652,7 @@ export type TextOverflowStyleType = SingleTextOverflowStyleType | [SingleTextOve
 
 
 // /** Type for the text-shadow style property */
-// export type TextShadowStyleType = string | UtilTypes.Base_StyleType |
+// export type TextShadowStyleType = string> |
 //     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType] |
 //     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType] |
 //     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, ColorTypes.Color_StyleType] |
@@ -673,25 +661,25 @@ export type TextOverflowStyleType = SingleTextOverflowStyleType | [SingleTextOve
 
 
 // /** Type for the text-transform style property */
-export type TextTransformStyleType = "none" | "capitalize" | "uppercase" | "lowercase" | "full-width" | "full-size-kana" | UtilTypes.Base_StyleType;
+export type TextTransformStyleType = UtilTypes.ExtendedPropType<"none" | "capitalize" | "uppercase" | "lowercase" | "full-width" | "full-size-kana">;
 
 
 
 // /** Type for the text-underlinePosition style property */
-export type TextUnderlinePositionStyleType = "auto" | "under" | "left" | "right" | "auto-pos" | "above" | "below" | UtilTypes.Base_StyleType;
+export type TextUnderlinePositionStyleType = UtilTypes.ExtendedPropType<"auto" | "under" | "left" | "right" | "auto-pos" | "above" | "below">;
 
 
 
 /** Type for the touch-action style property */
-export type TouchActionStyleType = "auto" | "none" | "manipulation" | "pan-x" | "pan-left" | "pan-right" | "pan-y" | "pan-up" | "pan-down" | "pinch-zoom" |
+export type TouchActionStyleType = UtilTypes.ExtendedPropType<"auto" | "none" | "manipulation" |
+    "pan-x" | "pan-left" | "pan-right" | "pan-y" | "pan-up" | "pan-down" | "pinch-zoom" |
     "pan-x pinch-zoom" | "pan-left pinch-zoom" | "pan-right pinch-zoom" | "pan-y pinch-zoom" | "pan-up pinch-zoom" | "pan-down pinch-zoom" |
     "pan-x pan-y" | "pan-x pan-y pinch-zoom" | "pan-x pan-up" | "pan-x pan-up pinch-zoom" | "pan-x pan-down" | "pan-x pan-down pinch-zoom" |
     "pan-y pan-left" | "pan-y pan-left pinch-zoom" | "pan-y pan-right" | "pan-y pan-right pinch-zoom" |
     "pan-left pan-up" | "pan-left pan-up pinch-zoom" | "pan-left pan-down" | "pan-left pan-down pinch-zoom" |
     "pan-right pan-up" | "pan-right pan-up pinch-zoom" | "pan-right pan-down" | "pan-right pan-down pinch-zoom" |
     "pan-up pan-left" | "pan-up pan-left pinch-zoom" | "pan-up pan-right" | "pan-up pan-right pinch-zoom" |
-    "pan-down pan-left" | "pan-down pan-left pinch-zoom" | "pan-down pan-right" | "pan-down pan-right pinch-zoom" |
-    UtilTypes.Base_StyleType;
+    "pan-down pan-left" | "pan-down pan-left pinch-zoom" | "pan-down pan-right" | "pan-down pan-right pinch-zoom">;
 
 
 
@@ -702,51 +690,51 @@ export type TranslateStyleType = "none" | UtilTypes.Length_StyleType |
 
 
 /** Type for the unicode-bidi style property */
-export type UnicodeBidiStyleType = "normal" | "embed" | "isolate" | "bidi-override" | "isolate-override" | "plaintext" | UtilTypes.Base_StyleType;
+export type UnicodeBidiStyleType = UtilTypes.ExtendedPropType<"normal" | "embed" | "isolate" | "bidi-override" | "isolate-override" | "plaintext">;
 
 
 
 /** Type for the user-select style property */
-export type UserSelectStyleType = "auto" | "text" | "none" | "contain" | "all" | UtilTypes.Base_StyleType;
+export type UserSelectStyleType = UtilTypes.ExtendedPropType<"auto" | "text" | "none" | "contain" | "all">;
 
 
 
 /** Type for the white-space style property */
-export type WhiteSpaceStyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "pre-line" | "break-spaces" | UtilTypes.Base_StyleType;
+export type WhiteSpaceStyleType = UtilTypes.ExtendedPropType<"normal" | "pre" | "nowrap" | "pre-wrap" | "pre-line" | "break-spaces">;
 
 
 
 /** Type for widows style property */
-export type WidowsStyleType = number | UtilTypes.Base_StyleType;
+export type WidowsStyleType = UtilTypes.ExtendedPropType<number>;
 
 
 
 /** Type for the word-break style property */
-export type WordBreakStyleType = "normal" | "break-all" | "keep-all" | "break-word" | UtilTypes.Base_StyleType;
+export type WordBreakStyleType = UtilTypes.ExtendedPropType<"normal" | "break-all" | "keep-all" | "break-word">;
 
 
 
 /** Type for the word-spacing style property */
-export type WordSpacingStyleType = "normal" | UtilTypes.Length_StyleType;
+export type WordSpacingStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Length_StyleType;
 
 
 
 /** Type for the writing-mode style property */
-export type WritingModeStyleType = "horizontal-tb" | "vertical-rl" | "vertical-lr" | "sideways-rl" | "sideways-lr" | UtilTypes.Base_StyleType;
+export type WritingModeStyleType = UtilTypes.ExtendedPropType<"horizontal-tb" | "vertical-rl" | "vertical-lr" | "sideways-rl" | "sideways-lr">;
 
 
 
 /** Type for the z-index style property */
-export type ZIndexStyleType = "auto" | number | UtilTypes.Base_StyleType;
+export type ZIndexStyleType = UtilTypes.ExtendedPropType<"auto" | number>;
 
 
 
 /** Type for the zoom style property */
-export type ZoomStyleType = "normal" | "reset" | UtilTypes.Percent_StyleType;
+export type ZoomStyleType = UtilTypes.ExtendedPropType<"normal" | "reset"> | UtilTypes.Percent_StyleType;
 
 
 
-export type StyleType = string | UtilTypes.Base_StyleType;
+export type StyleType = UtilTypes.ExtendedPropType<string>;
 
 
 
@@ -1152,31 +1140,32 @@ import {ICustomVar} from "../rules/RuleTypes";
  * been defined at the top-level using the $custom function. That way you can have a "global"
  * value of a custom property and assign a different value to it under a certain CSS selector.
  */
-export interface ICustomVal<K extends keyof PureStyleset = any>
+export interface ICustomVal<T = any>
 {
 	/**
 	 * Either name of a custom CSS property or a ICustomVar object representing a custom CSS
 	 * property.
 	 */
-	readonly varDef: string | ICustomVar<K>;
+	readonly varDef: string | ICustomVar<T>;
 
 	/**
 	 * Name of a non-custom CSS property whose type determines the type of the custom property
 	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
 	 * object, since the latter already has the template property name defined.
 	 */
-	readonly templatePropName?: K;
+	readonly templatePropName?: string;
 
 	/** Value of the custom CSS property. */
-	readonly varValue: PureStyleset[K];
+	readonly varValue: T;
 }
 
 
 
 /**
- * Interface representing a collection of style properties and their values. In addition to the
+ * Type representing a collection of style properties and their values. In addition to the
  * properties representing the standard CSS styles, this type also includes the $custom property,
  * which is an array of ICustomIVal objects. This can be used as in the following example:
+ * 
  * ```typescript
  * let styleset = {
  *     $custom: [

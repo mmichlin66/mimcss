@@ -186,7 +186,7 @@ export class Selector implements IEmptySelector, ISelector
 
 
 	// Internal buffer, where selector tokens are accumulated.
-	private buf: (string | SelectorTokenType)[];
+	private buf: (string | ISelector | SelectorTokenType)[];
 }
 
 

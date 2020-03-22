@@ -1,17 +1,17 @@
 import {ICustomVar, RuleType, INamedRule} from "./RuleTypes"
-import {PureStyleset} from "../styles/StyleTypes"
-import {tsh} from "../helpers/tsh"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {ExtendedPropType} from "../styles/UtilTypes";
+import {stylePropToCssString} from "../styles/StyleFuncs"
 
 
 
 /**
  * The CustomVar class describes a custom CSS property.
  */
-export class CustomVar<K extends keyof PureStyleset = any> extends Rule implements ICustomVar<K>
+export class CustomVar<T = any> extends Rule implements ICustomVar<T>
 {
-	public constructor( templatePropName?: K, varValue?: PureStyleset[K], nameOverride?: string | INamedRule)
+	public constructor( templatePropName?: string, varValue?: T, nameOverride?: string | INamedRule)
 	{
 		super( RuleType.VAR);
 
@@ -61,9 +61,9 @@ export class CustomVar<K extends keyof PureStyleset = any> extends Rule implemen
 
 
 	// Creates a copy of the rule.
-	public clone(): CustomVar<K>
+	public clone(): CustomVar<T>
 	{
-		let newRule = new CustomVar<K>();
+		let newRule = new CustomVar<T>();
 		newRule.templatePropName = this.templatePropName;
 		newRule.varValue = this.varValue;
 		newRule.nameOverride = this.nameOverride;
@@ -82,19 +82,19 @@ export class CustomVar<K extends keyof PureStyleset = any> extends Rule implemen
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `--${this.varName}: ${tsh.val( this.templatePropName, this.varValue)}`;
+		return `--${this.varName}: ${stylePropToCssString( this.templatePropName, this.varValue, true)}`;
 	}
 
 
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
-	public templatePropName: K;
+	public templatePropName: string;
 
 	// Name of the custom CSS property.
 	public varName: string;
 
 	// Value of the custom CSS property.
-	private varValue: PureStyleset[K];
+	public varValue: T;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

@@ -1,8 +1,8 @@
 ﻿/**
- * This file contains types for working with CSS colors.
+ * This module contains types for working with CSS colors.
  */
 
-import {Base_StyleType} from "./UtilTypes"
+import {ExtendedPropType} from "./UtilTypes"
 
 
 
@@ -198,7 +198,7 @@ export type ColorAsArray =
  *     - negative and floating point numbers are rejected.
  *   - array [[ColorAsArray]]
  */
-export type Color_StyleType = "transparent" | "currentcolor" | keyof typeof Colors | number | ColorAsArray | Base_StyleType;
+export type Color_StyleType = ExtendedPropType<"transparent" | "currentcolor" | keyof typeof Colors | number | ColorAsArray>;
 
 
 

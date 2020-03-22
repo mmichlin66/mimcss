@@ -44,7 +44,7 @@ export function arrayToCssString<T>( val: T[], func: (v: T) => string, separator
  * Converts array of string values to a single string using the given separator.
  * @param val Array of string values
  */
-export function stringArrayToCssString( val: (string | UtilTypes.StringProxy)[], separator: string = " "): string
+export function stringArrayToCssString( val: (string | object)[], separator: string = " "): string
 {
     return arrayToCssString( val, (v) => typeof v === "string" ? v : v.toString());
 }
@@ -117,7 +117,7 @@ export function percentToCssString( val: UtilTypes.Percent_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
+    else if (typeof val === "object")
         return val.toString();
     else
 	    return percentNumberToCssString( val);
@@ -162,7 +162,7 @@ export function lengthToCssString( val: UtilTypes.Length_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
+    else if (typeof val === "object")
         return val.toString();
     else
 	    return lengthNumberToCssString( val);
@@ -206,7 +206,7 @@ export function angleToCssString( val: UtilTypes.Angle_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
+    else if (typeof val === "object")
         return val.toString();
     else
 	    return angleNumberToCssString( val);
@@ -238,7 +238,7 @@ export function timeToCssString( val: UtilTypes.Time_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
+    else if (typeof val === "object")
         return val.toString();
     else
 	    return timeNumberToCssString( val);
@@ -254,10 +254,10 @@ export function multiTimeToCssString( val: UtilTypes.MultiTime_StyleType): strin
         return val;
     else if (typeof val === "number")
         return timeNumberToCssString( val);
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
+    else if (Array.isArray(val))
         return arrayToCssString( val, timeToCssString);
+    else
+        return val.toString();
 }
 
 

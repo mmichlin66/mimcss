@@ -1,11 +1,10 @@
-﻿import {StringProxy, LengthUnits, AngleUnits, TimeUnits} from "../styles/UtilTypes"
+﻿import {StringProxy, VarValue, ExtendedPropType, LengthUnits, AngleUnits, TimeUnits} from "../styles/UtilTypes"
 import * as UtilFuncs from "../styles/UtilFuncs"
 import * as ColorTypes from "../styles/ColorTypes";
 import * as ColorFuncs from "../styles/ColorFuncs";
 import {PureStyleset, ICustomVal} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs";
 import {ICustomVar} from "../rules/RuleTypes"
-import {CustomVar} from "../rules/CustomVar"
 
 
 
@@ -337,7 +336,7 @@ export class tsh
      * The `tsh.custom` method will produce a compilation error if an invalid type is used for the
      * property value.
      */
-    public static custom<K extends keyof PureStyleset>( varDef: ICustomVar<K>, varValue: PureStyleset[K]): ICustomVal<K>
+    public static custom<T>( varDef: ICustomVar<T>, varValue: T): ICustomVal<T>
     {
 		return { varDef, varValue };
     }
@@ -354,56 +353,11 @@ export class tsh
      *     sidebar = $class( { color: tsh.var( this.defaultColor) })
      * });
      * ```
-     * 
-     * The var method can also be used with simple string values:
-     * ```typescript
-     * <div style={{ color: tsh.var( "default-color") }}
-     * ```
      */
-    public static var<K extends keyof PureStyleset>( varDef: ICustomVar<K> | string,
-                    fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy): StringProxy
+    public static var<T>( varDef: ICustomVar<ExtendedPropType<T>>, fallbackValue?: T | ICustomVar<ExtendedPropType<T>> | string): VarValue<T>
     {
-        return new VarValue( varDef, fallbackValue);
+        return new VarValue( varDef, fallbackValue) as VarValue<T>;
     }
-}
-
-
-
-/**
- * The VarValue class encapsulates a usage of the CSS `var` function for getting a value of a
- * custom CSS property.
- */
-class VarValue<K extends keyof PureStyleset> extends StringProxy
-{
-    constructor( varDef: ICustomVar<K> | string,
-                    fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy)
-    {
-        super();
-        this.varDef = varDef;
-        this.fallbackValue = fallbackValue;
-    }
-
-    public toString(): string
-    {
-        let varName = typeof this.varDef === "string" ? this.varDef : (this.varDef as CustomVar<K>).varName;
-        let s = `var(--${varName}`;
-        if (this.fallbackValue)
-        {
-            s += ",";
-            if (this.fallbackValue instanceof CustomVar)
-                s += tsh.var( this.fallbackValue);
-            else if (typeof this.fallbackValue === "string" || this.fallbackValue instanceof StringProxy || typeof this.varDef === "string")
-                s += this.fallbackValue;
-            else
-                s += stylePropToCssString( (this.varDef as CustomVar<K>).templatePropName, this.fallbackValue, true);
-        }
-
-        return s + ")";
-    }
-
-    public varDef: ICustomVar<K> | string;
-    // public fallbackValue?: PureStyleset[K] | ICustomVar<K> | string | StringProxy;
-    public fallbackValue?: any;
 }
 
 

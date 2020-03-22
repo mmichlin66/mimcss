@@ -106,6 +106,8 @@ export function colorAsArrayToCssString( val: ColorTypes.ColorAsArray): string
         return rgb( val[0], val[1], val[2], val[3]).toString();
 }
 
+
+
 /**
  * Converts time style value to the CSS time string.
  * @param val Time as a style property type

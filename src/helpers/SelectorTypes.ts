@@ -168,7 +168,7 @@ export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
 
 
 
-/** Type for a single selector token */
+/** Type for a selector */
 export type SelectorType = string | ISelector | SelectorTokenType | SelectorTokenType[];
 
 

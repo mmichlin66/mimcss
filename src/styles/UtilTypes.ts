@@ -2,6 +2,18 @@
  * This file contains basic types and functions used to define CSS property types.
  */
 
+import {ICustomVar} from "../rules/RuleTypes"
+import {CustomVar} from "../rules/CustomVar";
+import {stylePropToCssString} from "./StyleFuncs";
+
+
+
+/**
+ * Style values that can be used for (almost) any CSS property.
+ */
+export type Base_StyleType = "inherit" | "initial" | "unset";
+
+
 
 /**
  * The StringProxy class encapsulates a string, which is returned via the standard toString()
@@ -21,9 +33,14 @@ export class StringProxy
         this.s = s;
     }
 
-    public toString(): string
+    public stringProxyToCssString(): string
     {
         return this.s == null ? "" : typeof this.s === "string" ? this.s : this.s.toString();
+    }
+
+    public toString(): string
+    {
+        return this.stringProxyToCssString();
     }
 
     private s?: string | StringProxy;
@@ -32,9 +49,53 @@ export class StringProxy
 
 
 /**
- * Style values that can be used for (almost) any property.
+ * The VarValue class encapsulates a usage of the CSS `var` function for getting a value of a
+ * custom CSS property.
  */
-export type Base_StyleType = "inherit" | "initial" | "unset" | StringProxy;
+export class VarValue<T>
+{
+    constructor( varDef: ICustomVar<T>, fallbackValue?: T | ICustomVar<T> | string)
+    {
+        this.varDef = varDef;
+        this.fallbackValue = fallbackValue;
+    }
+
+    public varValueToCssString(): string
+    {
+        let varName = typeof this.varDef === "string" ? this.varDef : (this.varDef as CustomVar<T>).varName;
+        let s = `var(--${varName}`;
+        if (this.fallbackValue)
+        {
+            s += ",";
+            if (this.fallbackValue instanceof CustomVar)
+                s += new VarValue( this.fallbackValue);
+            else if (typeof this.fallbackValue === "string" || this.fallbackValue instanceof StringProxy || typeof this.varDef === "string")
+                s += this.fallbackValue;
+            else
+                s += stylePropToCssString( (this.varDef as CustomVar<T>).templatePropName, this.fallbackValue, true);
+        }
+
+        return s + ")";
+    }
+
+    public toString(): string
+    {
+        return this.varValueToCssString();
+    }
+
+    public varDef: ICustomVar<T>;
+    public fallbackValue?: T | ICustomVar<T> | string;
+}
+
+
+
+/**
+ * Type that extends the given type with the following types:
+ * - basic style values that are valid for all style properties.
+ * - StringProxy type that allows specifying raw string value.
+ * - VarValue generic type that allows using a CSS custom property.
+ */
+export type ExtendedPropType<T> = T | Base_StyleType | StringProxy | VarValue<T>;
 
 
 
@@ -45,7 +106,7 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | StringProxy;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for single number style property */
-export type Number_StyleType = number | Base_StyleType;
+export type Number_StyleType = ExtendedPropType<number>;
 
 /** Type for multi-part number style property */
 export type MultiNumber_StyleType = Number_StyleType | Number_StyleType[];
@@ -63,7 +124,7 @@ export type MultiNumber_StyleType = Number_StyleType | Number_StyleType[];
  *   - number: integer numbers are treated as percents; floating numbers within -1 and 1
  *     are multilied by 100.
  */
-export type Percent_StyleType = number | Base_StyleType;
+export type Percent_StyleType = ExtendedPropType<number>;
 
 /** Type for multi-part percentage style property */
 export type MultiPercent_StyleType = Percent_StyleType | Percent_StyleType[];
@@ -86,7 +147,7 @@ export type LengthUnits = "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" |
  *   - number: integer values are treated as pixels while floating numbers within -1 and 1 are
  *     treated as percents and floating numbers outside -1 and 1 are treated as "em".
  */
-export type Length_StyleType = "auto" | number | string | Base_StyleType;
+export type Length_StyleType = ExtendedPropType<"auto" | number | string>;
 
 /** Type for multi-part length or percentage style property */
 export type MultiLength_StyleType = Length_StyleType | Length_StyleType[];
@@ -108,7 +169,7 @@ export type AngleUnits = "deg" | "rad" | "grad" | "turn";
  *   - number: zero is treated as not having any suffix; integer numbers are treated as degrees;
  *     floating numbers are treated as radians.
  */
-export type Angle_StyleType = number | string | Base_StyleType;
+export type Angle_StyleType = ExtendedPropType<number | string>;
 
 
 
@@ -127,7 +188,7 @@ export type TimeUnits = "s" | "ms";
  *   - number: integer numbers are treated as milliseconds while floating numbers are treated
  *     as seconds.
  */
-export type Time_StyleType = number | string | Base_StyleType;
+export type Time_StyleType = ExtendedPropType<number>;
 
 /** Type for multi-part time style property */
 export type MultiTime_StyleType = Time_StyleType | Time_StyleType[];
@@ -161,10 +222,9 @@ export type MultiSize_StyleType = Size_StyleType | Size_StyleType[];
 /**
  * Type for CSS position, which can be expressed as one or two or 3 or 4 values.
  */
-export type Position_StyleType = "center" | "left" | "right" | "top" | "bottom" | Length_StyleType |
+export type Position_StyleType = ExtendedPropType<"center" | "left" | "right" | "top" | "bottom" | Length_StyleType |
                 { x: "center" | "left" | "right" | Length_StyleType; y: "center" | "top" | "bottom" | Length_StyleType } |
-                { xedge: string; x?: Length_StyleType; yedge: string; y?: Length_StyleType } |
-                Base_StyleType;
+                { xedge: string; x?: Length_StyleType; yedge: string; y?: Length_StyleType }>;
 
 /** Type for multi-part position style property */
 export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];

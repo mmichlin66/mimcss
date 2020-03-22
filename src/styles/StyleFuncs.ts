@@ -51,32 +51,35 @@ function singleAnimationTimingFunctionToCssString( val: StyleTypes.SingleAnimati
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
+    else if (Array.isArray(val))
+    {
+        if (val.length < 3)
+        {
+            // this is step function with only the number of steps
+
+            /// #if DEBUG
+                if (val[0] <= 0)
+                    throw new Error( "Number of steps in animation function must be greater than zero");
+                else if (!Number.isInteger( val[0]))
+                    throw new Error( "Number of steps in animation function must be an Integer");
+            /// #endif
+
+            return `step(${val[0]}${val.length === 2 ? "," + val[1] : ""})`;
+        }
+        else
+        {
+            // this is bezier function
+
+            /// #if DEBUG
+                if (val[0] < 0 || val[0] > 1 || val[2] < 0 || val[2] > 1)
+                    throw new Error( "First and third parameters of cubic-bezier animation function must be between 0 and 1");
+            /// #endif
+
+            return `cubic-bezier(${val[0]},${val[1]},${val[2]},${val[3]})`;
+        }
+    }
+    else
         return val.toString();
-    else if (val.length < 3)
-	{
-		// this is step function with only the number of steps
-
-		/// #if DEBUG
-			if (val[0] <= 0)
-				throw new Error( "Number of steps in animation function must be greater than zero");
-			else if (!Number.isInteger( val[0]))
-				throw new Error( "Number of steps in animation function must be an Integer");
-		/// #endif
-
-		return `step(${val[0]}${val.length === 2 ? "," + val[1] : ""})`;
-	}
-	else
-	{
-		// this is bezier function
-
-		/// #if DEBUG
-			if (val[0] < 0 || val[0] > 1 || val[2] < 0 || val[2] > 1)
-				throw new Error( "First and third parameters of cubic-bezier animation function must be between 0 and 1");
-		/// #endif
-
-		return `cubic-bezier(${val[0]},${val[1]},${val[2]},${val[3]})`;
-	}
 }
 
 /**
@@ -86,15 +89,18 @@ function animationTimingFunctionToCssString( val: StyleTypes.AnimationTimingFunc
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else if (val.length === 0)
-        return "";
-    else if (typeof val[0] === "number")
-        return singleAnimationTimingFunctionToCssString( val as StyleTypes.SingleAnimationTimingFunction);
+    else if (Array.isArray(val))
+    {
+        if (val.length === 0)
+            return "";
+        else if (typeof val[0] === "number")
+            return singleAnimationTimingFunctionToCssString( val as StyleTypes.SingleAnimationTimingFunction);
+        else
+            return UtilFuncs.arrayToCssString( val as StyleTypes.SingleAnimationTimingFunction[],
+                            singleAnimationTimingFunctionToCssString, ",");
+    }
     else
-        return UtilFuncs.arrayToCssString( val as StyleTypes.SingleAnimationTimingFunction[],
-        singleAnimationTimingFunctionToCssString, ",");
+        return val.toString();
 }
 
 
@@ -149,12 +155,10 @@ function borderStyleToCssString( val: StyleTypes.BorderStyleStyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
     else if (Array.isArray(val))
         return UtilFuncs.stringArrayToCssString( val, " ");
     else
-        return val;
+        return val.toString();
 }
 
 
@@ -166,12 +170,12 @@ function borderWidthToCssString( val: StyleTypes.BorderWidthStyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
+    else if (typeof val === "number")
+        return UtilFuncs.lengthNumberToCssString(val);
     else if (Array.isArray(val))
         return UtilFuncs.arrayToCssString( val, UtilFuncs.lengthToCssString, " ");
     else
-        return UtilFuncs.lengthToCssString( val);
+        return val.toString();
 }
 
 
@@ -216,8 +220,6 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
         return val;
     else if (typeof val === "number")
         return UtilFuncs.lengthToCssString( val);
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
     else if (Array.isArray(val))
     {
         let s = "";
@@ -236,6 +238,8 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
 
         return s;
     }
+    else if (typeof val === "object")
+        return val.toString();
     else
         return ColorFuncs.colorToCssString( val);
 }
@@ -251,10 +255,10 @@ function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleTyp
         return val;
     else if (typeof val === "number")
         return val.toString();
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
+    else if (Array.isArray(val))
         return UtilFuncs.arrayToCssString( val, borderImageOutsetToCssString, " ");
+    else
+        return val.toString();
 }
 
 
@@ -266,10 +270,10 @@ function boxShadowToCssString( val: StyleTypes.BoxShadowStyleType): string
 {
      if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else 
+    else if (Array.isArray(val))
         return UtilFuncs.stringArrayToCssString( val);
+    else
+        return val.toString();
 }
 
 
@@ -281,10 +285,10 @@ function clipToCssString( val: StyleTypes.ClipStyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof UtilTypes.StringProxy)
-        return val.toString();
-    else
+    else if (Array.isArray(val))
         return `rect(${UtilFuncs.arrayToCssString( val, UtilFuncs.lengthToCssString, " ")}`;
+    else
+        return val.toString();
 }
 
 
@@ -349,10 +353,7 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
         {
             let s = val[0] + " " + val[1] + " ";
             let v = val[2];
-            if (typeof v === "string")
-                s += v;
-            else
-              s += UtilFuncs.lengthToCssString( v);
+            s += UtilFuncs.lengthToCssString( v);
 
             return s;
         }

@@ -3,6 +3,7 @@
  */
 
 
+import {ExtendedPropType} from "../styles/UtilTypes";
 import {Styleset, PureStyleset, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
@@ -247,16 +248,16 @@ export interface IFontFaceRule extends IRule
 /**
  * The ICustomVar interface represents a CSS custom property definition.
  */
-export interface ICustomVar<K extends keyof PureStyleset = any> extends INamedRule
+export interface ICustomVar<T = any> extends INamedRule
 {
-	/**
-	 * Name of a non-custom CSS property whose type determines the type of the custom property
-	 * value.
-	 */
-	readonly templatePropName: K;
+	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
+	readonly templatePropName: string;
 
 	/** Name of the CSS custom property */
 	readonly varName: string;
+
+	/** Value of the custom CSS property. */
+	readonly varValue: T;
 }
 
 
@@ -373,7 +374,7 @@ export function $animation( keyframes: Keyframe[], nameOverride?: string | IName
 
 /** Returns new CustomVar object that defines a custom CSS property */
 export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K],
-				nameOverride?: string | INamedRule): ICustomVar<K>
+				nameOverride?: string | INamedRule): ICustomVar<PureStyleset[K]>
 	{ return new CustomVar( templatePropName, propVal, nameOverride); }
 
 /** Returns new SupportsRule object  */
