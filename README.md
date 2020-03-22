@@ -105,4 +105,4 @@ The TypeScript variant is obviously more verbose; however, let's see what we get
 - The names we are using in our code are not actually the names that will be used in the resulting HTML. The actual names to use in HTML will be defined based on several factors described later; the important fact is that the Mimcss infrastructure ensures that they will be unique.
 - The `import "./MyStyles.css"` statement in the CSS-based component file doesn't work on its own but only with the help of a plug in to our bundler (e.g. Webpack). In Mimcss code, there is no need in such a plug in - everything is just a pure TypeScript code.
 
-For more information please check out this [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcssAbout.html)
+For more information please check out this [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html)
