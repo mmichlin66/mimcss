@@ -180,9 +180,9 @@ import {Selector, nth, attr} from "./SelectorFuncs"
  */
 export abstract class SelectorHelper
 {
-	public raw( raw?: string) { return new StringProxy( raw); }
-	public all( ns?: string) { return ns == null ? "*" : `${ns}|*`; }
-	public attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType,
+	public static raw( raw?: string) { return new StringProxy( raw); }
+	public static all( ns?: string) { return ns == null ? "*" : `${ns}|*`; }
+	public static attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType,
 					value?: string, caseInsensitive?: boolean, caseSensitive?: boolean)
 		{ return new StringProxy( attr( attrName, op, value, caseInsensitive, caseSensitive)); }
 	public static tag( s: string) { return new StringProxy( s); }

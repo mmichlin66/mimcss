@@ -1,5 +1,5 @@
 import {ICustomVar, RuleType, INamedRule} from "./RuleTypes"
-import {PureStyleset, Styleset} from "../styles/StyleTypes"
+import {PureStyleset} from "../styles/StyleTypes"
 import {tsh} from "../helpers/tsh"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
@@ -9,7 +9,7 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The CustomVar class describes a custom CSS property.
  */
-export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICustomVar<K>
+export class CustomVar<K extends keyof PureStyleset = any> extends Rule implements ICustomVar<K>
 {
 	public constructor( templatePropName?: K, varValue?: PureStyleset[K], nameOverride?: string | INamedRule)
 	{
@@ -94,7 +94,7 @@ export class CustomVar<K extends keyof PureStyleset> extends Rule implements ICu
 	public varName: string;
 
 	// Value of the custom CSS property.
-	public varValue: PureStyleset[K];
+	private varValue: PureStyleset[K];
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

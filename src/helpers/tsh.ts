@@ -34,19 +34,14 @@ export class tsh
     }
 
     /**
-     * Converts the given value corresponding to the given style property to string.
+     * Converts the given value corresponding to the given style property to a CSS string.
      * @param stylePropName Style property name that determines how the value should be converted
      * to a CSS compliant string.
      * @param stylePropValue Value to convert.
      */
-    public static val( stylePropName: string, stylePropValue: any): string
+    public static val<K extends keyof PureStyleset>( stylePropName: K, stylePropValue: PureStyleset[K]): string
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
-    }
-
-    public static units<T extends string>( n: number, unit: T): string
-    {
-        return n + unit;
     }
 
 
@@ -63,12 +58,12 @@ export class tsh
      * values in styleset properties. Each color separation cna be represented as a number or a
      * string with the following meaning:
      *   - Integer number 0 to 255.
-     *   - Floating number 0.0 to 1.0 non-inclusive, whcih is treated as percentage.
-     *   - String which is treated as is.
+     *   - Floating number 0.0 to 1.0 non-inclusive, which is treated as percentage.
+     *   - String which is used as is.
      * 
      * The alpha mask can be one of the following:
      *   - Number 0 to 1 inclusive, which is treated as percentage.
-     *   - String which is treated as is.
+     *   - String which is used as is.
      * 
      * @param r Red separation value.
      * @param g Green separation vaue.
@@ -87,7 +82,7 @@ export class tsh
      * 
      * The alpha mask can be one of the following:
      *   - Number 0 to 1 inclusive, which is treated as percentage.
-     *   - String which is treated as is.
+     *   - String which is used as is.
      * 
      * @param h Hue component as an angle value.
      * @param s Saturation as a percentage value.
@@ -106,7 +101,7 @@ export class tsh
      * 
      * The alpha mask can be one of the following:
      *   - Number 0 to 1 inclusive, which is treated as percentage.
-     *   - String which is treated as is.
+     *   - String which is used as is.
      * 
      * @param c 
      * @param a 
@@ -140,64 +135,66 @@ export class tsh
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    /** Creates length value in vmin */
+    /** Creates length value in quaters of an inch */
     public static Q( n: number) { return n + "Q"; }
 
-    /** Creates length value in ch */
+    /** Creates length value in ch units */
     public static ch( n: number) { return n + "ch"; }
 
-    /** Creates length value in cm */
+    /** Creates length value in cantimeters */
     public static cm( n: number) { return n + "cm"; }
 
-    /** Creates length value in em */
+    /** Creates length value in calculated font-sizes of the element */
     public static em( n: number) { return n + "em"; }
 
-    /** Creates length value in ex */
+    /** Creates length value in heights of lowercase letter 'x' in the font */
     public static ex( n: number) { return n + "ex"; }
 
-    /** Creates length value in ic */
+    /** Creates length value in ic units */
     public static ic( n: number) { return n + "ic"; }
 
-    /** Creates length value in in */
+    /** Creates length value in inches */
     public static in( n: number) { return n + "in"; }
 
-    /** Creates length value in lh */
+    /** Creates length value in line-heights of the element */
     public static lh( n: number) { return n + "lh"; }
 
-    /** Creates length value in mm */
+    /** Creates length value in millimeters */
     public static mm( n: number) { return n + "mm"; }
 
-    /** Creates length value in pc */
+    /** Creates length value in picas */
     public static pc( n: number) { return n + "pc"; }
 
-    /** Creates length value in pt */
+    /** Creates length value in points */
     public static pt( n: number) { return n + "pt"; }
 
-    /** Creates length value in px */
+    /** Creates length value in pixels */
     public static px( n: number) { return n + "px"; }
 
-    /** Creates length value in vb */
+    /** Creates length value in 1% of the size of the initial containing block, in the direction
+     * of the root element’s block axis */
     public static vb( n: number) { return n + "vb"; }
 
-    /** Creates length value in vh */
+    /** Creates length value in 1% of the height of the viewport's initial containing block */
     public static vh( n: number) { return n + "vh"; }
 
-    /** Creates length value in vi */
+    /** Creates length value in 1% of the size of the initial containing block, in the direction
+     * of the root element’s inline axis */
     public static vi( n: number) { return n + "vi"; }
 
-    /** Creates length value in vw */
+    /** Creates length value in 1% of the width of the viewport's initial containing block */
     public static vw( n: number) { return n + "vw"; }
 
-    /** Creates length value in rem */
+    /** Creates length value in fontsizes of the root element (<html>) */
     public static rem( n: number) { return n + "rem"; }
 
-    /** Creates length value in rlh */
+    /** Creates length value in line-heights of the root element (<html>) */
     public static rlh( n: number) { return n + "rlh"; }
 
-    /** Creates length value in vmax */
+    /** Creates length value in the units which are a smaller value between vw and vh */
     public static vmax( n: number) { return n + "vmax"; }
 
-    /** Creates length value in vmin */
+    /** Creates length value in the units which are a larger value between vw and vh */
     public static vmin( n: number) { return n + "vmin"; }
 
     /**
@@ -321,6 +318,7 @@ export class tsh
 
     /**
      * Defines a custom CSS property as part of a Styleset. Use it as in the following example:
+     * 
      * ```typescript
      * let myStyles = $scope( class
      * {
@@ -328,11 +326,14 @@ export class tsh
      *     div = $tag( "div", { $custom: [ tsh.custom( this.mainColor, "brown") ] })
      * });
      * ```
+     * 
      * This is equivalent to the following CSS:
+     * 
      * ```css
      * :root { --mainColor: "black"; }
      * div { --mainColor: "brown"; }
      * ```
+     * 
      * The `tsh.custom` method will produce a compilation error if an invalid type is used for the
      * property value.
      */
@@ -344,17 +345,19 @@ export class tsh
     /**
      * Returns the string representation of the CSS var() function for the given custom property.
      * Use it as in the following example:
+     * 
      * ```typescript
      * let myStyles = $scope( class
      * {
      *     defaultColor = $custom( "color", "blue");
      * 
-     *     sidebar = $class( { color: tsh.var( this.defaultColor, "black") })
+     *     sidebar = $class( { color: tsh.var( this.defaultColor) })
      * });
      * ```
+     * 
      * The var method can also be used with simple string values:
      * ```typescript
-     * <div style={{ color: tsh.var( "default-color", "black") }}
+     * <div style={{ color: tsh.var( "default-color") }}
      * ```
      */
     public static var<K extends keyof PureStyleset>( varDef: ICustomVar<K> | string,
@@ -392,7 +395,7 @@ class VarValue<K extends keyof PureStyleset> extends StringProxy
             else if (typeof this.fallbackValue === "string" || this.fallbackValue instanceof StringProxy || typeof this.varDef === "string")
                 s += this.fallbackValue;
             else
-                s += tsh.val( (this.varDef as CustomVar<K>).templatePropName, this.fallbackValue);
+                s += stylePropToCssString( (this.varDef as CustomVar<K>).templatePropName, this.fallbackValue, true);
         }
 
         return s + ")";

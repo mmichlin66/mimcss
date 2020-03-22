@@ -32,7 +32,7 @@ export class StringProxy
 
 
 /**
- * Style values that can be used for (almost) any property
+ * Style values that can be used for (almost) any property.
  */
 export type Base_StyleType = "inherit" | "initial" | "unset" | StringProxy;
 
