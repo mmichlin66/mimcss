@@ -1,7 +1,9 @@
 import {IImportRule, RuleType} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {MediaQuery} from "../styles/MediaTypes"
+import {SupportsQuery} from "../styles/StyleTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
+import {supportsQueryToCssString} from "../styles/StyleFuncs";
 import {TssManager} from "../scope/TssManager"
 
 
@@ -11,12 +13,13 @@ import {TssManager} from "../scope/TssManager"
  */
 export class ImportRule extends Rule implements IImportRule
 {
-	public constructor( url?: string, query?: string | MediaQuery)
+	public constructor( url?: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery)
 	{
 		super( RuleType.IMPORT);
 
 		this.url = url;
-		this.query = query;
+		this.mediaQuery = mediaQuery;
+		this.supportsQuery = supportsQuery;
 	}
 
 
@@ -26,7 +29,7 @@ export class ImportRule extends Rule implements IImportRule
 	{
 		let newRule = new ImportRule();
 		newRule.url = this.url;
-		newRule.query = this.query;
+		newRule.mediaQuery = this.mediaQuery;
 		return newRule;
 	}
 
@@ -43,8 +46,12 @@ export class ImportRule extends Rule implements IImportRule
 		else
 			url = `url(${this.url})`;
 
-		let queryString = !this.query ? "" : typeof this.query === "string" ? this.query : mediaQueryToCssString( this.query);
-		this.cssRule = TssManager.addImportRule( `@import ${url} ${queryString}`);
+		let supportsQueryString = !this.supportsQuery ? "" : typeof this.supportsQuery === "string" ? this.supportsQuery : supportsQueryToCssString( this.supportsQuery);
+		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
+			supportsQueryString = `supports( ${supportsQueryString} )`;
+
+		let mediaQueryString = !this.mediaQuery ? "" : typeof this.mediaQuery === "string" ? this.mediaQuery : mediaQueryToCssString( this.mediaQuery);
+		this.cssRule = TssManager.addImportRule( `@import ${url} ${supportsQueryString} ${mediaQueryString}`);
 	}
 
 
@@ -56,7 +63,10 @@ export class ImportRule extends Rule implements IImportRule
 	public url: string;
 
 	// Optional media query for this rule.
-	public query?: string | MediaQuery;
+	public mediaQuery?: string | MediaQuery;
+
+	// Optional supports query for this rule.
+	public supportsQuery: string | SupportsQuery;
 }
 
 

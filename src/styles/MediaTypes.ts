@@ -3,7 +3,7 @@
 
 
 /** Possible media types */
-export type MediaType = "all" | "screen" | "print" | "speech";
+export type MediaType = "all" | "braille" | "embossed" | "handheld" | "print" | "projection" | "screen" | "speech" | "tty" | "tv";
 
 
 
@@ -30,11 +30,11 @@ export type MediaFeatureset =
     aspectRatio?: AspectRatioFeatureType;
     minAspectRatio?: AspectRatioFeatureType;
     maxAspectRatio?: AspectRatioFeatureType;
-    color?: number;
+    color?: number | [number, number];
     minColor?: number;
     maxColor?: number;
     colorGamut?: "srgb" | "p3" | "rec2020";
-    colorIndex?: number;
+    colorIndex?: number | [number, number];
     minColorIndex?: number;
     maxColorIndex?: number;
     // deviceAspectRatio?: FeatureType;
@@ -43,13 +43,13 @@ export type MediaFeatureset =
     displayMode?: "fullscreen" | "standalone" | "minimal-ui" | "browser";
     forcedColors?: "none" | "active";
     grid?: boolean;
-    height?: LengthFeatureType;
+    height?: LengthFeatureType | [LengthFeatureType, LengthFeatureType];
     minHeight?: LengthFeatureType;
     maxHeight?: LengthFeatureType;
     hover?: "none" | "hover";
     invertedColors?: "none" | "inverted";
     lightLevel?: "dim" | "normal" | "washed";
-    monochrome?: number;
+    monochrome?: number | [number, number];
     minMonochrome?: number;
     maxMonochrome?: number;
     orientation?: "portrait" | "landscape";
@@ -60,13 +60,13 @@ export type MediaFeatureset =
     prefersContrast?: "no-preference" | "high" | "low";
     prefersReducedMotion?: "no-preference" | "reduce";
     prefersReducedTransparency?: "no-preference" | "reduce";
-    resolution?: ResolutionFeatureType;
+    resolution?: ResolutionFeatureType | [ResolutionFeatureType, ResolutionFeatureType];
     minResolution?: ResolutionFeatureType;
     maxResolution?: ResolutionFeatureType;
     scan?: "interlace" | "progressive";
     scripting?: "none" | "initial-only" | "enabled";
     update?: "none" | "slow" | "fast";
-    width?: LengthFeatureType;
+    width?: LengthFeatureType | [LengthFeatureType, LengthFeatureType];
     minWidth?: LengthFeatureType;
     maxWidth?: LengthFeatureType;
 }

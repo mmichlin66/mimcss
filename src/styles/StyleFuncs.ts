@@ -623,22 +623,22 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
 
 
 /** Converts the given supports query to its string representation */
-export function supportQueryToCssString( query: StyleTypes.SupportsQuery): string
+export function supportsQueryToCssString( query: StyleTypes.SupportsQuery): string
 {
     if (!query)
         return "";
     else if (typeof query === "string")
         return query;
     else if (Array.isArray( query))
-        return query.map( (singleQuery) => singleSupportQueryToCssString( singleQuery)).join(" or ");
+        return query.map( (singleQuery) => singleSupportsQueryToCssString( singleQuery)).join(" or ");
     else
-        return singleSupportQueryToCssString( query);
+        return singleSupportsQueryToCssString( query);
 }
 
 
 
 /** Converts the given supports query to its string representation */
-export function singleSupportQueryToCssString( query: StyleTypes.SingleSupportsQuery): string
+export function singleSupportsQueryToCssString( query: StyleTypes.SingleSupportsQuery): string
 {
     if (!query)
         return "";

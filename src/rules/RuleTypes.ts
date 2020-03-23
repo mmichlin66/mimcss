@@ -386,8 +386,8 @@ export function $media<T>( query: string | MediaQuery, definition: T): IMediaRul
 	{ return new MediaRule( query, definition); }
 
 /** Returns new ImportRule object  */
-export function $import( url: string, query?: string | MediaQuery): IImportRule
-	{ return new ImportRule( url, query); }
+export function $import( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery): IImportRule
+	{ return new ImportRule( url, mediaQuery, supportsQuery); }
 
 /** Returns new FonFaceRule object  */
 export function $fontface( fontface: Fontface): IFontFaceRule

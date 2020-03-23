@@ -1,7 +1,7 @@
 import {ISupportsRule, IRuleDefinitionClass, RuleType} from "./RuleTypes"
 import {GroupRule} from "./GroupRule"
 import {SupportsQuery} from "../styles/StyleTypes"
-import {supportQueryToCssString} from "../styles/StyleFuncs"
+import {supportsQueryToCssString} from "../styles/StyleFuncs"
 
 
 
@@ -15,7 +15,7 @@ export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule
 		super( RuleType.SUPPORTS, definition);
 
 		// convert the query to its string form
-		this.queryString = supportQueryToCssString( query);
+		this.queryString = supportsQueryToCssString( query);
 	}
 
 

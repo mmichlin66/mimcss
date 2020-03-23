@@ -25,20 +25,17 @@ function resolutionFeatureToCssString( val: MediaTypes.ResolutionFeatureType): s
 
 
 /** Type of a function that converts the property-specific type to CSS string */
-type convertFuncType<K extends keyof MediaTypes.MediaFeatureset> = (val: MediaTypes.MediaFeatureset[K]) => string;
+type convertFuncType<K extends keyof MediaTypes.MediaFeatureset = any> = (val: MediaTypes.MediaFeatureset[K]) => string;
 
 
 
 /**
  * The MediaFeatureInfo represents information that we keep for style properties
  */
-type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = convertFuncType<K> | string |
+type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = convertFuncType<K> | boolean |
     {
         /** Function that converts from the property-specific type to CSS string */
         convert?: convertFuncType<K>;
-
-        /** If defined, indicates the property that our property should be treated as */
-        treatAs?: string;
 
         /**
          * If defined, indicates the value, which we will not put into CSS string. This is needed for
@@ -46,6 +43,11 @@ type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = conver
          */
         defaultValue?: MediaTypes.MediaFeatureset[K];
 
+        /**
+         * Flag indicating whether the feature is a "range" feature; that is, can be used in an
+         * expression (a <= feature <= b).
+         */
+        isRange?: boolean;
     }
 
 
@@ -103,17 +105,8 @@ export function mediaFeatureToCssString( featureName: string, propVal: any, valu
     if (!featureName || propVal == null)
         return null;
 
-    // find information object and follow "treatAs" while exists
+    // find information object 
     let info: MediaFeatureInfo = mediaFeatures[featureName];
-    while( info)
-    {
-        if (typeof info === "string")
-            info = mediaFeatures[info];
-        else if (typeof info === "object")
-            info = mediaFeatures[info.treatAs];
-        else
-            break;
-    }
 
     let realFeatureName = UtilFuncs.camelToDash( featureName);
 
@@ -122,18 +115,36 @@ export function mediaFeatureToCssString( featureName: string, propVal: any, valu
     if (defaultValue !== undefined && propVal === defaultValue)
         return valueOnly ? "" : realFeatureName;
 
-    let s: string;
     let convert = typeof info === "function" ? info : typeof info === "object" ? info.convert : undefined;
-    if (convert)
-        s = convert( propVal);
-    else if (typeof propVal === "string")
-        s = propVal;
-    else if (Array.isArray( propVal))
-        s = UtilFuncs.arrayToCssString( propVal, item => item == null ? "" : item.toString());
+    let isRange = typeof info === "boolean" ? info : typeof info === "object" ? info.isRange : undefined;
+    if (isRange && !valueOnly && Array.isArray( propVal) && propVal.length === 2)
+    {
+        let s1 = mediaFeatureSingleValueToCssString( convert, propVal[0]);
+        let s2 = mediaFeatureSingleValueToCssString( convert, propVal[1]);
+        return `${s1} <= ${realFeatureName} <= ${s2}`;
+    }
     else
-        s = propVal.toString();
+    {
+        let s = mediaFeatureSingleValueToCssString( convert, propVal);
+        return valueOnly ? s : realFeatureName + ":" + s;
+    }
+}
 
-    return valueOnly ? s : realFeatureName + ":" + s;
+
+
+function mediaFeatureSingleValueToCssString( convert: convertFuncType, propVal: any): string | null
+{
+    if (propVal == null)
+        return null;
+
+    if (convert)
+        return convert( propVal);
+    else if (typeof propVal === "string")
+        return propVal;
+    else if (Array.isArray( propVal))
+        return UtilFuncs.arrayToCssString( propVal, item => item == null ? "" : item.toString());
+    else
+        return propVal.toString();
 }
 
 
@@ -141,26 +152,20 @@ export function mediaFeatureToCssString( featureName: string, propVal: any, valu
 let mediaFeatures: { [K in keyof MediaTypes.MediaFeatureset]?: MediaFeatureInfo<K> } =
 {
     aspectRatio: aspectRatioToCssString,
-    minAspectRatio: "aspectRatio",
-    maxAspectRatio: "aspectRatio",
-    color: { defaultValue: 0 },
-    minColor: "color",
-    maxColor: "color",
-    colorIndex: { defaultValue: 0 },
-    minColorIndex: "color",
-    maxColorIndex: "color",
-    height: lengthFeatureToCssString,
-    minHeight: "height",
-    maxHeight: "height",
-    monochrome: { defaultValue: 0 },
-    minMonochrome: "monochrome",
-    maxMonochrome:"monochrome",
-    resolution: resolutionFeatureToCssString,
-    minResolution: "resolution",
-    maxResolution: "resolution",
-    width: lengthFeatureToCssString,
-    minWidth: "width",
-    maxWidth:"width",
+    minAspectRatio: aspectRatioToCssString,
+    maxAspectRatio: aspectRatioToCssString,
+    color: { defaultValue: 0, isRange: true },
+    colorIndex: { defaultValue: 0, isRange: true },
+    height: { convert: lengthFeatureToCssString, isRange: true },
+    minHeight: lengthFeatureToCssString,
+    maxHeight: lengthFeatureToCssString,
+    monochrome: { defaultValue: 0, isRange: true },
+    resolution: { convert: resolutionFeatureToCssString, isRange: true },
+    minResolution: resolutionFeatureToCssString,
+    maxResolution: resolutionFeatureToCssString,
+    width: { convert: lengthFeatureToCssString, isRange: true },
+    minWidth: lengthFeatureToCssString,
+    maxWidth: lengthFeatureToCssString,
 };
 
 
