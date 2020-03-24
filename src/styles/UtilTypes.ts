@@ -54,7 +54,7 @@ export class StringProxy
  */
 export class VarValue<T>
 {
-    constructor( varDef: ICustomVar<T>, fallbackValue?: T | ICustomVar<T> | string)
+    constructor( varDef: ICustomVar<T>, fallbackValue?: ExtendedPropType<T> | ICustomVar<T>)
     {
         this.varDef = varDef;
         this.fallbackValue = fallbackValue;
@@ -62,17 +62,17 @@ export class VarValue<T>
 
     public varValueToCssString(): string
     {
-        let varName = typeof this.varDef === "string" ? this.varDef : (this.varDef as CustomVar<T>).varName;
+        let varName = this.varDef.name;
         let s = `var(--${varName}`;
         if (this.fallbackValue)
         {
             s += ",";
             if (this.fallbackValue instanceof CustomVar)
                 s += new VarValue( this.fallbackValue);
-            else if (typeof this.fallbackValue === "string" || this.fallbackValue instanceof StringProxy || typeof this.varDef === "string")
-                s += this.fallbackValue;
+            else if (this.fallbackValue instanceof StringProxy)
+                s += this.fallbackValue.stringProxyToCssString();
             else
-                s += stylePropToCssString( (this.varDef as CustomVar<T>).templatePropName, this.fallbackValue, true);
+                s += stylePropToCssString( this.varDef.templatePropName, this.fallbackValue, true);
         }
 
         return s + ")";
@@ -84,7 +84,7 @@ export class VarValue<T>
     }
 
     public varDef: ICustomVar<T>;
-    public fallbackValue?: T | ICustomVar<T> | string;
+    public fallbackValue?: ExtendedPropType<T> | ICustomVar<T>;
 }
 
 

@@ -61,9 +61,9 @@ export function colorSeparation( c: number | string): string
 
 export function rgb( r: number | string, g: number | string, b: number | string, a?: number | string): string
 {
-    r = this.colorSep(r);
-    g = this.colorSep(g);
-    b = this.colorSep(b);
+    r = colorSeparation(r);
+    g = colorSeparation(g);
+    b = colorSeparation(b);
     a = a == null ? null : typeof a === "string" ? a : this.percent(a);
 
     return a == null ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;

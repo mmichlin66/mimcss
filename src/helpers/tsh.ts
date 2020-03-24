@@ -354,7 +354,8 @@ export class tsh
      * });
      * ```
      */
-    public static var<T>( varDef: ICustomVar<ExtendedPropType<T>>, fallbackValue?: T | ICustomVar<ExtendedPropType<T>> | string): VarValue<T>
+    public static var<T>( varDef: ICustomVar<ExtendedPropType<T>>,
+            fallbackValue?: ExtendedPropType<T> | ICustomVar<ExtendedPropType<T>>): VarValue<T>
     {
         return new VarValue( varDef, fallbackValue) as VarValue<T>;
     }
