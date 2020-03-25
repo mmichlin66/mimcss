@@ -95,7 +95,7 @@ export class VarValue<T>
  * - StringProxy type that allows specifying raw string value.
  * - VarValue generic type that allows using a CSS custom property.
  */
-export type ExtendedPropType<T> = T | Base_StyleType | StringProxy | VarValue<T>;
+export type ExtendedPropType<T> = T | Base_StyleType | StringProxy | VarValue<T> | ICustomVar<ExtendedPropType<T>>;
 
 
 

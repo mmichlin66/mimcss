@@ -87,6 +87,15 @@ export class CustomVar<T = any> extends Rule implements ICustomVar<T>
 
 
 
+	// The toString function is used when the object is specified as a value of a style property.
+	// We return the var(--name) expression.
+    public toString(): string
+    {
+		return `var(--${this.varName})`;
+    }
+
+
+
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
 	public templatePropName: string;
 
