@@ -66,7 +66,8 @@ export const enum RuleType
 
 	// not real rules but derive from the Rule object
     VAR = 50,
-    SCOPE = 51,
+    SCOPE,
+	CUSTOMVAR_ROOT,
 }
 
 
@@ -248,8 +249,27 @@ export interface IFontFaceRule extends IRule
 /**
  * The ICustomVar interface represents a CSS custom property definition.
  */
-export interface ICustomVar<T = any> extends INamedRule
+export interface ICustomVar<T = any>
 {
+	/**
+	 * Name of the property on the rule definition object to which this rule is assigned.
+	 */
+	readonly ruleName: string;
+
+	/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	readonly name: string;
+
+	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	readonly cssName: string;
+
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly templatePropName: string;
 
@@ -262,34 +282,6 @@ export interface ICustomVar<T = any> extends INamedRule
 
 
 
-/**
- * The ICustomVarRule interface represents a ":root" block with CSS custom property definitions.
- */
-export interface ICustomVarRule<T = any> extends IRule
-{
-	/** Map of custom property names to property definitions */
-	readonly vars: PropsOfType<T,ICustomVar>;
-
-	/** SOM style rule */
-	readonly cssStyleRule?: CSSStyleRule;
-}
-
-
-
-/**
- * Type that combines interfaces of rules that have names; such rules have to be assigned to a
- * member property and cannot be be created by the addUnnamedRUles method.
- */
-export type NamedRule = INamedRule;
-
-/**
- * Type that combines interfaces of rules that don't have names; that is, they don't have to be
- * assigned to a member property and may be created by the addUnnamedRUles method.
- */
-export type UnnamedRule = ITagRule | ISelectorRule | IGroupRule;
-
-
-
 import {IStyleScope} from "../scope/ScopeTypes"
 
 /**
@@ -297,22 +289,22 @@ import {IStyleScope} from "../scope/ScopeTypes"
  */
 export interface IRuleContainer<T = IRuleDefinition>
 {
-	/** Names of classes. */
+	/** Map of names of properties defining class rules to actual class names. */
 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
 
-	/** Names of element identifiers. */
+	/** Map of names of properties defining ID rules to actual IDs. */
 	readonly ids: NamesOfPropsOfType<T,IIDRule>;
 
-	/** Names of animations. */
+	/** Map of names of properties defining animation rules to actual animation names. */
 	readonly animations: NamesOfPropsOfType<T,IAnimationRule>;
 
-	/** Names of custom CSS properties */
-	readonly vars: NamesOfPropsOfType<T,ICustomVar>;
+	/** Map of names of properties defining custom property rules to the ICustomVar objects. */
+	readonly vars: PropsOfType<T,ICustomVar>;
 
 	/** Map of property names to rule objects. */
 	readonly rules: PropsOfType<T,IRule>;
 
-	/** Used external style scopes created using the $use function. */
+	/**  Map of property names to external style scopes created using the $use function. */
 	readonly uses: PropsOfType<T,IStyleScope>;
 }
 

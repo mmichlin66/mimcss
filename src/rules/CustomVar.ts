@@ -1,7 +1,5 @@
-import {ICustomVar, RuleType, INamedRule} from "./RuleTypes"
-import {Rule} from "./Rule";
+import {ICustomVar, INamedRule} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
-import {ExtendedPropType} from "../styles/UtilTypes";
 import {stylePropToCssString} from "../styles/StyleFuncs"
 
 
@@ -9,12 +7,10 @@ import {stylePropToCssString} from "../styles/StyleFuncs"
 /**
  * The CustomVar class describes a custom CSS property.
  */
-export class CustomVar<T = any> extends Rule implements ICustomVar<T>
+export class CustomVar<T = any> implements ICustomVar<T>
 {
 	public constructor( templatePropName?: string, varValue?: T, nameOverride?: string | INamedRule)
 	{
-		super( RuleType.VAR);
-
 		this.templatePropName = templatePropName;
 		this.varValue = varValue;
 		this.nameOverride = nameOverride;
@@ -25,7 +21,9 @@ export class CustomVar<T = any> extends Rule implements ICustomVar<T>
 	// Processes the given rule.
 	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
-		super.process( container, owner, ruleName);
+		this.container = container;
+		this.owner = owner;
+		this.ruleName = ruleName;
 
 		if (!this.nameOverride)
 			this.varName = this.owner.getScopedRuleNamed( ruleName);
@@ -53,13 +51,6 @@ export class CustomVar<T = any> extends Rule implements ICustomVar<T>
 
 
 
-	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
-	// element. For the majority of Rule-derived classes this is true; however, for some classes,
-	// e.g. for the CustomVar class, this is not so.
-	public get isRealCssRule(): boolean { return false; }
-
-
-
 	// Creates a copy of the rule.
 	public clone(): CustomVar<T>
 	{
@@ -69,13 +60,6 @@ export class CustomVar<T = any> extends Rule implements ICustomVar<T>
 		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
-
-
-
-	// Inserts this rule into the given parent rule or stylesheet.
-	// Since CustomVar is not a real CSS rule, this implementation does nothing. Instead, the
-	// RuleContainer uses the toCssString method of our class.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
 
 
 
@@ -95,6 +79,16 @@ export class CustomVar<T = any> extends Rule implements ICustomVar<T>
     }
 
 
+
+	// Rule container to which this rule belongs. This is "this" for StyleScope.
+	public container: RuleContainer;
+
+	// Style scope to which this rule belongs. This is "this" for StyleScope.
+	public owner: IRuleContainerOwner;
+
+	// Name of the property of the style scope definition to which this rule was assigned. This is
+	// null for StyleScope.
+	public ruleName: string;
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
 	public templatePropName: string;

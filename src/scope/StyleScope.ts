@@ -26,13 +26,6 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 
-	// Determines whether this rule is a real CSS rule that should be inserted under the <style>
-	// element. For the majority of Rule-derived classes this is true; however, for some classes,
-	// e.g. for the CustomVar class, this is not so.
-	public get isRealCssRule(): boolean { return false; }
-
-
-
 	// Creates a copy of the rule.
 	public clone(): Rule { return null; }
 
@@ -86,8 +79,8 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 	{
 		// check whether we already have this rule name: if yes, return the already assigned
 		// unique scoped name
-		if (ruleName in this._allNames)
-			return this._allNames[ruleName];
+		if (ruleName in this.allNames)
+			return this.allNames[ruleName];
 		else
 			return this.generateScopedName( ruleName);
 	}
@@ -155,7 +148,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 	// Class that defined this style scope. This member is used for style scope derivation
-	protected readonly definitionClass: IStyleScopeDefinitionClass<T>;
+	public readonly definitionClass: IStyleScopeDefinitionClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
