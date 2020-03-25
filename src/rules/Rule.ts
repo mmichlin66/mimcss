@@ -10,9 +10,9 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export abstract class Rule implements IRule
 {
-	constructor( type: RuleType)
+	constructor( ruleType: RuleType)
 	{
-		this.type = type;
+		this.ruleType = ruleType;
 	}
 
 
@@ -39,7 +39,7 @@ export abstract class Rule implements IRule
 
 
 	/** Type of the rule */
-	public readonly type: RuleType;
+	public readonly ruleType: RuleType;
 
 	// Rule container to which this rule belongs. This is "this" for StyleScope.
 	public container: RuleContainer;

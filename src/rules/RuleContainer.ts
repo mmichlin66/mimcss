@@ -16,8 +16,8 @@ import {CustomVar} from "./CustomVar"
  */
 export interface IRuleContainerOwner
 {
-	/** Adds a style scope this style scope */
-	addImportedScope( scope: IStyleScope): void;
+	/** Adds an external style scope to this style scope */
+	addExternalScope( scope: IStyleScope): void;
 
 	/** Generates a name, which will be unique in this style scope */
 	getScopedRuleNamed( ruleName: string): string;
@@ -53,9 +53,8 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	/** Map of all tag rules. */
 	public get rules(): PropsOfType<T,IRule> { return this._rules as PropsOfType<T,IRule>; }
 
- 	/** The ":root" block with CSS custom property definitions. */
-	public get varRule(): ICustomVarRule { return this._varRule; }
-
+	/** Used external style scopes created using the $use function. */
+	public get uses(): PropsOfType<T,IStyleScope> { return this._uses as PropsOfType<T,IStyleScope>; }
 
 
 	// Creates the style scope definition instance, parses its properties and creates names for
@@ -73,6 +72,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		this._vars = {};
 
 		this._rules = {};
+		this._uses = {};
 		this._allRules = [];
 
 		// create our internal rule for custom CSS properties
@@ -131,9 +131,10 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 			// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
 			// We inform our owner style scope about the "imported" scope so that when the owner
 			// scope is activated, the imported one is activated too.
-			if (rule.type === RuleType.SCOPE)
+			if (rule.ruleType === RuleType.SCOPE)
 			{
-				this.owner.addImportedScope( rule as any as IStyleScope);
+				this._uses[ruleName] = rule as any as IStyleScope;
+				this.owner.addExternalScope( rule as any as IStyleScope);
 				continue;
 			}
 
@@ -144,12 +145,10 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 			rule.process( this, this.owner, ruleName);
 
-			// remember real rules
+			// remember rules
+			this._rules[ruleName] = rule;
 			if (rule.isRealCssRule)
-			{
-				this._rules[ruleName] = rule;
 				this._allRules.push( rule);
-			}
 
 			// put rules and their names into buckets
 			if (rule instanceof ClassRule)
@@ -191,9 +190,9 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 			// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
 			// We inform our owner style scope about the "imported" scope so that when the owner
 			// scope is activated, the imported one is activated too.
-			if (rule.type === RuleType.SCOPE)
+			if (rule.ruleType === RuleType.SCOPE)
 			{
-				this.owner.addImportedScope( rule as any as IStyleScope);
+				this.owner.addExternalScope( rule as any as IStyleScope);
 				continue;
 			}
 
@@ -250,6 +249,9 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 	// Rule that combines all custom variables defined in this container.
 	protected _varRule: CustomVarRule;
+
+	// Used external style scopes created using the $use function.
+	protected _uses: { [K: string]: IStyleScope }
 
 	// List of all rules
 	public _allRules: Rule[];

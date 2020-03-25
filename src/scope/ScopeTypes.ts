@@ -34,11 +34,14 @@ export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
  */
 export interface IStyleScope<T = any> extends IRuleContainer<T>
 {
-	/** Inserts this style scope into DOM. */
-	activate(): void;
+	/** CSS style sheet which contains rules defined by this scope*/
+	readonly cssStyleSheet: CSSStyleSheet;
 
-	/** Removes this style scope from DOM - only works for multiplex style scopes. */
-	deactivate(): void;
+	// /** Inserts this style scope into DOM. */
+	// activate(): void;
+
+	// /** Removes this style scope from DOM - only works for multiplex style scopes. */
+	// deactivate(): void;
 }
 
 
@@ -83,11 +86,19 @@ export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScop
  * manipulations. For a given style scope definition class there is a single style scope object,
  * no matter how many times this function is invoked.
  */
-export function $activate<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
+export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStyleScope<T> | IStyleScopeDefinitionClass<T>): IStyleScope<T>
 {
-	let scope = $use( styleScopeDefinitionClass);
-	scope.activate();
-	return scope;
+	if (scopeOrDefinition instanceof StyleScope)
+	{
+		scopeOrDefinition.activate();
+		return  scopeOrDefinition;
+	}
+	else
+	{
+		let scope = $use( scopeOrDefinition as IStyleScopeDefinitionClass<T>);
+		(scope as StyleScope<T>).activate();
+		return scope;
+	}
 }
 
 

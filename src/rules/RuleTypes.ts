@@ -83,7 +83,7 @@ export interface IRule
 	readonly ruleName: string;
 
 	/** Type of the rule */
-	readonly type: RuleType;
+	readonly ruleType: RuleType;
 
 	/** SOM rule */
 	readonly cssRule: CSSRule;
@@ -193,7 +193,7 @@ export type Keyframe = ["from" | "to" | number, ExtendedStyleset];
 /**
  * The IGroupRule interface represents a CSS grouping rule.
  */
-export interface IGroupRule<T = any> extends IRuleContainer<T>
+export interface IGroupRule<T = any> extends IRuleContainer<T>, IRule
 {
 	/** SOM grouping rule */
 	readonly cssGroupRule: CSSGroupingRule;
@@ -277,7 +277,7 @@ export interface ICustomVarRule<T = any> extends IRule
 
 
 /**
- * Type that combines interfaces of rules that have names; auch rules have to be assigned to a
+ * Type that combines interfaces of rules that have names; such rules have to be assigned to a
  * member property and cannot be be created by the addUnnamedRUles method.
  */
 export type NamedRule = INamedRule;
@@ -290,10 +290,12 @@ export type UnnamedRule = ITagRule | ISelectorRule | IGroupRule;
 
 
 
+import {IStyleScope} from "../scope/ScopeTypes"
+
 /**
  * The IRuleContainer interface represents an object that contains CSS rules.
  */
-export interface IRuleContainer<T = IRuleDefinition> extends IRule
+export interface IRuleContainer<T = IRuleDefinition>
 {
 	/** Names of classes. */
 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
@@ -310,8 +312,8 @@ export interface IRuleContainer<T = IRuleDefinition> extends IRule
 	/** Map of property names to rule objects. */
 	readonly rules: PropsOfType<T,IRule>;
 
-	/** Rule that combines all custom variables defined in this container. */
-	readonly varRule: ICustomVarRule<T>;
+	/** Used external style scopes created using the $use function. */
+	readonly uses: PropsOfType<T,IStyleScope>;
 }
 
 

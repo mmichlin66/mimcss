@@ -3,6 +3,7 @@ import {RuleType, IRuleDefinition, IRuleDefinitionClass} from "../rules/RuleType
 import {Rule} from "../rules/Rule"
 import {TssManager} from "./TssManager"
 import {RuleContainer, IRuleContainerOwner} from "../rules/RuleContainer"
+import { StyleType } from "../styles/StyleTypes"
 
 
 
@@ -18,7 +19,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 		this.definitionClass = definitionClass;
 
 		this.activationRefCount = 0;
-		this.importedScopes = [];
+		this.usedScopes = [];
 
 		this.processScope();
 	}
@@ -73,9 +74,9 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 	/** Adds a style scope this style scope */
-	public addImportedScope( scope: IStyleScope): void
+	public addExternalScope( scope: IStyleScope): void
 	{
-		this.importedScopes.push( scope);
+		this.usedScopes.push( scope as StyleScope);
 	}
 
 
@@ -108,7 +109,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 	public activate(): void
 	{
 		// activate imported scopes
-		for( let scope of this.importedScopes)
+		for( let scope of this.usedScopes)
 			scope.activate();
 
 		if (++this.activationRefCount === 1 && !this.isActivated)
@@ -125,7 +126,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 			return;
 
 		// deactivate imported scopes
-		for( let scope of this.importedScopes)
+		for( let scope of this.usedScopes)
 			scope.deactivate();
 
 		if (--this.activationRefCount === 0 && this.isActivated)
@@ -169,8 +170,8 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 	// Reference count of activation requests.
 	private activationRefCount: number;
 
-	// List of imported style scope objects that will be activated when our scope is activated.
-	private importedScopes: IStyleScope[];
+	// List of used style scope objects that will be activated when our scope is activated.
+	private usedScopes: StyleScope[];
 }
 
 
