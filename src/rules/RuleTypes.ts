@@ -367,7 +367,7 @@ export function $id( style: ExtendedStyleset, nameOverride?: string | INamedRule
 	{ return new IDRule( style, nameOverride); }
 
 /** Creates new SelectorRule object  */
-export function $rule( selector: SelectorType, style: ExtendedStyleset): ISelectorRule
+export function $style( selector: SelectorType, style: ExtendedStyleset): ISelectorRule
 	{ return new SelectorRule( selector, style); }
 
 /** Returns new AnimationRule object  */
