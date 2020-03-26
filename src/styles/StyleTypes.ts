@@ -860,7 +860,7 @@ export type PureStyleset =
     fontFamily?: StyleType;
     fontFeatureSettings?: StyleType;
     fontKerning?: FontKerningStyleType;
-    fontSize?: StyleType;
+    fontSize?: UtilTypes.Length_StyleType;
     fontSizeAdjust?: StyleType;
     fontStretch?: StyleType;
     fontStyle?: FontStyleStyleType;

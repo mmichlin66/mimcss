@@ -365,6 +365,21 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
 
 
 /**
+ * Converts font style value to the CSS string.
+ */
+function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (typeof val === "number")
+        return "oblique " + UtilFuncs.angleNumberToCssString( val);
+    else
+        return val.toString();
+}
+
+
+
+/**
  * Converts text-emphasis style value to the CSS string.
  */
 function textEmphasisPositionToCssString( val: StyleTypes.TextEmphasisPositionStyleType): string
@@ -566,7 +581,8 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
 
     flex: flexToCssString,
     floodColor: ColorFuncs.colorToCssString,
-    fontStyle: UtilFuncs.angleToCssString,
+    fontSize: UtilFuncs.lengthToCssString,
+    fontStyle: fontStyleToCssString,
 
     gap: UtilFuncs.multiLengthToCssString,
     gridColumnGap: UtilFuncs.lengthToCssString,
