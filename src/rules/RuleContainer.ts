@@ -141,7 +141,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 		varObj.process( this, this.owner, varName);
 
-		this.allNames[varName] = varObj.varName;
+		this.allNames[varName] = varObj.name;
 		this._vars[varName] = varObj;
 	}
 
@@ -174,18 +174,18 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		// put rules and their names into buckets
 		if (rule instanceof ClassRule)
 		{
-			this.allNames[ruleName] = rule.className;
-			this._classes[ruleName] = rule.className;
+			this.allNames[ruleName] = rule.name;
+			this._classes[ruleName] = rule.name;
 		}
 		else if (rule instanceof IDRule)
 		{
-			this.allNames[ruleName] = rule.idName;
-			this._ids[ruleName] = rule.idName;
+			this.allNames[ruleName] = rule.name;
+			this._ids[ruleName] = rule.name;
 		}
 		else if (rule instanceof AnimationRule)
 		{
-			this.allNames[ruleName] = rule.animationName;
-			this._animations[ruleName] = rule.animationName;
+			this.allNames[ruleName] = rule.name;
+			this._animations[ruleName] = rule.name;
 		}
 	}
 

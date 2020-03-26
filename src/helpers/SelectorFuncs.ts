@@ -170,9 +170,9 @@ export class Selector implements IEmptySelector, ISelector
 				if (token instanceof TagRule)
 					return token.tagName;
 				else if (token instanceof ClassRule)
-					return "." + token.className;
+					return "." + token.name;
 				else if (token instanceof IDRule)
-					return "#" + token.idName;
+					return "#" + token.name;
 				else if (token instanceof StringProxy)
 					return token.toString();
 				else if (token instanceof Selector)

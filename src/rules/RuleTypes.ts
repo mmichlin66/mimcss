@@ -146,8 +146,8 @@ export interface ITagRule extends IStyleRule
  */
 export interface IClassRule extends IStyleRule, INamedRule
 {
-	/** Name of the CSS class */
-	readonly class: string;
+	/** Flag, which is always true, that is needed to distinguish class rule from other rules */
+	readonly isClassRule: boolean;
 }
 
 
@@ -157,8 +157,8 @@ export interface IClassRule extends IStyleRule, INamedRule
  */
 export interface IIDRule extends IStyleRule, INamedRule
 {
-	/** ID of the HTML element */
-	readonly id: string;
+	/** Flag, which is always true, that is needed to distinguish ID rule from other rules */
+	readonly isIDRule: boolean;
 }
 
 
@@ -273,11 +273,8 @@ export interface ICustomVar<T = any>
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly templatePropName: string;
 
-	/** Name of the CSS custom property */
-	readonly varName: string;
-
 	/** Value of the custom CSS property. */
-	readonly varValue: T;
+	value: T;
 }
 
 

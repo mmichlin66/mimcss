@@ -30,31 +30,17 @@ export class AnimationRule extends Rule implements IAnimationRule
 		super.process( container, owner, ruleName);
 
 		if (!this.nameOverride)
-			this.animationName = this.owner.getScopedRuleNamed( ruleName);
+			this.name = this.owner.getScopedRuleNamed( ruleName);
 		else if (typeof this.nameOverride === "string")
-			this.animationName = this.nameOverride;
+			this.name = this.nameOverride;
 		else
-			this.animationName = this.nameOverride.name;
+			this.name = this.nameOverride.name;
+
+		this.cssName = this.name;
 
 		for( let keyframeRule of this.keyframeRules)
 			keyframeRule.process( container, owner, ruleName);
 	}
-
-
-
-		/**
-	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
-	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
-	 * properties (--).
-	 */
-	public get name(): string { return this.animationName; }
-
-	/**
-	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
-	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
-	 * `name` property.
-	 */
-	public get cssName(): string { return this.animationName; }
 
 
 
@@ -72,7 +58,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let index = parent.insertRule( `@keyframes ${this.animationName} {}`, parent.cssRules.length);
+		let index = parent.insertRule( `@keyframes ${this.name} {}`, parent.cssRules.length);
 		this.cssRule = parent.cssRules[index];
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
 		
@@ -88,8 +74,19 @@ export class AnimationRule extends Rule implements IAnimationRule
 	/** Only needed to distinguish from class and ID rules */
 	public keyframeRules: KeyframeRule[];
 
-	// Name of the animation to use in animation-name CSS property.
-	public animationName: string;
+	/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	public cssName: string;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

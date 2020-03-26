@@ -5,14 +5,17 @@ import {stylePropToCssString} from "../styles/StyleFuncs"
 
 
 /**
- * The CustomVar class describes a custom CSS property.
+ * The CustomVar class describes a custom CSS property. CustomVar does not derive from the Rule
+ * class because it is not a real CSS rule; however, in many aspects it repeats the Rule's
+ * functionality. In particular it has the process function that allows it to obtain an actual
+ * name, whcih will be used when defining and using this custom property in CSS.
  */
 export class CustomVar<T = any> implements ICustomVar<T>
 {
 	public constructor( templatePropName?: string, varValue?: T, nameOverride?: string | INamedRule)
 	{
 		this.templatePropName = templatePropName;
-		this.varValue = varValue;
+		this.value = varValue;
 		this.nameOverride = nameOverride;
 	}
 
@@ -21,33 +24,18 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// Processes the given rule.
 	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
-		this.container = container;
 		this.owner = owner;
 		this.ruleName = ruleName;
 
 		if (!this.nameOverride)
-			this.varName = this.owner.getScopedRuleNamed( ruleName);
+			this.name = this.owner.getScopedRuleNamed( ruleName);
 		else if (typeof this.nameOverride === "string")
-			this.varName = this.nameOverride;
+			this.name = this.nameOverride;
 		else
-			this.varName = this.nameOverride.name;
+			this.name = this.nameOverride.name;
+
+		this.cssName = "--" + this.name;
 	}
-
-
-
-	/**
-	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
-	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
-	 * properties (--).
-	 */
-	public get name(): string { return this.varName; }
-
-	/**
-	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
-	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
-	 * `name` property.
-	 */
-	public get cssName(): string { return "--" + this.varName; }
 
 
 
@@ -56,7 +44,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	{
 		let newRule = new CustomVar<T>();
 		newRule.templatePropName = this.templatePropName;
-		newRule.varValue = this.varValue;
+		newRule.value = this.value;
 		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
@@ -66,7 +54,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `--${this.varName}: ${stylePropToCssString( this.templatePropName, this.varValue, true)}`;
+		return `${this.cssName}: ${stylePropToCssString( this.templatePropName, this.value, true)}`;
 	}
 
 
@@ -75,16 +63,10 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// We return the var(--name) expression.
     public toString(): string
     {
-		return `var(--${this.varName})`;
+		return `var(${this.cssName})`;
     }
 
 
-
-	// Rule container to which this rule belongs. This is "this" for StyleScope.
-	public container: RuleContainer;
-
-	// Style scope to which this rule belongs. This is "this" for StyleScope.
-	public owner: IRuleContainerOwner;
 
 	// Name of the property of the style scope definition to which this rule was assigned. This is
 	// null for StyleScope.
@@ -93,15 +75,29 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
 	public templatePropName: string;
 
-	// Name of the custom CSS property.
-	public varName: string;
+	/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	public cssName: string;
 
 	// Value of the custom CSS property.
-	public varValue: T;
+	public value: T;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | INamedRule;
+
+	// Style scope to which this rule belongs. This is "this" for StyleScope.
+	public owner: IRuleContainerOwner;
 }
 
 

@@ -24,28 +24,14 @@ export class IDRule extends StyleRule implements IIDRule
 		super.process( container, owner, ruleName);
 
 		if (!this.nameOverride)
-			this.idName = this.owner.getScopedRuleNamed( ruleName);
+			this.name = this.owner.getScopedRuleNamed( ruleName);
 		else if (typeof this.nameOverride === "string")
-			this.idName = this.nameOverride;
+			this.name = this.nameOverride;
 		else
-			this.idName = this.nameOverride.name;
+			this.name = this.nameOverride.name;
+
+		this.cssName = "#" + this.name;
 	}
-
-
-
-	/**
-	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
-	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
-	 * properties (--).
-	 */
-	public get name(): string { return this.idName; }
-
-	/**
-	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
-	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
-	 * `name` property.
-	 */
-	public get cssName(): string { return "#" + this.idName; }
 
 
 
@@ -63,16 +49,27 @@ export class IDRule extends StyleRule implements IIDRule
 	// Returns the selector part of the style rule.
 	protected geSelectorString(): string
 	{
-		return "#" + this.idName;
+		return this.cssName;
 	}
 
 
 
-	/** ID of the HTML element */
-	public get id(): string { return this.idName; }
+	/** Only needed to distinguish from other rules */
+	public get isIDRule(): boolean { return true; }
 
-	// Name of the element identifier for applying the styleset.
-	public idName: string;
+	/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	public cssName: string;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
