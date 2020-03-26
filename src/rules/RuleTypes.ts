@@ -66,7 +66,7 @@ export const enum RuleType
 
 	// not real rules but derive from the Rule object
     SCOPE = 50,
-	CUSTOMVAR_ROOT,
+	ABSTRACT,
 }
 
 
@@ -130,6 +130,18 @@ export interface IStyleRule extends IRule
 
 
 /**
+ * The IAbstractRule interface represents a style rule that can only be used as a base for other
+ * style rules. No CSSStyleRule objects are created for the abstract rules.
+ */
+export interface IAbstractRule extends IStyleRule
+{
+	/** Flag, which is always true, that is needed to distinguish abstract rules from other rules */
+	readonly isAbstractRule: boolean;
+}
+
+
+
+/**
  * The ITagRule interface represents a style rule that applies to elements identified by a tag name.
  */
 export interface ITagRule extends IStyleRule
@@ -145,7 +157,7 @@ export interface ITagRule extends IStyleRule
  */
 export interface IClassRule extends IStyleRule, INamedRule
 {
-	/** Flag, which is always true, that is needed to distinguish class rule from other rules */
+	/** Flag, which is always true, that is needed to distinguish class rules from other rules */
 	readonly isClassRule: boolean;
 }
 
@@ -156,7 +168,7 @@ export interface IClassRule extends IStyleRule, INamedRule
  */
 export interface IIDRule extends IStyleRule, INamedRule
 {
-	/** Flag, which is always true, that is needed to distinguish ID rule from other rules */
+	/** Flag, which is always true, that is needed to distinguish ID rules from other rules */
 	readonly isIDRule: boolean;
 }
 
@@ -328,6 +340,7 @@ export interface IRuleDefinitionClass<T extends IRuleDefinition>
 
 
 
+import {AbstractRule} from "./AbstractRule"
 import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
@@ -341,6 +354,10 @@ import {ImportRule} from "./ImportRule"
 import {FontFaceRule} from "./FontFaceRule"
 
 
+
+/** Creates new AbstractRule object  */
+export function $abstract( style: ExtendedStyleset): IAbstractRule
+	{ return new AbstractRule( style); }
 
 /** Creates new TagRule object  */
 export function $tag( tagName: string, style: ExtendedStyleset): ITagRule
