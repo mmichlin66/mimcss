@@ -65,8 +65,7 @@ export const enum RuleType
     VIEWPORT,
 
 	// not real rules but derive from the Rule object
-    VAR = 50,
-    SCOPE,
+    SCOPE = 50,
 	CUSTOMVAR_ROOT,
 }
 
@@ -271,7 +270,7 @@ export interface ICustomVar<T = any>
 	readonly cssName: string;
 
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
-	readonly templatePropName: string;
+	readonly template: string;
 
 	/** Value of the custom CSS property. */
 	value: T;
@@ -364,9 +363,9 @@ export function $animation( keyframes: Keyframe[], nameOverride?: string | IName
 	{ return new AnimationRule( keyframes, nameOverride); }
 
 /** Returns new CustomVar object that defines a custom CSS property */
-export function $custom<K extends keyof PureStyleset>( templatePropName: K, propVal: PureStyleset[K],
+export function $custom<K extends keyof PureStyleset>( template: K, propVal: PureStyleset[K],
 				nameOverride?: string | INamedRule): ICustomVar<PureStyleset[K]>
-	{ return new CustomVar( templatePropName, propVal, nameOverride); }
+	{ return new CustomVar( template, propVal, nameOverride); }
 
 /** Returns new SupportsRule object  */
 export function $supports<T>( query: SupportsQuery, definition: T): ISupportsRule<T>

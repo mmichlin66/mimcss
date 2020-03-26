@@ -437,22 +437,22 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset, important?: 
             for( let customVal of propVal)
             {
                 let customPropName: string;
-                let templatePropName: string;
+                let template: string;
                 if (typeof customVal.varDef === "string")
                 {
                     customPropName = customVal.varDef;
-                    templatePropName = customVal.templatePropName;
+                    template = customVal.template;
                 }
                 else
                 {
                     customPropName = customVal.varDef.name;
-                    templatePropName = customVal.varDef.templatePropName;
+                    template = customVal.varDef.template;
                 }
 
-                if (!customPropName || !templatePropName)
+                if (!customPropName || !template)
                     continue;
                     
-                s += `--${customPropName}:${stylePropToCssString( templatePropName, customVal.varValue, true)}`;
+                s += `--${customPropName}:${stylePropToCssString( template, customVal.varValue, true)}`;
                 s += (important && important.has( propName) ? " !important;" : ";");
             }
         }

@@ -12,10 +12,10 @@ import {stylePropToCssString} from "../styles/StyleFuncs"
  */
 export class CustomVar<T = any> implements ICustomVar<T>
 {
-	public constructor( templatePropName?: string, varValue?: T, nameOverride?: string | INamedRule)
+	public constructor( template?: string, value?: T, nameOverride?: string | INamedRule)
 	{
-		this.templatePropName = templatePropName;
-		this.value = varValue;
+		this.template = template;
+		this._value = value;
 		this.nameOverride = nameOverride;
 	}
 
@@ -24,11 +24,11 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// Processes the given rule.
 	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
-		this.owner = owner;
+		this.container = container;
 		this.ruleName = ruleName;
 
 		if (!this.nameOverride)
-			this.name = this.owner.getScopedRuleNamed( ruleName);
+			this.name = owner.getScopedRuleNamed( ruleName);
 		else if (typeof this.nameOverride === "string")
 			this.name = this.nameOverride;
 		else
@@ -43,8 +43,8 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	public clone(): CustomVar<T>
 	{
 		let newRule = new CustomVar<T>();
-		newRule.templatePropName = this.templatePropName;
-		newRule.value = this.value;
+		newRule.template = this.template;
+		newRule._value = this._value;
 		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
@@ -54,7 +54,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `${this.cssName}: ${stylePropToCssString( this.templatePropName, this.value, true)}`;
+		return `${this.cssName}: ${stylePropToCssString( this.template, this._value, true)}`;
 	}
 
 
@@ -73,7 +73,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	public ruleName: string;
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
-	public templatePropName: string;
+	public template: string;
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -90,14 +90,20 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	public cssName: string;
 
 	// Value of the custom CSS property.
-	public value: T;
+	private _value: T;
+	public get value(): T { return this._value; }
+	public set value( v: T)
+	{
+		this._value = v;
+		this.container.setCustomVarValue( this.cssName, stylePropToCssString( this.template, this._value, true))
+	}
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | INamedRule;
 
-	// Style scope to which this rule belongs. This is "this" for StyleScope.
-	public owner: IRuleContainerOwner;
+	// Rule container to which this rule belongs. This is "this" for StyleScope.
+	public container: RuleContainer;
 }
 
 

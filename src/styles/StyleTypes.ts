@@ -1153,7 +1153,7 @@ export interface ICustomVal<T = any>
 	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
 	 * object, since the latter already has the template property name defined.
 	 */
-	readonly templatePropName?: string;
+	readonly template?: string;
 
 	/** Value of the custom CSS property. */
 	readonly varValue: T;
@@ -1169,7 +1169,7 @@ export interface ICustomVal<T = any>
  * ```typescript
  * let styleset = {
  *     $custom: [
- *         { var: "mainColor", templatePropName: "color", varValue: "black" },
+ *         { var: "mainColor", template: "color", varValue: "black" },
  *         { var: MyStyles.varRules.mainBgColor, varValue: "white"),
  *         tsh.custom( MyStyles.varRules.mainSelectionColor, "blue")
  *     ]

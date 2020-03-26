@@ -72,7 +72,7 @@ export class VarValue<T>
             else if (this.fallbackValue instanceof StringProxy)
                 s += this.fallbackValue.stringProxyToCssString();
             else
-                s += stylePropToCssString( this.varDef.templatePropName, this.fallbackValue, true);
+                s += stylePropToCssString( this.varDef.template, this.fallbackValue, true);
         }
 
         return s + ")";

@@ -75,11 +75,6 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		this._uses = {};
 		this.allRules = [];
 
-		// create our internal rule for custom CSS properties
-		this.varRule = new CustomVarRule();
-		this.varRule.process( this, this.owner, null)
-		this.allRules.push( this.varRule);
-
 		// get the "rule definition" object whose properties are the rule objects
 		let rulesDef: IRuleDefinition;
 		if (typeof this.definitionClass === "function")
@@ -132,30 +127,30 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 
 	// Processes custom CSS property.
-	private processCustomVar( varName: string, varObj: CustomVar): void
+	private processCustomVar( propName: string, varObj: CustomVar): void
 	{
 		// if the object is already assigned to a style scope, we create a clone of the
 		// rule and assign it to our scope.
-		if (varObj.owner)
+		if (varObj.container)
 			varObj = varObj.clone();
 
-		varObj.process( this, this.owner, varName);
+		varObj.process( this, this.owner, propName);
 
-		this.allNames[varName] = varObj.name;
-		this._vars[varName] = varObj;
+		this.allNames[propName] = varObj.name;
+		this._vars[propName] = varObj;
 	}
 
 
 
 	// Processes the given Rule-derived object.
-	private processNamedRule( ruleName: string, rule: Rule): void
+	private processNamedRule( propName: string, rule: Rule): void
 	{
 		// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
 		// We inform our owner style scope about the "imported" scope so that when the owner
 		// scope is activated, the imported one is activated too.
 		if (rule.ruleType === RuleType.SCOPE)
 		{
-			this._uses[ruleName] = rule as any as IStyleScope;
+			this._uses[propName] = rule as any as IStyleScope;
 			this.owner.addExternalScope( rule as any as IStyleScope);
 			return;
 		}
@@ -165,27 +160,27 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		if (rule.owner)
 			rule = rule.clone();
 
-		rule.process( this, this.owner, ruleName);
+		rule.process( this, this.owner, propName);
 
 		// remember rules
-		this._rules[ruleName] = rule;
+		this._rules[propName] = rule;
 		this.allRules.push( rule);
 
 		// put rules and their names into buckets
 		if (rule instanceof ClassRule)
 		{
-			this.allNames[ruleName] = rule.name;
-			this._classes[ruleName] = rule.name;
+			this.allNames[propName] = rule.name;
+			this._classes[propName] = rule.name;
 		}
 		else if (rule instanceof IDRule)
 		{
-			this.allNames[ruleName] = rule.name;
-			this._ids[ruleName] = rule.name;
+			this.allNames[propName] = rule.name;
+			this._ids[propName] = rule.name;
 		}
 		else if (rule instanceof AnimationRule)
 		{
-			this.allNames[ruleName] = rule.name;
-			this._animations[ruleName] = rule.name;
+			this.allNames[propName] = rule.name;
+			this._animations[propName] = rule.name;
 		}
 	}
 
@@ -228,6 +223,23 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	{
 		for( let rule of this.allRules)
 			rule.insert( parent);
+
+		// isert our custom variables in a ":root" rule
+		let varNames = Object.keys( this._vars);
+		if (varNames.length === 0)
+			return;
+
+		let s = `:root {${varNames.map( (varName) => this._vars[varName].toCssString()).join(";")}}`;
+		let index = parent.insertRule( s, parent.cssRules.length);
+		this.customVarStyleRule = parent.cssRules[index] as CSSStyleRule;
+	}
+
+
+
+	// Helper properties
+	public setCustomVarValue( name: string, value: string): void
+	{
+		this.customVarStyleRule && this.customVarStyleRule.style.setProperty( name, value);
 	}
 
 
@@ -237,29 +249,11 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 
 
-	// Inserts all custom CSS properties defined in this container as a ":root" rule into the
-	// given parent.
-	public insertCustomVars( parent: CSSStyleSheet | CSSGroupingRule): CSSStyleRule
-	{
-		let varNames = Object.keys( this._vars);
-		if (varNames.length === 0)
-			return;
-
-		let s = `:root {${varNames.map( (varName) => this._vars[varName].toCssString()).join(";")}}`;
-		let index = parent.insertRule( s, parent.cssRules.length);
-		return parent.cssRules[index] as CSSStyleRule;
-	}
-
-
-
 	// Class that defined this style scope. This member is used for style scope derivation
 	public readonly definitionClass: IRuleDefinitionClass<T> | T;
 
 	// Names of all classes, IDs, animations and custom properties defined in this container.
 	public allNames: { [K: string]: string };
-
-	// Rule that combines all custom variables defined in this container.
-	public varRule: CustomVarRule;
 
 	// List of all rules
 	public allRules: Rule[];
@@ -281,31 +275,9 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 	//  Map of property names to external style scopes created using the $use function.
 	private _uses: { [K: string]: IStyleScope }
-}
 
-
-
-/**
- * The CustomVarRule class represents a :root rule that is used for defining custom CSS properties.
- */
-class CustomVarRule extends Rule
-{
-	constructor()
-	{
-		super( RuleType.CUSTOMVAR_ROOT);
-	}
-
-	// Creates a copy of the rule.
-	public clone(): Rule
-	{
-		return null;
-	}
-
-	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
-	{
-		this.cssRule = this.container.insertCustomVars( parent);
-	}
+	// ":root" rule where all custom CSS properties defined in this container are defined.
+	private customVarStyleRule: CSSStyleRule;
 }
 
 
