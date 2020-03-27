@@ -336,7 +336,7 @@ export class tsh
      * The `tsh.custom` method will produce a compilation error if an invalid type is used for the
      * property value.
      */
-    public static custom<T>( varDef: ICustomVar<T>, varValue: T): ICustomVal<T>
+    public static custom<K extends keyof PureStyleset>( varDef: ICustomVar<PureStyleset[K]>, varValue: PureStyleset[K]): ICustomVal<K>
     {
 		return { varDef, varValue };
     }

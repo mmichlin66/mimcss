@@ -3,7 +3,6 @@
  */
 
 
-import {ExtendedPropType} from "../styles/UtilTypes";
 import {Styleset, PureStyleset, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
@@ -125,6 +124,22 @@ export interface IStyleRule extends IRule
 {
 	/** SOM style rule */
 	readonly cssStyleRule: CSSStyleRule;
+
+	/**
+	 * Adds/replaces the value of the given CSS property in this rule.
+	 * @param name Name of the CSS property.
+	 * @param value New value of the CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 */
+	setProp<K extends keyof PureStyleset>( name: K, value: PureStyleset[K], important?: boolean): void;
+
+	/**
+	 * Adds/replaces the value of the given custmom cSS property in this rule.
+	 * @param customVar ICUstomVar object defining a custom CSS property.
+	 * @param value New value of the custom CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 */
+	setCustomProp<T>( customVar: ICustomVar<T>, value: T, important?: boolean): void;
 }
 
 

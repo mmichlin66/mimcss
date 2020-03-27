@@ -1,6 +1,5 @@
 import {IAnimationRule, Keyframe, RuleType, INamedRule} from "./RuleTypes"
 import {tsh} from "../helpers/tsh"
-import {stylesetToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
@@ -130,14 +129,6 @@ class KeyframeRule extends StyleRule
 		newRule.copyFrom( this);
 		newRule.waypointString = this.waypointString;
 		return newRule;
-	}
-
-
-
-	// Inserts this rule into the given parent rule or stylesheet.
-	public toCssString(): string
-	{
-		return `${this.waypointString} ${stylesetToCssString( this.styleset, this.important)}`;
 	}
 
 

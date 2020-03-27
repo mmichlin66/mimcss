@@ -1,6 +1,6 @@
-import {IStyleRule, ExtendedStyleset, RuleType} from "./RuleTypes";
-import {Styleset} from "../styles/StyleTypes"
-import {stylesetToCssString} from "../styles/StyleFuncs"
+import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar} from "./RuleTypes";
+import {PureStyleset, Styleset} from "../styles/StyleTypes"
+import {stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
@@ -118,13 +118,18 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
+	// Converts the rule to CSS string representing the rule.
+	public toCssString(): string
+	{
+		return `${this.geSelectorString()} ${stylesetToCssString( this.styleset, this.important)}`;
+	}
+
+
+
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let index = parent.insertRule(
-			`${this.geSelectorString()} ${stylesetToCssString( this.styleset, this.important)}`,
-			parent.cssRules.length);
-
+		let index = parent.insertRule( this.toCssString(), parent.cssRules.length);
 		this.cssRule = parent.cssRules[index];
 	}
 
@@ -135,6 +140,53 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
+	/**
+	 * Adds/replaces the value of the given CSS property in this rule.
+	 * @param name Name of the CSS property.
+	 * @param value New value of the CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 */
+	public setProp<K extends keyof PureStyleset>( name: K, value: PureStyleset[K], important?: boolean): void
+	{
+		if (!this.styleset)
+			this.styleset = {};
+
+		this.styleset[name] = value as any;
+
+		if (this.cssStyleRule)
+		{
+			this.cssStyleRule.style.setProperty( name,
+				stylePropToCssString( name, value, true), important ? "!important" : null)
+		}
+	}
+
+
+
+	/**
+	 * Adds/replaces the value of the given custmom cSS property in this rule.
+	 * @param customVar ICUstomVar object defining a custom CSS property.
+	 * @param varValue New value of the custom CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 */
+	public setCustomProp<T>( varDef: ICustomVar<T>, varValue: T, important?: boolean): void
+	{
+		if (!this.styleset)
+			this.styleset = {};
+
+		if (!this.styleset.$custom)
+			this.styleset.$custom = [];
+
+		this.styleset.$custom.push( { varDef, varValue});
+
+		if (this.cssStyleRule)
+		{
+			this.cssStyleRule.style.setProperty( varDef.cssName,
+				stylePropToCssString( varDef.template, varValue, true), important ? "!important" : null)
+		}
+	}
+
+
+
 	/** SOM style rule */
 	public get cssStyleRule(): CSSStyleRule { return this.cssRule as CSSStyleRule; }
 
@@ -142,10 +194,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public parents: StyleRule[];
 
 	// Set of property names from this styleset that should be !important.
-	important: Set<string>;
+	private important: Set<string>;
 
 	// Resultant Styleset object defining properties to be inserted into DOM.
-	public styleset: Styleset;
+	private styleset: Styleset;
 }
 
 
