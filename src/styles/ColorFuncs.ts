@@ -1,4 +1,5 @@
 ﻿import * as ColorTypes from "./ColorTypes"
+import * as UtilFuncs from "./UtilFuncs"
 
 
 
@@ -54,7 +55,7 @@ export function colorNumberToCssString( val: number): string
 
 export function colorSeparation( c: number | string): string
 {
-    return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : this.percent(c);
+    return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : UtilFuncs.percentNumberToCssString(c);
 }
 
 
@@ -64,7 +65,7 @@ export function rgb( r: number | string, g: number | string, b: number | string,
     r = colorSeparation(r);
     g = colorSeparation(g);
     b = colorSeparation(b);
-    a = a == null ? null : typeof a === "string" ? a : this.percent(a);
+    a = a == null ? null : typeof a === "string" ? a : UtilFuncs.percentNumberToCssString(a);
 
     return a == null ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;
 }
@@ -74,9 +75,9 @@ export function rgb( r: number | string, g: number | string, b: number | string,
 export function hsl( h: number | string, s: number | string, l: number | string, a?: number | string): string
 {
     h = typeof h === "string" ? h : Number.isInteger( h) ? h + "deg" : h + "rad";
-    s = s == null ? "100%" : typeof s === "string" ? s : this.percent(s);
-    l = l == null ? "100%" : typeof l === "string" ? l : this.percent(l);
-    a = a == null ? null : typeof a === "string" ? a : this.percent(a);
+    s = s == null ? "100%" : typeof s === "string" ? s : UtilFuncs.percentNumberToCssString(s);
+    l = l == null ? "100%" : typeof l === "string" ? l : UtilFuncs.percentNumberToCssString(l);
+    a = a == null ? null : typeof a === "string" ? a : UtilFuncs.percentNumberToCssString(a);
 
     return a == null ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
 }
@@ -115,7 +116,12 @@ export function colorAsArrayToCssString( val: ColorTypes.ColorAsArray): string
 export function colorToCssString( val: ColorTypes.Color_StyleType): string
 {
     if (typeof val === "string")
-        return val;
+    {
+        if (ColorTypes.Colors[val])
+            return colorNumberToCssString( ColorTypes.Colors[val]);
+        else
+            return val;
+    }
     else if (typeof val === "number")
 	    return colorNumberToCssString( val);
     else if (Array.isArray( val))

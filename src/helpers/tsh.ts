@@ -1,6 +1,6 @@
 ﻿import {StringProxy} from "../styles/UtilTypes"
 import {percentNumberToCssString} from "../styles/UtilFuncs"
-import {Colors} from "../styles/ColorTypes";
+import {IColors} from "../styles/ColorTypes";
 import {rgb, hsl, alpha} from "../styles/ColorFuncs";
 import {PureStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs";
@@ -104,7 +104,7 @@ export class tsh
      * @param c 
      * @param a 
      */
-    public static alpha( c: number | keyof typeof Colors, a: number | string): StringProxy
+    public static alpha( c: number | keyof IColors, a: number | string): StringProxy
     {
         return new StringProxy( alpha( c, a));
     }
