@@ -48,54 +48,13 @@ export class StringProxy
 
 
 
-// /**
-//  * The VarValue class encapsulates a usage of the CSS `var` function for getting a value of a
-//  * custom CSS property.
-//  */
-// export class VarValue<T>
-// {
-//     constructor( varDef: ICustomVar<T>, fallbackValue?: ExtendedPropType<T> | ICustomVar<T>)
-//     {
-//         this.varDef = varDef;
-//         this.fallbackValue = fallbackValue;
-//     }
-
-//     public varValueToCssString(): string
-//     {
-//         let varName = this.varDef.name;
-//         let s = `var(--${varName}`;
-//         if (this.fallbackValue)
-//         {
-//             s += ",";
-//             if (this.fallbackValue instanceof CustomVar)
-//                 s += new VarValue( this.fallbackValue);
-//             else if (this.fallbackValue instanceof StringProxy)
-//                 s += this.fallbackValue.stringProxyToCssString();
-//             else
-//                 s += stylePropToCssString( this.varDef.template, this.fallbackValue, true);
-//         }
-
-//         return s + ")";
-//     }
-
-//     public toString(): string
-//     {
-//         return this.varValueToCssString();
-//     }
-
-//     public varDef: ICustomVar<T>;
-//     public fallbackValue?: ExtendedPropType<T> | ICustomVar<T>;
-// }
-
-
-
 /**
  * Type that extends the given type with the following types:
  * - basic style values that are valid for all style properties.
  * - StringProxy type that allows specifying raw string value.
  * - ICustomVar object that allows using a CSS custom property.
  */
-export type ExtendedPropType<T> = T | Base_StyleType | StringProxy | ICustomVar<ExtendedPropType<T>>/* | VarValue<T>*/;
+export type ExtendedPropType<T> = T | Base_StyleType | StringProxy | ICustomVar<ExtendedPropType<T>>;
 
 
 

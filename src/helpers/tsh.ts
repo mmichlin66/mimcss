@@ -270,33 +270,6 @@ export class tsh
 
     /** Creates fraction value for flex */
     public static fr( n: number) { return n + "fr"; }
-
-
-
-    // ///////////////////////////////////////////////////////////////////////////////////////////////
-    // //
-    // // Custom CSS properties
-    // //
-    // ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    // /**
-    //  * Returns the string representation of the CSS var() function for the given custom property.
-    //  * Use it as in the following example:
-    //  * 
-    //  * ```typescript
-    //  * let myStyles = $scope( class
-    //  * {
-    //  *     defaultColor = $custom( "color", "blue");
-    //  * 
-    //  *     sidebar = $class( { color: tsh.var( this.defaultColor) })
-    //  * });
-    //  * ```
-    //  */
-    // public static var<T>( varName: string,
-    //         fallbackValue?: ExtendedPropType<T> | ICustomVar<ExtendedPropType<T>>): VarValue<T>
-    // {
-    //     return new VarValue( varDef, fallbackValue) as VarValue<T>;
-    // }
 }
 
 
