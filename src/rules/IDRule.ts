@@ -30,7 +30,7 @@ export class IDRule extends StyleRule implements IIDRule
 		else
 			this.name = this.nameOverride.name;
 
-		this.cssName = "#" + this.name;
+		this.cssName = this.name.startsWith("#") ? this.name : "#" + this.name;
 	}
 
 

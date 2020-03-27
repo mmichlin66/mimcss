@@ -1,10 +1,9 @@
-﻿import {StringProxy, VarValue, ExtendedPropType, LengthUnits, AngleUnits, TimeUnits} from "../styles/UtilTypes"
-import * as UtilFuncs from "../styles/UtilFuncs"
-import * as ColorTypes from "../styles/ColorTypes";
-import * as ColorFuncs from "../styles/ColorFuncs";
-import {PureStyleset, ICustomVal} from "../styles/StyleTypes"
+﻿import {StringProxy} from "../styles/UtilTypes"
+import {percentNumberToCssString} from "../styles/UtilFuncs"
+import {Colors} from "../styles/ColorTypes";
+import {rgb, hsl, alpha} from "../styles/ColorFuncs";
+import {PureStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs";
-import {ICustomVar} from "../rules/RuleTypes"
 
 
 
@@ -38,7 +37,7 @@ export class tsh
      * to a CSS compliant string.
      * @param stylePropValue Value to convert.
      */
-    public static val<K extends keyof PureStyleset>( stylePropName: K, stylePropValue: PureStyleset[K]): string
+    public static val<K extends keyof PureStyleset>( stylePropName: K, stylePropValue: PureStyleset[K]): string | null
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }
@@ -71,7 +70,7 @@ export class tsh
      */
     public static rgb( r: number | string, g: number | string, b: number | string, a?: number | string): StringProxy
     {
-        return new StringProxy( ColorFuncs.rgb( r, g, b, a));
+        return new StringProxy( rgb( r, g, b, a));
     }
 
     /**
@@ -90,7 +89,7 @@ export class tsh
      */
     public static hsl( h: number | string, s: number | string, l: number | string, a?: number | string): StringProxy
     {
-        return new StringProxy( ColorFuncs.hsl( h, s, l, a));
+        return new StringProxy( hsl( h, s, l, a));
     }
 
     /**
@@ -105,9 +104,9 @@ export class tsh
      * @param c 
      * @param a 
      */
-    public static alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): StringProxy
+    public static alpha( c: number | keyof typeof Colors, a: number | string): StringProxy
     {
-        return new StringProxy( ColorFuncs.alpha( c, a));
+        return new StringProxy( alpha( c, a));
     }
 
 
@@ -123,7 +122,7 @@ export class tsh
      */
     public static percent( n: number): string
     {
-        return UtilFuncs.percentNumberToCssString( n);
+        return percentNumberToCssString( n);
     }
 
 
@@ -196,14 +195,6 @@ export class tsh
     /** Creates length value in the units which are a larger value between vw and vh */
     public static vmin( n: number) { return n + "vmin"; }
 
-    /**
-     * Converts length value from the numeric representation to the CSS string.
-     */
-    public static len( n: number, units?: LengthUnits): string
-    {
-        return UtilFuncs.lengthNumberToCssString( n, units);
-    }
-
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,15 +215,6 @@ export class tsh
     /** Creates angle value in turns */
     public static turn( n: number) { return n + "turn"; }
 
-    /**
-     * Converts angle value from the numeric representation to the CSS string. Integer
-     * values are treated as degrees while floating numbers are treated as radians.
-     */
-    public static angle( n: number, units?: AngleUnits): string
-    {
-        return UtilFuncs.angleNumberToCssString( n, units);
-    }
-
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,15 +228,6 @@ export class tsh
 
     /** Creates time value in milliseconds */
     public static ms( n: number) { return n + "ms"; }
-
-    /**
-     * Converts time value from the numeric representation to the CSS string. Integer
-     * values are treated as milliseconds while floating numbers are treated as seconds.
-     */
-    public static time( n: number, units?: TimeUnits): string
-    {
-        return UtilFuncs.timeNumberToCssString( n, units);
-    }
 
 
 
@@ -287,15 +260,6 @@ export class tsh
     /** Creates resolution value in DPPX */
     public static dppx( n: number) { return n + "dppx"; }
 
-/**
-     * Converts resolution value from the numeric representation to the CSS string. Integer
-     * values are treated as DPI while floating numbers are treated as DPCM.
-     */
-    public static resolution( n: number, units?: string): string
-    {
-        return UtilFuncs.resolutionToCssString( n, units);
-    }
-
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,56 +273,30 @@ export class tsh
 
 
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Custom CSS properties
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////////////////////////////////////
+    // //
+    // // Custom CSS properties
+    // //
+    // ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Defines a custom CSS property as part of a Styleset. Use it as in the following example:
-     * 
-     * ```typescript
-     * let myStyles = $scope( class
-     * {
-     *     mainColor = $custom( "color", "black");
-     *     div = $tag( "div", { $custom: [ tsh.custom( this.mainColor, "brown") ] })
-     * });
-     * ```
-     * 
-     * This is equivalent to the following CSS:
-     * 
-     * ```css
-     * :root { --mainColor: "black"; }
-     * div { --mainColor: "brown"; }
-     * ```
-     * 
-     * The `tsh.custom` method will produce a compilation error if an invalid type is used for the
-     * property value.
-     */
-    public static custom<K extends keyof PureStyleset>( varDef: ICustomVar<PureStyleset[K]>, varValue: PureStyleset[K]): ICustomVal<K>
-    {
-		return { varDef, varValue };
-    }
-
-    /**
-     * Returns the string representation of the CSS var() function for the given custom property.
-     * Use it as in the following example:
-     * 
-     * ```typescript
-     * let myStyles = $scope( class
-     * {
-     *     defaultColor = $custom( "color", "blue");
-     * 
-     *     sidebar = $class( { color: tsh.var( this.defaultColor) })
-     * });
-     * ```
-     */
-    public static var<T>( varDef: ICustomVar<ExtendedPropType<T>>,
-            fallbackValue?: ExtendedPropType<T> | ICustomVar<ExtendedPropType<T>>): VarValue<T>
-    {
-        return new VarValue( varDef, fallbackValue) as VarValue<T>;
-    }
+    // /**
+    //  * Returns the string representation of the CSS var() function for the given custom property.
+    //  * Use it as in the following example:
+    //  * 
+    //  * ```typescript
+    //  * let myStyles = $scope( class
+    //  * {
+    //  *     defaultColor = $custom( "color", "blue");
+    //  * 
+    //  *     sidebar = $class( { color: tsh.var( this.defaultColor) })
+    //  * });
+    //  * ```
+    //  */
+    // public static var<T>( varName: string,
+    //         fallbackValue?: ExtendedPropType<T> | ICustomVar<ExtendedPropType<T>>): VarValue<T>
+    // {
+    //     return new VarValue( varDef, fallbackValue) as VarValue<T>;
+    // }
 }
 
 

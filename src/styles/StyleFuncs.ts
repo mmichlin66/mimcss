@@ -442,44 +442,71 @@ type StylePropertyInfo<T> = PropToStringFunc<T> | keyof StyleTypes.Styleset;
 /** Converts the given styleset to its string representation */
 export function stylesetToCssString( styleset: StyleTypes.Styleset, important?: Set<string>): string
 {
-    let s = "";
+    let buf: string[] = [];
 	for( let propName in styleset)
 	{
         if (propName === "$custom")
         {
-            // special handling of the "$custom" property
-            let propVal = styleset[propName] as StyleTypes.ICustomVal[];
+            // special handling of the "$custom" property, which is an array where each item is
+            // a two-item or three-item array
+            let propVal = styleset[propName] as StyleTypes.CustomVarStyleType[];
             for( let customVal of propVal)
             {
-                let customPropName: string;
-                let template: string;
-                if (typeof customVal.varDef === "string")
-                {
-                    customPropName = customVal.varDef;
-                    template = customVal.template;
-                }
-                else
-                {
-                    customPropName = customVal.varDef.name;
-                    template = customVal.varDef.template;
-                }
-
-                if (!customPropName || !template)
+                if (!customVal)
                     continue;
-                    
-                s += `--${customPropName}:${stylePropToCssString( template, customVal.varValue, true)}`;
-                s += (important && important.has( propName) ? " !important;" : ";");
+
+                buf.push( customPropToCssString( customVal, false));
             }
         }
         else
         {
             // get the string representation of the property
-            s += stylePropToCssString( propName, styleset[propName]);
-            s += (important && important.has( propName) ? " !important;" : ";");
+            buf.push( stylePropToCssString( propName, styleset[propName]) +
+                    (important && important.has( propName) ? " !important" : ""));
         }
 	}
 
-    return `{${s}}`;
+    return `{${buf.filter( (item) => item != null).join(";")}}`;
+}
+
+
+
+/**
+ * Converts the given custom CSS property definition to string.
+ * @param propVal 
+ * @param valueOnly 
+ */
+export function customPropToCssString( propVal: StyleTypes.CustomVarStyleType, valueOnly?: boolean): string | null
+{
+    if (!propVal)
+        return null;
+
+    let varName: string;
+    let template: string;
+    let value: any;
+    if (propVal.length === 2)
+    {
+        varName = propVal[0].cssName;
+        template = propVal[0].template;
+        value = propVal[1]
+    }
+    else
+    {
+        varName = propVal[0];
+        if (!varName)
+            return null;
+        else if (!varName.startsWith("--"))
+            varName = "--" + varName;
+
+        template = propVal[1];
+        if (!varName || !template)
+            return null;
+
+        value = propVal[2];
+    }
+
+    let varValue = stylePropToCssString( template, value, true);
+    return valueOnly ? varValue : `${varName}:${varValue}`;
 }
 
 
@@ -491,7 +518,7 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset, important?: 
 export function stylePropToCssString( propName: string, propVal: any, valueOnly?: boolean): string
 {
     if (!propName || propVal == null)
-        return "";
+        return null;
 
     // find information object for the property
     let info = StylePropertyInfos[propName];
@@ -508,18 +535,19 @@ export function stylePropToCssString( propName: string, propVal: any, valueOnly?
 
     let s = valueOnly ? "" : UtilFuncs.camelToDash( propName) + ":";
 
+    let varValue;
     if (typeof info === "function")
-        s += info( propVal);
+        varValue = info( propVal);
     else if (typeof propVal === "string")
-        s += propVal;
+        varValue = propVal;
     else if (propVal instanceof UtilTypes.StringProxy)
-        s += propVal.toString();
+        varValue = propVal.toString();
     else if (Array.isArray( propVal))
-        s += UtilFuncs.arrayToCssString( propVal, item => item == null ? "" : item.toString());
+        varValue = UtilFuncs.arrayToCssString( propVal, item => item == null ? "" : item.toString());
     else
-        s += propVal.toString();
+        varValue = propVal.toString();
 
-    return s;
+    return valueOnly ? varValue : `${UtilFuncs.camelToDash( propName)}:${varValue}`;
 }
 
 

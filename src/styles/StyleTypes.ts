@@ -1132,32 +1132,73 @@ export type PureStyleset =
 import {ICustomVar} from "../rules/RuleTypes";
 
 /**
- * The ICustomVal interface represents a custom CSS property name and value that are used to
+ * The CustomVarStyleType type represents a custom CSS property name and value that are used to
  * define custom properties in a Styleset. This object is used in conjunction with the
- * {@link Styleset.$custom | $custom} property of the Styleset type.
+ * `$custom` property of the Styleset type.
  * 
- * ICustomVal objects should be mostly used to override custom properties that have previously
- * been defined at the top-level using the $custom function. That way you can have a "global"
- * value of a custom property and assign a different value to it under a certain CSS selector.
+ * CustomVarStyleType objects should be mostly used to override custom properties that have
+ * previously been defined at the top-level using the $custom function. That way you can have a
+ * "global" value of a custom property and assign a different value to it under a certain CSS
+ * selector.
+ * 
+ * The values of the type can be specified as either a two-item or a three-item array. The
+ * two-item array is used with a previously defined custom CSS property represented by an ICustomVar
+ * object:
+ * - The first item is the ICustomVar object.
+ * - The second item is the value
+ * 
+ * The three-item array allows directly specifying the custom CSS property name:
+ * - The first item is a string - the name of the custom CSS property. If the name is not prefixed
+ * with two dashes they will be added automatically.
+ * - The second item is the name of a non-custom CSS property whose type determines the type of the
+ * custom property value.
+ * - The third item is the value
+ * 
+ * Use the CustomVarStyleType type in the following manner:
+ * 
+ * ```typescript
+ * class MyStyles
+ * {
+ *     // define global custom CSS property and re-define its value under "brown" class.
+ *     mainColor = $custom( "color", "black");
+ *     brown = $class({ $custom: [ [this.mainColor, "brown"] ] })
+
+ *     // directly define custom CSS property under "blue" class.
+ *     mainColor = $custom( "color", "black");
+ *     blue = $class({ $custom: [ ["different-color", "color", "blue"] ] })
+ * });
+ * ```
+ * 
+ * This is equivalent to the following CSS:
+ * 
+ * ```css
+ * :root { --MyStyles_mainColor: "black"; }
+ * .brown { --MyStyles_mainColor: "brown"; }
+ * .blue { --different-olor: "blue"; }
+ * ```
  */
-export interface ICustomVal<K extends keyof PureStyleset = any>
-{
-	/**
-	 * Either name of a custom CSS property or a ICustomVar object representing a custom CSS
-	 * property.
-	 */
-	readonly varDef: string | ICustomVar<PureStyleset[K]>;
+export type CustomVarStyleType<K extends keyof PureStyleset = any> = 
+    [ICustomVar<PureStyleset[K]>, PureStyleset[K]] |
+    [string, K, PureStyleset[K]]
 
-	/**
-	 * Name of a non-custom CSS property whose type determines the type of the custom property
-	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
-	 * object, since the latter already has the template property name defined.
-	 */
-	readonly template?: K;
+// interface X
+// {
+// 	/**
+// 	 * Either name of a custom CSS property or a ICustomVar object representing a custom CSS
+// 	 * property.
+// 	 */
+// 	readonly varDef: string | ICustomVar<PureStyleset[K]>;
 
-	/** Value of the custom CSS property. */
-	readonly varValue: PureStyleset[K];
-}
+// 	/**
+// 	 * Name of a non-custom CSS property whose type determines the type of the custom property
+// 	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
+// 	 * object, since the latter already has the template property name defined.
+// 	 */
+// 	readonly template?: K;
+
+// 	/** Value of the custom CSS property. */
+// 	readonly varValue: PureStyleset[K];
+// }
 
 
 
@@ -1182,7 +1223,7 @@ export type Styleset = PureStyleset &
          * Special property is an array that contains ICustomIVal objects each representing a
          * definition of a custom CSS property.
          */
-        $custom?: ICustomVal[];
+        $custom?: CustomVarStyleType[];
     }
 
 

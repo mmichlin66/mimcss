@@ -176,7 +176,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (!this.styleset.$custom)
 			this.styleset.$custom = [];
 
-		this.styleset.$custom.push( { varDef, varValue});
+		this.styleset.$custom.push( [varDef, varValue]);
 
 		if (this.cssStyleRule)
 		{
