@@ -1,5 +1,5 @@
 import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar} from "./RuleTypes";
-import {PureStyleset, Styleset} from "../styles/StyleTypes"
+import {IStyleset, Styleset} from "../styles/StyleTypes"
 import {stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
@@ -146,7 +146,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param value New value of the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setProp<K extends keyof PureStyleset>( name: K, value: PureStyleset[K], important?: boolean): void
+	public setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void
 	{
 		if (!this.styleset)
 			this.styleset = {};

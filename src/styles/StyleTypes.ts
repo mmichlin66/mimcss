@@ -741,7 +741,7 @@ export type StyleType = UtilTypes.ExtendedPropType<string>;
 /**
  * Interface representing a collection of style properties and their values.
  */
-export type PureStyleset =
+export interface IStyleset
 {
     alignContent?: AlignContentStyleType;
     alignItems?: AlignItemsStyleType;
@@ -1129,6 +1129,10 @@ export type PureStyleset =
 
 
 
+// export type PureStyleset = { [K in keyof IPureStyleset]: UtilTypes.ExtendedPropType<IPureStyleset[K]> };
+
+
+
 import {ICustomVar} from "../rules/RuleTypes";
 
 /**
@@ -1177,28 +1181,9 @@ import {ICustomVar} from "../rules/RuleTypes";
  * .blue { --different-olor: "blue"; }
  * ```
  */
-export type CustomVarStyleType<K extends keyof PureStyleset = any> = 
-    [ICustomVar<PureStyleset[K]>, PureStyleset[K]] |
-    [string, K, PureStyleset[K]]
-
-// interface X
-// {
-// 	/**
-// 	 * Either name of a custom CSS property or a ICustomVar object representing a custom CSS
-// 	 * property.
-// 	 */
-// 	readonly varDef: string | ICustomVar<PureStyleset[K]>;
-
-// 	/**
-// 	 * Name of a non-custom CSS property whose type determines the type of the custom property
-// 	 * value. This property may be undefined if the `varDef` property points to the ICustomVar
-// 	 * object, since the latter already has the template property name defined.
-// 	 */
-// 	readonly template?: K;
-
-// 	/** Value of the custom CSS property. */
-// 	readonly varValue: PureStyleset[K];
-// }
+export type CustomVarStyleType<K extends keyof IStyleset = any> = 
+    [ICustomVar<IStyleset[K]>, IStyleset[K]] |
+    [string, K, IStyleset[K]]
 
 
 
@@ -1217,7 +1202,7 @@ export type CustomVarStyleType<K extends keyof PureStyleset = any> =
  * }
  * ```
  */
-export type Styleset = PureStyleset &
+export type Styleset = IStyleset &
     {
         /**
          * Special property is an array that contains ICustomIVal objects each representing a
@@ -1238,7 +1223,7 @@ export type Styleset = PureStyleset &
  * supports the "flex" value, we cannot check whether both "flex" and "grid" values are supported.
  * To check such criteria you must specify the query as a string.
  */
-export type SingleSupportsQuery = string | PureStyleset & { $negate?: boolean; };
+export type SingleSupportsQuery = string | IStyleset & { $negate?: boolean; };
 
 
 

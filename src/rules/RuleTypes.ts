@@ -3,7 +3,7 @@
  */
 
 
-import {Styleset, PureStyleset, SupportsQuery} from "../styles/StyleTypes";
+import {Styleset, IStyleset, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
 
@@ -36,7 +36,7 @@ export type ExtendedStyleset =
 	(Styleset &
 		{
 			$extends?: IStyleRule | IStyleRule[],
-			$important?: keyof PureStyleset | (keyof PureStyleset)[],
+			$important?: keyof IStyleset | (keyof IStyleset)[],
 		}
 	) | IStyleRule | IStyleRule[];
 
@@ -131,7 +131,7 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	setProp<K extends keyof PureStyleset>( name: K, value: PureStyleset[K], important?: boolean): void;
+	setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void;
 
 	/**
 	 * Adds/replaces the value of the given custmom cSS property in this rule.
@@ -395,8 +395,8 @@ export function $animation( keyframes: Keyframe[], nameOverride?: string | IName
 	{ return new AnimationRule( keyframes, nameOverride); }
 
 /** Returns new CustomVar object that defines a custom CSS property */
-export function $custom<K extends keyof PureStyleset>( template: K, propVal: PureStyleset[K],
-				nameOverride?: string | INamedRule): ICustomVar<PureStyleset[K]>
+export function $custom<K extends keyof IStyleset>( template: K, propVal: IStyleset[K],
+				nameOverride?: string | INamedRule): ICustomVar<IStyleset[K]>
 	{ return new CustomVar( template, propVal, nameOverride); }
 
 /** Returns new SupportsRule object  */

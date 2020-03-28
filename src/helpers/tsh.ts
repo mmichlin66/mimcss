@@ -2,7 +2,7 @@
 import {percentNumberToCssString} from "../styles/UtilFuncs"
 import {IColors} from "../styles/ColorTypes";
 import {rgb, hsl, alpha} from "../styles/ColorFuncs";
-import {PureStyleset} from "../styles/StyleTypes"
+import {IStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs";
 
 
@@ -37,7 +37,7 @@ export class tsh
      * to a CSS compliant string.
      * @param stylePropValue Value to convert.
      */
-    public static val<K extends keyof PureStyleset>( stylePropName: K, stylePropValue: PureStyleset[K]): string | null
+    public static val<K extends keyof IStyleset>( stylePropName: K, stylePropValue: IStyleset[K]): string | null
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }
