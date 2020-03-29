@@ -1,7 +1,6 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, ICustomVar,
-		IRuleDefinition, IRuleDefinitionClass, IRuleContainer, RuleType
+		IRuleDefinition, IRuleDefinitionClass, IRuleContainer, RuleType, IStyleScope
 		} from "./RuleTypes"
-import {IStyleScope} from "../scope/ScopeTypes"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"

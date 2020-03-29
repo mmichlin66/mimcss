@@ -71,14 +71,11 @@ export const enum RuleType
 
 
 /**
- * The IRule interface is a base interface that is implemented by all rules. Its only purpose is to
- * provide the reference to the style scope that owns it.
+ * The IRule interface is a base interface that is implemented by all rules.
  */
 export interface IRule
 {
-	/**
-	 * Name of the property on the rule definition object to which this rule is assigned.
-	 */
+	/** Name of the property on the rule definition object to which this rule is assigned. */
 	readonly ruleName: string;
 
 	/** Type of the rule */
@@ -305,8 +302,6 @@ export interface ICustomVar<T = any>
 
 
 
-import {IStyleScope} from "../scope/ScopeTypes"
-
 /**
  * The IRuleContainer interface represents an object that contains CSS rules.
  */
@@ -355,11 +350,51 @@ export interface IRuleDefinitionClass<T extends IRuleDefinition>
 
 
 
+/**
+ * "Constructor" interface defining how style scope definition classes can be created.
+ */
+export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
+{
+	/** All style scope definition objects should conform to this constructor */
+	new(): T;
+
+	/**
+	 * Flag inidicating that multiple style scopes can be created for this style scope definition -
+	 * each time with unique rule IDs. This is useful for styles created for a control - e.g. tree
+	 * or accordeon - which can be used multiple times on the same page but with different styles.
+	 * By default, style scope definitions are singular, that is a single instance of a style scope
+	 * object is created for them and inserted into DOM.
+	 */
+	isMultiplex?: boolean;
+}
+
+
+
+/**
+ * The IStyleScope interface represents the resultant style scope after the style scope definition
+ * has been processed. The style scope object contains names of IDs, classes and animations, which
+ * can be used in the application code. The interface also provides methods that are used to
+ * manipulate the rules and their stylesets.
+ */
+export interface IStyleScope<T = any> extends IRuleContainer<T>
+{
+	/** CSS style sheet which contains rules defined by this scope*/
+	readonly cssStyleSheet: CSSStyleSheet;
+
+	// /** Inserts this style scope into DOM. */
+	// activate(): void;
+
+	// /** Removes this style scope from DOM - only works for multiplex style scopes. */
+	// deactivate(): void;
+}
+
+
+
 import {AbstractRule} from "./AbstractRule"
 import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
-import {SelectorType} from "../helpers/SelectorTypes"
+import {SelectorType} from "../styles/SelectorTypes"
 import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {CustomVar} from "./CustomVar"
@@ -414,6 +449,80 @@ export function $import( url: string, mediaQuery?: string | MediaQuery, supports
 /** Returns new FonFaceRule object  */
 export function $fontface( fontface: Fontface): IFontFaceRule
 	{ return new FontFaceRule( fontface); }
+
+
+
+import {StyleScope} from "./StyleScope"
+
+/**
+ * Processes the given style scope definition and returns the StyleScope object that contains
+ * names of IDs, classes and keyframes and allows style manipulations. For a given style scope
+ * definition class there is a single style scope object, no matter how many times this function
+ * is invoked.
+ */
+export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
+{
+	// if the style scope definition is multiplex, create new StyleScope object every time;
+	// otherwise, check whether the style sheet definition object has already been processed. This
+	// is indicated by the existence of the instance static property on the class.
+	if (styleScopeDefinitionClass.isMultiplex)
+		return new StyleScope( styleScopeDefinitionClass);
+	else
+	{
+		// we don't want the class styleScope property to be exposed on the publicly available
+		// interface; therefore, we access it via "as any".
+		let styleScope = (styleScopeDefinitionClass as any).styleScope as StyleScope<T>;
+		if (!styleScope)
+		{
+			styleScope = new StyleScope( styleScopeDefinitionClass);
+			(styleScopeDefinitionClass as any).styleScope = styleScope;
+		}
+
+		return styleScope;
+	}
+}
+
+
+
+/**
+ * Processes the given style scope definition, inserts the CSS rules into DOM and returns the
+ * StyleScope object that contains names of IDs, classes and keyframes and allows style
+ * manipulations. For a given style scope definition class there is a single style scope object,
+ * no matter how many times this function is invoked.
+ */
+export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStyleScope<T> | IStyleScopeDefinitionClass<T>): IStyleScope<T>
+{
+	if (scopeOrDefinition instanceof StyleScope)
+	{
+		scopeOrDefinition.activate();
+		return  scopeOrDefinition;
+	}
+	else
+	{
+		let scope = $use( scopeOrDefinition as IStyleScopeDefinitionClass<T>);
+		(scope as StyleScope<T>).activate();
+		return scope;
+	}
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Functions to configure TssManager options
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+import {TssManager} from "./TssManager";
+
+/**
+ * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
+ * will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix "n" will be used.
+ * @param optimize
+ * @param prefix
+ */
+export function useOptimizedStyleNames( optimize: boolean, prefix?: string): void
+	{ TssManager.useOptimizedStyleNames( optimize, prefix); }
 
 
 

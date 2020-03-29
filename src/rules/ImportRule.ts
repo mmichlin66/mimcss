@@ -4,7 +4,7 @@ import {MediaQuery} from "../styles/MediaTypes"
 import {SupportsQuery} from "../styles/StyleTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
 import {supportsQueryToCssString} from "../styles/StyleFuncs";
-import {TssManager} from "../scope/TssManager"
+import {TssManager} from "./TssManager"
 
 
 

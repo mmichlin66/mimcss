@@ -1,9 +1,9 @@
-﻿import {IStringProxy} from "../styles/UtilTypes"
-import * as UtilFuncs from "../styles/UtilFuncs"
-import {IColors} from "../styles/ColorTypes";
-import {rgb, hsl, alpha} from "../styles/ColorFuncs";
-import {IStyleset} from "../styles/StyleTypes"
-import {stylePropToCssString} from "../styles/StyleFuncs";
+﻿import {IStringProxy} from "./UtilTypes"
+import * as UtilFuncs from "./UtilFuncs"
+import {IColors} from "./ColorTypes";
+import {rgb, hsl, alpha} from "./ColorFuncs";
+import {IStyleset} from "./StyleTypes"
+import {stylePropToCssString} from "./StyleFuncs";
 
 
 

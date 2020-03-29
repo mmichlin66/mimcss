@@ -3,7 +3,7 @@ import {ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"
-import {StringProxyBase} from "../styles/UtilFuncs";
+import {StringProxyBase} from "./UtilFuncs";
 
 
 
