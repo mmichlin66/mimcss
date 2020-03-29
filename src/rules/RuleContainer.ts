@@ -6,6 +6,7 @@ import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
 import {AnimationRule} from "./AnimationRule"
 import {CustomVar} from "./CustomVar"
+import {ImportRule} from "./ImportRule"
 
 
 
@@ -19,7 +20,7 @@ export interface IRuleContainerOwner
 	addExternalScope( scope: IStyleScope): void;
 
 	/** Generates a name, which will be unique in this style scope */
-	getScopedRuleNamed( ruleName: string): string;
+	getScopedRuleName( ruleName: string): string;
 }
 
 
@@ -64,15 +65,16 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		if (this.isProcessed)
 			return;
 
+		this.allRules = [];
+		this.importRules = [];
 		this.allNames = {};
+
 		this._classes = {};
 		this._ids = {};
 		this._animations = {};
 		this._vars = {};
-
 		this._rules = {};
 		this._uses = {};
-		this.allRules = [];
 
 		// get the "rule definition" object whose properties are the rule objects
 		let rulesDef: IRuleDefinition;
@@ -105,21 +107,17 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	// classes, IDs, animations.
 	private processNamedRules( rulesDef: IRuleDefinition): void
 	{
-		// loop over the properties of the definition object and process those that are rules.
+		// loop over the properties of the definition object and process those that are rules,
+		// custom var definitions and arrays.
 		for( let propName in rulesDef)
 		{
-			if (propName === "$unnamed")
-			{
-				let propVal = rulesDef.$unnamed;
-				this.processUnnamedRules( propVal as Rule[])
-				continue;
-			}
-
 			let propVal = rulesDef[propName];
 			if (propVal instanceof CustomVar)
 				this.processCustomVar( propName, propVal as CustomVar)
 			else if (propVal instanceof Rule)
 				this.processNamedRule( propName, propVal as Rule);
+			else if (Array.isArray(propVal))
+				this.processUnnamedRules( propVal)
 		}
 	}
 
@@ -161,7 +159,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 		rule.process( this, this.owner, propName);
 
-		// remember rules
+		// remember the rule
 		this._rules[propName] = rule;
 		this.allRules.push( rule);
 
@@ -181,20 +179,26 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 			this.allNames[propName] = rule.name;
 			this._animations[propName] = rule.name;
 		}
+		else if (rule instanceof ImportRule)
+			this.importRules.push( rule);
 	}
 
 
 
-	// Creates the style scope definition instance, parses its properties and creates names for
-	// classes, IDs, animations.
-	private processUnnamedRules( rules: Rule[]): void
+	// Processes rules from the given array.
+	private processUnnamedRules( propVals: any[]): void
 	{
-		if (!rules || rules.length === 0)
+		if (!propVals || propVals.length === 0)
 			return;
 
 		// loop over the properties of the definition object and process those that are rules.
-		for( let rule of rules)
+		for( let propVal of propVals)
 		{
+			if (!(propVal instanceof Rule))
+				continue;
+
+			let rule = propVal as Rule;
+
 			// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
 			// We inform our owner style scope about the "imported" scope so that when the owner
 			// scope is activated, the imported one is activated too.
@@ -212,6 +216,8 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 			rule.process( this, this.owner, null);
 
 			this.allRules.push( rule);
+			if (rule instanceof ImportRule)
+				this.importRules.push( rule);
 		}
 	}
 
@@ -220,25 +226,38 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	// Inserts all rules defined in this container to either the style sheet or grouping rule.
 	protected insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		for( let rule of this.allRules)
-			rule.insert( parent);
+		// insert @import rules as they must be before other rules. If the parent is a grouping
+		// rule, don't insert @import rules at all
+		if (parent instanceof CSSStyleSheet)
+		{
+			for( let rule of this.importRules)
+				rule.insert( parent);
+		}
 
 		// isert our custom variables in a ":root" rule
 		let varNames = Object.keys( this._vars);
-		if (varNames.length === 0)
-			return;
+		if (varNames.length > 0)
+		{
+			let s = `:root {${varNames.map( (varName) => this._vars[varName].toCssString()).join(";")}}`;
+			let index = parent.insertRule( s, parent.cssRules.length);
+			this.customVarStyleRule = parent.cssRules[index] as CSSStyleRule;
+		}
 
-		let s = `:root {${varNames.map( (varName) => this._vars[varName].toCssString()).join(";")}}`;
-		let index = parent.insertRule( s, parent.cssRules.length);
-		this.customVarStyleRule = parent.cssRules[index] as CSSStyleRule;
+		// insert all other rules
+		for( let rule of this.allRules)
+		{
+			if (!(rule instanceof ImportRule))
+				rule.insert( parent);
+		}
 	}
 
 
 
 	// Helper properties
-	public setCustomVarValue( name: string, value: string): void
+	public setCustomVarValue( name: string, value: string, important?: boolean): void
 	{
-		this.customVarStyleRule && this.customVarStyleRule.style.setProperty( name, value);
+		if (this.customVarStyleRule)
+			this.customVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
 	}
 
 
@@ -254,8 +273,11 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	// Names of all classes, IDs, animations and custom properties defined in this container.
 	public allNames: { [K: string]: string };
 
-	// List of all rules
+	// List of all rules except @import
 	public allRules: Rule[];
+
+	// List of all rules except @import
+	public importRules: ImportRule[];
 
 	// Map of names of properties defining class rules to actual class names.
 	private _classes: { [K: string]: string };

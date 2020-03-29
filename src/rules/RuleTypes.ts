@@ -296,8 +296,23 @@ export interface ICustomVar<T = any>
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly template: string;
 
-	/** Value of the custom CSS property. */
-	value: T;
+	/** Sets new value of this custom CSS property. */
+
+	/**
+	 * Sets new value of this custom CSS property.
+	 * @param value New value for the CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 */
+	setValue( value: T, important?: boolean): void;
+}
+
+
+
+/**
+ * Interface for rule definition objects.
+ */
+export interface IRuleDefinition
+{
 }
 
 
@@ -324,17 +339,6 @@ export interface IRuleContainer<T = IRuleDefinition>
 
 	/**  Map of property names to external style scopes created using the $use function. */
 	readonly uses: PropsOfType<T,IStyleScope>;
-}
-
-
-
-/**
- * "Constructor" interface defining how rule definition classes can be created.
- */
-export interface IRuleDefinition
-{
-	/** Array of unnamed rules */
-	$unnamed?: IRule[];
 }
 
 
@@ -378,8 +382,8 @@ export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
  */
 export interface IStyleScope<T = any> extends IRuleContainer<T>
 {
-	/** CSS style sheet which contains rules defined by this scope*/
-	readonly cssStyleSheet: CSSStyleSheet;
+	/** DOM style element that contains CSS style sheet that contains rules defined by this scope*/
+	readonly domStyleElm: HTMLStyleElement;
 
 	// /** Inserts this style scope into DOM. */
 	// activate(): void;
@@ -485,17 +489,21 @@ export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScop
 
 
 /**
- * Processes the given style scope definition, inserts the CSS rules into DOM and returns the
- * StyleScope object that contains names of IDs, classes and keyframes and allows style
- * manipulations. For a given style scope definition class there is a single style scope object,
- * no matter how many times this function is invoked.
+ * Activates the given style scope and inserts all its rules into DOM. If the input object is not
+ * a style scope but a style definition class, obtain style scope by calling the $use function.
+ * Note that each style scope object maintains a reference counter of how many times it was
+ * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
+ * up to 1.
  */
 export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStyleScope<T> | IStyleScopeDefinitionClass<T>): IStyleScope<T>
 {
+	if (!scopeOrDefinition)
+		return null;
+
 	if (scopeOrDefinition instanceof StyleScope)
 	{
 		scopeOrDefinition.activate();
-		return  scopeOrDefinition;
+		return scopeOrDefinition;
 	}
 	else
 	{
@@ -507,22 +515,16 @@ export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStyleScope<T
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Functions to configure TssManager options
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-import {TssManager} from "./TssManager";
-
 /**
- * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
- * will be created by appending a unique number to the given prefix. If the prefix is not
- * specified, the standard prefix "n" will be used.
- * @param optimize
- * @param prefix
+ * Deactivates the given style scope by removing its rules from DOM. Note that each style scope
+ * object maintains a reference counter of how many times it was activated and deactivated. The
+ * rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function useOptimizedStyleNames( optimize: boolean, prefix?: string): void
-	{ TssManager.useOptimizedStyleNames( optimize, prefix); }
+export function $deactivate( scope: IStyleScope): void
+{
+	if (scope)
+		(scope as StyleScope).deactivate();
+}
 
 
 

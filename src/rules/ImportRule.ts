@@ -4,7 +4,6 @@ import {MediaQuery} from "../styles/MediaTypes"
 import {SupportsQuery} from "../styles/StyleTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
 import {supportsQueryToCssString} from "../styles/StyleFuncs";
-import {TssManager} from "./TssManager"
 
 
 
@@ -51,8 +50,9 @@ export class ImportRule extends Rule implements IImportRule
 			supportsQueryString = `supports( ${supportsQueryString} )`;
 
 		let mediaQueryString = !this.mediaQuery ? "" : typeof this.mediaQuery === "string" ? this.mediaQuery : mediaQueryToCssString( this.mediaQuery);
-		this.cssRule = TssManager.addImportRule( `@import ${url} ${supportsQueryString} ${mediaQueryString}`);
-	}
+		let index = parent.insertRule( `@import ${url} ${supportsQueryString} ${mediaQueryString}`, parent.cssRules.length);
+		this.cssRule = parent.cssRules[index] as CSSImportRule;
+}
 
 
 

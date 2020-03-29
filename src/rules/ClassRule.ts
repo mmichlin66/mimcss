@@ -24,7 +24,7 @@ export class ClassRule extends StyleRule implements IClassRule
 		super.process( container, owner, ruleName);
 
 		if (!this.nameOverride)
-			this.name = this.owner.getScopedRuleNamed( ruleName);
+			this.name = this.owner.getScopedRuleName( ruleName);
 		else if (typeof this.nameOverride === "string")
 			this.name = this.nameOverride;
 		else

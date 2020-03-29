@@ -15,7 +15,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	public constructor( template?: string, value?: T, nameOverride?: string | INamedRule)
 	{
 		this.template = template;
-		this._value = value;
+		this.value = value;
 		this.nameOverride = nameOverride;
 	}
 
@@ -28,7 +28,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 		this.ruleName = ruleName;
 
 		if (!this.nameOverride)
-			this.name = owner.getScopedRuleNamed( ruleName);
+			this.name = owner.getScopedRuleName( ruleName);
 		else if (typeof this.nameOverride === "string")
 			this.name = this.nameOverride;
 		else
@@ -44,7 +44,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	{
 		let newRule = new CustomVar<T>();
 		newRule.template = this.template;
-		newRule._value = this._value;
+		newRule.value = this.value;
 		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
@@ -54,7 +54,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `${this.cssName}: ${stylePropToCssString( this.template, this._value, true)}`;
+		return `${this.cssName}: ${stylePropToCssString( this.template, this.value, true)}`;
 	}
 
 
@@ -68,6 +68,18 @@ export class CustomVar<T = any> implements ICustomVar<T>
 
 
 
+	/**
+	 * Sets new value of this custom CSS property.
+	 * @param value New value for the CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 */
+	public setValue( value: T, important?: boolean): void
+	{
+		this.container.setCustomVarValue( this.cssName, stylePropToCssString( this.template, value, true), important)
+	}
+
+
+	
 	// Name of the property of the style scope definition to which this rule was assigned. This is
 	// null for StyleScope.
 	public ruleName: string;
@@ -90,13 +102,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	public cssName: string;
 
 	// Value of the custom CSS property.
-	private _value: T;
-	public get value(): T { return this._value; }
-	public set value( v: T)
-	{
-		this._value = v;
-		this.container.setCustomVarValue( this.cssName, stylePropToCssString( this.template, this._value, true))
-	}
+	private value: T;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

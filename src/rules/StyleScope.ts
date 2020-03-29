@@ -1,6 +1,5 @@
 import {RuleType, IRuleDefinition, IStyleScopeDefinitionClass, IStyleScope} from "./RuleTypes"
 import {Rule} from "./Rule"
-import {TssManager} from "./TssManager"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -17,6 +16,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 		this.definitionClass = definitionClass;
 
 		this.activationRefCount = 0;
+		this.domStyleElm = null;
 		this.usedScopes = [];
 
 		this.processScope();
@@ -25,15 +25,12 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 	// Creates a copy of the rule.
+	// This method is not used and is need only because it is abstract in the Rule class.
 	public clone(): Rule { return null; }
 
-
-
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
-	{
-		super.insertRules( this.cssStyleSheet);
-	}
+	// This method is not used and is need only because it is abstract in the Rule class.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
 
 
 
@@ -56,7 +53,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 		// name for the style scope.
 		this.name = this.definitionClass.name;
 		if (!this.name)
-			this.name = TssManager.generateUniqueName( "s");
+			this.name = generateUniqueName( "s");
 
 		// process sub-rules rules.
 		this.processRules();
@@ -73,11 +70,13 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 	/** Generates a name, which will be unique in this style scope */
-	public getScopedRuleNamed( ruleName: string): string
+	public getScopedRuleName( ruleName: string): string
 	{
 		// check whether we already have this rule name: if yes, return the already assigned
 		// unique scoped name
-		if (ruleName in this.allNames)
+		if (!ruleName)
+			return generateUniqueName();
+		else if (ruleName in this.allNames)
 			return this.allNames[ruleName];
 		else
 			return this.generateScopedName( ruleName);
@@ -89,9 +88,9 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 	public generateScopedName( ruleName: string): string
 	{
 		if (this.isMultiplex)
-			return TssManager.generateUniqueName();
+			return generateUniqueName();
 		else
-			return TssManager.generateName( this.name, ruleName);
+			return generateName( this.name, ruleName);
 	}
 
 
@@ -103,8 +102,13 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 		for( let scope of this.usedScopes)
 			scope.activate();
 
-		if (++this.activationRefCount === 1 && !this.isActivated)
-			TssManager.activate( this);
+		if (++this.activationRefCount === 1)
+		{
+			this.domStyleElm = document.createElement( "style");
+			this.domStyleElm.id = this.name;
+			document.head.appendChild( this.domStyleElm);
+			this.insertRules( this.domStyleElm.sheet as CSSStyleSheet);
+		}
 	}
 
 
@@ -116,32 +120,16 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 		if (this.activationRefCount === 0)
 			return;
 
+		if (--this.activationRefCount === 0)
+		{
+			this.domStyleElm.remove();
+			this.domStyleElm = null;
+		}
+
 		// deactivate imported scopes
 		for( let scope of this.usedScopes)
 			scope.deactivate();
-
-		if (--this.activationRefCount === 0 && this.isActivated)
-			TssManager.deactivate( this);
 	}
-
-
-
-	public setDOMInfo( styleSheet: CSSStyleSheet)
-	{
-		this.cssStyleSheet = styleSheet;
-	}
-
-
-
-	public clearDOMInfo()
-	{
-		this.cssStyleSheet = undefined;
-	}
-
-
-
-	// Helper properties
-	private get isActivated(): boolean { return !!this.cssStyleSheet; }
 
 
 
@@ -155,14 +143,73 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 	// for multiplex styles scopes - those that can be creaed multiple times.
 	public isMultiplex: boolean;
 
-	// CSS style sheet
-	public cssStyleSheet: CSSStyleSheet;
-
 	// Reference count of activation requests.
 	private activationRefCount: number;
 
+	// DOM style elemnt
+	public domStyleElm: HTMLStyleElement;
+
 	// List of used style scope objects that will be activated when our scope is activated.
 	private usedScopes: StyleScope[];
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Name generation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Flag indicating whether to use optimaized names for style elements (class names, animation
+// names, etc.)
+let useUniqueStyleNames: boolean = false;
+
+// Prefix to use when generating unique style names. If undefined, a standard prefix "n" will
+// be used.
+let uniqueStyleNamesPrefix: string = "n";
+
+// Next number to use when generating unique identifiers.
+let nextUniqueID: number = 1;
+
+
+
+/**
+ * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
+ * will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix "n" will be used.
+ * @param optimize
+ * @param prefix
+ */
+export function useOptimizedStyleNames( optimize: boolean, prefix?: string): void
+{
+	useUniqueStyleNames = optimize;
+	uniqueStyleNamesPrefix = prefix ? prefix : "n";
+}
+
+
+
+/**
+ * Generates name to use for the given rule from the given style sheet.
+ * @param sheetName 
+ * @param ruleName 
+ */
+function generateName( sheetName: string, ruleName: string): string
+{
+	return useUniqueStyleNames
+		? generateUniqueName( uniqueStyleNamesPrefix)
+		: `${sheetName}_${ruleName}`;
+}
+
+
+
+/**
+ * Generates a unique name, which can be used either for style element's ID or or class,
+ * identifier or animation name. Names are generated using a simple incrementing number.
+ */
+function generateUniqueName( prefix?: string): string
+{
+	return (prefix ? prefix : uniqueStyleNamesPrefix) + nextUniqueID++;
 }
 
 

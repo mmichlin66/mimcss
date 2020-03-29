@@ -148,11 +148,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 */
 	public setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void
 	{
-		if (!this.styleset)
-			this.styleset = {};
-
-		this.styleset[name] = value as any;
-
 		if (this.cssStyleRule)
 		{
 			this.cssStyleRule.style.setProperty( name,
@@ -170,14 +165,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 */
 	public setCustomProp<T>( varDef: ICustomVar<T>, varValue: T, important?: boolean): void
 	{
-		if (!this.styleset)
-			this.styleset = {};
-
-		if (!this.styleset.$custom)
-			this.styleset.$custom = [];
-
-		this.styleset.$custom.push( [varDef, varValue]);
-
 		if (this.cssStyleRule)
 		{
 			this.cssStyleRule.style.setProperty( varDef.cssName,
