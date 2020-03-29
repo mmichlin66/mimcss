@@ -331,23 +331,6 @@ export let Colors: IColors =
 
 
 /**
- * Type for CSS color represented as an array:
- *   - single-element array represents a color value either as a string or as a number.
- *   - two-element array represents either a color name or a numeric RGB value in the first element
- *     and an alpha separation in the second element.
- *   - three-element aray represents RGB separations as either integer numbers (0 to 255) or floating
- *     numbers (0.0 to 1.0) for percentages.
- *   - four-element aray represents RGBA separations as either integer numbers (0 to 255) or floating
- *     numbers (0.0 to 1.0) for percentages. The alpha separation (the last element) is always a
- *     percentage value.
- */
-export type ColorAsArray =
-                [keyof IColors | number] |
-                [keyof IColors | number, number] |
-                [number, number, number] |
-                [number, number, number, number];
-
-/**
  * Type for CSS color. Color can be represented using the following types:
  *   - string (e.g. "red" or "#fe5" or "rgba(190, 200, 235, 90%)", etc.)
  *   - number:
@@ -356,7 +339,7 @@ export type ColorAsArray =
  *     - negative and floating point numbers are rejected.
  *   - array [[ColorAsArray]]
  */
-export type Color_StyleType = ExtendedPropType<"transparent" | "currentcolor" | keyof IColors | number | ColorAsArray>;
+export type Color_StyleType = ExtendedPropType<"transparent" | "currentcolor" | keyof IColors | number>;
 
 
 

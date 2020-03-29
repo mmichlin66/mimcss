@@ -9,3 +9,4 @@ export * from "./rules/RuleTypes";
 export * from "./scope/ScopeTypes";
 export * from "./helpers/SelectorTypes";
 export * from "./helpers/tsh";
+export {Num, Len, Angle, Time, Resolution, Frequency, Percent} from "./styles/UtilFuncs";

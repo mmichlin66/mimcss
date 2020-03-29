@@ -1,5 +1,5 @@
 ﻿import * as ColorTypes from "./ColorTypes"
-import * as UtilFuncs from "./UtilFuncs"
+import {Percent} from "./UtilFuncs"
 
 
 
@@ -7,7 +7,7 @@ import * as UtilFuncs from "./UtilFuncs"
  * Converts color separation value from the numeric representation to the 2-digit hexadecimal string.
  * @param val Number from 0 to 255
  */
-export function sepToHex( val: number): string
+function sepToHex( val: number): string
 {
     let s = val.toString(16);
     return s.length === 1 ? "0" + s : s;
@@ -19,7 +19,7 @@ export function sepToHex( val: number): string
  * Converts color value from the numeric representation to the CSS color string.
  * @param val Color as a number
  */
-export function colorNumberToCssString( val: number): string
+function colorNumberToCssString( val: number): string
 {
     /// #if DEBUG
         if (val < 0)
@@ -53,62 +53,6 @@ export function colorNumberToCssString( val: number): string
 
 
 
-export function colorSeparation( c: number | string): string
-{
-    return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : UtilFuncs.percentNumberToCssString(c);
-}
-
-
-
-export function rgb( r: number | string, g: number | string, b: number | string, a?: number | string): string
-{
-    r = colorSeparation(r);
-    g = colorSeparation(g);
-    b = colorSeparation(b);
-    a = a == null ? null : typeof a === "string" ? a : UtilFuncs.percentNumberToCssString(a);
-
-    return a == null ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;
-}
-
-
-
-export function hsl( h: number | string, s: number | string, l: number | string, a?: number | string): string
-{
-    h = typeof h === "string" ? h : Number.isInteger( h) ? h + "deg" : h + "rad";
-    s = s == null ? "100%" : typeof s === "string" ? s : UtilFuncs.percentNumberToCssString(s);
-    l = l == null ? "100%" : typeof l === "string" ? l : UtilFuncs.percentNumberToCssString(l);
-    a = a == null ? null : typeof a === "string" ? a : UtilFuncs.percentNumberToCssString(a);
-
-    return a == null ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
-}
-
-
-
-export function alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): string
-{
-    let rgbVal = typeof c === "string" ? ColorTypes.Colors[c] : c;
-    return rgb( (rgbVal & 0xFF0000) >> 16, (rgbVal & 0x00FF00) >> 8, rgbVal & 0x0000FF, a);
-}
-
-
-
-/**
- * Converts color value from the array representation to the CSS time string.
- */
-export function colorAsArrayToCssString( val: ColorTypes.ColorAsArray): string
-{
-    if (val.length === 1)
-        return colorToCssString( val[0]);
-    else if (val.length === 2)
-        return alpha( val[0], val[1]).toString();
-    else if (val.length === 3)
-        return rgb( val[0], val[1], val[2]).toString();
-    else
-        return rgb( val[0], val[1], val[2], val[3]).toString();
-}
-
-
-
 /**
  * Converts time style value to the CSS time string.
  * @param val Time as a style property type
@@ -124,10 +68,47 @@ export function colorToCssString( val: ColorTypes.Color_StyleType): string
     }
     else if (typeof val === "number")
 	    return colorNumberToCssString( val);
-    else if (Array.isArray( val))
-	    return colorAsArrayToCssString( val);
     else
         return val.toString();
+}
+
+
+
+function sep( c: number | string): string
+{
+    return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : Percent.numberToString(c);
+}
+
+
+
+export function rgb( r: number | string, g: number | string, b: number | string, a?: number | string): string
+{
+    r = sep(r);
+    g = sep(g);
+    b = sep(b);
+    a = a == null ? null : typeof a === "string" ? a : Percent.numberToString(a);
+
+    return a == null ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;
+}
+
+
+
+export function hsl( h: number | string, s: number | string, l: number | string, a?: number | string): string
+{
+    h = typeof h === "string" ? h : Number.isInteger( h) ? h + "deg" : h + "rad";
+    s = s == null ? "100%" : typeof s === "string" ? s : Percent.numberToString(s);
+    l = l == null ? "100%" : typeof l === "string" ? l : Percent.numberToString(l);
+    a = a == null ? null : typeof a === "string" ? a : Percent.numberToString(a);
+
+    return a == null ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
+}
+
+
+
+export function alpha( c: number | keyof typeof ColorTypes.Colors, a: number | string): string
+{
+    let rgbVal = typeof c === "string" ? ColorTypes.Colors[c] : c;
+    return rgb( (rgbVal & 0xFF0000) >> 16, (rgbVal & 0x00FF00) >> 8, rgbVal & 0x0000FF, a);
 }
 
 

@@ -1,5 +1,5 @@
 import {IAnimationRule, Keyframe, RuleType, INamedRule} from "./RuleTypes"
-import {tsh} from "../helpers/tsh"
+import {Percent} from "../styles/UtilFuncs"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
@@ -117,7 +117,7 @@ class KeyframeRule extends StyleRule
 		else if (Number.isInteger( waypoint))
 			return waypoint + "%";
 		else
-			return tsh.percent( waypoint);
+			return Percent.styleToString( waypoint);
 	}
 
 

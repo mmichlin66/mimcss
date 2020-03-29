@@ -1,5 +1,5 @@
 ﻿import {ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
-import {StringProxy} from "../styles/UtilTypes";
+import {StringProxy} from "../styles/UtilFuncs";
 
 
 

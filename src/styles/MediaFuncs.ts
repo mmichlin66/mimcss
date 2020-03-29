@@ -142,7 +142,7 @@ function mediaFeatureSingleValueToCssString( convert: convertFuncType, propVal: 
     else if (typeof propVal === "string")
         return propVal;
     else if (Array.isArray( propVal))
-        return UtilFuncs.arrayToCssString( propVal, item => item == null ? "" : item.toString());
+        return UtilFuncs.arrayToCssString( propVal);
     else
         return propVal.toString();
 }

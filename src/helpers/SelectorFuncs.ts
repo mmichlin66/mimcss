@@ -3,7 +3,7 @@ import {ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"
-import {StringProxy} from "../styles/UtilTypes";
+import {StringProxyBase} from "../styles/UtilFuncs";
 
 
 
@@ -165,7 +165,7 @@ export class Selector implements IEmptySelector, ISelector
 	 */
 	public toCssString(): string
 	{
-		return this.buf.map( (token) =>
+		return this.buf.map( (token: string | ISelector | SelectorTokenType) =>
 			{
 				if (token instanceof TagRule)
 					return token.tagName;
@@ -173,7 +173,7 @@ export class Selector implements IEmptySelector, ISelector
 					return "." + token.name;
 				else if (token instanceof IDRule)
 					return "#" + token.name;
-				else if (token instanceof StringProxy)
+				else if (token instanceof StringProxyBase)
 					return token.toString();
 				else if (token instanceof Selector)
 					return token.toCssString();
@@ -182,6 +182,13 @@ export class Selector implements IEmptySelector, ISelector
 			}
 		).join("");
 	}
+
+
+
+    public toString(): string
+    {
+        return this.toCssString();
+    }
 
 
 

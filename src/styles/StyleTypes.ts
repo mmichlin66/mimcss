@@ -33,9 +33,9 @@ export type AlignmentBaselineStyleType = UtilTypes.ExtendedPropType<"auto" | "ba
 /** Type for single animation */
 export type SingleAnimation = UtilTypes.Base_StyleType |
     {
-        delay?: UtilTypes.Time_StyleType;
+        delay?: UtilTypes.Number_StyleType;
         function?: SingleAnimationTimingFunction;
-        duration?: UtilTypes.Time_StyleType;
+        duration?: UtilTypes.Number_StyleType;
         count?: SingleAnimationIterationCount;
         direction?: SingleAnimationDirection;
         state?: SingleAnimationPlayState;
@@ -158,24 +158,24 @@ export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSiz
 
 
 /** Type for a single corner radius */
-export type SingleCornerRadius_StyleType = UtilTypes.Length_StyleType |
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
+export type SingleCornerRadius_StyleType = UtilTypes.Number_StyleType |
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType];
 
 
 
 /** Helper type that defines an array of one to 4 elements each defining a length/percentage */
 export type MultiCornerRadius_StyleType =
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?
     ];
 
 /** Type for border-radius style property */
-export type BorderRadiusStyleType = UtilTypes.Length_StyleType | MultiCornerRadius_StyleType |
+export type BorderRadiusStyleType = UtilTypes.Number_StyleType | MultiCornerRadius_StyleType |
     [MultiCornerRadius_StyleType, MultiCornerRadius_StyleType];
 
 
 
 /** Type for baseline-shift style property */
-export type BaselineShiftStyleType = UtilTypes.ExtendedPropType<"sub" | "super"> | UtilTypes.Length_StyleType;
+export type BaselineShiftStyleType = UtilTypes.ExtendedPropType<"sub" | "super"> | UtilTypes.Number_StyleType;
 
 
 
@@ -192,7 +192,7 @@ export type BorderStyleStyleType = BorderSideStyle_StyleType |
 
 
 /** Type for border side width style property */
-export type BorderSideWidth_StyleType = UtilTypes.ExtendedPropType<"thin" | "medium" | "thick"> | UtilTypes.Length_StyleType;
+export type BorderSideWidth_StyleType = UtilTypes.ExtendedPropType<"thin" | "medium" | "thick"> | UtilTypes.Number_StyleType;
 
 
 
@@ -208,8 +208,8 @@ export type BorderColapseStyleType = UtilTypes.ExtendedPropType<"collapse" | "se
 
 
 /** Type for border-spacing style property */
-export type BorderSpacingStyleType = UtilTypes.Length_StyleType |
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
+export type BorderSpacingStyleType = UtilTypes.Number_StyleType |
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType];
 
 
 
@@ -220,8 +220,8 @@ export type BorderColorStyleType = ColorTypes.Color_StyleType |
 
 
 /** Type for border side style property */
-export type BorderSide_StyleType = UtilTypes.Length_StyleType |  BorderSideStyle_StyleType | ColorTypes.Color_StyleType |
-    [UtilTypes.Length_StyleType?, BorderSideStyle_StyleType?, ColorTypes.Color_StyleType?];
+export type BorderSide_StyleType = UtilTypes.Number_StyleType |  BorderSideStyle_StyleType | ColorTypes.Color_StyleType |
+    [UtilTypes.Number_StyleType?, BorderSideStyle_StyleType?, ColorTypes.Color_StyleType?];
 
 
 
@@ -240,8 +240,8 @@ export type BorderImageRepeatStyleType = BorderImageRepeatKeyword | [BorderImage
 
 
 /** Type for border-image-width style property */
-export type BorderImageWidthStyleType = UtilTypes.Length_StyleType |
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?];
+export type BorderImageWidthStyleType = UtilTypes.Number_StyleType |
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?];
 
 
 
@@ -294,7 +294,7 @@ export type ClearStyleType = UtilTypes.ExtendedPropType<"none" | "left" | "right
 
 /** Type for clear style property */
 export type ClipStyleType = UtilTypes.ExtendedPropType<"auto"> |
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType];
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType];
 
 
 
@@ -336,7 +336,7 @@ export type ColumnSpanStyleType = UtilTypes.ExtendedPropType<"none" | "all">;
 
 
 /** Type for columns style property */
-export type ColumnsStyleType = UtilTypes.ExtendedPropType<"auto" | number | ["auto" | number, UtilTypes.Length_StyleType]>;
+export type ColumnsStyleType = UtilTypes.ExtendedPropType<"auto" | number | ["auto" | number, UtilTypes.Number_StyleType]>;
 
 
 
@@ -389,7 +389,7 @@ export type FillRuleStyleType = UtilTypes.ExtendedPropType<"nonzero" | "evenodd"
 
 
 /** Type for flex-basis style property */
-export type FlexBasisStyleType = UtilTypes.ExtendedPropType<"auto" | "content"> | UtilTypes.Length_StyleType;
+export type FlexBasisStyleType = UtilTypes.ExtendedPropType<"auto" | "content"> | UtilTypes.Number_StyleType;
 
 
 
@@ -415,7 +415,7 @@ export type FlexFlowStyleType = FlexDirectionStyleType | FlexWrapStyleType |
 
 
 /** Type for font-style style property */
-export type FontStyleStyleType = UtilTypes.ExtendedPropType<"normal" | "italic" | "oblique"> | UtilTypes.Angle_StyleType;
+export type FontStyleStyleType = UtilTypes.ExtendedPropType<"normal" | "italic" | "oblique"> | UtilTypes.Number_StyleType;
 
 
 
@@ -431,7 +431,7 @@ export type FontWeightStyleType = UtilTypes.ExtendedPropType<"normal" | "bold" |
 
 
 /** Type for a row-gap or column-gap style property */
-export type SingleGapStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Length_StyleType;
+export type SingleGapStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Number_StyleType;
 
 /** Type for a row-gap or column-gap style property */
 export type GapStyleType = SingleGapStyleType | [SingleGapStyleType, SingleGapStyleType];
@@ -474,7 +474,7 @@ export type JustifySelfStyleType = UtilTypes.ExtendedPropType<"auto" | "normal" 
 
 
 /** Type for letter-spacing style property */
-export type LetterSpacingStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Length_StyleType;
+export type LetterSpacingStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Number_StyleType;
 
 
 
@@ -509,8 +509,8 @@ export type ListStyleStyleType = ListStyleTypeStyleType | ListStylePositionStyle
 
 
 /** Type for the margin style property */
-export type MarginStyleType = UtilTypes.Length_StyleType |
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?];
+export type MarginStyleType = UtilTypes.Number_StyleType |
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?];
 
 
 
@@ -534,8 +534,8 @@ export type OverflowStyleType = SingleOverflowStyleType | [SingleOverflowStyleTy
 
 
 /** Type for the padding style property */
-export type PaddingStyleType = UtilTypes.Length_StyleType |
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?, UtilTypes.Length_StyleType?];
+export type PaddingStyleType = UtilTypes.Number_StyleType |
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?];
 
 
 
@@ -604,7 +604,7 @@ export type TextDecorationLineStyleType = UtilTypes.ExtendedPropType<"none" | "u
 export type TextDecorationStyleStyleType = UtilTypes.ExtendedPropType<"solid" | "double" | "dotted" | "dashed" | "wavy">;
 
 /** Type for the text-decoration-thickness style property */
-export type TextDecorationThicknessStyleType = UtilTypes.ExtendedPropType<"auto" | "from-font"> | UtilTypes.Length_StyleType;
+export type TextDecorationThicknessStyleType = UtilTypes.ExtendedPropType<"auto" | "from-font"> | UtilTypes.Number_StyleType;
 
 // /** Type for the text-decoration-line style property */
 // export type TextDecorationStyleType = TextDecorationLineStyleType | TextDecorationStyleStyleType |
@@ -614,7 +614,7 @@ export type TextDecorationThicknessStyleType = UtilTypes.ExtendedPropType<"auto"
 
 
 /** Type for the text-emphasis-position style property */
-export type TextEmphasisPositionStyleType = ["over" | "under", "left" | "right"] | UtilTypes.Length_StyleType;
+export type TextEmphasisPositionStyleType = ["over" | "under", "left" | "right"] | UtilTypes.Number_StyleType;
 
 /** Type for the text-emphasis-style style property */
 export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame";
@@ -628,13 +628,13 @@ export type TextEmphasisStyleStyleType = UtilTypes.ExtendedPropType<"none" | num
 
 
 /** Type for the text-indent style property */
-export type TextIndentStyleType = UtilTypes.Length_StyleType |
-    [UtilTypes.Length_StyleType, "each-line", "hanging"?] | [UtilTypes.Length_StyleType, "hanging", "each-line"?];
+export type TextIndentStyleType = UtilTypes.Number_StyleType |
+    [UtilTypes.Number_StyleType, "each-line", "hanging"?] | [UtilTypes.Number_StyleType, "hanging", "each-line"?];
 
 
 
 /** Type for the text-justify style property */
-export type TextJustifyStyleType = UtilTypes.ExtendedPropType<"auto" | "inter-character" | "inter-word" | "none"> | UtilTypes.Length_StyleType;
+export type TextJustifyStyleType = UtilTypes.ExtendedPropType<"auto" | "inter-character" | "inter-word" | "none"> | UtilTypes.Number_StyleType;
 
 
 
@@ -644,7 +644,7 @@ export type TextOrientationStyleType = UtilTypes.ExtendedPropType<"mixed" | "upr
 
 
 /** Type for the text-overflow style property */
-export type SingleTextOverflowStyleType = UtilTypes.ExtendedPropType<"clip" | "ellipsis" | "fade"> | UtilTypes.Length_StyleType;
+export type SingleTextOverflowStyleType = UtilTypes.ExtendedPropType<"clip" | "ellipsis" | "fade"> | UtilTypes.Number_StyleType;
 
 /** Type for the text-overflow style property */
 export type TextOverflowStyleType = SingleTextOverflowStyleType | [SingleTextOverflowStyleType, SingleTextOverflowStyleType];
@@ -653,10 +653,10 @@ export type TextOverflowStyleType = SingleTextOverflowStyleType | [SingleTextOve
 
 // /** Type for the text-shadow style property */
 // export type TextShadowStyleType = string> |
-//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType] |
-//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType] |
-//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, ColorTypes.Color_StyleType] |
-//     [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, ColorTypes.Color_StyleType];
+//     [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType] |
+//     [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType] |
+//     [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, ColorTypes.Color_StyleType] |
+//     [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, ColorTypes.Color_StyleType];
 
 
 
@@ -684,8 +684,8 @@ export type TouchActionStyleType = UtilTypes.ExtendedPropType<"auto" | "none" | 
 
 
 /** Type for the translate style property */
-export type TranslateStyleType = "none" | UtilTypes.Length_StyleType |
-    [UtilTypes.Length_StyleType, UtilTypes.Length_StyleType, UtilTypes.Length_StyleType?];
+export type TranslateStyleType = "none" | UtilTypes.Number_StyleType |
+    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?];
 
 
 
@@ -715,7 +715,7 @@ export type WordBreakStyleType = UtilTypes.ExtendedPropType<"normal" | "break-al
 
 
 /** Type for the word-spacing style property */
-export type WordSpacingStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Length_StyleType;
+export type WordSpacingStyleType = UtilTypes.ExtendedPropType<"normal"> | UtilTypes.Number_StyleType;
 
 
 
@@ -730,7 +730,7 @@ export type ZIndexStyleType = UtilTypes.ExtendedPropType<"auto" | number>;
 
 
 /** Type for the zoom style property */
-export type ZoomStyleType = UtilTypes.ExtendedPropType<"normal" | "reset"> | UtilTypes.Percent_StyleType;
+export type ZoomStyleType = UtilTypes.ExtendedPropType<"normal" | "reset"> | UtilTypes.Number_StyleType;
 
 
 
@@ -748,9 +748,9 @@ export interface IStyleset
     alignSelf?: AlignSelfStyleType;
     alignmentBaseline?: AlignmentBaselineStyleType;
     animation?: AnimationStyleType;
-    animationDelay?: UtilTypes.MultiTime_StyleType;
+    animationDelay?: UtilTypes.MultiNumber_StyleType;
     animationDirection?: AnimationDirectionStyleType;
-    animationDuration?: UtilTypes.MultiTime_StyleType;
+    animationDuration?: UtilTypes.MultiNumber_StyleType;
     animationFillMode?: AnimationFillModeStyleType;
     animationIterationCount?: AnimationIterationCountStyleType;
     animationName?: AnimationNameStyleType;
@@ -803,7 +803,7 @@ export interface IStyleset
     borderTopStyle?: BorderSideStyle_StyleType;
     borderTopWidth?: BorderSideWidth_StyleType;
     borderWidth?: BorderWidthStyleType;
-    bottom?: UtilTypes.Length_StyleType;
+    bottom?: UtilTypes.Number_StyleType;
     boxShadow?: BoxShadowStyleType;
     boxSizing?: BoxSizingStyleType;
     breakAfter?: BreakAfterStyleType;
@@ -826,7 +826,7 @@ export interface IStyleset
     columnRuleStyle?: BorderSideStyle_StyleType;
     columnRuleWidth?: BorderSideWidth_StyleType;
     columnSpan?: ColumnSpanStyleType;
-    columnWidth?: UtilTypes.Length_StyleType;
+    columnWidth?: UtilTypes.Number_StyleType;
     columns?: ColumnsStyleType;
     content?: StyleType;
     counterIncrement?: StyleType;
@@ -860,7 +860,7 @@ export interface IStyleset
     fontFamily?: StyleType;
     fontFeatureSettings?: StyleType;
     fontKerning?: FontKerningStyleType;
-    fontSize?: UtilTypes.Length_StyleType;
+    fontSize?: UtilTypes.Number_StyleType;
     fontSizeAdjust?: StyleType;
     fontStretch?: StyleType;
     fontStyle?: FontStyleStyleType;
@@ -895,7 +895,7 @@ export interface IStyleset
     gridTemplateColumns?: StyleType;
 	gridTemplateRows?: StyleType;
 	
-    height?: UtilTypes.Length_StyleType;
+    height?: UtilTypes.Number_StyleType;
 	hyphens?: HyphensStyleType;
 	
     imageOrientation?: StyleType;
@@ -913,7 +913,7 @@ export interface IStyleset
     layoutGridLine?: StyleType;
     layoutGridMode?: StyleType;
     layoutGridType?: StyleType;
-    left?: UtilTypes.Length_StyleType;
+    left?: UtilTypes.Number_StyleType;
     letterSpacing?: LetterSpacingStyleType;
     lightingColor?: ColorTypes.Color_StyleType;
     lineBreak?: LineBreakStyleType;
@@ -924,10 +924,10 @@ export interface IStyleset
 	listStyleType?: ListStyleTypeStyleType;
 	
     margin?: MarginStyleType;
-    marginBottom?: UtilTypes.Length_StyleType;
-    marginLeft?: UtilTypes.Length_StyleType;
-    marginRight?: UtilTypes.Length_StyleType;
-    marginTop?: UtilTypes.Length_StyleType;
+    marginBottom?: UtilTypes.Number_StyleType;
+    marginLeft?: UtilTypes.Number_StyleType;
+    marginRight?: UtilTypes.Number_StyleType;
+    marginTop?: UtilTypes.Number_StyleType;
     marker?: StyleType;
     markerEnd?: StyleType;
     markerMid?: StyleType;
@@ -939,10 +939,10 @@ export interface IStyleset
     maskRepeat?: StyleType;
     maskSize?: StyleType;
     maskType?: StyleType;
-    maxHeight?: UtilTypes.Length_StyleType;
-    maxWidth?: UtilTypes.Length_StyleType;
-    minHeight?: UtilTypes.Length_StyleType;
-	minWidth?: UtilTypes.Length_StyleType;
+    maxHeight?: UtilTypes.Number_StyleType;
+    maxWidth?: UtilTypes.Number_StyleType;
+    minHeight?: UtilTypes.Number_StyleType;
+	minWidth?: UtilTypes.Number_StyleType;
 	
     msContentZoomChaining?: StyleType;
     msContentZoomLimit?: StyleType;
@@ -999,7 +999,7 @@ export interface IStyleset
     orphans?: UtilTypes.Number_StyleType;
     outline?: BorderSide_StyleType;
     outlineColor?: ColorTypes.Color_StyleType;
-    outlineOffset?: UtilTypes.Length_StyleType;
+    outlineOffset?: UtilTypes.Number_StyleType;
     outlineStyle?: BorderStyleStyleType;
     outlineWidth?: BorderSideWidth_StyleType;
     overflow?: OverflowStyleType;
@@ -1011,15 +1011,15 @@ export interface IStyleset
     overflowBlock?: SingleOverflowStyleType;
 	
     padding?: PaddingStyleType;
-    paddingBottom?: UtilTypes.Length_StyleType;
-    paddingLeft?: UtilTypes.Length_StyleType;
-    paddingRight?: UtilTypes.Length_StyleType;
-    paddingTop?: UtilTypes.Length_StyleType;
+    paddingBottom?: UtilTypes.Number_StyleType;
+    paddingLeft?: UtilTypes.Number_StyleType;
+    paddingRight?: UtilTypes.Number_StyleType;
+    paddingTop?: UtilTypes.Number_StyleType;
     pageBreakAfter?: BreakAfterStyleType;
     pageBreakBefore?: BreakBeforeStyleType;
     pageBreakInside?: BreakInsideStyleType;
     penAction?: StyleType;
-    perspective?: UtilTypes.Length_StyleType;
+    perspective?: UtilTypes.Number_StyleType;
     perspectiveOrigin?: UtilTypes.Position_StyleType;
     placeContent?: PlaceContentStyleType;
     placeItems?: PlaceItemsStyleType;
@@ -1030,7 +1030,7 @@ export interface IStyleset
 	quotes?: StyleType;
 	
     resize?: ResizeStyleType;
-    right?: UtilTypes.Length_StyleType;
+    right?: UtilTypes.Number_StyleType;
     rotate?: StyleType;
     rowGap?: SingleGapStyleType;
     rubyAlign?: StyleType;
@@ -1050,7 +1050,7 @@ export interface IStyleset
     strokeOpacity?: StyleType;
 	strokeWidth?: StyleType;
 	
-    tabSize?: UtilTypes.Length_StyleType;
+    tabSize?: UtilTypes.Number_StyleType;
     tableLayout?: TableLayoutStyleType;
     textAlign?: TextAlignStyleType;
     textAlignLast?: TextAlignLastStyleType;
@@ -1074,7 +1074,7 @@ export interface IStyleset
     textShadow?: StyleType;
     textTransform?: TextTransformStyleType;
     textUnderlinePosition?: TextUnderlinePositionStyleType;
-    top?: UtilTypes.Length_StyleType;
+    top?: UtilTypes.Number_StyleType;
     touchAction?: TouchActionStyleType;
     transform?: StyleType;
     transformBox?: StyleType;
@@ -1116,7 +1116,7 @@ export interface IStyleset
 	
     whiteSpace?: WhiteSpaceStyleType;
     widows?: WidowsStyleType;
-    width?: UtilTypes.Length_StyleType;
+    width?: UtilTypes.Number_StyleType;
     willChange?: StyleType;
     wordBreak?: WordBreakStyleType;
     wordSpacing?: WordSpacingStyleType;

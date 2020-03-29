@@ -3,8 +3,6 @@
  */
 
 import {ICustomVar} from "../rules/RuleTypes"
-import {CustomVar} from "../rules/CustomVar";
-import {stylePropToCssString} from "./StyleFuncs";
 
 
 
@@ -16,34 +14,28 @@ export type Base_StyleType = "inherit" | "initial" | "unset";
 
 
 /**
- * The StringProxy class encapsulates a string, which is returned via the standard toString()
- * method. All CSS properties should accept string as the type of their value even if normally
+ * The IStringProxy interface represents an object that can produce a string, which is returned
+ * via the valueToCssString() method.
+ * 
+ * All CSS properties should accept string as the type of their value even if normally
  * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
  * color) property. This is because in addition to their normal values any property
  * can use custom CSS property in the form `var(--propname)`. However, if we add string type
  * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
- * Intellisense and it doesn't prompt developers for the possible values. The StringProxy
+ * Intellisense and it doesn't prompt developers for the possible values. The IStringProxy
  * can be used instead of string (e.g. `"row" | "column" | StringProxy`) and this solves
  * the Intellisense issue.
+ * 
+ * Another benefit of using objects implementing the IStringProxy interface is that they are
+ * constructed at one point but the string generation occurs at another time. This allows
+ * using these objects in the style definition classes. They can reference objects like
+ * ICustomVar that are not fully initialized yet. However, when the styles should be inserted
+ * into DOM the initialization will have already occurred and the valueToCssString method will
+ * return a correct string.
  */
-export class StringProxy
+export interface IStringProxy
 {
-    constructor( s?: string | StringProxy)
-    {
-        this.s = s;
-    }
-
-    public stringProxyToCssString(): string
-    {
-        return this.s == null ? "" : typeof this.s === "string" ? this.s : this.s.toString();
-    }
-
-    public toString(): string
-    {
-        return this.stringProxyToCssString();
-    }
-
-    private s?: string | StringProxy;
+    valueToCssString(): string;
 }
 
 
@@ -54,103 +46,42 @@ export class StringProxy
  * - StringProxy type that allows specifying raw string value.
  * - ICustomVar object that allows using a CSS custom property.
  */
-export type ExtendedPropType<T> = T | Base_StyleType | StringProxy | ICustomVar<ExtendedPropType<T>>;
+export type ExtendedPropType<T> = T | Base_StyleType | IStringProxy | ICustomVar<ExtendedPropType<T>>;
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Number
+// Numeric types for handling CSS <number>. <length>, <angle>, etc.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Type for single number style property */
-export type Number_StyleType = ExtendedPropType<number>;
+/** Type for single numeric style property */
+export type Number_StyleType = ExtendedPropType<number | string>;
 
-/** Type for multi-part number style property */
+/** Type for multi-part numeric style property */
 export type MultiNumber_StyleType = Number_StyleType | Number_StyleType[];
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Percent
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Type for CSS percentage. Percent can be represented using the following types:
- *   - number: integer numbers are treated as percents; floating numbers within -1 and 1
- *     are multilied by 100.
- */
-export type Percent_StyleType = ExtendedPropType<number>;
-
-/** Type for multi-part percentage style property */
-export type MultiPercent_StyleType = Percent_StyleType | Percent_StyleType[];
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Length
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Units of length */
 export type LengthUnits = "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" | "mm" | "pc" |
                 "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "%";
 
-/**
- * Type for CSS length or percentage. Length can be represented using the following types:
- *   - string (e.g. "20px" or "75%")
- *   - number: integer values are treated as pixels while floating numbers within -1 and 1 are
- *     treated as percents and floating numbers outside -1 and 1 are treated as "em".
- */
-export type Length_StyleType = ExtendedPropType<"auto" | number | string>;
-
-/** Type for multi-part length or percentage style property */
-export type MultiLength_StyleType = Length_StyleType | Length_StyleType[];
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Angle
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 /** Units of angle */
 export type AngleUnits = "deg" | "rad" | "grad" | "turn";
-
-/**
- * Type for CSS angle. Angle can be represented using the following types:
- *   - string (e.g. 20deg or 1.4rad)
- *   - number: zero is treated as not having any suffix; integer numbers are treated as degrees;
- *     floating numbers are treated as radians.
- */
-export type Angle_StyleType = ExtendedPropType<number | string>;
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Time
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Units of time */
 export type TimeUnits = "s" | "ms";
 
-/**
- * Type for CSS time. Time can be represented using the following types:
- *   - string (e.g. "2s" or "250ms")
- *   - number: integer numbers are treated as milliseconds while floating numbers are treated
- *     as seconds.
- */
-export type Time_StyleType = ExtendedPropType<number>;
+/** Units of resolution */
+export type ResolutionUnits = "dpi" | "dpcm" | "dppx" | "x";
 
-/** Type for multi-part time style property */
-export type MultiTime_StyleType = Time_StyleType | Time_StyleType[];
+/** Units of frequency */
+export type FrequencyUnits = "Hz" | "kHz";
+
+/** Units of flex */
+export type FlexUnits = "fr";
 
 
 
@@ -162,10 +93,10 @@ export type MultiTime_StyleType = Time_StyleType | Time_StyleType[];
 
 /**
  * Type for CSS size, which can be expressed as one or two values each of each is of the
- * Length_StyleType type. Two values are given as an object with 'w' (width) and 'h' (height)
+ * Number_StyleType type. Two values are given as an object with 'w' (width) and 'h' (height)
  * properties.
  */
-export type Size_StyleType = Length_StyleType | { w: Length_StyleType; h: Length_StyleType };
+export type Size_StyleType = Number_StyleType | { w: Number_StyleType; h: Number_StyleType };
 
 /** Type for multi-part size style property */
 export type MultiSize_StyleType = Size_StyleType | Size_StyleType[];
@@ -181,12 +112,62 @@ export type MultiSize_StyleType = Size_StyleType | Size_StyleType[];
 /**
  * Type for CSS position, which can be expressed as one or two or 3 or 4 values.
  */
-export type Position_StyleType = ExtendedPropType<"center" | "left" | "right" | "top" | "bottom" | Length_StyleType |
-                { x: "center" | "left" | "right" | Length_StyleType; y: "center" | "top" | "bottom" | Length_StyleType } |
-                { xedge: string; x?: Length_StyleType; yedge: string; y?: Length_StyleType }>;
+export type Position_StyleType = ExtendedPropType<"center" | "left" | "right" | "top" | "bottom" | Number_StyleType |
+                { x: "center" | "left" | "right" | Number_StyleType; y: "center" | "top" | "bottom" | Number_StyleType } |
+                { xedge: string; x?: Number_StyleType; yedge: string; y?: Number_StyleType }>;
 
 /** Type for multi-part position style property */
 export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];
+
+
+
+/**
+ * The CssNummberMath class contains methods that implement CSS mathematic functions on the
+ * numeric CSS types. When arguments for these functions are of the number JavaScript type they
+ * are converted to strings by calling a function specified in the constructor.
+ */
+export interface ICssNumberMath
+{
+    /** Converts number to string appending necessary unit suffixes */
+    numberToString: ( n: number) => string;
+
+    /** Converts single numeric style value to string appending necessary unit suffixes */
+    styleToString: ( val: Number_StyleType) => string;
+
+    /** Converts multiple numeric style value to string appending necessary unit suffixes */
+    multiStyleToString: ( val: MultiNumber_StyleType, separator: string) => string;
+
+    /** Creates property value of <number> type using the CSS min() function. */
+    min: ( ...params: Number_StyleType[]) => IStringProxy;
+
+    /** Creates property value of <number> type using the CSS max() function. */
+    max: ( ...params: Number_StyleType[]) => IStringProxy;
+
+    /** Creates property value of <number> type using the CSS clamp() function. */
+    clamp: ( params: [Number_StyleType, Number_StyleType, Number_StyleType]) => IStringProxy;
+
+    /**
+     * Creates property value using the CSS calc() function. This function accepts a formular
+     * string and an arbitrary number of parameters. The formular string can contain placeholders
+     * that will be replaced by the parameters. Placeholders have the following format:
+     * 
+     * ```
+     * {<index> [| <unit>]}
+     * ```
+     * The <index> token is a zero-based index in the parameter array. The optional <unit> token is
+     * a measurement unit (length, percent, angle, etc.) and is used if the corresponding parameter
+     * is a number.
+     * 
+     * ```typescript
+     * class MyStyles
+     * {
+     *     wallGap = $custom( "width", 16);
+     *     myClass = $class({ maxWidth: tsh.calc("{0|%} - 2*{1}", 100, this.wallGap)})
+     * }
+     * ```
+     */
+    calc: ( formula: string, ...params: Number_StyleType[]) => IStringProxy;
+}
 
 
 

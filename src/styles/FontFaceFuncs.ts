@@ -36,7 +36,7 @@ export function fontFaceToCssString( fontface: FontFaceTypes.Fontface): string |
 
 
 
-export function fontStretchToCssString( val: FontFaceTypes.FontStretchType): string
+function fontStretchToCssString( val: FontFaceTypes.FontStretchType): string
 {
     if (typeof val === "string")
         return val;
@@ -48,7 +48,7 @@ export function fontStretchToCssString( val: FontFaceTypes.FontStretchType): str
 
 
 
-export function fontStyleToCssString( val: FontFaceTypes.FontStretchType): string
+function fontStyleToCssString( val: FontFaceTypes.FontStretchType): string
 {
     if (typeof val === "string")
         return val;
@@ -77,7 +77,7 @@ export function fontStyleToCssString( val: FontFaceTypes.FontStretchType): strin
 
 
 
-export function fontWeightToCssString( val: FontFaceTypes.FontWeightType): string
+function fontWeightToCssString( val: FontFaceTypes.FontWeightType): string
 {
     if (typeof val === "string")
         return val;
@@ -89,7 +89,7 @@ export function fontWeightToCssString( val: FontFaceTypes.FontWeightType): strin
 
 
 
-export function fontSrcToCssString( val: FontFaceTypes.FontSrcType): string
+function fontSrcToCssString( val: FontFaceTypes.FontSrcType): string
 {
     if (typeof val === "string" || !Array.isArray(val))
         return fontSingleSrcToCssString( val as FontFaceTypes.FontSingleSrcType);
@@ -99,7 +99,7 @@ export function fontSrcToCssString( val: FontFaceTypes.FontSrcType): string
 
 
 
-export function fontSingleSrcToCssString( val: FontFaceTypes.FontSingleSrcType): string
+function fontSingleSrcToCssString( val: FontFaceTypes.FontSingleSrcType): string
 {
     if (typeof val === "string")
     {
