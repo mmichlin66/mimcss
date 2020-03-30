@@ -107,7 +107,7 @@ export class StringProxy extends StringProxyBase
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Type of function that converts a number to a string */
+/** Type of functions that convert a number to a string */
 type ConvertFuncType = ((n: number) => string) | null | undefined;
 
 
@@ -132,7 +132,7 @@ function numberToCssString( n: number, intUnit: string = "", floatUint: string =
 function numberStyleToCssString( val: Number_StyleType, convertFunc?: ConvertFuncType): string
 {
     if (val == null)
-        return "";
+        return "0";
     else if (typeof val === "string")
         return val;
     else if (typeof val === "object")
@@ -144,17 +144,6 @@ function numberStyleToCssString( val: Number_StyleType, convertFunc?: ConvertFun
 }
 
 /**
- * Converts array of <number> CSS type values to a single string using the given function that
- * converts number to string and the given separator.
- * @param val Array of string values
- */
-function numberStyleArrayToCssString( val: Number_StyleType[],
-                convertFunc?: ConvertFuncType, separator: string = " "): string
-{
-    return arrayToCssString( val, (v) => numberStyleToCssString( v, convertFunc), separator);
-}
-
-/**
  * Converts animation delay style value to the CSS string.
  * @param val Single- or multi-number style value.
  * @param convertFunc Function that converts a number to a string.
@@ -163,16 +152,36 @@ function numberStyleArrayToCssString( val: Number_StyleType[],
 function multiNumberStyleToCssString( val: MultiNumber_StyleType,
                 convertFunc: ConvertFuncType, separator: string = " "): string
 {
-    if (val == null)
-        return "";
-    else if (typeof val === "string")
-        return val;
-    else if (typeof val === "number" && convertFunc)
-        return convertFunc( val);
-    else if (Array.isArray(val))
-        return numberStyleArrayToCssString( val, convertFunc, separator);
-    else
-        return val.toString();
+    return Array.isArray(val)
+        ? arrayToCssString( val, (v) => numberStyleToCssString( v, convertFunc), separator)
+        : numberStyleToCssString( val, convertFunc);
+}
+
+
+
+/**
+ * Replaces patterns {index|[unit]} in the format string with values from the given array.
+ * @param format 
+ * @param convertFunc 
+ * @param params 
+ */
+function formatNumbers( format: string, params: Number_StyleType[], convertFunc?: ConvertFuncType): string
+{
+    function replacer( token: string, ...args: any[]): string
+    {
+        let index = parseInt( args[0]);
+        if (index >= params.length)
+            return "0";
+
+        let unit = args[1];
+        let param = params[index];
+        if (unit && typeof param === "number")
+            return param + unit;
+        else
+            return numberStyleToCssString( param, convertFunc);
+    }
+
+    return format.replace( /{ *(\d*) *(?:\| *([a-zA-Z\%]+) *)?}/g, replacer);
 }
 
 
@@ -203,7 +212,40 @@ class MathFuncProxy extends StringProxyBase
     // If not defined, numbers are converted to strings without appending any suffix.
     private convertFunc: ConvertFuncType;
 
-    // Either a single Number_StyleType parameter or an array of such parameters.
+    // Array of Number_StyleType parameters to the mathematical function.
+    private params: Number_StyleType[];
+}
+
+
+
+/**
+ * The CalcFuncProxy class implements the IStringProxy interface by encapsulating parameters of a
+ * calc() CSS function that accepts a formula string and zero or more parameters of type
+ * Number_StyleType.
+ */
+class CalcFuncProxy extends StringProxyBase
+{
+    constructor( formula: string, params: Number_StyleType[], convertFunc?: ConvertFuncType)
+    {
+        super();
+        this.formula = formula;
+        this.convertFunc = convertFunc;
+        this.params = params;
+    }
+
+    public valueToCssString(): string
+    {
+        return `calc(${formatNumbers( this.formula, this.params, this.convertFunc)})`;
+    }
+
+    // Calculation formula with placeholders.
+    private formula: string;
+
+    // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
+    // If not defined, numbers are converted to strings without appending any suffix.
+    private convertFunc: ConvertFuncType;
+
+    // Array Number_StyleType parameters to substitute placeholders in the formula string.
     private params: Number_StyleType[];
 }
 
@@ -224,8 +266,8 @@ class CssNumberMath implements ICssNumberMath
         this.convertFunc = !init
             ? (n: number) => n.toString()
             : typeof init === "function"
-                ? this.convertFunc = init
-                : this.convertFunc = (n: number) => numberToCssString( n, init[0], init[1]);
+                ? init
+                : (n: number) => numberToCssString( n, init[0], init[1]);
     }
 
     public numberToString = (n: number): string =>
@@ -243,24 +285,29 @@ class CssNumberMath implements ICssNumberMath
         return multiNumberStyleToCssString( val, this.convertFunc, separator);
     }
 
-    public min = (...params: Number_StyleType[]): IStringProxy =>
+    public min( ...params: Number_StyleType[]): IStringProxy
     {
         return new MathFuncProxy( "min", params, this.convertFunc);
     }
 
-    public max = (...params: Number_StyleType[]): IStringProxy =>
+    public max( ...params: Number_StyleType[]): IStringProxy
     {
         return new MathFuncProxy( "max", params, this.convertFunc);
     }
 
-    public clamp = (params: [Number_StyleType, Number_StyleType, Number_StyleType]): IStringProxy =>
+    public minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy
     {
-        return new MathFuncProxy( "clamp", params, this.convertFunc);
+        return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
     }
 
-    public calc = (formula: string, ...params: Number_StyleType[]): IStringProxy =>
+    public clamp( min: Number_StyleType, pref: Number_StyleType, max: Number_StyleType): IStringProxy
     {
-        return new StringProxy( `calc(formula)`);
+        return new MathFuncProxy( "clamp", [min, pref, max], this.convertFunc);
+    }
+
+    public calc( formula: string, ...params: Number_StyleType[]): IStringProxy
+    {
+        return new CalcFuncProxy( formula, params, this.convertFunc);
     }
 }
 

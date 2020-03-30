@@ -138,13 +138,16 @@ export interface ICssNumberMath
     multiStyleToString: ( val: MultiNumber_StyleType, separator: string) => string;
 
     /** Creates property value of <number> type using the CSS min() function. */
-    min: ( ...params: Number_StyleType[]) => IStringProxy;
+    min( ...params: Number_StyleType[]): IStringProxy;
 
     /** Creates property value of <number> type using the CSS max() function. */
-    max: ( ...params: Number_StyleType[]) => IStringProxy;
+    max( ...params: Number_StyleType[]): IStringProxy;
+
+    /** Creates property value of <number> type using the CSS minmax() function. */
+    minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy;
 
     /** Creates property value of <number> type using the CSS clamp() function. */
-    clamp: ( params: [Number_StyleType, Number_StyleType, Number_StyleType]) => IStringProxy;
+    clamp( min: Number_StyleType, pref: Number_StyleType, max: Number_StyleType): IStringProxy;
 
     /**
      * Creates property value using the CSS calc() function. This function accepts a formular
@@ -165,8 +168,10 @@ export interface ICssNumberMath
      *     myClass = $class({ maxWidth: tsh.calc("{0|%} - 2*{1}", 100, this.wallGap)})
      * }
      * ```
+     * @param formula 
+     * @param params 
      */
-    calc: ( formula: string, ...params: Number_StyleType[]) => IStringProxy;
+    calc( formula: string, ...params: Number_StyleType[]): IStringProxy;
 }
 
 
