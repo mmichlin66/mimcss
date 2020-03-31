@@ -81,7 +81,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 
 	
 	// Name of the property of the stylesheet definition to which this rule was assigned. This is
-	// null for StyleScope.
+	// null for Stylesheet.
 	public ruleName: string;
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
@@ -108,7 +108,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | INamedRule;
 
-	// Rule container to which this rule belongs. This is "this" for StyleScope.
+	// Rule container to which this rule belongs. This is "this" for Stylesheet.
 	public container: RuleContainer;
 }
 

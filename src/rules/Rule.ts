@@ -5,8 +5,8 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 /**
  * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
- * class is also an ancestor for StyleScope; however, most of its the fields are undefined in
- * te StyleScope instances.
+ * class is also an ancestor for Stylesheet; however, most of its the fields are undefined in
+ * te Stylesheet instances.
  */
 export abstract class Rule implements IRule
 {
@@ -36,18 +36,18 @@ export abstract class Rule implements IRule
 	/** Type of the rule */
 	public readonly ruleType: RuleType;
 
-	// Rule container to which this rule belongs. This is "this" for StyleScope.
+	// Rule container to which this rule belongs. This is "this" for Stylesheet.
 	public container: RuleContainer;
 
-	// Stylesheet to which this rule belongs. This is "this" for StyleScope.
+	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
 	public owner: IRuleContainerOwner;
 
 	// Name of the property of the stylesheet definition to which this rule was assigned. This is
-	// null for StyleScope.
+	// null for Stylesheet.
 	public ruleName: string;
 
 	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
-	// the styles sheet or the parent rule. This is undefined for StyleScope objects.
+	// the styles sheet or the parent rule. This is undefined for Stylesheet objects.
 	public cssRule: CSSRule;
 }
 

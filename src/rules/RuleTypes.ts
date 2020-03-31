@@ -382,7 +382,7 @@ export interface IStylesheetDefinitionClass<T> extends IRuleDefinitionClass<T>
  */
 export interface IStylesheet<T = any> extends IRuleContainer<T>
 {
-	/** DOM style element that contains CSS style sheet that contains rules defined by this scope*/
+	/** DOM style element that contains CSS style sheet that contains rules defined by this stylesheet*/
 	readonly domStyleElm: HTMLStyleElement;
 }
 
@@ -453,30 +453,30 @@ export function $fontface( fontface: Fontface): IFontFaceRule
 import {Stylesheet} from "./Stylesheet"
 
 /**
- * Processes the given stylesheet definition and returns the StyleScope object that contains
+ * Processes the given stylesheet definition and returns the Stylesheet object that contains
  * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
  * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStylesheetDefinitionClass<T>): IStylesheet<T>
+export function $use<T = IRuleDefinition>( stylesheetDefinitionClass: IStylesheetDefinitionClass<T>): IStylesheet<T>
 {
-	// if the stylesheet definition is multiplex, create new StyleScope object every time;
+	// if the stylesheet definition is multiplex, create new Stylesheet object every time;
 	// otherwise, check whether the style sheet definition object has already been processed. This
 	// is indicated by the existence of the instance static property on the class.
-	if (styleScopeDefinitionClass.isMultiplex)
-		return new Stylesheet( styleScopeDefinitionClass);
+	if (stylesheetDefinitionClass.isMultiplex)
+		return new Stylesheet( stylesheetDefinitionClass);
 	else
 	{
-		// we don't want the class styleScope property to be exposed on the publicly available
+		// we don't want the class stylesheet property to be exposed on the publicly available
 		// interface; therefore, we access it via "as any".
-		let styleScope = (styleScopeDefinitionClass as any).styleScope as Stylesheet<T>;
-		if (!styleScope)
+		let stylesheet = (stylesheetDefinitionClass as any).stylesheet as Stylesheet<T>;
+		if (!stylesheet)
 		{
-			styleScope = new Stylesheet( styleScopeDefinitionClass);
-			(styleScopeDefinitionClass as any).styleScope = styleScope;
+			stylesheet = new Stylesheet( stylesheetDefinitionClass);
+			(stylesheetDefinitionClass as any).stylesheet = stylesheet;
 		}
 
-		return styleScope;
+		return stylesheet;
 	}
 }
 
@@ -489,21 +489,21 @@ export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleshee
  * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
  * up to 1.
  */
-export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStylesheet<T> | IStylesheetDefinitionClass<T>): IStylesheet<T>
+export function $activate<T = IRuleDefinition>( stylesheetOrDefinition: IStylesheet<T> | IStylesheetDefinitionClass<T>): IStylesheet<T>
 {
-	if (!scopeOrDefinition)
+	if (!stylesheetOrDefinition)
 		return null;
 
-	if (scopeOrDefinition instanceof Stylesheet)
+	if (stylesheetOrDefinition instanceof Stylesheet)
 	{
-		scopeOrDefinition.activate();
-		return scopeOrDefinition;
+		stylesheetOrDefinition.activate();
+		return stylesheetOrDefinition;
 	}
 	else
 	{
-		let scope = $use( scopeOrDefinition as IStylesheetDefinitionClass<T>);
-		(scope as Stylesheet<T>).activate();
-		return scope;
+		let stylesheet = $use( stylesheetOrDefinition as IStylesheetDefinitionClass<T>);
+		(stylesheet as Stylesheet<T>).activate();
+		return stylesheet;
 	}
 }
 
@@ -514,10 +514,10 @@ export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStylesheet<T
  * object maintains a reference counter of how many times it was activated and deactivated. The
  * rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function $deactivate( scope: IStylesheet): void
+export function $deactivate( stylesheet: IStylesheet): void
 {
-	if (scope)
-		(scope as Stylesheet).deactivate();
+	if (stylesheet)
+		(stylesheet as Stylesheet).deactivate();
 }
 
 

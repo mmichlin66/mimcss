@@ -17,9 +17,9 @@ export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements
 
 		this.activationRefCount = 0;
 		this.domStyleElm = null;
-		this.usedScopes = [];
+		this.usedStylesheets = [];
 
-		this.processScope();
+		this.processStylesheet();
 	}
 
 
@@ -36,13 +36,13 @@ export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements
 
 	// Creates the stylesheet definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
-	private processScope(): void
+	private processStylesheet(): void
 	{
-		// check if the scope definition has already been processed
+		// check if the stylesheet definition has already been processed
 		if (this.isProcessed)
 			return;
 
-		// the container and the owner properties of the Rule base class point to the StyleScope
+		// the container and the owner properties of the Rule base class point to the Stylesheet
 		// object itself
 		super.process( this, this, null);
 
@@ -62,9 +62,9 @@ export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 	/** Adds a stylesheet this stylesheet */
-	public addExternalScope( scope: IStylesheet): void
+	public addExternalStylesheet( stylesheet: IStylesheet): void
 	{
-		this.usedScopes.push( scope as Stylesheet);
+		this.usedStylesheets.push( stylesheet as Stylesheet);
 	}
 
 
@@ -98,9 +98,9 @@ export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements
 	/** Inserts this stylesheet into DOM. */
 	public activate(): void
 	{
-		// activate imported scopes
-		for( let scope of this.usedScopes)
-			scope.activate();
+		// activate imported stylesheets
+		for( let stylesheet of this.usedStylesheets)
+			stylesheet.activate();
 
 		if (++this.activationRefCount === 1)
 		{
@@ -126,9 +126,9 @@ export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements
 			this.domStyleElm = null;
 		}
 
-		// deactivate imported scopes
-		for( let scope of this.usedScopes)
-			scope.deactivate();
+		// deactivate imported stylesheets
+		for( let stylesheet of this.usedStylesheets)
+			stylesheet.deactivate();
 	}
 
 
@@ -140,7 +140,7 @@ export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements
 	public name: string;
 
 	// Flag indicating whether this stylesheet object owns the <style> element. This is true only
-	// for multiplex styles scopes - those that can be creaed multiple times.
+	// for multiplex stylesheets - those that can be creaed multiple times.
 	public isMultiplex: boolean;
 
 	// Reference count of activation requests.
@@ -149,8 +149,8 @@ export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements
 	// DOM style elemnt
 	public domStyleElm: HTMLStyleElement;
 
-	// List of used stylesheet objects that will be activated when our scope is activated.
-	private usedScopes: Stylesheet[];
+	// List of used stylesheet objects that will be activated when our stylesheet is activated.
+	private usedStylesheets: Stylesheet[];
 }
 
 

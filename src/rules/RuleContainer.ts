@@ -17,7 +17,7 @@ import {ImportRule} from "./ImportRule"
 export interface IRuleContainerOwner
 {
 	/** Adds an external stylesheet to this stylesheet */
-	addExternalScope( scope: IStylesheet): void;
+	addExternalStylesheet( stylesheet: IStylesheet): void;
 
 	/** Generates a name, which will be unique in this stylesheet */
 	getScopedRuleName( ruleName: string): string;
@@ -127,7 +127,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	private processCustomVar( propName: string, varObj: CustomVar): void
 	{
 		// if the object is already assigned to a stylesheet, we create a clone of the
-		// rule and assign it to our scope.
+		// rule and assign it to our stylesheet.
 		if (varObj.container)
 			varObj = varObj.clone();
 
@@ -142,18 +142,18 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	// Processes the given Rule-derived object.
 	private processNamedRule( propName: string, rule: Rule): void
 	{
-		// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
-		// We inform our owner stylesheet about the "imported" scope so that when the owner
-		// scope is activated, the imported one is activated too.
+		// Stylesheet derives from Rule (via RuleContainer); however, it is not a real rule.
+		// We inform our owner stylesheet about the "imported" stylesheet so that when the owner
+		// stylesheet is activated, the imported one is activated too.
 		if (rule.ruleType === RuleType.SCOPE)
 		{
 			this._uses[propName] = rule as any as IStylesheet;
-			this.owner.addExternalScope( rule as any as IStylesheet);
+			this.owner.addExternalStylesheet( rule as any as IStylesheet);
 			return;
 		}
 
 		// if the rule object is already assigned to a stylesheet, we create a clone of the
-		// rule and assign it to our scope.
+		// rule and assign it to our stylesheet.
 		if (rule.owner)
 			rule = rule.clone();
 
@@ -199,17 +199,17 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 			let rule = propVal as Rule;
 
-			// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
-			// We inform our owner stylesheet about the "imported" scope so that when the owner
-			// scope is activated, the imported one is activated too.
+			// Stylesheet derives from Rule (via RuleContainer); however, it is not a real rule.
+			// We inform our owner stylesheet about the "imported" stylesheet so that when the owner
+			// stylesheet is activated, the imported one is activated too.
 			if (rule.ruleType === RuleType.SCOPE)
 			{
-				this.owner.addExternalScope( rule as any as IStylesheet);
+				this.owner.addExternalStylesheet( rule as any as IStylesheet);
 				continue;
 			}
 
 			// if the rule object is already assigned to a stylesheet, we create a clone of the
-			// rule and assign it to our scope.
+			// rule and assign it to our stylesheet.
 			if (rule.owner)
 				rule = rule.clone();
 
