@@ -7,36 +7,6 @@ import {StringProxyBase} from "./UtilFuncs";
 
 
 
-/** Represents possible pseudo classes */
-export type xPseudoClass =
-	// "dir( s: "rtl" | "ltr")" |
-	// "has( s: string): ISelector { this.buf.push( `:has(${s})`); return this; }
-	// "host( s: string): ISelector { this.buf.push( `:host(${s})`); return this; }
-	// "hostContext( s: string): ISelector { this.buf.push( `:host-context(${s})`); return this; }
-	":hover" |
-	":indeterminate" |
-	":in-range" |
-	":invalid" |
-	// "is( s: string): ISelector { this.buf.push( `:is(${s})`); return this; }
-	// "lang( s: string): ISelector { this.buf.push( `:lang(${s})`); return this; }
-	// "not( s: string): ISelector { this.buf.push( `:not(${s})`); return this; }
-	// "nthChild( a: number | "odd" | "even", b?: number): ISelector { this.buf.push( `:nth-child(${this.nth( a, b)})`); return this; }
-	// "nthLastChild( a: number | "odd" | "even", b?: number): ISelector { this.buf.push( `:nth-last-child(${this.nth( a, b)})`); return this; }
-	// "nthLastOfType( a: number | "odd" | "even", b?: number): ISelector { this.buf.push( `:nth-last-of-type(${this.nth( a, b)})`); return this; }
-	// "nthOfType( a: number | "odd" | "even", b?: number): ISelector { this.buf.push( `:nth-of-type(${this.nth( a, b)})`); return this; }
-	// "where( s: string): ISelector { this.buf.push( `:where(${s})`); return this; }
-	"";
-
-
-
-/** Represents possible pseudo elements */
-export type xPseudoElement =
-	// part( s: string): ISelector { this.buf.push( `::part(${s})`); return this; }
-	// slotted( s: string): ISelector { this.buf.push( `::slotted(${s})`); return this; }
-	"";
-
-
-
 /**
  * The selector class encapsulates all the functionality for building a CSS selector.
  */

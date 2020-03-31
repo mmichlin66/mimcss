@@ -1129,7 +1129,19 @@ export interface IStyleset
 
 
 
-// export type PureStyleset = { [K in keyof IPureStyleset]: UtilTypes.ExtendedPropType<IPureStyleset[K]> };
+/** Represents possible pseudo classes */
+export type PseudoClass = ":active" | ":any-link" | ":blank" | ":checked" | ":default" | ":defined" |
+	":disabled" | ":empty" | ":enabled" | ":first" | ":first-child" | ":first-of-type" | ":fullscreen" |
+	":focus" | ":focus-visible" | ":focus-Within" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" |
+	":last-child" | ":last-of-type" | ":left" | ":link" | ":only-child" | ":only-of-type" | ":optional" |
+	":out-of-range" | ":placeholder-shown" | ":read-only" | ":read-write" | ":required" | ":right" |
+	":root" | ":scope" | ":target" | ":valid" | ":visited";
+
+
+
+/** Represents possible pseudo elements */
+export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | "::firstLetter" |
+	"::firstLine" | "::grammarError" | "::marker" | "::placeholder" | "::selection" | "::spellingError";
 
 
 

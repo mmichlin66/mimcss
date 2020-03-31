@@ -1,4 +1,5 @@
-﻿import {ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
+﻿import {PseudoClass, PseudoElement} from "./StyleTypes"
+import {ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
 import {StringProxy} from "./UtilFuncs";
 
 
@@ -144,22 +145,6 @@ export const enum AttrSelectorOperation
 
 
 
-/** Represents possible pseudo classes */
-export type PseudoClass = ":active" | ":any-link" | ":blank" | ":checked" | ":default" | ":defined" |
-	":disabled" | ":empty" | ":enabled" | ":first" | ":first-child" | ":first-of-type" | ":fullscreen" |
-	":focus" | ":focus-visible" | ":focus-Within" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" |
-	":last-child" | ":last-of-type" | ":left" | ":link" | ":only-child" | ":only-of-type" | ":optional" |
-	":out-of-range" | ":placeholder-shown" | ":read-only" | ":read-write" | ":required" | ":right" |
-	":root" | ":scope" | ":target" | ":valid" | ":visited";
-
-
-
-/** Represents possible pseudo elements */
-export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | "::firstLetter" |
-	"::firstLine" | "::grammarError" | "::marker" | "::placeholder" | "::selection" | "::spellingError";
-
-
-
 /** Type for a single selector token */
 export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
 	SelectorCombinator | SelectorCombinatorType |
@@ -178,7 +163,7 @@ import {Selector, nth, attr} from "./SelectorFuncs"
 /**
  * Helper class for creating elements of a selector (selector tokens).
  */
-export abstract class SelectorHelper
+export abstract class sh
 {
 	public static raw( raw?: string) { return new StringProxy( raw); }
 	public static all( ns?: string) { return ns == null ? "*" : `${ns}|*`; }

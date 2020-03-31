@@ -160,7 +160,7 @@ function multiNumberStyleToCssString( val: MultiNumber_StyleType,
 
 
 /**
- * Replaces patterns {index|[unit]} in the format string with values from the given array.
+ * Replaces patterns {index[|unit]} in the format string with values from the given array.
  * @param format 
  * @param convertFunc 
  * @param params 
@@ -181,7 +181,7 @@ function formatNumbers( format: string, params: Number_StyleType[], convertFunc?
             return numberStyleToCssString( param, convertFunc);
     }
 
-    return format.replace( /{ *(\d*) *(?:\| *([a-zA-Z\%]+) *)?}/g, replacer);
+    return format.replace( /{\s*(\d*)\s*(?:\|\s*([a-zA-Z\%]+)\s*)?}/g, replacer);
 }
 
 

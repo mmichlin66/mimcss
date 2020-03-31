@@ -1,4 +1,4 @@
-import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, HierarchicalStyleset, RuleType, ICustomVar} from "./RuleTypes";
 import {IStyleset, Styleset} from "../styles/StyleTypes"
 import {stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
 import {Rule} from "./Rule";
@@ -20,20 +20,20 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		this.important = new Set<string>();
 
 		if (style)
-			this.parseExtendedStyleset( style);
+			this.parseStyleset( style);
 	}
 
-	private parseExtendedStyleset( style: ExtendedStyleset): void
+	private parseStyleset( styleset: ExtendedStyleset): void
 	{
-		if (style instanceof StyleRule)
+		if (styleset instanceof StyleRule)
 		{
 			// styleset is a single IStyleRule object, which we add as our parent
-			this.parents.push( style);
+			this.parents.push( styleset);
 		}
-		else if (Array.isArray(style))
+		else if (Array.isArray(styleset))
 		{
 			// styleset is an array of IStyleRule objects, which we add as our parents
-			for( let rule of style)
+			for( let rule of styleset)
 				this.parents.push( rule as StyleRule);
 		}
 		else
@@ -41,9 +41,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			// extendedStyleset is a set of style properties but can also include the $extends and
 			// $important properties. Remember parents and important names and copy the rest of
 			// style properties to our internal Styleset object.
-			for( let propName in style)
+			for( let propName in styleset)
 			{
-				let propVal = style[propName];
+				let propVal = styleset[propName];
 				if (propName === "$extends")
 				{
 					let inheritsPropVal = propVal as (IStyleRule | IStyleRule[]);
@@ -61,7 +61,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				}
 				else if (propName === "$important")
 				{
-					let importantPropVal = propVal as (string | string[]);
+					let importantPropVal = propVal as any as (string | string[]);
 					if (Array.isArray(importantPropVal))
 					{
 						// this is is an array of strings
@@ -185,6 +185,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	// Resultant Styleset object defining properties to be inserted into DOM.
 	private styleset: Styleset;
+
+	// // Styleset objects mapped to selectors for nested styles (e.g. .my-class:hover).
+	// private nestedStylesets: Map<string,Styleset>;
 }
 
 

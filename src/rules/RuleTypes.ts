@@ -3,7 +3,7 @@
  */
 
 
-import {Styleset, IStyleset, SupportsQuery} from "../styles/StyleTypes";
+import {Styleset, IStyleset, PseudoClass, PseudoElement, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
 
@@ -15,10 +15,10 @@ type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
 type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
 
 /** Utility type that represents string values mapped to names of properties of type T that are of type U. */
-export type NamesOfPropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: string };
+export type NamesOfPropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: string };
 
 /** Type that represents all properties of type T that are of type U */
-export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
+export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
 
 
 
@@ -26,11 +26,14 @@ export type PropsOfType<T,U> = { [K in PropNamesOfType<T,U>]: T[K] };
  * The ExtendedStyleset type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset:
  * - The `$extends` property specifies one or more parent style rules. This allows specifying
- *   parent rules using a convenient style-property-like notation. Parents can also be specified
- *   without a styleset.
+ *   parent rules using a convenient style-property-like notation.
  * - The `$important` property specifies one or more names of styleset properties that shuld be
  *   considered "important". When the rule is inserted into DOM, the "!important" attribute is
  *   added to the property value.
+ * 
+ * An ExtendedStyleset may not include a Styleset at all and only indicate one or more style
+ * rule objects, which are treated as parents from which this styleset should inherit all
+ * style rules.
  */
 export type ExtendedStyleset =
 	(Styleset &
@@ -41,6 +44,30 @@ export type ExtendedStyleset =
 	) | IStyleRule | IStyleRule[];
 
 
+
+/**
+ * The HierarchicalStyleset type extends the ExtendedStyleset type with the properties that allow
+ * building a list of nested style definitions:
+ * - Properties with pseudo class names (e.g. ":hover") and pseudo element names (e.g. "::after").
+ *   These properties define a styleset (also hierarchical) that will be assigned to the original
+ *   styleset's owner (tag, class or id) followed by the given pseudo class or pseudo element.
+ * 
+ * Use the HierarchicalStyleset in the following ways:
+ * 
+ * ```typescript
+ * class MyStyles
+ * {
+ *     myClass = $class( {
+ *         backgroundColor: "white",
+ *         ":hover" : {
+ *             backgroundColor: "gray"
+ *         }
+ *     })
+ * }
+ * ```
+ */
+export type HierarchicalStyleset = ExtendedStyleset &
+	{ [K in (keyof PseudoClass) | (keyof PseudoElement)]?: HierarchicalStyleset };
 
 
 
@@ -309,10 +336,22 @@ export interface ICustomVar<T = any>
 
 
 /**
- * Interface for rule definition objects.
+ * Interface for rule definition objects. The interface doesn't define any properties or methods
+ * but it allows defining the IRuleDefinitionClass "constructor" interface.
  */
 export interface IRuleDefinition
 {
+}
+
+
+
+/**
+ * "Constructor" interface defining how rule definition classes can be created.
+ */
+export interface IRuleDefinitionClass<T extends IRuleDefinition>
+{
+	/** All rule definition classes should conform to this constructor */
+	new(): T;
 }
 
 
@@ -339,17 +378,6 @@ export interface IRuleContainer<T = IRuleDefinition>
 
 	/**  Map of property names to external stylesheets created using the $use function. */
 	readonly uses: PropsOfType<T,IStylesheet>;
-}
-
-
-
-/**
- * "Constructor" interface defining how rule definition classes can be created.
- */
-export interface IRuleDefinitionClass<T extends IRuleDefinition>
-{
-	/** All rule definition classes should conform to this constructor */
-	new(): T;
 }
 
 
