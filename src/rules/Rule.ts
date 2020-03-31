@@ -39,10 +39,10 @@ export abstract class Rule implements IRule
 	// Rule container to which this rule belongs. This is "this" for StyleScope.
 	public container: RuleContainer;
 
-	// Style scope to which this rule belongs. This is "this" for StyleScope.
+	// Stylesheet to which this rule belongs. This is "this" for StyleScope.
 	public owner: IRuleContainerOwner;
 
-	// Name of the property of the style scope definition to which this rule was assigned. This is
+	// Name of the property of the stylesheet definition to which this rule was assigned. This is
 	// null for StyleScope.
 	public ruleName: string;
 

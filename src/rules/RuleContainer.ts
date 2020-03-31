@@ -1,5 +1,5 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, ICustomVar,
-		IRuleDefinition, IRuleDefinitionClass, IRuleContainer, RuleType, IStyleScope
+		IRuleDefinition, IRuleDefinitionClass, IRuleContainer, RuleType, IStylesheet
 		} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
@@ -11,15 +11,15 @@ import {ImportRule} from "./ImportRule"
 
 
 /**
- * The IRuleContainerOwner interface represents a style scope that "owns" the rules under this
+ * The IRuleContainerOwner interface represents a stylesheet that "owns" the rules under this
  * container. In particular, the owner's job is to generate "scoped" unique names.
  */
 export interface IRuleContainerOwner
 {
-	/** Adds an external style scope to this style scope */
-	addExternalScope( scope: IStyleScope): void;
+	/** Adds an external stylesheet to this stylesheet */
+	addExternalScope( scope: IStylesheet): void;
 
-	/** Generates a name, which will be unique in this style scope */
+	/** Generates a name, which will be unique in this stylesheet */
 	getScopedRuleName( ruleName: string): string;
 }
 
@@ -53,11 +53,11 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	/** Map of property names to rule objects. */
 	public get rules(): PropsOfType<T,IRule> { return this._rules as PropsOfType<T,IRule>; }
 
-	/**  Map of property names to external style scopes created using the $use function. */
-	public get uses(): PropsOfType<T,IStyleScope> { return this._uses as PropsOfType<T,IStyleScope>; }
+	/**  Map of property names to external stylesheets created using the $use function. */
+	public get uses(): PropsOfType<T,IStylesheet> { return this._uses as PropsOfType<T,IStylesheet>; }
 
 
-	// Creates the style scope definition instance, parses its properties and creates names for
+	// Creates the stylesheet definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
 	protected processRules(): void
 	{
@@ -103,7 +103,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 
 
-	// Creates the style scope definition instance, parses its properties and creates names for
+	// Creates the stylesheet definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
 	private processNamedRules( rulesDef: IRuleDefinition): void
 	{
@@ -126,7 +126,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	// Processes custom CSS property.
 	private processCustomVar( propName: string, varObj: CustomVar): void
 	{
-		// if the object is already assigned to a style scope, we create a clone of the
+		// if the object is already assigned to a stylesheet, we create a clone of the
 		// rule and assign it to our scope.
 		if (varObj.container)
 			varObj = varObj.clone();
@@ -143,16 +143,16 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	private processNamedRule( propName: string, rule: Rule): void
 	{
 		// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
-		// We inform our owner style scope about the "imported" scope so that when the owner
+		// We inform our owner stylesheet about the "imported" scope so that when the owner
 		// scope is activated, the imported one is activated too.
 		if (rule.ruleType === RuleType.SCOPE)
 		{
-			this._uses[propName] = rule as any as IStyleScope;
-			this.owner.addExternalScope( rule as any as IStyleScope);
+			this._uses[propName] = rule as any as IStylesheet;
+			this.owner.addExternalScope( rule as any as IStylesheet);
 			return;
 		}
 
-		// if the rule object is already assigned to a style scope, we create a clone of the
+		// if the rule object is already assigned to a stylesheet, we create a clone of the
 		// rule and assign it to our scope.
 		if (rule.owner)
 			rule = rule.clone();
@@ -200,15 +200,15 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 			let rule = propVal as Rule;
 
 			// ScopeStyle derives from Rule (via RuleContainer); however, it is not a real rule.
-			// We inform our owner style scope about the "imported" scope so that when the owner
+			// We inform our owner stylesheet about the "imported" scope so that when the owner
 			// scope is activated, the imported one is activated too.
 			if (rule.ruleType === RuleType.SCOPE)
 			{
-				this.owner.addExternalScope( rule as any as IStyleScope);
+				this.owner.addExternalScope( rule as any as IStylesheet);
 				continue;
 			}
 
-			// if the rule object is already assigned to a style scope, we create a clone of the
+			// if the rule object is already assigned to a stylesheet, we create a clone of the
 			// rule and assign it to our scope.
 			if (rule.owner)
 				rule = rule.clone();
@@ -267,7 +267,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 
 
-	// Class that defined this style scope. This member is used for style scope derivation
+	// Class that defined this stylesheet. This member is used for stylesheet derivation
 	public readonly definitionClass: IRuleDefinitionClass<T> | T;
 
 	// Names of all classes, IDs, animations and custom properties defined in this container.
@@ -294,8 +294,8 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 	// Map of names of properties of the rule definitions to the Rule objects.
 	private _rules: { [K: string]: IRule };
 
-	//  Map of property names to external style scopes created using the $use function.
-	private _uses: { [K: string]: IStyleScope }
+	//  Map of property names to external stylesheets created using the $use function.
+	private _uses: { [K: string]: IStylesheet }
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
 	private customVarStyleRule: CSSStyleRule;

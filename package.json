@@ -2,7 +2,7 @@
 	"name": "mimcss",
 	"version": "0.2.8",
 	"description": "Authoring CSS in TypeScript",
-	"homepage": "https://mmichlin66.github.io/mimcss/mimcssAbout.html",
+	"homepage": "https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html",
 	"repository": "github:mmichlin66/mimcss",
 	"main": "./lib/mimcss.js",
 	"module": "./lib/mimcss.js",
@@ -45,6 +45,6 @@
 		"lib/styles/tsh.d.ts",
 		"lib/rules/RuleTypes.d.ts",
 		"lib/styles/UtilFuncs.d.ts",
-		"lib/rules/StyleScope.d.ts"
+		"lib/rules/Stylesheet.d.ts"
 	]
 }

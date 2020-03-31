@@ -1,15 +1,15 @@
-import {RuleType, IRuleDefinition, IStyleScopeDefinitionClass, IStyleScope} from "./RuleTypes"
+import {RuleType, IRuleDefinition, IStylesheetDefinitionClass, IStylesheet} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
 /**
- * The StyleScope class represents a parsed form of a IStyleScopeDefinition-derived class.
+ * The Stylesheet class represents a parsed form of a IStylesheetDefinition-derived class.
  */
-export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements IStyleScope<T>, IRuleContainerOwner
+export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStylesheet<T>, IRuleContainerOwner
 {
-	public constructor( definitionClass: IStyleScopeDefinitionClass<T>)
+	public constructor( definitionClass: IStylesheetDefinitionClass<T>)
 	{
 		super( RuleType.SCOPE, definitionClass)
 
@@ -34,7 +34,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 
-	// Creates the style scope definition instance, parses its properties and creates names for
+	// Creates the stylesheet definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
 	private processScope(): void
 	{
@@ -50,7 +50,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 		// in DEBUG, each class has a name unless it was created as an anonymous class. In RELEASE,
 		// (as well as in the anonymous cases), the name is undefined and we generate a unique
-		// name for the style scope.
+		// name for the stylesheet.
 		this.name = this.definitionClass.name;
 		if (!this.name)
 			this.name = generateUniqueName( "s");
@@ -61,15 +61,15 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 
-	/** Adds a style scope this style scope */
-	public addExternalScope( scope: IStyleScope): void
+	/** Adds a stylesheet this stylesheet */
+	public addExternalScope( scope: IStylesheet): void
 	{
-		this.usedScopes.push( scope as StyleScope);
+		this.usedScopes.push( scope as Stylesheet);
 	}
 
 
 
-	/** Generates a name, which will be unique in this style scope */
+	/** Generates a name, which will be unique in this stylesheet */
 	public getScopedRuleName( ruleName: string): string
 	{
 		// check whether we already have this rule name: if yes, return the already assigned
@@ -84,7 +84,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 
-	// Generates a name, which will be unique in this style scope
+	// Generates a name, which will be unique in this stylesheet
 	public generateScopedName( ruleName: string): string
 	{
 		if (this.isMultiplex)
@@ -95,7 +95,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 
-	/** Inserts this style scope into DOM. */
+	/** Inserts this stylesheet into DOM. */
 	public activate(): void
 	{
 		// activate imported scopes
@@ -113,7 +113,7 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 
-	/** Removes this style scope from DOM - only works for multiplex style scopes. */
+	/** Removes this stylesheet from DOM - only works for multiplex stylesheets. */
 	public deactivate(): void
 	{
 		// guard from extra deactivate calls
@@ -133,13 +133,13 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 
 
 
-	// Class that defined this style scope. This member is used for style scope derivation
-	public readonly definitionClass: IStyleScopeDefinitionClass<T>;
+	// Class that defined this stylesheet. This member is used for stylesheet derivation
+	public readonly definitionClass: IStylesheetDefinitionClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
 
-	// Flag indicating whether this style scope object owns the <style> element. This is true only
+	// Flag indicating whether this stylesheet object owns the <style> element. This is true only
 	// for multiplex styles scopes - those that can be creaed multiple times.
 	public isMultiplex: boolean;
 
@@ -149,8 +149,8 @@ export class StyleScope<T = IRuleDefinition> extends RuleContainer<T> implements
 	// DOM style elemnt
 	public domStyleElm: HTMLStyleElement;
 
-	// List of used style scope objects that will be activated when our scope is activated.
-	private usedScopes: StyleScope[];
+	// List of used stylesheet objects that will be activated when our scope is activated.
+	private usedScopes: Stylesheet[];
 }
 
 

@@ -337,8 +337,8 @@ export interface IRuleContainer<T = IRuleDefinition>
 	/** Map of property names to rule objects. */
 	readonly rules: PropsOfType<T,IRule>;
 
-	/**  Map of property names to external style scopes created using the $use function. */
-	readonly uses: PropsOfType<T,IStyleScope>;
+	/**  Map of property names to external stylesheets created using the $use function. */
+	readonly uses: PropsOfType<T,IStylesheet>;
 }
 
 
@@ -355,18 +355,18 @@ export interface IRuleDefinitionClass<T extends IRuleDefinition>
 
 
 /**
- * "Constructor" interface defining how style scope definition classes can be created.
+ * "Constructor" interface defining how stylesheet definition classes can be created.
  */
-export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
+export interface IStylesheetDefinitionClass<T> extends IRuleDefinitionClass<T>
 {
-	/** All style scope definition objects should conform to this constructor */
+	/** All stylesheet definition objects should conform to this constructor */
 	new(): T;
 
 	/**
-	 * Flag inidicating that multiple style scopes can be created for this style scope definition -
+	 * Flag inidicating that multiple stylesheets can be created for this stylesheet definition -
 	 * each time with unique rule IDs. This is useful for styles created for a control - e.g. tree
 	 * or accordeon - which can be used multiple times on the same page but with different styles.
-	 * By default, style scope definitions are singular, that is a single instance of a style scope
+	 * By default, stylesheet definitions are singular, that is a single instance of a stylesheet
 	 * object is created for them and inserted into DOM.
 	 */
 	isMultiplex?: boolean;
@@ -375,21 +375,15 @@ export interface IStyleScopeDefinitionClass<T> extends IRuleDefinitionClass<T>
 
 
 /**
- * The IStyleScope interface represents the resultant style scope after the style scope definition
- * has been processed. The style scope object contains names of IDs, classes and animations, which
+ * The IStylesheet interface represents the resultant stylesheet after the stylesheet definition
+ * has been processed. The stylesheet object contains names of IDs, classes and animations, which
  * can be used in the application code. The interface also provides methods that are used to
  * manipulate the rules and their stylesets.
  */
-export interface IStyleScope<T = any> extends IRuleContainer<T>
+export interface IStylesheet<T = any> extends IRuleContainer<T>
 {
 	/** DOM style element that contains CSS style sheet that contains rules defined by this scope*/
 	readonly domStyleElm: HTMLStyleElement;
-
-	// /** Inserts this style scope into DOM. */
-	// activate(): void;
-
-	// /** Removes this style scope from DOM - only works for multiplex style scopes. */
-	// deactivate(): void;
 }
 
 
@@ -456,29 +450,29 @@ export function $fontface( fontface: Fontface): IFontFaceRule
 
 
 
-import {StyleScope} from "./StyleScope"
+import {Stylesheet} from "./Stylesheet"
 
 /**
- * Processes the given style scope definition and returns the StyleScope object that contains
- * names of IDs, classes and keyframes and allows style manipulations. For a given style scope
- * definition class there is a single style scope object, no matter how many times this function
+ * Processes the given stylesheet definition and returns the StyleScope object that contains
+ * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
+ * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScopeDefinitionClass<T>): IStyleScope<T>
+export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStylesheetDefinitionClass<T>): IStylesheet<T>
 {
-	// if the style scope definition is multiplex, create new StyleScope object every time;
+	// if the stylesheet definition is multiplex, create new StyleScope object every time;
 	// otherwise, check whether the style sheet definition object has already been processed. This
 	// is indicated by the existence of the instance static property on the class.
 	if (styleScopeDefinitionClass.isMultiplex)
-		return new StyleScope( styleScopeDefinitionClass);
+		return new Stylesheet( styleScopeDefinitionClass);
 	else
 	{
 		// we don't want the class styleScope property to be exposed on the publicly available
 		// interface; therefore, we access it via "as any".
-		let styleScope = (styleScopeDefinitionClass as any).styleScope as StyleScope<T>;
+		let styleScope = (styleScopeDefinitionClass as any).styleScope as Stylesheet<T>;
 		if (!styleScope)
 		{
-			styleScope = new StyleScope( styleScopeDefinitionClass);
+			styleScope = new Stylesheet( styleScopeDefinitionClass);
 			(styleScopeDefinitionClass as any).styleScope = styleScope;
 		}
 
@@ -489,26 +483,26 @@ export function $use<T = IRuleDefinition>( styleScopeDefinitionClass: IStyleScop
 
 
 /**
- * Activates the given style scope and inserts all its rules into DOM. If the input object is not
- * a style scope but a style definition class, obtain style scope by calling the $use function.
- * Note that each style scope object maintains a reference counter of how many times it was
+ * Activates the given stylesheet and inserts all its rules into DOM. If the input object is not
+ * a stylesheet but a style definition class, obtain stylesheet by calling the $use function.
+ * Note that each stylesheet object maintains a reference counter of how many times it was
  * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
  * up to 1.
  */
-export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStyleScope<T> | IStyleScopeDefinitionClass<T>): IStyleScope<T>
+export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStylesheet<T> | IStylesheetDefinitionClass<T>): IStylesheet<T>
 {
 	if (!scopeOrDefinition)
 		return null;
 
-	if (scopeOrDefinition instanceof StyleScope)
+	if (scopeOrDefinition instanceof Stylesheet)
 	{
 		scopeOrDefinition.activate();
 		return scopeOrDefinition;
 	}
 	else
 	{
-		let scope = $use( scopeOrDefinition as IStyleScopeDefinitionClass<T>);
-		(scope as StyleScope<T>).activate();
+		let scope = $use( scopeOrDefinition as IStylesheetDefinitionClass<T>);
+		(scope as Stylesheet<T>).activate();
 		return scope;
 	}
 }
@@ -516,14 +510,14 @@ export function $activate<T = IRuleDefinition>( scopeOrDefinition: IStyleScope<T
 
 
 /**
- * Deactivates the given style scope by removing its rules from DOM. Note that each style scope
+ * Deactivates the given stylesheet by removing its rules from DOM. Note that each stylesheet
  * object maintains a reference counter of how many times it was activated and deactivated. The
  * rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function $deactivate( scope: IStyleScope): void
+export function $deactivate( scope: IStylesheet): void
 {
 	if (scope)
-		(scope as StyleScope).deactivate();
+		(scope as Stylesheet).deactivate();
 }
 
 

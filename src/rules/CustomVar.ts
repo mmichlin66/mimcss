@@ -80,7 +80,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 
 
 	
-	// Name of the property of the style scope definition to which this rule was assigned. This is
+	// Name of the property of the stylesheet definition to which this rule was assigned. This is
 	// null for StyleScope.
 	public ruleName: string;
 

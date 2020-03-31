@@ -10,4 +10,4 @@ export * from "./styles/tsh";
 export * from "./rules/RuleTypes";
 
 export {Num, Len, Angle, Time, Resolution, Frequency, Percent} from "./styles/UtilFuncs";
-export {useOptimizedStyleNames} from "./rules/StyleScope";
+export {useOptimizedStyleNames} from "./rules/Stylesheet";
