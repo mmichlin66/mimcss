@@ -1,5 +1,6 @@
 ﻿import {ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
 import {StringProxy} from "./UtilFuncs";
+import { IStringProxy } from "./UtilTypes";
 
 
 
@@ -19,48 +20,59 @@ export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | ":
 
 
 
-/** Represents possible selector combinators */
-export type SelectorCombinatorType = "," | " > " | " " | " ~ " | " + ";
+// /** Represents possible selector combinators */
+// export type SelectorCombinatorType = "," | " > " | " " | " ~ " | " + ";
 
-/** Represents possible selector combinators */
-export const enum SelectorCombinator
-{
-	And = ", ",
-	Child = " > ",
-	Descendand = " ",
-	Sibling = " ~ ",
-	Adjacent = " + ",
-}
+// /** Represents possible selector combinators */
+// export const enum SelectorCombinator
+// {
+// 	And = ", ",
+// 	Child = " > ",
+// 	Descendand = " ",
+// 	Sibling = " ~ ",
+// 	Adjacent = " + ",
+// }
 
 
 
-/** Represents possible operations for attribute selector */
-export type AttrSelectorOperationType = "=" | "~=" | "|=" | "^=" | "$=" | "*=";
+// /** Represents possible operations for attribute selector */
+// export type AttrSelectorOperationType = "=" | "~=" | "|=" | "^=" | "$=" | "*=";
 
-/** Represents possible operations for attribute selector */
-export const enum AttrSelectorOperation
-{
-	Match = "=",
-	Word = "~=",
-	SubCode = "|=",
-	StartsWith = "^=",
-	EndsWith = "$=",
-	Contains = "*=",
-}
+// /** Represents possible operations for attribute selector */
+// export const enum AttrSelectorOperation
+// {
+// 	Match = "=",
+// 	Word = "~=",
+// 	SubCode = "|=",
+// 	StartsWith = "^=",
+// 	EndsWith = "$=",
+// 	Contains = "*=",
+// }
+
+
+
+// /** Type for a single selector token */
+// export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
+// 	keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap |
+// 	SelectorCombinator | SelectorCombinatorType |
+// 	PseudoClass | PseudoElement |
+// 	StringProxy;
+
+
+
+// /** Type for a selector */
+// export type SelectorType = string | SelectorTokenType | SelectorTokenType[];
 
 
 
 /** Type for a single selector token */
 export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
-	keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap |
-	SelectorCombinator | SelectorCombinatorType |
-	PseudoClass | PseudoElement |
-	StringProxy;
+	number | string | StringProxy;
 
 
 
 /** Type for a selector */
-export type SelectorType = string | SelectorTokenType | SelectorTokenType[];
+export type SelectorType = string | IStringProxy;
 
 
 

@@ -1164,7 +1164,6 @@ import {ICustomVar} from "../rules/RuleTypes";
  *     brown = $class({ $custom: [ [this.mainColor, "brown"] ] })
 
  *     // directly define custom CSS property under "blue" class.
- *     mainColor = $custom( "color", "black");
  *     blue = $class({ $custom: [ ["different-color", "color", "blue"] ] })
  * });
  * ```
@@ -1178,31 +1177,20 @@ import {ICustomVar} from "../rules/RuleTypes";
  * ```
  */
 export type CustomVarStyleType<K extends keyof IStyleset = any> = 
-    [ICustomVar<IStyleset[K]>, IStyleset[K]] |
-    [string, K, IStyleset[K]]
+    [ICustomVar<IStyleset[K]>, IStyleset[K]] | [string, K, IStyleset[K]]
 
 
 
 /**
  * Type representing a collection of style properties and their values. In addition to the
  * properties representing the standard CSS styles, this type also includes the $custom property,
- * which is an array of ICustomIVal objects. This can be used as in the following example:
- * 
- * ```typescript
- * let styleset = {
- *     $custom: [
- *         { var: "mainColor", template: "color", varValue: "black" },
- *         { var: MyStyles.varRules.mainBgColor, varValue: "white"),
- *         tsh.custom( MyStyles.varRules.mainSelectionColor, "blue")
- *     ]
- * }
- * ```
+ * which is an array of CustomVarStyleType objects.
  */
 export type Styleset = IStyleset &
     {
         /**
-         * Special property is an array that contains ICustomIVal objects each representing a
-         * definition of a custom CSS property.
+         * Special property is an array that contains CustomVarStyleType objects each representing
+         * a definition of a custom CSS property.
          */
         $custom?: CustomVarStyleType[];
     }

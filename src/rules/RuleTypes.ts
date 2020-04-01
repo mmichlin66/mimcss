@@ -3,10 +3,9 @@
  */
 
 
-import {Styleset, IStyleset, SupportsQuery} from "../styles/StyleTypes";
+import {Styleset, IStyleset} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement} from "../styles/SelectorTypes";
-import {MediaQuery} from "../styles/MediaTypes"
-import {Fontface} from "../styles/FontFaceTypes";
+import {SelectorType} from "../styles/SelectorTypes"
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -47,11 +46,23 @@ export type ExtendedStyleset =
 
 
 /**
+ * The NestedStyleType type represents and object that defines a CSS selector and a style
+ * for this selector. The selector can use the ampersand symbol ('&') to refer to the
+ * parent style selector.
+ */
+export type NestedStyleType = { selector: SelectorType, style: ExtendedStyleset};
+
+
+
+/**
  * The HierarchicalStyleset type extends the ExtendedStyleset type with the properties that allow
  * building a list of nested style definitions:
- * - Properties with pseudo class names (e.g. ":hover") and pseudo element names (e.g. "::after").
+ * - Properties with pseudo class names (e.g. ":hover") or pseudo element names (e.g. "::after").
  *   These properties define a styleset (also hierarchical) that will be assigned to the original
  *   styleset's owner (tag, class or id) followed by the given pseudo class or pseudo element.
+ * - $nested property that contains one or more NestedStyleType objects each of which defining
+ *   a selector and a style corresponding to this selector. Selectors can use the ampersand symbol
+ *   ('&') to refer to the parent style selector.
  * 
  * Use the HierarchicalStyleset in the following ways:
  * 
@@ -62,13 +73,25 @@ export type ExtendedStyleset =
  *         backgroundColor: "white",
  *         ":hover" : {
  *             backgroundColor: "gray"
- *         }
+ *         },
+ *         $nested: { selector: "& > li", style: {
+ *            backgroundColor: "yellow"
+ *         }}
  *     })
  * }
  * ```
+ * 
+ * This will translate to the following CSS (class name is auto-generated):
+ * 
+ * ```css
+ * .m123 { backgroundColor: white; }
+ * .m123:hover { backgroundColor: gray; }
+ * .m123 > li { backgroundColor: yellow; }
+ * ```
  */
 export type HierarchicalStyleset = ExtendedStyleset &
-	{ [K in PseudoClass | PseudoElement]?: HierarchicalStyleset };
+	{ [K in PseudoClass | PseudoElement]?: HierarchicalStyleset } &
+	{ $nested?: NestedStyleType | NestedStyleType[] };
 
 
 

@@ -1,4 +1,4 @@
-import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar, NestedStyleType} from "./RuleTypes";
 import {IStyleset, Styleset} from "../styles/StyleTypes"
 import {SelectorType} from "../styles/SelectorTypes"
 import {Rule} from "./Rule";
@@ -17,15 +17,15 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		super( type);
 
-		this.parents = [];
-		this.important = new Set<string>();
-
 		if (style)
 			this.parseStyleset( style);
 	}
 
 	private parseStyleset( styleset: ExtendedStyleset): void
 	{
+		this.styleset = {};
+		this.parents = [];
+
 		if (styleset instanceof StyleRule)
 		{
 			// styleset is a single IStyleRule object, which we add as our parent
@@ -62,7 +62,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				}
 				else if (propName === "$important")
 				{
-					let importantPropVal = propVal as any as (string | string[]);
+					this.important = new Set<string>();
+					let importantPropVal = propVal as (string | string[]);
 					if (Array.isArray(importantPropVal))
 					{
 						// this is is an array of strings
@@ -80,14 +81,30 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					if (!this.nestedRules)
 						this.nestedRules = [];
 
-					this.nestedRules.push( new NestedRule( propName, this, propVal as ExtendedStyleset));
+					this.nestedRules.push( new NestedRule( "&" + propName, this, propVal as ExtendedStyleset));
+				}
+				else if (propName === "$nested")
+				{
+					if (!this.nestedRules)
+						this.nestedRules = [];
+
+					if (Array.isArray(propVal))
+					{
+						for( let item of propVal)
+						{
+							let nestedStyle = item as NestedStyleType;
+							this.nestedRules.push( new NestedRule( nestedStyle.selector, this, nestedStyle.style));
+						}
+					}
+					else
+					{
+						let nestedStyle = propVal as NestedStyleType;
+						this.nestedRules.push( new NestedRule( nestedStyle.selector, this, nestedStyle.style));
+					}
 				}
 				else
 				{
 					// copy the property value to our internal styleset
-					if (!this.styleset)
-						this.styleset = {};
-
 					this.styleset[propName] = propVal;
 				}
 			}
@@ -103,7 +120,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 		// if we have parents, we need to first copy their stylesets, so that our styleset can
 		// override their values.
-		if (this.parents.length > 0)
+		if (this.parents && this.parents.length > 0)
 		{
 			let tempStyleset = this.styleset;
 			this.styleset = {};
@@ -112,22 +129,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			for( let parent of this.parents)
 			{
 				if (parent.styleset)
-				{
-					if (!this.styleset)
-						this.styleset = {};
-
 					Object.assign( this.styleset, parent.styleset);
-				}
 			}
 
 			// copy our styles over those of the parents
 			if (tempStyleset)
-			{
-				if (!this.styleset)
-					this.styleset = {};
-
 				Object.assign( this.styleset, tempStyleset);
-			}
 		}
 
 		// if nested rules exist, process them under the same container
@@ -276,7 +283,9 @@ export class NestedRule extends StyleRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return this.parentRule.getSelectorString() + selectorToCssString( this.selector);
+		// get selector string and replace all occurrences of the ampersand symbol with the
+		// selector string of the parent rule.
+		return selectorToCssString( this.selector).replace( "&", this.parentRule.getSelectorString());
 	}
 
 

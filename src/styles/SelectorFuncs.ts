@@ -1,7 +1,82 @@
-﻿import {SelectorType, SelectorTokenType, AttrSelectorOperation, AttrSelectorOperationType} from "./SelectorTypes"
-import {StringProxyBase, StringProxy} from "./UtilFuncs";
+﻿import {SelectorTokenType, SelectorType} from "./SelectorTypes"
+import {IStringProxy} from "./UtilTypes";
+import {StringProxyBase} from "./UtilFuncs";
 import {RuleType, ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
 import {Rule} from "../rules/Rule"
+
+
+
+/**
+ * The SelectorProxy class implements the IStringProxy interface by encapsulating a selector
+ * template string with optional placeholders (e.g. {0}), which will be replaced by names
+ * of tags, classes and IDs and other possible types.
+ */
+class SelectorProxy extends StringProxyBase
+{
+    constructor( template: string, params: SelectorTokenType[])
+    {
+        super();
+        this.template = template;
+        this.params = params;
+    }
+
+    public valueToCssString(): string
+    {
+		let tokens: string[] = this.template.split( /{(\d+)}/g);
+		let tokenIsNumber = false;
+		let arr: string[] = [];
+		for (let token of tokens)
+		{
+			if (tokenIsNumber)
+			{
+				let index = parseInt( token, 10);
+				if (index >= this.params.length)
+					continue;
+
+				let item = this.params[index];
+				if (item == null)
+					continue;
+				else if (typeof item === "string")
+					arr.push( item);
+				else if (item instanceof Rule)
+				{
+					if (item.ruleType === RuleType.TAG)
+						arr.push( (item as ITagRule).tag);
+					else if (item.ruleType === RuleType.CLASS)
+						arr.push( (item as IClassRule).cssName);
+					else if (item.ruleType === RuleType.ID)
+						arr.push( (item as IIDRule).cssName);
+				}
+				else 
+					arr.push( item.toString());
+			}
+			else if (token)
+				arr.push( token);
+	
+			tokenIsNumber = !tokenIsNumber;
+		}
+	
+		return arr.join( "");
+    }
+
+    // Name of the mathematical function.
+    private template: string;
+
+    // Array of Number_StyleType parameters to the mathematical function.
+    private params: SelectorTokenType[];
+}
+
+
+
+/**
+ * Returns a string representation of a selector using the given template string with optional
+ * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
+ * possible types.
+ */
+export function sh( template: string, ...args: SelectorTokenType[]): string | IStringProxy
+{
+	return !template ? "" : args.length === 0 ? template : new SelectorProxy( template, args);
+}
 
 
 
@@ -14,85 +89,8 @@ export function selectorToCssString( selector: SelectorType): string
 		return "";
 	else if (typeof selector === "string")
 		return selector;
-	else if (selector instanceof Rule)
-	{
-		if (selector.ruleType === RuleType.TAG)
-			return (selector as ITagRule).tag;
-		else if (selector.ruleType === RuleType.CLASS)
-			return (selector as IClassRule).cssName;
-		else if (selector.ruleType === RuleType.ID)
-			return (selector as IIDRule).cssName;
-	}
-	else if (Array.isArray( selector))
-	{
-		return selector.map( (token: SelectorTokenType) =>
-			{
-				if (token instanceof Rule)
-				{
-					if (token.ruleType === RuleType.TAG)
-						return (token as ITagRule).tag;
-					else if (token.ruleType === RuleType.CLASS)
-						return (token as IClassRule).cssName;
-					else if (token.ruleType === RuleType.ID)
-						return (token as IIDRule).cssName;
-				}
-				else if (token instanceof StringProxyBase)
-					return token.toString();
-				else
-					return token;
-			}
-		).join("");
-	}
 	else
 		return selector.toString();
-}
-
-
-
-/** Returns the "nth" notation */
-export function nth( a: number | "odd" | "even", b?: number): string
-{
-	return b == null ? a.toString() : `${a}n${b >= 0 ? `+${b}` : `-${-b}`}`;
-}
-
-
-
-/** Returns the attribute selector token */
-export function attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType,
-				value?: string, caseInsensitive?: boolean, caseSensitive?: boolean): string
-{
-	let opAndVal = op ? `${op}"${value}"` : "";
-	let caseSign = caseInsensitive ? " i" : caseSensitive ? " s" : "";
-	return `[${attrName}${opAndVal}${caseSign}]`;
-}
-
-
-
-/**
- * Helper class for creating elements of a selector (selector tokens).
- */
-export abstract class sh
-{
-	public static raw( raw?: string) { return new StringProxy( raw); }
-	public static all( ns?: string) { return ns == null ? "*" : `${ns}|*`; }
-	public static attr( attrName: string, op?: AttrSelectorOperation | AttrSelectorOperationType,
-					value?: string, caseInsensitive?: boolean, caseSensitive?: boolean)
-		{ return new StringProxy( attr( attrName, op, value, caseInsensitive, caseSensitive)); }
-	public static rtl() { return new StringProxy( ":dir(rtl)"); }
-	public static ltr() { return new StringProxy( ":dir(ltr)"); }
-	public static has( s: string) { return new StringProxy( `:has(${s})`); }
-	public static host( s: string) { return new StringProxy( `:host(${s})`); }
-	public static hostContext( s: string) { return new StringProxy( `:host-context(${s})`); }
-	public static is( s: string) { return new StringProxy( `:is(${s})`); }
-	public static lang( s: string) { return new StringProxy( `:lang(${s})`); }
-	public static not( s: string) { return new StringProxy( `:not(${s})`); }
-	public static nthChild( a: number | "odd" | "even", b?: number) { return new StringProxy( `:nth-child(${nth( a, b)})`); }
-	public static nthLastChild( a: number | "odd" | "even", b?: number) { return new StringProxy( `:nth-last-child(${nth( a, b)})`); }
-	public static nthLastOfType( a: number | "odd" | "even", b?: number) { return new StringProxy( `:nth-last-of-type(${nth( a, b)})`); }
-	public static nthOfType( a: number | "odd" | "even", b?: number) { return new StringProxy( `:nth-of-type(${nth( a, b)})`); }
-	public static where( s: string) { return new StringProxy( `:where(${s})`); }
-	public static part( s: string) { return new StringProxy( `::part(${s})`); }
-	public static slotted( s: string) { return new StringProxy( `::slotted(${s})`); }
 }
 
 
