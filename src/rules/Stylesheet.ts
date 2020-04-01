@@ -7,7 +7,7 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The Stylesheet class represents a parsed form of a IStylesheetDefinition-derived class.
  */
-export class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStylesheet<T>, IRuleContainerOwner
+class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStylesheet<T>, IRuleContainerOwner
 {
 	public constructor( definitionClass: IStylesheetDefinitionClass<T>)
 	{
@@ -175,21 +175,6 @@ let nextUniqueID: number = 1;
 
 
 /**
- * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
- * will be created by appending a unique number to the given prefix. If the prefix is not
- * specified, the standard prefix "n" will be used.
- * @param optimize
- * @param prefix
- */
-export function useOptimizedStyleNames( optimize: boolean, prefix?: string): void
-{
-	useUniqueStyleNames = optimize;
-	uniqueStyleNamesPrefix = prefix ? prefix : "n";
-}
-
-
-
-/**
  * Generates name to use for the given rule from the given style sheet.
  * @param sheetName 
  * @param ruleName 
@@ -210,6 +195,91 @@ function generateName( sheetName: string, ruleName: string): string
 function generateUniqueName( prefix?: string): string
 {
 	return (prefix ? prefix : uniqueStyleNamesPrefix) + nextUniqueID++;
+}
+
+
+
+/**
+ * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
+ * will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix "n" will be used.
+ * @param optimize
+ * @param prefix
+ */
+export function useOptimizedStyleNames( optimize: boolean, prefix?: string): void
+{
+	useUniqueStyleNames = optimize;
+	uniqueStyleNamesPrefix = prefix ? prefix : "n";
+}
+
+
+
+/**
+ * Processes the given stylesheet definition and returns the Stylesheet object that contains
+ * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
+ * definition class there is a single stylesheet object, no matter how many times this function
+ * is invoked.
+ */
+export function $use<T = IRuleDefinition>( stylesheetDefinitionClass: IStylesheetDefinitionClass<T>): IStylesheet<T>
+{
+	// if the stylesheet definition is multiplex, create new Stylesheet object every time;
+	// otherwise, check whether the style sheet definition object has already been processed. This
+	// is indicated by the existence of the instance static property on the class.
+	if (stylesheetDefinitionClass.isMultiplex)
+		return new Stylesheet( stylesheetDefinitionClass);
+	else
+	{
+		// we don't want the class stylesheet property to be exposed on the publicly available
+		// interface; therefore, we access it via "as any".
+		let stylesheet = (stylesheetDefinitionClass as any).stylesheet as Stylesheet<T>;
+		if (!stylesheet)
+		{
+			stylesheet = new Stylesheet( stylesheetDefinitionClass);
+			(stylesheetDefinitionClass as any).stylesheet = stylesheet;
+		}
+
+		return stylesheet;
+	}
+}
+
+
+
+/**
+ * Activates the given stylesheet and inserts all its rules into DOM. If the input object is not
+ * a stylesheet but a style definition class, obtain stylesheet by calling the $use function.
+ * Note that each stylesheet object maintains a reference counter of how many times it was
+ * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
+ * up to 1.
+ */
+export function $activate<T = IRuleDefinition>( stylesheetOrDefinition: IStylesheet<T> | IStylesheetDefinitionClass<T>): IStylesheet<T>
+{
+	if (!stylesheetOrDefinition)
+		return null;
+
+	if (stylesheetOrDefinition instanceof Stylesheet)
+	{
+		stylesheetOrDefinition.activate();
+		return stylesheetOrDefinition;
+	}
+	else
+	{
+		let stylesheet = $use( stylesheetOrDefinition as IStylesheetDefinitionClass<T>);
+		(stylesheet as Stylesheet<T>).activate();
+		return stylesheet;
+	}
+}
+
+
+
+/**
+ * Deactivates the given stylesheet by removing its rules from DOM. Note that each stylesheet
+ * object maintains a reference counter of how many times it was activated and deactivated. The
+ * rules are removed from DOM only when this reference counter goes down to 0.
+ */
+export function $deactivate( stylesheet: IStylesheet): void
+{
+	if (stylesheet)
+		(stylesheet as Stylesheet).deactivate();
 }
 
 
