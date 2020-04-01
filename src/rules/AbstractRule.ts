@@ -33,7 +33,7 @@ export class AbstractRule extends StyleRule implements IAbstractRule
 	}
 
 	// Returns the selector part of the style rule.
-	protected geSelectorString(): string
+	public getSelectorString(): string
 	{
 		return null;
 	}

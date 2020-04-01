@@ -43,9 +43,10 @@
 		"lib/styles/MediaTypes.d.ts",
 		"lib/styles/FontFaceTypes.d.ts",
 		"lib/styles/SelectorTypes.d.ts",
-		"lib/styles/SelectorFuncss.d.ts",
+		"lib/styles/SelectorFuncs.d.ts",
 		"lib/styles/tsh.d.ts",
 		"lib/rules/RuleTypes.d.ts",
+		"lib/rules/RuleFuncs.d.ts",
 		"lib/rules/Stylesheet.d.ts"
 	]
 }

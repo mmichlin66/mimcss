@@ -47,7 +47,7 @@ export class ClassRule extends StyleRule implements IClassRule
 
 
 	// Returns the selector part of the style rule.
-	protected geSelectorString(): string
+	public getSelectorString(): string
 	{
 		return this.cssName;
 	}

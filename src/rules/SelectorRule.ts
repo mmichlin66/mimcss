@@ -31,7 +31,7 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 
 
 	// Returns the selector part of the style rule.
-	protected geSelectorString(): string
+	public getSelectorString(): string
 	{
 		return selectorToCssString( this.selector);
 	}

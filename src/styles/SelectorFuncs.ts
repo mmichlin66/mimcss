@@ -1,8 +1,7 @@
 ﻿import {SelectorType, SelectorTokenType, AttrSelectorOperation, AttrSelectorOperationType} from "./SelectorTypes"
-import {TagRule} from "../rules/TagRule"
-import {ClassRule} from "../rules/ClassRule"
-import {IDRule} from "../rules/IDRule"
 import {StringProxyBase, StringProxy} from "./UtilFuncs";
+import {RuleType, ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
+import {Rule} from "../rules/Rule"
 
 
 
@@ -15,22 +14,28 @@ export function selectorToCssString( selector: SelectorType): string
 		return "";
 	else if (typeof selector === "string")
 		return selector;
-	else if (selector instanceof TagRule)
-		return selector.tagName;
-	else if (selector instanceof ClassRule)
-		return "." + selector.name;
-	else if (selector instanceof IDRule)
-		return "#" + selector.name;
+	else if (selector instanceof Rule)
+	{
+		if (selector.ruleType === RuleType.TAG)
+			return (selector as ITagRule).tag;
+		else if (selector.ruleType === RuleType.CLASS)
+			return (selector as IClassRule).cssName;
+		else if (selector.ruleType === RuleType.ID)
+			return (selector as IIDRule).cssName;
+	}
 	else if (Array.isArray( selector))
 	{
 		return selector.map( (token: SelectorTokenType) =>
 			{
-				if (token instanceof TagRule)
-					return token.tagName;
-				else if (token instanceof ClassRule)
-					return "." + token.name;
-				else if (token instanceof IDRule)
-					return "#" + token.name;
+				if (token instanceof Rule)
+				{
+					if (token.ruleType === RuleType.TAG)
+						return (token as ITagRule).tag;
+					else if (token.ruleType === RuleType.CLASS)
+						return (token as IClassRule).cssName;
+					else if (token.ruleType === RuleType.ID)
+						return (token as IIDRule).cssName;
+				}
 				else if (token instanceof StringProxyBase)
 					return token.toString();
 				else

@@ -1,6 +1,5 @@
 import {ITagRule, ExtendedStyleset, RuleType} from "./RuleTypes"
 import {StyleRule} from "./StyleRule";
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -9,10 +8,10 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( tagName?: string, style?: ExtendedStyleset)
+	public constructor( tag?: string, style?: ExtendedStyleset)
 	{
 		super( RuleType.TAG, style);
-		this.tagName = tagName;
+		this.tag = tag;
 	}
 
 
@@ -22,25 +21,22 @@ export class TagRule extends StyleRule implements ITagRule
 	{
 		let newRule = new TagRule();
 		newRule.copyFrom( this);
-		newRule.tagName = this.tagName;
+		newRule.tag = this.tag;
 		return newRule;
 	}
 
 
 
 	// Returns the selector part of the style rule.
-	protected geSelectorString(): string
+	public getSelectorString(): string
 	{
-		return this.tagName;
+		return this.tag;
 	}
 
 
 
 	/** Name of the HTML tag */
-	public get tag(): string { return this.tagName; }
-
-	// Name of the tag to which the styleset applies.
-	public tagName: string;
+	public tag: string;
 }
 
 

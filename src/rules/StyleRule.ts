@@ -1,8 +1,10 @@
-import {IStyleRule, ExtendedStyleset, HierarchicalStyleset, RuleType, ICustomVar} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar} from "./RuleTypes";
 import {IStyleset, Styleset} from "../styles/StyleTypes"
-import {stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
+import {SelectorType} from "../styles/SelectorTypes"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
+import {selectorToCssString} from "../styles/SelectorFuncs";
 
 
 
@@ -15,7 +17,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		super( type);
 
-		this.styleset = {};
 		this.parents = [];
 		this.important = new Set<string>();
 
@@ -74,9 +75,19 @@ export abstract class StyleRule extends Rule implements IStyleRule
 						this.important.add( importantPropVal);
 					}
 				}
+				else if (propName.startsWith(":"))
+				{
+					if (!this.nestedRules)
+						this.nestedRules = [];
+
+					this.nestedRules.push( new NestedRule( propName, this, propVal as ExtendedStyleset));
+				}
 				else
 				{
 					// copy the property value to our internal styleset
+					if (!this.styleset)
+						this.styleset = {};
+
 					this.styleset[propName] = propVal;
 				}
 			}
@@ -99,21 +110,54 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 			// go through all parents and copy their style properties to our own styleset.
 			for( let parent of this.parents)
-				Object.assign( this.styleset, parent.styleset);
+			{
+				if (parent.styleset)
+				{
+					if (!this.styleset)
+						this.styleset = {};
+
+					Object.assign( this.styleset, parent.styleset);
+				}
+			}
 
 			// copy our styles over those of the parents
-			Object.assign( this.styleset, tempStyleset);
+			if (tempStyleset)
+			{
+				if (!this.styleset)
+					this.styleset = {};
+
+				Object.assign( this.styleset, tempStyleset);
+			}
+		}
+
+		// if nested rules exist, process them under the same container
+		if (this.nestedRules)
+		{
+			for( let nestedRule of this.nestedRules)
+				nestedRule.process( container, owner, null);
 		}
 	}
 
 
 
 	// Copies internal data from another rule object.
-	protected copyFrom( src: StyleRule): void
+	public copyFrom( src: StyleRule): void
 	{
 		this.styleset = src.styleset;
 		this.parents = src.parents;
 		this.important = src.important;
+
+		// if nested rules exist, clone them
+		if (src.nestedRules)
+		{
+			this.nestedRules = [];
+			for( let srcNestedRule of src.nestedRules)
+			{
+				let newNestedRule = srcNestedRule.clone();
+				newNestedRule.parentRule = this;
+				this.nestedRules.push( newNestedRule);
+			}
+		}
 	}
 
 
@@ -121,7 +165,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Converts the rule to CSS string representing the rule.
 	public toCssString(): string
 	{
-		return `${this.geSelectorString()} ${stylesetToCssString( this.styleset, this.important)}`;
+		return this.styleset
+			? `${this.getSelectorString()} ${stylesetToCssString( this.styleset, this.important)}`
+			: null;
 	}
 
 
@@ -129,14 +175,24 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let index = parent.insertRule( this.toCssString(), parent.cssRules.length);
-		this.cssRule = parent.cssRules[index];
+		if (this.styleset)
+		{
+			let index = parent.insertRule( this.toCssString(), parent.cssRules.length);
+			this.cssRule = parent.cssRules[index];
+		}
+
+		// if nested rules exist, insert them under the same parent
+		if (this.nestedRules)
+		{
+			for( let nestedRule of this.nestedRules)
+				nestedRule.insert( parent);
+		}
 	}
 
 
 
 	// Returns the selector part of the style rule.
-	protected abstract geSelectorString(): string;
+	public abstract getSelectorString(): string;
 
 
 
@@ -186,8 +242,50 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Resultant Styleset object defining properties to be inserted into DOM.
 	private styleset: Styleset;
 
-	// // Styleset objects mapped to selectors for nested styles (e.g. .my-class:hover).
-	// private nestedStylesets: Map<string,Styleset>;
+	// List of nested styles.
+	private nestedRules: NestedRule[];
+}
+
+
+
+/**
+ * The NestedRule class describes a styleset that is nested within another style rule.
+ */
+export class NestedRule extends StyleRule
+{
+	public constructor( selector?: SelectorType, parentRule?: StyleRule, style?: ExtendedStyleset)
+	{
+		super( RuleType.NESTED, style);
+		this.selector = selector;
+		this.parentRule = parentRule;
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): NestedRule
+	{
+		let newRule = new NestedRule();
+		newRule.copyFrom( this);
+		newRule.selector = this.selector;
+		return newRule;
+	}
+
+
+
+	// Returns the selector part of the style rule.
+	public getSelectorString(): string
+	{
+		return this.parentRule.getSelectorString() + selectorToCssString( this.selector);
+	}
+
+
+
+	// Partial selector that should be appended to the parent selector.
+	private selector: SelectorType;
+
+	// Parent style within which this rule is nested.
+	public parentRule: StyleRule;
 }
 
 

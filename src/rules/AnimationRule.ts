@@ -134,7 +134,7 @@ class KeyframeRule extends StyleRule
 
 
 	// Returns the selector part of the style rule.
-	protected geSelectorString(): string
+	public getSelectorString(): string
 	{
 		return this.waypointString;
 	}
