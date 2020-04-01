@@ -10,4 +10,5 @@ export * from "./styles/tsh";
 export * from "./rules/RuleTypes";
 
 export {Num, Len, Angle, Time, Resolution, Frequency, Percent} from "./styles/UtilFuncs";
+export {sh} from "./styles/SelectorFuncs";
 export {useOptimizedStyleNames, $use, $activate, $deactivate} from "./rules/Stylesheet";

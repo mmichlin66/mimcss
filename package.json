@@ -37,14 +37,15 @@
 		"lib/mimcssTypes.d.ts",
 		
 		"lib/styles/UtilTypes.d.ts",
+		"lib/styles/UtilFuncs.d.ts",
 		"lib/styles/ColorTypes.d.ts",
 		"lib/styles/StyleTypes.d.ts",
 		"lib/styles/MediaTypes.d.ts",
 		"lib/styles/FontFaceTypes.d.ts",
 		"lib/styles/SelectorTypes.d.ts",
+		"lib/styles/SelectorFuncss.d.ts",
 		"lib/styles/tsh.d.ts",
 		"lib/rules/RuleTypes.d.ts",
-		"lib/styles/UtilFuncs.d.ts",
 		"lib/rules/Stylesheet.d.ts"
 	]
 }

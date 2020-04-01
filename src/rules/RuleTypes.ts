@@ -3,7 +3,8 @@
  */
 
 
-import {Styleset, IStyleset, PseudoClass, PseudoElement, SupportsQuery} from "../styles/StyleTypes";
+import {Styleset, IStyleset, SupportsQuery} from "../styles/StyleTypes";
+import {PseudoClass, PseudoElement} from "../styles/SelectorTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
 
@@ -436,7 +437,7 @@ export function $abstract( style: ExtendedStyleset): IAbstractRule
 	{ return new AbstractRule( style); }
 
 /** Creates new TagRule object  */
-export function $tag( tagName: string, style: ExtendedStyleset): ITagRule
+export function $tag( tagName: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap, style: ExtendedStyleset): ITagRule
 	{ return new TagRule( tagName, style); }
 
 /** Returns new ClassRule object  */

@@ -1,8 +1,7 @@
 import {ISelectorRule, ExtendedStyleset, RuleType} from "./RuleTypes"
 import {StyleRule} from "./StyleRule"
 import {SelectorType} from "../styles/SelectorTypes";
-import {Selector} from "../styles/SelectorFuncs";
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {selectorToCssString} from "../styles/SelectorFuncs";
 
 
 
@@ -15,7 +14,7 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	{
 		super( RuleType.SELECTOR, style);
 
-		this.selector = new Selector( selector);
+		this.selector = selector;
 	}
 
 
@@ -34,16 +33,16 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	// Returns the selector part of the style rule.
 	protected geSelectorString(): string
 	{
-		return this.selector.toCssString();
+		return selectorToCssString( this.selector);
 	}
 
 
 
 	/** CSS rule selector string */
-	public get selectorText(): string { return this.selector.toCssString(); }
+	public get selectorText(): string { return selectorToCssString( this.selector); }
 
 	// selector object for this rule.
-	public selector: Selector;
+	public selector: SelectorType;
 }
 
 
