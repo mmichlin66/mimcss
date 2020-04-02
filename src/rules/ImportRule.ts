@@ -8,7 +8,7 @@ import {supportsQueryToCssString} from "../styles/StyleFuncs";
 
 
 /**
- * The ImportRule type describes a CSS @import rule.
+ * The ImportRule class describes a CSS @import rule.
  */
 export class ImportRule extends Rule implements IImportRule
 {

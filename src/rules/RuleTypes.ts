@@ -254,9 +254,11 @@ export interface IAnimationRule extends INamedRule
 }
 
 /**
- * The Keyframe type defines a single keyframe within a @keyframes rule.
+ * The AnimationFrame type defines a single keyframe within a @keyframes rule.
+ * The waypoint can be specified as "from" or "to" strings or as a number 0 to 100, which will be
+ * used as a percent.
  */
-export type Keyframe = ["from" | "to" | number, ExtendedStyleset];
+export type AnimationFrame = ["from" | "to" | number, ExtendedStyleset];
 
 
 

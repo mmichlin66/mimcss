@@ -4,10 +4,7 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 /**
- * The GroupRule class represents a parsed form of a StyleSheetDefinition-derived class. This
- * class doesn't have a template parameter, but it conforms to the IStyleSheet<T> interface,
- * which provides names of classes, IDs and keyframes defined in the class T, which must be
- * derived from the StyleSheetDefinition class.
+ * The GroupRule class serves as a base class for all grouping CSS rules.
  */
 export abstract class GroupRule<T = any> extends RuleContainer<T> implements IGroupRule<T>
 {

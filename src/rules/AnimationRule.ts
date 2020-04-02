@@ -1,4 +1,4 @@
-import {IAnimationRule, Keyframe, RuleType, INamedRule} from "./RuleTypes"
+import {IAnimationRule, AnimationFrame, RuleType, INamedRule} from "./RuleTypes"
 import {Percent} from "../styles/UtilFuncs"
 import {Rule} from "./Rule"
 import {StyleRule} from "./StyleRule";
@@ -7,16 +7,16 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 /**
- * The TagRule type describes a styleset that applies to elements identified by a tag name.
+ * The AnimationRule class describes a @keyframes CSS rule.
  */
 export class AnimationRule extends Rule implements IAnimationRule
 {
-	public constructor( keyframes?: Keyframe[], nameOverride?: string | INamedRule)
+	public constructor( keyframes?: AnimationFrame[], nameOverride?: string | INamedRule)
 	{
 		super( RuleType.ANIMATION);
 
 		if (keyframes)
-			this.keyframeRules = keyframes.map( (keyframe) => new KeyframeRule( keyframe));
+			this.keyframeRules = keyframes.map( (keyframe) => new AnimationFrameRule( keyframe));
 
 		this.nameOverride = nameOverride;
 	}
@@ -80,7 +80,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 	public get cssKeyframesRule(): CSSKeyframesRule { return this.cssRule as CSSKeyframesRule; }
 
 	/** Only needed to distinguish from class and ID rules */
-	public keyframeRules: KeyframeRule[];
+	public keyframeRules: AnimationFrameRule[];
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -104,11 +104,11 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 /**
- * The KeyframeRule class represents a single keyframe clause in the animation rule.
+ * The AnimationFrameRule class represents a single keyframe clause in the animation rule.
  */
-class KeyframeRule extends StyleRule
+class AnimationFrameRule extends StyleRule
 {
-	public constructor( keyframe?: Keyframe)
+	public constructor( keyframe?: AnimationFrame)
 	{
 		super( RuleType.KEYFRAME, keyframe ? keyframe[1] : undefined);
 
@@ -132,9 +132,9 @@ class KeyframeRule extends StyleRule
 
 
 	// Creates a copy of the rule.
-	public clone(): KeyframeRule
+	public clone(): AnimationFrameRule
 	{
-		let newRule = new KeyframeRule();
+		let newRule = new AnimationFrameRule();
 		newRule.copyFrom( this);
 		newRule.waypointString = this.waypointString;
 		return newRule;

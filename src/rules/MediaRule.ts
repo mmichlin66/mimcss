@@ -7,7 +7,7 @@ import {mediaQueryToCssString} from "../styles/MediaFuncs";
 
 
 /**
- * The MediaRule type describes a CSS @media rule.
+ * The MediaRule class describes a CSS @media rule.
  */
 export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 {

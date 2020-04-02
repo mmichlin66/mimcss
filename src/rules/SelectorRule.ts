@@ -6,7 +6,7 @@ import {selectorToCssString} from "../styles/SelectorFuncs";
 
 
 /**
- * The SelectorRule type describes a styleset that applies to elements identified by a class.
+ * The SelectorRule type describes a styleset that applies to elements identified by a CSS selector.
  */
 export class SelectorRule extends StyleRule implements ISelectorRule
 {

@@ -5,7 +5,7 @@
 
 import {
 	ExtendedStyleset, IAbstractRule, INamedRule, ITagRule, IClassRule, IIDRule, ISelectorRule,
-	IAnimationRule, Keyframe, ICustomVar, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
+	IAnimationRule, AnimationFrame, ICustomVar, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
 } from "./RuleTypes";
 import {IStyleset, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
@@ -48,7 +48,7 @@ export function $style( selector: SelectorType, style: ExtendedStyleset): ISelec
 	{ return new SelectorRule( selector, style); }
 
 /** Returns new AnimationRule object  */
-export function $animation( keyframes: Keyframe[], nameOverride?: string | INamedRule): IAnimationRule
+export function $animation( keyframes: AnimationFrame[], nameOverride?: string | INamedRule): IAnimationRule
 	{ return new AnimationRule( keyframes, nameOverride); }
 
 /** Returns new CustomVar object that defines a custom CSS property */

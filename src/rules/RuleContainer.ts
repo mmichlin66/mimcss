@@ -26,7 +26,9 @@ export interface IRuleContainerOwner
 
 
 /**
- * The RuleContainer class represents a parsed form of a rule definition class.
+ * The RuleContainer class is a base for classes that contain CSS rules; that is, stylesheet and
+ * grouping rules. The RuleContainer class implements parsing form of a rule definition class or
+ * object.
  */
 export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements IRuleContainer<T>
 {

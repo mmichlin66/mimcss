@@ -5,7 +5,7 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 /**
- * The IDRule type describes a styleset that applies to elements identified by an ID.
+ * The IDRule class describes a styleset that applies to elements identified by an ID.
  */
 export class IDRule extends StyleRule implements IIDRule
 {

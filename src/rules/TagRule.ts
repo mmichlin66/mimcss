@@ -4,7 +4,7 @@ import {StyleRule} from "./StyleRule";
 
 
 /**
- * The TagRule type describes a styleset that applies to elements identified by a tag name.
+ * The TagRule class describes a styleset that applies to elements identified by a tag name.
  */
 export class TagRule extends StyleRule implements ITagRule
 {

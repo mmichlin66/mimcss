@@ -9,7 +9,8 @@ import {selectorToCssString} from "../styles/SelectorFuncs";
 
 
 /**
- * The StyleRule class is used as a base class for rules that have a single style rule.
+ * The StyleRule class is used as a base class for rules that contain a style rule. This class
+ * implements the parsing of the ExtendedStyleset object.
  */
 export abstract class StyleRule extends Rule implements IStyleRule
 {

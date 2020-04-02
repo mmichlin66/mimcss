@@ -4,7 +4,7 @@ import {StyleRule} from "./StyleRule";
 
 
 /**
- * The AbstractRule type describes a styleset that can only be used as a base for other style
+ * The AbstractRule class describes a styleset that can only be used as a base for other style
  * rules.
  */
 export class AbstractRule extends StyleRule implements IAbstractRule

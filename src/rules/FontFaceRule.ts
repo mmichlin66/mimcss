@@ -6,7 +6,7 @@ import {Rule} from "./Rule";
 
 
 /**
- * The FontFaceRule class is used as a base class for rules that have a single style rule.
+ * The FontFaceRule class describes a @font-face CSS rule.
  */
 export class FontFaceRule extends Rule implements IFontFaceRule
 {

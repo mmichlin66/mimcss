@@ -5,7 +5,7 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 /**
- * The ClassRule type describes a styleset that applies to elements identified by a class.
+ * The ClassRule class describes a styleset that applies to elements identified by a CSS class.
  */
 export class ClassRule extends StyleRule implements IClassRule
 {

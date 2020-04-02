@@ -7,7 +7,7 @@ import {supportsQueryToCssString} from "../styles/StyleFuncs"
 
 
 /**
- * The SupportRule type describes a CSS @supports rule.
+ * The SupportRule class describes a CSS @supports rule.
  */
 export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule<T>
 {
