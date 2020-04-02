@@ -1,4 +1,5 @@
 import {ISupportsRule, IRuleDefinitionClass, RuleType} from "./RuleTypes"
+import {Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {SupportsQuery} from "../styles/StyleTypes"
 import {supportsQueryToCssString} from "../styles/StyleFuncs"
@@ -37,8 +38,7 @@ export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule
 		if (!CSS.supports( this.queryString))
 			return;
 			
-		let index = parent.insertRule( `@supports ${this.queryString} {}`, parent.cssRules.length);
-		this.cssRule = parent.cssRules[index];
+		this.cssRule = Rule.addRuleToDOM( `@supports ${this.queryString} {}`, parent);
 
 		// insert sub-rules
 		this.insertRules( this.cssSupportsRule);

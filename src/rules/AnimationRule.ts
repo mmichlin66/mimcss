@@ -57,12 +57,21 @@ export class AnimationRule extends Rule implements IAnimationRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let index = parent.insertRule( `@keyframes ${this.name} {}`, parent.cssRules.length);
-		this.cssRule = parent.cssRules[index];
+		this.cssRule = Rule.addRuleToDOM( `@keyframes ${this.name} {}`, parent);
+
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
-		
 		for( let keyframeRule of this.keyframeRules)
-			cssKeyframesRule.appendRule( keyframeRule.toCssString())
+		{
+			let ruleText = keyframeRule.toCssString();
+			try
+			{
+				cssKeyframesRule.appendRule( ruleText)
+			}
+			catch(x)
+			{
+				console.error( `Cannot add CSS rule '${ruleText}'`, x)
+			}
+		}
 	}
 
 

@@ -238,9 +238,8 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		let varNames = Object.keys( this._vars);
 		if (varNames.length > 0)
 		{
-			let s = `:root {${varNames.map( (varName) => this._vars[varName].toCssString()).join(";")}}`;
-			let index = parent.insertRule( s, parent.cssRules.length);
-			this.customVarStyleRule = parent.cssRules[index] as CSSStyleRule;
+			this.customVarStyleRule = Rule.addRuleToDOM( `:root {${varNames.map( (varName) =>
+				this._vars[varName].toCssString()).join(";")}}`, parent) as CSSStyleRule;
 		}
 
 		// insert all other rules

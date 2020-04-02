@@ -33,6 +33,23 @@ export abstract class Rule implements IRule
 
 
 
+	// Inserts the given rule into the given parent rule or stylesheet.
+	public static addRuleToDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule
+	{
+		try
+		{
+			let index = parent.insertRule( ruleText, parent.cssRules.length);
+			return parent.cssRules[index];
+		}
+		catch( x)
+		{
+			console.error( `Cannot add CSS rule '${ruleText}'`, x)
+			return null;
+		}
+	}
+
+
+
 	/** Type of the rule */
 	public readonly ruleType: RuleType;
 

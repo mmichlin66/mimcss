@@ -31,11 +31,7 @@ export class FontFaceRule extends Rule implements IFontFaceRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let index = parent.insertRule(
-			`@font-face ${fontFaceToCssString( this.fontface)}`,
-			parent.cssRules.length);
-
-		this.cssRule = parent.cssRules[index];
+		this.cssRule = Rule.addRuleToDOM( `@font-face ${fontFaceToCssString( this.fontface)}`, parent);
 	}
 
 

@@ -1,4 +1,5 @@
-import {IMediaRule, IRuleDefinitionClass, RuleType} from "./RuleTypes"
+import {IMediaRule, RuleType} from "./RuleTypes"
+import {Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
@@ -34,8 +35,7 @@ export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 	{
 		let queryString = typeof this.query === "string" ? this.query : mediaQueryToCssString( this.query);
 
-		let index = parent.insertRule( `@media ${queryString} {}`, parent.cssRules.length);
-		this.cssRule = parent.cssRules[index];
+		this.cssRule = Rule.addRuleToDOM( `@media ${queryString} {}`, parent);
 
 		// insert sub-rules
 		this.insertRules( this.cssMediaRule);

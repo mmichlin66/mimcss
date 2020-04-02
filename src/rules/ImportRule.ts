@@ -45,13 +45,22 @@ export class ImportRule extends Rule implements IImportRule
 		else
 			url = `url(${this.url})`;
 
-		let supportsQueryString = !this.supportsQuery ? "" : typeof this.supportsQuery === "string" ? this.supportsQuery : supportsQueryToCssString( this.supportsQuery);
-		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
-			supportsQueryString = `supports( ${supportsQueryString} )`;
+		let supportsQueryString = !this.supportsQuery
+			? ""
+			: typeof this.supportsQuery === "string"
+				? this.supportsQuery
+				: supportsQueryToCssString( this.supportsQuery);
 
-		let mediaQueryString = !this.mediaQuery ? "" : typeof this.mediaQuery === "string" ? this.mediaQuery : mediaQueryToCssString( this.mediaQuery);
-		let index = parent.insertRule( `@import ${url} ${supportsQueryString} ${mediaQueryString}`, parent.cssRules.length);
-		this.cssRule = parent.cssRules[index] as CSSImportRule;
+		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
+		supportsQueryString = `supports( ${supportsQueryString} )`;
+
+		let mediaQueryString = !this.mediaQuery
+			? ""
+			: typeof this.mediaQuery === "string"
+				? this.mediaQuery
+				: mediaQueryToCssString( this.mediaQuery);
+				
+		this.cssRule = Rule.addRuleToDOM( `@import ${url} ${supportsQueryString} ${mediaQueryString}`, parent);
 }
 
 

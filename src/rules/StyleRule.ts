@@ -218,10 +218,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
 		if (this.styleset)
-		{
-			let index = parent.insertRule( this.toCssString(), parent.cssRules.length);
-			this.cssRule = parent.cssRules[index];
-		}
+			this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent);
 
 		// if nested rules exist, insert them under the same parent
 		if (this.nestedRules)
