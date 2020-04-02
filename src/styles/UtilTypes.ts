@@ -165,7 +165,7 @@ export interface ICssNumberMath
      * class MyStyles
      * {
      *     wallGap = $custom( "width", 16);
-     *     myClass = $class({ maxWidth: tsh.calc("{0|%} - 2*{1}", 100, this.wallGap)})
+     *     myClass = $class({ maxWidth: tsh.calc("100% - 2*{0}", this.wallGap)})
      * }
      * ```
      * @param formula 

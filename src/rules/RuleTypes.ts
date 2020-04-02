@@ -24,47 +24,25 @@ export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
 
 /**
  * The ExtendedStyleset type extends the Styleset type with certain properties that provide
- * additional meaning to the styleset:
- * - The `$extends` property specifies one or more parent style rules. This allows specifying
+ * additional meaning to the styleset and allow building nested styles:
+ * - The `+` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation.
- * - The `$important` property specifies one or more names of styleset properties that shuld be
+ * - The `!` property specifies one or more names of styleset properties that shuld be
  *   considered "important". When the rule is inserted into DOM, the "!important" attribute is
  *   added to the property value.
- * 
- * An ExtendedStyleset may not include a Styleset at all and only indicate one or more style
- * rule objects, which are treated as parents from which this styleset should inherit all
- * style rules.
- */
-export type ExtendedStyleset =
-	(Styleset &
-		{
-			$extends?: IStyleRule | IStyleRule[],
-			$important?: keyof IStyleset | (keyof IStyleset)[],
-		}
-	) | IStyleRule | IStyleRule[];
-
-
-
-/**
- * The NestedStyleType type represents and object that defines a CSS selector and a style
- * for this selector. The selector can use the ampersand symbol ('&') to refer to the
- * parent style selector.
- */
-export type NestedStyleType = { selector: SelectorType, style: ExtendedStyleset};
-
-
-
-/**
- * The HierarchicalStyleset type extends the ExtendedStyleset type with the properties that allow
- * building a list of nested style definitions:
  * - Properties with pseudo class names (e.g. ":hover") or pseudo element names (e.g. "::after").
- *   These properties define a styleset (also hierarchical) that will be assigned to the original
- *   styleset's owner (tag, class or id) followed by the given pseudo class or pseudo element.
- * - $nested property that contains one or more NestedStyleType objects each of which defining
+ *   These properties define a styleset that will be assigned to the selector obtained by using
+ *   the original styleset's owner followed by the given pseudo class or pseudo element.
+ * - The "&" property that contains one or more NestedStyleType objects each of which defining
  *   a selector and a style corresponding to this selector. Selectors can use the ampersand symbol
  *   ('&') to refer to the parent style selector.
  * 
- * Use the HierarchicalStyleset in the following ways:
+ * An ExtendedStyleset may not include a Styleset at all and only indicate one or more style
+ * rule objects, which are treated as parents from which this styleset should inherit all
+ * style properties.
+ * 
+ * Functions that return style rules (e.g. $class) accept the ExtendedStyleset as a parameter,
+ * for example:
  * 
  * ```typescript
  * class MyStyles
@@ -74,7 +52,7 @@ export type NestedStyleType = { selector: SelectorType, style: ExtendedStyleset}
  *         ":hover" : {
  *             backgroundColor: "gray"
  *         },
- *         $nested: { selector: "& > li", style: {
+ *         "&": { selector: "li > &", style: {
  *            backgroundColor: "yellow"
  *         }}
  *     })
@@ -86,12 +64,27 @@ export type NestedStyleType = { selector: SelectorType, style: ExtendedStyleset}
  * ```css
  * .m123 { backgroundColor: white; }
  * .m123:hover { backgroundColor: gray; }
- * .m123 > li { backgroundColor: yellow; }
+ * li > .m123 { backgroundColor: yellow; }
  * ```
  */
-export type HierarchicalStyleset = ExtendedStyleset &
-	{ [K in PseudoClass | PseudoElement]?: HierarchicalStyleset } &
-	{ $nested?: NestedStyleType | NestedStyleType[] };
+export type ExtendedStyleset = IStyleRule | IStyleRule[] |
+	(Styleset &
+		{
+			"+"?: IStyleRule | IStyleRule[],
+			"!"?: keyof IStyleset | (keyof IStyleset)[],
+			"&"?: NestedStyleType | NestedStyleType[],
+		} &
+		{ [K in PseudoClass | PseudoElement]?: ExtendedStyleset }
+	);
+
+
+
+/**
+ * The NestedStyleType type represents and object that defines a CSS selector and a style
+ * for this selector. The selector can use the ampersand symbol ('&') to refer to the
+ * parent style selector.
+ */
+export type NestedStyleType = { selector: SelectorType, style: ExtendedStyleset};
 
 
 

@@ -1,4 +1,4 @@
-import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar, NestedStyleType, HierarchicalStyleset} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar, NestedStyleType} from "./RuleTypes";
 import {IStyleset, Styleset} from "../styles/StyleTypes"
 import {SelectorType} from "../styles/SelectorTypes"
 import {Rule} from "./Rule";
@@ -57,7 +57,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			for( let propName in inputStyleset)
 			{
 				let propVal = inputStyleset[propName];
-				if (propName === "$extends")
+				if (propName === "+")
 				{
 					let extendsPropVal = propVal as (StyleRule | StyleRule[]);
 					if (extendsPropVal instanceof StyleRule)
@@ -65,7 +65,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					else
 						parents = extendsPropVal;
 				}
-				else if (propName === "$important")
+				else if (propName === "!")
 				{
 					impProps = new Set<string>();
 					let impPropVal = propVal as (string | string[]);
@@ -81,7 +81,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 					nestedRules.push( new NestedRule( this, "&" + propName, propVal as ExtendedStyleset));
 				}
-				else if (propName === "$nested")
+				else if (propName === "&")
 				{
 					if (!nestedRules)
 						nestedRules = [];
@@ -187,7 +187,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public copyFrom( src: StyleRule): void
 	{
 		this.styleset = src.styleset;
-		// this.parents = src.parents;
 		this.impProps = src.impProps;
 
 		// if nested rules exist, clone them
@@ -275,9 +274,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	/** SOM style rule */
 	public get cssStyleRule(): CSSStyleRule { return this.cssRule as CSSStyleRule; }
-
-	// // Style rule defining style properties.
-	// public parents: StyleRule[];
 
 	// Set of property names from this styleset that should be !important.
 	private impProps: Set<string>;

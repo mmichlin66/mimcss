@@ -3,7 +3,10 @@
  */
 
 
-import * as RuleTypes from "./RuleTypes";
+import {
+	ExtendedStyleset, IAbstractRule, INamedRule, ITagRule, IClassRule, IIDRule, ISelectorRule,
+	IAnimationRule, Keyframe, ICustomVar, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
+} from "./RuleTypes";
 import {IStyleset, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
@@ -25,48 +28,48 @@ import {FontFaceRule} from "./FontFaceRule"
 
 
 /** Creates new AbstractRule object  */
-export function $abstract( style: RuleTypes.ExtendedStyleset): RuleTypes.IAbstractRule
+export function $abstract( style: ExtendedStyleset): IAbstractRule
 	{ return new AbstractRule( style); }
 
 /** Creates new TagRule object  */
-export function $tag( tag: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap, style: RuleTypes.HierarchicalStyleset): RuleTypes.ITagRule
+export function $tag( tag: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap, style: ExtendedStyleset): ITagRule
 	{ return new TagRule( tag, style); }
 
 /** Returns new ClassRule object  */
-export function $class( style: RuleTypes.HierarchicalStyleset, nameOverride?: string | RuleTypes.INamedRule): RuleTypes.IClassRule
+export function $class( style: ExtendedStyleset, nameOverride?: string | INamedRule): IClassRule
 	{ return new ClassRule( style, nameOverride); }
 
 /** Returns new IDRule object  */
-export function $id( style: RuleTypes.HierarchicalStyleset, nameOverride?: string | RuleTypes.INamedRule): RuleTypes.IIDRule
+export function $id( style: ExtendedStyleset, nameOverride?: string | INamedRule): IIDRule
 	{ return new IDRule( style, nameOverride); }
 
 /** Creates new SelectorRule object  */
-export function $style( selector: SelectorType, style: RuleTypes.ExtendedStyleset): RuleTypes.ISelectorRule
+export function $style( selector: SelectorType, style: ExtendedStyleset): ISelectorRule
 	{ return new SelectorRule( selector, style); }
 
 /** Returns new AnimationRule object  */
-export function $animation( keyframes: RuleTypes.Keyframe[], nameOverride?: string | RuleTypes.INamedRule): RuleTypes.IAnimationRule
+export function $animation( keyframes: Keyframe[], nameOverride?: string | INamedRule): IAnimationRule
 	{ return new AnimationRule( keyframes, nameOverride); }
 
 /** Returns new CustomVar object that defines a custom CSS property */
 export function $custom<K extends keyof IStyleset>( template: K, propVal: IStyleset[K],
-				nameOverride?: string | RuleTypes.INamedRule): RuleTypes.ICustomVar<IStyleset[K]>
+				nameOverride?: string | INamedRule): ICustomVar<IStyleset[K]>
 	{ return new CustomVar( template, propVal, nameOverride); }
 
 /** Returns new SupportsRule object  */
-export function $supports<T>( query: SupportsQuery, definition: T): RuleTypes.ISupportsRule<T>
+export function $supports<T>( query: SupportsQuery, definition: T): ISupportsRule<T>
 	{ return new SupportsRule( query, definition); }
 
 /** Returns new MediaRule object  */
-export function $media<T>( query: string | MediaQuery, definition: T): RuleTypes.IMediaRule<T>
+export function $media<T>( query: string | MediaQuery, definition: T): IMediaRule<T>
 	{ return new MediaRule( query, definition); }
 
 /** Returns new ImportRule object  */
-export function $import( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery): RuleTypes.IImportRule
+export function $import( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery): IImportRule
 	{ return new ImportRule( url, mediaQuery, supportsQuery); }
 
 /** Returns new FonFaceRule object  */
-export function $fontface( fontface: Fontface): RuleTypes.IFontFaceRule
+export function $fontface( fontface: Fontface): IFontFaceRule
 	{ return new FontFaceRule( fontface); }
 
 

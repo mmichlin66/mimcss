@@ -1134,7 +1134,7 @@ import {ICustomVar} from "../rules/RuleTypes";
 /**
  * The CustomVarStyleType type represents a custom CSS property name and value that are used to
  * define custom properties in a Styleset. This object is used in conjunction with the
- * `$custom` property of the Styleset type.
+ * `--` property of the Styleset type.
  * 
  * CustomVarStyleType objects should be mostly used to override custom properties that have
  * previously been defined at the top-level using the $custom function. That way you can have a
@@ -1164,7 +1164,7 @@ import {ICustomVar} from "../rules/RuleTypes";
  *     brown = $class({ $custom: [ [this.mainColor, "brown"] ] })
 
  *     // directly define custom CSS property under "blue" class.
- *     blue = $class({ $custom: [ ["different-color", "color", "blue"] ] })
+ *     blue = $class({ "--": [ ["different-color", "color", "blue"] ] })
  * });
  * ```
  * 
@@ -1183,7 +1183,7 @@ export type CustomVarStyleType<K extends keyof IStyleset = any> =
 
 /**
  * Type representing a collection of style properties and their values. In addition to the
- * properties representing the standard CSS styles, this type also includes the $custom property,
+ * properties representing the standard CSS styles, this type also includes the "--" property,
  * which is an array of CustomVarStyleType objects.
  */
 export type Styleset = IStyleset &
@@ -1192,7 +1192,7 @@ export type Styleset = IStyleset &
          * Special property is an array that contains CustomVarStyleType objects each representing
          * a definition of a custom CSS property.
          */
-        $custom?: CustomVarStyleType[];
+        "--"?: CustomVarStyleType[];
     }
 
 

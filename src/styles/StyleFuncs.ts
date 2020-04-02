@@ -395,14 +395,14 @@ type StylePropertyInfo<T> = PropToStringFunc<T> | keyof StyleTypes.Styleset;
 
 
 /** Converts the given styleset to its string representation */
-export function stylesetToCssString( styleset: StyleTypes.Styleset, important?: Set<string>): string
+export function stylesetToCssString( styleset: StyleTypes.Styleset, impProps?: Set<string>): string
 {
     let buf: string[] = [];
 	for( let propName in styleset)
 	{
-        if (propName === "$custom")
+        if (propName === "--")
         {
-            // special handling of the "$custom" property, which is an array where each item is
+            // special handling of the "--" property, which is an array where each item is
             // a two-item or three-item array
             let propVal = styleset[propName] as StyleTypes.CustomVarStyleType[];
             for( let customVal of propVal)
@@ -417,7 +417,7 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset, important?: 
         {
             // get the string representation of the property
             buf.push( stylePropToCssString( propName, styleset[propName]) +
-                    (important && important.has( propName) ? " !important" : ""));
+                    (impProps && impProps.has( propName) ? " !important" : ""));
         }
 	}
 
