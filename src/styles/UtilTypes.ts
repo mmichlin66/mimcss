@@ -23,7 +23,7 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | null |
  * can use custom CSS property in the form `var(--propname)`. However, if we add string type
  * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
  * Intellisense and it doesn't prompt developers for the possible values. The IStringProxy
- * can be used instead of string (e.g. `"row" | "column" | StringProxy`) and this solves
+ * can be used instead of string (e.g. `"row" | "column" | IStringProxy`) and this solves
  * the Intellisense issue.
  * 
  * Another benefit of using objects implementing the IStringProxy interface is that they are

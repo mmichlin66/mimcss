@@ -1,7 +1,12 @@
-﻿import {SelectorTokenType, SelectorType} from "./SelectorTypes"
+﻿import {SelectorType} from "./SelectorTypes"
 import {IStringProxy} from "./UtilTypes";
-import {RuleType, ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
+import {RuleType, ITagRule, IClassRule, IIDRule, ISelectorRule} from "../rules/RuleTypes"
 import {Rule} from "../rules/Rule"
+
+
+
+/** Type for a single selector token that can be used as an argument to the $selector function */
+type SelectorTokenType = ITagRule | IClassRule | IIDRule | ISelectorRule | number | string | IStringProxy;
 
 
 
@@ -44,6 +49,8 @@ class SelectorProxy implements IStringProxy
 						arr.push( (item as IClassRule).cssName);
 					else if (item.ruleType === RuleType.ID)
 						arr.push( (item as IIDRule).cssName);
+					else if (item.ruleType === RuleType.SELECTOR)
+						arr.push( (item as ISelectorRule).selectorText);
 				}
 				else 
 					arr.push( item.toString());

@@ -1,5 +1,4 @@
 ﻿import {ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
-import {StringProxy} from "./UtilFuncs";
 import { IStringProxy } from "./UtilTypes";
 
 
@@ -48,12 +47,6 @@ export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | ":
 // 	EndsWith = "$=",
 // 	Contains = "*=",
 // }
-
-
-
-/** Type for a single selector token */
-export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
-	number | string | StringProxy;
 
 
 

@@ -8,14 +8,15 @@ import {stylePropToCssString} from "./StyleFuncs";
 
 
 /**
- * The msh class contains static helper functions that are used whenever there is a need to produce
- * CSS string value based on more complicated type(s). The majority of these functions return
- * StringProxy object so that they can be used in styleset properties assignments, for example:
+ * The sh class stands for Style Helper andcontains static helper functions that are used whenever
+ * there is a need to produce CSS string value based on more complicated type(s). The majority of
+ * these functions return StringProxy object so that they can be used in styleset properties
+ * assignments, for example:
  * ```typescript
- * <div style={{ color: tsh.rgb( 255, 128, 64) }}
+ * <div style={{ color: sh.rgb( 255, 128, 64) }}
  * ```
  */
-export class tsh
+export class sh
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -28,7 +29,7 @@ export class tsh
      */
     public static raw( s: string | IStringProxy): IStringProxy
     {
-        return new UtilFuncs.StringProxy(s);
+        return typeof s === "string" ? new UtilFuncs.StringProxy(s) : s;
     }
 
     /**
@@ -37,7 +38,7 @@ export class tsh
      * to a CSS compliant string.
      * @param stylePropValue Value to convert.
      */
-    public static val<K extends keyof IStyleset>( stylePropName: K, stylePropValue: IStyleset[K]): string | null
+    public static val<K extends keyof IStyleset>( stylePropName: K, stylePropValue: IStyleset[K]): string
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }

@@ -6,7 +6,7 @@ export * from "./styles/StyleTypes";
 export * from "./styles/MediaTypes";
 export * from "./styles/FontFaceTypes";
 export * from "./styles/SelectorTypes";
-export * from "./styles/tsh";
+export * from "./styles/sh";
 export * from "./rules/RuleTypes";
 
 export {

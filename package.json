@@ -44,7 +44,7 @@
 		"lib/styles/FontFaceTypes.d.ts",
 		"lib/styles/SelectorTypes.d.ts",
 		"lib/styles/SelectorFuncs.d.ts",
-		"lib/styles/tsh.d.ts",
+		"lib/styles/sh.d.ts",
 		"lib/rules/RuleTypes.d.ts",
 		"lib/rules/RuleFuncs.d.ts",
 		"lib/rules/Stylesheet.d.ts"
