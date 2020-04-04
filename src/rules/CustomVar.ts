@@ -59,9 +59,9 @@ export class CustomVar<T = any> implements ICustomVar<T>
 
 
 
-	// The toString function is used when the object is specified as a value of a style property.
+	// The valueToString function is used when the object is specified as a value of a style property.
 	// We return the var(--name) expression.
-    public toString(): string
+    public valueToString(): string
     {
 		return `var(${this.cssName})`;
     }

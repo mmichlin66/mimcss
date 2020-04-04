@@ -1,6 +1,5 @@
 ﻿import {SelectorTokenType, SelectorType} from "./SelectorTypes"
 import {IStringProxy} from "./UtilTypes";
-import {StringProxyBase} from "./UtilFuncs";
 import {RuleType, ITagRule, IClassRule, IIDRule} from "../rules/RuleTypes"
 import {Rule} from "../rules/Rule"
 
@@ -11,16 +10,15 @@ import {Rule} from "../rules/Rule"
  * template string with optional placeholders (e.g. {0}), which will be replaced by names
  * of tags, classes and IDs and other possible types.
  */
-class SelectorProxy extends StringProxyBase
+class SelectorProxy implements IStringProxy
 {
     constructor( template: string, params: SelectorTokenType[])
     {
-        super();
         this.template = template;
         this.params = params;
     }
 
-    public valueToCssString(): string
+    public valueToString(): string
     {
 		let tokens: string[] = this.template.split( /{(\d+)}/g);
 		let tokenIsNumber = false;
@@ -73,7 +71,7 @@ class SelectorProxy extends StringProxyBase
  * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
  * possible types.
  */
-export function $selector( template: string, ...args: SelectorTokenType[]): string | IStringProxy
+export function $selector( template: string, ...args: SelectorTokenType[]): SelectorType
 {
 	return !template ? "" : args.length === 0 ? template : new SelectorProxy( template, args);
 }
@@ -89,6 +87,8 @@ export function selectorToCssString( selector: SelectorType): string
 		return "";
 	else if (typeof selector === "string")
 		return selector;
+	else if (typeof selector.valueToString === "function")
+		return selector.valueToString();
 	else
 		return selector.toString();
 }

@@ -9,13 +9,13 @@ import {ICustomVar} from "../rules/RuleTypes"
 /**
  * Style values that can be used for (almost) any CSS property.
  */
-export type Base_StyleType = "inherit" | "initial" | "unset";
+export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | null | undefined;
 
 
 
 /**
  * The IStringProxy interface represents an object that can produce a string, which is returned
- * via the valueToCssString() method.
+ * via the valueToString() method.
  * 
  * All CSS properties should accept string as the type of their value even if normally
  * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
@@ -30,12 +30,12 @@ export type Base_StyleType = "inherit" | "initial" | "unset";
  * constructed at one point but the string generation occurs at another time. This allows
  * using these objects in the style definition classes. They can reference objects like
  * ICustomVar that are not fully initialized yet. However, when the styles should be inserted
- * into DOM the initialization will have already occurred and the valueToCssString method will
+ * into DOM the initialization will have already occurred and the valueToString method will
  * return a correct string.
  */
 export interface IStringProxy
 {
-    valueToCssString(): string;
+    valueToString(): string;
 }
 
 
@@ -43,7 +43,7 @@ export interface IStringProxy
 /**
  * Type that extends the given type with the following types:
  * - basic style values that are valid for all style properties.
- * - StringProxy type that allows specifying raw string value.
+ * - IStringProxy type that allows specifying raw string value.
  * - ICustomVar object that allows using a CSS custom property.
  */
 export type ExtendedPropType<T> = T | Base_StyleType | IStringProxy | ICustomVar<ExtendedPropType<T>>;

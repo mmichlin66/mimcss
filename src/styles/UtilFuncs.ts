@@ -31,51 +31,134 @@ export function camelToDash( camel: string): string
 
 
 /**
+ * The IValueConvertOptions interface defines optional functions that convertvalues of differnt
+ * types to strings.
+ */
+export interface IValueConvertOptions
+{
+    // Called if value is null or undefined
+    fromNull?: ( val: null | undefined) => string;
+
+    // Called if value is a boolean
+    fromBool?: (val: boolean) => string;
+
+    // Called if value is a number
+    fromNumber?: (val: number) => string;
+
+    // Called if value is an array
+    fromArray?: (val: any[]) => string;
+
+    // Called if value is an object
+    fromObject?: (val: {[K: string]: any}) => string;
+
+    // Called if type-specific function is not defined
+    fromAny?: (val: any) => string;
+
+    // Called to convert array items if fromArray is not defined
+    arrayItemFunc?: (v: any) => string;
+
+    // Separator for array items - used only if fromArray is not defined
+    arraySeparator?: string;
+
+    // If value is a function, these are arguments to pass when invoking it
+    funcArgs?: any[];
+}
+
+
+
+/**
+ * Converts a value of an arbitrary type to a single string. The optional options parameter
+ * can define how specific types are converted.
+ */
+export function valueToString( val: any, options?: IValueConvertOptions): string
+{
+    if (typeof val === "string")
+        return val;
+    else if (!options)
+    {
+        if (val == null)
+            return "";
+        else if (typeof val.valueToString === "function")
+            return val.valueToString();
+        else if (typeof val === "function")
+            return val();
+        else
+            return val.toString();
+    }
+    else
+    {
+        if (val == null)
+            return options.fromNull ? options.fromNull( val) : options.fromAny ? options.fromAny( val) : "";
+        else if (typeof val === "boolean")
+            return options.fromBool ? options.fromBool( val) : options.fromAny ? options.fromAny( val) : val.toString();
+        else if (typeof val === "number")
+            return options.fromNumber ? options.fromNumber( val) : options.fromAny ? options.fromAny( val) : val.toString();
+        else if (Array.isArray(val))
+        {
+            if (options.fromArray)
+                return options.fromArray( val);
+            else
+            {
+                let separator = options.arraySeparator != null ? options.arraySeparator : " ";
+                if (options.arrayItemFunc)
+                    return arrayToCssString( val, options.arrayItemFunc, separator);
+                else if (options.fromAny)
+                    return options.fromAny( val);
+                else
+                    return arrayToCssString( val, undefined, separator);
+            }
+        }
+        else if (typeof val === "object")
+        {
+            if (typeof val.valueToString === "function")
+                return val.valueToString();
+            else if (options.fromObject)
+                return options.fromObject( val);
+            else if (options.fromAny)
+                return options.fromAny( val);
+            else
+                return val.toString();
+        }
+        else if (typeof val === "function")
+            return valueToString( options.funcArgs ? val( ...options.funcArgs) : val());
+        else if (options.fromAny)
+            return options.fromAny( val);
+        else
+            return val.toString();
+    }
+}
+
+
+
+// /**
+//  * Converts a value of an arbitrary type to a single string using the given separator. If the value
+//  * is an array, every item is converted to a string and they are joined using the given separator.
+//  */
+// export function valueToString( val: any, separator: string = " "): string
+// {
+//     if (val == null)
+//         return "";
+//     else if (typeof val === "string")
+//         return val;
+//     else if (Array.isArray(val))
+//         return arrayToCssString( val, undefined, separator);
+//     else if (typeof val.valueToString === "function")
+//         return val.valueToString(); // this covers for all IStringProxy-implemented objects
+//     else
+//         return val.toString();  // this covers for numbers, Booleans and objects
+// }
+
+
+
+/**
  * Converts an array of the given typeto a single string using the given separator.
  * Elements of the array are converted to strings using the given function.
- * @param val Array of time values
  */
 export function arrayToCssString( val: any[], func?: (v) => string, separator: string = " "): string
 {
     return !val || val.length === 0
         ? ""
-        : val.filter( (v) => v != null).map(
-                (v) => func ? func(v) : (x) => valueToCssString( x, separator)).join( separator);
-}
-
-
-
-/**
- * Converts a value of an arbitrary type to a single string using the given separator. If the value
- * is an array, every item is converted to a string and they are joined using the given separator.
- */
-export function valueToCssString( val: any, separator: string = " "): string
-{
-    if (val == null)
-        return "";
-    else if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-        return arrayToCssString( val, undefined, separator);
-    else
-        return val.toString();
-}
-
-
-
-/**
- * The StringProxyBase abstract class serves as a base for all classes implementing the
- * IStringProxy interface. It implements the standard toString method by calling the
- * valueToCssString method.
- */
-export abstract class StringProxyBase implements IStringProxy
-{
-    public abstract valueToCssString(): string;
-
-    public toString(): string
-    {
-        return this.valueToCssString();
-    }
+        : val.filter( x => x != null).map( y => func ? func(y) : z => valueToString( z)).join( separator);
 }
 
 
@@ -83,15 +166,14 @@ export abstract class StringProxyBase implements IStringProxy
 /**
  * The StringProxy class implements the IStringProxy interface by encapsulating the string.
  */
-export class StringProxy extends StringProxyBase
+export class StringProxy implements IStringProxy
 {
     constructor( s?: string | IStringProxy)
     {
-        super();
         this.s = s;
     }
 
-    public valueToCssString(): string
+    public valueToString(): string
     {
         return this.s == null ? "" : typeof this.s === "string" ? this.s : this.s.toString();
     }
@@ -108,7 +190,7 @@ export class StringProxy extends StringProxyBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type of functions that convert a number to a string */
-type ConvertFuncType = ((n: number) => string) | null | undefined;
+type ConvertFuncType = (n: number) => string;
 
 
 
@@ -131,16 +213,7 @@ function numberToCssString( n: number, intUnit: string = "", floatUint: string =
  */
 function numberStyleToCssString( val: Number_StyleType, convertFunc?: ConvertFuncType): string
 {
-    if (val == null)
-        return "0";
-    else if (typeof val === "string")
-        return val;
-    else if (typeof val === "object")
-        return val.toString();
-    else if (convertFunc)
-        return convertFunc( val);
-    else
-        return val.toString();
+    return valueToString( val, { fromNumber: convertFunc});
 }
 
 /**
@@ -152,9 +225,10 @@ function numberStyleToCssString( val: Number_StyleType, convertFunc?: ConvertFun
 function multiNumberStyleToCssString( val: MultiNumber_StyleType,
                 convertFunc: ConvertFuncType, separator: string = " "): string
 {
-    return Array.isArray(val)
-        ? arrayToCssString( val, (v) => numberStyleToCssString( v, convertFunc), separator)
-        : numberStyleToCssString( val, convertFunc);
+    return valueToString( val, { fromNumber: convertFunc,
+        arrayItemFunc: v => numberStyleToCssString( v, convertFunc),
+        arraySeparator: separator
+    });
 }
 
 
@@ -190,17 +264,16 @@ function formatNumbers( format: string, params: Number_StyleType[], convertFunc?
  * The MathFuncProxy class implements the IStringProxy interface by encapsulating parameters of a
  * mathematic CSS function that accepts one or more parameters of type Number_StyleType.
  */
-class MathFuncProxy extends StringProxyBase
+class MathFuncProxy implements IStringProxy
 {
     constructor( name: string, params: Number_StyleType[], convertFunc?: ConvertFuncType)
     {
-        super();
         this.name = name;
         this.convertFunc = convertFunc;
         this.params = params;
     }
 
-    public valueToCssString(): string
+    public valueToString(): string
     {
         return `${this.name}(${multiNumberStyleToCssString( this.params, this.convertFunc, ",")})`;
     }
@@ -223,17 +296,16 @@ class MathFuncProxy extends StringProxyBase
  * calc() CSS function that accepts a formula string and zero or more parameters of type
  * Number_StyleType.
  */
-class CalcFuncProxy extends StringProxyBase
+class CalcFuncProxy implements IStringProxy
 {
     constructor( formula: string, params: Number_StyleType[], convertFunc?: ConvertFuncType)
     {
-        super();
         this.formula = formula;
         this.convertFunc = convertFunc;
         this.params = params;
     }
 
-    public valueToCssString(): string
+    public valueToString(): string
     {
         return `calc(${formatNumbers( this.formula, this.params, this.convertFunc)})`;
     }
@@ -432,8 +504,8 @@ export function sizeToCssString( val: Size_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof StringProxyBase)
-        return val.toString();
+    else if (typeof (val as any).valueToString === "function")
+        return (val as IStringProxy).valueToString();
     else if (typeof val === "object")
         return objectToCssString( val, false, ["w", Len.styleToString], ["h", Len.styleToString]);
     // else if (Array.isArray( val))
@@ -474,8 +546,8 @@ export function positionToCssString( val: Position_StyleType): string
 {
     if (typeof val === "string")
         return val;
-    else if (val instanceof StringProxyBase)
-        return val.toString();
+    else if (typeof (val as any).valueToString === "function")
+        return (val as IStringProxy).valueToString();
     else if (typeof val === "object")
     {
         if ("xedge" in val)

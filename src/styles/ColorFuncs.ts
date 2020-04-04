@@ -1,5 +1,5 @@
 ﻿import * as ColorTypes from "./ColorTypes"
-import {Percent} from "./UtilFuncs"
+import {Percent, valueToString} from "./UtilFuncs"
 
 
 
@@ -59,6 +59,7 @@ function colorNumberToCssString( val: number): string
  */
 export function colorToCssString( val: ColorTypes.Color_StyleType): string
 {
+
     if (typeof val === "string")
     {
         if (ColorTypes.Colors[val])
@@ -66,10 +67,8 @@ export function colorToCssString( val: ColorTypes.Color_StyleType): string
         else
             return val;
     }
-    else if (typeof val === "number")
-	    return colorNumberToCssString( val);
     else
-        return val.toString();
+        return valueToString( val, { fromNumber: colorNumberToCssString });
 }
 
 

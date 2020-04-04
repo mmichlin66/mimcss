@@ -1,5 +1,5 @@
 ﻿import * as StyleTypes from "./StyleTypes"
-import {camelToDash, valueToCssString, arrayToCssString, objectToCssString,
+import {camelToDash, valueToString, arrayToCssString, objectToCssString,
     multiSizeToCssString, positionToCssString, multiPositionToCssString,
     Num, Len, Angle, Time,
 } from "./UtilFuncs"
@@ -14,11 +14,8 @@ import * as ColorFuncs from "./ColorFuncs";
  */
 function singleAnimationToCssString( val: StyleTypes.SingleAnimation): string
 {
-    if (typeof val === "string")
-        return val;
-    else
-    {
-        return objectToCssString( val, false,
+    return valueToString( val, {
+        fromObject: v => objectToCssString( val, false,
             ["delay", Time.styleToString],
             ["function", singleAnimationTimingFunctionToCssString],
             ["duration", Time.numberToString],
@@ -26,9 +23,8 @@ function singleAnimationToCssString( val: StyleTypes.SingleAnimation): string
             "direction",
             "state",
             "mode",
-            "name",
-        );
-    }
+            "name")
+    });
 }
 
 /**
@@ -36,12 +32,11 @@ function singleAnimationToCssString( val: StyleTypes.SingleAnimation): string
  */
 function animationToCssString( val: StyleTypes.AnimationStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray( val))
-        return arrayToCssString( val, singleAnimationToCssString, ",");
-    else
-        return singleAnimationToCssString( val);
+    return valueToString( val, {
+        arrayItemFunc: singleAnimationToCssString,
+        arraySeparator: ",",
+        fromAny: singleAnimationToCssString
+    });
 }
 
 
@@ -51,37 +46,35 @@ function animationToCssString( val: StyleTypes.AnimationStyleType): string
  */
 function singleAnimationTimingFunctionToCssString( val: StyleTypes.SingleAnimationTimingFunction): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-    {
-        if (val.length < 3)
+    return valueToString( val, {
+        fromArray: val =>
         {
-            // this is step function with only the number of steps
+            if (val.length < 3)
+            {
+                // this is step function with only the number of steps
 
-            /// #if DEBUG
-                if (val[0] <= 0)
-                    throw new Error( "Number of steps in animation function must be greater than zero");
-                else if (!Number.isInteger( val[0]))
-                    throw new Error( "Number of steps in animation function must be an Integer");
-            /// #endif
+                /// #if DEBUG
+                    if (val[0] <= 0)
+                        throw new Error( "Number of steps in animation function must be greater than zero");
+                    else if (!Number.isInteger( val[0]))
+                        throw new Error( "Number of steps in animation function must be an Integer");
+                /// #endif
 
-            return `step(${val[0]}${val.length === 2 ? "," + val[1] : ""})`;
+                return `step(${val[0]}${val.length === 2 ? "," + val[1] : ""})`;
+            }
+            else
+            {
+                // this is bezier function
+
+                /// #if DEBUG
+                    if (val[0] < 0 || val[0] > 1 || val[2] < 0 || val[2] > 1)
+                        throw new Error( "First and third parameters of cubic-bezier animation function must be between 0 and 1");
+                /// #endif
+
+                return `cubic-bezier(${val[0]},${val[1]},${val[2]},${val[3]})`;
+            }
         }
-        else
-        {
-            // this is bezier function
-
-            /// #if DEBUG
-                if (val[0] < 0 || val[0] > 1 || val[2] < 0 || val[2] > 1)
-                    throw new Error( "First and third parameters of cubic-bezier animation function must be between 0 and 1");
-            /// #endif
-
-            return `cubic-bezier(${val[0]},${val[1]},${val[2]},${val[3]})`;
-        }
-    }
-    else
-        return val.toString();
+    });
 }
 
 /**
@@ -89,20 +82,18 @@ function singleAnimationTimingFunctionToCssString( val: StyleTypes.SingleAnimati
  */
 function animationTimingFunctionToCssString( val: StyleTypes.AnimationTimingFunctionStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-    {
-        if (val.length === 0)
-            return "";
-        else if (typeof val[0] === "number")
-            return singleAnimationTimingFunctionToCssString( val as StyleTypes.SingleAnimationTimingFunction);
-        else
-            return arrayToCssString( val as StyleTypes.SingleAnimationTimingFunction[],
-                            singleAnimationTimingFunctionToCssString, ",");
-    }
-    else
-        return val.toString();
+    return valueToString( val, {
+        fromArray: val =>
+        {
+            if (val.length === 0)
+                return "";
+            else if (typeof val[0] === "number")
+                return singleAnimationTimingFunctionToCssString( val as StyleTypes.SingleAnimationTimingFunction);
+            else
+                return arrayToCssString( val as StyleTypes.SingleAnimationTimingFunction[],
+                                singleAnimationTimingFunctionToCssString, ",");
+        }
+    });
 }
 
 
@@ -112,14 +103,10 @@ function animationTimingFunctionToCssString( val: StyleTypes.AnimationTimingFunc
  */
 function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_StyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-        return arrayToCssString( val, Len.styleToString, " ");
-    else if (typeof val === "object")
-        return val.toString();
-    else
-        return Len.styleToString( val);
+    return valueToString( val, {
+        arrayItemFunc: Len.styleToString,
+        fromAny: Len.styleToString
+    });
 }
 
 
@@ -129,23 +116,24 @@ function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_Style
  */
 function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
 {
-    if (Array.isArray(val))
-    {
-        if (Array.isArray( val[0]))
+    return valueToString( val, {
+        fromArray: val =>
         {
-            // two MultiCornerRadius values
-            let s = arrayToCssString( val[0], Len.styleToString, " ");
-            s += " / ";
-            return s + arrayToCssString( val[1] as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
-        }
-        else
-        {
-            // single MultiCornerRadius value
-            return arrayToCssString( val as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
-        }
-    }
-    else
-        return Len.styleToString( val);
+            if (Array.isArray( val[0]))
+            {
+                // two MultiCornerRadius values
+                let s = arrayToCssString( val[0], Len.styleToString, " ");
+                s += " / ";
+                return s + arrayToCssString( val[1] as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
+            }
+            else
+            {
+                // single MultiCornerRadius value
+                return arrayToCssString( val as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
+            }
+        },
+        fromAny: Len.styleToString
+    });
 }
 
 
@@ -155,28 +143,23 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
  */
 function borderSpacingToCssString( val: StyleTypes.BorderSpacingStyleType): string
 {
-    if (Array.isArray(val))
-        return arrayToCssString( val, Len.styleToString, " ");
-    else
-        return Len.styleToString( val);
+    return valueToString( val, {
+        arrayItemFunc: Len.styleToString,
+        fromAny: Len.styleToString
+    });
 }
 
 
 
 /**
  * Converts border color style value to the CSS string.
- * @param val Border color value
  */
 function borderColorToCssString( val: StyleTypes.BorderColorStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-        return arrayToCssString( val as ColorTypes.Color_StyleType[], ColorFuncs.colorToCssString, " ");
-    else if (typeof val === "object")
-        return val.toString();
-    else
-        return ColorFuncs.colorToCssString( val);
+    return valueToString( val, {
+        arrayItemFunc: ColorFuncs.colorToCssString,
+        fromAny: ColorFuncs.colorToCssString
+    });
 }
 
 
@@ -186,32 +169,28 @@ function borderColorToCssString( val: StyleTypes.BorderColorStyleType): string
  */
 function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return Len.styleToString( val);
-    else if (Array.isArray(val))
-    {
-        let s = "";
-        if (typeof val[0] === "string")
-            return val[0];
-        else if (typeof val[0] === "object")
-            return val[0].toString();
-        else if (val[0] != null)
-            s += Len.styleToString( val[0]) + " ";
+    return valueToString( val, {
+        fromArray: val =>
+        {
+            let s = "";
+            if (typeof val[0] === "string")
+                return val[0];
+            else if (typeof val[0] === "object")
+                return val[0].toString();
+            else if (val[0] != null)
+                s += Len.styleToString( val[0]) + " ";
 
-        if (val[1])
-            s += val[1] + " ";
+            if (val[1])
+                s += val[1] + " ";
 
-        if (val[2])
-            s += ColorFuncs.colorToCssString( val[2]) + " ";
+            if (val[2])
+                s += ColorFuncs.colorToCssString( val[2]) + " ";
 
-        return s;
-    }
-    else if (typeof val === "object")
-        return val.toString();
-    else
-        return ColorFuncs.colorToCssString( val);
+            return s;
+        },
+        fromNumber: Len.styleToString,
+        fromAny: ColorFuncs.colorToCssString
+    });
 }
 
 
@@ -221,14 +200,9 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
  */
 function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else if (Array.isArray(val))
-        return arrayToCssString( val, borderImageOutsetToCssString, " ");
-    else
-        return val.toString();
+    return valueToString( val, {
+        arrayItemFunc: borderImageOutsetToCssString
+    });
 }
 
 
@@ -238,12 +212,9 @@ function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleTyp
  */
 function clipToCssString( val: StyleTypes.ClipStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-        return `rect(${arrayToCssString( val, Len.styleToString, " ")}`;
-    else
-        return val.toString();
+    return valueToString( val, {
+        fromArray: val => `rect(${arrayToCssString( val, Len.styleToString, " ")}`
+    });
 }
 
 
@@ -254,18 +225,13 @@ function clipToCssString( val: StyleTypes.ClipStyleType): string
  */
 function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 {
-    if (!val)
-        return null;
-    else if (typeof val === "string")
-        return val;
-    else
-    {
-        return objectToCssString( val, false,
-            ["width", (v) => Len.multiStyleToString( v, " ")],
-            ["style", valueToCssString],
+    return valueToString( val, {
+        fromObject: val => objectToCssString( val, false,
+            ["width", v => Len.multiStyleToString( v, " ")],
+            ["style", valueToString],
             ["color", ColorFuncs.colorToCssString]
-        );
-    }
+        )
+    });
 }
 
 
@@ -275,16 +241,9 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
  */
 function columnsToCssString( val: StyleTypes.ColumnsStyleType): string
 {
-    if (!val)
-        return null;
-    else if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else if (Array.isArray(val))
-        return val[0].toString() + " " + Len.styleToString( val[1]);
-    else
-        return val.toString();
+    return valueToString( val, {
+        fromArray: val => val[0] + " " + Len.styleToString( val[1])
+    });
 }
 
 
@@ -294,27 +253,16 @@ function columnsToCssString( val: StyleTypes.ColumnsStyleType): string
  */
 function flexToCssString( val: StyleTypes.FlexStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else if (Array.isArray(val))
-    {
-        if (val.length === 2)
-            return val.join( " ");
-        else
+    return valueToString( val, {
+        fromArray: val =>
         {
-            let s = val[0] + " " + val[1] + " ";
-            let v = val[2];
-            s += Len.styleToString( v);
-
-            return s;
-        }
-    }
-    else if (typeof val === "object")
-        return val.toString();
-    else
-        return Len.styleToString( val);
+            if (val.length === 2)
+                return val.join( " ");
+            else
+                return val[0] + " " + val[1] + " "+ Len.styleToString( val[2]);
+        },
+        fromAny: Len.styleToString
+    });
 }
 
 
@@ -324,12 +272,9 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
  */
 function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return "oblique " + Angle.styleToString( val);
-    else
-        return val.toString();
+    return valueToString( val, {
+        fromNumber: val => "oblique " + Angle.styleToString( val)
+    });
 }
 
 
@@ -339,10 +284,9 @@ function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
  */
 function textEmphasisPositionToCssString( val: StyleTypes.TextEmphasisPositionStyleType): string
 {
-    if (Array.isArray( val))
-        return valueToCssString( val);
-    else
-        return Len.styleToString( val);
+    return valueToString( val, {
+        fromNumber: Len.styleToString
+    });
 }
 
 
@@ -352,16 +296,17 @@ function textEmphasisPositionToCssString( val: StyleTypes.TextEmphasisPositionSt
  */
 function textIndentToCssString( val: StyleTypes.TextIndentStyleType): string
 {
-    if (Array.isArray(val))
-    {
-        let s = `${Len.styleToString( val[0])} ${val[1]}`;
-        if (val[2])
-            s += " " + val[2];
+    return valueToString( val, {
+        fromArray: val =>
+        {
+            let s = `${Len.styleToString( val[0])} ${val[1]}`;
+            if (val[2])
+                s += " " + val[2];
 
-        return s;
-    }
-    else
-        return Len.styleToString( val);
+            return s;
+        },
+        fromAny: Len.styleToString
+    });
 }
 
 
@@ -371,10 +316,10 @@ function textIndentToCssString( val: StyleTypes.TextIndentStyleType): string
  */
 function translateToCssString( val: StyleTypes.TranslateStyleType): string
 {
-    if (Array.isArray(val))
-        return Len.multiStyleToString( val, " ");
-    else
-        return Len.styleToString( val);
+    return valueToString( val, {
+        fromArray: val => Len.multiStyleToString( val, " "),
+        fromAny: Len.styleToString
+    });
 }
 
 
@@ -488,18 +433,7 @@ export function stylePropToCssString( propName: string, propVal: any, valueOnly?
         }
     }
 
-    let s = valueOnly ? "" : camelToDash( propName) + ":";
-
-    let varValue;
-    if (typeof info === "function")
-        varValue = info( propVal);
-    else if (typeof propVal === "string")
-        varValue = propVal;
-    else if (Array.isArray( propVal))
-        varValue = arrayToCssString( propVal, item => item == null ? "" : item.toString());
-    else
-        varValue = propVal.toString();
-
+    let varValue = typeof info === "function" ? info( propVal) : valueToString( propVal);
     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
 }
 
@@ -512,8 +446,8 @@ export function stylePropToCssString( propName: string, propVal: any, valueOnly?
 const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<StyleTypes.Styleset[K]> } =
 {
     animation: animationToCssString,
-    animationDelay: (v) => Time.multiStyleToString( v, ","),
-    animationDuration: (v) => Time.multiStyleToString( v, ","),
+    animationDelay: v => Time.multiStyleToString( v, ","),
+    animationDuration: v => Time.multiStyleToString( v, ","),
     animationIterationCount: Num.styleToString,
     animationTimingFunction: animationTimingFunctionToCssString,
 
@@ -531,7 +465,7 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     borderBottomWidth: Len.styleToString,
     borderColor: borderColorToCssString,
     borderImageOutset: borderImageOutsetToCssString,
-    borderImageWidth: (v) => Len.multiStyleToString( v, " "),
+    borderImageWidth: v => Len.multiStyleToString( v, " "),
     borderLeft: borderSideToCssString,
     borderLeftColor: ColorFuncs.colorToCssString,
     borderLeftWidth: Len.styleToString,
@@ -539,16 +473,16 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     borderRight: borderSideToCssString,
     borderRightColor: ColorFuncs.colorToCssString,
     borderRightWidth: Len.styleToString,
-    borderStyle: valueToCssString,
+    borderStyle: valueToString,
     borderSpacing: borderSpacingToCssString,
     borderTop: borderSideToCssString,
     borderTopColor: ColorFuncs.colorToCssString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
     borderTopWidth: Len.styleToString,
-    borderWidth: (v) => Len.multiStyleToString( v, " "),
+    borderWidth: v => Len.multiStyleToString( v, " "),
     bottom: Len.styleToString,
-    boxShadow: valueToCssString,
+    boxShadow: valueToString,
 
     caretColor: ColorFuncs.colorToCssString,
     clip: clipToCssString,
@@ -556,8 +490,8 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     columnGap: Len.styleToString,
     columnRule: columnRuleToCssString,
     columnRuleColor: ColorFuncs.colorToCssString,
-    columnRuleStyle: valueToCssString,
-    columnRuleWidth: (v) => Len.multiStyleToString( v, " "),
+    columnRuleStyle: valueToString,
+    columnRuleWidth: v => Len.multiStyleToString( v, " "),
     columns: columnsToCssString,
 
     flex: flexToCssString,
@@ -565,7 +499,7 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     fontSize: Len.styleToString,
     fontStyle: fontStyleToCssString,
 
-    gap: (v) => Len.multiStyleToString( v, " "),
+    gap: v => Len.multiStyleToString( v, " "),
     gridColumnGap: Len.styleToString,
     gridRowGap: Len.styleToString,
 
@@ -575,7 +509,7 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     letterSpacing: Len.styleToString,
     lightingColor: ColorFuncs.colorToCssString,
 
-    margin: (v) => Len.multiStyleToString( v, " "),
+    margin: v => Len.multiStyleToString( v, " "),
     marginBottom: Len.styleToString,
     marginLeft: Len.styleToString,
     marginRight: Len.styleToString,
@@ -588,9 +522,9 @@ const StylePropertyInfos: { [K in keyof StyleTypes.Styleset]: StylePropertyInfo<
     objectPosition: positionToCssString,
     outlineColor: ColorFuncs.colorToCssString,
     outlineOffset: Len.styleToString,
-    outlineStyle: valueToCssString,
+    outlineStyle: valueToString,
 
-    padding: (v) => Len.multiStyleToString( v, " "),
+    padding: v => Len.multiStyleToString( v, " "),
     paddingBottom: Len.styleToString,
     paddingLeft: Len.styleToString,
     paddingRight: Len.styleToString,
