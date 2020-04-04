@@ -33,9 +33,9 @@ export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
  * - Properties with pseudo class names (e.g. ":hover") or pseudo element names (e.g. "::after").
  *   These properties define a styleset that will be assigned to the selector obtained by using
  *   the original styleset's owner followed by the given pseudo class or pseudo element.
- * - The "&" property that contains one or more NestedStyleType objects each of which defining
- *   a selector and a style corresponding to this selector. Selectors can use the ampersand symbol
- *   ('&') to refer to the parent style selector.
+ * - The "&" property that contains array of two-element tuples each defining a selector and a
+ *   style corresponding to this selector. Selectors can use the ampersand symbol ('&') to refer
+ *   to the parent style selector.
  * 
  * An ExtendedStyleset may not include a Styleset at all and only indicate one or more style
  * rule objects, which are treated as parents from which this styleset should inherit all
@@ -72,19 +72,10 @@ export type ExtendedStyleset = IStyleRule | IStyleRule[] |
 		{
 			"+"?: IStyleRule | IStyleRule[],
 			"!"?: keyof IStyleset | (keyof IStyleset)[],
-			"&"?: NestedStyleType | NestedStyleType[],
+			"&"?: [SelectorType, ExtendedStyleset][],
 		} &
 		{ [K in PseudoClass | PseudoElement]?: ExtendedStyleset }
 	);
-
-
-
-/**
- * The NestedStyleType type represents and object that defines a CSS selector and a style
- * for this selector. The selector can use the ampersand symbol ('&') to refer to the
- * parent style selector.
- */
-export type NestedStyleType = { selector: SelectorType, style: ExtendedStyleset};
 
 
 

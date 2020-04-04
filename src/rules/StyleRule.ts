@@ -1,4 +1,4 @@
-import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar, NestedStyleType} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, RuleType, ICustomVar} from "./RuleTypes";
 import {IStyleset, Styleset} from "../styles/StyleTypes"
 import {SelectorType} from "../styles/SelectorTypes"
 import {Rule} from "./Rule";
@@ -60,23 +60,16 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				let propVal = inputStyleset[propName];
 				if (propName === "+")
 				{
+					// the value is a single or an array of StyleRules to copy properties from
 					let extendsPropVal = propVal as (StyleRule | StyleRule[]);
 					if (extendsPropVal instanceof StyleRule)
 						parents = [extendsPropVal];
 					else
 						parents = extendsPropVal;
 				}
-				else if (propName === "!")
-				{
-					impProps = new Set<string>();
-					let impPropVal = propVal as (string | string[]);
-					if (typeof impPropVal === "string")
-						impProps.add( impPropVal);
-					else
-						impPropVal.forEach( v => impProps.add( v));
-				}
 				else if (propName.startsWith(":"))
 				{
+					// value is a styleset for a pseudo class or pseudo element
 					if (!nestedRules)
 						nestedRules = [];
 
@@ -84,20 +77,25 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				}
 				else if (propName === "&")
 				{
-					if (!nestedRules)
-						nestedRules = [];
+					// value is an array of two-element tuples with selector and styleset
+					let tuples = propVal as [SelectorType, ExtendedStyleset][];
+					if (tuples.length > 0)
+					{
+						if (!nestedRules)
+							nestedRules = [];
 
-					if (Array.isArray(propVal))
-					{
-						propVal.forEach( (item: NestedStyleType) => 
-							nestedRules.push( new NestedRule( this, item.selector, item.style))
-						);
+						tuples.forEach( tuple => nestedRules.push( new NestedRule( this, tuple[0], tuple[1])));
 					}
+				}
+				else if (propName === "!")
+				{
+					// value is either a single name or an array of names of CSS properties to add the !important flag
+					impProps = new Set<string>();
+					let impPropVal = propVal as (string | string[]);
+					if (typeof impPropVal === "string")
+						impProps.add( impPropVal);
 					else
-					{
-						let nestedStyle = propVal as NestedStyleType;
-						nestedRules.push( new NestedRule( this, nestedStyle.selector, nestedStyle.style));
-					}
+						impPropVal.forEach( v => impProps.add( v));
 				}
 				else
 				{

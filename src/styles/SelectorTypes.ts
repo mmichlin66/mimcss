@@ -51,20 +51,6 @@ export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | ":
 
 
 
-// /** Type for a single selector token */
-// export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
-// 	keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap |
-// 	SelectorCombinator | SelectorCombinatorType |
-// 	PseudoClass | PseudoElement |
-// 	StringProxy;
-
-
-
-// /** Type for a selector */
-// export type SelectorType = string | SelectorTokenType | SelectorTokenType[];
-
-
-
 /** Type for a single selector token */
 export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
 	number | string | StringProxy;

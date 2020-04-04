@@ -73,7 +73,7 @@ class SelectorProxy extends StringProxyBase
  * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
  * possible types.
  */
-export function sh( template: string, ...args: SelectorTokenType[]): string | IStringProxy
+export function $selector( template: string, ...args: SelectorTokenType[]): string | IStringProxy
 {
 	return !template ? "" : args.length === 0 ? template : new SelectorProxy( template, args);
 }
