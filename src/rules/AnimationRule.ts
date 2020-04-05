@@ -1,6 +1,5 @@
-import {IAnimationRule, AnimationFrame, RuleType, INamedRule} from "./RuleTypes"
-import {Percent} from "../styles/UtilFuncs"
-import {Rule} from "./Rule"
+import {IAnimationRule, AnimationFrame, RuleType, INamedEntity} from "./RuleTypes"
+import {Rule, createNames} from "./Rule"
 import {StyleRule} from "./StyleRule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
@@ -11,12 +10,12 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
  */
 export class AnimationRule extends Rule implements IAnimationRule
 {
-	public constructor( keyframes?: AnimationFrame[], nameOverride?: string | INamedRule)
+	public constructor( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule)
 	{
 		super( RuleType.ANIMATION);
 
-		if (keyframes)
-			this.keyframeRules = keyframes.map( (keyframe) => new AnimationFrameRule( keyframe));
+		if (frames)
+			this.frameRules = frames.map( (keyframe) => new AnimationFrameRule( keyframe));
 
 		this.nameOverride = nameOverride;
 	}
@@ -28,16 +27,9 @@ export class AnimationRule extends Rule implements IAnimationRule
 	{
 		super.process( container, owner, ruleName);
 
-		if (!this.nameOverride)
-			this.name = this.owner.getScopedRuleName( ruleName);
-		else if (typeof this.nameOverride === "string")
-			this.name = this.nameOverride;
-		else
-			this.name = this.nameOverride.name;
+		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride);
 
-		this.cssName = this.name;
-
-		for( let keyframeRule of this.keyframeRules)
+		for( let keyframeRule of this.frameRules)
 			keyframeRule.process( container, owner, ruleName);
 	}
 
@@ -47,7 +39,8 @@ export class AnimationRule extends Rule implements IAnimationRule
 	public clone(): AnimationRule
 	{
 		let newRule = new AnimationRule();
-		newRule.keyframeRules = this.keyframeRules.map( (keyframeRule) => keyframeRule.clone());
+		if (this.frameRules)
+			newRule.frameRules = this.frameRules.map( (keyframeRule) => keyframeRule.clone());
 		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
@@ -57,10 +50,13 @@ export class AnimationRule extends Rule implements IAnimationRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
+		if (!this.frameRules)
+			return;
+
 		this.cssRule = Rule.addRuleToDOM( `@keyframes ${this.name} {}`, parent);
 
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
-		for( let keyframeRule of this.keyframeRules)
+		for( let keyframeRule of this.frameRules)
 		{
 			let ruleText = keyframeRule.toCssString();
 			try
@@ -80,7 +76,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 	public get cssKeyframesRule(): CSSKeyframesRule { return this.cssRule as CSSKeyframesRule; }
 
 	/** Only needed to distinguish from class and ID rules */
-	public keyframeRules: AnimationFrameRule[];
+	public frameRules: AnimationFrameRule[];
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -98,7 +94,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | INamedRule;
+	private nameOverride?: string | INamedEntity;
 }
 
 
@@ -108,25 +104,12 @@ export class AnimationRule extends Rule implements IAnimationRule
  */
 class AnimationFrameRule extends StyleRule
 {
-	public constructor( keyframe?: AnimationFrame)
+	public constructor( frame?: AnimationFrame)
 	{
-		super( RuleType.KEYFRAME, keyframe ? keyframe[1] : undefined);
+		super( RuleType.KEYFRAME, frame ? frame[1] : undefined);
 
-		if (keyframe)
-			this.waypointString = this.parseWaypoint( keyframe[0]);
-	}
-
-
-
-	// Processes the given rule.
-	private parseWaypoint( waypoint: "from" | "to" | number): string
-	{
-		if (typeof waypoint === "string")
-			return waypoint;
-		else if (Number.isInteger( waypoint))
-			return waypoint + "%";
-		else
-			return Percent.styleToString( waypoint);
+		if (frame)
+			this.waypoint = typeof frame[0] === "string" ? frame[0] : frame[0] + "%";
 	}
 
 
@@ -136,7 +119,7 @@ class AnimationFrameRule extends StyleRule
 	{
 		let newRule = new AnimationFrameRule();
 		newRule.copyFrom( this);
-		newRule.waypointString = this.waypointString;
+		newRule.waypoint = this.waypoint;
 		return newRule;
 	}
 
@@ -145,13 +128,13 @@ class AnimationFrameRule extends StyleRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return this.waypointString;
+		return this.waypoint;
 	}
 
 
 
 	/** Identifier of the waypoint as a string */
-	public waypointString: string;
+	public waypoint: string;
 }
 
 

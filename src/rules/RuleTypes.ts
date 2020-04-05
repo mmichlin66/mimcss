@@ -128,7 +128,7 @@ export interface IRule
  * The INamedRule interface is a base interface implemented by all rules that have a name; that is,
  * class, ID, animation and custom CSS property.
  */
-export interface INamedRule extends IRule
+export interface INamedEntity
 {
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -204,7 +204,7 @@ export interface ITagRule extends IStyleRule
 /**
  * The IClassRule interface represents a style rule that applies to elements identified by a class.
  */
-export interface IClassRule extends IStyleRule, INamedRule
+export interface IClassRule extends IStyleRule, INamedEntity
 {
 	/** Flag, which is always true, that is needed to distinguish class rules from other rules */
 	readonly isClassRule: boolean;
@@ -215,7 +215,7 @@ export interface IClassRule extends IStyleRule, INamedRule
 /**
  * The IIDRule interface representsa a style rule that applies to elements identified by an ID.
  */
-export interface IIDRule extends IStyleRule, INamedRule
+export interface IIDRule extends IStyleRule, INamedEntity
 {
 	/** Flag, which is always true, that is needed to distinguish ID rules from other rules */
 	readonly isIDRule: boolean;
@@ -238,7 +238,7 @@ export interface ISelectorRule extends IStyleRule
 /**
  * The IAnimationRule interface represents a @keyframes rule.
  */
-export interface IAnimationRule extends INamedRule
+export interface IAnimationRule extends IRule, INamedEntity
 {
 	/** SOM keyframes rule */
 	readonly cssKeyframesRule: CSSKeyframesRule;
@@ -311,26 +311,12 @@ export interface IFontFaceRule extends IRule
 /**
  * The ICustomVar interface represents a CSS custom property definition.
  */
-export interface ICustomVar<T = any>
+export interface ICustomVar<T = any> extends INamedEntity
 {
 	/**
 	 * Name of the property on the rule definition object to which this rule is assigned.
 	 */
 	readonly ruleName: string;
-
-	/**
-	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
-	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
-	 * properties (--).
-	 */
-	readonly name: string;
-
-	/**
-	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
-	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
-	 * `name` property.
-	 */
-	readonly cssName: string;
 
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly template: string;

@@ -1,6 +1,7 @@
-import {ICustomVar, INamedRule} from "./RuleTypes"
+import {ICustomVar} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 import {stylePropToCssString} from "../styles/StyleFuncs"
+import {createNames} from "./Rule";
 
 
 
@@ -8,11 +9,11 @@ import {stylePropToCssString} from "../styles/StyleFuncs"
  * The CustomVar class describes a custom CSS property. CustomVar does not derive from the Rule
  * class because it is not a real CSS rule; however, in many aspects it repeats the Rule's
  * functionality. In particular it has the process function that allows it to obtain an actual
- * name, whcih will be used when defining and using this custom property in CSS.
+ * name, which will be used when defining and using this custom property in CSS.
  */
 export class CustomVar<T = any> implements ICustomVar<T>
 {
-	public constructor( template?: string, value?: T, nameOverride?: string | INamedRule)
+	public constructor( template?: string, value?: T, nameOverride?: string | ICustomVar)
 	{
 		this.template = template;
 		this.value = value;
@@ -27,14 +28,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 		this.container = container;
 		this.ruleName = ruleName;
 
-		if (!this.nameOverride)
-			this.name = owner.getScopedRuleName( ruleName);
-		else if (typeof this.nameOverride === "string")
-			this.name = this.nameOverride;
-		else
-			this.name = this.nameOverride.name;
-
-		this.cssName = this.name.startsWith("--") ? this.name : "--" + this.name;
+		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");
 	}
 
 
@@ -106,7 +100,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | INamedRule;
+	private nameOverride?: string | ICustomVar;
 
 	// Rule container to which this rule belongs. This is "this" for Stylesheet.
 	public container: RuleContainer;

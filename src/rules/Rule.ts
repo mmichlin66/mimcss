@@ -1,4 +1,4 @@
-import {IRule, RuleType} from "./RuleTypes"
+import {IRule, RuleType, INamedEntity} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -66,6 +66,21 @@ export abstract class Rule implements IRule
 	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
 	// the styles sheet or the parent rule. This is undefined for Stylesheet objects.
 	public cssRule: CSSRule;
+}
+
+
+
+/** Creates scoped names based on the given parameters */
+export function createNames( owner: IRuleContainerOwner, ruleName: string, nameOverride: string | INamedEntity,
+	cssPrefix?: string): [string,string]
+{
+	let name = !nameOverride
+		? owner.getScopedRuleName( ruleName)
+		: typeof nameOverride === "string"
+			? nameOverride
+			: nameOverride.name;
+
+	return [name, cssPrefix ? name.startsWith( cssPrefix) ? name : cssPrefix + name : name];
 }
 
 
