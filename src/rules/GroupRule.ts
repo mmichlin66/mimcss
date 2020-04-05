@@ -26,6 +26,34 @@ export abstract class GroupRule<T extends {} = {}> extends RuleContainer<T> impl
 
 
 
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	{
+		this.cssRule = this.insertGroupingRule( parent);
+
+		// insert sub-rules
+		if (this.cssRule)
+			this.insertRules( this.cssRule as CSSGroupingRule);
+	}
+
+
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	protected abstract insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule;
+
+
+
+	// Clers the CSS rule object.
+	public clear(): void
+	{
+		super.clear();
+
+		// clear sub-rules
+		this.clearRules();
+	}
+
+
+
 	/** SOM grouping rule */
 	public get cssGroupRule(): CSSGroupingRule { return this.cssRule as CSSGroupingRule; }
 }

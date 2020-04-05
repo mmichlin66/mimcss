@@ -28,8 +28,13 @@ export abstract class Rule implements IRule
 	// Creates a copy of the rule.
 	public clone(): Rule { return null; }
 
-	// Inserts this rule into the given parent rule or stylesheet.
+	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
+	// style definition class, to which this rule belongs, is activated.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
+
+	// Clers the CSS rule object. This method is called when the style definition class, to which
+	// this rule belongs, is deactivated.
+	public clear(): void { this.cssRule = null; }
 
 
 

@@ -240,7 +240,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 		let varNames = Object.keys( this._vars);
 		if (varNames.length > 0)
 		{
-			this.customVarStyleRule = Rule.addRuleToDOM( `:root {${varNames.map( (varName) =>
+			this.cssCustomVarStyleRule = Rule.addRuleToDOM( `:root {${varNames.map( (varName) =>
 				this._vars[varName].toCssString()).join(";")}}`, parent) as CSSStyleRule;
 		}
 
@@ -254,11 +254,22 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 
 
 
-	// Helper properties
+	// Clears all CSS rule objects defined in this container.
+	protected clearRules(): void
+	{
+		this.cssCustomVarStyleRule = null
+
+		// insert all other rules
+		this.allRules.forEach( rule => rule.clear());
+	}
+
+
+
+	// Sets the given value for the property with the given name
 	public setCustomVarValue( name: string, value: string, important?: boolean): void
 	{
-		if (this.customVarStyleRule)
-			this.customVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
+		if (this.cssCustomVarStyleRule)
+			this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
 	}
 
 
@@ -299,7 +310,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 	private _uses: { [K: string]: IStylesheet }
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
-	private customVarStyleRule: CSSStyleRule;
+	private cssCustomVarStyleRule: CSSStyleRule;
 }
 
 

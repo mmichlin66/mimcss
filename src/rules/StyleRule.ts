@@ -221,10 +221,19 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 		// if nested rules exist, insert them under the same parent
 		if (this.nestedRules)
-		{
-			for( let nestedRule of this.nestedRules)
-				nestedRule.insert( parent);
-		}
+			this.nestedRules.forEach( nestedRule => nestedRule.insert( parent));
+	}
+
+
+
+	// Clers the CSS rule object.
+	public clear(): void
+	{
+		super.clear();
+
+		// if nested rules exist, clear them too
+		if (this.nestedRules)
+			this.nestedRules.forEach( nestedRule => nestedRule.clear());
 	}
 
 

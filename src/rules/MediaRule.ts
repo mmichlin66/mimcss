@@ -31,14 +31,10 @@ export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule
 	{
 		let queryString = typeof this.query === "string" ? this.query : mediaQueryToCssString( this.query);
-
-		this.cssRule = Rule.addRuleToDOM( `@media ${queryString} {}`, parent);
-
-		// insert sub-rules
-		this.insertRules( this.cssMediaRule);
+		return Rule.addRuleToDOM( `@media ${queryString} {}`, parent);
 	}
 
 

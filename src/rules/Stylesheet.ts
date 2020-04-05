@@ -68,10 +68,13 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 			return generateUniqueName();
 		else if (ruleName in this.allNames)
 			return this.allNames[ruleName];
-		else if (this.isMultiplex)
-			return generateUniqueName();
 		else
-			return generateName( this.name, ruleName);
+		{
+			// find out if there a rule with this name defined in a stylesheet instance created for
+			// a class from the prototype chain of the style definition class.
+			let existingName = findNameForRuleInPrototypeChain( this.definitionClass, ruleName);
+			return existingName ? existingName : this.isMultiplex ? generateUniqueName() : generateName( this.name, ruleName);
+		}
 	}
 
 
@@ -105,6 +108,7 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 		{
 			this.domStyleElm.remove();
 			this.domStyleElm = null;
+			this.clearRules();
 		}
 
 		// deactivate imported stylesheets
@@ -153,6 +157,11 @@ let uniqueStyleNamesPrefix: string = "n";
 // Next number to use when generating unique identifiers.
 let nextUniqueID: number = 1;
 
+// Map of class definition classes to their singlton instances. Non-multiplex style definition
+// classes are added to this map upon calling the $use function on them.
+let classToInstanceMap = new Map<IStylesheetClass,Stylesheet>();
+
+
 
 
 /**
@@ -180,6 +189,33 @@ function generateUniqueName( prefix?: string): string
 
 
 
+// Looks up a property with the given name in the prototype  chain of the given style definition
+// class. If found and if the property is a rule, then returns the name assigned for it.
+function findNameForRuleInPrototypeChain( definitionClass: IStylesheetClass, ruleName: string)
+{
+	// loop over prototypes
+	let baseClass = Object.getPrototypeOf( definitionClass);
+	while( baseClass !== Object.prototype)
+	{
+		// check if the base class has an instance in the global map of used definition classes
+		let baseInst = classToInstanceMap.get( baseClass);
+		if (baseInst && ruleName in baseInst.rules && "name" in baseInst.rules[ruleName])
+			return baseInst.rules[ruleName].name;
+		else
+			baseClass = Object.getPrototypeOf( baseClass);
+	}
+
+	return null;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// API functions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
  * will be created by appending a unique number to the given prefix. If the prefix is not
@@ -195,30 +231,13 @@ export function useOptimizedStyleNames( optimize: boolean, prefix?: string): voi
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Managing class definition instances
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Map of class definition classes to their singlton instances. Non-multiplex style definition
-// classes are added to this map upon calling the $use function on them.
-let classToInstanceMap = new Map<any,any>();
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// API functions
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * Processes the given stylesheet definition and returns the Stylesheet object that contains
  * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
  * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T extends {}>( stylesheetDefinitionClass: IStylesheetClass<T>): IStylesheet<T>
+export function $use<T extends {} = {}>( stylesheetDefinitionClass: IStylesheetClass<T>): IStylesheet<T>
 {
 	// if the stylesheet definition is multiplex, create new Stylesheet object every time;
 	// otherwise, check whether the style sheet definition object has already been processed. This
@@ -234,7 +253,7 @@ export function $use<T extends {}>( stylesheetDefinitionClass: IStylesheetClass<
 			classToInstanceMap.set( stylesheetDefinitionClass, stylesheet);
 		}
 
-		return stylesheet;
+		return stylesheet as any as IStylesheet<T>;
 	}
 }
 

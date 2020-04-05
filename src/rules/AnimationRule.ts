@@ -58,14 +58,13 @@ export class AnimationRule extends Rule implements IAnimationRule
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
 		for( let keyframeRule of this.frameRules)
 		{
-			let ruleText = keyframeRule.toCssString();
 			try
 			{
-				cssKeyframesRule.appendRule( ruleText)
+				cssKeyframesRule.appendRule( keyframeRule.toCssString())
 			}
 			catch(x)
 			{
-				console.error( `Cannot add CSS rule '${ruleText}'`, x)
+				console.error( "Cannot add CSS keyframe rule", x)
 			}
 		}
 	}

@@ -336,7 +336,7 @@ export interface ICustomVar<T = any> extends INamedEntity
 /**
  * The IRuleContainer interface represents an object that contains CSS rules.
  */
-export interface IRuleContainer<T extends {}>
+export interface IRuleContainer<T extends {} = {}>
 {
 	/** Map of names of properties defining class rules to actual class names. */
 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
@@ -387,7 +387,7 @@ export interface IStylesheet<T extends {} = {}> extends IRuleContainer<T>
 /**
  * "Constructor" interface defining how stylesheet definition classes can be created.
  */
-export interface IStylesheetClass<T extends {}> extends IRuleContainerClass<T>
+export interface IStylesheetClass<T extends {} = {}> extends IRuleContainerClass<T>
 {
 	/** All stylesheet definition objects should conform to this constructor */
 	new(): T;

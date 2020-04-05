@@ -32,16 +32,12 @@ export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule
 	{
 		// determine whether the query is supported and if it is not, don't insert the rule
-		if (!CSS.supports( this.queryString))
-			return;
-			
-		this.cssRule = Rule.addRuleToDOM( `@supports ${this.queryString} {}`, parent);
-
-		// insert sub-rules
-		this.insertRules( this.cssSupportsRule);
+		return CSS.supports( this.queryString)
+			? Rule.addRuleToDOM( `@supports ${this.queryString} {}`, parent)
+			: null;
 	}
 
 
