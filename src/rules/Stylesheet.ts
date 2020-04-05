@@ -1,4 +1,4 @@
-import {RuleType, IRuleDefinition, IStylesheetDefinitionClass, IStylesheet} from "./RuleTypes"
+import {RuleType, IStylesheetClass, IStylesheet} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
@@ -7,9 +7,9 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The Stylesheet class represents a parsed form of a IStylesheetDefinition-derived class.
  */
-class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStylesheet<T>, IRuleContainerOwner
+class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesheet<T>, IRuleContainerOwner
 {
-	public constructor( definitionClass: IStylesheetDefinitionClass<T>)
+	public constructor( definitionClass: IStylesheetClass<T>)
 	{
 		super( RuleType.SCOPE, definitionClass)
 
@@ -21,16 +21,6 @@ class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStyle
 
 		this.processStylesheet();
 	}
-
-
-
-	// Creates a copy of the rule.
-	// This method is not used and is need only because it is abstract in the Rule class.
-	public clone(): Rule { return null; }
-
-	// Inserts this rule into the given parent rule or stylesheet.
-	// This method is not used and is need only because it is abstract in the Rule class.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
 
 
 
@@ -78,16 +68,7 @@ class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStyle
 			return generateUniqueName();
 		else if (ruleName in this.allNames)
 			return this.allNames[ruleName];
-		else
-			return this.generateScopedName( ruleName);
-	}
-
-
-
-	// Generates a name, which will be unique in this stylesheet
-	public generateScopedName( ruleName: string): string
-	{
-		if (this.isMultiplex)
+		else if (this.isMultiplex)
 			return generateUniqueName();
 		else
 			return generateName( this.name, ruleName);
@@ -113,7 +94,7 @@ class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStyle
 
 
 
-	/** Removes this stylesheet from DOM - only works for multiplex stylesheets. */
+	/** Removes this stylesheet from DOM. */
 	public deactivate(): void
 	{
 		// guard from extra deactivate calls
@@ -134,7 +115,7 @@ class Stylesheet<T = IRuleDefinition> extends RuleContainer<T> implements IStyle
 
 
 	// Class that defined this stylesheet. This member is used for stylesheet derivation
-	public readonly definitionClass: IStylesheetDefinitionClass<T>;
+	public readonly definitionClass: IStylesheetClass<T>;
 
 	// Name of the style sheet - used to create scoped names of style rules
 	public name: string;
@@ -200,7 +181,7 @@ function generateUniqueName( prefix?: string): string
 
 
 /**
- * Sets the flag indicating whether to use optimized (unique) style names. If yes, the names
+ * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
  * will be created by appending a unique number to the given prefix. If the prefix is not
  * specified, the standard prefix "n" will be used.
  * @param optimize
@@ -214,13 +195,30 @@ export function useOptimizedStyleNames( optimize: boolean, prefix?: string): voi
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Managing class definition instances
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Map of class definition classes to their singlton instances. Non-multiplex style definition
+// classes are added to this map upon calling the $use function on them.
+let classToInstanceMap = new Map<any,any>();
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// API functions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Processes the given stylesheet definition and returns the Stylesheet object that contains
  * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
  * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T = IRuleDefinition>( stylesheetDefinitionClass: IStylesheetDefinitionClass<T>): IStylesheet<T>
+export function $use<T extends {}>( stylesheetDefinitionClass: IStylesheetClass<T>): IStylesheet<T>
 {
 	// if the stylesheet definition is multiplex, create new Stylesheet object every time;
 	// otherwise, check whether the style sheet definition object has already been processed. This
@@ -229,13 +227,11 @@ export function $use<T = IRuleDefinition>( stylesheetDefinitionClass: IStyleshee
 		return new Stylesheet( stylesheetDefinitionClass);
 	else
 	{
-		// we don't want the class stylesheet property to be exposed on the publicly available
-		// interface; therefore, we access it via "as any".
-		let stylesheet = (stylesheetDefinitionClass as any).stylesheet as Stylesheet<T>;
+		let stylesheet = classToInstanceMap.get( stylesheetDefinitionClass);
 		if (!stylesheet)
 		{
 			stylesheet = new Stylesheet( stylesheetDefinitionClass);
-			(stylesheetDefinitionClass as any).stylesheet = stylesheet;
+			classToInstanceMap.set( stylesheetDefinitionClass, stylesheet);
 		}
 
 		return stylesheet;
@@ -251,7 +247,7 @@ export function $use<T = IRuleDefinition>( stylesheetDefinitionClass: IStyleshee
  * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
  * up to 1.
  */
-export function $activate<T = IRuleDefinition>( stylesheetOrDefinition: IStylesheet<T> | IStylesheetDefinitionClass<T>): IStylesheet<T>
+export function $activate<T extends {}>( stylesheetOrDefinition: IStylesheet<T> | IStylesheetClass<T>): IStylesheet<T>
 {
 	if (!stylesheetOrDefinition)
 		return null;
@@ -263,7 +259,7 @@ export function $activate<T = IRuleDefinition>( stylesheetOrDefinition: IStylesh
 	}
 	else
 	{
-		let stylesheet = $use( stylesheetOrDefinition as IStylesheetDefinitionClass<T>);
+		let stylesheet = $use( stylesheetOrDefinition as IStylesheetClass<T>);
 		(stylesheet as Stylesheet<T>).activate();
 		return stylesheet;
 	}

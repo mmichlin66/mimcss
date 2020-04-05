@@ -26,10 +26,10 @@ export abstract class Rule implements IRule
 	}
 
 	// Creates a copy of the rule.
-	public abstract clone(): Rule;
+	public clone(): Rule { return null; }
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public abstract insert( parent: CSSStyleSheet | CSSGroupingRule): void;
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
 
 
 

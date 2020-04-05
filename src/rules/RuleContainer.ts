@@ -1,5 +1,5 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, ICustomVar,
-		IRuleDefinition, IRuleDefinitionClass, IRuleContainer, RuleType, IStylesheet
+		IRuleContainerClass, IRuleContainer, RuleType, IStylesheet
 		} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
@@ -30,9 +30,9 @@ export interface IRuleContainerOwner
  * grouping rules. The RuleContainer class implements parsing form of a rule definition class or
  * object.
  */
-export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements IRuleContainer<T>
+export abstract class RuleContainer<T extends {} = {}> extends Rule implements IRuleContainer<T>
 {
-	public constructor( type: number, definition: T | IRuleDefinitionClass<T>)
+	public constructor( type: number, definition: T | IRuleContainerClass<T>)
 	{
 		super( type);
 		this.definitionClass = definition;
@@ -79,13 +79,13 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 		this._uses = {};
 
 		// get the "rule definition" object whose properties are the rule objects
-		let rulesDef: IRuleDefinition;
+		let rulesDef: T;
 		if (typeof this.definitionClass === "function")
 		{
 			// if the "definition" is a class then create an instance of it
 			try
 			{
-				rulesDef = new (this.definitionClass as IRuleDefinitionClass<IRuleDefinition>)();
+				rulesDef = new (this.definitionClass as IRuleContainerClass<T>)();
 			}
 			catch( err)
 			{
@@ -107,7 +107,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 	// Creates the stylesheet definition instance, parses its properties and creates names for
 	// classes, IDs, animations.
-	private processNamedRules( rulesDef: IRuleDefinition): void
+	private processNamedRules( rulesDef: T): void
 	{
 		// loop over the properties of the definition object and process those that are rules,
 		// custom var definitions and arrays.
@@ -269,7 +269,7 @@ export abstract class RuleContainer<T = IRuleDefinition> extends Rule implements
 
 
 	// Class that defined this stylesheet. This member is used for stylesheet derivation
-	public readonly definitionClass: IRuleDefinitionClass<T> | T;
+	public readonly definitionClass: IRuleContainerClass<T> | T;
 
 	// Names of all classes, IDs, animations and custom properties defined in this container.
 	public allNames: { [K: string]: string };

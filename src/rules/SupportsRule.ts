@@ -1,4 +1,4 @@
-import {ISupportsRule, IRuleDefinitionClass, RuleType} from "./RuleTypes"
+import {ISupportsRule, RuleType} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {SupportsQuery} from "../styles/StyleTypes"

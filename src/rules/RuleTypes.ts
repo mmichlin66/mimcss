@@ -334,30 +334,9 @@ export interface ICustomVar<T = any> extends INamedEntity
 
 
 /**
- * Interface for rule definition objects. The interface doesn't define any properties or methods
- * but it allows defining the IRuleDefinitionClass "constructor" interface.
- */
-export interface IRuleDefinition
-{
-}
-
-
-
-/**
- * "Constructor" interface defining how rule definition classes can be created.
- */
-export interface IRuleDefinitionClass<T extends IRuleDefinition>
-{
-	/** All rule definition classes should conform to this constructor */
-	new(): T;
-}
-
-
-
-/**
  * The IRuleContainer interface represents an object that contains CSS rules.
  */
-export interface IRuleContainer<T = IRuleDefinition>
+export interface IRuleContainer<T extends {}>
 {
 	/** Map of names of properties defining class rules to actual class names. */
 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
@@ -381,9 +360,34 @@ export interface IRuleContainer<T = IRuleDefinition>
 
 
 /**
+ * "Constructor" interface defining how rule definition classes can be created.
+ */
+export interface IRuleContainerClass<T extends {}>
+{
+	/** All rule definition classes should conform to this constructor */
+	new(): T;
+}
+
+
+
+/**
+ * The IStylesheet interface represents the resultant stylesheet after the stylesheet definition
+ * has been processed. The stylesheet object contains names of IDs, classes and animations, which
+ * can be used in the application code. The interface also provides methods that are used to
+ * manipulate the rules and their stylesets.
+ */
+export interface IStylesheet<T extends {} = {}> extends IRuleContainer<T>
+{
+	/** DOM style element that contains CSS style sheet that contains rules defined by this stylesheet*/
+	readonly domStyleElm: HTMLStyleElement;
+}
+
+
+
+/**
  * "Constructor" interface defining how stylesheet definition classes can be created.
  */
-export interface IStylesheetDefinitionClass<T> extends IRuleDefinitionClass<T>
+export interface IStylesheetClass<T extends {}> extends IRuleContainerClass<T>
 {
 	/** All stylesheet definition objects should conform to this constructor */
 	new(): T;
@@ -396,20 +400,6 @@ export interface IStylesheetDefinitionClass<T> extends IRuleDefinitionClass<T>
 	 * object is created for them and inserted into DOM.
 	 */
 	isMultiplex?: boolean;
-}
-
-
-
-/**
- * The IStylesheet interface represents the resultant stylesheet after the stylesheet definition
- * has been processed. The stylesheet object contains names of IDs, classes and animations, which
- * can be used in the application code. The interface also provides methods that are used to
- * manipulate the rules and their stylesets.
- */
-export interface IStylesheet<T = any> extends IRuleContainer<T>
-{
-	/** DOM style element that contains CSS style sheet that contains rules defined by this stylesheet*/
-	readonly domStyleElm: HTMLStyleElement;
 }
 
 
