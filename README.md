@@ -6,20 +6,18 @@ Mimcss is a TypeScript library that allows authoring CSS styles without creating
 The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. Mimcss provides the following capabilities:
 
 - Compatible with and independent of any library: use with React, Angular, Vue etc.
-- Supports all CSS rule types:
-    - Tag-, class-, ID- and complex selector-based rules
-    - Pseudo classes and pseudo elements
-    - Custom CSS properties
-    - Animation (@keyframes) rules
-    - Conditional rules: @media, @supports
-    - Other rules: @import, @font-face
-- Names of classes, IDs, animations and custom CSS properties are auto-generated, while developers use TypeScript object properties that return these names.
+- Stylesheets are defined as TypeScript classes.
+- Names of classes, IDs, animations and custom CSS properties are auto-generated, while developers use properties that return these names.
+- Stylesheets can be dynamically activated and deactivated.
+- All CSS rule types are supported including style rules and at-rules.
+- Custom CSS properties are supported in a type safe manner by defining what standard CSS property type they represent.
 - Style rules can be nested and can extend other style rules.
-- Type safety and autocomplete (Intellisense) support for CSS properties to eliminate misspellings.
-- Using numbers for default dimensions of length, angle, percent and other CSS property types.
+- All pseudo styles and pseudo elements are supported using convenient and compact notation.
+- Stylesheet classes support inheritance - elegant way to implement theming.
+- Type safety and autocomplete support for CSS property values to eliminate misspellings.
+- Using numbers for default units of length, angle, percent and other CSS property types.
 - Using Booleans, numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate misspellings.
 - Convenience functions for specifying complex property values (e.g. colors, calc(), var(), etc.)
-- Type safety for custom CSS properties by defining what standard CSS property type they represent.
 - Access to CSSRule-derived objects for direct rule and property manipulation.
 
 ### Quick Start

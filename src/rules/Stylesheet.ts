@@ -1,5 +1,4 @@
 import {RuleType, IStylesheetClass, IStylesheet} from "./RuleTypes"
-import {Rule} from "./Rule"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -18,6 +17,14 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 		this.activationRefCount = 0;
 		this.domStyleElm = null;
 		this.usedStylesheets = [];
+
+		// call the $use function for all the base classes so that rule names are generated. We
+		// don't activate stylesheets for these clases because derived classes will have all the
+		// rules from all the base classes as their own and so these rules will be activated as
+		// part of the derived class.
+		let baseClass = this.definitionClass;
+		while( (baseClass = Object.getPrototypeOf( baseClass)) !== Function.prototype)
+			$use( baseClass);
 
 		this.processStylesheet();
 	}
@@ -166,8 +173,6 @@ let classToInstanceMap = new Map<IStylesheetClass,Stylesheet>();
 
 /**
  * Generates name to use for the given rule from the given style sheet.
- * @param sheetName 
- * @param ruleName 
  */
 function generateName( sheetName: string, ruleName: string): string
 {
@@ -194,15 +199,13 @@ function generateUniqueName( prefix?: string): string
 function findNameForRuleInPrototypeChain( definitionClass: IStylesheetClass, ruleName: string)
 {
 	// loop over prototypes
-	let baseClass = Object.getPrototypeOf( definitionClass);
-	while( baseClass !== Object.prototype)
+	let baseClass = definitionClass;
+	while( (baseClass = Object.getPrototypeOf( baseClass)) !== Function.prototype)
 	{
 		// check if the base class has an instance in the global map of used definition classes
 		let baseInst = classToInstanceMap.get( baseClass);
 		if (baseInst && ruleName in baseInst.rules && "name" in baseInst.rules[ruleName])
 			return baseInst.rules[ruleName].name;
-		else
-			baseClass = Object.getPrototypeOf( baseClass);
 	}
 
 	return null;
@@ -237,7 +240,7 @@ export function useOptimizedStyleNames( optimize: boolean, prefix?: string): voi
  * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T extends {} = {}>( stylesheetDefinitionClass: IStylesheetClass<T>): IStylesheet<T>
+export function $use<T extends {}>( stylesheetDefinitionClass: IStylesheetClass<T>): IStylesheet<T>
 {
 	// if the stylesheet definition is multiplex, create new Stylesheet object every time;
 	// otherwise, check whether the style sheet definition object has already been processed. This
