@@ -27,19 +27,12 @@ export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
  * additional meaning to the styleset and allow building nested styles:
  * - The `+` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation.
- * - The `!` property specifies one or more names of styleset properties that shuld be
- *   considered "important". When the rule is inserted into DOM, the "!important" attribute is
- *   added to the property value.
  * - Properties with pseudo class names (e.g. ":hover") or pseudo element names (e.g. "::after").
  *   These properties define a styleset that will be assigned to the selector obtained by using
  *   the original styleset's owner followed by the given pseudo class or pseudo element.
  * - The "&" property that contains array of two-element tuples each defining a selector and a
  *   style corresponding to this selector. Selectors can use the ampersand symbol ('&') to refer
  *   to the parent style selector.
- * 
- * An ExtendedStyleset may not include a Styleset at all and only indicate one or more style
- * rule objects, which are treated as parents from which this styleset should inherit all
- * style properties.
  * 
  * Functions that return style rules (e.g. $class) accept the ExtendedStyleset as a parameter,
  * for example:
@@ -67,15 +60,12 @@ export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
  * li > .m123 { backgroundColor: yellow; }
  * ```
  */
-export type ExtendedStyleset = IStyleRule | IStyleRule[] |
-	(Styleset &
-		{
-			"+"?: IStyleRule | IStyleRule[],
-			"!"?: keyof IStyleset | (keyof IStyleset)[],
-			"&"?: [SelectorType, ExtendedStyleset][],
-		} &
-		{ [K in PseudoClass | PseudoElement]?: ExtendedStyleset }
-	);
+export type ExtendedStyleset = Styleset & { [K in PseudoClass | PseudoElement]?: ExtendedStyleset } &
+	{
+		"+"?: IStyleRule | IStyleRule[],
+		"&"?: [SelectorType, ExtendedStyleset][],
+	};
+	
 
 
 
@@ -247,9 +237,10 @@ export interface IAnimationRule extends IRule, INamedEntity
 /**
  * The AnimationFrame type defines a single keyframe within a @keyframes rule.
  * The waypoint can be specified as "from" or "to" strings or as a number 0 to 100, which will be
- * used as a percent.
+ * used as a percent. Styleset for a keyframe allows custom properties (via "--") but do not
+ * allow the !important flag ("!").
  */
-export type AnimationFrame = ["from" | "to" | number, ExtendedStyleset];
+export type AnimationFrame = ["from" | "to" | number, Omit<ExtendedStyleset,"!">];
 
 
 

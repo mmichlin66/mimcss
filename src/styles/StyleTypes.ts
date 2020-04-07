@@ -1183,17 +1183,26 @@ export type CustomVarStyleType<K extends keyof IStyleset = any> =
 
 /**
  * Type representing a collection of style properties and their values. In addition to the
- * properties representing the standard CSS styles, this type also includes the "--" property,
- * which is an array of CustomVarStyleType objects.
+ * properties representing the standard CSS styles, this type also includes:
+ * - the "--" property, which is an array of CustomVarStyleType objects.
+ * - the "!" property, which is one or more names of CSS properties to which the !important
+ *   flag should be added
  */
 export type Styleset = IStyleset &
     {
         /**
-         * Special property is an array that contains CustomVarStyleType objects each representing
-         * a definition of a custom CSS property.
+         * Special property "--" specifies an array that contains CustomVarStyleType objects each
+         * representing a definition of a custom CSS property.
          */
         "--"?: CustomVarStyleType[];
-    }
+
+        /**
+         * Special property "!" specifies one or more names of styleset properties that shuld be
+         * considered "important". When the rule is inserted into DOM, the "!important" flag is
+         * added to the property value.
+         */
+        "!"?: (keyof IStyleset)[],
+    };
 
 
 

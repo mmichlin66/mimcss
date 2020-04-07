@@ -3,7 +3,7 @@ import {IStyleset, Styleset} from "../styles/StyleTypes"
 import {SelectorType} from "../styles/SelectorTypes"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
-import {stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
+import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
 import {selectorToCssString} from "../styles/SelectorFuncs";
 
 
@@ -33,99 +33,57 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// prepare local variables to accumulate parsing results. We do it in local varibales
 		// because in case there are parents, we want first copy properties from them so that
 		// our own properties can override them.
-		let parents: StyleRule[];
-		let styleset: Styleset;
-		let impProps: Set<string>;
+		let parentRules: StyleRule[];
 		let nestedRules: NestedRule[];
+		let styleset: Styleset = {};
 
-		if (inputStyleset instanceof StyleRule)
+		for( let propName in inputStyleset)
 		{
-			// styleset is a single IStyleRule object, which we add as our parent
-			parents = [inputStyleset];
-		}
-		else if (Array.isArray(inputStyleset))
-		{
-			// styleset is an array of IStyleRule objects, which we add as our parents
-			parents = inputStyleset as StyleRule[];
-		}
-		else
-		{
-			// extendedStyleset is a set of style properties but can also include the $extends and
-			// $important properties. Remember parents and important names and copy the rest of
-			// style properties to our internal Styleset object.
-			styleset = {};
-
-			for( let propName in inputStyleset)
+			let propVal = inputStyleset[propName];
+			if (propName === "+")
 			{
-				let propVal = inputStyleset[propName];
-				if (propName === "+")
+				// the value is a single or an array of StyleRules to copy properties from
+				let extendsPropVal = propVal as (StyleRule | StyleRule[]);
+				if (extendsPropVal instanceof StyleRule)
+					parentRules = [extendsPropVal];
+				else
+					parentRules = extendsPropVal;
+			}
+			else if (propName.startsWith(":"))
+			{
+				// value is a styleset for a pseudo class or pseudo element
+				if (!nestedRules)
+					nestedRules = [];
+
+				nestedRules.push( new NestedRule( this, "&" + propName, propVal as ExtendedStyleset));
+			}
+			else if (propName === "&")
+			{
+				// value is an array of two-element tuples with selector and styleset
+				let tuples = propVal as [SelectorType, ExtendedStyleset][];
+				if (tuples.length > 0)
 				{
-					// the value is a single or an array of StyleRules to copy properties from
-					let extendsPropVal = propVal as (StyleRule | StyleRule[]);
-					if (extendsPropVal instanceof StyleRule)
-						parents = [extendsPropVal];
-					else
-						parents = extendsPropVal;
-				}
-				else if (propName.startsWith(":"))
-				{
-					// value is a styleset for a pseudo class or pseudo element
 					if (!nestedRules)
 						nestedRules = [];
 
-					nestedRules.push( new NestedRule( this, "&" + propName, propVal as ExtendedStyleset));
+					tuples.forEach( tuple => nestedRules.push( new NestedRule( this, tuple[0], tuple[1])));
 				}
-				else if (propName === "&")
-				{
-					// value is an array of two-element tuples with selector and styleset
-					let tuples = propVal as [SelectorType, ExtendedStyleset][];
-					if (tuples.length > 0)
-					{
-						if (!nestedRules)
-							nestedRules = [];
-
-						tuples.forEach( tuple => nestedRules.push( new NestedRule( this, tuple[0], tuple[1])));
-					}
-				}
-				else if (propName === "!")
-				{
-					// value is either a single name or an array of names of CSS properties to add the !important flag
-					impProps = new Set<string>();
-					let impPropVal = propVal as (string | string[]);
-					if (typeof impPropVal === "string")
-						impProps.add( impPropVal);
-					else
-						impPropVal.forEach( v => impProps.add( v));
-				}
-				else
-				{
-					// copy the property value to our internal styleset
-					styleset[propName] = propVal;
-				}
+			}
+			else
+			{
+				// copy the property value to our internal styleset
+				styleset[propName] = propVal;
 			}
 		}
 
 		// by now we went over all properties of the input styleset. If we have parent style
 		// rules, copy styleset, important and nested rules data from them.
-		if (parents && parents.length > 0)
+		if (parentRules && parentRules.length > 0)
 		{
-			parents.forEach( parent =>
+			parentRules.forEach( parent =>
 			{
-				if (parent.styleset && Object.keys( parent.styleset).length > 0)
-				{
-					if (!this.styleset)
-						this.styleset = {};
-
-					Object.assign( this.styleset, parent.styleset);
-				}
-
-				if (parent.impProps && parent.impProps.size > 0)
-				{
-					if (!this.impProps)
-						this.impProps = new Set<string>();
-
-					parent.impProps.forEach( impProp => this.impProps.add( impProp));
-				}
+				if (parent.styleset)
+					this.styleset = mergeStylesets( this.styleset, parent.styleset);
 
 				if (parent.nestedRules && parent.nestedRules.length > 0)
 				{
@@ -148,15 +106,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			if (!this.styleset)
 				this.styleset = styleset;
 			else
-				Object.assign( this.styleset, styleset);
-		}
-
-		if (impProps && impProps.size > 0)
-		{
-			if (!this.impProps)
-				this.impProps = impProps;
-			else
-				impProps.forEach( impProp => this.impProps.add( impProp));
+				mergeStylesets( this.styleset, styleset);
 		}
 
 		if (nestedRules && nestedRules.length > 0)
@@ -186,7 +136,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public copyFrom( src: StyleRule): void
 	{
 		this.styleset = src.styleset;
-		this.impProps = src.impProps;
 
 		// if nested rules exist, clone them
 		if (src.nestedRules)
@@ -207,7 +156,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public toCssString(): string
 	{
 		return this.styleset
-			? `${this.getSelectorString()} ${stylesetToCssString( this.styleset, this.impProps)}`
+			? `${this.getSelectorString()} ${stylesetToCssString( this.styleset)}`
 			: null;
 	}
 
@@ -279,9 +228,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	/** SOM style rule */
 	public get cssStyleRule(): CSSStyleRule { return this.cssRule as CSSStyleRule; }
-
-	// Set of property names from this styleset that should be !important.
-	private impProps: Set<string>;
 
 	// Resultant Styleset object defining properties to be inserted into DOM.
 	private styleset: Styleset;

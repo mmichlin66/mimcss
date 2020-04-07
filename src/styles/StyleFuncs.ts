@@ -339,12 +339,88 @@ type StylePropertyInfo<T> = PropToStringFunc<T> | keyof StyleTypes.Styleset;
 
 
 
-/** Converts the given styleset to its string representation */
-export function stylesetToCssString( styleset: StyleTypes.Styleset, impProps?: Set<string>): string
+/**
+ * Merges properties from the source styleset to the target styleset. All regular properties are
+ * replaced. Properties "--" and "!" get special treatment because they might be arrays.
+ * @param target 
+ * @param source 
+ * @returns Reference to the target styleset if not null or a new styleset otherwise.
+ */
+export function mergeStylesets( target: StyleTypes.Styleset, source: StyleTypes.Styleset): StyleTypes.Styleset
 {
+    if (!source)
+        return target;
+
+    // if target is not defined, create it as an empty object. This object will be returned after
+    // properties from the source are copied to it.
+    if (!target)
+    {
+        target = {};
+        Object.assign( target, source);
+        return target;
+    }
+
+    // check whether custom properties and important properties are defined. If we don't have
+    // either, we can just use the Object.assign function.
+    let sourceCustomProps = source["--"];
+    let sourceImpProps = source["!"];
+    if (!sourceCustomProps && !sourceImpProps)
+    {
+        Object.assign( target, source);
+        return target;
+    }
+
+    // merge custom properties
+    if (sourceCustomProps)
+    {
+        let targetCustomProps = target["--"];
+        target["--"] = !targetCustomProps ? sourceCustomProps : targetCustomProps.concat( sourceCustomProps);
+    }
+
+    // merge important properties
+    if (sourceImpProps)
+    {
+        let targetImpProps = target["!"];
+        target["!"] = !targetImpProps ? sourceImpProps : targetImpProps.concat( sourceImpProps);
+    }
+
+    // copy all other properties from the source
+	for( let propName in source)
+	{
+        if (propName === "!" || propName === "--")
+            continue;
+        else
+            target[propName] = source[propName];
+	}
+
+    return target;
+}
+
+
+
+/** Converts the given styleset to its string representation */
+export function stylesetToCssString( styleset: StyleTypes.Styleset): string | null
+{
+    if (!styleset)
+        return null;
+
+    let impProps: Set<string> = null;
+    if (styleset["!"])
+    {
+        // value is either a single name or an array of names of CSS properties to add the !important flag
+        impProps = new Set<string>();
+        let impPropVal = styleset["!"] as (string | string[]);
+        if (typeof impPropVal === "string")
+            impProps.add( impPropVal);
+        else
+            impPropVal.forEach( v => impProps.add( v));
+    }
+
     let buf: string[] = [];
 	for( let propName in styleset)
 	{
+        if (propName === "!")
+            continue;
         if (propName === "--")
         {
             // special handling of the "--" property, which is an array where each item is
