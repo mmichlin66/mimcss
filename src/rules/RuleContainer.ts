@@ -5,7 +5,7 @@ import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
 import {AnimationRule} from "./AnimationRule"
-import {VarRule} from "./CustomVar"
+import {VarRule} from "./VarRule"
 import {ImportRule} from "./ImportRule"
 
 
