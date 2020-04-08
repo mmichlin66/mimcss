@@ -14,5 +14,6 @@ export {
 	$import, $fontface
 } from "./rules/RuleFuncs";
 export {Num, Len, Angle, Time, Resolution, Frequency, Percent} from "./styles/UtilFuncs";
+export {Colors} from "./styles/ColorFuncs";
 export {$selector} from "./styles/SelectorFuncs";
 export {useOptimizedStyleNames, $use, $activate, $deactivate} from "./rules/Stylesheet";

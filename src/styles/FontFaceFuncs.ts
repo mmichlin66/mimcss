@@ -48,7 +48,7 @@ function fontStretchToCssString( val: FontFaceTypes.FontStretchType): string
 
 
 
-function fontStyleToCssString( val: FontFaceTypes.FontStretchType): string
+function fontStyleToCssString( val: FontFaceTypes.FontStyleType): string
 {
     if (typeof val === "string")
         return val;
@@ -94,7 +94,7 @@ function fontSrcToCssString( val: FontFaceTypes.FontSrcType): string
     if (typeof val === "string" || !Array.isArray(val))
         return fontSingleSrcToCssString( val as FontFaceTypes.FontSingleSrcType);
     else
-        return val.map( (singleVal) => fontSingleSrcToCssString( singleVal)).join(",");
+        return val.map( singleVal => fontSingleSrcToCssString( singleVal)).join(",");
 }
 
 

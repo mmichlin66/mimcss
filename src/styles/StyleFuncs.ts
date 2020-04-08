@@ -8,6 +8,11 @@ import * as ColorFuncs from "./ColorFuncs";
 
 
 
+// helper functions for style property conversions
+let multiTimeToStringWithComma = v => Time.multiStyleToString( v, ",");
+let multiLenToStringWithSpace = v => Time.multiStyleToString( v, " ");
+
+
 /**
  * Converts animation style represented as an object with fields corresponding to animation
  * properties to its CSS string value.
@@ -227,7 +232,7 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 {
     return valueToString( val, {
         fromObject: val => objectToCssString( val, false,
-            ["width", v => Len.multiStyleToString( v, " ")],
+            ["width", multiLenToStringWithSpace],
             ["style", valueToString],
             ["color", ColorFuncs.colorToCssString]
         )
@@ -503,8 +508,8 @@ type PropToStringFunc<K extends keyof IStyleset> = (val: IStyleset[K]) => string
 const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
 {
     animation: animationToCssString,
-    animationDelay: v => Time.multiStyleToString( v, ","),
-    animationDuration: v => Time.multiStyleToString( v, ","),
+    animationDelay: multiTimeToStringWithComma,
+    animationDuration: multiTimeToStringWithComma,
     animationIterationCount: Num.styleToString,
     animationTimingFunction: animationTimingFunctionToCssString,
 
@@ -521,7 +526,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     borderBottomWidth: Len.styleToString,
     borderColor: borderColorToCssString,
     borderImageOutset: borderImageOutsetToCssString,
-    borderImageWidth: v => Len.multiStyleToString( v, " "),
+    borderImageWidth: multiLenToStringWithSpace,
     borderLeft: borderSideToCssString,
     borderLeftColor: ColorFuncs.colorToCssString,
     borderLeftWidth: Len.styleToString,
@@ -536,7 +541,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
     borderTopWidth: Len.styleToString,
-    borderWidth: v => Len.multiStyleToString( v, " "),
+    borderWidth: multiLenToStringWithSpace,
     bottom: Len.styleToString,
     boxShadow: valueToString,
 
@@ -547,7 +552,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     columnRule: columnRuleToCssString,
     columnRuleColor: ColorFuncs.colorToCssString,
     columnRuleStyle: valueToString,
-    columnRuleWidth: v => Len.multiStyleToString( v, " "),
+    columnRuleWidth: multiLenToStringWithSpace,
     columns: columnsToCssString,
 
     flex: flexToCssString,
@@ -555,7 +560,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     fontSize: Len.styleToString,
     fontStyle: fontStyleToCssString,
 
-    gap: v => Len.multiStyleToString( v, " "),
+    gap: multiLenToStringWithSpace,
     gridColumnGap: Len.styleToString,
     gridRowGap: Len.styleToString,
 
@@ -565,7 +570,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     letterSpacing: Len.styleToString,
     lightingColor: ColorFuncs.colorToCssString,
 
-    margin: v => Len.multiStyleToString( v, " "),
+    margin: multiLenToStringWithSpace,
     marginBottom: Len.styleToString,
     marginLeft: Len.styleToString,
     marginRight: Len.styleToString,
@@ -580,7 +585,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     outlineOffset: Len.styleToString,
     outlineStyle: valueToString,
 
-    padding: v => Len.multiStyleToString( v, " "),
+    padding: multiLenToStringWithSpace,
     paddingBottom: Len.styleToString,
     paddingLeft: Len.styleToString,
     paddingRight: Len.styleToString,
