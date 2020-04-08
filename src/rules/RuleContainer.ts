@@ -7,6 +7,7 @@ import {IDRule} from "./IDRule"
 import {AnimationRule} from "./AnimationRule"
 import {VarRule} from "./VarRule"
 import {ImportRule} from "./ImportRule"
+import {NamespaceRule} from "./NamespaceRule"
 
 
 
@@ -69,6 +70,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 
 		this.allRules = [];
 		this.importRules = [];
+		this.namespaceRules = [];
 		this.allNames = {};
 
 		this._classes = {};
@@ -183,6 +185,8 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 		}
 		else if (rule instanceof ImportRule)
 			this.importRules.push( rule);
+		else if (rule instanceof NamespaceRule)
+			this.namespaceRules.push( rule);
 	}
 
 
@@ -220,6 +224,8 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 			this.allRules.push( rule);
 			if (rule instanceof ImportRule)
 				this.importRules.push( rule);
+			else if (rule instanceof NamespaceRule)
+				this.namespaceRules.push( rule);
 		}
 	}
 
@@ -228,12 +234,12 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 	// Inserts all rules defined in this container to either the style sheet or grouping rule.
 	protected insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		// insert @import rules as they must be before other rules. If the parent is a grouping
+		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import rules at all
 		if (parent instanceof CSSStyleSheet)
 		{
-			for( let rule of this.importRules)
-				rule.insert( parent);
+			this.importRules && this.importRules.forEach( rule => rule.insert( parent))
+			this.namespaceRules && this.namespaceRules.forEach( rule => rule.insert( parent))
 		}
 
 		// isert our custom variables in a ":root" rule
@@ -247,7 +253,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 		// insert all other rules
 		for( let rule of this.allRules)
 		{
-			if (!(rule instanceof ImportRule))
+			if (!(rule instanceof ImportRule || rule instanceof NamespaceRule))
 				rule.insert( parent);
 		}
 	}
@@ -288,8 +294,11 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 	// List of all rules except @import
 	public allRules: Rule[];
 
-	// List of all rules except @import
+	// List of @import rules
 	public importRules: ImportRule[];
+
+	// List of @namespace rules
+	public namespaceRules: NamespaceRule[];
 
 	// Map of names of properties defining class rules to actual class names.
 	private _classes: { [K: string]: string };

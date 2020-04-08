@@ -65,7 +65,7 @@ export class ImportRule extends Rule implements IImportRule
 
 
 
-	/** SOM media rule */
+	/** SOM import rule */
 	public get cssImportRule(): CSSImportRule { return this.cssRule as CSSImportRule; }
 
 	// URL to import from.

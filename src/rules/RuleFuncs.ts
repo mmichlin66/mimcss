@@ -4,8 +4,9 @@
 
 
 import {
-	ExtendedStyleset, IAbstractRule, INamedEntity, ITagRule, IClassRule, IIDRule, ISelectorRule,
+	ExtendedStyleset, IAbstractRule, ITagRule, IClassRule, IIDRule, ISelectorRule,
 	IAnimationRule, AnimationFrame, IVarRule, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
+	INamespaceRule,
 } from "./RuleTypes";
 import {IStyleset, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
@@ -24,6 +25,7 @@ import {SupportsRule} from "./SupportsRule"
 import {MediaRule} from "./MediaRule"
 import {ImportRule} from "./ImportRule"
 import {FontFaceRule} from "./FontFaceRule"
+import {NamespaceRule} from "./NamespaceRule";
 
 
 
@@ -110,6 +112,12 @@ export function $import( url: string, mediaQuery?: string | MediaQuery, supports
  */
 export function $fontface( fontface: Fontface): IFontFaceRule
 	{ return new FontFaceRule( fontface); }
+
+/**
+ * Creates new namespace rule.
+ */
+export function $namespace( namespace: string, prefix?: string): INamespaceRule
+	{ return new NamespaceRule( namespace, prefix); }
 
 
 

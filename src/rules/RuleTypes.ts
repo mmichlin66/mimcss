@@ -227,7 +227,7 @@ export interface ISelectorRule extends IStyleRule
 
 
 /**
- * The IAnimationRule interface represents a @keyframes rule.
+ * The IAnimationRule interface represents the @keyframes rule.
  */
 export interface IAnimationRule extends IRule, INamedEntity
 {
@@ -246,7 +246,7 @@ export type AnimationFrame = ["from" | "to" | number, Omit<ExtendedStyleset,"!">
 
 
 /**
- * The IGroupRule interface represents a CSS grouping rule.
+ * The IGroupRule interface is a base interface for the CSS grouping rules.
  */
 export interface IGroupRule<T = any> extends IRuleContainer<T>, IRule
 {
@@ -257,7 +257,7 @@ export interface IGroupRule<T = any> extends IRuleContainer<T>, IRule
 
 
 /**
- * The ISupportRule interface represents a CSS @supports rule.
+ * The ISupportRule interface represents the CSS @supports rule.
  */
 export interface ISupportsRule<T = any> extends IGroupRule<T>
 {
@@ -268,7 +268,7 @@ export interface ISupportsRule<T = any> extends IGroupRule<T>
 
 
 /**
- * The IMediaRule interface represents a CSS @media rule.
+ * The IMediaRule interface represents the CSS @media rule.
  */
 export interface IMediaRule<T = any> extends IGroupRule<T>
 {
@@ -279,7 +279,7 @@ export interface IMediaRule<T = any> extends IGroupRule<T>
 
 
 /**
- * The IImportRule interface represents a CSS @import rule.
+ * The IImportRule interface represents the CSS @import rule.
  */
 export interface IImportRule extends IRule
 {
@@ -290,12 +290,29 @@ export interface IImportRule extends IRule
 
 
 /**
- * The IFontFaceRule interface represents a CSS @font-face rule.
+ * The IFontFaceRule interface represents the CSS @font-face rule.
  */
 export interface IFontFaceRule extends IRule
 {
 	/** SOM font-face rule */
 	readonly cssFontFaceRule: CSSFontFaceRule;
+}
+
+
+
+/**
+ * The INamespaceRule interface represents the CSS @namespace rule.
+ */
+export interface INamespaceRule extends IRule
+{
+	/** Namespace string for the rule */
+	readonly namespace: string;
+
+	/** Optional prefix for the rule */
+	readonly prefix: string | undefined;
+
+	/** SOM namespace rule */
+	readonly cssNamespaceRule: CSSNamespaceRule;
 }
 
 

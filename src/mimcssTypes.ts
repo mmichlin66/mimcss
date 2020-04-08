@@ -11,7 +11,7 @@ export * from "./rules/RuleTypes";
 
 export {
 	$abstract, $tag, $class, $id, $style, $animation, $var, $supports, $media,
-	$import, $fontface
+	$import, $fontface, $namespace
 } from "./rules/RuleFuncs";
 export {Num, Len, Angle, Time, Resolution, Frequency, Percent} from "./styles/UtilFuncs";
 export {Colors} from "./styles/ColorFuncs";
