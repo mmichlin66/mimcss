@@ -2,7 +2,7 @@
  * This file contains basic types and functions used to define CSS property types.
  */
 
-import {ICustomVar} from "../rules/RuleTypes"
+import {IVarRule} from "../rules/RuleTypes"
 
 
 
@@ -46,7 +46,7 @@ export interface IStringProxy
  * - IStringProxy type that allows specifying raw string value.
  * - ICustomVar object that allows using a CSS custom property.
  */
-export type ExtendedPropType<T> = T | Base_StyleType | IStringProxy | ICustomVar<ExtendedPropType<T>>;
+export type ExtendedPropType<T> = T | Base_StyleType | IStringProxy | IVarRule<ExtendedPropType<T>>;
 
 
 

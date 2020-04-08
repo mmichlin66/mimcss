@@ -5,7 +5,7 @@
 
 import {
 	ExtendedStyleset, IAbstractRule, INamedEntity, ITagRule, IClassRule, IIDRule, ISelectorRule,
-	IAnimationRule, AnimationFrame, ICustomVar, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
+	IAnimationRule, AnimationFrame, IVarRule, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
 } from "./RuleTypes";
 import {IStyleset, SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
@@ -19,7 +19,7 @@ import {IDRule} from "./IDRule"
 import {SelectorType} from "../styles/SelectorTypes"
 import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
-import {CustomVar} from "./CustomVar"
+import {VarRule} from "./CustomVar"
 import {SupportsRule} from "./SupportsRule"
 import {MediaRule} from "./MediaRule"
 import {ImportRule} from "./ImportRule"
@@ -83,9 +83,9 @@ export function $animation( frames?: AnimationFrame[], nameOverride?: string | I
  * function can be called without parameters just to "declare" the variable. Such variable can be
  * later used either in conditional grouping rules or in derived style definition classes.
  */
-export function $custom<K extends keyof IStyleset>( template: K, propVal?: IStyleset[K],
-				nameOverride?: string | ICustomVar<IStyleset[K]>): ICustomVar<IStyleset[K]>
-	{ return new CustomVar( template, propVal, nameOverride); }
+export function $var<K extends keyof IStyleset>( template: K, propVal?: IStyleset[K],
+				nameOverride?: string | IVarRule<IStyleset[K]>): IVarRule<IStyleset[K]>
+	{ return new VarRule( template, propVal, nameOverride); }
 
 /**
  * Creates new supports rule.

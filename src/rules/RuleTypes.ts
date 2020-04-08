@@ -163,7 +163,7 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	setCustomProp<T>( customVar: ICustomVar<T>, value: T, important?: boolean): void;
+	setCustomProp<T>( customVar: IVarRule<T>, value: T, important?: boolean): void;
 }
 
 
@@ -302,7 +302,7 @@ export interface IFontFaceRule extends IRule
 /**
  * The ICustomVar interface represents a CSS custom property definition.
  */
-export interface ICustomVar<T = any> extends INamedEntity
+export interface IVarRule<T = any> extends INamedEntity
 {
 	/**
 	 * Name of the property on the rule definition object to which this rule is assigned.
@@ -339,7 +339,7 @@ export interface IRuleContainer<T extends {} = {}>
 	readonly animations: NamesOfPropsOfType<T,IAnimationRule>;
 
 	/** Map of names of properties defining custom property rules to the ICustomVar objects. */
-	readonly vars: PropsOfType<T,ICustomVar>;
+	readonly vars: PropsOfType<T,IVarRule>;
 
 	/** Map of property names to rule objects. */
 	readonly rules: PropsOfType<T,IRule>;

@@ -1,4 +1,4 @@
-import {ICustomVar} from "./RuleTypes"
+import {IVarRule} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 import {IStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs"
@@ -12,9 +12,9 @@ import {createNames} from "./Rule";
  * functionality. In particular it has the process function that allows it to obtain an actual
  * name, which will be used when defining and using this custom property in CSS.
  */
-export class CustomVar<T = any> implements ICustomVar<T>
+export class VarRule<T = any> implements IVarRule<T>
 {
-	public constructor( template?: keyof IStyleset, value?: T, nameOverride?: string | ICustomVar)
+	public constructor( template?: keyof IStyleset, value?: T, nameOverride?: string | IVarRule)
 	{
 		this.template = template;
 		this.value = value;
@@ -35,9 +35,9 @@ export class CustomVar<T = any> implements ICustomVar<T>
 
 
 	// Creates a copy of the rule.
-	public clone(): CustomVar<T>
+	public clone(): VarRule<T>
 	{
-		let newRule = new CustomVar<T>();
+		let newRule = new VarRule<T>();
 		newRule.template = this.template;
 		newRule.value = this.value;
 		newRule.nameOverride = this.nameOverride;
@@ -101,7 +101,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | ICustomVar;
+	private nameOverride?: string | IVarRule;
 
 	// Rule container to which this rule belongs. This is "this" for Stylesheet.
 	public container: RuleContainer;

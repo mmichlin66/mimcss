@@ -1129,7 +1129,7 @@ export interface IStyleset
 
 
 
-import {ICustomVar} from "../rules/RuleTypes";
+import {IVarRule} from "../rules/RuleTypes";
 
 /**
  * The CustomVarStyleType type represents a custom CSS property name and value that are used to
@@ -1177,7 +1177,7 @@ import {ICustomVar} from "../rules/RuleTypes";
  * ```
  */
 export type CustomVarStyleType<K extends keyof IStyleset = any> = 
-    [ICustomVar<IStyleset[K]>, IStyleset[K]] | [string, K, IStyleset[K]]
+    [IVarRule<IStyleset[K]>, IStyleset[K]] | [string, K, IStyleset[K]]
 
 
 
