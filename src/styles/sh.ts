@@ -38,7 +38,7 @@ export class sh
      * to a CSS compliant string.
      * @param stylePropValue Value to convert.
      */
-    public static val<K extends keyof IStyleset>( stylePropName: K, stylePropValue: IStyleset[K]): string
+    public static val<K extends keyof IStyleset>( stylePropName: K, stylePropValue: IStyleset[K]): string | null
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }

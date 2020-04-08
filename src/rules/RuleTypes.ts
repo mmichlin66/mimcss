@@ -310,7 +310,7 @@ export interface ICustomVar<T = any> extends INamedEntity
 	readonly ruleName: string;
 
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
-	readonly template: string;
+	readonly template: keyof IStyleset;
 
 	/** Sets new value of this custom CSS property. */
 

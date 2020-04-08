@@ -1,5 +1,6 @@
 import {ICustomVar} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {IStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs"
 import {createNames} from "./Rule";
 
@@ -13,7 +14,7 @@ import {createNames} from "./Rule";
  */
 export class CustomVar<T = any> implements ICustomVar<T>
 {
-	public constructor( template?: string, value?: T, nameOverride?: string | ICustomVar)
+	public constructor( template?: keyof IStyleset, value?: T, nameOverride?: string | ICustomVar)
 	{
 		this.template = template;
 		this.value = value;
@@ -79,7 +80,7 @@ export class CustomVar<T = any> implements ICustomVar<T>
 	public ruleName: string;
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
-	public template: string;
+	public template: keyof IStyleset;
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
