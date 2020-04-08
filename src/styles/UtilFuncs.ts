@@ -1,5 +1,5 @@
-﻿import {IStringProxy, Number_StyleType, MultiNumber_StyleType, ICssNumberMath,
-    Size_StyleType, MultiSize_StyleType, Position_StyleType, MultiPosition_StyleType
+﻿import {IStringProxy, Number_StyleType, MultiNumber_StyleType, INumberMath,
+    Size_StyleType, MultiSize_StyleType, Position_StyleType, MultiPosition_StyleType, IFractionMath
 } from "./UtilTypes"
 
 
@@ -324,14 +324,14 @@ class CalcFuncProxy implements IStringProxy
 
 
 /**
- * The CssNummberMath class contains methods that implement CSS mathematic functions on the
+ * The NummberMath class contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
  */
-class CssNumberMath implements ICssNumberMath
+class NumberMath implements INumberMath
 {
     // Function that appends proper units for parameters of number type.
-    private convertFunc: ConvertFuncType;
+    protected convertFunc: ConvertFuncType;
 
     constructor( init?: ConvertFuncType | [string,string])
     {
@@ -367,11 +367,6 @@ class CssNumberMath implements ICssNumberMath
         return new MathFuncProxy( "max", params, this.convertFunc);
     }
 
-    public minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy
-    {
-        return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
-    }
-
     public clamp( min: Number_StyleType, pref: Number_StyleType, max: Number_StyleType): IStringProxy
     {
         return new MathFuncProxy( "clamp", [min, pref, max], this.convertFunc);
@@ -396,7 +391,7 @@ class CssNumberMath implements ICssNumberMath
  * CSS type. When arguments for these functions are of the number JavaScript type they are
  * converted to strings without appending any units to them.
  */
-export let Num: ICssNumberMath = new CssNumberMath();
+export let Num: INumberMath = new NumberMath();
 
 
 
@@ -411,7 +406,7 @@ export let Num: ICssNumberMath = new CssNumberMath();
  * CSS type by appending a length unit suffix.
  * Integer numbers use "px"; floating point numbers use "em".
  */
-export let Len: ICssNumberMath = new CssNumberMath( ["px", "em"]);
+export let Len: INumberMath = new NumberMath( ["px", "em"]);
 
 
 
@@ -426,7 +421,7 @@ export let Len: ICssNumberMath = new CssNumberMath( ["px", "em"]);
  * CSS type by appending an angle unit suffix.
  * Integer numbers use "deg"; floating point numbers use "rad".
  */
-export let Angle: ICssNumberMath = new CssNumberMath( ["deg", "rad"]);
+export let Angle: INumberMath = new NumberMath( ["deg", "rad"]);
 
 
 
@@ -441,7 +436,7 @@ export let Angle: ICssNumberMath = new CssNumberMath( ["deg", "rad"]);
  * CSS type by appending a time unit suffix.
  * Integer numbers use "ms"; floating point numbers use "s".
  */
-export let Time: ICssNumberMath = new CssNumberMath( ["ms", "s"]);
+export let Time: INumberMath = new NumberMath( ["ms", "s"]);
 
 
 
@@ -456,7 +451,7 @@ export let Time: ICssNumberMath = new CssNumberMath( ["ms", "s"]);
  * <resolution> CSS type by appending a resolution unit suffix.
  * Integer numbers use "dpi"; floating point numbers use "dpcm".
  */
-export let Resolution: ICssNumberMath = new CssNumberMath( ["dpi", "dpcm"]);
+export let Resolution: INumberMath = new NumberMath( ["dpi", "dpcm"]);
 
 
 
@@ -471,7 +466,41 @@ export let Resolution: ICssNumberMath = new CssNumberMath( ["dpi", "dpcm"]);
  * <frequency> CSS type by appending a frequency unit suffix.
  * Integer numbers use "Hz"; floating point numbers use "kHz".
  */
-export let Frequency: ICssNumberMath = new CssNumberMath( ["Hz", "kHz"]);
+export let Frequency: INumberMath = new NumberMath( ["Hz", "kHz"]);
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Fraction
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The FractionMath class contains methods that implement CSS mathematic functions on the
+ * <fraction> CSS types.
+ */
+class FractionMath extends NumberMath implements IFractionMath
+{
+    constructor()
+    {
+        super( ["fr", "%"])
+    }
+
+    public minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy
+    {
+        return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
+    }
+}
+
+
+
+/**
+ * The Fraction object contains static methods that implement CSS mathematic functions on the
+ * <fraction> CSS type by appending a fraction unit suffix.
+ * Integer numbers use "fr"; floating point numbers use "%".
+ */
+export let Fraction: IFractionMath = new FractionMath();
 
 
 
@@ -485,7 +514,7 @@ export let Frequency: ICssNumberMath = new CssNumberMath( ["Hz", "kHz"]);
  * The Percent object contains static methods that implement CSS mathematic functions on the
  * <percentage> CSS type by appending a "%" unit suffix.
  */
-export let Percent: ICssNumberMath = new CssNumberMath( (n: number) =>
+export let Percent: INumberMath = new NumberMath( (n: number) =>
         (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%");
 
 

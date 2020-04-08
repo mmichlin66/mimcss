@@ -239,12 +239,6 @@ export type BorderImageRepeatStyleType = BorderImageRepeatKeyword | [BorderImage
 
 
 
-/** Type for border-image-width style property */
-export type BorderImageWidthStyleType = UtilTypes.Number_StyleType |
-    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?];
-
-
-
 /** Type for single box shadow. */
 export type SingleBoxShadow = UtilTypes.ExtendedPropType<"none" | string>;
 
@@ -293,8 +287,7 @@ export type ClearStyleType = UtilTypes.ExtendedPropType<"none" | "left" | "right
 
 
 /** Type for clear style property */
-export type ClipStyleType = UtilTypes.ExtendedPropType<"auto"> |
-    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType];
+export type ClipStyleType = UtilTypes.ExtendedPropType<"auto"> | UtilTypes.Box_StyleType;
 
 
 
@@ -508,12 +501,6 @@ export type ListStyleStyleType = ListStyleTypeStyleType | ListStylePositionStyle
 
 
 
-/** Type for the margin style property */
-export type MarginStyleType = UtilTypes.Number_StyleType |
-    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?];
-
-
-
 /** Type for the object-fit style property */
 export type ObjectFitStyleType = UtilTypes.ExtendedPropType<"fill" | "contain" | "cover" | "none" | "scale-down">;
 
@@ -530,12 +517,6 @@ export type SingleOverflowStyleType = UtilTypes.ExtendedPropType<"visible" | "hi
 
 /** Type for the overflow- style property */
 export type OverflowStyleType = SingleOverflowStyleType | [SingleOverflowStyleType, SingleOverflowStyleType];
-
-
-
-/** Type for the padding style property */
-export type PaddingStyleType = UtilTypes.Number_StyleType |
-    [UtilTypes.Number_StyleType, UtilTypes.Number_StyleType, UtilTypes.Number_StyleType?, UtilTypes.Number_StyleType?];
 
 
 
@@ -784,7 +765,7 @@ export interface IStyleset
     borderImageRepeat?: BorderImageRepeatStyleType;
     borderImageSlice?: StyleType;
     borderImageSource?: StyleType;
-    borderImageWidth?: BorderImageWidthStyleType;
+    borderImageWidth?: UtilTypes.Box_StyleType;
     borderLeft?: BorderSide_StyleType;
     borderLeftColor?: ColorTypes.Color_StyleType;
     borderLeftStyle?: BorderSideStyle_StyleType;
@@ -923,7 +904,7 @@ export interface IStyleset
     listStylePosition?: ListStylePositionStyleType;
 	listStyleType?: ListStyleTypeStyleType;
 	
-    margin?: MarginStyleType;
+    margin?: UtilTypes.Box_StyleType;
     marginBottom?: UtilTypes.Number_StyleType;
     marginLeft?: UtilTypes.Number_StyleType;
     marginRight?: UtilTypes.Number_StyleType;
@@ -1010,7 +991,7 @@ export interface IStyleset
 	overflowInline?: SingleOverflowStyleType;
     overflowBlock?: SingleOverflowStyleType;
 	
-    padding?: PaddingStyleType;
+    padding?: UtilTypes.Box_StyleType;
     paddingBottom?: UtilTypes.Number_StyleType;
     paddingLeft?: UtilTypes.Number_StyleType;
     paddingRight?: UtilTypes.Number_StyleType;

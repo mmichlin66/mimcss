@@ -73,11 +73,67 @@ export type Number_StyleType = ExtendedPropType<number | string>;
 /** Type for multi-part numeric style property */
 export type MultiNumber_StyleType = Number_StyleType | Number_StyleType[];
 
+/** Type for box style property that can have 1 to 4 numeric values */
+export type Box_StyleType = Number_StyleType | 
+    [Number_StyleType, Number_StyleType, Number_StyleType?, Number_StyleType?];
+
+
+
+/**
+ * The INummberMath interface contains methods that implement CSS mathematic functions on the
+ * numeric CSS types. When arguments for these functions are of the number JavaScript type they
+ * are converted to strings by calling a function specified in the constructor.
+ */
+export interface INumberMath
+{
+    /** Converts number to string appending necessary unit suffixes */
+    numberToString: ( n: number) => string;
+
+    /** Converts single numeric style value to string appending necessary unit suffixes */
+    styleToString: ( val: Number_StyleType) => string;
+
+    /** Converts multiple numeric style value to string appending necessary unit suffixes */
+    multiStyleToString: ( val: MultiNumber_StyleType, separator: string) => string;
+
+    /** Creates property value of <number> type using the CSS min() function. */
+    min( ...params: Number_StyleType[]): IStringProxy;
+
+    /** Creates property value of <number> type using the CSS max() function. */
+    max( ...params: Number_StyleType[]): IStringProxy;
+
+    /** Creates property value of <number> type using the CSS clamp() function. */
+    clamp( min: Number_StyleType, pref: Number_StyleType, max: Number_StyleType): IStringProxy;
+
+    /**
+     * Creates property value using the CSS calc() function. This function accepts a formular
+     * string and an arbitrary number of parameters. The formular string can contain placeholders
+     * that will be replaced by the parameters. Placeholders have the following format:
+     * 
+     * ```
+     * {<index> [| <unit>]}
+     * ```
+     * The <index> token is a zero-based index in the parameter array. The optional <unit> token is
+     * a measurement unit (length, percent, angle, etc.) and is used if the corresponding parameter
+     * is a number.
+     * 
+     * ```typescript
+     * class MyStyles
+     * {
+     *     wallGap = $var( "width", 16);
+     *     myClass = $class({ maxWidth: tsh.calc("100% - 2*{0}", this.wallGap)})
+     * }
+     * ```
+     * @param formula 
+     * @param params 
+     */
+    calc( formula: string, ...params: Number_StyleType[]): IStringProxy;
+}
+
 
 
 /** Units of length */
 export type LengthUnits = "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" | "mm" | "pc" |
-                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "%";
+                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin";
 
 /** Units of angle */
 export type AngleUnits = "deg" | "rad" | "grad" | "turn";
@@ -91,8 +147,28 @@ export type ResolutionUnits = "dpi" | "dpcm" | "dppx" | "x";
 /** Units of frequency */
 export type FrequencyUnits = "Hz" | "kHz";
 
-/** Units of flex */
-export type FlexUnits = "fr";
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Fraction
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Units of fractions (for flex and grid layouts) */
+export type FractionUnits = "fr";
+
+
+
+/**
+ * The IFractionMath interface contains methods that implement CSS mathematic functions on the
+ * <fraction> CSS types.
+ */
+export interface IFractionMath extends INumberMath
+{
+    /** Creates property value of <number> type using the CSS minmax() function. */
+    minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy;
+}
 
 
 
@@ -129,61 +205,6 @@ export type Position_StyleType = ExtendedPropType<"center" | "left" | "right" | 
 
 /** Type for multi-part position style property */
 export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];
-
-
-
-/**
- * The CssNummberMath class contains methods that implement CSS mathematic functions on the
- * numeric CSS types. When arguments for these functions are of the number JavaScript type they
- * are converted to strings by calling a function specified in the constructor.
- */
-export interface ICssNumberMath
-{
-    /** Converts number to string appending necessary unit suffixes */
-    numberToString: ( n: number) => string;
-
-    /** Converts single numeric style value to string appending necessary unit suffixes */
-    styleToString: ( val: Number_StyleType) => string;
-
-    /** Converts multiple numeric style value to string appending necessary unit suffixes */
-    multiStyleToString: ( val: MultiNumber_StyleType, separator: string) => string;
-
-    /** Creates property value of <number> type using the CSS min() function. */
-    min( ...params: Number_StyleType[]): IStringProxy;
-
-    /** Creates property value of <number> type using the CSS max() function. */
-    max( ...params: Number_StyleType[]): IStringProxy;
-
-    /** Creates property value of <number> type using the CSS minmax() function. */
-    minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy;
-
-    /** Creates property value of <number> type using the CSS clamp() function. */
-    clamp( min: Number_StyleType, pref: Number_StyleType, max: Number_StyleType): IStringProxy;
-
-    /**
-     * Creates property value using the CSS calc() function. This function accepts a formular
-     * string and an arbitrary number of parameters. The formular string can contain placeholders
-     * that will be replaced by the parameters. Placeholders have the following format:
-     * 
-     * ```
-     * {<index> [| <unit>]}
-     * ```
-     * The <index> token is a zero-based index in the parameter array. The optional <unit> token is
-     * a measurement unit (length, percent, angle, etc.) and is used if the corresponding parameter
-     * is a number.
-     * 
-     * ```typescript
-     * class MyStyles
-     * {
-     *     wallGap = $var( "width", 16);
-     *     myClass = $class({ maxWidth: tsh.calc("100% - 2*{0}", this.wallGap)})
-     * }
-     * ```
-     * @param formula 
-     * @param params 
-     */
-    calc( formula: string, ...params: Number_StyleType[]): IStringProxy;
-}
 
 
 

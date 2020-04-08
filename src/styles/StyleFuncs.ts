@@ -4,13 +4,22 @@ import {camelToDash, valueToString, arrayToCssString, objectToCssString,
     multiSizeToCssString, positionToCssString, multiPositionToCssString,
     Num, Len, Angle, Time,
 } from "./UtilFuncs"
+import {MultiNumber_StyleType} from "./UtilTypes";
 import * as ColorFuncs from "./ColorFuncs";
 
 
 
 // helper functions for style property conversions
-let multiTimeToStringWithComma = v => Time.multiStyleToString( v, ",");
-let multiLenToStringWithSpace = v => Time.multiStyleToString( v, " ");
+function multiTimeToStringWithComma( val: MultiNumber_StyleType)
+{
+    return Time.multiStyleToString( val, ",");
+
+}
+
+function multiLenToStringWithSpace( val: MultiNumber_StyleType)
+{
+    return Len.multiStyleToString( val, " ");
+}
 
 
 /**
