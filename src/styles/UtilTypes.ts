@@ -2,8 +2,6 @@
  * This file contains basic types and functions used to define CSS property types.
  */
 
-import {IVarRule} from "../rules/RuleTypes"
-
 
 
 /**
@@ -29,7 +27,7 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | null |
  * Another benefit of using objects implementing the IStringProxy interface is that they are
  * constructed at one point but the string generation occurs at another time. This allows
  * using these objects in the style definition classes. They can reference objects like
- * ICustomVar that are not fully initialized yet. However, when the styles should be inserted
+ * IVarRule that are not fully initialized yet. However, when the styles should be inserted
  * into DOM the initialization will have already occurred and the valueToString method will
  * return a correct string.
  */
@@ -41,12 +39,25 @@ export interface IStringProxy
 
 
 /**
+ * The ICustomVar interface represents a CSS custom property object with values of the given type.
+ * we need this interface because every style property can accept value in the form of var()
+ * CSS function.
+ */
+export interface ICustomVar<T = any> extends IStringProxy
+{
+	// Value of the custom CSS property.
+	readonly value: T;
+}
+
+
+
+/**
  * Type that extends the given type with the following types:
  * - basic style values that are valid for all style properties.
  * - IStringProxy type that allows specifying raw string value.
  * - ICustomVar object that allows using a CSS custom property.
  */
-export type ExtendedPropType<T> = T | Base_StyleType | IStringProxy | IVarRule<ExtendedPropType<T>>;
+export type ExtendedPropType<T> = T | Base_StyleType | IStringProxy | ICustomVar<ExtendedPropType<T>>;
 
 
 
@@ -164,7 +175,7 @@ export interface ICssNumberMath
      * ```typescript
      * class MyStyles
      * {
-     *     wallGap = $custom( "width", 16);
+     *     wallGap = $var( "width", 16);
      *     myClass = $class({ maxWidth: tsh.calc("100% - 2*{0}", this.wallGap)})
      * }
      * ```

@@ -7,14 +7,14 @@ import {createNames} from "./Rule";
 
 
 /**
- * The CustomVar class describes a custom CSS property. CustomVar does not derive from the Rule
+ * The VarRule class describes a custom CSS property. VarRule does not derive from the Rule
  * class because it is not a real CSS rule; however, in many aspects it repeats the Rule's
  * functionality. In particular it has the process function that allows it to obtain an actual
  * name, which will be used when defining and using this custom property in CSS.
  */
-export class VarRule<T = any> implements IVarRule<T>
+export class VarRule<K extends keyof IStyleset = any> implements IVarRule<K>
 {
-	public constructor( template?: keyof IStyleset, value?: T, nameOverride?: string | IVarRule)
+	public constructor( template?: K, value?: IStyleset[K], nameOverride?: string | IVarRule<K>)
 	{
 		this.template = template;
 		this.value = value;
@@ -35,9 +35,9 @@ export class VarRule<T = any> implements IVarRule<T>
 
 
 	// Creates a copy of the rule.
-	public clone(): VarRule<T>
+	public clone(): VarRule<K>
 	{
-		let newRule = new VarRule<T>();
+		let newRule = new VarRule<K>();
 		newRule.template = this.template;
 		newRule.value = this.value;
 		newRule.nameOverride = this.nameOverride;
@@ -68,7 +68,7 @@ export class VarRule<T = any> implements IVarRule<T>
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setValue( value: T, important?: boolean): void
+	public setValue( value: IStyleset[K], important?: boolean): void
 	{
 		this.container.setCustomVarValue( this.cssName, stylePropToCssString( this.template, value, true), important)
 	}
@@ -80,7 +80,7 @@ export class VarRule<T = any> implements IVarRule<T>
 	public ruleName: string;
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
-	public template: keyof IStyleset;
+	public template: K;
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -97,11 +97,11 @@ export class VarRule<T = any> implements IVarRule<T>
 	public cssName: string;
 
 	// Value of the custom CSS property.
-	private value: T;
+	public value: IStyleset[K];
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | IVarRule;
+	private nameOverride?: string | IVarRule<K>;
 
 	// Rule container to which this rule belongs. This is "this" for Stylesheet.
 	public container: RuleContainer;

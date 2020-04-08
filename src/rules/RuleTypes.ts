@@ -6,6 +6,7 @@
 import {Styleset, IStyleset} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement} from "../styles/SelectorTypes";
 import {SelectorType} from "../styles/SelectorTypes"
+import {ICustomVar, ExtendedPropType} from "../styles/UtilTypes";
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -163,7 +164,7 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	setCustomProp<T>( customVar: IVarRule<T>, value: T, important?: boolean): void;
+	setCustomProp<K extends keyof IStyleset>( customVar: IVarRule<K>, value: IStyleset[K], important?: boolean): void;
 }
 
 
@@ -300,9 +301,9 @@ export interface IFontFaceRule extends IRule
 
 
 /**
- * The ICustomVar interface represents a CSS custom property definition.
+ * The IVarRule interface represents a CSS custom property definition.
  */
-export interface IVarRule<T = any> extends INamedEntity
+export interface IVarRule<K extends keyof IStyleset = any> extends INamedEntity, ICustomVar<IStyleset[K]>
 {
 	/**
 	 * Name of the property on the rule definition object to which this rule is assigned.
@@ -310,7 +311,7 @@ export interface IVarRule<T = any> extends INamedEntity
 	readonly ruleName: string;
 
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
-	readonly template: keyof IStyleset;
+	readonly template: K;
 
 	/** Sets new value of this custom CSS property. */
 
@@ -319,7 +320,7 @@ export interface IVarRule<T = any> extends INamedEntity
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	setValue( value: T, important?: boolean): void;
+	setValue( value: IStyleset[K], important?: boolean): void;
 }
 
 
@@ -338,7 +339,7 @@ export interface IRuleContainer<T extends {} = {}>
 	/** Map of names of properties defining animation rules to actual animation names. */
 	readonly animations: NamesOfPropsOfType<T,IAnimationRule>;
 
-	/** Map of names of properties defining custom property rules to the ICustomVar objects. */
+	/** Map of names of properties defining custom property rules to the IVarRule objects. */
 	readonly vars: PropsOfType<T,IVarRule>;
 
 	/** Map of property names to rule objects. */

@@ -84,7 +84,7 @@ export function $animation( frames?: AnimationFrame[], nameOverride?: string | I
  * later used either in conditional grouping rules or in derived style definition classes.
  */
 export function $var<K extends keyof IStyleset>( template: K, propVal?: IStyleset[K],
-				nameOverride?: string | IVarRule<IStyleset[K]>): IVarRule<IStyleset[K]>
+				nameOverride?: string | IVarRule<K>): IVarRule<K>
 	{ return new VarRule( template, propVal, nameOverride); }
 
 /**

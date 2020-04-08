@@ -215,7 +215,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param varValue New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setCustomProp<T>( varDef: IVarRule<T>, varValue: T, important?: boolean): void
+	public setCustomProp<K extends keyof IStyleset>( varDef: IVarRule<K>, varValue: IStyleset[K], important?: boolean): void
 	{
 		if (!varDef || !this.cssStyleRule)
 			return;

@@ -1137,14 +1137,14 @@ import {IVarRule} from "../rules/RuleTypes";
  * `--` property of the Styleset type.
  * 
  * CustomVarStyleType objects should be mostly used to override custom properties that have
- * previously been defined at the top-level using the $custom function. That way you can have a
+ * previously been defined at the top-level using the $var function. That way you can have a
  * "global" value of a custom property and assign a different value to it under a certain CSS
  * selector.
  * 
  * The values of the type can be specified as either a two-item or a three-item array. The
- * two-item array is used with a previously defined custom CSS property represented by an ICustomVar
+ * two-item array is used with a previously defined custom CSS property represented by an IVarRule
  * object:
- * - The first item is the ICustomVar object.
+ * - The first item is the IVarRule object.
  * - The second item is the value
  * 
  * The three-item array allows directly specifying the custom CSS property name:
@@ -1160,8 +1160,8 @@ import {IVarRule} from "../rules/RuleTypes";
  * class MyStyles
  * {
  *     // define global custom CSS property and re-define its value under "brown" class.
- *     mainColor = $custom( "color", "black");
- *     brown = $class({ $custom: [ [this.mainColor, "brown"] ] })
+ *     mainColor = $var( "color", "black");
+ *     brown = $class({ "--": [ [this.mainColor, "brown"] ] })
 
  *     // directly define custom CSS property under "blue" class.
  *     blue = $class({ "--": [ ["different-color", "color", "blue"] ] })
@@ -1177,7 +1177,7 @@ import {IVarRule} from "../rules/RuleTypes";
  * ```
  */
 export type CustomVarStyleType<K extends keyof IStyleset = any> = 
-    [IVarRule<IStyleset[K]>, IStyleset[K]] | [string, K, IStyleset[K]]
+    [IVarRule<K>, IStyleset[K]] | [string, K, IStyleset[K]]
 
 
 

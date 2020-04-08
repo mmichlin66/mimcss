@@ -1,4 +1,5 @@
 ﻿import * as StyleTypes from "./StyleTypes"
+import {IStyleset} from "./StyleTypes"
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
     multiSizeToCssString, positionToCssString, multiPositionToCssString,
     Num, Len, Angle, Time,
@@ -421,7 +422,7 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset): string | nu
         else
         {
             // get the string representation of the property
-            buf.push( stylePropToCssString( propName as keyof StyleTypes.IStyleset, styleset[propName]) +
+            buf.push( stylePropToCssString( propName as keyof IStyleset, styleset[propName]) +
                     (impProps && impProps.has( propName) ? " !important" : ""));
         }
 	}
@@ -436,7 +437,7 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset): string | nu
  * @param propVal 
  * @param valueOnly 
  */
-export function customPropToCssString<K extends keyof StyleTypes.IStyleset>(
+export function customPropToCssString<K extends keyof IStyleset>(
     propVal: StyleTypes.CustomVarStyleType<K>, valueOnly?: boolean): string | null
 {
     if (!propVal)
@@ -448,7 +449,7 @@ export function customPropToCssString<K extends keyof StyleTypes.IStyleset>(
     if (propVal.length === 2)
     {
         varName = propVal[0].cssName;
-        template = propVal[0].template as K;
+        template = propVal[0].template;
         value = propVal[1]
     }
     else
@@ -476,8 +477,8 @@ export function customPropToCssString<K extends keyof StyleTypes.IStyleset>(
  * Converts the given style property to the CSS style string
  * @param style 
  */
-export function stylePropToCssString<K extends keyof StyleTypes.IStyleset>(
-    propName: K, propVal: StyleTypes.IStyleset[K], valueOnly?: boolean): string | null
+export function stylePropToCssString<K extends keyof IStyleset>(
+    propName: K, propVal: IStyleset[K], valueOnly?: boolean): string | null
 {
     if (!propName || propVal == null)
         return null;
@@ -491,7 +492,7 @@ export function stylePropToCssString<K extends keyof StyleTypes.IStyleset>(
 
 
 /** Type defnition of a function that takes property value and converts it to string */
-type PropToStringFunc<K extends keyof StyleTypes.IStyleset> = (val: StyleTypes.IStyleset[K]) => string;
+type PropToStringFunc<K extends keyof IStyleset> = (val: IStyleset[K]) => string;
 
 
 
@@ -499,7 +500,7 @@ type PropToStringFunc<K extends keyof StyleTypes.IStyleset> = (val: StyleTypes.I
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in keyof StyleTypes.IStyleset]: PropToStringFunc<K> } =
+const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
 {
     animation: animationToCssString,
     animationDelay: v => Time.multiStyleToString( v, ","),
@@ -637,7 +638,7 @@ export function singleSupportsQueryToCssString( query: StyleTypes.SingleSupports
 
     let not = query.$negate ? "not" : "";
     return  `${not} (${propNames.map( (propName) =>
-        stylePropToCssString( propName as keyof StyleTypes.IStyleset, query[propName])).join( ") and (")})`;
+        stylePropToCssString( propName as keyof IStyleset, query[propName])).join( ") and (")})`;
 }
 
 

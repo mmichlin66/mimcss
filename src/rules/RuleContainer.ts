@@ -49,7 +49,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 	/** Map of names of properties defining animation rules to actual animation names. */
 	public get animations(): NamesOfPropsOfType<T,IAnimationRule> { return this._animations as NamesOfPropsOfType<T,IAnimationRule>; }
 
-	/** Map of names of properties defining custom property rules to the ICustomVar objects. */
+	/** Map of names of properties defining custom property rules to the IVarRule objects. */
 	public get vars(): PropsOfType<T,IVarRule> { return this._vars as PropsOfType<T,IVarRule>; }
 
 	/** Map of property names to rule objects. */
@@ -115,7 +115,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 		{
 			let propVal = rulesDef[propName];
 			if (propVal instanceof VarRule)
-				this.processCustomVar( propName, propVal as VarRule)
+				this.processVarRule( propName, propVal as VarRule)
 			else if (propVal instanceof Rule)
 				this.processNamedRule( propName, propVal as Rule);
 			else if (Array.isArray(propVal))
@@ -126,7 +126,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 
 
 	// Processes custom CSS property.
-	private processCustomVar( propName: string, varObj: VarRule): void
+	private processVarRule( propName: string, varObj: VarRule): void
 	{
 		// if the object is already assigned to a stylesheet, we create a clone of the
 		// rule and assign it to our stylesheet.
@@ -300,7 +300,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 	// Map of names of properties defining animation rules to actual animation names.
 	private _animations: { [K: string]: string };
 
-	// Map of names of properties defining custom property rules to the CustomVar objects.
+	// Map of names of properties defining custom property rules to the VarRule objects.
 	private _vars: { [K: string]: VarRule };
 
 	// Map of names of properties of the rule definitions to the Rule objects.
