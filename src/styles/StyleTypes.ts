@@ -1274,6 +1274,32 @@ export type Styleset = IStyleset &
 
 
 
+/** Represents pseudo classes */
+export type PseudoClass = ":active" | ":any-link" | ":blank" | ":checked" | ":default" | ":defined" |
+	":disabled" | ":empty" | ":enabled" | ":first-child" | ":first-of-type" | ":fullscreen" |
+	":focus" | ":focus-visible" | ":focus-Within" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" |
+	":last-child" | ":last-of-type" | ":link" | ":only-child" | ":only-of-type" | ":optional" |
+	":out-of-range" | ":placeholder-shown" | ":read-only" | ":read-write" | ":required" | ":root" |
+	":scope" | ":target" | ":valid" | ":visited" | ":dir(rtl)" | ":dir(ltr)";
+
+
+
+/** Represents print-related pseudo classes - those that can be specified with the @page CSS rule */
+export type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
+
+
+
+/** Represents possible pseudo elements */
+export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | "::firstLetter" |
+	"::firstLine" | "::grammarError" | "::marker" | "::placeholder" | "::selection" | "::spellingError";
+
+
+
+/** Type for a selector */
+export type SelectorType = string | UtilTypes.IStringProxy;
+
+
+
 /**
  * Type representing a single set of styles as part of the @supports rules. The styles in the
  * styleset are combined with the "and" operator. The entire styleset can be negated, which will

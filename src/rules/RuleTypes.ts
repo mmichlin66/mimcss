@@ -3,10 +3,9 @@
  */
 
 
-import {Styleset, IStyleset} from "../styles/StyleTypes";
-import {PseudoClass, PseudoElement} from "../styles/SelectorTypes";
-import {SelectorType} from "../styles/SelectorTypes"
-import {ICustomVar, ExtendedPropType} from "../styles/UtilTypes";
+import {Styleset, IStyleset, PagePseudoClass} from "../styles/StyleTypes";
+import {PseudoClass, PseudoElement, SelectorType} from "../styles/StyleTypes";
+import {ICustomVar, IStringProxy} from "../styles/UtilTypes";
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -246,39 +245,6 @@ export type AnimationFrame = ["from" | "to" | number, Omit<ExtendedStyleset,"!">
 
 
 /**
- * The IGroupRule interface is a base interface for the CSS grouping rules.
- */
-export interface IGroupRule<T = any> extends IRuleContainer<T>, IRule
-{
-	/** SOM grouping rule */
-	readonly cssGroupRule: CSSGroupingRule;
-}
-
-
-
-/**
- * The ISupportRule interface represents the CSS @supports rule.
- */
-export interface ISupportsRule<T = any> extends IGroupRule<T>
-{
-	/** SOM supports rule */
-	readonly cssSupportsRule: CSSSupportsRule;
-}
-
-
-
-/**
- * The IMediaRule interface represents the CSS @media rule.
- */
-export interface IMediaRule<T = any> extends IGroupRule<T>
-{
-	/** SOM media rule */
-	readonly cssMediaRule: CSSMediaRule;
-}
-
-
-
-/**
  * The IImportRule interface represents the CSS @import rule.
  */
 export interface IImportRule extends IRule
@@ -313,6 +279,20 @@ export interface INamespaceRule extends IRule
 
 	/** SOM namespace rule */
 	readonly cssNamespaceRule: CSSNamespaceRule;
+}
+
+
+
+/**
+ * The IPageRule interface represents the CSS @page rule.
+ */
+export interface IPageRule extends IStyleRule
+{
+	/** Optional name of the page pseudo style (e.g. "":first") */
+	readonly pseudoClass: PagePseudoClass | undefined;
+
+	/** SOM namespace rule */
+	readonly cssPageRule: CSSPageRule;
 }
 
 
@@ -380,6 +360,39 @@ export interface IRuleContainerClass<T extends {}>
 
 
 /**
+ * The IGroupRule interface is a base interface for the CSS grouping rules.
+ */
+export interface IGroupRule<T = any> extends IRuleContainer<T>, IRule
+{
+	/** SOM grouping rule */
+	readonly cssGroupRule: CSSGroupingRule;
+}
+
+
+
+/**
+ * The ISupportRule interface represents the CSS @supports rule.
+ */
+export interface ISupportsRule<T = any> extends IGroupRule<T>
+{
+	/** SOM supports rule */
+	readonly cssSupportsRule: CSSSupportsRule;
+}
+
+
+
+/**
+ * The IMediaRule interface represents the CSS @media rule.
+ */
+export interface IMediaRule<T = any> extends IGroupRule<T>
+{
+	/** SOM media rule */
+	readonly cssMediaRule: CSSMediaRule;
+}
+
+
+
+/**
  * The IStylesheet interface represents the resultant stylesheet after the stylesheet definition
  * has been processed. The stylesheet object contains names of IDs, classes and animations, which
  * can be used in the application code. The interface also provides methods that are used to
@@ -410,6 +423,11 @@ export interface IStylesheetClass<T extends {} = {}> extends IRuleContainerClass
 	 */
 	isMultiplex?: boolean;
 }
+
+
+
+/** Type for a single selector token that can be used as an argument to the $selector function */
+export type SelectorTokenType = ITagRule | IClassRule | IIDRule | ISelectorRule | number | string | IStringProxy;
 
 
 

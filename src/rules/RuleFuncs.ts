@@ -6,18 +6,19 @@
 import {
 	ExtendedStyleset, IAbstractRule, ITagRule, IClassRule, IIDRule, ISelectorRule,
 	IAnimationRule, AnimationFrame, IVarRule, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
-	INamespaceRule,
+	INamespaceRule, IPageRule, SelectorTokenType, RuleType
 } from "./RuleTypes";
-import {IStyleset, SupportsQuery} from "../styles/StyleTypes";
+import {IStringProxy} from "../styles/UtilTypes";
+import {IStyleset, SupportsQuery, SelectorType, PagePseudoClass, Styleset} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
 
 
+import {Rule} from "../rules/Rule"
 import {AbstractRule} from "./AbstractRule"
 import {TagRule} from "./TagRule"
 import {ClassRule} from "./ClassRule"
 import {IDRule} from "./IDRule"
-import {SelectorType} from "../styles/SelectorTypes"
 import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {VarRule} from "./VarRule"
@@ -26,6 +27,7 @@ import {MediaRule} from "./MediaRule"
 import {ImportRule} from "./ImportRule"
 import {FontFaceRule} from "./FontFaceRule"
 import {NamespaceRule} from "./NamespaceRule";
+import {PageRule} from "./PageRule";
 
 
 
@@ -118,6 +120,87 @@ export function $fontface( fontface: Fontface): IFontFaceRule
  */
 export function $namespace( namespace: string, prefix?: string): INamespaceRule
 	{ return new NamespaceRule( namespace, prefix); }
+
+/**
+ * Creates new page rule.
+ */
+export function $page( style?: Styleset, pseudoClass?: PagePseudoClass): IPageRule
+	{ return new PageRule( style, pseudoClass); }
+
+
+
+/**
+ * The SelectorProxy class implements the IStringProxy interface by encapsulating a selector
+ * template string with optional placeholders (e.g. {0}), which will be replaced by names
+ * of tags, classes and IDs and other possible types.
+ */
+class SelectorProxy implements IStringProxy
+{
+    constructor( template: string, params: SelectorTokenType[])
+    {
+        this.template = template;
+        this.params = params;
+    }
+
+    public valueToString(): string
+    {
+		let tokens: string[] = this.template.split( /{(\d+)}/g);
+		let tokenIsNumber = false;
+		let arr: string[] = [];
+		for (let token of tokens)
+		{
+			if (tokenIsNumber)
+			{
+				let index = parseInt( token, 10);
+				if (index >= this.params.length)
+					continue;
+
+				let item = this.params[index];
+				if (item == null)
+					continue;
+				else if (typeof item === "string")
+					arr.push( item);
+				else if (item instanceof Rule)
+				{
+					if (item.ruleType === RuleType.TAG)
+						arr.push( (item as ITagRule).tag);
+					else if (item.ruleType === RuleType.CLASS)
+						arr.push( (item as IClassRule).cssName);
+					else if (item.ruleType === RuleType.ID)
+						arr.push( (item as IIDRule).cssName);
+					else if (item.ruleType === RuleType.SELECTOR)
+						arr.push( (item as ISelectorRule).selectorText);
+				}
+				else 
+					arr.push( item.toString());
+			}
+			else if (token)
+				arr.push( token);
+	
+			tokenIsNumber = !tokenIsNumber;
+		}
+	
+		return arr.join( "");
+    }
+
+    // Name of the mathematical function.
+    private template: string;
+
+    // Array of Number_StyleType parameters to the mathematical function.
+    private params: SelectorTokenType[];
+}
+
+
+
+/**
+ * Returns a string representation of a selector using the given template string with optional
+ * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
+ * possible types.
+ */
+export function $selector( template: string, ...args: SelectorTokenType[]): SelectorType
+{
+	return !template ? "" : args.length === 0 ? template : new SelectorProxy( template, args);
+}
 
 
 

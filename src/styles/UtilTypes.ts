@@ -81,8 +81,8 @@ export type Box_StyleType = Number_StyleType |
 
 /**
  * The INummberMath interface contains methods that implement CSS mathematic functions on the
- * numeric CSS types. When arguments for these functions are of the number JavaScript type they
- * are converted to strings by calling a function specified in the constructor.
+ * numeric CSS types. When arguments for these functions are of the number type, they are converted
+ * to strings by calling a function specified in the constructor.
  */
 export interface INumberMath
 {
@@ -95,13 +95,13 @@ export interface INumberMath
     /** Converts multiple numeric style value to string appending necessary unit suffixes */
     multiStyleToString: ( val: MultiNumber_StyleType, separator: string) => string;
 
-    /** Creates property value of <number> type using the CSS min() function. */
+    /** Creates property value of using the CSS min() function. */
     min( ...params: Number_StyleType[]): IStringProxy;
 
-    /** Creates property value of <number> type using the CSS max() function. */
+    /** Creates property value using the CSS max() function. */
     max( ...params: Number_StyleType[]): IStringProxy;
 
-    /** Creates property value of <number> type using the CSS clamp() function. */
+    /** Creates property value using the CSS clamp() function. */
     clamp( min: Number_StyleType, pref: Number_StyleType, max: Number_StyleType): IStringProxy;
 
     /**
@@ -112,7 +112,7 @@ export interface INumberMath
      * ```
      * {<index> [| <unit>]}
      * ```
-     * The <index> token is a zero-based index in the parameter array. The optional <unit> token is
+     * The `<index>` token is a zero-based index in the parameter array. The optional `<unit>` token is
      * a measurement unit (length, percent, angle, etc.) and is used if the corresponding parameter
      * is a number.
      * 
@@ -120,7 +120,7 @@ export interface INumberMath
      * class MyStyles
      * {
      *     wallGap = $var( "width", 16);
-     *     myClass = $class({ maxWidth: tsh.calc("100% - 2*{0}", this.wallGap)})
+     *     myClass = $class({ maxWidth: Len.calc("100% - 2*{0}", this.wallGap)})
      * }
      * ```
      * @param formula 
@@ -162,11 +162,11 @@ export type FractionUnits = "fr";
 
 /**
  * The IFractionMath interface contains methods that implement CSS mathematic functions on the
- * <fraction> CSS types.
+ * `<fraction>` CSS types.
  */
 export interface IFractionMath extends INumberMath
 {
-    /** Creates property value of <number> type using the CSS minmax() function. */
+    /** Creates property value using the CSS minmax() function. */
     minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy;
 }
 

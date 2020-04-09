@@ -10,7 +10,7 @@ export class NamespaceRule extends Rule implements INamespaceRule
 {
 	public constructor( namespace?: string, prefix?: string)
 	{
-		super( RuleType.IMPORT);
+		super( RuleType.NAMESPACE);
 
 		this.namespace = namespace;
 		this.prefix = prefix;

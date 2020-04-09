@@ -5,15 +5,13 @@ export * from "./styles/ColorTypes";
 export * from "./styles/StyleTypes";
 export * from "./styles/MediaTypes";
 export * from "./styles/FontFaceTypes";
-export * from "./styles/SelectorTypes";
 export * from "./styles/sh";
 export * from "./rules/RuleTypes";
 
-export {
-	$abstract, $tag, $class, $id, $style, $animation, $var, $supports, $media,
-	$import, $fontface, $namespace
-} from "./rules/RuleFuncs";
 export {Num, Len, Angle, Time, Resolution, Frequency, Percent} from "./styles/UtilFuncs";
 export {Colors} from "./styles/ColorFuncs";
-export {$selector} from "./styles/SelectorFuncs";
+export {
+	$abstract, $tag, $class, $id, $style, $animation, $var, $supports, $media,
+	$import, $fontface, $namespace, $page, $selector
+} from "./rules/RuleFuncs";
 export {useOptimizedStyleNames, $use, $activate, $deactivate} from "./rules/Stylesheet";

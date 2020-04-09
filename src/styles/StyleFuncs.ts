@@ -673,6 +673,23 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
 
 
 
+/**
+ * Converts the selector object into full selector string.
+ */
+export function selectorToCssString( selector: StyleTypes.SelectorType): string
+{
+	if (!selector)
+		return "";
+	else if (typeof selector === "string")
+		return selector;
+	else if (typeof selector.valueToString === "function")
+		return selector.valueToString();
+	else
+		return selector.toString();
+}
+
+
+
 /** Converts the given supports query to its string representation */
 export function supportsQueryToCssString( query: StyleTypes.SupportsQuery): string
 {

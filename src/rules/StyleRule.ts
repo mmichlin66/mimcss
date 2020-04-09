@@ -1,10 +1,8 @@
 import {IStyleRule, ExtendedStyleset, RuleType, IVarRule} from "./RuleTypes";
-import {IStyleset, Styleset} from "../styles/StyleTypes"
-import {SelectorType} from "../styles/SelectorTypes"
+import {IStyleset, Styleset, SelectorType} from "../styles/StyleTypes"
 import {Rule} from "./Rule";
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
-import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
-import {selectorToCssString} from "../styles/SelectorFuncs";
+import {mergeStylesets, stylesetToCssString, stylePropToCssString, selectorToCssString} from "../styles/StyleFuncs"
 
 
 
@@ -14,7 +12,9 @@ import {selectorToCssString} from "../styles/SelectorFuncs";
  */
 export abstract class StyleRule extends Rule implements IStyleRule
 {
-	public constructor( type: RuleType, styleset?: ExtendedStyleset)
+	// The styleset can be an ExtendedStyleset for many rules; however, for some it is just
+	// of the Styleset type.
+	public constructor( type: RuleType, styleset?: Styleset)
 	{
 		super( type);
 
@@ -28,7 +28,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
 	 * important properties and nested rules.
 	 */
-	private parseInputStyleset( inputStyleset: ExtendedStyleset): void
+	private parseInputStyleset( inputStyleset: Styleset): void
 	{
 		// prepare local variables to accumulate parsing results. We do it in local varibales
 		// because in case there are parents, we want first copy properties from them so that
@@ -230,7 +230,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public get cssStyleRule(): CSSStyleRule { return this.cssRule as CSSStyleRule; }
 
 	// Resultant Styleset object defining properties to be inserted into DOM.
-	private styleset: Styleset;
+	protected styleset: Styleset;
 
 	// List of nested styles.
 	private nestedRules: NestedRule[];
