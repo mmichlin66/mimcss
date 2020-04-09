@@ -5,13 +5,6 @@
 
 
 /**
- * Style values that can be used for (almost) any CSS property.
- */
-export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | null | undefined;
-
-
-
-/**
  * The IStringProxy interface represents an object that can produce a string, which is returned
  * via the valueToString() method.
  * 
@@ -39,6 +32,13 @@ export interface IStringProxy
 
 
 /**
+ * Style values that can be used for (almost) any CSS property.
+ */
+export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | IStringProxy | null | undefined;
+
+
+
+/**
  * The ICustomVar interface represents a CSS custom property object with values of the given type.
  * we need this interface because every style property can accept value in the form of var()
  * CSS function.
@@ -57,7 +57,7 @@ export interface ICustomVar<T = any> extends IStringProxy
  * - IStringProxy type that allows specifying raw string value.
  * - ICustomVar object that allows using a CSS custom property.
  */
-export type ExtendedPropType<T> = T | Base_StyleType | IStringProxy | ICustomVar<ExtendedPropType<T>>;
+export type ExtendedPropType<T> = T | Base_StyleType | ICustomVar<T | Base_StyleType>;
 
 
 
