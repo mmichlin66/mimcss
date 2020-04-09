@@ -1,4 +1,4 @@
-import {IGroupRule, RuleType} from "./RuleTypes"
+import {RuleType, IRule, IRuleContainer} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -6,7 +6,7 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends {} = {}> extends RuleContainer<T> implements IGroupRule<T>
+export abstract class GroupRule<T extends {} = {}> extends RuleContainer<T> implements IRuleContainer<T>, IRule
 {
 	public constructor( type: RuleType, definition: T)
 	{
@@ -51,11 +51,6 @@ export abstract class GroupRule<T extends {} = {}> extends RuleContainer<T> impl
 		// clear sub-rules
 		this.clearRules();
 	}
-
-
-
-	/** SOM grouping rule */
-	public get cssGroupRule(): CSSGroupingRule { return this.cssRule as CSSGroupingRule; }
 }
 
 

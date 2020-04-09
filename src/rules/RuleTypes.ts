@@ -360,20 +360,9 @@ export interface IRuleContainerClass<T extends {}>
 
 
 /**
- * The IGroupRule interface is a base interface for the CSS grouping rules.
- */
-export interface IGroupRule<T = any> extends IRuleContainer<T>, IRule
-{
-	/** SOM grouping rule */
-	readonly cssGroupRule: CSSGroupingRule;
-}
-
-
-
-/**
  * The ISupportRule interface represents the CSS @supports rule.
  */
-export interface ISupportsRule<T = any> extends IGroupRule<T>
+export interface ISupportsRule<T = any> extends IRuleContainer<T>, IRule
 {
 	/** SOM supports rule */
 	readonly cssSupportsRule: CSSSupportsRule;
@@ -384,7 +373,7 @@ export interface ISupportsRule<T = any> extends IGroupRule<T>
 /**
  * The IMediaRule interface represents the CSS @media rule.
  */
-export interface IMediaRule<T = any> extends IGroupRule<T>
+export interface IMediaRule<T = any> extends IRuleContainer<T>, IRule
 {
 	/** SOM media rule */
 	readonly cssMediaRule: CSSMediaRule;
