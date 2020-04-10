@@ -75,7 +75,7 @@ export function $style( selector: SelectorType, style: ExtendedStyleset): ISelec
  * "declare" the animation. Such animation can be later used either in conditional grouping rules
  * or in derived style definition classes.
  */
-export function $animation( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule): IAnimationRule
+export function $keyframes( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule): IAnimationRule
 	{ return new AnimationRule( frames, nameOverride); }
 
 /**

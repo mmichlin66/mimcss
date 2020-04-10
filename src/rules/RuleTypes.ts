@@ -4,7 +4,7 @@
 
 
 import {IStyleset, Styleset, PagePseudoClass} from "../styles/StyleTypes";
-import {PseudoClass, PseudoElement, SelectorType} from "../styles/StyleTypes";
+import {PseudoClass, PseudoElement, SelectorType, IAnimationNameProvider} from "../styles/StyleTypes";
 import {ICustomVar, IStringProxy} from "../styles/UtilTypes";
 
 
@@ -228,7 +228,7 @@ export interface ISelectorRule extends IStyleRule
 /**
  * The IAnimationRule interface represents the @keyframes rule.
  */
-export interface IAnimationRule extends IRule, INamedEntity
+export interface IAnimationRule extends IRule, INamedEntity, IAnimationNameProvider
 {
 	/** SOM keyframes rule */
 	readonly cssKeyframesRule: CSSKeyframesRule;

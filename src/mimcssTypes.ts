@@ -11,7 +11,7 @@ export * from "./rules/RuleTypes";
 export {Num, Len, Angle, Time, Resolution, Frequency, Percent} from "./styles/UtilFuncs";
 export {Colors} from "./styles/ColorFuncs";
 export {
-	$abstract, $tag, $class, $id, $style, $animation, $var, $supports, $media,
+	$abstract, $tag, $class, $id, $style, $keyframes, $var, $supports, $media,
 	$import, $fontface, $namespace, $page, $selector
 } from "./rules/RuleFuncs";
 export {useOptimizedStyleNames, $use, $activate, $deactivate} from "./rules/Stylesheet";

@@ -76,8 +76,13 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         return val;
     else if (!options)
     {
+        // standard processing:
+        // - null/undefined become "initial".
+        // - call valueToString (IStringProxy) or varToString (IVarRule) if exist.
+        // - function: call without parameters.
+        // - everything else: call toString().
         if (val == null)
-            return "";
+            return "initial";
         else if (typeof val.valueToString === "function")
             return val.valueToString();
         else if (typeof val.varToString === "function")
@@ -89,8 +94,9 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
     }
     else
     {
+        // processing with options
         if (val == null)
-            return options.fromNull ? options.fromNull( val) : options.fromAny ? options.fromAny( val) : "";
+            return options.fromNull ? options.fromNull( val) : "initial";
         else if (typeof val === "boolean")
             return options.fromBool ? options.fromBool( val) : options.fromAny ? options.fromAny( val) : val.toString();
         else if (typeof val === "number")
@@ -599,37 +605,35 @@ export function multiPositionToCssString( val: MultiPosition_StyleType): string
  * @param propsAndFuncs Array of property names and optionally functions. The order of the names determines in
  *     which oprder the properties should be added to the string. If a function is present for the property,
  *     it will be used to convert the property's value to the string. If a function is not present, then the
- *     property value should be converted to the string using the toString method.
+ *     property value should be converted to the string using the valueToString function.
  */
-export function objectToCssString( val: any, usePropNames: boolean, ...propsAndFuncs: (string | [string, (val: any) => string])[] ): string
+export function objectToCssString( val: any, usePropNames: boolean,
+    ...propsAndFuncs: (string | [string, (val: any) => string])[] ): string
 {
     if (val == null || propsAndFuncs.length === 0)
-        return null;
+        return "";
 
-	let s = "";
+    let buf: string[] = [];
+    propsAndFuncs.forEach( propAndFunc =>
+        {
+            let propName = typeof propAndFunc === "string" ? propAndFunc : propAndFunc[0];
+            let func = typeof propAndFunc === "string" ? undefined : propAndFunc[1];
 
-    for( let propAndFunc in propsAndFuncs)
-    {
-        let propName = typeof propAndFunc === "string" ? propAndFunc : propAndFunc[0];
-        let func = typeof propAndFunc === "string" ? undefined : propAndFunc[1];
+            let propVal = val[propName];
+            if (propVal == null)
+                return;
 
-        let propVal = val[propName];
-        if (propVal == null)
-            continue;
+            if (usePropNames)
+                buf.push( propName);
 
-        if (s.length > 0)
-            s += " ";
+            if (func)
+                buf.push( func( propVal));
+            else if (propVal != null)
+                buf.push( valueToString( propVal));
+        }
+    );
 
-        if (usePropNames)
-            s += propName;
-
-        if (func)
-            s += " " + func( propVal);
-        else if (propVal != null)
-            s += " " + propVal;
-    }
-
-	return s;
+	return buf.join(" ");
 }
 
 

@@ -2,9 +2,11 @@
 import {IStyleset} from "./StyleTypes"
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
     multiSizeToCssString, positionToCssString, multiPositionToCssString,
-    Num, Len, Angle, Time,
+    Num, Len, Angle, Time, StringProxy
 } from "./UtilFuncs"
-import {ExtendedMultiNumber_StyleType} from "./UtilTypes";
+import {
+    ExtendedPropType, ExtendedNumber_StyleType, ExtendedMultiNumber_StyleType, IStringProxy
+} from "./UtilTypes";
 import * as ColorFuncs from "./ColorFuncs";
 
 
@@ -26,29 +28,50 @@ function multiLenToStringWithSpace( val: ExtendedMultiNumber_StyleType)
  * Converts animation style represented as an object with fields corresponding to animation
  * properties to its CSS string value.
  */
-function singleAnimationToCssString( val: StyleTypes.SingleAnimation): string
+function singleAnimationObjectToCssString( val: StyleTypes.SingleAnimation): string
 {
-    return valueToString( val, {
-        fromObject: v => objectToCssString( val, false,
-            ["delay", Time.styleToString],
-            ["function", singleAnimationTimingFunctionToCssString],
+    return objectToCssString( val, false,
             ["duration", Time.numberToString],
+            ["func", singleAnimationTimingFunctionToCssString],
+            ["delay", Time.styleToString],
             ["count", Num.styleToString],
             "direction",
-            "state",
             "mode",
-            "name")
+            "state",
+            ["name", singleAnimationNameToCssString]);
+}
+
+/**
+ * Converts animation style represented as an object with fields corresponding to animation
+ * properties to its CSS string value.
+ */
+function singleAnimationNameToCssString( val: ExtendedPropType<StyleTypes.SingleAnimationName>): string
+{
+    return valueToString( val, {
+        fromObject: v => (v as StyleTypes.IAnimationNameProvider).getAnimationName()
+    });
+}
+
+/**
+ * Converts animation style represented as an object with fields corresponding to animation
+ * properties to its CSS string value.
+ */
+function singleAnimationToCssString( val: ExtendedPropType<StyleTypes.SingleAnimation>): string
+{
+    return valueToString( val, {
+        fromObject: singleAnimationObjectToCssString
     });
 }
 
 /**
  * Converts animation style to its CSS string value.
  */
-function animationToCssString( val: StyleTypes.AnimationStyleType): string
+function animationToCssString( val: ExtendedPropType<StyleTypes.AnimationStyleType>): string
 {
     return valueToString( val, {
         arrayItemFunc: singleAnimationToCssString,
         arraySeparator: ",",
+        fromObject: singleAnimationObjectToCssString,
         fromAny: singleAnimationToCssString
     });
 }
@@ -58,34 +81,35 @@ function animationToCssString( val: StyleTypes.AnimationStyleType): string
 /**
  * Converts single animation timing function value to the CSS time string.
  */
-function singleAnimationTimingFunctionToCssString( val: StyleTypes.SingleAnimationTimingFunction): string
+function singleAnimationTimingFunctionToCssString( val: ExtendedPropType<StyleTypes.SingleAnimationTimingFunction>): string
 {
     return valueToString( val, {
-        fromArray: val =>
+        fromNumber: v => `steps(${v})`,
+        fromArray: v =>
         {
-            if (val.length < 3)
+            if (v.length < 3)
             {
-                // this is step function with only the number of steps
+                // this is steps function with only the number of steps
 
                 /// #if DEBUG
-                    if (val[0] <= 0)
-                        throw new Error( "Number of steps in animation function must be greater than zero");
-                    else if (!Number.isInteger( val[0]))
-                        throw new Error( "Number of steps in animation function must be an Integer");
+                    if (v[0] <= 0)
+                        console.error( `Number of steps in animation function must be greater than zero. You have: ${v[0]}`);
+                    else if (!Number.isInteger( v[0]))
+                        console.error( `Number of steps in animation function must be an Integer. You have: ${v[0]}`);
                 /// #endif
 
-                return `step(${val[0]}${val.length === 2 ? "," + val[1] : ""})`;
+                return `steps(${v[0]}${v.length === 2 ? "," + v[1] : ""})`;
             }
             else
             {
                 // this is bezier function
 
                 /// #if DEBUG
-                    if (val[0] < 0 || val[0] > 1 || val[2] < 0 || val[2] > 1)
-                        throw new Error( "First and third parameters of cubic-bezier animation function must be between 0 and 1");
+                    if (v[0] < 0 || v[0] > 1 || v[2] < 0 || v[2] > 1)
+                        console.error( `First and third parameters of cubic-bezier animation function must be between 0 and 1. You have ${v[0]} and ${v[2]}`);
                 /// #endif
 
-                return `cubic-bezier(${val[0]},${val[1]},${val[2]},${val[3]})`;
+                return `cubic-bezier(${v[0]},${v[1]},${v[2]},${v[3]})`;
             }
         }
     });
@@ -97,14 +121,15 @@ function singleAnimationTimingFunctionToCssString( val: StyleTypes.SingleAnimati
 function animationTimingFunctionToCssString( val: StyleTypes.AnimationTimingFunctionStyleType): string
 {
     return valueToString( val, {
-        fromArray: val =>
+        fromNumber: singleAnimationTimingFunctionToCssString,
+        fromArray: v =>
         {
-            if (val.length === 0)
+            if (v.length === 0)
                 return "";
-            else if (typeof val[0] === "number")
+            else if (typeof v[0] === "number")
                 return singleAnimationTimingFunctionToCssString( val as StyleTypes.SingleAnimationTimingFunction);
             else
-                return arrayToCssString( val as StyleTypes.SingleAnimationTimingFunction[],
+                return arrayToCssString( v as StyleTypes.SingleAnimationTimingFunction[],
                                 singleAnimationTimingFunctionToCssString, ",");
         }
     });
@@ -131,19 +156,19 @@ function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_Style
 function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
 {
     return valueToString( val, {
-        fromArray: val =>
+        fromArray: v =>
         {
-            if (Array.isArray( val[0]))
+            if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = arrayToCssString( val[0], Len.styleToString, " ");
+                let s = arrayToCssString( v[0], Len.styleToString, " ");
                 s += " / ";
-                return s + arrayToCssString( val[1] as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
+                return s + arrayToCssString( v[1] as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return arrayToCssString( val as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
+                return arrayToCssString( v as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
             }
         },
         fromAny: Len.styleToString

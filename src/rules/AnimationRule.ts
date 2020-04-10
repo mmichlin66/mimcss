@@ -70,6 +70,9 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 
+    /** Returns the name of the animation */
+    public getAnimationName(): string { return this.name; }
+
 	/** SOM keyframes rule */
 	public get cssKeyframesRule(): CSSKeyframesRule { return this.cssRule as CSSKeyframesRule; }
 
