@@ -383,10 +383,10 @@ export interface IStylesheetClass<T extends {} = {}>
 
 
 /**
- * The GroupRuleDefinition class is a base for all classes that define nested grouping rules.
+ * The NestedGroup class is a base for all classes that define nested grouping rules.
  * @typeparam O Stylesheet definition class, which is the owner of this grouping rule.
  */
-export abstract class GroupRuleDefinition<O extends {} = {}>
+export abstract class NestedGroup<O extends {} = {}>
 {
 	constructor( protected owner: O) {}
 }
@@ -396,7 +396,7 @@ export abstract class GroupRuleDefinition<O extends {} = {}>
 /**
  * "Constructor" interface defining how group rule definition classes can be created.
  */
-export interface IGroupRuleDefinitionClass<T extends GroupRuleDefinition<O>, O extends {} = {}>
+export interface INestedGroupClass<T extends NestedGroup<O>, O extends {} = {}>
 {
 	/** All group rule definition classes should conform to this constructor */
 	new( owner?: O): T;

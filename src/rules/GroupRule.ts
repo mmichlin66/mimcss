@@ -1,4 +1,4 @@
-import {RuleType, IRule, IRuleContainer, IGroupRuleDefinitionClass, GroupRuleDefinition} from "./RuleTypes"
+import {RuleType, IRule, IRuleContainer, INestedGroupClass, NestedGroup} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -6,9 +6,9 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends GroupRuleDefinition<O>, O extends {}> extends RuleContainer<T> implements IRuleContainer<T>, IRule
+export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends RuleContainer<T> implements IRuleContainer<T>, IRule
 {
-	public constructor( type: RuleType, definitionClass: IGroupRuleDefinitionClass<T,O>)
+	public constructor( type: RuleType, definitionClass: INestedGroupClass<T,O>)
 	{
 		super( type);
 		this.definitionClass = definitionClass;
@@ -36,7 +36,7 @@ export abstract class GroupRule<T extends GroupRuleDefinition<O>, O extends {}> 
 		}
 		catch( err)
 		{
-			console.error( `Error instantiating Group Rule Definition Class '${this.definitionClass.name}'`);
+			console.error( `Error instantiating Group Rule Definition Class '${this.definitionClass.name}'`, err);
 			return null;
 		}
 	}
@@ -72,7 +72,7 @@ export abstract class GroupRule<T extends GroupRuleDefinition<O>, O extends {}> 
 
 
 	// Class that defined this stylesheet.
-	protected definitionClass: IGroupRuleDefinitionClass<T,O>;
+	protected definitionClass: INestedGroupClass<T,O>;
 }
 
 

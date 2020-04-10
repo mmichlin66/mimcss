@@ -6,7 +6,7 @@
 import {
 	ExtendedStyleset, IAbstractRule, ITagRule, IClassRule, IIDRule, ISelectorRule,
 	IAnimationRule, AnimationFrame, IVarRule, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
-	INamespaceRule, IPageRule, SelectorTokenType, RuleType, IGroupRuleDefinitionClass, GroupRuleDefinition
+	INamespaceRule, IPageRule, SelectorTokenType, RuleType, INestedGroupClass, NestedGroup
 } from "./RuleTypes";
 import {IStringProxy} from "../styles/UtilTypes";
 import {IStyleset, SupportsQuery, SelectorType, PagePseudoClass, Styleset} from "../styles/StyleTypes";
@@ -116,15 +116,15 @@ export function $page( style?: Styleset, pseudoClass?: PagePseudoClass): IPageRu
 /**
  * Creates new supports rule.
  */
-export function $supports<T extends GroupRuleDefinition<O>, O extends {}>( query: SupportsQuery,
-				definitionClass: IGroupRuleDefinitionClass<T,O>): ISupportsRule<T>
+export function $supports<T extends NestedGroup<O>, O extends {}>( query: SupportsQuery,
+				definitionClass: INestedGroupClass<T,O>): ISupportsRule<T>
 	{ return new SupportsRule( query, definitionClass); }
 
 /**
  * Creates new media rule.
  */
-export function $media<T extends GroupRuleDefinition<O>, O extends {}>( query: string | MediaQuery,
-	definitionClass: IGroupRuleDefinitionClass<T,O>): IMediaRule<T>
+export function $media<T extends NestedGroup<O>, O extends {}>( query: string | MediaQuery,
+	definitionClass: INestedGroupClass<T,O>): IMediaRule<T>
 	{ return new MediaRule( query, definitionClass); }
 
 

@@ -68,7 +68,7 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 		}
 		catch( err)
 		{
-			console.error( `Error instantiating Stylesheet Definition Class '${this.definitionClass.name}'`);
+			console.error( `Error instantiating Stylesheet Definition Class '${this.definitionClass.name}'`, err);
 			return null;
 		}
 	}
