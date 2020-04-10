@@ -20,9 +20,8 @@ export class PageRule extends StyleRule implements IPageRule
 	// Creates a copy of the rule.
 	public clone(): PageRule
 	{
-		let newRule = new PageRule();
+		let newRule = new PageRule( undefined, this.pseudoClass);
 		newRule.copyFrom( this);
-		newRule.pseudoClass = this.pseudoClass;
 		return newRule;
 	}
 

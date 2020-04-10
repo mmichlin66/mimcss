@@ -1,7 +1,6 @@
 import {IClassRule, ExtendedStyleset, RuleType, INamedEntity} from "./RuleTypes"
 import {StyleRule} from "./StyleRule";
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
-import {createNames} from "./Rule";
+import {createNames, IRuleContainerOwner} from "./Rule";
 
 
 
@@ -20,9 +19,9 @@ export class ClassRule extends StyleRule implements IClassRule
 
 
 	// Processes the given rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
+	public process( owner: IRuleContainerOwner, ruleName: string): void
 	{
-		super.process( container, owner, ruleName);
+		super.process( owner, ruleName);
 
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, ".");
 	}
@@ -32,9 +31,8 @@ export class ClassRule extends StyleRule implements IClassRule
 	// Creates a copy of the rule.
 	public clone(): ClassRule
 	{
-		let newRule = new ClassRule();
+		let newRule = new ClassRule( undefined, this.nameOverride);
 		newRule.copyFrom( this);
-		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
 
@@ -67,7 +65,7 @@ export class ClassRule extends StyleRule implements IClassRule
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | INamedEntity;
+	private nameOverride?: string | IClassRule;
 }
 
 

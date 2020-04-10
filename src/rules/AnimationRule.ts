@@ -1,7 +1,6 @@
 import {IAnimationRule, AnimationFrame, RuleType, INamedEntity} from "./RuleTypes"
-import {Rule, createNames} from "./Rule"
+import {Rule, IRuleContainerOwner, createNames} from "./Rule"
 import {StyleRule} from "./StyleRule";
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
 
@@ -23,14 +22,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string)
+	public process(  owner: IRuleContainerOwner, ruleName: string)
 	{
-		super.process( container, owner, ruleName);
+		super.process( owner, ruleName);
 
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride);
 
 		for( let keyframeRule of this.frameRules)
-			keyframeRule.process( container, owner, ruleName);
+			keyframeRule.process( owner, ruleName);
 	}
 
 

@@ -10,7 +10,7 @@ import {selectorToCssString} from "../styles/StyleFuncs";
  */
 export class SelectorRule extends StyleRule implements ISelectorRule
 {
-	public constructor( selector?: SelectorType, style?: ExtendedStyleset)
+	public constructor( selector: SelectorType, style?: ExtendedStyleset)
 	{
 		super( RuleType.SELECTOR, style);
 
@@ -22,9 +22,8 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	// Creates a copy of the rule.
 	public clone(): SelectorRule
 	{
-		let newRule = new SelectorRule();
+		let newRule = new SelectorRule( this.selector);
 		newRule.copyFrom( this);
-		newRule.selector = this.selector;
 		return newRule;
 	}
 

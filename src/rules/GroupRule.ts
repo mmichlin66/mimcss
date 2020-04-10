@@ -1,12 +1,13 @@
-import {RuleType, IRule, IRuleContainer, INestedGroupClass, NestedGroup} from "./RuleTypes"
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {RuleType, INestedGroupClass, NestedGroup} from "./RuleTypes"
+import {RuleContainer} from "./RuleContainer"
+import {IRuleContainerOwner} from "./Rule"
 
 
 
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends RuleContainer<T> implements IRuleContainer<T>, IRule
+export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends RuleContainer<T>
 {
 	public constructor( type: RuleType, definitionClass: INestedGroupClass<T,O>)
 	{
@@ -17,9 +18,9 @@ export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends 
 
 
 	// Processes the given rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string)
+	public process( owner: IRuleContainerOwner, ruleName: string)
 	{
-		super.process( container, owner, ruleName);
+		super.process( owner, ruleName);
 
 		// process sub-rules
 		this.processRules();

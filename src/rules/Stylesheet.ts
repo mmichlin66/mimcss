@@ -1,5 +1,6 @@
 import {RuleType, IStylesheetClass, IStylesheet} from "./RuleTypes"
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {RuleContainer} from "./RuleContainer"
+import {IRuleContainerOwner} from "./Rule"
 
 
 
@@ -41,7 +42,7 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 
 		// the container and the owner properties of the Rule base class point to the Stylesheet
 		// object itself
-		super.process( this, this, null);
+		super.process( this, null);
 
 		this.isMultiplex = !!this.definitionClass.isMultiplex;
 

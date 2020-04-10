@@ -1,5 +1,5 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, IVarRule,
-	INestedGroupClass, IRuleContainer, RuleType, IStylesheet
+	IRuleContainer, RuleType, IStylesheet
 		} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
@@ -8,24 +8,6 @@ import {AnimationRule} from "./AnimationRule"
 import {VarRule} from "./VarRule"
 import {ImportRule} from "./ImportRule"
 import {NamespaceRule} from "./NamespaceRule"
-
-
-
-/**
- * The IRuleContainerOwner interface represents a stylesheet that "owns" the rules under this
- * container. In particular, the owner's job is to generate "scoped" unique names.
- */
-export interface IRuleContainerOwner
-{
-	/** Returns the instance of the stylesheet definition class */
-	getDefinitionInstance(): any;
-
-	/** Adds an external stylesheet to this stylesheet */
-	addExternalStylesheet( stylesheet: IStylesheet): void;
-
-	/** Generates a name, which will be unique in this stylesheet */
-	getScopedRuleName( ruleName: string): string;
-}
 
 
 
@@ -142,7 +124,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 		if (rule.owner)
 			rule = rule.clone();
 
-		rule.process( this, this.owner, propName);
+		rule.process( this.owner, propName);
 
 		// remember the rule
 		this._rules[propName] = rule;
@@ -200,7 +182,7 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 			if (rule.owner)
 				rule = rule.clone();
 
-			rule.process( this, this.owner, null);
+			rule.process( this.owner, null);
 
 			this.allRules.push( rule);
 			if (rule instanceof ImportRule)

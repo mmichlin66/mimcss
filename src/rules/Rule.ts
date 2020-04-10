@@ -1,5 +1,22 @@
-import {IRule, RuleType, INamedEntity} from "./RuleTypes"
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {IRule, RuleType, INamedEntity, IStylesheet} from "./RuleTypes"
+
+
+
+/**
+ * The IRuleContainerOwner interface represents a stylesheet that "owns" the rules under this
+ * container. In particular, the owner's job is to generate "scoped" unique names.
+ */
+export interface IRuleContainerOwner
+{
+	/** Returns the instance of the stylesheet definition class */
+	getDefinitionInstance(): any;
+
+	/** Adds an external stylesheet to this stylesheet */
+	addExternalStylesheet( stylesheet: IStylesheet): void;
+
+	/** Generates a name, which will be unique in this stylesheet */
+	getScopedRuleName( ruleName: string): string;
+}
 
 
 
@@ -18,9 +35,8 @@ export abstract class Rule implements IRule
 
 
 	// Processes the rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
+	public process( owner: IRuleContainerOwner, ruleName: string): void
 	{
-		this.container = container;
 		this.owner = owner;
 		this.ruleName = ruleName;
 	}
@@ -57,9 +73,6 @@ export abstract class Rule implements IRule
 
 	/** Type of the rule */
 	public readonly ruleType: RuleType;
-
-	// Rule container to which this rule belongs. This is "this" for Stylesheet.
-	public container: RuleContainer;
 
 	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
 	public owner: IRuleContainerOwner;

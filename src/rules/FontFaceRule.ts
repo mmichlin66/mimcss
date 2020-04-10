@@ -10,7 +10,7 @@ import {Rule} from "./Rule";
  */
 export class FontFaceRule extends Rule implements IFontFaceRule
 {
-	public constructor( fontface?: Fontface)
+	public constructor( fontface: Fontface)
 	{
 		super( RuleType.FONTFACE);
 
@@ -20,10 +20,7 @@ export class FontFaceRule extends Rule implements IFontFaceRule
 	// Creates a copy of the rule.
 	public clone(): FontFaceRule
 	{
-		let newRule = new FontFaceRule();
-		newRule.fontface = {};
-		Object.assign( this.fontface, this.fontface);
-		return newRule;
+		return new FontFaceRule( this.fontface);
 	}
 
 

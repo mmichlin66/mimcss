@@ -8,7 +8,7 @@ import {Rule} from "./Rule"
  */
 export class NamespaceRule extends Rule implements INamespaceRule
 {
-	public constructor( namespace?: string, prefix?: string)
+	public constructor( namespace: string, prefix?: string)
 	{
 		super( RuleType.NAMESPACE);
 
@@ -21,10 +21,7 @@ export class NamespaceRule extends Rule implements INamespaceRule
 	// Creates a copy of the rule.
 	public clone(): NamespaceRule
 	{
-		let newRule = new NamespaceRule();
-		newRule.namespace = this.namespace;
-		newRule.prefix = this.prefix;
-		return newRule;
+		return new NamespaceRule( this.namespace, this.prefix);
 	}
 
 

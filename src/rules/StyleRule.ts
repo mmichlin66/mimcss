@@ -1,7 +1,6 @@
 import {IStyleRule, ExtendedStyleset, RuleType, IVarRule} from "./RuleTypes";
 import {IStyleset, Styleset, SelectorType} from "../styles/StyleTypes"
-import {Rule} from "./Rule";
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {Rule, IRuleContainerOwner} from "./Rule";
 import {mergeStylesets, stylesetToCssString, stylePropToCssString, selectorToCssString} from "../styles/StyleFuncs"
 
 
@@ -121,13 +120,13 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
+	public process( owner: IRuleContainerOwner, ruleName: string): void
 	{
-		super.process( container, owner, ruleName);
+		super.process( owner, ruleName);
 
 		// if nested rules exist, process them under the same container
 		if (this.nestedRules)
-			this.nestedRules.forEach( nestedRule => nestedRule.process( container, owner, null));
+			this.nestedRules.forEach( nestedRule => nestedRule.process( owner, null));
 	}
 
 

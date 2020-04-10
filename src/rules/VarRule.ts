@@ -1,8 +1,8 @@
 import {IVarRule} from "./RuleTypes"
-import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
+import {RuleContainer} from "./RuleContainer"
 import {IStyleset} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs"
-import {createNames} from "./Rule";
+import {createNames, IRuleContainerOwner} from "./Rule";
 
 
 
@@ -14,7 +14,7 @@ import {createNames} from "./Rule";
  */
 export class VarRule<K extends keyof IStyleset = any> implements IVarRule<K>
 {
-	public constructor( template?: K, value?: IStyleset[K], nameOverride?: string | IVarRule<K>)
+	public constructor( template: K, value?: IStyleset[K], nameOverride?: string | IVarRule<K>)
 	{
 		this.template = template;
 		this.value = value;
@@ -37,11 +37,7 @@ export class VarRule<K extends keyof IStyleset = any> implements IVarRule<K>
 	// Creates a copy of the rule.
 	public clone(): VarRule<K>
 	{
-		let newRule = new VarRule<K>();
-		newRule.template = this.template;
-		newRule.value = this.value;
-		newRule.nameOverride = this.nameOverride;
-		return newRule;
+		return new VarRule<K>(this.template, this.value, this.nameOverride);
 	}
 
 

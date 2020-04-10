@@ -11,7 +11,7 @@ import {mediaQueryToCssString} from "../styles/MediaFuncs";
  */
 export class MediaRule<T extends NestedGroup<O>, O extends {}> extends GroupRule<T,O> implements IMediaRule<T>
 {
-	public constructor( query?: string | MediaQuery, definitionClass?: INestedGroupClass<T,O>)
+	public constructor( query: string | MediaQuery, definitionClass: INestedGroupClass<T,O>)
 	{
 		super( RuleType.MEDIA, definitionClass);
 

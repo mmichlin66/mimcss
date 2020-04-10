@@ -12,7 +12,7 @@ import {supportsQueryToCssString} from "../styles/StyleFuncs";
  */
 export class ImportRule extends Rule implements IImportRule
 {
-	public constructor( url?: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery)
+	public constructor( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery)
 	{
 		super( RuleType.IMPORT);
 
@@ -26,10 +26,7 @@ export class ImportRule extends Rule implements IImportRule
 	// Creates a copy of the rule.
 	public clone(): ImportRule
 	{
-		let newRule = new ImportRule();
-		newRule.url = this.url;
-		newRule.mediaQuery = this.mediaQuery;
-		return newRule;
+		return new ImportRule( this.url, this.mediaQuery, this.supportsQuery);
 	}
 
 

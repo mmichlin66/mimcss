@@ -8,7 +8,7 @@ import {StyleRule} from "./StyleRule";
  */
 export class TagRule extends StyleRule implements ITagRule
 {
-	public constructor( tag?: string, style?: ExtendedStyleset)
+	public constructor( tag: string, style?: ExtendedStyleset)
 	{
 		super( RuleType.TAG, style);
 		this.tag = tag;
@@ -19,9 +19,8 @@ export class TagRule extends StyleRule implements ITagRule
 	// Creates a copy of the rule.
 	public clone(): TagRule
 	{
-		let newRule = new TagRule();
+		let newRule = new TagRule( this.tag);
 		newRule.copyFrom( this);
-		newRule.tag = this.tag;
 		return newRule;
 	}
 

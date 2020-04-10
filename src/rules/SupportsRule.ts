@@ -11,7 +11,7 @@ import {supportsQueryToCssString} from "../styles/StyleFuncs"
  */
 export class SupportsRule<T extends NestedGroup<O>, O extends {}> extends GroupRule<T,O> implements ISupportsRule<T>
 {
-	public constructor( query?: SupportsQuery, definitionClass?: INestedGroupClass<T,O>)
+	public constructor( query: SupportsQuery, definitionClass: INestedGroupClass<T,O>)
 	{
 		super( RuleType.SUPPORTS, definitionClass);
 
