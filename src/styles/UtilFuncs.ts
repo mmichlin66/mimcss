@@ -1,4 +1,4 @@
-﻿import {IStringProxy, Number_StyleType, MultiNumber_StyleType, INumberMath,
+﻿import {IStringProxy, ExtendedNumber_StyleType, ExtendedMultiNumber_StyleType, INumberMath,
     Size_StyleType, MultiSize_StyleType, Position_StyleType, MultiPosition_StyleType, IFractionMath
 } from "./UtilTypes"
 
@@ -80,6 +80,8 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             return "";
         else if (typeof val.valueToString === "function")
             return val.valueToString();
+        else if (typeof val.varToString === "function")
+            return val.varToString();
         else if (typeof val === "function")
             return val();
         else
@@ -112,6 +114,8 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         {
             if (typeof val.valueToString === "function")
                 return val.valueToString();
+            else if (typeof val.varToString === "function")
+                return val.varToString();
             else if (options.fromObject)
                 return options.fromObject( val);
             else if (options.fromAny)
@@ -127,26 +131,6 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             return val.toString();
     }
 }
-
-
-
-// /**
-//  * Converts a value of an arbitrary type to a single string using the given separator. If the value
-//  * is an array, every item is converted to a string and they are joined using the given separator.
-//  */
-// export function valueToString( val: any, separator: string = " "): string
-// {
-//     if (val == null)
-//         return "";
-//     else if (typeof val === "string")
-//         return val;
-//     else if (Array.isArray(val))
-//         return arrayToCssString( val, undefined, separator);
-//     else if (typeof val.valueToString === "function")
-//         return val.valueToString(); // this covers for all IStringProxy-implemented objects
-//     else
-//         return val.toString();  // this covers for numbers, Booleans and objects
-// }
 
 
 
@@ -211,7 +195,7 @@ function numberToCssString( n: number, intUnit: string = "", floatUint: string =
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function numberStyleToCssString( val: Number_StyleType, convertFunc?: ConvertFuncType): string
+function numberStyleToCssString( val: ExtendedNumber_StyleType, convertFunc?: ConvertFuncType): string
 {
     return valueToString( val, { fromNumber: convertFunc});
 }
@@ -222,7 +206,7 @@ function numberStyleToCssString( val: Number_StyleType, convertFunc?: ConvertFun
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiNumberStyleToCssString( val: MultiNumber_StyleType,
+function multiNumberStyleToCssString( val: ExtendedMultiNumber_StyleType,
                 convertFunc: ConvertFuncType, separator: string = " "): string
 {
     return valueToString( val, { fromNumber: convertFunc,
@@ -239,7 +223,7 @@ function multiNumberStyleToCssString( val: MultiNumber_StyleType,
  * @param convertFunc 
  * @param params 
  */
-function formatNumbers( format: string, params: Number_StyleType[], convertFunc?: ConvertFuncType): string
+function formatNumbers( format: string, params: ExtendedNumber_StyleType[], convertFunc?: ConvertFuncType): string
 {
     function replacer( token: string, ...args: any[]): string
     {
@@ -266,7 +250,7 @@ function formatNumbers( format: string, params: Number_StyleType[], convertFunc?
  */
 class MathFuncProxy implements IStringProxy
 {
-    constructor( name: string, params: Number_StyleType[], convertFunc?: ConvertFuncType)
+    constructor( name: string, params: ExtendedNumber_StyleType[], convertFunc?: ConvertFuncType)
     {
         this.name = name;
         this.convertFunc = convertFunc;
@@ -286,7 +270,7 @@ class MathFuncProxy implements IStringProxy
     private convertFunc: ConvertFuncType;
 
     // Array of Number_StyleType parameters to the mathematical function.
-    private params: Number_StyleType[];
+    private params: ExtendedNumber_StyleType[];
 }
 
 
@@ -298,7 +282,7 @@ class MathFuncProxy implements IStringProxy
  */
 class CalcFuncProxy implements IStringProxy
 {
-    constructor( formula: string, params: Number_StyleType[], convertFunc?: ConvertFuncType)
+    constructor( formula: string, params: ExtendedNumber_StyleType[], convertFunc?: ConvertFuncType)
     {
         this.formula = formula;
         this.convertFunc = convertFunc;
@@ -318,7 +302,7 @@ class CalcFuncProxy implements IStringProxy
     private convertFunc: ConvertFuncType;
 
     // Array Number_StyleType parameters to substitute placeholders in the formula string.
-    private params: Number_StyleType[];
+    private params: ExtendedNumber_StyleType[];
 }
 
 
@@ -347,32 +331,32 @@ class NumberMath implements INumberMath
         return this.convertFunc( n);
     }
 
-    public styleToString = (val: Number_StyleType): string =>
+    public styleToString = (val: ExtendedNumber_StyleType): string =>
     {
         return numberStyleToCssString( val, this.convertFunc);
     }
 
-    public multiStyleToString = (val: MultiNumber_StyleType, separator: string = " "): string =>
+    public multiStyleToString = (val: ExtendedMultiNumber_StyleType, separator: string = " "): string =>
     {
         return multiNumberStyleToCssString( val, this.convertFunc, separator);
     }
 
-    public min( ...params: Number_StyleType[]): IStringProxy
+    public min( ...params: ExtendedNumber_StyleType[]): IStringProxy
     {
         return new MathFuncProxy( "min", params, this.convertFunc);
     }
 
-    public max( ...params: Number_StyleType[]): IStringProxy
+    public max( ...params: ExtendedNumber_StyleType[]): IStringProxy
     {
         return new MathFuncProxy( "max", params, this.convertFunc);
     }
 
-    public clamp( min: Number_StyleType, pref: Number_StyleType, max: Number_StyleType): IStringProxy
+    public clamp( min: ExtendedNumber_StyleType, pref: ExtendedNumber_StyleType, max: ExtendedNumber_StyleType): IStringProxy
     {
         return new MathFuncProxy( "clamp", [min, pref, max], this.convertFunc);
     }
 
-    public calc( formula: string, ...params: Number_StyleType[]): IStringProxy
+    public calc( formula: string, ...params: ExtendedNumber_StyleType[]): IStringProxy
     {
         return new CalcFuncProxy( formula, params, this.convertFunc);
     }
@@ -487,7 +471,7 @@ class FractionMath extends NumberMath implements IFractionMath
         super( ["fr", "%"])
     }
 
-    public minmax( min: Number_StyleType, max: Number_StyleType): IStringProxy
+    public minmax( min: ExtendedNumber_StyleType, max: ExtendedNumber_StyleType): IStringProxy
     {
         return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
     }
@@ -534,11 +518,11 @@ export function sizeToCssString( val: Size_StyleType): string
     if (typeof val === "string")
         return val;
     else if (typeof (val as any).valueToString === "function")
-        return (val as IStringProxy).valueToString();
+        return (val as any).valueToString();
+    else if (typeof (val as any).varToString === "function")
+        return (val as any).varToString();
     else if (typeof val === "object")
         return objectToCssString( val, false, ["w", Len.styleToString], ["h", Len.styleToString]);
-    // else if (Array.isArray( val))
-    //     return lengthToCssString( val[0]) + " " + lengthToCssString( val[1]);
     else
 	    return Len.styleToString( val);
 }
@@ -553,8 +537,6 @@ export function multiSizeToCssString( val: MultiSize_StyleType): string
         return val;
     else if (Array.isArray(val))
         return arrayToCssString( val, sizeToCssString);
-    else if (typeof val === "object")
-        return val.toString();
     else
         return sizeToCssString( val);
 }
@@ -576,7 +558,9 @@ export function positionToCssString( val: Position_StyleType): string
     if (typeof val === "string")
         return val;
     else if (typeof (val as any).valueToString === "function")
-        return (val as IStringProxy).valueToString();
+        return (val as any).valueToString();
+    else if (typeof (val as any).varToString === "function")
+        return (val as any).varToString();
     else if (typeof val === "object")
     {
         if ("xedge" in val)

@@ -3,7 +3,7 @@
  */
 
 
-import {Styleset, IStyleset, PagePseudoClass} from "../styles/StyleTypes";
+import {IStyleset, Styleset, PagePseudoClass} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement, SelectorType} from "../styles/StyleTypes";
 import {ICustomVar, IStringProxy} from "../styles/UtilTypes";
 
