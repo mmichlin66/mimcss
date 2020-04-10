@@ -1,5 +1,5 @@
 import {NamesOfPropsOfType, PropsOfType, IRule, IClassRule, IIDRule, IAnimationRule, IVarRule,
-		IRuleContainerClass, IRuleContainer, RuleType, IStylesheet
+	IGroupRuleDefinitionClass, IRuleContainer, RuleType, IStylesheet
 		} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {ClassRule} from "./ClassRule"
@@ -17,6 +17,9 @@ import {NamespaceRule} from "./NamespaceRule"
  */
 export interface IRuleContainerOwner
 {
+	/** Returns the instance of the stylesheet definition class */
+	getDefinitionInstance(): any;
+
 	/** Adds an external stylesheet to this stylesheet */
 	addExternalStylesheet( stylesheet: IStylesheet): void;
 
@@ -33,10 +36,9 @@ export interface IRuleContainerOwner
  */
 export abstract class RuleContainer<T extends {} = {}> extends Rule implements IRuleContainer<T>
 {
-	public constructor( type: number, definition: T | IRuleContainerClass<T>)
+	public constructor( type: number)
 	{
 		super( type);
-		this.definitionClass = definition;
 	}
 
 
@@ -81,36 +83,10 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 		this._uses = {};
 
 		// get the "rule definition" object whose properties are the rule objects
-		let rulesDef: T;
-		if (typeof this.definitionClass === "function")
-		{
-			// if the "definition" is a class then create an instance of it
-			try
-			{
-				rulesDef = new (this.definitionClass as IRuleContainerClass<T>)();
-			}
-			catch( err)
-			{
-				console.error( `Error instantiating Rule Definition of type '${this.definitionClass.name}'`);
-				return;
-			}
-		}
-		else
-		{
-			// if the "definition" is an object (not a class) then use it directly
-			rulesDef = this.definitionClass;
-		}
+		let rulesDef = this.createDefinitionInstance();
+		if (!rulesDef)
+			return;
 
-		// process rules that are assigned to the properties of the definition class
-		this.processNamedRules( rulesDef);
-	}
-
-
-
-	// Creates the stylesheet definition instance, parses its properties and creates names for
-	// classes, IDs, animations.
-	private processNamedRules( rulesDef: T): void
-	{
 		// loop over the properties of the definition object and process those that are rules,
 		// custom var definitions and arrays.
 		for( let propName in rulesDef)
@@ -124,6 +100,11 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 				this.processUnnamedRules( propVal)
 		}
 	}
+
+
+
+	// Returns an instance of the definition class or null if failure
+	protected abstract createDefinitionInstance(): T | null;
 
 
 
@@ -284,9 +265,6 @@ export abstract class RuleContainer<T extends {} = {}> extends Rule implements I
 	public get isProcessed(): boolean { return !!this._rules; }
 
 
-
-	// Class that defined this stylesheet. This member is used for stylesheet derivation
-	public readonly definitionClass: IRuleContainerClass<T> | T;
 
 	// Names of all classes, IDs, animations and custom properties defined in this container.
 	public allNames: { [K: string]: string };

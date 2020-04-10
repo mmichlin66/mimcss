@@ -1,4 +1,4 @@
-import {RuleType, IRule, IRuleContainer} from "./RuleTypes"
+import {RuleType, IRule, IRuleContainer, IGroupRuleDefinitionClass, GroupRuleDefinition} from "./RuleTypes"
 import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 
 
@@ -6,11 +6,12 @@ import {RuleContainer, IRuleContainerOwner} from "./RuleContainer"
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends {} = {}> extends RuleContainer<T> implements IRuleContainer<T>, IRule
+export abstract class GroupRule<T extends GroupRuleDefinition<O>, O extends {}> extends RuleContainer<T> implements IRuleContainer<T>, IRule
 {
-	public constructor( type: RuleType, definition: T)
+	public constructor( type: RuleType, definitionClass: IGroupRuleDefinitionClass<T,O>)
 	{
-		super( type, definition);
+		super( type);
+		this.definitionClass = definitionClass;
 	}
 
 
@@ -22,6 +23,22 @@ export abstract class GroupRule<T extends {} = {}> extends RuleContainer<T> impl
 
 		// process sub-rules
 		this.processRules();
+	}
+
+
+
+	// Returns an instance of the definition class or null if failure
+	protected createDefinitionInstance(): T | null
+	{
+		try
+		{
+			return new this.definitionClass( this.owner.getDefinitionInstance() as O);
+		}
+		catch( err)
+		{
+			console.error( `Error instantiating Group Rule Definition Class '${this.definitionClass.name}'`);
+			return null;
+		}
 	}
 
 
@@ -51,6 +68,11 @@ export abstract class GroupRule<T extends {} = {}> extends RuleContainer<T> impl
 		// clear sub-rules
 		this.clearRules();
 	}
+
+
+
+	// Class that defined this stylesheet.
+	protected definitionClass: IGroupRuleDefinitionClass<T,O>;
 }
 
 

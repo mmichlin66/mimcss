@@ -10,7 +10,7 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 {
 	public constructor( definitionClass: IStylesheetClass<T>)
 	{
-		super( RuleType.SCOPE, definitionClass)
+		super( RuleType.SCOPE)
 
 		this.definitionClass = definitionClass;
 
@@ -58,6 +58,31 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 
 
 
+	// Returns an instance of the definition class or null if failure
+	protected createDefinitionInstance(): T | null
+	{
+		try
+		{
+			this.definitionInstance = new this.definitionClass();
+			return this.definitionInstance;
+		}
+		catch( err)
+		{
+			console.error( `Error instantiating Stylesheet Definition Class '${this.definitionClass.name}'`);
+			return null;
+		}
+	}
+
+
+
+	/** Returns the instance of the stylesheet definition class */
+	public getDefinitionInstance(): any
+	{
+		return this.definitionInstance;
+	}
+
+
+	
 	/** Adds a stylesheet this stylesheet */
 	public addExternalStylesheet( stylesheet: IStylesheet): void
 	{
@@ -140,6 +165,9 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 
 	// DOM style elemnt
 	public domStyleElm: HTMLStyleElement;
+
+	// Instance of the definition class
+	private definitionInstance: T;
 
 	// List of used stylesheet objects that will be activated when our stylesheet is activated.
 	private usedStylesheets: Stylesheet[];

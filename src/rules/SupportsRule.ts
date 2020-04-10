@@ -1,4 +1,4 @@
-import {ISupportsRule, RuleType} from "./RuleTypes"
+import {ISupportsRule, RuleType, IGroupRuleDefinitionClass, GroupRuleDefinition} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {SupportsQuery} from "../styles/StyleTypes"
@@ -9,11 +9,11 @@ import {supportsQueryToCssString} from "../styles/StyleFuncs"
 /**
  * The SupportRule class describes a CSS @supports rule.
  */
-export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule<T>
+export class SupportsRule<T extends GroupRuleDefinition<O>, O extends {}> extends GroupRule<T,O> implements ISupportsRule<T>
 {
-	public constructor( query?: SupportsQuery, definition?: T)
+	public constructor( query?: SupportsQuery, definitionClass?: IGroupRuleDefinitionClass<T,O>)
 	{
-		super( RuleType.SUPPORTS, definition);
+		super( RuleType.SUPPORTS, definitionClass);
 
 		// convert the query to its string form
 		this.queryString = supportsQueryToCssString( query);
@@ -22,11 +22,9 @@ export class SupportsRule<T = any> extends GroupRule<T> implements ISupportsRule
 
 
 	// Creates a copy of the rule.
-	public clone(): SupportsRule<T>
+	public clone(): SupportsRule<T,O>
 	{
-		let newRule = new SupportsRule<T>();
-		newRule.queryString = this.queryString;
-		return newRule;
+		return new SupportsRule<T,O>( this.queryString, this.definitionClass);
 	}
 
 

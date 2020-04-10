@@ -6,14 +6,12 @@
 import {
 	ExtendedStyleset, IAbstractRule, ITagRule, IClassRule, IIDRule, ISelectorRule,
 	IAnimationRule, AnimationFrame, IVarRule, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
-	INamespaceRule, IPageRule, SelectorTokenType, RuleType
+	INamespaceRule, IPageRule, SelectorTokenType, RuleType, IGroupRuleDefinitionClass, GroupRuleDefinition
 } from "./RuleTypes";
 import {IStringProxy} from "../styles/UtilTypes";
 import {IStyleset, SupportsQuery, SelectorType, PagePseudoClass, Styleset} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
-
-
 import {Rule} from "../rules/Rule"
 import {AbstractRule} from "./AbstractRule"
 import {TagRule} from "./TagRule"
@@ -22,12 +20,12 @@ import {IDRule} from "./IDRule"
 import {SelectorRule} from "./SelectorRule"
 import {AnimationRule} from "./AnimationRule"
 import {VarRule} from "./VarRule"
-import {SupportsRule} from "./SupportsRule"
-import {MediaRule} from "./MediaRule"
 import {ImportRule} from "./ImportRule"
 import {FontFaceRule} from "./FontFaceRule"
 import {NamespaceRule} from "./NamespaceRule";
 import {PageRule} from "./PageRule";
+import {SupportsRule} from "./SupportsRule"
+import {MediaRule} from "./MediaRule"
 
 
 
@@ -92,18 +90,6 @@ export function $var<K extends keyof IStyleset>( template: K, propVal?: IStylese
 	{ return new VarRule( template, propVal, nameOverride); }
 
 /**
- * Creates new supports rule.
- */
-export function $supports<T>( query: SupportsQuery, definition: T): ISupportsRule<T>
-	{ return new SupportsRule( query, definition); }
-
-/**
- * Creates new media rule.
- */
-export function $media<T>( query: string | MediaQuery, definition: T): IMediaRule<T>
-	{ return new MediaRule( query, definition); }
-
-/**
  * Creates new import rule.
  */
 export function $import( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery): IImportRule
@@ -126,6 +112,20 @@ export function $namespace( namespace: string, prefix?: string): INamespaceRule
  */
 export function $page( style?: Styleset, pseudoClass?: PagePseudoClass): IPageRule
 	{ return new PageRule( style, pseudoClass); }
+
+/**
+ * Creates new supports rule.
+ */
+export function $supports<T extends GroupRuleDefinition<O>, O extends {}>( query: SupportsQuery,
+				definitionClass: IGroupRuleDefinitionClass<T,O>): ISupportsRule<T>
+	{ return new SupportsRule( query, definitionClass); }
+
+/**
+ * Creates new media rule.
+ */
+export function $media<T extends GroupRuleDefinition<O>, O extends {}>( query: string | MediaQuery,
+	definitionClass: IGroupRuleDefinitionClass<T,O>): IMediaRule<T>
+	{ return new MediaRule( query, definitionClass); }
 
 
 

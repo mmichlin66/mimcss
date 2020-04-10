@@ -349,39 +349,6 @@ export interface IRuleContainer<T extends {} = {}>
 
 
 /**
- * "Constructor" interface defining how rule definition classes can be created.
- */
-export interface IRuleContainerClass<T extends {}>
-{
-	/** All rule definition classes should conform to this constructor */
-	new(): T;
-}
-
-
-
-/**
- * The ISupportRule interface represents the CSS @supports rule.
- */
-export interface ISupportsRule<T = any> extends IRuleContainer<T>, IRule
-{
-	/** SOM supports rule */
-	readonly cssSupportsRule: CSSSupportsRule;
-}
-
-
-
-/**
- * The IMediaRule interface represents the CSS @media rule.
- */
-export interface IMediaRule<T = any> extends IRuleContainer<T>, IRule
-{
-	/** SOM media rule */
-	readonly cssMediaRule: CSSMediaRule;
-}
-
-
-
-/**
  * The IStylesheet interface represents the resultant stylesheet after the stylesheet definition
  * has been processed. The stylesheet object contains names of IDs, classes and animations, which
  * can be used in the application code. The interface also provides methods that are used to
@@ -398,7 +365,7 @@ export interface IStylesheet<T extends {} = {}> extends IRuleContainer<T>
 /**
  * "Constructor" interface defining how stylesheet definition classes can be created.
  */
-export interface IStylesheetClass<T extends {} = {}> extends IRuleContainerClass<T>
+export interface IStylesheetClass<T extends {} = {}>
 {
 	/** All stylesheet definition objects should conform to this constructor */
 	new(): T;
@@ -411,6 +378,50 @@ export interface IStylesheetClass<T extends {} = {}> extends IRuleContainerClass
 	 * object is created for them and inserted into DOM.
 	 */
 	isMultiplex?: boolean;
+}
+
+
+
+/**
+ * The GroupRuleDefinition class is a base for all classes that define nested grouping rules.
+ * @typeparam O Stylesheet definition class, which is the owner of this grouping rule.
+ */
+export abstract class GroupRuleDefinition<O extends {} = {}>
+{
+	constructor( protected owner: O) {}
+}
+
+
+
+/**
+ * "Constructor" interface defining how group rule definition classes can be created.
+ */
+export interface IGroupRuleDefinitionClass<T extends GroupRuleDefinition<O>, O extends {} = {}>
+{
+	/** All group rule definition classes should conform to this constructor */
+	new( owner?: O): T;
+}
+
+
+
+/**
+ * The ISupportRule interface represents the CSS @supports rule.
+ */
+export interface ISupportsRule<T = {}> extends IRuleContainer<T>, IRule
+{
+	/** SOM supports rule */
+	readonly cssSupportsRule: CSSSupportsRule;
+}
+
+
+
+/**
+ * The IMediaRule interface represents the CSS @media rule.
+ */
+export interface IMediaRule<T = {}> extends IRuleContainer<T>, IRule
+{
+	/** SOM media rule */
+	readonly cssMediaRule: CSSMediaRule;
 }
 
 

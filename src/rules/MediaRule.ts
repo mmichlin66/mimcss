@@ -1,4 +1,4 @@
-import {IMediaRule, RuleType} from "./RuleTypes"
+import {IMediaRule, RuleType, IGroupRuleDefinitionClass, GroupRuleDefinition} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {MediaQuery} from "../styles/MediaTypes"
@@ -9,11 +9,11 @@ import {mediaQueryToCssString} from "../styles/MediaFuncs";
 /**
  * The MediaRule class describes a CSS @media rule.
  */
-export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
+export class MediaRule<T extends GroupRuleDefinition<O>, O extends {}> extends GroupRule<T,O> implements IMediaRule<T>
 {
-	public constructor( query?: string | MediaQuery, definition?: T)
+	public constructor( query?: string | MediaQuery, definitionClass?: IGroupRuleDefinitionClass<T,O>)
 	{
-		super( RuleType.MEDIA, definition);
+		super( RuleType.MEDIA, definitionClass);
 
 		this.query = query;
 	}
@@ -21,11 +21,9 @@ export class MediaRule<T = any> extends GroupRule<T> implements IMediaRule<T>
 
 
 	// Creates a copy of the rule.
-	public clone(): MediaRule<T>
+	public clone(): MediaRule<T,O>
 	{
-		let newRule = new MediaRule<T>();
-		newRule.query = this.query;
-		return newRule;
+		return new MediaRule<T,O>( this.query, this.definitionClass);
 	}
 
 
