@@ -5,91 +5,66 @@ import {
 } from "./UtilTypes";
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
     multiSizeToCssString, positionToCssString, multiPositionToCssString,
-    Num, Len, Angle, Time
+    Num, Len, Angle, Time, IValueConvertOptions
 } from "./UtilFuncs"
-import * as ColorFuncs from "./ColorFuncs";
+import {colorToCssString} from "./ColorFuncs";
 
 
 
 // helper functions for style property conversions
-function multiTimeToStringWithComma( val: Extended<MultiCssNumber>)
-{
-    return Time.multiStyleToString( val, ",");
-
-}
-
-function multiLenToStringWithSpace( val: Extended<MultiCssNumber>)
-{
-    return Len.multiStyleToString( val, " ");
-}
+function multiTimeToStringWithComma( val: Extended<MultiCssNumber>) { return Time.multiStyleToString( val, ","); }
+function multiLenToStringWithSpace( val: Extended<MultiCssNumber>) { return Len.multiStyleToString( val, " "); }
 
 
-/**
- * Converts animation style represented as an object with fields corresponding to animation
- * properties to its CSS string value.
- */
-function singleAnimationObjectToCssString( val: StyleTypes.SingleAnimation): string
+function singleAnimation_fromObject( val: StyleTypes.SingleAnimation): string
 {
     return objectToCssString( val, false,
             ["duration", Time.numberToString],
-            ["func", singleAnimationTimingFunctionToCssString],
+            ["func", singleAnimationTimingFunction_fromStyle],
             ["delay", Time.styleToString],
             ["count", Num.styleToString],
             "direction",
             "mode",
             "state",
-            ["name", singleAnimationNameToCssString]);
+            ["name", singleAnimationName_fromStyle]);
 }
 
-/**
- * Converts animation style represented as an object with fields corresponding to animation
- * properties to its CSS string value.
- */
-function singleAnimationNameToCssString( val: Extended<StyleTypes.SingleAnimationName>): string
-{
-    return valueToString( val, {
-        fromObject: v => (v as StyleTypes.IAnimationNameProvider).getAnimationName()
-    });
-}
 
-/**
- * Converts animation style represented as an object with fields corresponding to animation
- * properties to its CSS string value.
- */
-function singleAnimationToCssString( val: Extended<StyleTypes.SingleAnimation>): string
-{
-    return valueToString( val, {
-        fromObject: singleAnimationObjectToCssString
-    });
-}
 
-/**
- * Converts animation style to its CSS string value.
- */
-function animationToCssString( val: Extended<StyleTypes.AnimationStyleType>): string
+function singleAnimation_fromStyle( val: Extended<StyleTypes.SingleAnimation>): string
 {
     return valueToString( val, {
-        arrayItemFunc: singleAnimationToCssString,
-        arraySeparator: ",",
-        fromObject: singleAnimationObjectToCssString,
-        fromAny: singleAnimationToCssString
+        fromObject: singleAnimation_fromObject
     });
 }
 
 
 
-/**
- * Converts single animation timing function value to the CSS time string.
- */
-function singleAnimationTimingFunctionToCssString( val: Extended<StyleTypes.SingleAnimationTimingFunction>): string
+function animationTimingFunction_fromNumber( val: number): string
+{
+    return `steps(${val})`;
+}
+
+
+
+function animationTimingFunction_fromArray( val: any[]): string
+{
+    return typeof val[0] === "number"
+        ? singleAnimationTimingFunction_fromStyle( val as StyleTypes.SingleAnimationTimingFunction)
+        : arrayToCssString( val, singleAnimationTimingFunction_fromStyle, ",");
+}
+
+
+
+function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.SingleAnimationTimingFunction>): string
 {
     return valueToString( val, {
-        fromNumber: v => `steps(${v})`,
+        fromNumber: animationTimingFunction_fromNumber,
         fromArray: v =>
         {
             if (v.length < 3)
             {
-                // this is steps function with only the number of steps
+                // this is steps function
 
                 /// #if DEBUG
                     if (v[0] <= 0)
@@ -115,23 +90,12 @@ function singleAnimationTimingFunctionToCssString( val: Extended<StyleTypes.Sing
     });
 }
 
-/**
- * Converts animation iteration count style value to the CSS time string.
- */
-function animationTimingFunctionToCssString( val: StyleTypes.AnimationTimingFunctionStyleType): string
+
+
+function singleAnimationName_fromStyle( val: Extended<StyleTypes.SingleAnimationName>): string
 {
     return valueToString( val, {
-        fromNumber: singleAnimationTimingFunctionToCssString,
-        fromArray: v =>
-        {
-            if (v.length === 0)
-                return "";
-            else if (typeof v[0] === "number")
-                return singleAnimationTimingFunctionToCssString( val as StyleTypes.SingleAnimationTimingFunction);
-            else
-                return arrayToCssString( v as StyleTypes.SingleAnimationTimingFunction[],
-                                singleAnimationTimingFunctionToCssString, ",");
-        }
+        fromObject: v => (v as StyleTypes.IAnimationNameProvider).getAnimationName()
     });
 }
 
@@ -196,8 +160,8 @@ function borderSpacingToCssString( val: StyleTypes.BorderSpacingStyleType): stri
 function borderColorToCssString( val: StyleTypes.BorderColorStyleType): string
 {
     return valueToString( val, {
-        arrayItemFunc: ColorFuncs.colorToCssString,
-        fromAny: ColorFuncs.colorToCssString
+        arrayItemFunc: colorToCssString,
+        fromAny: colorToCssString
     });
 }
 
@@ -223,12 +187,12 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
                 s += val[1] + " ";
 
             if (val[2])
-                s += ColorFuncs.colorToCssString( val[2]) + " ";
+                s += colorToCssString( val[2]) + " ";
 
             return s;
         },
         fromNumber: Len.styleToString,
-        fromAny: ColorFuncs.colorToCssString
+        fromAny: colorToCssString
     });
 }
 
@@ -268,7 +232,7 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
         fromObject: val => objectToCssString( val, false,
             ["width", multiLenToStringWithSpace],
             ["style", valueToString],
-            ["color", ColorFuncs.colorToCssString]
+            ["color", colorToCssString]
         )
     });
 }
@@ -466,7 +430,8 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset): string | nu
         }
 	}
 
-    return `{${buf.filter( (item) => item != null).join(";")}}`;
+    // join all elements in the array except nulls, undefined and empty strings
+    return `{${buf.filter( (item) => !!item).join(";")}}`;
 }
 
 
@@ -519,12 +484,18 @@ export function customPropToCssString<K extends keyof IStyleset>(
 export function stylePropToCssString<K extends keyof IStyleset>(
     propName: K, propVal: IStyleset[K], valueOnly?: boolean): string | null
 {
-    if (!propName || propVal == null)
+    if (!propName)
         return null;
 
     // find information object for the property
-    let info = StylePropertyInfos[propName];
-    let varValue = typeof info === "function" ? (info as PropToStringFunc<K>)( propVal) : valueToString( propVal);
+    let info: any = StylePropertyInfos[propName];
+
+    let varValue = !info
+        ? valueToString( propVal)
+        : typeof info === "object"
+            ? valueToString( propVal, info as IValueConvertOptions)
+            : (info as PropToStringFunc<K>)( propVal);
+
     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
 }
 
@@ -535,32 +506,55 @@ type PropToStringFunc<K extends keyof IStyleset> = (val: IStyleset[K]) => string
 
 
 
+// /** Type defnition of a function that takes property value and converts it to string */
+// type StylePropertyInfo<K extends keyof IStyleset> = PropToStringFunc<K>;
+
+
+
 /**
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
+const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValueConvertOptions) } =
 {
-    animation: animationToCssString,
+    animation: {
+        arrayItemFunc: singleAnimation_fromStyle,
+        arraySeparator: ",",
+        fromObject: singleAnimation_fromObject,
+        fromAny: singleAnimation_fromStyle
+    },
+
     animationDelay: multiTimeToStringWithComma,
     animationDuration: multiTimeToStringWithComma,
-    animationIterationCount: Num.styleToString,
-    animationTimingFunction: animationTimingFunctionToCssString,
+    animationIterationCount: { arraySeparator: "," },
+    animationFillMode: { arraySeparator: "," },
 
-    backgroundColor: ColorFuncs.colorToCssString,
+    animationName: {
+        arrayItemFunc: singleAnimationName_fromStyle,
+        arraySeparator: ","
+    },
+
+    animationPlayState: { arraySeparator: "," },
+
+    animationTimingFunction: {
+        fromNumber: animationTimingFunction_fromNumber,
+        fromArray: animationTimingFunction_fromArray
+    },
+
+    backgroundColor: colorToCssString,
     backgroundPosition: multiPositionToCssString,
     backgroundSize: multiSizeToCssString,
     baselineShift: Len.styleToString,
 
     border: borderSideToCssString,
     borderBlockEnd: borderSideToCssString,
-    borderBlockEndColor: ColorFuncs.colorToCssString,
+    borderBlockEndColor: colorToCssString,
     borderBlockEndWidth: Len.styleToString,
     borderBlockStart: borderSideToCssString,
-    borderBlockStartColor: ColorFuncs.colorToCssString,
+    borderBlockStartColor: colorToCssString,
     borderBlockStartWidth: Len.styleToString,
     borderBottom: borderSideToCssString,
-    borderBottomColor: ColorFuncs.colorToCssString,
+    borderBottomColor: colorToCssString,
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
     borderBottomWidth: Len.styleToString,
@@ -568,22 +562,22 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     borderImageOutset: borderImageOutsetToCssString,
     borderImageWidth: multiLenToStringWithSpace,
     borderInlineEnd: borderSideToCssString,
-    borderInlineEndColor: ColorFuncs.colorToCssString,
+    borderInlineEndColor: colorToCssString,
     borderInlineEndWidth: Len.styleToString,
     borderInlineStart: borderSideToCssString,
-    borderInlineStartColor: ColorFuncs.colorToCssString,
+    borderInlineStartColor: colorToCssString,
     borderInlineStartWidth: Len.styleToString,
     borderLeft: borderSideToCssString,
-    borderLeftColor: ColorFuncs.colorToCssString,
+    borderLeftColor: colorToCssString,
     borderLeftWidth: Len.styleToString,
     borderRadius: borderRadiusToCssString,
     borderRight: borderSideToCssString,
-    borderRightColor: ColorFuncs.colorToCssString,
+    borderRightColor: colorToCssString,
     borderRightWidth: Len.styleToString,
     borderStyle: valueToString,
     borderSpacing: borderSpacingToCssString,
     borderTop: borderSideToCssString,
-    borderTopColor: ColorFuncs.colorToCssString,
+    borderTopColor: colorToCssString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
     borderTopWidth: Len.styleToString,
@@ -591,18 +585,18 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     bottom: Len.styleToString,
     boxShadow: valueToString,
 
-    caretColor: ColorFuncs.colorToCssString,
+    caretColor: colorToCssString,
     clip: clipToCssString,
-    color: ColorFuncs.colorToCssString,
+    color: colorToCssString,
     columnGap: Len.styleToString,
     columnRule: columnRuleToCssString,
-    columnRuleColor: ColorFuncs.colorToCssString,
+    columnRuleColor: colorToCssString,
     columnRuleStyle: valueToString,
     columnRuleWidth: multiLenToStringWithSpace,
     columns: columnsToCssString,
 
     flex: flexToCssString,
-    floodColor: ColorFuncs.colorToCssString,
+    floodColor: colorToCssString,
     fontSize: Len.styleToString,
     fontStyle: fontStyleToCssString,
 
@@ -616,7 +610,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
 
     left: Len.styleToString,
     letterSpacing: Len.styleToString,
-    lightingColor: ColorFuncs.colorToCssString,
+    lightingColor: colorToCssString,
 
     margin: multiLenToStringWithSpace,
     marginBlockEnd: Len.styleToString,
@@ -639,7 +633,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     minZoom: Len.styleToString,
 
     objectPosition: positionToCssString,
-    outlineColor: ColorFuncs.colorToCssString,
+    outlineColor: colorToCssString,
     outlineOffset: Len.styleToString,
     outlineStyle: valueToString,
 
@@ -680,12 +674,12 @@ const StylePropertyInfos: { [K in keyof IStyleset]: PropToStringFunc<K> } =
     scrollPaddingLeft: Len.styleToString,
     scrollPaddingRight: Len.styleToString,
     scrollPaddingTop: Len.styleToString,
-    stopColor: ColorFuncs.colorToCssString,
+    stopColor: colorToCssString,
 
     tabSize: Len.styleToString,
-    textDecorationColor: ColorFuncs.colorToCssString,
+    textDecorationColor: colorToCssString,
     textDecorationThickness: Len.styleToString,
-    textEmphasisColor: ColorFuncs.colorToCssString,
+    textEmphasisColor: colorToCssString,
     textEmphasisPosition: textEmphasisPositionToCssString,
     textIndent: textIndentToCssString,
     top: Len.styleToString,

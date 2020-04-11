@@ -180,7 +180,7 @@ export class StringProxy implements IStringProxy
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type of functions that convert a number to a string */
-type ConvertFuncType = (n: number) => string;
+type ConvertNumberFuncType = (n: number) => string;
 
 
 
@@ -201,7 +201,7 @@ function numberToCssString( n: number, intUnit: string = "", floatUint: string =
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function numberStyleToCssString( val: Extended<CssNumber>, convertFunc?: ConvertFuncType): string
+function numberStyleToCssString( val: Extended<CssNumber>, convertFunc?: ConvertNumberFuncType): string
 {
     return valueToString( val, { fromNumber: convertFunc});
 }
@@ -213,7 +213,7 @@ function numberStyleToCssString( val: Extended<CssNumber>, convertFunc?: Convert
  * @param separator String to use to separate multiple values.
  */
 function multiNumberStyleToCssString( val: Extended<MultiCssNumber>,
-                convertFunc: ConvertFuncType, separator: string = " "): string
+                convertFunc: ConvertNumberFuncType, separator: string = " "): string
 {
     return valueToString( val, { fromNumber: convertFunc,
         arrayItemFunc: v => numberStyleToCssString( v, convertFunc),
@@ -229,7 +229,7 @@ function multiNumberStyleToCssString( val: Extended<MultiCssNumber>,
  * @param convertFunc 
  * @param params 
  */
-function formatNumbers( format: string, params: Extended<CssNumber>[], convertFunc?: ConvertFuncType): string
+function formatNumbers( format: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType): string
 {
     function replacer( token: string, ...args: any[]): string
     {
@@ -256,7 +256,7 @@ function formatNumbers( format: string, params: Extended<CssNumber>[], convertFu
  */
 class MathFuncProxy implements IStringProxy
 {
-    constructor( name: string, params: Extended<CssNumber>[], convertFunc?: ConvertFuncType)
+    constructor( name: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
     {
         this.name = name;
         this.convertFunc = convertFunc;
@@ -273,7 +273,7 @@ class MathFuncProxy implements IStringProxy
 
     // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
     // If not defined, numbers are converted to strings without appending any suffix.
-    private convertFunc: ConvertFuncType;
+    private convertFunc: ConvertNumberFuncType;
 
     // Array of Number_StyleType parameters to the mathematical function.
     private params: Extended<CssNumber>[];
@@ -288,7 +288,7 @@ class MathFuncProxy implements IStringProxy
  */
 class CalcFuncProxy implements IStringProxy
 {
-    constructor( formula: string, params: Extended<CssNumber>[], convertFunc?: ConvertFuncType)
+    constructor( formula: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
     {
         this.formula = formula;
         this.convertFunc = convertFunc;
@@ -305,7 +305,7 @@ class CalcFuncProxy implements IStringProxy
 
     // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
     // If not defined, numbers are converted to strings without appending any suffix.
-    private convertFunc: ConvertFuncType;
+    private convertFunc: ConvertNumberFuncType;
 
     // Array Number_StyleType parameters to substitute placeholders in the formula string.
     private params: Extended<CssNumber>[];
@@ -321,9 +321,9 @@ class CalcFuncProxy implements IStringProxy
 class NumberMath implements INumberMath
 {
     // Function that appends proper units for parameters of number type.
-    protected convertFunc: ConvertFuncType;
+    protected convertFunc: ConvertNumberFuncType;
 
-    constructor( init?: ConvertFuncType | [string,string])
+    constructor( init?: ConvertNumberFuncType | [string,string])
     {
         this.convertFunc = !init
             ? (n: number) => n.toString()
