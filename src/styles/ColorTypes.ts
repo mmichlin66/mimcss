@@ -2,7 +2,7 @@
  * This module contains types for working with CSS colors.
  */
 
-import {ExtendedPropType, IStringProxy} from "./UtilTypes"
+import {IStringProxy, Box} from "./UtilTypes"
 
 
 
@@ -231,7 +231,14 @@ export interface IColors extends INamedColors
  *     - negative and floating point numbers are rejected.
  *   - array [[ColorAsArray]]
  */
-export type Color_StyleType = ExtendedPropType<"transparent" | "currentcolor" | keyof INamedColors | number>;
+export type Color_StyleType = "transparent" | "currentcolor" | keyof INamedColors | number;
+
+
+
+/**
+ * Represents a type that can have 1 to 4 color values.
+ */
+export type ColorBox = Box<Color_StyleType>;
 
 
 

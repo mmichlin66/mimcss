@@ -1,24 +1,24 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
+import {
+    Extended, MultiCssNumber
+} from "./UtilTypes";
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
     multiSizeToCssString, positionToCssString, multiPositionToCssString,
-    Num, Len, Angle, Time, StringProxy
+    Num, Len, Angle, Time
 } from "./UtilFuncs"
-import {
-    ExtendedPropType, ExtendedNumber_StyleType, ExtendedMultiNumber_StyleType, IStringProxy
-} from "./UtilTypes";
 import * as ColorFuncs from "./ColorFuncs";
 
 
 
 // helper functions for style property conversions
-function multiTimeToStringWithComma( val: ExtendedMultiNumber_StyleType)
+function multiTimeToStringWithComma( val: Extended<MultiCssNumber>)
 {
     return Time.multiStyleToString( val, ",");
 
 }
 
-function multiLenToStringWithSpace( val: ExtendedMultiNumber_StyleType)
+function multiLenToStringWithSpace( val: Extended<MultiCssNumber>)
 {
     return Len.multiStyleToString( val, " ");
 }
@@ -45,7 +45,7 @@ function singleAnimationObjectToCssString( val: StyleTypes.SingleAnimation): str
  * Converts animation style represented as an object with fields corresponding to animation
  * properties to its CSS string value.
  */
-function singleAnimationNameToCssString( val: ExtendedPropType<StyleTypes.SingleAnimationName>): string
+function singleAnimationNameToCssString( val: Extended<StyleTypes.SingleAnimationName>): string
 {
     return valueToString( val, {
         fromObject: v => (v as StyleTypes.IAnimationNameProvider).getAnimationName()
@@ -56,7 +56,7 @@ function singleAnimationNameToCssString( val: ExtendedPropType<StyleTypes.Single
  * Converts animation style represented as an object with fields corresponding to animation
  * properties to its CSS string value.
  */
-function singleAnimationToCssString( val: ExtendedPropType<StyleTypes.SingleAnimation>): string
+function singleAnimationToCssString( val: Extended<StyleTypes.SingleAnimation>): string
 {
     return valueToString( val, {
         fromObject: singleAnimationObjectToCssString
@@ -66,7 +66,7 @@ function singleAnimationToCssString( val: ExtendedPropType<StyleTypes.SingleAnim
 /**
  * Converts animation style to its CSS string value.
  */
-function animationToCssString( val: ExtendedPropType<StyleTypes.AnimationStyleType>): string
+function animationToCssString( val: Extended<StyleTypes.AnimationStyleType>): string
 {
     return valueToString( val, {
         arrayItemFunc: singleAnimationToCssString,
@@ -81,7 +81,7 @@ function animationToCssString( val: ExtendedPropType<StyleTypes.AnimationStyleTy
 /**
  * Converts single animation timing function value to the CSS time string.
  */
-function singleAnimationTimingFunctionToCssString( val: ExtendedPropType<StyleTypes.SingleAnimationTimingFunction>): string
+function singleAnimationTimingFunctionToCssString( val: Extended<StyleTypes.SingleAnimationTimingFunction>): string
 {
     return valueToString( val, {
         fromNumber: v => `steps(${v})`,
@@ -163,12 +163,12 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
                 // two MultiCornerRadius values
                 let s = arrayToCssString( v[0], Len.styleToString, " ");
                 s += " / ";
-                return s + arrayToCssString( v[1] as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
+                return s + arrayToCssString( v[1], Len.styleToString, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return arrayToCssString( v as StyleTypes.MultiCornerRadius_StyleType, Len.styleToString, " ");
+                return arrayToCssString( v, Len.styleToString, " ");
             }
         },
         fromAny: Len.styleToString

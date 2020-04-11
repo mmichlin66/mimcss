@@ -1,4 +1,4 @@
-﻿import {IStringProxy, ExtendedNumber_StyleType, ExtendedMultiNumber_StyleType, INumberMath,
+﻿import {Extended, IStringProxy, CssNumber, MultiCssNumber, INumberMath,
     Size_StyleType, MultiSize_StyleType, Position_StyleType, MultiPosition_StyleType, IFractionMath
 } from "./UtilTypes"
 
@@ -201,7 +201,7 @@ function numberToCssString( n: number, intUnit: string = "", floatUint: string =
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function numberStyleToCssString( val: ExtendedNumber_StyleType, convertFunc?: ConvertFuncType): string
+function numberStyleToCssString( val: Extended<CssNumber>, convertFunc?: ConvertFuncType): string
 {
     return valueToString( val, { fromNumber: convertFunc});
 }
@@ -212,7 +212,7 @@ function numberStyleToCssString( val: ExtendedNumber_StyleType, convertFunc?: Co
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiNumberStyleToCssString( val: ExtendedMultiNumber_StyleType,
+function multiNumberStyleToCssString( val: Extended<MultiCssNumber>,
                 convertFunc: ConvertFuncType, separator: string = " "): string
 {
     return valueToString( val, { fromNumber: convertFunc,
@@ -229,7 +229,7 @@ function multiNumberStyleToCssString( val: ExtendedMultiNumber_StyleType,
  * @param convertFunc 
  * @param params 
  */
-function formatNumbers( format: string, params: ExtendedNumber_StyleType[], convertFunc?: ConvertFuncType): string
+function formatNumbers( format: string, params: Extended<CssNumber>[], convertFunc?: ConvertFuncType): string
 {
     function replacer( token: string, ...args: any[]): string
     {
@@ -256,7 +256,7 @@ function formatNumbers( format: string, params: ExtendedNumber_StyleType[], conv
  */
 class MathFuncProxy implements IStringProxy
 {
-    constructor( name: string, params: ExtendedNumber_StyleType[], convertFunc?: ConvertFuncType)
+    constructor( name: string, params: Extended<CssNumber>[], convertFunc?: ConvertFuncType)
     {
         this.name = name;
         this.convertFunc = convertFunc;
@@ -276,7 +276,7 @@ class MathFuncProxy implements IStringProxy
     private convertFunc: ConvertFuncType;
 
     // Array of Number_StyleType parameters to the mathematical function.
-    private params: ExtendedNumber_StyleType[];
+    private params: Extended<CssNumber>[];
 }
 
 
@@ -288,7 +288,7 @@ class MathFuncProxy implements IStringProxy
  */
 class CalcFuncProxy implements IStringProxy
 {
-    constructor( formula: string, params: ExtendedNumber_StyleType[], convertFunc?: ConvertFuncType)
+    constructor( formula: string, params: Extended<CssNumber>[], convertFunc?: ConvertFuncType)
     {
         this.formula = formula;
         this.convertFunc = convertFunc;
@@ -308,7 +308,7 @@ class CalcFuncProxy implements IStringProxy
     private convertFunc: ConvertFuncType;
 
     // Array Number_StyleType parameters to substitute placeholders in the formula string.
-    private params: ExtendedNumber_StyleType[];
+    private params: Extended<CssNumber>[];
 }
 
 
@@ -337,32 +337,32 @@ class NumberMath implements INumberMath
         return this.convertFunc( n);
     }
 
-    public styleToString = (val: ExtendedNumber_StyleType): string =>
+    public styleToString = (val: Extended<CssNumber>): string =>
     {
         return numberStyleToCssString( val, this.convertFunc);
     }
 
-    public multiStyleToString = (val: ExtendedMultiNumber_StyleType, separator: string = " "): string =>
+    public multiStyleToString = (val: Extended<MultiCssNumber>, separator: string = " "): string =>
     {
         return multiNumberStyleToCssString( val, this.convertFunc, separator);
     }
 
-    public min( ...params: ExtendedNumber_StyleType[]): IStringProxy
+    public min( ...params: Extended<CssNumber>[]): IStringProxy
     {
         return new MathFuncProxy( "min", params, this.convertFunc);
     }
 
-    public max( ...params: ExtendedNumber_StyleType[]): IStringProxy
+    public max( ...params: Extended<CssNumber>[]): IStringProxy
     {
         return new MathFuncProxy( "max", params, this.convertFunc);
     }
 
-    public clamp( min: ExtendedNumber_StyleType, pref: ExtendedNumber_StyleType, max: ExtendedNumber_StyleType): IStringProxy
+    public clamp( min: Extended<CssNumber>, pref: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy
     {
         return new MathFuncProxy( "clamp", [min, pref, max], this.convertFunc);
     }
 
-    public calc( formula: string, ...params: ExtendedNumber_StyleType[]): IStringProxy
+    public calc( formula: string, ...params: Extended<CssNumber>[]): IStringProxy
     {
         return new CalcFuncProxy( formula, params, this.convertFunc);
     }
@@ -477,7 +477,7 @@ class FractionMath extends NumberMath implements IFractionMath
         super( ["fr", "%"])
     }
 
-    public minmax( min: ExtendedNumber_StyleType, max: ExtendedNumber_StyleType): IStringProxy
+    public minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy
     {
         return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
     }

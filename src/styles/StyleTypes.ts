@@ -1,9 +1,10 @@
 ﻿import {
-    Number_StyleType, ExtendedNumber_StyleType, MultiNumber_StyleType, ExtendedMultiNumber_StyleType, Box_StyleType,
-    Size_StyleType, MultiSize_StyleType, Position_StyleType, MultiPosition_StyleType,
-    ExtendedPropType, IStringProxy
+    Extended, IStringProxy, Pair, Box, OneOrMany, NumberBox,
+    CssNumber, MultiCssNumber,
+    Size_StyleType, Position_StyleType, MultiPosition_StyleType,
+    
 } from "./UtilTypes"
-import {Color_StyleType} from "./ColorTypes"
+import {Color_StyleType, ColorBox} from "./ColorTypes"
 
 
 
@@ -37,18 +38,18 @@ export type AlignmentBaselineStyleType = "auto" | "baseline" | "before-edge" | "
 /** Type for single animation */
 export type SingleAnimation = string |
     {
-        delay?: ExtendedNumber_StyleType;
-        func?: ExtendedPropType<SingleAnimationTimingFunction>;
-        duration?: ExtendedNumber_StyleType;
-        count?: ExtendedPropType<SingleAnimationIterationCount>;
-        direction?: ExtendedPropType<SingleAnimationDirection>;
-        state?: ExtendedPropType<SingleAnimationPlayState>;
-        mode?: ExtendedPropType<SingleAnimationFillMode>;
-        name?: ExtendedPropType<SingleAnimationName>;
+        delay?: Extended<CssNumber>;
+        func?: Extended<SingleAnimationTimingFunction>;
+        duration?: Extended<CssNumber>;
+        count?: Extended<SingleAnimationIterationCount>;
+        direction?: Extended<SingleAnimationDirection>;
+        state?: Extended<SingleAnimationPlayState>;
+        mode?: Extended<SingleAnimationFillMode>;
+        name?: Extended<SingleAnimationName>;
     };
 
 /** Type for animation style property */
-export type AnimationStyleType = SingleAnimation | ExtendedPropType<SingleAnimation>[];
+export type AnimationStyleType = OneOrMany<SingleAnimation>;
 
 
 
@@ -56,7 +57,7 @@ export type AnimationStyleType = SingleAnimation | ExtendedPropType<SingleAnimat
 export type SingleAnimationDirection = "normal" | "reverse" | "alternate" | "alternate-reverse";
 
 /** Type for animation-direction style property */
-export type AnimationDirectionStyleType = SingleAnimationDirection | ExtendedPropType<SingleAnimationDirection>[];
+export type AnimationDirectionStyleType = OneOrMany<SingleAnimationDirection>;
 
 
 
@@ -64,15 +65,15 @@ export type AnimationDirectionStyleType = SingleAnimationDirection | ExtendedPro
 export type SingleAnimationFillMode = "none" | "forwards" | "backwards" | "both";
 
 /** Type for animation-fill-mode style property */
-export type AnimationFillModeStyleType = SingleAnimationDirection | ExtendedPropType<SingleAnimationDirection>[];
+export type AnimationFillModeStyleType = OneOrMany<SingleAnimationDirection>;
 
 
 
 /** Type for single animation iteration count */
-export type SingleAnimationIterationCount = "infinite" | Number_StyleType;
+export type SingleAnimationIterationCount = "infinite" | CssNumber;
 
 /** Type for animation-iteration-count style property */
-export type AnimationIterationCountStyleType = SingleAnimationIterationCount | ExtendedPropType<SingleAnimationIterationCount>[];
+export type AnimationIterationCountStyleType = OneOrMany<SingleAnimationIterationCount>;
 
 
 
@@ -92,7 +93,7 @@ export interface IAnimationNameProvider
 export type SingleAnimationName = "none" | string | IAnimationNameProvider;
 
 /** Type for animation-name style property */
-export type AnimationNameStyleType = SingleAnimationName | ExtendedPropType<SingleAnimationName>[];
+export type AnimationNameStyleType = OneOrMany<SingleAnimationName>;
 
 
 
@@ -100,7 +101,7 @@ export type AnimationNameStyleType = SingleAnimationName | ExtendedPropType<Sing
 export type SingleAnimationPlayState = "paused" | "running";
 
 /** Type for animation-play-state style property */
-export type AnimationPlayStateStyleType = SingleAnimationPlayState | ExtendedPropType<SingleAnimationPlayState>[];
+export type AnimationPlayStateStyleType = OneOrMany<SingleAnimationPlayState>;
 
 
 
@@ -111,16 +112,16 @@ export type AnimationTimingFunction_Simple = "linear" | "ease" | "ease-in" | "ea
 export type AnimationTimingFunction_StepPosition = "jump-start" | "jump-end" | "jump-none" | "jump-both" | "start" | "end";
 
 /** Type for step animation timing function */
-export type AnimationTimingFunction_Step = number | [ExtendedPropType<number>, ExtendedPropType<AnimationTimingFunction_StepPosition>?];
+export type AnimationTimingFunction_Step = number | [Extended<number>, Extended<AnimationTimingFunction_StepPosition>?];
 
 /** Type for Bezier animation timing function */
-export type AnimationTimingFunction_Bezier = [ExtendedPropType<number>, ExtendedPropType<number>, ExtendedPropType<number>, ExtendedPropType<number>];
+export type AnimationTimingFunction_Bezier = [Extended<number>, Extended<number>, Extended<number>, Extended<number>];
 
 /** Type for single animation timing function */
 export type SingleAnimationTimingFunction = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier;
 
 /** Type for animation-timing-function style property */
-export type AnimationTimingFunctionStyleType = SingleAnimationTimingFunction | ExtendedPropType<SingleAnimationTimingFunction>[];
+export type AnimationTimingFunctionStyleType = OneOrMany<SingleAnimationTimingFunction>;
 
 
 
@@ -133,7 +134,7 @@ export type BackfaceVisibilityModeStyleType = "visible" | "hidden";
 export type SingleBackgroundAttachment = "scroll" | "fixed" | "local";
 
 /** Type for background-attachment style property */
-export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | ExtendedPropType<SingleBackgroundAttachment>[];
+export type BackgroundAttachmentStyleType = OneOrMany<SingleBackgroundAttachment>;
 
 
 
@@ -141,7 +142,7 @@ export type BackgroundAttachmentStyleType = SingleBackgroundAttachment | Extende
 export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" | "text";
 
 /** Type for background-clip style property */
-export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundClip[];
+export type BackgroundClipStyleType = OneOrMany<SingleBackgroundClip>;
 
 
 
@@ -149,7 +150,7 @@ export type BackgroundClipStyleType = SingleBackgroundClip | SingleBackgroundCli
 export type SingleBackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text";
 
 /** Type for background-origin style property */
-export type BackgroundOriginStyleType = SingleBackgroundOrigin | SingleBackgroundOrigin[];
+export type BackgroundOriginStyleType = OneOrMany<SingleBackgroundOrigin>;
 
 
 
@@ -161,7 +162,7 @@ export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | "repeat" | "space
     "no-repeat repeat" | "no-repeat space" | "no-repeat round" | "no-repeat no-repeat";
 
 /** Type for background-repeat style property */
-export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroundRepeat[];
+export type BackgroundRepeatStyleType = OneOrMany<SingleBackgroundRepeat>;
 
 
 
@@ -169,29 +170,22 @@ export type BackgroundRepeatStyleType = SingleBackgroundRepeat | SingleBackgroun
 export type SingleBackgroundSize = "cover" | "contain" | Size_StyleType;
 
 /** Type for background-size style property */
-export type BackgroundSizeStyleType = SingleBackgroundSize | SingleBackgroundSize[];
+export type BackgroundSizeStyleType = OneOrMany<SingleBackgroundSize>;
 
 
 
 /** Type for a single corner radius */
-export type SingleCornerRadius_StyleType = Number_StyleType |
-    [Number_StyleType, Number_StyleType];
+export type SingleCornerRadius_StyleType = Pair<CssNumber>;
 
 
-
-/** Helper type that defines an array of one to 4 elements each defining a length/percentage */
-export type MultiCornerRadius_StyleType =
-    [Number_StyleType, Number_StyleType?, Number_StyleType?, Number_StyleType?
-    ];
 
 /** Type for border-radius style property */
-export type BorderRadiusStyleType = Number_StyleType | MultiCornerRadius_StyleType |
-    [MultiCornerRadius_StyleType, MultiCornerRadius_StyleType];
+export type BorderRadiusStyleType = Pair<NumberBox>;
 
 
 
 /** Type for baseline-shift style property */
-export type BaselineShiftStyleType = "sub" | "super" | Number_StyleType;
+export type BaselineShiftStyleType = "sub" | "super" | CssNumber;
 
 
 
@@ -202,19 +196,17 @@ export type BorderSideStyle_StyleType = "none" | "hidden" | "dotted" | "dashed" 
 
 
 /** Type for border-style style property */
-export type BorderStyleStyleType = BorderSideStyle_StyleType |
-    [BorderSideStyle_StyleType, BorderSideStyle_StyleType, BorderSideStyle_StyleType?, BorderSideStyle_StyleType?];
+export type BorderStyleStyleType = Box<BorderSideStyle_StyleType>;
 
 
 
 /** Type for border side width style property */
-export type BorderSideLength_StyleType = "thin" | "medium" | "thick" | Number_StyleType;
+export type BorderSideLength_StyleType = "thin" | "medium" | "thick" | CssNumber;
 
 
 
 /** Type for border-width style property */
-export type BorderLengthStyleType = BorderSideLength_StyleType |
-    [BorderSideLength_StyleType, BorderSideLength_StyleType, BorderSideLength_StyleType?, BorderSideLength_StyleType?];
+export type BorderLengthStyleType = NumberBox;
 
 
 
@@ -224,20 +216,18 @@ export type BorderColapseStyleType = "collapse" | "separate";
 
 
 /** Type for border-spacing style property */
-export type BorderSpacingStyleType = Number_StyleType |
-    [Number_StyleType, Number_StyleType];
+export type BorderSpacingStyleType = Pair<CssNumber>;
 
 
 
 /** Type for border-color style property */
-export type BorderColorStyleType = Color_StyleType |
-    [Color_StyleType, Color_StyleType, Color_StyleType?, Color_StyleType?];
+export type BorderColorStyleType = ColorBox;
 
 
 
 /** Type for border side style property */
-export type BorderSide_StyleType = Number_StyleType |  BorderSideStyle_StyleType | Color_StyleType |
-    [Number_StyleType?, BorderSideStyle_StyleType?, Color_StyleType?];
+export type BorderSide_StyleType = CssNumber |  BorderSideStyle_StyleType | Color_StyleType |
+    [Extended<CssNumber>?, Extended<BorderSideStyle_StyleType>?, Extended<Color_StyleType>?];
 
 
 
@@ -251,7 +241,7 @@ export type BorderImageOutsetStyleType = string | number |
 export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space";
 
 /** Type for border-image-repeat style property */
-export type BorderImageRepeatStyleType = BorderImageRepeatKeyword | [BorderImageRepeatKeyword, BorderImageRepeatKeyword];
+export type BorderImageRepeatStyleType = Pair<BorderImageRepeatKeyword>;
 
 
 
@@ -259,7 +249,7 @@ export type BorderImageRepeatStyleType = BorderImageRepeatKeyword | [BorderImage
 export type SingleBoxShadow = "none" | string;
 
 /** Type for box shadow style property */
-export type BoxShadowStyleType = SingleBoxShadow | SingleBoxShadow[];
+export type BoxShadowStyleType = OneOrMany<SingleBoxShadow>;
 
 
 
@@ -303,7 +293,7 @@ export type ClearStyleType = "none" | "left" | "right" | "both" | "inline-start"
 
 
 /** Type for clear style property */
-export type ClipStyleType = "auto" | Box_StyleType;
+export type ClipStyleType = "auto" | NumberBox;
 
 
 
@@ -345,7 +335,7 @@ export type ColumnSpanStyleType = "none" | "all";
 
 
 /** Type for columns style property */
-export type ColumnsStyleType = "auto" | number | ["auto" | number, Number_StyleType];
+export type ColumnsStyleType = "auto" | number | ["auto" | number, CssNumber];
 
 
 
@@ -398,12 +388,13 @@ export type FillRuleStyleType = "nonzero" | "evenodd";
 
 
 /** Type for flex-basis style property */
-export type FlexBasisStyleType = "auto" | "content" | Number_StyleType;
+export type FlexBasisStyleType = "auto" | "content" | CssNumber;
 
 
 
 /** Type for flex style property */
-export type FlexStyleType = FlexBasisStyleType | [number,number] | [number,number,FlexBasisStyleType];
+export type FlexStyleType = FlexBasisStyleType | [Extended<number>, Extended<number>] |
+    [Extended<number>, Extended<number>, Extended<FlexBasisStyleType>];
 
 
 
@@ -419,12 +410,12 @@ export type FlexWrapStyleType = "nowrap" | "wrap" | "wrap-reverse";
 
 /** Type for flex-flow style property */
 export type FlexFlowStyleType = FlexDirectionStyleType | FlexWrapStyleType |
-    [FlexDirectionStyleType, FlexWrapStyleType];
+    [Extended<FlexDirectionStyleType>, Extended<FlexWrapStyleType>];
 
 
 
 /** Type for font-style style property */
-export type FontStyleStyleType = "normal" | "italic" | "oblique" | Number_StyleType;
+export type FontStyleStyleType = "normal" | "italic" | "oblique" | CssNumber;
 
 
 
@@ -439,10 +430,10 @@ export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" | num
 
 
 /** Type for a row-gap or column-gap style property */
-export type SingleGapStyleType = "normal" | Number_StyleType;
+export type SingleGapStyleType = "normal" | CssNumber;
 
 /** Type for a row-gap or column-gap style property */
-export type GapStyleType = SingleGapStyleType | [SingleGapStyleType, SingleGapStyleType];
+export type GapStyleType = Pair<SingleGapStyleType>;
 
 
 
@@ -487,7 +478,7 @@ export type JustifySelfStyleType = "auto" | "normal" | "stretch" | "baseline" | 
 
 
 /** Type for letter-spacing style property */
-export type LetterSpacingStyleType = "normal" | Number_StyleType;
+export type LetterSpacingStyleType = "normal" | CssNumber;
 
 
 
@@ -497,7 +488,7 @@ export type LineBreakStyleType = "auto" | "loose" | "normal" | "strict" | "anywh
 
 
 /** Type for line-height style property */
-export type LineHeightStyleType = Number_StyleType;
+export type LineHeightStyleType = CssNumber;
 
 
 
@@ -517,7 +508,7 @@ export type ListStylePositionStyleType = "inside" | "outside";
 
 /** Type for list-style-position style property */
 export type ListStyleStyleType = ListStyleTypeStyleType | ListStylePositionStyleType |
-    [ListStyleTypeStyleType, ListStylePositionStyleType, string?];
+    [Extended<ListStyleTypeStyleType>, Extended<ListStylePositionStyleType>, Extended<string>?];
 
 
 
@@ -536,18 +527,18 @@ export type OverflowWrapStyleType = "normal" | "break-word" | "anywhere";
 export type SingleOverflowStyleType = "visible" | "hidden" | "clip" | "scroll" | "auto";
 
 /** Type for the overflow- style property */
-export type OverflowStyleType = SingleOverflowStyleType | [SingleOverflowStyleType, SingleOverflowStyleType];
+export type OverflowStyleType = Pair<SingleOverflowStyleType>;
 
 
 
 /** Type for the place-content style property */
-export type PlaceContentStyleType = AlignContentStyleType | [AlignContentStyleType, JustifyContentStyleType];
+export type PlaceContentStyleType = AlignContentStyleType | [Extended<AlignContentStyleType>, Extended<JustifyContentStyleType>];
 
 /** Type for the place-items style property */
-export type PlaceItemsStyleType = AlignItemsStyleType | [AlignItemsStyleType, JustifyItemsStyleType];
+export type PlaceItemsStyleType = AlignItemsStyleType | [Extended<AlignItemsStyleType>, Extended<JustifyItemsStyleType>];
 
 /** Type for the place-self style property */
-export type PlaceSelfStyleType = AlignSelfStyleType | [AlignSelfStyleType, JustifySelfStyleType];
+export type PlaceSelfStyleType = AlignSelfStyleType | [Extended<AlignSelfStyleType>, Extended<JustifySelfStyleType>];
 
 
 
@@ -605,7 +596,7 @@ export type TextDecorationLineStyleType = "none" | "underline" | "overline" | "l
 export type TextDecorationStyleStyleType = "solid" | "double" | "dotted" | "dashed" | "wavy";
 
 /** Type for the text-decoration-thickness style property */
-export type TextDecorationThicknessStyleType = "auto" | "from-font" | Number_StyleType;
+export type TextDecorationThicknessStyleType = "auto" | "from-font" | CssNumber;
 
 // /** Type for the text-decoration-line style property */
 // export type TextDecorationStyleType = TextDecorationLineStyleType | TextDecorationStyleStyleType |
@@ -615,13 +606,14 @@ export type TextDecorationThicknessStyleType = "auto" | "from-font" | Number_Sty
 
 
 /** Type for the text-emphasis-position style property */
-export type TextEmphasisPositionStyleType = ["over" | "under", "left" | "right"] | Number_StyleType;
+export type TextEmphasisPositionStyleType = [Extended<"over" | "under">, Extended<"left" | "right">] | CssNumber;
 
 /** Type for the text-emphasis-style style property */
 export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame";
 
 /** Type for the text-emphasis-style style property */
-export type TextEmphasisStyleStyleType = "none" | number | TextEmphasisShape | ["filled" | "open", TextEmphasisShape];
+export type TextEmphasisStyleStyleType = "none" | number | TextEmphasisShape |
+    [Extended<"filled" | "open">, Extended<TextEmphasisShape>];
 
 // /** Type for the text-emphasis style property */
 // export type TextEmphasisStyleType = TextEmphasisStyleStyleType | Color_StyleType | [TextEmphasisStyleStyleType, Color_StyleType];
@@ -629,13 +621,13 @@ export type TextEmphasisStyleStyleType = "none" | number | TextEmphasisShape | [
 
 
 /** Type for the text-indent style property */
-export type TextIndentStyleType = Number_StyleType |
-    [Number_StyleType, "each-line", "hanging"?] | [Number_StyleType, "hanging", "each-line"?];
+export type TextIndentStyleType = CssNumber |
+    [Extended<CssNumber>, Extended<"each-line" | "hanging" | "each-line hanging">?];
 
 
 
 /** Type for the text-justify style property */
-export type TextJustifyStyleType = "auto" | "inter-character" | "inter-word" | "none" | Number_StyleType;
+export type TextJustifyStyleType = "auto" | "inter-character" | "inter-word" | "none" | CssNumber;
 
 
 
@@ -645,10 +637,10 @@ export type TextOrientationStyleType = "mixed" | "upright" | "sideways";
 
 
 /** Type for the text-overflow style property */
-export type SingleTextOverflowStyleType = "clip" | "ellipsis" | "fade" | Number_StyleType;
+export type SingleTextOverflowStyleType = "clip" | "ellipsis" | "fade" | CssNumber;
 
 /** Type for the text-overflow style property */
-export type TextOverflowStyleType = SingleTextOverflowStyleType | [SingleTextOverflowStyleType, SingleTextOverflowStyleType];
+export type TextOverflowStyleType = Pair<SingleTextOverflowStyleType>;
 
 
 
@@ -685,8 +677,8 @@ export type TouchActionStyleType = "auto" | "none" | "manipulation" |
 
 
 /** Type for the translate style property */
-export type TranslateStyleType = "none" | Number_StyleType |
-    [Number_StyleType, Number_StyleType, Number_StyleType?];
+export type TranslateStyleType = "none" | CssNumber |
+    [Extended<CssNumber>, Extended<CssNumber>, Extended<CssNumber>?];
 
 
 
@@ -716,7 +708,7 @@ export type WordBreakStyleType = "normal" | "break-all" | "keep-all" | "break-wo
 
 
 /** Type for the word-spacing style property */
-export type WordSpacingStyleType = "normal" | Number_StyleType;
+export type WordSpacingStyleType = "normal" | CssNumber;
 
 
 
@@ -731,7 +723,7 @@ export type ZIndexStyleType = "auto" | number;
 
 
 /** Type for the zoom style property */
-export type ZoomStyleType = "normal" | "reset" | Number_StyleType;
+export type ZoomStyleType = "normal" | "reset" | CssNumber;
 
 
 
@@ -750,9 +742,9 @@ export interface ICssStyleset
     alignSelf?: AlignSelfStyleType;
     alignmentBaseline?: AlignmentBaselineStyleType;
     animation?: AnimationStyleType;
-    animationDelay?: MultiNumber_StyleType;
+    animationDelay?: MultiCssNumber;
     animationDirection?: AnimationDirectionStyleType;
-    animationDuration?: MultiNumber_StyleType;
+    animationDuration?: MultiCssNumber;
     animationFillMode?: AnimationFillModeStyleType;
     animationIterationCount?: AnimationIterationCountStyleType;
     animationName?: AnimationNameStyleType;
@@ -799,7 +791,7 @@ export interface ICssStyleset
     borderImageRepeat?: BorderImageRepeatStyleType;
     borderImageSlice?: StyleType;
     borderImageSource?: StyleType;
-    borderImageWidth?: Box_StyleType;
+    borderImageWidth?: NumberBox;
     borderInlineEnd?: BorderSide_StyleType;
     borderInlineEndColor?: Color_StyleType;
     borderInlineEndStyle?: BorderSideStyle_StyleType;
@@ -827,7 +819,7 @@ export interface ICssStyleset
     borderTopStyle?: BorderSideStyle_StyleType;
     borderTopWidth?: BorderSideLength_StyleType;
     borderWidth?: BorderLengthStyleType;
-    bottom?: Number_StyleType;
+    bottom?: CssNumber;
     boxShadow?: BoxShadowStyleType;
     boxSizing?: BoxSizingStyleType;
     breakAfter?: BreakAfterStyleType;
@@ -851,7 +843,7 @@ export interface ICssStyleset
     columnRuleStyle?: BorderSideStyle_StyleType;
     columnRuleWidth?: BorderSideLength_StyleType;
     columnSpan?: ColumnSpanStyleType;
-    columnWidth?: Number_StyleType;
+    columnWidth?: CssNumber;
     columns?: ColumnsStyleType;
     contain?: StyleType;
     content?: StyleType;
@@ -873,8 +865,8 @@ export interface ICssStyleset
     flexBasis?: FlexBasisStyleType;
     flexDirection?: FlexDirectionStyleType;
     flexFlow?: FlexFlowStyleType;
-    flexGrow?: Number_StyleType;
-    flexShrink?: Number_StyleType;
+    flexGrow?: CssNumber;
+    flexShrink?: CssNumber;
     flexWrap?: FlexWrapStyleType;
     float?: FloatStyleType;
     floodColor?: Color_StyleType;
@@ -885,7 +877,7 @@ export interface ICssStyleset
     fontFeatureSettings?: StyleType;
     fontKerning?: FontKerningStyleType;
     fontOpticalSizing?: StyleType;
-    fontSize?: Number_StyleType;
+    fontSize?: CssNumber;
     fontSizeAdjust?: StyleType;
     fontStretch?: StyleType;
     fontStyle?: FontStyleStyleType;
@@ -919,11 +911,11 @@ export interface ICssStyleset
     gridTemplateColumns?: StyleType;
 	gridTemplateRows?: StyleType;
 	
-    height?: Number_StyleType;
+    height?: CssNumber;
 	hyphens?: HyphensStyleType;
 	
     imageRendering?: ImageRenderingStyleType;
-	inlineSize?: Number_StyleType;
+	inlineSize?: CssNumber;
 	isolation?: IsolationStyleType;
 	
     justifyContent?: JustifyContentStyleType;
@@ -932,7 +924,7 @@ export interface ICssStyleset
 	
 	kerning?: FontKerningStyleType;
 	
-    left?: Number_StyleType;
+    left?: CssNumber;
     letterSpacing?: LetterSpacingStyleType;
     lightingColor?: Color_StyleType;
     lineBreak?: LineBreakStyleType;
@@ -942,15 +934,15 @@ export interface ICssStyleset
     listStylePosition?: ListStylePositionStyleType;
 	listStyleType?: ListStyleTypeStyleType;
 	
-    margin?: Box_StyleType;
-    marginBlockEnd?: Number_StyleType;
-    marginBlockStart?: Number_StyleType;
-    marginBottom?: Number_StyleType;
-    marginInlineEnd?: Number_StyleType;
-    marginInlineStart?: Number_StyleType;
-    marginLeft?: Number_StyleType;
-    marginRight?: Number_StyleType;
-    marginTop?: Number_StyleType;
+    margin?: NumberBox;
+    marginBlockEnd?: CssNumber;
+    marginBlockStart?: CssNumber;
+    marginBottom?: CssNumber;
+    marginInlineEnd?: CssNumber;
+    marginInlineStart?: CssNumber;
+    marginLeft?: CssNumber;
+    marginRight?: CssNumber;
+    marginTop?: CssNumber;
     marker?: StyleType;
     markerEnd?: StyleType;
     markerMid?: StyleType;
@@ -962,16 +954,16 @@ export interface ICssStyleset
     maskRepeat?: StyleType;
     maskSize?: StyleType;
     maskType?: StyleType;
-    maxBlockSize?: Number_StyleType;
-    maxHeight?: Number_StyleType;
-    maxInlineSize?: Number_StyleType;
-    maxWidth?: Number_StyleType;
-	maxZoom?: Number_StyleType;
-    minBlockSize?: Number_StyleType;
-    minHeight?: Number_StyleType;
-    minInlineSize?: Number_StyleType;
-	minWidth?: Number_StyleType;
-	minZoom?: Number_StyleType;
+    maxBlockSize?: CssNumber;
+    maxHeight?: CssNumber;
+    maxInlineSize?: CssNumber;
+    maxWidth?: CssNumber;
+	maxZoom?: CssNumber;
+    minBlockSize?: CssNumber;
+    minHeight?: CssNumber;
+    minInlineSize?: CssNumber;
+	minWidth?: CssNumber;
+	minZoom?: CssNumber;
 	
     msContentZoomChaining?: StyleType;
     msContentZoomLimit?: StyleType;
@@ -1027,13 +1019,13 @@ export interface ICssStyleset
     offsetDistance?: StyleType;
     offsetPath?: StyleType;
     offsetRotate?: StyleType;
-    opacity?: Number_StyleType;
-    order?: Number_StyleType;
+    opacity?: CssNumber;
+    order?: CssNumber;
     orientation?: StyleType;
-    orphans?: Number_StyleType;
+    orphans?: CssNumber;
     outline?: BorderSide_StyleType;
     outlineColor?: Color_StyleType;
-    outlineOffset?: Number_StyleType;
+    outlineOffset?: CssNumber;
     outlineStyle?: BorderStyleStyleType;
     outlineWidth?: BorderSideLength_StyleType;
     overflow?: OverflowStyleType;
@@ -1049,21 +1041,21 @@ export interface ICssStyleset
     overscrollBehaviorX?: StyleType;
     overscrollBehaviorY?: StyleType;
     
-    padding?: Box_StyleType;
-    paddingBlockEnd?: Number_StyleType;
-    paddingBlockStart?: Number_StyleType;
-    paddingBottom?: Number_StyleType;
-    paddingInlineEnd?: Number_StyleType;
-    paddingInlineStart?: Number_StyleType;
-    paddingLeft?: Number_StyleType;
-    paddingRight?: Number_StyleType;
-    paddingTop?: Number_StyleType;
+    padding?: NumberBox;
+    paddingBlockEnd?: CssNumber;
+    paddingBlockStart?: CssNumber;
+    paddingBottom?: CssNumber;
+    paddingInlineEnd?: CssNumber;
+    paddingInlineStart?: CssNumber;
+    paddingLeft?: CssNumber;
+    paddingRight?: CssNumber;
+    paddingTop?: CssNumber;
     page?: StyleType;
     paintOrder?: StyleType;
     pageBreakAfter?: BreakAfterStyleType;
     pageBreakBefore?: BreakBeforeStyleType;
     pageBreakInside?: BreakInsideStyleType;
-    perspective?: Number_StyleType;
+    perspective?: CssNumber;
     perspectiveOrigin?: Position_StyleType;
     placeContent?: PlaceContentStyleType;
     placeItems?: PlaceItemsStyleType;
@@ -1074,7 +1066,7 @@ export interface ICssStyleset
 	quotes?: StyleType;
 	
     resize?: ResizeStyleType;
-    right?: Number_StyleType;
+    right?: CssNumber;
     rotate?: StyleType;
     rowGap?: SingleGapStyleType;
     rubyAlign?: StyleType;
@@ -1083,28 +1075,28 @@ export interface ICssStyleset
 	
     scale?: StyleType;
     scrollBehavior?: ScrollBehaviorStyleType;
-    scrollMargin?: Box_StyleType;
-    scrollMarginBlock?: Box_StyleType;
-    scrollMarginBlockEnd?: Number_StyleType;
-    scrollMarginBlockStart?: Number_StyleType;
-    scrollMarginBottom?: Number_StyleType;
-    scrollMarginInline?: Box_StyleType;
-    scrollMarginInlineEnd?: Number_StyleType;
-    scrollMarginInlineStart?: Number_StyleType;
-    scrollMarginLeft?: Number_StyleType;
-    scrollMarginRight?: Number_StyleType;
-    scrollMarginTop?: Number_StyleType;
-    scrollPadding?: Box_StyleType;
-    scrollPaddingBlock?: Box_StyleType;
-    scrollPaddingBlockEnd?: Number_StyleType;
-    scrollPaddingBlockStart?: Number_StyleType;
-    scrollPaddingBottom?: Number_StyleType;
-    scrollPaddingInline?: Box_StyleType;
-    scrollPaddingInlineEnd?: Number_StyleType;
-    scrollPaddingInlineStart?: Number_StyleType;
-    scrollPaddingLeft?: Number_StyleType;
-    scrollPaddingRight?: Number_StyleType;
-    scrollPaddingTop?: Number_StyleType;
+    scrollMargin?: NumberBox;
+    scrollMarginBlock?: NumberBox;
+    scrollMarginBlockEnd?: CssNumber;
+    scrollMarginBlockStart?: CssNumber;
+    scrollMarginBottom?: CssNumber;
+    scrollMarginInline?: NumberBox;
+    scrollMarginInlineEnd?: CssNumber;
+    scrollMarginInlineStart?: CssNumber;
+    scrollMarginLeft?: CssNumber;
+    scrollMarginRight?: CssNumber;
+    scrollMarginTop?: CssNumber;
+    scrollPadding?: NumberBox;
+    scrollPaddingBlock?: NumberBox;
+    scrollPaddingBlockEnd?: CssNumber;
+    scrollPaddingBlockStart?: CssNumber;
+    scrollPaddingBottom?: CssNumber;
+    scrollPaddingInline?: NumberBox;
+    scrollPaddingInlineEnd?: CssNumber;
+    scrollPaddingInlineStart?: CssNumber;
+    scrollPaddingLeft?: CssNumber;
+    scrollPaddingRight?: CssNumber;
+    scrollPaddingTop?: CssNumber;
     scrollSnapAlign?: StyleType;
     scrollSnapStop?: StyleType;
     scrollSnapType?: StyleType;
@@ -1123,7 +1115,7 @@ export interface ICssStyleset
     strokeOpacity?: StyleType;
 	strokeWidth?: StyleType;
 	
-    tabSize?: Number_StyleType;
+    tabSize?: CssNumber;
     tableLayout?: TableLayoutStyleType;
     textAlign?: TextAlignStyleType;
     textAlignLast?: TextAlignLastStyleType;
@@ -1149,7 +1141,7 @@ export interface ICssStyleset
     textSizeAdjust?: StyleType;
     textTransform?: TextTransformStyleType;
     textUnderlinePosition?: TextUnderlinePositionStyleType;
-    top?: Number_StyleType;
+    top?: CssNumber;
     touchAction?: TouchActionStyleType;
     transform?: StyleType;
     transformBox?: StyleType;
@@ -1193,7 +1185,7 @@ export interface ICssStyleset
 	
     whiteSpace?: WhiteSpaceStyleType;
     widows?: WidowsStyleType;
-    width?: Number_StyleType;
+    width?: CssNumber;
     willChange?: StyleType;
     wordBreak?: WordBreakStyleType;
     wordSpacing?: WordSpacingStyleType;
@@ -1209,7 +1201,7 @@ export interface ICssStyleset
 /**
  * Interface representing a collection of style properties and their values.
  */
-export type IStyleset = { [K in keyof ICssStyleset]: ExtendedPropType <ICssStyleset[K]> }
+export type IStyleset = { [K in keyof ICssStyleset]: Extended<ICssStyleset[K]> }
 
 
 

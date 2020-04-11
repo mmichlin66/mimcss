@@ -57,7 +57,24 @@ export interface ICustomVar<T = any>
  * - IStringProxy type that allows specifying raw string value.
  * - ICustomVar object that allows using a CSS custom property.
  */
-export type ExtendedPropType<T> = T | Base_StyleType | ICustomVar<ExtendedPropType<T>>;
+export type Extended<T> = T | Base_StyleType | ICustomVar<Extended<T>>;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Utility types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Type for pair-like property that can have 1 to 2 values of the given type */
+export type Pair<T> = T | [Extended<T>, Extended<T>];
+
+/** Type for box-like property that can have 1 to 4 values of the given type */
+export type Box<T> = T | [Extended<T>, Extended<T>, Extended<T>?, Extended<T>?];
+
+/** Type for a roperty that can have 1 or more values of the given type */
+export type OneOrMany<T> = T | Extended<T>[];
 
 
 
@@ -68,20 +85,13 @@ export type ExtendedPropType<T> = T | Base_StyleType | ICustomVar<ExtendedPropTy
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for single numeric style property */
-export type Number_StyleType = number | string;
-
-/** Extended type for single numeric style property */
-export type ExtendedNumber_StyleType = ExtendedPropType<Number_StyleType>;
+export type CssNumber = number | string;
 
 /** Type for multi-part numeric style property */
-export type MultiNumber_StyleType = Number_StyleType | ExtendedNumber_StyleType[];
-
-/** Extended type for multi-part numeric style property */
-export type ExtendedMultiNumber_StyleType = ExtendedPropType<MultiNumber_StyleType>;
+export type MultiCssNumber = OneOrMany<CssNumber>;
 
 /** Type for box style property that can have 1 to 4 numeric values */
-export type Box_StyleType = Number_StyleType | 
-    [ExtendedNumber_StyleType, ExtendedNumber_StyleType, ExtendedNumber_StyleType?, ExtendedNumber_StyleType?];
+export type NumberBox = Box<CssNumber>;
 
 
 
@@ -96,19 +106,19 @@ export interface INumberMath
     numberToString: ( n: number) => string;
 
     /** Converts single numeric style value to string appending necessary unit suffixes */
-    styleToString: ( val: ExtendedNumber_StyleType) => string;
+    styleToString: ( val: Extended<CssNumber>) => string;
 
     /** Converts multiple numeric style value to string appending necessary unit suffixes */
-    multiStyleToString: ( val: ExtendedMultiNumber_StyleType, separator: string) => string;
+    multiStyleToString: ( val: Extended<MultiCssNumber>, separator: string) => string;
 
     /** Creates property value of using the CSS min() function. */
-    min( ...params: ExtendedNumber_StyleType[]): IStringProxy;
+    min( ...params: Extended<CssNumber>[]): IStringProxy;
 
     /** Creates property value using the CSS max() function. */
-    max( ...params: ExtendedNumber_StyleType[]): IStringProxy;
+    max( ...params: Extended<CssNumber>[]): IStringProxy;
 
     /** Creates property value using the CSS clamp() function. */
-    clamp( min: ExtendedNumber_StyleType, pref: ExtendedNumber_StyleType, max: ExtendedNumber_StyleType): IStringProxy;
+    clamp( min: Extended<CssNumber>, pref: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy;
 
     /**
      * Creates property value using the CSS calc() function. This function accepts a formular
@@ -132,7 +142,7 @@ export interface INumberMath
      * @param formula 
      * @param params 
      */
-    calc( formula: string, ...params: ExtendedNumber_StyleType[]): IStringProxy;
+    calc( formula: string, ...params: Extended<CssNumber>[]): IStringProxy;
 }
 
 
@@ -173,7 +183,7 @@ export type FractionUnits = "fr";
 export interface IFractionMath extends INumberMath
 {
     /** Creates property value using the CSS minmax() function. */
-    minmax( min: ExtendedNumber_StyleType, max: ExtendedNumber_StyleType): IStringProxy;
+    minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy;
 }
 
 
@@ -189,7 +199,7 @@ export interface IFractionMath extends INumberMath
  * Number_StyleType type. Two values are given as an object with 'w' (width) and 'h' (height)
  * properties.
  */
-export type Size_StyleType = Number_StyleType | { w: Number_StyleType; h: Number_StyleType };
+export type Size_StyleType = CssNumber | { w: CssNumber; h: CssNumber };
 
 /** Type for multi-part size style property */
 export type MultiSize_StyleType = Size_StyleType | Size_StyleType[];
@@ -205,9 +215,9 @@ export type MultiSize_StyleType = Size_StyleType | Size_StyleType[];
 /**
  * Type for CSS position, which can be expressed as one or two or 3 or 4 values.
  */
-export type Position_StyleType = ExtendedPropType<"center" | "left" | "right" | "top" | "bottom" | Number_StyleType |
-                { x: "center" | "left" | "right" | Number_StyleType; y: "center" | "top" | "bottom" | Number_StyleType } |
-                { xedge: string; x?: Number_StyleType; yedge: string; y?: Number_StyleType }>;
+export type Position_StyleType = Extended<"center" | "left" | "right" | "top" | "bottom" | CssNumber |
+                { x: "center" | "left" | "right" | CssNumber; y: "center" | "top" | "bottom" | CssNumber } |
+                { xedge: string; x?: CssNumber; yedge: string; y?: CssNumber }>;
 
 /** Type for multi-part position style property */
 export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];

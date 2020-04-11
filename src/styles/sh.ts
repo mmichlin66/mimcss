@@ -1,5 +1,5 @@
 ﻿import {
-    IStringProxy, ExtendedPropType, ExtendedNumber_StyleType
+    IStringProxy, Extended, CssNumber
 } from "./UtilTypes"
 import {StringProxy} from "./UtilFuncs"
 import {IStyleset} from "./StyleTypes"
@@ -60,14 +60,14 @@ export class sh
      * @param mode Animation fill mode. The default value is "none".
      * @param state Animation state. The default value is "running".
      */
-    public static animation( name: ExtendedPropType<StyleTypes.SingleAnimationName>,
-        duration: ExtendedNumber_StyleType = 1000,
-        func: ExtendedPropType<StyleTypes.SingleAnimationTimingFunction> = "ease",
-        delay: ExtendedNumber_StyleType = 0,
-        count: ExtendedPropType<StyleTypes.SingleAnimationIterationCount> = 1,
-        direction: ExtendedPropType<StyleTypes.SingleAnimationDirection> = "normal",
-        mode: ExtendedPropType<StyleTypes.SingleAnimationFillMode> = "none",
-        state: ExtendedPropType<StyleTypes.SingleAnimationPlayState> = "running",
+    public static animation( name: Extended<StyleTypes.SingleAnimationName>,
+        duration: Extended<CssNumber> = 1000,
+        func: Extended<StyleTypes.SingleAnimationTimingFunction> = "ease",
+        delay: Extended<CssNumber> = 0,
+        count: Extended<StyleTypes.SingleAnimationIterationCount> = 1,
+        direction: Extended<StyleTypes.SingleAnimationDirection> = "normal",
+        mode: Extended<StyleTypes.SingleAnimationFillMode> = "none",
+        state: Extended<StyleTypes.SingleAnimationPlayState> = "running",
         ): StyleTypes.SingleAnimation
     {
         return { name, duration, func, delay,count, direction, state, mode };
