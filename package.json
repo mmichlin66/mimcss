@@ -23,19 +23,18 @@
 	],
 	"license": "MIT",
 	"devDependencies": {
-		"ifdef-loader": "^2.1.1",
+		"ifdef-loader": "^2.1.5",
 		"source-map-loader": "^0.2.4",
 		"terser-webpack-plugin": "^2.0.1",
-		"ts-loader": "^6.2.1",
-		"typescript": "^3.8.2",
-		"webpack": "^4.39.3",
+		"ts-loader": "^6.2.2",
+		"typescript": "^3.8.3",
+		"webpack": "^4.42.1",
 		"webpack-cli": "^3.3.8"
 	},
 	"files": [
 		"lib/mimcss.js",
 		"lib/mimcss.js.map",
 		"lib/mimcssTypes.d.ts",
-		
 		"lib/styles/UtilTypes.d.ts",
 		"lib/styles/UtilFuncs.d.ts",
 		"lib/styles/ColorTypes.d.ts",

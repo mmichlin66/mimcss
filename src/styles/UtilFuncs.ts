@@ -83,6 +83,8 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         // - everything else: call toString().
         if (val == null)
             return "initial";
+        else if (Array.isArray(val))
+            return arrayToCssString( val);
         else if (typeof val.valueToString === "function")
             return val.valueToString();
         else if (typeof val.varToString === "function")
@@ -148,7 +150,7 @@ export function arrayToCssString( val: any[], func?: (v) => string, separator: s
 {
     return !val || val.length === 0
         ? ""
-        : val.filter( x => x != null).map( y => func ? func(y) : z => valueToString( z)).join( separator);
+        : val.filter( x => x != null).map( y => func ? func(y) : valueToString( y)).join( separator);
 }
 
 

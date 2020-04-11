@@ -164,11 +164,10 @@ export type BackgroundOriginStyleType = OneOrMany<SingleBackgroundOrigin>;
 
 
 /** Type for single background repeat */
-export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | "repeat" | "space" | "round" | "no-repeat" |
-    "repeat repeat" | "repeat space" | "repeat round" | "repeat no-repeat" |
-    "space repeat" | "space space" | "space round" | "space no-repeat" |
-    "round repeat" | "round space" | "round round" | "round no-repeat" |
-    "no-repeat repeat" | "no-repeat space" | "no-repeat round" | "no-repeat no-repeat";
+export type SingleBackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat";
+
+/** Type for single background repeat */
+export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | Pair<SingleBackgroundRepeatKeyword>;
 
 /** Type for background-repeat style property */
 export type BackgroundRepeatStyleType = OneOrMany<SingleBackgroundRepeat>;
@@ -190,7 +189,7 @@ export type SingleBackgroundSize = "cover" | "contain" | Pair<CssNumber | "auto"
  * to specify both width and height you must use array within array - even for a single size:
  * [[100,200]] wll be interpreted as "100px 200px".
  */
-export type BackgroundSizeStyleType = "cover" | "contain" | CssNumber | Extended<SingleBackgroundSize>[];
+export type BackgroundSizeStyleType = OneOrMany<SingleBackgroundSize>;
 
 
 
