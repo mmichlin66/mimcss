@@ -1,6 +1,6 @@
 ﻿import {INamedColors, IColors, Color_StyleType} from "./ColorTypes"
 import {Percent, valueToString, StringProxy} from "./UtilFuncs"
-import {IStringProxy} from "./UtilTypes";
+import {IStringProxy, Extended} from "./UtilTypes";
 
 
 
@@ -45,7 +45,7 @@ function colorNumberToCssString( val: number): string
 /**
  * Converts color style value to the CSS time string.
  */
-export function colorToCssString( val: Color_StyleType): string
+export function colorToCssString( val: Extended<Color_StyleType>): string
 {
     // if a string value is in the Colors object we need to get its number and convert it to the
     // rgb[a]() function because it might be a custom color name added via INamedColors module

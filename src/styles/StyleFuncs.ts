@@ -1,10 +1,10 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
 import {
-    Extended, MultiCssNumber
+    Extended, MultiCssNumber, CssNumber
 } from "./UtilTypes";
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
-    multiSizeToCssString, positionToCssString, multiPositionToCssString,
+    positionToCssString, multiPositionToCssString,
     Num, Len, Angle, Time, IValueConvertOptions
 } from "./UtilFuncs"
 import {colorToCssString} from "./ColorFuncs";
@@ -96,6 +96,16 @@ function singleAnimationName_fromStyle( val: Extended<StyleTypes.SingleAnimation
 {
     return valueToString( val, {
         fromObject: v => (v as StyleTypes.IAnimationNameProvider).getAnimationName()
+    });
+}
+
+
+
+function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgroundSize>): string
+{
+    return valueToString( val, {
+        fromNumber: Len.styleToString,
+        fromArray: v => Len.multiStyleToString( v, " ")
     });
 }
 
@@ -511,6 +521,12 @@ type PropToStringFunc<K extends keyof IStyleset> = (val: IStyleset[K]) => string
 
 
 
+// Helper object that is used to indicate that values in an array should be separated by comma.
+// We use it many times in the stucture below.
+let commaArraySeparator = { arraySeparator: "," };
+
+
+
 /**
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
@@ -526,24 +542,34 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
 
     animationDelay: multiTimeToStringWithComma,
     animationDuration: multiTimeToStringWithComma,
-    animationIterationCount: { arraySeparator: "," },
-    animationFillMode: { arraySeparator: "," },
+    animationIterationCount: commaArraySeparator,
+    animationFillMode: commaArraySeparator,
 
     animationName: {
         arrayItemFunc: singleAnimationName_fromStyle,
         arraySeparator: ","
     },
 
-    animationPlayState: { arraySeparator: "," },
+    animationPlayState: commaArraySeparator,
 
     animationTimingFunction: {
         fromNumber: animationTimingFunction_fromNumber,
         fromArray: animationTimingFunction_fromArray
     },
 
+    backgroundAttachment: commaArraySeparator,
+    backgroundBlendMode: commaArraySeparator,
+    backgroundClip: commaArraySeparator,
     backgroundColor: colorToCssString,
+    backgroundOrigin: commaArraySeparator,
     backgroundPosition: multiPositionToCssString,
-    backgroundSize: multiSizeToCssString,
+    backgroundRepeat: commaArraySeparator,
+    backgroundSize: {
+        fromNumber: Len.styleToString,
+        arrayItemFunc: singleBackgroundSize_fromStyle,
+        arraySeparator: ","
+    },
+
     baselineShift: Len.styleToString,
 
     border: borderSideToCssString,
@@ -582,6 +608,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     borderTopRightRadius: singleCornerRadiusToCssString,
     borderTopWidth: Len.styleToString,
     borderWidth: multiLenToStringWithSpace,
+
     bottom: Len.styleToString,
     boxShadow: valueToString,
 

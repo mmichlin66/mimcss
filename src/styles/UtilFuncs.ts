@@ -511,46 +511,6 @@ export let Percent: INumberMath = new NumberMath( (n: number) =>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Size
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Converts size style value to the CSS string.
- * @param val Size as a style property type
- */
-export function sizeToCssString( val: Size_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (typeof (val as any).valueToString === "function")
-        return (val as any).valueToString();
-    else if (typeof (val as any).varToString === "function")
-        return (val as any).varToString();
-    else if (typeof val === "object")
-        return objectToCssString( val, false, ["w", Len.styleToString], ["h", Len.styleToString]);
-    else
-	    return Len.styleToString( val);
-}
-
-/**
- * Converts multi-part size style property to the CSS string.
- * @param val Array of length style values
- */
-export function multiSizeToCssString( val: MultiSize_StyleType): string
-{
-    if (typeof val === "string")
-        return val;
-    else if (Array.isArray(val))
-        return arrayToCssString( val, sizeToCssString);
-    else
-        return sizeToCssString( val);
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // Position
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////

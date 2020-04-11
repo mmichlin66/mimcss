@@ -1,7 +1,6 @@
 ﻿import {
-    Extended, IStringProxy, Pair, Box, OneOrMany, NumberBox,
-    CssNumber, MultiCssNumber,
-    Size_StyleType, Position_StyleType, MultiPosition_StyleType,
+    Extended, IStringProxy, Pair, Box, OneOrMany, NumberBox, CssNumber, MultiCssNumber,
+    Position_StyleType, MultiPosition_StyleType,
     
 } from "./UtilTypes"
 import {Color_StyleType, ColorBox} from "./ColorTypes"
@@ -138,6 +137,16 @@ export type BackgroundAttachmentStyleType = OneOrMany<SingleBackgroundAttachment
 
 
 
+/** Type for single background blend mode */
+export type SingleBackgroundBlendMode = "normal" | "multiply" | "screen" | "overlay" | "darken" |
+    "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" |
+    "exclusion" | "hue" | "saturation" | "color" | "luminosity";
+
+/** Type for commaArraySeparator style property */
+export type BackgroundBlendModeStyleType = OneOrMany<SingleBackgroundBlendMode>;
+
+
+
 /** Type for single background clip */
 export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" | "text";
 
@@ -167,10 +176,21 @@ export type BackgroundRepeatStyleType = OneOrMany<SingleBackgroundRepeat>;
 
 
 /** Type for background size */
-export type SingleBackgroundSize = "cover" | "contain" | Size_StyleType;
+export type SingleBackgroundSize = "cover" | "contain" | Pair<CssNumber | "auto">;
 
-/** Type for background-size style property */
-export type BackgroundSizeStyleType = OneOrMany<SingleBackgroundSize>;
+/**
+ * Type for background-size style property. The background-size style can specify one or more
+ * comma-separated sizes, where each size can be a keyword, a length or two lengths. We model
+ * this structure the following way:
+ * - if the value is a string or a number, that's the only value;
+ * - if the value is an array, then it is a list of several sizes. Each element in this array is
+ *   either a keyword or a length or an array of two elements.
+ * Thus [100,200] will be interpreted as "100px, 200px" and not "100px 200px"; that is, it will
+ * define two sizes each with a width instead of one size with both width and height. If you need
+ * to specify both width and height you must use array within array - even for a single size:
+ * [[100,200]] wll be interpreted as "100px 200px".
+ */
+export type BackgroundSizeStyleType = "cover" | "contain" | CssNumber | Extended<SingleBackgroundSize>[];
 
 
 
@@ -179,13 +199,13 @@ export type SingleCornerRadius_StyleType = Pair<CssNumber>;
 
 
 
-/** Type for border-radius style property */
-export type BorderRadiusStyleType = Pair<NumberBox>;
-
-
-
 /** Type for baseline-shift style property */
 export type BaselineShiftStyleType = "sub" | "super" | CssNumber;
+
+
+
+/** Type for border-radius style property */
+export type BorderRadiusStyleType = Pair<NumberBox>;
 
 
 
@@ -755,7 +775,7 @@ export interface ICssStyleset
     backfaceVisibility?: BackfaceVisibilityModeStyleType;
     background?: StyleType;
     backgroundAttachment?: BackgroundAttachmentStyleType;
-    backgroundBlendMode?: StyleType;
+    backgroundBlendMode?: BackgroundBlendModeStyleType;
     backgroundClip?: BackgroundClipStyleType;
     backgroundColor?: Color_StyleType;
     backgroundImage?: StyleType;
