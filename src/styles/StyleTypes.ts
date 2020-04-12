@@ -87,14 +87,14 @@ export type AnimationIterationCountStyleType = OneOrMany<SingleAnimationIteratio
  * primary object that implements this interface is AnimationRule returned from the $keyframes
  * function.
  */
-export interface IAnimationNameProvider
+export interface IAnimationNameProxy extends IValueProxy
 {
-    /** Returns the name of the animation */
-    getAnimationName(): string;
+    /** Flag indicating that this object implements the IAnimationNameProxy interface */
+    readonly isAnimationNameProxy: boolean;
 }
 
 /** Type for single animation name */
-export type SingleAnimationName = "none" | string | IAnimationNameProvider;
+export type SingleAnimationName = "none" | string | IAnimationNameProxy;
 
 /** Type for animation-name style property */
 export type AnimationNameStyleType = OneOrMany<SingleAnimationName>;

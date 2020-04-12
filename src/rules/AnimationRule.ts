@@ -70,8 +70,11 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 
-    /** Returns the name of the animation */
-    public getAnimationName(): string { return this.name; }
+    /** Flag indicating that this object implements the IAnimationNameProxy interface */
+    public get isAnimationNameProxy(): boolean { return true; }
+
+    /** Converts internally held value(s) to string - returns the name of the animation */
+    public valueToString(): string { return this.name; }
 
 	/** SOM keyframes rule */
 	public get cssKeyframesRule(): CSSKeyframesRule { return this.cssRule as CSSKeyframesRule; }

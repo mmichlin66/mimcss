@@ -33,7 +33,7 @@ function singleAnimation_fromObject( val: StyleTypes.SingleAnimation): string
             "direction",
             "mode",
             "state",
-            ["name", singleAnimationName_fromStyle]);
+            "name");
 }
 
 
@@ -94,15 +94,6 @@ function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.Singl
                 return `cubic-bezier(${v[0]},${v[1]},${v[2]},${v[3]})`;
             }
         }
-    });
-}
-
-
-
-function singleAnimationName_fromStyle( val: Extended<StyleTypes.SingleAnimationName>): string
-{
-    return valueToString( val, {
-        fromObject: v => (v as StyleTypes.IAnimationNameProvider).getAnimationName()
     });
 }
 
@@ -558,12 +549,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     animationDuration: multiTimeToStringWithComma,
     animationIterationCount: commaArraySeparator,
     animationFillMode: commaArraySeparator,
-
-    animationName: {
-        arrayItemFunc: singleAnimationName_fromStyle,
-        arraySeparator: ","
-    },
-
+    animationName: commaArraySeparator,
     animationPlayState: commaArraySeparator,
 
     animationTimingFunction: {
