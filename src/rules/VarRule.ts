@@ -52,7 +52,7 @@ export class VarRule<K extends keyof IStyleset = any> implements IVarRule<K>
 
 	// The valueToString function is used when the object is specified as a value of a style property.
 	// We return the var(--name) expression.
-    public varToString(): string
+    public valueToString(): string
     {
 		return `var(${this.cssName})`;
     }

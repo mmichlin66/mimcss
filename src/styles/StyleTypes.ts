@@ -3,7 +3,7 @@
     Position_StyleType, MultiPosition_StyleType,
     
 } from "./UtilTypes"
-import {Color_StyleType, ColorBox} from "./ColorTypes"
+import {CssColor} from "./ColorTypes"
 
 
 
@@ -240,19 +240,18 @@ export type BorderSpacingStyleType = Pair<CssNumber>;
 
 
 /** Type for border-color style property */
-export type BorderColorStyleType = ColorBox;
+export type BorderColorStyleType = Box<CssColor>;
 
 
 
 /** Type for border side style property */
-export type BorderSide_StyleType = CssNumber |  BorderSideStyle_StyleType | Color_StyleType |
-    [Extended<CssNumber>?, Extended<BorderSideStyle_StyleType>?, Extended<Color_StyleType>?];
+export type BorderSide_StyleType = CssNumber |  BorderSideStyle_StyleType | CssColor |
+    [Extended<CssNumber>?, Extended<BorderSideStyle_StyleType>?, Extended<CssColor>?];
 
 
 
 /** Type for border-image-outset style property */
-export type BorderImageOutsetStyleType = string | number |
-    [string | number, string | number, (string | number)?, (string | number)?];
+export type BorderImageOutsetStyleType = Box<string | number>;
 
 
 
@@ -302,7 +301,7 @@ export type CaptionSideStyleType = "top" | "bottom" | "block-start" | "block-end
 
 
 /** Type for caret-color style property */
-export type CaretColorStyleType = "auto" | Color_StyleType;
+export type CaretColorStyleType = "auto" | CssColor;
 
 
 
@@ -343,7 +342,7 @@ export type ColumnRuleStyleType = string |
         /** Column rule style. */
         style?: BorderStyleStyleType;
         /** Column rule color. */
-        color?: Color_StyleType;
+        color?: CssColor;
     };
 
 
@@ -746,7 +745,7 @@ export type ZoomStyleType = "normal" | "reset" | CssNumber;
 
 
 
-export type StyleType = string;
+export type DefaultStyleType = string;
 
 
 
@@ -755,7 +754,7 @@ export type StyleType = string;
  */
 export interface ICssStyleset
 {
-    all?: StyleType;
+    all?: DefaultStyleType;
     alignContent?: AlignContentStyleType;
     alignItems?: AlignItemsStyleType;
     alignSelf?: AlignSelfStyleType;
@@ -768,71 +767,71 @@ export interface ICssStyleset
     animationIterationCount?: AnimationIterationCountStyleType;
     animationName?: AnimationNameStyleType;
     animationPlayState?: AnimationPlayStateStyleType;
-	animationTimingFunction?: AnimationTimingFunctionStyleType;
-	
-    backdropFilter?: StyleType;
+    animationTimingFunction?: AnimationTimingFunctionStyleType;
+
+    backdropFilter?: DefaultStyleType;
     backfaceVisibility?: BackfaceVisibilityModeStyleType;
-    background?: StyleType;
+    background?: DefaultStyleType;
     backgroundAttachment?: BackgroundAttachmentStyleType;
     backgroundBlendMode?: BackgroundBlendModeStyleType;
     backgroundClip?: BackgroundClipStyleType;
-    backgroundColor?: Color_StyleType;
-    backgroundImage?: StyleType;
+    backgroundColor?: CssColor;
+    backgroundImage?: DefaultStyleType;
     backgroundOrigin?: BackgroundOriginStyleType;
     backgroundPosition?: MultiPosition_StyleType;
-    backgroundPositionX?: StyleType;
-    backgroundPositionY?: StyleType;
+    backgroundPositionX?: DefaultStyleType;
+    backgroundPositionY?: DefaultStyleType;
     backgroundRepeat?: BackgroundRepeatStyleType;
-    backgroundRepeatX?: StyleType;
-    backgroundRepeatY?: StyleType;
+    backgroundRepeatX?: DefaultStyleType;
+    backgroundRepeatY?: DefaultStyleType;
     backgroundSize?: BackgroundSizeStyleType;
     baselineShift?: BaselineShiftStyleType;
-    blockSize?: StyleType;
+    blockSize?: DefaultStyleType;
     border?: BorderSide_StyleType;
     borderBlockEnd?: BorderSide_StyleType;
-    borderBlockEndColor?: Color_StyleType;
+    borderBlockEndColor?: CssColor;
     borderBlockEndStyle?: BorderSideStyle_StyleType;
     borderBlockEndWidth?: BorderSideLength_StyleType;
     borderBlockStart?: BorderSide_StyleType;
-    borderBlockStartColor?: Color_StyleType;
+    borderBlockStartColor?: CssColor;
     borderBlockStartStyle?: BorderSideStyle_StyleType;
     borderBlockStartWidth?: BorderSideLength_StyleType;
     borderBottom?: BorderSide_StyleType;
-    borderBottomColor?: Color_StyleType;
+    borderBottomColor?: CssColor;
     borderBottomLeftRadius?: SingleCornerRadius_StyleType;
     borderBottomRightRadius?: SingleCornerRadius_StyleType;
     borderBottomStyle?: BorderSideStyle_StyleType;
     borderBottomWidth?: BorderSideLength_StyleType;
     borderCollapse?: BorderColapseStyleType;
     borderColor?: BorderColorStyleType;
-    borderImage?: StyleType;
+    borderImage?: DefaultStyleType;
     borderImageOutset?: BorderImageOutsetStyleType;
     borderImageRepeat?: BorderImageRepeatStyleType;
-    borderImageSlice?: StyleType;
-    borderImageSource?: StyleType;
+    borderImageSlice?: DefaultStyleType;
+    borderImageSource?: DefaultStyleType;
     borderImageWidth?: NumberBox;
     borderInlineEnd?: BorderSide_StyleType;
-    borderInlineEndColor?: Color_StyleType;
+    borderInlineEndColor?: CssColor;
     borderInlineEndStyle?: BorderSideStyle_StyleType;
     borderInlineEndWidth?: BorderSideLength_StyleType;
     borderInlineStart?: BorderSide_StyleType;
-    borderInlineStartColor?: Color_StyleType;
+    borderInlineStartColor?: CssColor;
     borderInlineStartStyle?: BorderSideStyle_StyleType;
     borderInlineStartWidth?: BorderSideLength_StyleType;
     borderLeft?: BorderSide_StyleType;
-    borderLeftColor?: Color_StyleType;
+    borderLeftColor?: CssColor;
     borderLeftStyle?: BorderSideStyle_StyleType;
     borderLeftWidth?: BorderSideLength_StyleType;
     borderRadius?: BorderRadiusStyleType;
-    bufferedRendering?: StyleType;
+    bufferedRendering?: DefaultStyleType;
     borderRight?: BorderSide_StyleType;
-    borderRightColor?: Color_StyleType;
+    borderRightColor?: CssColor;
     borderRightStyle?: BorderSideStyle_StyleType;
     borderRightWidth?: BorderSideLength_StyleType;
     borderSpacing?: BorderSpacingStyleType;
     borderStyle?: BorderStyleStyleType;
     borderTop?: BorderSide_StyleType;
-    borderTopColor?: Color_StyleType;
+    borderTopColor?: CssColor;
     borderTopLeftRadius?: SingleCornerRadius_StyleType;
     borderTopRightRadius?: SingleCornerRadius_StyleType;
     borderTopStyle?: BorderSideStyle_StyleType;
@@ -843,43 +842,43 @@ export interface ICssStyleset
     boxSizing?: BoxSizingStyleType;
     breakAfter?: BreakAfterStyleType;
     breakBefore?: BreakBeforeStyleType;
-	breakInside?: BreakInsideStyleType;
-	
+    breakInside?: BreakInsideStyleType;
+
     captionSide?: CaptionSideStyleType;
     caretColor?: CaretColorStyleType;
     clear?: ClearStyleType;
     clip?: ClipStyleType;
-    clipPath?: StyleType;
-    clipRule?: StyleType;
-    color?: Color_StyleType;
-    colorInterpolation?: StyleType;
+    clipPath?: DefaultStyleType;
+    clipRule?: DefaultStyleType;
+    color?: CssColor;
+    colorInterpolation?: DefaultStyleType;
     colorInterpolationFilters?: ColorInterpolationFiltersStyleType;
     columnCount?: ColumnCountStyleType;
     columnFill?: ColumnFillStyleType;
     columnGap?: "normal" | SingleGapStyleType;
     columnRule?: ColumnRuleStyleType;
-    columnRuleColor?: Color_StyleType;
+    columnRuleColor?: CssColor;
     columnRuleStyle?: BorderSideStyle_StyleType;
     columnRuleWidth?: BorderSideLength_StyleType;
     columnSpan?: ColumnSpanStyleType;
     columnWidth?: CssNumber;
     columns?: ColumnsStyleType;
-    contain?: StyleType;
-    content?: StyleType;
-    counterIncrement?: StyleType;
-    counterReset?: StyleType;
-	cursor?: CursorStyleType;
-	
+    contain?: DefaultStyleType;
+    content?: DefaultStyleType;
+    counterIncrement?: DefaultStyleType;
+    counterReset?: DefaultStyleType;
+    cursor?: CursorStyleType;
+
     direction?: DirectionStyleType;
     display?: DisplayStyleType;
     dominantBaseline?: DominantBaselineStyleType;
 
     emptyCells?: EmptyCellsStyleType;
-	
-    fill?: StyleType;
-    fillOpacity?: StyleType;
+
+    fill?: DefaultStyleType;
+    fillOpacity?: DefaultStyleType;
     fillRule?: FillRuleStyleType;
-    filter?: StyleType;
+    filter?: DefaultStyleType;
     flex?: FlexStyleType;
     flexBasis?: FlexBasisStyleType;
     flexDirection?: FlexDirectionStyleType;
@@ -888,71 +887,71 @@ export interface ICssStyleset
     flexShrink?: CssNumber;
     flexWrap?: FlexWrapStyleType;
     float?: FloatStyleType;
-    floodColor?: Color_StyleType;
-    floodOpacity?: StyleType;
-    font?: StyleType;
-    fontDisplay?: StyleType;
-    fontFamily?: StyleType;
-    fontFeatureSettings?: StyleType;
+    floodColor?: CssColor;
+    floodOpacity?: DefaultStyleType;
+    font?: DefaultStyleType;
+    fontDisplay?: DefaultStyleType;
+    fontFamily?: DefaultStyleType;
+    fontFeatureSettings?: DefaultStyleType;
     fontKerning?: FontKerningStyleType;
-    fontOpticalSizing?: StyleType;
+    fontOpticalSizing?: DefaultStyleType;
     fontSize?: CssNumber;
-    fontSizeAdjust?: StyleType;
-    fontStretch?: StyleType;
+    fontSizeAdjust?: DefaultStyleType;
+    fontStretch?: DefaultStyleType;
     fontStyle?: FontStyleStyleType;
-    fontSynthesis?: StyleType;
-    fontVariant?: StyleType;
-    fontVariantCaps?: StyleType;
-    fontVariantEastAsian?: StyleType;
-    fontVariantLigatures?: StyleType;
-    fontVariantNumeric?: StyleType;
-    fontVariantPosition?: StyleType;
-    fontVariationSettings?: StyleType;
-	fontWeight?: FontWeightStyleType;
-	
+    fontSynthesis?: DefaultStyleType;
+    fontVariant?: DefaultStyleType;
+    fontVariantCaps?: DefaultStyleType;
+    fontVariantEastAsian?: DefaultStyleType;
+    fontVariantLigatures?: DefaultStyleType;
+    fontVariantNumeric?: DefaultStyleType;
+    fontVariantPosition?: DefaultStyleType;
+    fontVariationSettings?: DefaultStyleType;
+    fontWeight?: FontWeightStyleType;
+
     gap?: GapStyleType;
-    grid?: StyleType;
-    gridArea?: StyleType;
-    gridAutoColumns?: StyleType;
-    gridAutoFlow?: StyleType;
-    gridAutoRows?: StyleType;
-    gridColumn?: StyleType;
-    gridColumnEnd?: StyleType;
+    grid?: DefaultStyleType;
+    gridArea?: DefaultStyleType;
+    gridAutoColumns?: DefaultStyleType;
+    gridAutoFlow?: DefaultStyleType;
+    gridAutoRows?: DefaultStyleType;
+    gridColumn?: DefaultStyleType;
+    gridColumnEnd?: DefaultStyleType;
     gridColumnGap?: SingleGapStyleType;
-    gridColumnStart?: StyleType;
-    gridGap?: StyleType;
-    gridRow?: StyleType;
-    gridRowEnd?: StyleType;
+    gridColumnStart?: DefaultStyleType;
+    gridGap?: DefaultStyleType;
+    gridRow?: DefaultStyleType;
+    gridRowEnd?: DefaultStyleType;
     gridRowGap?: SingleGapStyleType;
-    gridRowStart?: StyleType;
-    gridTemplate?: StyleType;
-    gridTemplateAreas?: StyleType;
-    gridTemplateColumns?: StyleType;
-	gridTemplateRows?: StyleType;
-	
+    gridRowStart?: DefaultStyleType;
+    gridTemplate?: DefaultStyleType;
+    gridTemplateAreas?: DefaultStyleType;
+    gridTemplateColumns?: DefaultStyleType;
+    gridTemplateRows?: DefaultStyleType;
+
     height?: CssNumber;
-	hyphens?: HyphensStyleType;
-	
+    hyphens?: HyphensStyleType;
+
     imageRendering?: ImageRenderingStyleType;
-	inlineSize?: CssNumber;
-	isolation?: IsolationStyleType;
-	
+    inlineSize?: CssNumber;
+    isolation?: IsolationStyleType;
+
     justifyContent?: JustifyContentStyleType;
     justifyItems?: JustifyItemsStyleType;
-	justifySelf?: JustifySelfStyleType;
-	
-	kerning?: FontKerningStyleType;
-	
+    justifySelf?: JustifySelfStyleType;
+
+    kerning?: FontKerningStyleType;
+
     left?: CssNumber;
     letterSpacing?: LetterSpacingStyleType;
-    lightingColor?: Color_StyleType;
+    lightingColor?: CssColor;
     lineBreak?: LineBreakStyleType;
     lineHeight?: LineHeightStyleType;
     listStyle?: ListStyleStyleType;
-    listStyleImage?: StyleType;
+    listStyleImage?: DefaultStyleType;
     listStylePosition?: ListStylePositionStyleType;
-	listStyleType?: ListStyleTypeStyleType;
-	
+    listStyleType?: ListStyleTypeStyleType;
+
     margin?: NumberBox;
     marginBlockEnd?: CssNumber;
     marginBlockStart?: CssNumber;
@@ -962,88 +961,88 @@ export interface ICssStyleset
     marginLeft?: CssNumber;
     marginRight?: CssNumber;
     marginTop?: CssNumber;
-    marker?: StyleType;
-    markerEnd?: StyleType;
-    markerMid?: StyleType;
-    markerStart?: StyleType;
-    mask?: StyleType;
-    maskComposite?: StyleType;
-    maskImage?: StyleType;
-    maskPosition?: StyleType;
-    maskRepeat?: StyleType;
-    maskSize?: StyleType;
-    maskType?: StyleType;
+    marker?: DefaultStyleType;
+    markerEnd?: DefaultStyleType;
+    markerMid?: DefaultStyleType;
+    markerStart?: DefaultStyleType;
+    mask?: DefaultStyleType;
+    maskComposite?: DefaultStyleType;
+    maskImage?: DefaultStyleType;
+    maskPosition?: DefaultStyleType;
+    maskRepeat?: DefaultStyleType;
+    maskSize?: DefaultStyleType;
+    maskType?: DefaultStyleType;
     maxBlockSize?: CssNumber;
     maxHeight?: CssNumber;
     maxInlineSize?: CssNumber;
     maxWidth?: CssNumber;
-	maxZoom?: CssNumber;
+    maxZoom?: CssNumber;
     minBlockSize?: CssNumber;
     minHeight?: CssNumber;
     minInlineSize?: CssNumber;
-	minWidth?: CssNumber;
-	minZoom?: CssNumber;
-	
-    msContentZoomChaining?: StyleType;
-    msContentZoomLimit?: StyleType;
-    msContentZoomLimitMax?: StyleType;
-    msContentZoomLimitMin?: StyleType;
-    msContentZoomSnap?: StyleType;
-    msContentZoomSnapPoints?: StyleType;
-    msContentZoomSnapType?: StyleType;
-    msContentZooming?: StyleType;
-    msFlowFrom?: StyleType;
-    msFlowInto?: StyleType;
-    msFontFeatureSettings?: StyleType;
-    msGridColumn?: StyleType;
-    msGridColumnAlign?: StyleType;
-    msGridColumnSpan?: StyleType;
-    msGridColumns?: StyleType;
-    msGridRow?: StyleType;
-    msGridRowAlign?: StyleType;
-    msGridRowSpan?: StyleType;
-    msGridRows?: StyleType;
-    msHighContrastAdjust?: StyleType;
-    msHyphenateLimitChars?: StyleType;
-    msHyphenateLimitLines?: StyleType;
-    msHyphenateLimitZone?: StyleType;
-    msHyphens?: StyleType;
-    msImeAlign?: StyleType;
-    msOverflowStyle?: StyleType;
-    msScrollChaining?: StyleType;
-    msScrollLimit?: StyleType;
-    msScrollLimitXMax?: StyleType;
-    msScrollLimitXMin?: StyleType;
-    msScrollLimitYMax?: StyleType;
-    msScrollLimitYMin?: StyleType;
-    msScrollRails?: StyleType;
-    msScrollSnapPointsX?: StyleType;
-    msScrollSnapPointsY?: StyleType;
-    msScrollSnapType?: StyleType;
-    msScrollSnapX?: StyleType;
-    msScrollSnapY?: StyleType;
-    msScrollTranslation?: StyleType;
-    msTextCombineHorizontal?: StyleType;
-    msTextSizeAdjust?: StyleType;
-    msTouchAction?: StyleType;
-    msTouchSelect?: StyleType;
-    msUserSelect?: StyleType;
-    msWrapFlow?: StyleType;
-    msWrapMargin?: StyleType;
-	msWrapThrough?: StyleType;
-	
+    minWidth?: CssNumber;
+    minZoom?: CssNumber;
+
+    msContentZoomChaining?: DefaultStyleType;
+    msContentZoomLimit?: DefaultStyleType;
+    msContentZoomLimitMax?: DefaultStyleType;
+    msContentZoomLimitMin?: DefaultStyleType;
+    msContentZoomSnap?: DefaultStyleType;
+    msContentZoomSnapPoints?: DefaultStyleType;
+    msContentZoomSnapType?: DefaultStyleType;
+    msContentZooming?: DefaultStyleType;
+    msFlowFrom?: DefaultStyleType;
+    msFlowInto?: DefaultStyleType;
+    msFontFeatureSettings?: DefaultStyleType;
+    msGridColumn?: DefaultStyleType;
+    msGridColumnAlign?: DefaultStyleType;
+    msGridColumnSpan?: DefaultStyleType;
+    msGridColumns?: DefaultStyleType;
+    msGridRow?: DefaultStyleType;
+    msGridRowAlign?: DefaultStyleType;
+    msGridRowSpan?: DefaultStyleType;
+    msGridRows?: DefaultStyleType;
+    msHighContrastAdjust?: DefaultStyleType;
+    msHyphenateLimitChars?: DefaultStyleType;
+    msHyphenateLimitLines?: DefaultStyleType;
+    msHyphenateLimitZone?: DefaultStyleType;
+    msHyphens?: DefaultStyleType;
+    msImeAlign?: DefaultStyleType;
+    msOverflowStyle?: DefaultStyleType;
+    msScrollChaining?: DefaultStyleType;
+    msScrollLimit?: DefaultStyleType;
+    msScrollLimitXMax?: DefaultStyleType;
+    msScrollLimitXMin?: DefaultStyleType;
+    msScrollLimitYMax?: DefaultStyleType;
+    msScrollLimitYMin?: DefaultStyleType;
+    msScrollRails?: DefaultStyleType;
+    msScrollSnapPointsX?: DefaultStyleType;
+    msScrollSnapPointsY?: DefaultStyleType;
+    msScrollSnapType?: DefaultStyleType;
+    msScrollSnapX?: DefaultStyleType;
+    msScrollSnapY?: DefaultStyleType;
+    msScrollTranslation?: DefaultStyleType;
+    msTextCombineHorizontal?: DefaultStyleType;
+    msTextSizeAdjust?: DefaultStyleType;
+    msTouchAction?: DefaultStyleType;
+    msTouchSelect?: DefaultStyleType;
+    msUserSelect?: DefaultStyleType;
+    msWrapFlow?: DefaultStyleType;
+    msWrapMargin?: DefaultStyleType;
+    msWrapThrough?: DefaultStyleType;
+
     objectFit?: ObjectFitStyleType;
     objectPosition?: Position_StyleType;
-    offset?: StyleType;
-    offsetDistance?: StyleType;
-    offsetPath?: StyleType;
-    offsetRotate?: StyleType;
+    offset?: DefaultStyleType;
+    offsetDistance?: DefaultStyleType;
+    offsetPath?: DefaultStyleType;
+    offsetRotate?: DefaultStyleType;
     opacity?: CssNumber;
     order?: CssNumber;
-    orientation?: StyleType;
+    orientation?: DefaultStyleType;
     orphans?: CssNumber;
     outline?: BorderSide_StyleType;
-    outlineColor?: Color_StyleType;
+    outlineColor?: CssColor;
     outlineOffset?: CssNumber;
     outlineStyle?: BorderStyleStyleType;
     outlineWidth?: BorderSideLength_StyleType;
@@ -1051,15 +1050,15 @@ export interface ICssStyleset
     overflowAnchor?: OverflowAnchorStyleType;
     overflowWrap?: OverflowWrapStyleType;
     overflowX?: SingleOverflowStyleType;
-	overflowY?: SingleOverflowStyleType;
-	overflowInline?: SingleOverflowStyleType;
+    overflowY?: SingleOverflowStyleType;
+    overflowInline?: SingleOverflowStyleType;
     overflowBlock?: SingleOverflowStyleType;
-    overscrollBehavior?: StyleType;
-    overscrollBehaviorBlock?: StyleType;
-    overscrollBehaviorInline?: StyleType;
-    overscrollBehaviorX?: StyleType;
-    overscrollBehaviorY?: StyleType;
-    
+    overscrollBehavior?: DefaultStyleType;
+    overscrollBehaviorBlock?: DefaultStyleType;
+    overscrollBehaviorInline?: DefaultStyleType;
+    overscrollBehaviorX?: DefaultStyleType;
+    overscrollBehaviorY?: DefaultStyleType;
+
     padding?: NumberBox;
     paddingBlockEnd?: CssNumber;
     paddingBlockStart?: CssNumber;
@@ -1069,8 +1068,8 @@ export interface ICssStyleset
     paddingLeft?: CssNumber;
     paddingRight?: CssNumber;
     paddingTop?: CssNumber;
-    page?: StyleType;
-    paintOrder?: StyleType;
+    page?: DefaultStyleType;
+    paintOrder?: DefaultStyleType;
     pageBreakAfter?: BreakAfterStyleType;
     pageBreakBefore?: BreakBeforeStyleType;
     pageBreakInside?: BreakInsideStyleType;
@@ -1080,19 +1079,19 @@ export interface ICssStyleset
     placeItems?: PlaceItemsStyleType;
     placeSelf?: PlaceSelfStyleType;
     pointerEvents?: PointerEventsStyleType;
-	position?: PositionStyleType;
-	
-	quotes?: StyleType;
-	
+    position?: PositionStyleType;
+
+    quotes?: DefaultStyleType;
+
     resize?: ResizeStyleType;
     right?: CssNumber;
-    rotate?: StyleType;
+    rotate?: DefaultStyleType;
     rowGap?: SingleGapStyleType;
-    rubyAlign?: StyleType;
-    rubyOverhang?: StyleType;
-	rubyPosition?: StyleType;
-	
-    scale?: StyleType;
+    rubyAlign?: DefaultStyleType;
+    rubyOverhang?: DefaultStyleType;
+    rubyPosition?: DefaultStyleType;
+
+    scale?: DefaultStyleType;
     scrollBehavior?: ScrollBehaviorStyleType;
     scrollMargin?: NumberBox;
     scrollMarginBlock?: NumberBox;
@@ -1116,101 +1115,101 @@ export interface ICssStyleset
     scrollPaddingLeft?: CssNumber;
     scrollPaddingRight?: CssNumber;
     scrollPaddingTop?: CssNumber;
-    scrollSnapAlign?: StyleType;
-    scrollSnapStop?: StyleType;
-    scrollSnapType?: StyleType;
-    shapeImageThreshold?: StyleType;
-    shapeMargin?: StyleType;
-    shapeOutside?: StyleType;
-    shapeRendering?: StyleType;
-    stopColor?: Color_StyleType;
+    scrollSnapAlign?: DefaultStyleType;
+    scrollSnapStop?: DefaultStyleType;
+    scrollSnapType?: DefaultStyleType;
+    shapeImageThreshold?: DefaultStyleType;
+    shapeMargin?: DefaultStyleType;
+    shapeOutside?: DefaultStyleType;
+    shapeRendering?: DefaultStyleType;
+    stopColor?: CssColor;
     stopOpacity?: StopOpacityStyleType;
-    stroke?: StyleType;
-    strokeDasharray?: StyleType;
-    strokeDashoffset?: StyleType;
-    strokeLinecap?: StyleType;
-    strokeLinejoin?: StyleType;
-    strokeMiterlimit?: StyleType;
-    strokeOpacity?: StyleType;
-	strokeWidth?: StyleType;
-	
+    stroke?: DefaultStyleType;
+    strokeDasharray?: DefaultStyleType;
+    strokeDashoffset?: DefaultStyleType;
+    strokeLinecap?: DefaultStyleType;
+    strokeLinejoin?: DefaultStyleType;
+    strokeMiterlimit?: DefaultStyleType;
+    strokeOpacity?: DefaultStyleType;
+    strokeWidth?: DefaultStyleType;
+
     tabSize?: CssNumber;
     tableLayout?: TableLayoutStyleType;
     textAlign?: TextAlignStyleType;
     textAlignLast?: TextAlignLastStyleType;
     textAnchor?: TextAnchorStyleType;
-    textCombineUpright?: StyleType;
-    textDecoration?: StyleType;
-    textDecorationColor?: Color_StyleType;
+    textCombineUpright?: DefaultStyleType;
+    textDecoration?: DefaultStyleType;
+    textDecorationColor?: CssColor;
     textDecorationLine?: TextDecorationLineStyleType;
-    textDecorationSkipInk?: StyleType;
+    textDecorationSkipInk?: DefaultStyleType;
     textDecorationStyle?: TextDecorationStyleStyleType;
     textDecorationThickness?: TextDecorationThicknessStyleType;
-    textEmphasis?: StyleType;
-    textEmphasisColor?: Color_StyleType;
+    textEmphasis?: DefaultStyleType;
+    textEmphasisColor?: CssColor;
     textEmphasisPosition?: TextEmphasisPositionStyleType;
     textEmphasisStyle?: TextEmphasisStyleStyleType;
     textIndent?: TextIndentStyleType;
     textJustify?: TextJustifyStyleType;
-    textKashida?: StyleType;
-    textKashidaSpace?: StyleType;
+    textKashida?: DefaultStyleType;
+    textKashidaSpace?: DefaultStyleType;
     textOrientation?: TextOrientationStyleType;
     textOverflow?: TextOverflowStyleType;
-    textShadow?: StyleType;
-    textSizeAdjust?: StyleType;
+    textShadow?: DefaultStyleType;
+    textSizeAdjust?: DefaultStyleType;
     textTransform?: TextTransformStyleType;
     textUnderlinePosition?: TextUnderlinePositionStyleType;
     top?: CssNumber;
     touchAction?: TouchActionStyleType;
-    transform?: StyleType;
-    transformBox?: StyleType;
-    transformOrigin?: StyleType;
-    transformStyle?: StyleType;
-    transition?: StyleType;
-    transitionDelay?: StyleType;
-    transitionDuration?: StyleType;
-    transitionProperty?: StyleType;
-    transitionTimingFunction?: StyleType;
-	translate?: TranslateStyleType;
-	
+    transform?: DefaultStyleType;
+    transformBox?: DefaultStyleType;
+    transformOrigin?: DefaultStyleType;
+    transformStyle?: DefaultStyleType;
+    transition?: DefaultStyleType;
+    transitionDelay?: DefaultStyleType;
+    transitionDuration?: DefaultStyleType;
+    transitionProperty?: DefaultStyleType;
+    transitionTimingFunction?: DefaultStyleType;
+    translate?: TranslateStyleType;
+
     unicodeBidi?: UnicodeBidiStyleType;
-	userSelect?: UserSelectStyleType;
-    userZoom?: StyleType;
-	
-    verticalAlign?: StyleType;
-	visibility?: StyleType;
-	vectorEffect?: StyleType;
-	
-    webkitBorderImage?: StyleType;
-    webkitBoxDirection?: StyleType;
-    webkitBoxOrient?: StyleType;
-    webkitColumnBreakAfter?: StyleType;
-    webkitColumnBreakBefore?: StyleType;
-    webkitColumnBreakInside?: StyleType;
+    userSelect?: UserSelectStyleType;
+    userZoom?: DefaultStyleType;
+
+    verticalAlign?: DefaultStyleType;
+    visibility?: DefaultStyleType;
+    vectorEffect?: DefaultStyleType;
+
+    webkitBorderImage?: DefaultStyleType;
+    webkitBoxDirection?: DefaultStyleType;
+    webkitBoxOrient?: DefaultStyleType;
+    webkitColumnBreakAfter?: DefaultStyleType;
+    webkitColumnBreakBefore?: DefaultStyleType;
+    webkitColumnBreakInside?: DefaultStyleType;
     webkitColumnCount?: ColumnCountStyleType;
     webkitColumnGap?: SingleGapStyleType;
     webkitColumnRule?: ColumnRuleStyleType;
-    webkitColumnRuleColor?: Color_StyleType;
+    webkitColumnRuleColor?: CssColor;
     webkitColumnRuleStyle?: ColumnRuleStyleType;
     webkitColumnRuleWidth?: BorderLengthStyleType;
-    webkitColumnSpan?: StyleType;
-    webkitColumnWidth?: StyleType;
-    webkitColumns?: StyleType;
-    webkitLineClamp?: StyleType;
-    webkitTapHighlightColor?: StyleType;
-    webkitUserModify?: StyleType;
-    webkitUserSelect?: StyleType;
-	webkitWritingMode?: StyleType;
-	
+    webkitColumnSpan?: DefaultStyleType;
+    webkitColumnWidth?: DefaultStyleType;
+    webkitColumns?: DefaultStyleType;
+    webkitLineClamp?: DefaultStyleType;
+    webkitTapHighlightColor?: DefaultStyleType;
+    webkitUserModify?: DefaultStyleType;
+    webkitUserSelect?: DefaultStyleType;
+    webkitWritingMode?: DefaultStyleType;
+
     whiteSpace?: WhiteSpaceStyleType;
     widows?: WidowsStyleType;
     width?: CssNumber;
-    willChange?: StyleType;
+    willChange?: DefaultStyleType;
     wordBreak?: WordBreakStyleType;
     wordSpacing?: WordSpacingStyleType;
-    wordWrap?: StyleType;
-	writingMode?: WritingModeStyleType;
-	
+    wordWrap?: DefaultStyleType;
+    writingMode?: WritingModeStyleType;
+
     zIndex?: ZIndexStyleType;
     zoom?: ZoomStyleType;
 }

@@ -229,16 +229,8 @@ export interface IColors extends INamedColors
  *     - positive integer numbers less than or equal to 0xFFFFFF are treated as RGB separations 0xRRGGBB.
  *     - positive integer numbers greater than 0xFFFFFF are treated as RGBA separations 0xRRGGBBAA.
  *     - negative and floating point numbers are rejected.
- *   - array [[ColorAsArray]]
  */
-export type Color_StyleType = "transparent" | "currentcolor" | keyof INamedColors | number;
-
-
-
-/**
- * Represents a type that can have 1 to 4 color values.
- */
-export type ColorBox = Box<Color_StyleType>;
+export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number;
 
 
 

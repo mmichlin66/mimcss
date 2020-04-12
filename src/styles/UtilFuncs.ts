@@ -1,5 +1,5 @@
-﻿import {Extended, IStringProxy, CssNumber, MultiCssNumber, INumberMath,
-    Size_StyleType, MultiSize_StyleType, Position_StyleType, MultiPosition_StyleType, IFractionMath
+﻿import {Extended, IStringProxy, INumberProxy, CssNumber, MultiCssNumber, INumberMath,
+    Position_StyleType, MultiPosition_StyleType, IFractionMath
 } from "./UtilTypes"
 
 
@@ -78,7 +78,7 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
     {
         // standard processing:
         // - null/undefined become "initial".
-        // - call valueToString (IStringProxy) or varToString (IVarRule) if exist.
+        // - call valueToString (IStringProxy and the like) if exist.
         // - function: call without parameters.
         // - everything else: call toString().
         if (val == null)
@@ -87,8 +87,6 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             return arrayToCssString( val);
         else if (typeof val.valueToString === "function")
             return val.valueToString();
-        else if (typeof val.varToString === "function")
-            return val.varToString();
         else if (typeof val === "function")
             return val();
         else
@@ -122,8 +120,6 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         {
             if (typeof val.valueToString === "function")
                 return val.valueToString();
-            else if (typeof val.varToString === "function")
-                return val.varToString();
             else if (options.fromObject)
                 return options.fromObject( val);
             else if (options.fromAny)
@@ -156,10 +152,53 @@ export function arrayToCssString( val: any[], func?: (v) => string, separator: s
 
 
 /**
+ * Converts the given object to a CSS string.
+ * @param val Object to convert to string.
+ * @param usePropNames Flag indicating whether the names of the object's proprties should be added to the string.
+ * @param propsAndFuncs Array of property names and optionally functions. The order of the names determines in
+ *     which oprder the properties should be added to the string. If a function is present for the property,
+ *     it will be used to convert the property's value to the string. If a function is not present, then the
+ *     property value should be converted to the string using the valueToString function.
+ */
+export function objectToCssString( val: any, usePropNames: boolean,
+    ...propsAndFuncs: (string | [string, (val: any) => string])[] ): string
+{
+    if (val == null || propsAndFuncs.length === 0)
+        return "";
+
+    let buf: string[] = [];
+    propsAndFuncs.forEach( propAndFunc =>
+        {
+            let propName = typeof propAndFunc === "string" ? propAndFunc : propAndFunc[0];
+            let func = typeof propAndFunc === "string" ? undefined : propAndFunc[1];
+
+            let propVal = val[propName];
+            if (propVal == null)
+                return;
+
+            if (usePropNames)
+                buf.push( propName);
+
+            if (func)
+                buf.push( func( propVal));
+            else if (propVal != null)
+                buf.push( valueToString( propVal));
+        }
+    );
+
+	return buf.join(" ");
+}
+
+
+
+/**
  * The StringProxy class implements the IStringProxy interface by encapsulating the string.
  */
 export class StringProxy implements IStringProxy
 {
+    /** Flag indicating that this object implements the INumerProxy interface */
+    public get isStringProxy(): boolean { return true; }
+
     constructor( s?: string | IStringProxy)
     {
         this.s = s;
@@ -253,16 +292,43 @@ function formatNumbers( format: string, params: Extended<CssNumber>[], convertFu
 
 
 /**
- * The MathFuncProxy class implements the IStringProxy interface by encapsulating parameters of a
- * mathematic CSS function that accepts one or more parameters of type Number_StyleType.
+ * The NumberProxy class implements the INumberProxy interface by encapsulating parameters of a
+ * mathematic CSS function that accepts one or more parameters of type CssNumber.
  */
-class MathFuncProxy implements IStringProxy
+abstract class NumberProxy implements INumberProxy
+{
+    /** Flag indicating that this object implements the INumerProxy interface */
+    public get isNumberProxy(): boolean { return true; }
+
+    constructor( params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
+    {
+        this.convertFunc = convertFunc;
+        this.params = params;
+    }
+
+    /** Converts internnally held value(s) to string - should be implemented by the derived classes */
+    abstract valueToString(): string;
+
+    // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
+    // If not defined, numbers are converted to strings without appending any suffix.
+    protected convertFunc: ConvertNumberFuncType;
+
+    // Array of CssNumber parameters to the mathematical function.
+    protected params: Extended<CssNumber>[];
+}
+
+
+
+/**
+ * The MathFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
+ * mathematic CSS function that accepts one or more parameters of type CssNumber.
+ */
+class MathFuncProxy extends NumberProxy
 {
     constructor( name: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
     {
+        super( params, convertFunc);
         this.name = name;
-        this.convertFunc = convertFunc;
-        this.params = params;
     }
 
     public valueToString(): string
@@ -272,29 +338,20 @@ class MathFuncProxy implements IStringProxy
 
     // Name of the mathematical function.
     private name: string;
-
-    // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
-    // If not defined, numbers are converted to strings without appending any suffix.
-    private convertFunc: ConvertNumberFuncType;
-
-    // Array of Number_StyleType parameters to the mathematical function.
-    private params: Extended<CssNumber>[];
 }
 
 
 
 /**
- * The CalcFuncProxy class implements the IStringProxy interface by encapsulating parameters of a
- * calc() CSS function that accepts a formula string and zero or more parameters of type
- * Number_StyleType.
+ * The CalcFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
+ * calc() CSS function that accepts a formula string and zero or more parameters of type CssNumber.
  */
-class CalcFuncProxy implements IStringProxy
+class CalcFuncProxy extends NumberProxy
 {
     constructor( formula: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
     {
+        super( params, convertFunc);
         this.formula = formula;
-        this.convertFunc = convertFunc;
-        this.params = params;
     }
 
     public valueToString(): string
@@ -304,13 +361,6 @@ class CalcFuncProxy implements IStringProxy
 
     // Calculation formula with placeholders.
     private formula: string;
-
-    // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
-    // If not defined, numbers are converted to strings without appending any suffix.
-    private convertFunc: ConvertNumberFuncType;
-
-    // Array Number_StyleType parameters to substitute placeholders in the formula string.
-    private params: Extended<CssNumber>[];
 }
 
 
@@ -349,22 +399,22 @@ class NumberMath implements INumberMath
         return multiNumberStyleToCssString( val, this.convertFunc, separator);
     }
 
-    public min( ...params: Extended<CssNumber>[]): IStringProxy
+    public min( ...params: Extended<CssNumber>[]): INumberProxy
     {
         return new MathFuncProxy( "min", params, this.convertFunc);
     }
 
-    public max( ...params: Extended<CssNumber>[]): IStringProxy
+    public max( ...params: Extended<CssNumber>[]): INumberProxy
     {
         return new MathFuncProxy( "max", params, this.convertFunc);
     }
 
-    public clamp( min: Extended<CssNumber>, pref: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy
+    public clamp( min: Extended<CssNumber>, pref: Extended<CssNumber>, max: Extended<CssNumber>): INumberProxy
     {
         return new MathFuncProxy( "clamp", [min, pref, max], this.convertFunc);
     }
 
-    public calc( formula: string, ...params: Extended<CssNumber>[]): IStringProxy
+    public calc( formula: string, ...params: Extended<CssNumber>[]): INumberProxy
     {
         return new CalcFuncProxy( formula, params, this.convertFunc);
     }
@@ -479,7 +529,7 @@ class FractionMath extends NumberMath implements IFractionMath
         super( ["fr", "%"])
     }
 
-    public minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy
+    public minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): INumberProxy
     {
         return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
     }
@@ -527,8 +577,6 @@ export function positionToCssString( val: Position_StyleType): string
         return val;
     else if (typeof (val as any).valueToString === "function")
         return (val as any).valueToString();
-    else if (typeof (val as any).varToString === "function")
-        return (val as any).varToString();
     else if (typeof val === "object")
     {
         if ("xedge" in val)
@@ -550,52 +598,6 @@ export function multiPositionToCssString( val: MultiPosition_StyleType): string
         return arrayToCssString( val, positionToCssString);
     else
         return  positionToCssString( val);
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Object
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Converts the given object to a CSS string.
- * @param val Object to convert to string.
- * @param usePropNames Flag indicating whether the names of the object's proprties should be added to the string.
- * @param propsAndFuncs Array of property names and optionally functions. The order of the names determines in
- *     which oprder the properties should be added to the string. If a function is present for the property,
- *     it will be used to convert the property's value to the string. If a function is not present, then the
- *     property value should be converted to the string using the valueToString function.
- */
-export function objectToCssString( val: any, usePropNames: boolean,
-    ...propsAndFuncs: (string | [string, (val: any) => string])[] ): string
-{
-    if (val == null || propsAndFuncs.length === 0)
-        return "";
-
-    let buf: string[] = [];
-    propsAndFuncs.forEach( propAndFunc =>
-        {
-            let propName = typeof propAndFunc === "string" ? propAndFunc : propAndFunc[0];
-            let func = typeof propAndFunc === "string" ? undefined : propAndFunc[1];
-
-            let propVal = val[propName];
-            if (propVal == null)
-                return;
-
-            if (usePropNames)
-                buf.push( propName);
-
-            if (func)
-                buf.push( func( propVal));
-            else if (propVal != null)
-                buf.push( valueToString( propVal));
-        }
-    );
-
-	return buf.join(" ");
 }
 
 

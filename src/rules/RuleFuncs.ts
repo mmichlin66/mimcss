@@ -136,6 +136,9 @@ export function $media<T extends NestedGroup<O>, O extends {}>( query: string | 
  */
 class SelectorProxy implements IStringProxy
 {
+    /** Flag indicating that this object implements the INumerProxy interface */
+    public get isStringProxy(): boolean { return true; }
+
     constructor( template: string, params: SelectorTokenType[])
     {
         this.template = template;

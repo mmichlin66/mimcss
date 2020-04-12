@@ -1,10 +1,42 @@
 ﻿import {
-    IStringProxy, Extended, CssNumber
+    IStringProxy, Extended, CssNumber, IUrlProxy
 } from "./UtilTypes"
-import {StringProxy} from "./UtilFuncs"
+import {StringProxy, valueToString} from "./UtilFuncs"
 import {IStyleset} from "./StyleTypes"
 import * as StyleTypes from "./StyleTypes"
 import {stylePropToCssString} from "./StyleFuncs";
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// URLs
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The UrlProxy class represents an invocation of the CSS url() function.
+ */
+class UrlProxy implements IUrlProxy
+{
+    /** Flag indicating that this object implements the INumerProxy interface */
+    public get isUrlProxy(): boolean { return true; }
+
+    constructor( url: Extended<string>)
+    {
+        this.url = url;
+    }
+
+    // IStringProxy method that should be implemented by the derived classes.
+    public valueToString(): string
+    {
+        let s = valueToString( this.url);
+        return s && !s.startsWith("url(") ? `url(${s})` : s;
+    }
+
+    // Array of CssNumber parameters to the mathematical function.
+    private url: Extended<string>;
+}
 
 
 
@@ -21,12 +53,14 @@ export class sh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Creates a StringProxy object from the given string or another StringProxy object.
+     * Creates an IStringProxy object from the given string or another IStringProxy object.
      */
     public static raw( s: string | IStringProxy): IStringProxy
     {
         return typeof s === "string" ? new StringProxy(s) : s;
     }
+
+
 
     /**
      * Converts the given value corresponding to the given style property to a CSS string.
@@ -37,6 +71,17 @@ export class sh
     public static val<K extends keyof IStyleset>( stylePropName: K, stylePropValue: IStyleset[K]): string | null
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
+    }
+
+
+
+    /**
+     * Creates an IStringProxy object representing the CSS url() function. The string parameter
+     * will be wrapped in a "url()" invocation unless it already is.
+     */
+    public static url( val: Extended<string>): IUrlProxy
+    {
+        return new UrlProxy( val);
     }
 
 

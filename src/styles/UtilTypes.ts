@@ -26,7 +26,11 @@
  */
 export interface IStringProxy
 {
+    /** Converts internnally held value(s) to string */
     valueToString(): string;
+
+    /** Flag indicating that this object implements the IStringProxy interface */
+    readonly isStringProxy: boolean;
 }
 
 
@@ -45,7 +49,10 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | IStrin
  */
 export interface ICustomVar<T = any>
 {
-    varToString(): string;
+    /** Converts internnally held value(s) to string */
+    valueToString(): string;
+
+    // Type of the internally held value.
     value: T;
 }
 
@@ -84,8 +91,24 @@ export type OneOrMany<T> = T | Extended<T>[];
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * The INumberProxy interface represents a string proxy object whose string value can be assigned
+ * to propertoes of the CSS numeric types. This interface is returned from functions like min(),
+ * max(), calc() and others.
+ */
+export interface INumberProxy
+{
+    /** Converts internnally held value(s) to string */
+    valueToString(): string;
+
+    /** Flag indicating that this object implements the INumerProxy interface */
+    readonly isNumberProxy: boolean;
+}
+
+
+
 /** Type for single numeric style property */
-export type CssNumber = number | string;
+export type CssNumber = number | string | INumberProxy;
 
 /** Type for multi-part numeric style property */
 export type MultiCssNumber = OneOrMany<CssNumber>;
@@ -112,13 +135,13 @@ export interface INumberMath
     multiStyleToString: ( val: Extended<MultiCssNumber>, separator: string) => string;
 
     /** Creates property value of using the CSS min() function. */
-    min( ...params: Extended<CssNumber>[]): IStringProxy;
+    min( ...params: Extended<CssNumber>[]): INumberProxy;
 
     /** Creates property value using the CSS max() function. */
-    max( ...params: Extended<CssNumber>[]): IStringProxy;
+    max( ...params: Extended<CssNumber>[]): INumberProxy;
 
     /** Creates property value using the CSS clamp() function. */
-    clamp( min: Extended<CssNumber>, pref: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy;
+    clamp( min: Extended<CssNumber>, pref: Extended<CssNumber>, max: Extended<CssNumber>): INumberProxy;
 
     /**
      * Creates property value using the CSS calc() function. This function accepts a formular
@@ -142,7 +165,7 @@ export interface INumberMath
      * @param formula 
      * @param params 
      */
-    calc( formula: string, ...params: Extended<CssNumber>[]): IStringProxy;
+    calc( formula: string, ...params: Extended<CssNumber>[]): INumberProxy;
 }
 
 
@@ -183,7 +206,7 @@ export type FractionUnits = "fr";
 export interface IFractionMath extends INumberMath
 {
     /** Creates property value using the CSS minmax() function. */
-    minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): IStringProxy;
+    minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): INumberProxy;
 }
 
 
@@ -223,6 +246,32 @@ export type Position_StyleType = Extended<"center" | "left" | "right" | "top" | 
 export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// URLs.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The IUrlProxy interface represents an invocation of the CSS url() function.
+ */
+export interface IUrlProxy
+{
+    /** Converts internnally held value(s) to string */
+    valueToString(): string;
+
+    /** Flag indicating that this object implements the IUrlProxy interface */
+    readonly isUrlProxy: boolean;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Web Namespaces.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * The WebNamespaces class contains identifiers for the known Web-related namespaces.
