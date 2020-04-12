@@ -16,6 +16,13 @@ function multiTimeToStringWithComma( val: Extended<MultiCssNumber>) { return Tim
 function multiLenToStringWithSpace( val: Extended<MultiCssNumber>) { return Len.multiStyleToString( val, " "); }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Functions for converting CSS property types to strings.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 function singleAnimation_fromObject( val: StyleTypes.SingleAnimation): string
 {
     return objectToCssString( val, false,
@@ -337,6 +344,12 @@ function translateToCssString( val: StyleTypes.TranslateStyleType): string
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Functions for handling Stylesets.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Merges properties from the source styleset to the target styleset. All regular properties are
  * replaced. Properties "--" and "!" get special treatment because they might be arrays.
@@ -511,13 +524,14 @@ export function stylePropToCssString<K extends keyof IStyleset>(
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Registry of CSS properties that specifies how their values should be converted to strings.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /** Type defnition of a function that takes property value and converts it to string */
 type PropToStringFunc<K extends keyof IStyleset> = (val: IStyleset[K]) => string;
-
-
-
-// /** Type defnition of a function that takes property value and converts it to string */
-// type StylePropertyInfo<K extends keyof IStyleset> = PropToStringFunc<K>;
 
 
 
@@ -719,10 +733,16 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS selector.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Converts the selector object into full selector string.
  */
-export function selectorToCssString( selector: StyleTypes.SelectorType): string
+export function selectorToCssString( selector: StyleTypes.CssSelector): string
 {
 	if (!selector)
 		return "";
@@ -735,6 +755,12 @@ export function selectorToCssString( selector: StyleTypes.SelectorType): string
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS supports query.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Converts the given supports query to its string representation */
 export function supportsQueryToCssString( query: StyleTypes.SupportsQuery): string

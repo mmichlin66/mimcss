@@ -8,8 +8,7 @@ import {
 	IAnimationRule, AnimationFrame, IVarRule, ISupportsRule, IMediaRule, IImportRule, IFontFaceRule,
 	INamespaceRule, IPageRule, SelectorTokenType, RuleType, INestedGroupClass, NestedGroup
 } from "./RuleTypes";
-import {IStringProxy} from "../styles/UtilTypes";
-import {IStyleset, SupportsQuery, SelectorType, PagePseudoClass, Styleset} from "../styles/StyleTypes";
+import {IStyleset, SupportsQuery, CssSelector, PagePseudoClass, Styleset, ISelectorProxy} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
 import {Rule} from "../rules/Rule"
@@ -65,7 +64,7 @@ export function $id( style?: ExtendedStyleset, nameOverride?: string | IIDRule):
 /**
  * Creates new selector rule. Selector can be specified as a string or via the $selector function.
  */
-export function $style( selector: SelectorType, style: ExtendedStyleset): ISelectorRule
+export function $style( selector: CssSelector, style: ExtendedStyleset): ISelectorRule
 	{ return new SelectorRule( selector, style); }
 
 /**
@@ -134,10 +133,10 @@ export function $media<T extends NestedGroup<O>, O extends {}>( query: string | 
  * template string with optional placeholders (e.g. {0}), which will be replaced by names
  * of tags, classes and IDs and other possible types.
  */
-class SelectorProxy implements IStringProxy
+class SelectorProxy implements ISelectorProxy
 {
-    /** Flag indicating that this object implements the INumerProxy interface */
-    public get isStringProxy(): boolean { return true; }
+    /** Flag indicating that this object implements the ISelectorProxy interface */
+    public get isSelectorProxy(): boolean { return true; }
 
     constructor( template: string, params: SelectorTokenType[])
     {
@@ -145,6 +144,7 @@ class SelectorProxy implements IStringProxy
         this.params = params;
     }
 
+    /** Converts internally held value(s) to string */
     public valueToString(): string
     {
 		let tokens: string[] = this.template.split( /{(\d+)}/g);
@@ -200,7 +200,7 @@ class SelectorProxy implements IStringProxy
  * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
  * possible types.
  */
-export function $selector( template: string, ...args: SelectorTokenType[]): SelectorType
+export function $selector( template: string, ...args: SelectorTokenType[]): CssSelector
 {
 	return !template ? "" : args.length === 0 ? template : new SelectorProxy( template, args);
 }

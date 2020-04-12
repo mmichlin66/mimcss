@@ -4,7 +4,7 @@
 
 
 import {IStyleset, Styleset, PagePseudoClass} from "../styles/StyleTypes";
-import {PseudoClass, PseudoElement, SelectorType, IAnimationNameProvider} from "../styles/StyleTypes";
+import {PseudoClass, PseudoElement, CssSelector, IAnimationNameProvider} from "../styles/StyleTypes";
 import {ICustomVar, IStringProxy} from "../styles/UtilTypes";
 
 
@@ -63,7 +63,7 @@ export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
 export type ExtendedStyleset = Styleset & { [K in PseudoClass | PseudoElement]?: ExtendedStyleset } &
 	{
 		"+"?: IStyleRule | IStyleRule[],
-		"&"?: [SelectorType, ExtendedStyleset][],
+		"&"?: [CssSelector, ExtendedStyleset][],
 	};
 	
 

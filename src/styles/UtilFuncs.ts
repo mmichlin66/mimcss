@@ -4,6 +4,12 @@
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Basics.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Converts names with dashes into names in camelCase, where every character after a dash is
  * capitalized and dashes are removed.
@@ -196,7 +202,7 @@ export function objectToCssString( val: any, usePropNames: boolean,
  */
 export class StringProxy implements IStringProxy
 {
-    /** Flag indicating that this object implements the INumerProxy interface */
+    /** Flag indicating that this object implements the IStringProxy interface */
     public get isStringProxy(): boolean { return true; }
 
     constructor( s?: string | IStringProxy)
@@ -204,6 +210,7 @@ export class StringProxy implements IStringProxy
         this.s = s;
     }
 
+    /** Converts internally held value(s) to string */
     public valueToString(): string
     {
         return this.s == null ? "" : typeof this.s === "string" ? this.s : this.s.toString();
@@ -306,7 +313,7 @@ abstract class NumberProxy implements INumberProxy
         this.params = params;
     }
 
-    /** Converts internnally held value(s) to string - should be implemented by the derived classes */
+    /** Converts internally held value(s) to string - should be implemented by the derived classes */
     abstract valueToString(): string;
 
     // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
@@ -331,6 +338,7 @@ class MathFuncProxy extends NumberProxy
         this.name = name;
     }
 
+    /** Converts internally held value(s) to string */
     public valueToString(): string
     {
         return `${this.name}(${multiNumberStyleToCssString( this.params, this.convertFunc, ",")})`;
@@ -354,6 +362,7 @@ class CalcFuncProxy extends NumberProxy
         this.formula = formula;
     }
 
+    /** Converts internally held value(s) to string */
     public valueToString(): string
     {
         return `calc(${formatNumbers( this.formula, this.params, this.convertFunc)})`;

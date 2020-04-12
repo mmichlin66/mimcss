@@ -27,7 +27,7 @@ class UrlProxy implements IUrlProxy
         this.url = url;
     }
 
-    // IStringProxy method that should be implemented by the derived classes.
+    /** Converts internally held value(s) to string */
     public valueToString(): string
     {
         let s = valueToString( this.url);

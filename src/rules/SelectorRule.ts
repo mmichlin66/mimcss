@@ -1,6 +1,6 @@
 import {ISelectorRule, ExtendedStyleset, RuleType} from "./RuleTypes"
 import {StyleRule} from "./StyleRule"
-import {SelectorType} from "../styles/StyleTypes";
+import {CssSelector} from "../styles/StyleTypes";
 import {selectorToCssString} from "../styles/StyleFuncs";
 
 
@@ -10,7 +10,7 @@ import {selectorToCssString} from "../styles/StyleFuncs";
  */
 export class SelectorRule extends StyleRule implements ISelectorRule
 {
-	public constructor( selector: SelectorType, style?: ExtendedStyleset)
+	public constructor( selector: CssSelector, style?: ExtendedStyleset)
 	{
 		super( RuleType.SELECTOR, style);
 
@@ -41,7 +41,7 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	public get selectorText(): string { return selectorToCssString( this.selector); }
 
 	// selector object for this rule.
-	public selector: SelectorType;
+	public selector: CssSelector;
 }
 
 

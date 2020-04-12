@@ -2,7 +2,7 @@
  * This module contains types for working with CSS colors.
  */
 
-import {IStringProxy, Box} from "./UtilTypes"
+import {IStringProxy, OneOrBox} from "./UtilTypes"
 
 
 

@@ -1,11 +1,16 @@
 ﻿import {
-    Extended, IStringProxy, Pair, Box, OneOrMany, NumberBox, CssNumber, MultiCssNumber,
-    Position_StyleType, MultiPosition_StyleType,
-    
+    Extended, OneOrPair, OneOrBox, OneOrMany, NumberBox, CssNumber, MultiCssNumber,
+    Position_StyleType, MultiPosition_StyleType, IValueProxy,
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS property types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for align-content style property */
 export type AlignContentStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
@@ -167,7 +172,7 @@ export type BackgroundOriginStyleType = OneOrMany<SingleBackgroundOrigin>;
 export type SingleBackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat";
 
 /** Type for single background repeat */
-export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | Pair<SingleBackgroundRepeatKeyword>;
+export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<SingleBackgroundRepeatKeyword>;
 
 /** Type for background-repeat style property */
 export type BackgroundRepeatStyleType = OneOrMany<SingleBackgroundRepeat>;
@@ -175,7 +180,7 @@ export type BackgroundRepeatStyleType = OneOrMany<SingleBackgroundRepeat>;
 
 
 /** Type for background size */
-export type SingleBackgroundSize = "cover" | "contain" | Pair<CssNumber | "auto">;
+export type SingleBackgroundSize = "cover" | "contain" | OneOrPair<CssNumber | "auto">;
 
 /**
  * Type for background-size style property. The background-size style can specify one or more
@@ -194,7 +199,7 @@ export type BackgroundSizeStyleType = OneOrMany<SingleBackgroundSize>;
 
 
 /** Type for a single corner radius */
-export type SingleCornerRadius_StyleType = Pair<CssNumber>;
+export type SingleCornerRadius_StyleType = OneOrPair<CssNumber>;
 
 
 
@@ -204,7 +209,7 @@ export type BaselineShiftStyleType = "sub" | "super" | CssNumber;
 
 
 /** Type for border-radius style property */
-export type BorderRadiusStyleType = Pair<NumberBox>;
+export type BorderRadiusStyleType = OneOrPair<NumberBox>;
 
 
 
@@ -215,7 +220,7 @@ export type BorderSideStyle_StyleType = "none" | "hidden" | "dotted" | "dashed" 
 
 
 /** Type for border-style style property */
-export type BorderStyleStyleType = Box<BorderSideStyle_StyleType>;
+export type BorderStyleStyleType = OneOrBox<BorderSideStyle_StyleType>;
 
 
 
@@ -235,12 +240,12 @@ export type BorderColapseStyleType = "collapse" | "separate";
 
 
 /** Type for border-spacing style property */
-export type BorderSpacingStyleType = Pair<CssNumber>;
+export type BorderSpacingStyleType = OneOrPair<CssNumber>;
 
 
 
 /** Type for border-color style property */
-export type BorderColorStyleType = Box<CssColor>;
+export type BorderColorStyleType = OneOrBox<CssColor>;
 
 
 
@@ -251,7 +256,7 @@ export type BorderSide_StyleType = CssNumber |  BorderSideStyle_StyleType | CssC
 
 
 /** Type for border-image-outset style property */
-export type BorderImageOutsetStyleType = Box<string | number>;
+export type BorderImageOutsetStyleType = OneOrBox<string | number>;
 
 
 
@@ -259,7 +264,7 @@ export type BorderImageOutsetStyleType = Box<string | number>;
 export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space";
 
 /** Type for border-image-repeat style property */
-export type BorderImageRepeatStyleType = Pair<BorderImageRepeatKeyword>;
+export type BorderImageRepeatStyleType = OneOrPair<BorderImageRepeatKeyword>;
 
 
 
@@ -451,7 +456,7 @@ export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" | num
 export type SingleGapStyleType = "normal" | CssNumber;
 
 /** Type for a row-gap or column-gap style property */
-export type GapStyleType = Pair<SingleGapStyleType>;
+export type GapStyleType = OneOrPair<SingleGapStyleType>;
 
 
 
@@ -545,7 +550,7 @@ export type OverflowWrapStyleType = "normal" | "break-word" | "anywhere";
 export type SingleOverflowStyleType = "visible" | "hidden" | "clip" | "scroll" | "auto";
 
 /** Type for the overflow- style property */
-export type OverflowStyleType = Pair<SingleOverflowStyleType>;
+export type OverflowStyleType = OneOrPair<SingleOverflowStyleType>;
 
 
 
@@ -658,7 +663,7 @@ export type TextOrientationStyleType = "mixed" | "upright" | "sideways";
 export type SingleTextOverflowStyleType = "clip" | "ellipsis" | "fade" | CssNumber;
 
 /** Type for the text-overflow style property */
-export type TextOverflowStyleType = Pair<SingleTextOverflowStyleType>;
+export type TextOverflowStyleType = OneOrPair<SingleTextOverflowStyleType>;
 
 
 
@@ -748,6 +753,12 @@ export type ZoomStyleType = "normal" | "reset" | CssNumber;
 export type DefaultStyleType = string;
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Styleset types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Interface representing a collection of built-in style properties and their values.
@@ -1300,6 +1311,12 @@ export type Styleset = IStyleset &
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Selector types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /** Represents pseudo classes */
 export type PseudoClass = ":active" | ":any-link" | ":blank" | ":checked" | ":default" | ":defined" |
 	":disabled" | ":empty" | ":enabled" | ":first-child" | ":first-of-type" | ":fullscreen" |
@@ -1321,10 +1338,28 @@ export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | ":
 
 
 
+/**
+ * The ISelectorProxy interface represents an object that can produce a CSS selector string. This
+ * interface is returned from the `$selector` function.
+ */
+export interface ISelectorProxy extends IValueProxy
+{
+    /** Flag indicating that this object implements the ISelectorProxy interface */
+    readonly isSelectorProxy: boolean;
+}
+
+
+
 /** Type for a selector */
-export type SelectorType = string | IStringProxy;
+export type CssSelector = string | ISelectorProxy;
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Supports query types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Type representing a single set of styles as part of the @supports rules. The styles in the

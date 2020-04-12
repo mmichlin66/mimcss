@@ -4,31 +4,58 @@
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Basic types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * The IStringProxy interface represents an object that can produce a string, which is returned
- * via the valueToString() method.
+ * The IValueProxy interface represents an object that can produce a string, which is returned
+ * via the valueToString() method. This interface is used as a base for other interfaces that
+ * represents different CSS types, such as `<number>`, <length>`, `<url>`, `<image>`, etc.
  * 
  * All CSS properties should accept string as the type of their value even if normally
  * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
  * color) property. This is because in addition to their normal values any property
  * can use custom CSS property in the form `var(--propname)`. However, if we add string type
  * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
- * Intellisense and it doesn't prompt developers for the possible values. The IStringProxy
- * can be used instead of string (e.g. `"row" | "column" | IStringProxy`) and this solves
- * the Intellisense issue.
+ * Intellisense and it doesn't prompt developers for the possible values. The IValueProxy
+ * can be used instead of string and this solves the Intellisense issue.
  * 
- * Another benefit of using objects implementing the IStringProxy interface is that they are
+ * Another benefit of using objects implementing the IValueProxy interface is that they are
  * constructed at one point but the string generation occurs at another time. This allows
  * using these objects in the style definition classes. They can reference objects like
  * IVarRule that are not fully initialized yet. However, when the styles should be inserted
  * into DOM the initialization will have already occurred and the valueToString method will
  * return a correct string.
+ * 
+ * Note that the IValueProxy interface is never used directly when specifying property types;
+ * only its derivatives are used directly. This is because we want to distinguish between
+ * different CSS types, so that a function used for one CSS type cannot be used for a different
+ * CSS type. For example, the `calc()` function returns the INumberProxy interface, while the
+ * `linearIngradient()` function returns the IImageProxy interface. Thus you cannot use the
+ * 'calc()` function for image-based CSS properties and vice versa.
  */
-export interface IStringProxy
+export interface IValueProxy
 {
-    /** Converts internnally held value(s) to string */
+    /** Converts internally held value(s) to string */
     valueToString(): string;
+}
 
+
+
+/**
+ * The IStringProxy interface represents an object that can be assigned to any CSS property. This
+ * This interface is part of type definition for all CSS properties - even for those that don't
+ * have `string` as part of their type. 
+ * 
+ * This interface is returned from the `raw()` function, which allows by-passing the property
+ * typing rules and specifying a string directly. This might be useful, when a string value is
+ * obtained from soe external calculations.
+ */
+export interface IStringProxy extends IValueProxy
+{
     /** Flag indicating that this object implements the IStringProxy interface */
     readonly isStringProxy: boolean;
 }
@@ -47,11 +74,8 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | IStrin
  * we need this interface because every style property can accept value in the form of var()
  * CSS function.
  */
-export interface ICustomVar<T = any>
+export interface ICustomVar<T = any> extends IValueProxy
 {
-    /** Converts internnally held value(s) to string */
-    valueToString(): string;
-
     // Type of the internally held value.
     value: T;
 }
@@ -75,13 +99,16 @@ export type Extended<T> = T | Base_StyleType | ICustomVar<Extended<T>>;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for pair-like property that can have 1 to 2 values of the given type */
-export type Pair<T> = T | [Extended<T>, Extended<T>];
+export type OneOrPair<T> = T | [Extended<T>, Extended<T>];
 
 /** Type for box-like property that can have 1 to 4 values of the given type */
-export type Box<T> = T | [Extended<T>, Extended<T>, Extended<T>?, Extended<T>?];
+export type OneOrBox<T> = T | [Extended<T>, Extended<T>, Extended<T>?, Extended<T>?];
 
 /** Type for a roperty that can have 1 or more values of the given type */
 export type OneOrMany<T> = T | Extended<T>[];
+
+/** Type for a roperty that can have 1 or more values of the given type */
+export type Many<T> = Extended<T>[];
 
 
 
@@ -96,11 +123,8 @@ export type OneOrMany<T> = T | Extended<T>[];
  * to propertoes of the CSS numeric types. This interface is returned from functions like min(),
  * max(), calc() and others.
  */
-export interface INumberProxy
+export interface INumberProxy extends IValueProxy
 {
-    /** Converts internnally held value(s) to string */
-    valueToString(): string;
-
     /** Flag indicating that this object implements the INumerProxy interface */
     readonly isNumberProxy: boolean;
 }
@@ -114,7 +138,7 @@ export type CssNumber = number | string | INumberProxy;
 export type MultiCssNumber = OneOrMany<CssNumber>;
 
 /** Type for box style property that can have 1 to 4 numeric values */
-export type NumberBox = Box<CssNumber>;
+export type NumberBox = OneOrBox<CssNumber>;
 
 
 
@@ -256,14 +280,37 @@ export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];
 /**
  * The IUrlProxy interface represents an invocation of the CSS url() function.
  */
-export interface IUrlProxy
+export interface IUrlProxy extends IValueProxy
 {
-    /** Converts internnally held value(s) to string */
-    valueToString(): string;
-
     /** Flag indicating that this object implements the IUrlProxy interface */
     readonly isUrlProxy: boolean;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Images.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The IImageProxy interface represents an invocation of one of CSS functions that are used for
+ * secifying images. This interface is returned from functions like: linearGradient, paint(),
+ * element(), etc.
+ */
+export interface IImageProxy extends IValueProxy
+{
+    /** Flag indicating that this object implements the IImageProxy interface */
+    readonly isImageProxy: boolean;
+}
+
+
+
+/**
+ * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
+ */
+export type CssImage = string | IUrlProxy | IImageProxy;
 
 
 

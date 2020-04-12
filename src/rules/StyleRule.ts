@@ -1,5 +1,5 @@
 import {IStyleRule, ExtendedStyleset, RuleType, IVarRule} from "./RuleTypes";
-import {IStyleset, Styleset, SelectorType} from "../styles/StyleTypes"
+import {IStyleset, Styleset, CssSelector} from "../styles/StyleTypes"
 import {Rule, IRuleContainerOwner} from "./Rule";
 import {mergeStylesets, stylesetToCssString, stylePropToCssString, selectorToCssString} from "../styles/StyleFuncs"
 
@@ -59,7 +59,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			else if (propName === "&")
 			{
 				// value is an array of two-element tuples with selector and styleset
-				let tuples = propVal as [SelectorType, ExtendedStyleset][];
+				let tuples = propVal as [CssSelector, ExtendedStyleset][];
 				if (tuples.length > 0)
 				{
 					if (!nestedRules)
@@ -242,7 +242,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
  */
 class NestedRule extends StyleRule
 {
-	public constructor( containingRule?: StyleRule, selector?: SelectorType, style?: ExtendedStyleset)
+	public constructor( containingRule?: StyleRule, selector?: CssSelector, style?: ExtendedStyleset)
 	{
 		super( RuleType.NESTED, style);
 		this.selector = selector;
@@ -273,7 +273,7 @@ class NestedRule extends StyleRule
 
 
 	// Partial selector that should be appended to the parent selector.
-	private selector: SelectorType;
+	private selector: CssSelector;
 
 	// Parent style within which this rule is nested.
 	public containingRule: StyleRule;
