@@ -1,6 +1,6 @@
 ﻿import * as types from "./ImageTypes"
 import {Angle, valueToString, Percent, positionToString} from "./UtilFuncs";
-import {colorToCssString} from "./ColorFuncs";
+import {colorToString} from "./ColorFuncs";
 import { CssPosition } from "./UtilTypes";
 
 
@@ -8,7 +8,7 @@ import { CssPosition } from "./UtilTypes";
 function gradientStopOrHintToString( val: types.GradientStopOrHint): string
 {
     return valueToString( val, {
-        fromNumber: colorToCssString,
+        fromNumber: colorToString,
         fromArray: v => v.length === 0 ? "" : v.length === 1 ? Percent.styleToString( v[0]) :
         gradientColorAndLengthToString( v as types.GradientColorAndLength)
     });
@@ -19,7 +19,7 @@ function gradientStopOrHintToString( val: types.GradientStopOrHint): string
 function gradientColorAndLengthToString( val: types.GradientColorAndLength): string
 {
     let secondStop = val.length > 2 ? Percent.styleToString( val[1]) : "";
-    return `${colorToCssString(val[0])} ${Percent.styleToString( val[1])} ${secondStop}`;
+    return `${colorToString(val[0])} ${Percent.styleToString( val[1])} ${secondStop}`;
 }
 
 

@@ -6,7 +6,7 @@ import {
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
     Num, Len, Angle, Time, IValueConvertOptions, positionToString, multiPositionToString
 } from "./UtilFuncs"
-import {colorToCssString} from "./ColorFuncs";
+import {colorToString} from "./ColorFuncs";
 
 
 
@@ -168,8 +168,8 @@ function borderSpacingToCssString( val: StyleTypes.BorderSpacingStyleType): stri
 function borderColorToCssString( val: StyleTypes.BorderColorStyleType): string
 {
     return valueToString( val, {
-        arrayItemFunc: colorToCssString,
-        fromAny: colorToCssString
+        arrayItemFunc: colorToString,
+        fromAny: colorToString
     });
 }
 
@@ -195,12 +195,12 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
                 s += val[1] + " ";
 
             if (val[2])
-                s += colorToCssString( val[2]) + " ";
+                s += colorToString( val[2]) + " ";
 
             return s;
         },
         fromNumber: Len.styleToString,
-        fromAny: colorToCssString
+        fromAny: colorToString
     });
 }
 
@@ -240,7 +240,7 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
         fromObject: val => objectToCssString( val, false,
             ["width", multiLenToStringWithSpace],
             ["style", valueToString],
-            ["color", colorToCssString]
+            ["color", colorToString]
         )
     });
 }
@@ -510,6 +510,9 @@ export function stylePropToCssString<K extends keyof IStyleset>(
             ? valueToString( propVal, info as IValueConvertOptions)
             : (info as PropToStringFunc<K>)( propVal);
 
+    if (!varValue)
+        varValue = "initial";
+        
     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
 }
 
@@ -560,7 +563,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     backgroundAttachment: commaArraySeparator,
     backgroundBlendMode: commaArraySeparator,
     backgroundClip: commaArraySeparator,
-    backgroundColor: colorToCssString,
+    backgroundColor: colorToString,
     backgroundOrigin: commaArraySeparator,
     backgroundPosition: multiPositionToStringWithComma,
     backgroundRepeat: commaArraySeparator,
@@ -574,13 +577,13 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
 
     border: borderSideToCssString,
     borderBlockEnd: borderSideToCssString,
-    borderBlockEndColor: colorToCssString,
+    borderBlockEndColor: colorToString,
     borderBlockEndWidth: Len.styleToString,
     borderBlockStart: borderSideToCssString,
-    borderBlockStartColor: colorToCssString,
+    borderBlockStartColor: colorToString,
     borderBlockStartWidth: Len.styleToString,
     borderBottom: borderSideToCssString,
-    borderBottomColor: colorToCssString,
+    borderBottomColor: colorToString,
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
     borderBottomWidth: Len.styleToString,
@@ -588,22 +591,22 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     borderImageOutset: borderImageOutsetToCssString,
     borderImageWidth: multiLenToStringWithSpace,
     borderInlineEnd: borderSideToCssString,
-    borderInlineEndColor: colorToCssString,
+    borderInlineEndColor: colorToString,
     borderInlineEndWidth: Len.styleToString,
     borderInlineStart: borderSideToCssString,
-    borderInlineStartColor: colorToCssString,
+    borderInlineStartColor: colorToString,
     borderInlineStartWidth: Len.styleToString,
     borderLeft: borderSideToCssString,
-    borderLeftColor: colorToCssString,
+    borderLeftColor: colorToString,
     borderLeftWidth: Len.styleToString,
     borderRadius: borderRadiusToCssString,
     borderRight: borderSideToCssString,
-    borderRightColor: colorToCssString,
+    borderRightColor: colorToString,
     borderRightWidth: Len.styleToString,
     borderStyle: valueToString,
     borderSpacing: borderSpacingToCssString,
     borderTop: borderSideToCssString,
-    borderTopColor: colorToCssString,
+    borderTopColor: colorToString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
     borderTopWidth: Len.styleToString,
@@ -612,18 +615,18 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     bottom: Len.styleToString,
     boxShadow: valueToString,
 
-    caretColor: colorToCssString,
+    caretColor: colorToString,
     clip: clipToCssString,
-    color: colorToCssString,
+    color: colorToString,
     columnGap: Len.styleToString,
     columnRule: columnRuleToCssString,
-    columnRuleColor: colorToCssString,
+    columnRuleColor: colorToString,
     columnRuleStyle: valueToString,
     columnRuleWidth: multiLenToStringWithSpace,
     columns: columnsToCssString,
 
     flex: flexToCssString,
-    floodColor: colorToCssString,
+    floodColor: colorToString,
     fontSize: Len.styleToString,
     fontStyle: fontStyleToCssString,
 
@@ -637,7 +640,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
 
     left: Len.styleToString,
     letterSpacing: Len.styleToString,
-    lightingColor: colorToCssString,
+    lightingColor: colorToString,
 
     margin: multiLenToStringWithSpace,
     marginBlockEnd: Len.styleToString,
@@ -660,7 +663,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     minZoom: Len.styleToString,
 
     objectPosition: positionToString,
-    outlineColor: colorToCssString,
+    outlineColor: colorToString,
     outlineOffset: Len.styleToString,
     outlineStyle: valueToString,
 
@@ -701,12 +704,12 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     scrollPaddingLeft: Len.styleToString,
     scrollPaddingRight: Len.styleToString,
     scrollPaddingTop: Len.styleToString,
-    stopColor: colorToCssString,
+    stopColor: colorToString,
 
     tabSize: Len.styleToString,
-    textDecorationColor: colorToCssString,
+    textDecorationColor: colorToString,
     textDecorationThickness: Len.styleToString,
-    textEmphasisColor: colorToCssString,
+    textEmphasisColor: colorToString,
     textEmphasisPosition: textEmphasisPositionToCssString,
     textIndent: textIndentToCssString,
     top: Len.styleToString,

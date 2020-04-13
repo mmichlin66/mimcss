@@ -18,9 +18,8 @@ import {IStringProxy, Extended} from "./UtilTypes";
 
 /**
  * Converts color value from the numeric representation to the CSS color string.
- * @param val Color as a number
  */
-function colorNumberToCssString( val: number): string
+function colorNumberToString( val: number): string
 {
     /// #if DEBUG
         if (val < 0)
@@ -35,24 +34,47 @@ function colorNumberToCssString( val: number): string
         }
     /// #endif
 
-    return (val <= 0xFFFFFF)
-        ? `rgb(${(val & 0xFF0000) >> 16},${(val & 0x00FF00) >> 8},${val & 0x0000FF})`
-        : `rgb(${(val & 0xFF000000) >> 24},${(val & 0x00FF0000) >> 16},${(val & 0x0000FF00) >> 8},${(val & 0x000000FF) / 255})`;
+    // let s = val.toString(16);
+    // if (val <= 0xFFFFFF)
+    //     s = s.length < 6 ? (s as any).padStart( 6, "0") : s;
+    // else
+    //     s = s.length < 8 ? (s as any).padStart( 8, "0") : s;
+
+    // return `#${s}`;
+
+    // if we have a named color with the given value, return the color name
+    let name = reversedColorMap.get( val);
+    if (name)
+        return name;
+    else
+    {
+        // otherwise convert numeric value to # notation
+        let s = val.toString(16);
+        return "#" + (val <= 0xFFFFFF
+            ? s.length < 6 ? (s as any).padStart( 6, "0") : s
+            : s.length < 8 ? (s as any).padStart( 8, "0") : s);
+
+        // // otherwise convert numeric value to rgb notation
+        // return (val <= 0xFFFFFF)
+        //     ? `rgb(${(val & 0xFF0000) >> 16},${(val & 0x00FF00) >> 8},${val & 0x0000FF})`
+        //     : `rgb(${(val & 0xFF000000) >> 24},${(val & 0x00FF0000) >> 16},${(val & 0x0000FF00) >> 8},${(val & 0x000000FF) / 255})`;
+    }
 }
 
 
 
 /**
- * Converts color style value to the CSS time string.
+ * Converts color style value to the CSS time string. If a string value is in the Colors object we
+ * need to get its number and convert it to the rgb[a]() function because it might be a custom
+ * color name added via INamedColors module augmentation. For numeric values, we check if this is
+ * one of the predefined
  */
-export function colorToCssString( val: Extended<CssColor>): string
+export function colorToString( val: Extended<CssColor>): string
 {
-    // if a string value is in the Colors object we need to get its number and convert it to the
-    // rgb[a]() function because it might be a custom color name added via INamedColors module
-    // augmentation.
-    return typeof val === "string"
-        ? Colors[val] ? colorNumberToCssString( Colors[val]) : val
-        : valueToString( val, { fromNumber: colorNumberToCssString });
+    return valueToString( val, {
+        fromString: v => Colors[v] ? colorNumberToString( Colors[v]) : v,
+        fromNumber: colorNumberToString
+    });
 }
 
 
@@ -303,6 +325,17 @@ class ColorsClass implements IColors
  * to get their numeric values.
  */
 export let Colors: IColors = new ColorsClass();
+
+
+/**
+ * Map of predefined color names by their numeric values
+ */
+let reversedColorMap = new Map<number,string>();
+
+Object.keys( Colors).forEach( name => {
+    if (typeof Colors[name] === "number")
+        reversedColorMap.set( Colors[name], name);
+});
 
 
 

@@ -45,6 +45,9 @@ export interface IValueConvertOptions
     // Called if value is null or undefined
     fromNull?: ( val: null | undefined) => string;
 
+    // Called if value is a string. This allows transforming one string to another.
+    fromString?: ( val: string) => string;
+
     // Called if value is a boolean
     fromBool?: (val: boolean) => string;
 
@@ -78,9 +81,7 @@ export interface IValueConvertOptions
  */
 export function valueToString( val: any, options?: IValueConvertOptions): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (!options)
+   if (!options)
     {
         // standard processing:
         // - null/undefined become "initial".
@@ -88,7 +89,9 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         // - function: call without parameters.
         // - everything else: call toString().
         if (val == null)
-            return "initial";
+            return "";
+        else if (typeof val === "string")
+            return val;
         else if (Array.isArray(val))
             return arrayToCssString( val);
         else if (typeof val.valueToString === "function")
@@ -100,9 +103,12 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
     }
     else
     {
-        // processing with options
+        // processing with options. For all types except null and string, if the type-specific
+        // function is not defined, call fromAny if defined.
         if (val == null)
-            return options.fromNull ? options.fromNull( val) : "initial";
+            return options.fromNull ? options.fromNull( val) : "";
+        else if (typeof val === "string")
+            return options.fromString ? options.fromString( val) : val;
         else if (typeof val === "boolean")
             return options.fromBool ? options.fromBool( val) : options.fromAny ? options.fromAny( val) : val.toString();
         else if (typeof val === "number")
@@ -598,41 +604,6 @@ export function multiPositionToString( val: Extended<MultiCssPosition>, separato
         arraySeparator: separator
     });
 }
-
-
-
-// /**
-//  * Converts single position style value to the CSS string.
-//  * @param val Size as a style property type
-//  */
-// export function positionToCssString( val: Position_StyleType): string
-// {
-//     if (typeof val === "string")
-//         return val;
-//     else if (typeof (val as any).valueToString === "function")
-//         return (val as any).valueToString();
-//     else if (typeof val === "object")
-//     {
-//         if ("xedge" in val)
-//             return objectToCssString( val, false, "xedge", ["x", Len.styleToString], "yedge", ["y", Len.styleToString]);
-//         else
-//             return objectToCssString( val, false, ["x", Len.styleToString], ["y", Len.styleToString]);
-//     }
-//     else
-// 	    return Len.styleToString( val);
-// }
-
-// /**
-//  * Converts multi-part position style values to the CSS string.
-//  * @param val Array of length style values
-//  */
-// export function multiPositionToCssString( val: MultiPosition_StyleType): string
-// {
-//     if (Array.isArray(val))
-//         return arrayToCssString( val, positionToCssString);
-//     else
-//         return  positionToCssString( val);
-// }
 
 
 
