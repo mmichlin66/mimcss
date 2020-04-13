@@ -1,8 +1,10 @@
 ﻿import {
-    IStringProxy, Extended, CssNumber, IUrlProxy
+    IStringProxy, Extended, CssNumber, IUrlProxy, CssPosition
 } from "./UtilTypes"
 import {StringProxy, valueToString} from "./UtilFuncs"
 import {IStyleset} from "./StyleTypes"
+import * as ImageTypes from "./ImageTypes"
+import * as ImageFuncs from "./ImageFuncs"
 import * as StyleTypes from "./StyleTypes"
 import {stylePropToCssString} from "./StyleFuncs";
 
@@ -76,7 +78,7 @@ export class sh
 
 
     /**
-     * Creates an IStringProxy object representing the CSS url() function. The string parameter
+     * Creates an IUrlProxy object representing the CSS `url()` function. The string parameter
      * will be wrapped in a "url()" invocation unless it already is.
      */
     public static url( val: Extended<string>): IUrlProxy
@@ -85,6 +87,58 @@ export class sh
     }
 
 
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Images
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Creates an IImageProxy object representing the CSS `linear-gradient()` function.
+     */
+    public static linearGradient( angle: ImageTypes.LinearGradAngle,
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+    {
+        return new ImageFuncs.LinearGradientProxy( "linear-gradient", angle, stopsOrHints);
+    }
+
+    /**
+     * Creates an IImageProxy object representing the CSS `repeating-linear-gradient()` function.
+     */
+    public static repeatingLinearGradient( angle: ImageTypes.LinearGradAngle = "to bottom",
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+    {
+        return new ImageFuncs.LinearGradientProxy( "repeating-linear-gradient", angle, stopsOrHints);
+    }
+
+    /**
+     * Creates an IImageProxy object representing the CSS `radial-gradient()` function.
+     */
+    public static radialGradient( shape: ImageTypes.RadialGradientShape,
+        extent: ImageTypes.RadialGradientExtent, pos: CssPosition,
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+    {
+        return new ImageFuncs.RadialGradientProxy( "radial-gradient", shape, extent, pos, stopsOrHints);
+    }
+
+    /**
+     * Creates an IImageProxy object representing the CSS `repeating-radial-gradient()` function.
+     */
+    public static repeatingRadialGradient( shape: ImageTypes.RadialGradientShape,
+        extent: ImageTypes.RadialGradientExtent, pos: CssPosition,
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+    {
+        return new ImageFuncs.RadialGradientProxy( "repeating-radial-gradient", shape, extent, pos, stopsOrHints);
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Animations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Returns an object that can be assigned to the animation property.
@@ -97,7 +151,7 @@ export class sh
      *   - a number of steps in the steps function. The step position will be set to jump-start.
      *   - one- or two-item array that defines a step function. The first item defines the number
      *     of steps. The optional second item is one of pre-defined step postion names.
-     *   - for-item array that defines cubic-bezier function.
+     *   - four-item array that defines cubic-bezier function.
      * @param delay Delay before the animation starts. Integer numbers for milliseconds, floating
      * point numbers for seconds. The default value is 0.
      * @param count Number of iterations the animation shold run. The default value is 1.

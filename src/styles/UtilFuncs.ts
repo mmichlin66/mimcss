@@ -1,5 +1,5 @@
 ﻿import {Extended, IStringProxy, INumberProxy, CssNumber, MultiCssNumber, INumberMath,
-    Position_StyleType, MultiPosition_StyleType, IFractionMath
+    IFractionMath, CssPosition, MultiCssPosition
 } from "./UtilTypes"
 
 
@@ -578,36 +578,61 @@ export let Percent: INumberMath = new NumberMath( (n: number) =>
 
 /**
  * Converts single position style value to the CSS string.
- * @param val Size as a style property type
  */
-export function positionToCssString( val: Position_StyleType): string
+export function positionToString( val: Extended<CssPosition>): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof (val as any).valueToString === "function")
-        return (val as any).valueToString();
-    else if (typeof val === "object")
-    {
-        if ("xedge" in val)
-            return objectToCssString( val, false, "xedge", ["x", Len.styleToString], "yedge", ["y", Len.styleToString]);
-        else
-            return objectToCssString( val, false, ["x", Len.styleToString], ["y", Len.styleToString]);
-    }
-    else
-	    return Len.styleToString( val);
+    return valueToString( val, {
+        fromNull: v => null,
+        fromNumber: Len.styleToString,
+        fromArray: v => Len.multiStyleToString( v, " ")
+    });
 }
 
 /**
- * Converts multi-part position style values to the CSS string.
- * @param val Array of length style values
+ * Converts multi-position style value to the CSS string.
  */
-export function multiPositionToCssString( val: MultiPosition_StyleType): string
+export function multiPositionToString( val: Extended<MultiCssPosition>, separator: string): string
 {
-    if (Array.isArray(val))
-        return arrayToCssString( val, positionToCssString);
-    else
-        return  positionToCssString( val);
+    return valueToString( val, {
+        arrayItemFunc: positionToString,
+        arraySeparator: separator
+    });
 }
+
+
+
+// /**
+//  * Converts single position style value to the CSS string.
+//  * @param val Size as a style property type
+//  */
+// export function positionToCssString( val: Position_StyleType): string
+// {
+//     if (typeof val === "string")
+//         return val;
+//     else if (typeof (val as any).valueToString === "function")
+//         return (val as any).valueToString();
+//     else if (typeof val === "object")
+//     {
+//         if ("xedge" in val)
+//             return objectToCssString( val, false, "xedge", ["x", Len.styleToString], "yedge", ["y", Len.styleToString]);
+//         else
+//             return objectToCssString( val, false, ["x", Len.styleToString], ["y", Len.styleToString]);
+//     }
+//     else
+// 	    return Len.styleToString( val);
+// }
+
+// /**
+//  * Converts multi-part position style values to the CSS string.
+//  * @param val Array of length style values
+//  */
+// export function multiPositionToCssString( val: MultiPosition_StyleType): string
+// {
+//     if (Array.isArray(val))
+//         return arrayToCssString( val, positionToCssString);
+//     else
+//         return  positionToCssString( val);
+// }
 
 
 

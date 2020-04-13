@@ -1,19 +1,19 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
 import {
-    Extended, MultiCssNumber, CssNumber
+    Extended, MultiCssNumber, CssNumber, MultiCssPosition
 } from "./UtilTypes";
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
-    positionToCssString, multiPositionToCssString,
-    Num, Len, Angle, Time, IValueConvertOptions
+    Num, Len, Angle, Time, IValueConvertOptions, positionToString, multiPositionToString
 } from "./UtilFuncs"
 import {colorToCssString} from "./ColorFuncs";
 
 
 
 // helper functions for style property conversions
-function multiTimeToStringWithComma( val: Extended<MultiCssNumber>) { return Time.multiStyleToString( val, ","); }
-function multiLenToStringWithSpace( val: Extended<MultiCssNumber>) { return Len.multiStyleToString( val, " "); }
+function multiTimeToStringWithComma( val: Extended<MultiCssNumber>): string { return Time.multiStyleToString( val, ","); }
+function multiLenToStringWithSpace( val: Extended<MultiCssNumber>): string { return Len.multiStyleToString( val, " "); }
+function multiPositionToStringWithComma( val: Extended<MultiCssPosition>): string { return multiPositionToString( val, ","); }
 
 
 
@@ -562,7 +562,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     backgroundClip: commaArraySeparator,
     backgroundColor: colorToCssString,
     backgroundOrigin: commaArraySeparator,
-    backgroundPosition: multiPositionToCssString,
+    backgroundPosition: multiPositionToStringWithComma,
     backgroundRepeat: commaArraySeparator,
     backgroundSize: {
         fromNumber: Len.styleToString,
@@ -659,7 +659,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
 	minWidth: Len.styleToString,
     minZoom: Len.styleToString,
 
-    objectPosition: positionToCssString,
+    objectPosition: positionToString,
     outlineColor: colorToCssString,
     outlineOffset: Len.styleToString,
     outlineStyle: valueToString,
@@ -674,7 +674,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     paddingRight: Len.styleToString,
     paddingTop: Len.styleToString,
     perspective: Len.styleToString,
-    perspectiveOrigin: positionToCssString,
+    perspectiveOrigin: positionToString,
 
     right: Len.styleToString,
     rowGap: Len.styleToString,

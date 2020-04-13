@@ -1,8 +1,9 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, NumberBox, CssNumber, MultiCssNumber,
-    Position_StyleType, MultiPosition_StyleType, IValueProxy,
+    CssPosition, MultiCssPosition, IValueProxy,
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
+import {CssImage} from "./ImageTypes";
 
 
 
@@ -157,6 +158,11 @@ export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" 
 
 /** Type for background-clip style property */
 export type BackgroundClipStyleType = OneOrMany<SingleBackgroundClip>;
+
+
+
+/** Type for background-image style property */
+export type BackgroundImageStyleType = "none" | CssImage;
 
 
 
@@ -787,9 +793,9 @@ export interface ICssStyleset
     backgroundBlendMode?: BackgroundBlendModeStyleType;
     backgroundClip?: BackgroundClipStyleType;
     backgroundColor?: CssColor;
-    backgroundImage?: DefaultStyleType;
+    backgroundImage?: BackgroundImageStyleType;
     backgroundOrigin?: BackgroundOriginStyleType;
-    backgroundPosition?: MultiPosition_StyleType;
+    backgroundPosition?: MultiCssPosition;
     backgroundPositionX?: DefaultStyleType;
     backgroundPositionY?: DefaultStyleType;
     backgroundRepeat?: BackgroundRepeatStyleType;
@@ -1043,7 +1049,7 @@ export interface ICssStyleset
     msWrapThrough?: DefaultStyleType;
 
     objectFit?: ObjectFitStyleType;
-    objectPosition?: Position_StyleType;
+    objectPosition?: CssPosition;
     offset?: DefaultStyleType;
     offsetDistance?: DefaultStyleType;
     offsetPath?: DefaultStyleType;
@@ -1085,7 +1091,7 @@ export interface ICssStyleset
     pageBreakBefore?: BreakBeforeStyleType;
     pageBreakInside?: BreakInsideStyleType;
     perspective?: CssNumber;
-    perspectiveOrigin?: Position_StyleType;
+    perspectiveOrigin?: CssPosition;
     placeContent?: PlaceContentStyleType;
     placeItems?: PlaceItemsStyleType;
     placeSelf?: PlaceSelfStyleType;

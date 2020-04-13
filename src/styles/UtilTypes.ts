@@ -237,37 +237,25 @@ export interface IFractionMath extends INumberMath
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Size
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Type for CSS size, which can be expressed as one or two values each of each is of the
- * Number_StyleType type. Two values are given as an object with 'w' (width) and 'h' (height)
- * properties.
- */
-export type Size_StyleType = CssNumber | { w: CssNumber; h: CssNumber };
-
-/** Type for multi-part size style property */
-export type MultiSize_StyleType = Size_StyleType | Size_StyleType[];
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // Position
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Type for CSS position, which can be expressed as one or two or 3 or 4 values.
- */
-export type Position_StyleType = Extended<"center" | "left" | "right" | "top" | "bottom" | CssNumber |
-                { x: "center" | "left" | "right" | CssNumber; y: "center" | "top" | "bottom" | CssNumber } |
-                { xedge: string; x?: CssNumber; yedge: string; y?: CssNumber }>;
+/** Type describing the horizontal position */
+export type HorizontalKeyword = "left" | "center" | "right";
 
-/** Type for multi-part position style property */
-export type MultiPosition_StyleType = Position_StyleType | Position_StyleType[];
+/** Type describing the horizontal position */
+export type VerticalKeyword = "top" | "center" | "bottom";
+
+/** Type describing the `<position>` CSS type */
+export type CssPosition = HorizontalKeyword | VerticalKeyword | Extended<CssNumber> |
+    [HorizontalKeyword | Extended<CssNumber>, VerticalKeyword | Extended<CssNumber>] | 
+    [HorizontalKeyword, Extended<CssNumber>, VerticalKeyword] |
+    [HorizontalKeyword, VerticalKeyword, Extended<CssNumber>] |
+    [HorizontalKeyword, Extended<CssNumber>, VerticalKeyword, Extended<CssNumber>];
+
+/** Type describing multiple `<position>` CSS types */
+export type MultiCssPosition = Extended<CssPosition>[];
 
 
 
@@ -285,32 +273,6 @@ export interface IUrlProxy extends IValueProxy
     /** Flag indicating that this object implements the IUrlProxy interface */
     readonly isUrlProxy: boolean;
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Images.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The IImageProxy interface represents an invocation of one of CSS functions that are used for
- * secifying images. This interface is returned from functions like: linearGradient, paint(),
- * element(), etc.
- */
-export interface IImageProxy extends IValueProxy
-{
-    /** Flag indicating that this object implements the IImageProxy interface */
-    readonly isImageProxy: boolean;
-}
-
-
-
-/**
- * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
- */
-export type CssImage = string | IUrlProxy | IImageProxy;
 
 
 
