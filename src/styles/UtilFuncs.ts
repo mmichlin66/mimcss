@@ -255,22 +255,23 @@ function numberToCssString( n: number, intUnit: string = "", floatUint: string =
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function numberStyleToCssString( val: Extended<CssNumber>, convertFunc?: ConvertNumberFuncType): string
+function styleToString( val: Extended<CssNumber>, convertFunc?: ConvertNumberFuncType): string
 {
     return valueToString( val, { fromNumber: convertFunc});
 }
 
 /**
- * Converts animation delay style value to the CSS string.
+ * Converts single CssNumber or array of CssNumber objects to the CSS string.
  * @param val Single- or multi-number style value.
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiNumberStyleToCssString( val: Extended<MultiCssNumber>,
-                convertFunc: ConvertNumberFuncType, separator: string = " "): string
+function multiStyleToString( val: Extended<MultiCssNumber>,
+                convertFunc: ConvertNumberFuncType, separator: string): string
 {
-    return valueToString( val, { fromNumber: convertFunc,
-        arrayItemFunc: v => numberStyleToCssString( v, convertFunc),
+    return valueToString( val, {
+        fromNumber: convertFunc,
+        arrayItemFunc: v => styleToString( v, convertFunc),
         arraySeparator: separator
     });
 }
@@ -296,7 +297,7 @@ function formatNumbers( format: string, params: Extended<CssNumber>[], convertFu
         if (unit && typeof param === "number")
             return param + unit;
         else
-            return numberStyleToCssString( param, convertFunc);
+            return styleToString( param, convertFunc);
     }
 
     return format.replace( /{\s*(\d*)\s*(?:\|\s*([a-zA-Z\%]+)\s*)?}/g, replacer);
@@ -347,7 +348,7 @@ class MathFuncProxy extends NumberProxy
     /** Converts internally held value(s) to string */
     public valueToString(): string
     {
-        return `${this.name}(${multiNumberStyleToCssString( this.params, this.convertFunc, ",")})`;
+        return `${this.name}(${multiStyleToString( this.params, this.convertFunc, ",")})`;
     }
 
     // Name of the mathematical function.
@@ -387,16 +388,8 @@ class CalcFuncProxy extends NumberProxy
  */
 class NumberMath implements INumberMath
 {
-    // Function that appends proper units for parameters of number type.
-    protected convertFunc: ConvertNumberFuncType;
-
-    constructor( init?: ConvertNumberFuncType | [string,string])
+    constructor( protected convertFunc: ConvertNumberFuncType)
     {
-        this.convertFunc = !init
-            ? (n: number) => n.toString()
-            : typeof init === "function"
-                ? init
-                : (n: number) => numberToCssString( n, init[0], init[1]);
     }
 
     public numberToString = (n: number): string =>
@@ -406,12 +399,12 @@ class NumberMath implements INumberMath
 
     public styleToString = (val: Extended<CssNumber>): string =>
     {
-        return numberStyleToCssString( val, this.convertFunc);
+        return styleToString( val, this.convertFunc);
     }
 
     public multiStyleToString = (val: Extended<MultiCssNumber>, separator: string = " "): string =>
     {
-        return multiNumberStyleToCssString( val, this.convertFunc, separator);
+        return multiStyleToString( val, this.convertFunc, separator);
     }
 
     public min( ...params: Extended<CssNumber>[]): INumberProxy
@@ -444,11 +437,27 @@ class NumberMath implements INumberMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The Num object contains static methods that implement CSS mathematic functions on the <number>
- * CSS type. When arguments for these functions are of the number JavaScript type they are
- * converted to strings without appending any units to them.
+ * The NumMath class contains methods that implement CSS mathematic functions on the
+ * <number> CSS types.
  */
-export let Num: INumberMath = new NumberMath();
+export class NumMath extends NumberMath
+{
+    public static convertFunc( n: number) { return n.toString(); }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, NumMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, NumMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, NumMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, NumMath.convertFunc, ","); }
+
+    constructor() { super( NumMath.convertFunc) }
+}
 
 
 
@@ -459,11 +468,27 @@ export let Num: INumberMath = new NumberMath();
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The Len object contains static methods that implement CSS mathematic functions on the <length>
- * CSS type by appending a length unit suffix.
- * Integer numbers use "px"; floating point numbers use "em".
+ * The LengthMath class contains methods that implement CSS mathematic functions on the
+ * <length> CSS types.
  */
-export let Len: INumberMath = new NumberMath( ["px", "em"]);
+export class LengthMath extends NumberMath
+{
+    public static convertFunc( n: number) { return numberToCssString( n, "px", "em"); }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, LengthMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, LengthMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, LengthMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, LengthMath.convertFunc, ","); }
+
+    constructor() { super( LengthMath.convertFunc) }
+}
 
 
 
@@ -474,11 +499,27 @@ export let Len: INumberMath = new NumberMath( ["px", "em"]);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The Angle object contains static methods that implement CSS mathematic functions on the <angle>
- * CSS type by appending an angle unit suffix.
- * Integer numbers use "deg"; floating point numbers use "rad".
+ * The AngleMath class contains methods that implement CSS mathematic functions on the
+ * <angle> CSS types.
  */
-export let Angle: INumberMath = new NumberMath( ["deg", "rad"]);
+export class AngleMath extends NumberMath
+{
+    public static convertFunc( n: number) { return numberToCssString( n, "deg", "rad"); }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, AngleMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, AngleMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, AngleMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, AngleMath.convertFunc, ","); }
+
+    constructor() { super( AngleMath.convertFunc) }
+}
 
 
 
@@ -489,11 +530,27 @@ export let Angle: INumberMath = new NumberMath( ["deg", "rad"]);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The Time object contains static methods that implement CSS mathematic functions on the <time>
- * CSS type by appending a time unit suffix.
- * Integer numbers use "ms"; floating point numbers use "s".
+ * The TimeMath class contains methods that implement CSS mathematic functions on the
+ * <time> CSS types.
  */
-export let Time: INumberMath = new NumberMath( ["ms", "s"]);
+export class TimeMath extends NumberMath
+{
+    public static convertFunc( n: number) { return numberToCssString( n, "ms", "s"); }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, TimeMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, TimeMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, TimeMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, TimeMath.convertFunc, ","); }
+
+    constructor() { super( TimeMath.convertFunc) }
+}
 
 
 
@@ -504,11 +561,27 @@ export let Time: INumberMath = new NumberMath( ["ms", "s"]);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The Resolution object contains static methods that implement CSS mathematic functions on the
- * <resolution> CSS type by appending a resolution unit suffix.
- * Integer numbers use "dpi"; floating point numbers use "dpcm".
+ * The ResolutionMath class contains methods that implement CSS mathematic functions on the
+ * <resolution> CSS types.
  */
-export let Resolution: INumberMath = new NumberMath( ["dpi", "dpcm"]);
+export class ResolutionMath extends NumberMath
+{
+    public static convertFunc( n: number) { return numberToCssString( n, "dpi", "dpcm"); }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, ResolutionMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, ResolutionMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, ResolutionMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, ResolutionMath.convertFunc, ","); }
+
+    constructor() { super( ResolutionMath.convertFunc) }
+}
 
 
 
@@ -519,11 +592,27 @@ export let Resolution: INumberMath = new NumberMath( ["dpi", "dpcm"]);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The Frequency object contains static methods that implement CSS mathematic functions on the
- * <frequency> CSS type by appending a frequency unit suffix.
- * Integer numbers use "Hz"; floating point numbers use "kHz".
+ * The FrequencyMath class contains methods that implement CSS mathematic functions on the
+ * <frequence> CSS types.
  */
-export let Frequency: INumberMath = new NumberMath( ["Hz", "kHz"]);
+export class FrequencyMath extends NumberMath
+{
+    public static convertFunc( n: number) { return numberToCssString( n, "Hz", "kHz"); }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, FrequencyMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, FrequencyMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, FrequencyMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, FrequencyMath.convertFunc, ","); }
+
+    constructor() { super( FrequencyMath.convertFunc) }
+}
 
 
 
@@ -537,27 +626,29 @@ export let Frequency: INumberMath = new NumberMath( ["Hz", "kHz"]);
  * The FractionMath class contains methods that implement CSS mathematic functions on the
  * <fraction> CSS types.
  */
-class FractionMath extends NumberMath implements IFractionMath
+export class FractionMath extends NumberMath implements IFractionMath
 {
-    constructor()
-    {
-        super( ["fr", "%"])
-    }
+    public static convertFunc( n: number) { return numberToCssString( n, "fr", "fr"); }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, FractionMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, FractionMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, FractionMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, FractionMath.convertFunc, ","); }
+
+    constructor() { super( FractionMath.convertFunc) }
 
     public minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): INumberProxy
     {
         return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
     }
 }
-
-
-
-/**
- * The Fraction object contains static methods that implement CSS mathematic functions on the
- * <fraction> CSS type by appending a fraction unit suffix.
- * Integer numbers use "fr"; floating point numbers use "%".
- */
-export let Fraction: IFractionMath = new FractionMath();
 
 
 
@@ -568,11 +659,28 @@ export let Fraction: IFractionMath = new FractionMath();
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The Percent object contains static methods that implement CSS mathematic functions on the
- * <percentage> CSS type by appending a "%" unit suffix.
+ * The PercentMath class contains methods that implement CSS mathematic functions on the
+ * <percent> CSS types.
  */
-export let Percent: INumberMath = new NumberMath( (n: number) =>
-        (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%");
+export class PercentMath extends NumberMath
+{
+    public static convertFunc( n: number): string
+        { return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%"; }
+
+    public static styleToString( val: Extended<CssNumber>)
+        { return styleToString( val, PercentMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string)
+        { return multiStyleToString( val, PercentMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, PercentMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>)
+        { return multiStyleToString( val, PercentMath.convertFunc, ","); }
+
+    constructor() { super( FractionMath.convertFunc) }
+}
 
 
 
@@ -589,8 +697,8 @@ export function positionToString( val: Extended<CssPosition>): string
 {
     return valueToString( val, {
         fromNull: v => null,
-        fromNumber: Len.styleToString,
-        fromArray: v => Len.multiStyleToString( v, " ")
+        fromNumber: LengthMath.styleToString,
+        fromArray: LengthMath.multiStyleToStringWithSpace
     });
 }
 

@@ -1,11 +1,12 @@
 ﻿/**
- * This module defines types of object that represent CSS rules.
+ * This module defines types and interfaces that represent CSS rules.
  */
 
 
-import {IStyleset, Styleset, PagePseudoClass} from "../styles/StyleTypes";
-import {PseudoClass, PseudoElement, CssSelector, IAnimationNameProxy} from "../styles/StyleTypes";
-import {ICustomVar, IStringProxy} from "../styles/UtilTypes";
+import {ICustomVar} from "../styles/UtilTypes";
+import {IStyleset, Styleset} from "../styles/StyleTypes";
+import {IAnimationNameProxy} from "../styles/StyleTypes";
+import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 
 
 /** Utility type that represents all properties of type T that are of type U */
@@ -423,11 +424,6 @@ export interface IMediaRule<T = {}> extends IRuleContainer<T>, IRule
 	/** SOM media rule */
 	readonly cssMediaRule: CSSMediaRule;
 }
-
-
-
-/** Type for a single selector token that can be used as an argument to the $selector function */
-export type SelectorTokenType = ITagRule | IClassRule | IIDRule | ISelectorRule | number | string | IStringProxy;
 
 
 

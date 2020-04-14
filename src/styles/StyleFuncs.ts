@@ -1,18 +1,14 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
-import {
-    Extended, MultiCssNumber, CssNumber, MultiCssPosition
-} from "./UtilTypes";
+import {Extended, MultiCssPosition} from "./UtilTypes";
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
-    Num, Len, Angle, Time, IValueConvertOptions, positionToString, multiPositionToString
+    IValueConvertOptions, positionToString, multiPositionToString, LengthMath, TimeMath, NumMath, AngleMath
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 
 
 
 // helper functions for style property conversions
-function multiTimeToStringWithComma( val: Extended<MultiCssNumber>): string { return Time.multiStyleToString( val, ","); }
-function multiLenToStringWithSpace( val: Extended<MultiCssNumber>): string { return Len.multiStyleToString( val, " "); }
 function multiPositionToStringWithComma( val: Extended<MultiCssPosition>): string { return multiPositionToString( val, ","); }
 
 
@@ -26,10 +22,10 @@ function multiPositionToStringWithComma( val: Extended<MultiCssPosition>): strin
 function singleAnimation_fromObject( val: StyleTypes.SingleAnimation): string
 {
     return objectToCssString( val, false,
-            ["duration", Time.numberToString],
+            ["duration", TimeMath.styleToString],
             ["func", singleAnimationTimingFunction_fromStyle],
-            ["delay", Time.styleToString],
-            ["count", Num.styleToString],
+            ["delay", TimeMath.styleToString],
+            ["count", NumMath.styleToString],
             "direction",
             "mode",
             "state",
@@ -102,8 +98,8 @@ function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.Singl
 function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgroundSize>): string
 {
     return valueToString( val, {
-        fromNumber: Len.styleToString,
-        fromArray: v => Len.multiStyleToString( v, " ")
+        fromNumber: LengthMath.styleToString,
+        fromArray: LengthMath.multiStyleToStringWithSpace
     });
 }
 
@@ -115,8 +111,8 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgrou
 function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_StyleType): string
 {
     return valueToString( val, {
-        arrayItemFunc: Len.styleToString,
-        fromAny: Len.styleToString
+        arrayItemFunc: LengthMath.styleToString,
+        fromAny: LengthMath.styleToString
     });
 }
 
@@ -133,17 +129,17 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
             if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = arrayToCssString( v[0], Len.styleToString, " ");
+                let s = arrayToCssString( v[0], LengthMath.styleToString, " ");
                 s += " / ";
-                return s + arrayToCssString( v[1], Len.styleToString, " ");
+                return s + arrayToCssString( v[1], LengthMath.styleToString, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return arrayToCssString( v, Len.styleToString, " ");
+                return arrayToCssString( v, LengthMath.styleToString, " ");
             }
         },
-        fromAny: Len.styleToString
+        fromAny: LengthMath.styleToString
     });
 }
 
@@ -155,8 +151,8 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
 function borderSpacingToCssString( val: StyleTypes.BorderSpacingStyleType): string
 {
     return valueToString( val, {
-        arrayItemFunc: Len.styleToString,
-        fromAny: Len.styleToString
+        arrayItemFunc: LengthMath.styleToString,
+        fromAny: LengthMath.styleToString
     });
 }
 
@@ -189,7 +185,7 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
             else if (typeof val[0] === "object")
                 return val[0].toString();
             else if (val[0] != null)
-                s += Len.styleToString( val[0]) + " ";
+                s += LengthMath.styleToString( val[0]) + " ";
 
             if (val[1])
                 s += val[1] + " ";
@@ -199,7 +195,7 @@ function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
 
             return s;
         },
-        fromNumber: Len.styleToString,
+        fromNumber: LengthMath.styleToString,
         fromAny: colorToString
     });
 }
@@ -224,7 +220,7 @@ function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleTyp
 function clipToCssString( val: StyleTypes.ClipStyleType): string
 {
     return valueToString( val, {
-        fromArray: val => `rect(${arrayToCssString( val, Len.styleToString, " ")}`
+        fromArray: val => `rect(${arrayToCssString( val, LengthMath.styleToString, " ")}`
     });
 }
 
@@ -238,7 +234,7 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 {
     return valueToString( val, {
         fromObject: val => objectToCssString( val, false,
-            ["width", multiLenToStringWithSpace],
+            ["width", LengthMath.multiStyleToStringWithSpace],
             ["style", valueToString],
             ["color", colorToString]
         )
@@ -253,7 +249,7 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 function columnsToCssString( val: StyleTypes.ColumnsStyleType): string
 {
     return valueToString( val, {
-        fromArray: val => val[0] + " " + Len.styleToString( val[1])
+        fromArray: val => val[0] + " " + LengthMath.styleToString( val[1])
     });
 }
 
@@ -270,9 +266,9 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
             if (val.length === 2)
                 return val.join( " ");
             else
-                return val[0] + " " + val[1] + " "+ Len.styleToString( val[2]);
+                return val[0] + " " + val[1] + " "+ LengthMath.styleToString( val[2]);
         },
-        fromAny: Len.styleToString
+        fromAny: LengthMath.styleToString
     });
 }
 
@@ -284,7 +280,7 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
 function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
 {
     return valueToString( val, {
-        fromNumber: val => "oblique " + Angle.styleToString( val)
+        fromNumber: val => "oblique " + AngleMath.styleToString( val)
     });
 }
 
@@ -296,7 +292,7 @@ function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
 function textEmphasisPositionToCssString( val: StyleTypes.TextEmphasisPositionStyleType): string
 {
     return valueToString( val, {
-        fromNumber: Len.styleToString
+        fromNumber: LengthMath.styleToString
     });
 }
 
@@ -310,13 +306,13 @@ function textIndentToCssString( val: StyleTypes.TextIndentStyleType): string
     return valueToString( val, {
         fromArray: val =>
         {
-            let s = `${Len.styleToString( val[0])} ${val[1]}`;
+            let s = `${LengthMath.styleToString( val[0])} ${val[1]}`;
             if (val[2])
                 s += " " + val[2];
 
             return s;
         },
-        fromAny: Len.styleToString
+        fromAny: LengthMath.styleToString
     });
 }
 
@@ -328,8 +324,8 @@ function textIndentToCssString( val: StyleTypes.TextIndentStyleType): string
 function translateToCssString( val: StyleTypes.TranslateStyleType): string
 {
     return valueToString( val, {
-        fromArray: val => Len.multiStyleToString( val, " "),
-        fromAny: Len.styleToString
+        fromArray: LengthMath.multiStyleToStringWithSpace,
+        fromAny: LengthMath.styleToString
     });
 }
 
@@ -548,8 +544,8 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
         fromAny: singleAnimation_fromStyle
     },
 
-    animationDelay: multiTimeToStringWithComma,
-    animationDuration: multiTimeToStringWithComma,
+    animationDelay: TimeMath.multiStyleToStringWithComma,
+    animationDuration: TimeMath.multiStyleToStringWithComma,
     animationIterationCount: commaArraySeparator,
     animationFillMode: commaArraySeparator,
     animationName: commaArraySeparator,
@@ -568,180 +564,157 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     backgroundPosition: multiPositionToStringWithComma,
     backgroundRepeat: commaArraySeparator,
     backgroundSize: {
-        fromNumber: Len.styleToString,
+        fromNumber: LengthMath.styleToString,
         arrayItemFunc: singleBackgroundSize_fromStyle,
         arraySeparator: ","
     },
 
-    baselineShift: Len.styleToString,
+    baselineShift: LengthMath.styleToString,
 
     border: borderSideToCssString,
     borderBlockEnd: borderSideToCssString,
     borderBlockEndColor: colorToString,
-    borderBlockEndWidth: Len.styleToString,
+    borderBlockEndWidth: LengthMath.styleToString,
     borderBlockStart: borderSideToCssString,
     borderBlockStartColor: colorToString,
-    borderBlockStartWidth: Len.styleToString,
+    borderBlockStartWidth: LengthMath.styleToString,
     borderBottom: borderSideToCssString,
     borderBottomColor: colorToString,
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
-    borderBottomWidth: Len.styleToString,
+    borderBottomWidth: LengthMath.styleToString,
     borderColor: borderColorToCssString,
     borderImageOutset: borderImageOutsetToCssString,
-    borderImageWidth: multiLenToStringWithSpace,
+    borderImageWidth: LengthMath.multiStyleToStringWithSpace,
     borderInlineEnd: borderSideToCssString,
     borderInlineEndColor: colorToString,
-    borderInlineEndWidth: Len.styleToString,
+    borderInlineEndWidth: LengthMath.styleToString,
     borderInlineStart: borderSideToCssString,
     borderInlineStartColor: colorToString,
-    borderInlineStartWidth: Len.styleToString,
+    borderInlineStartWidth: LengthMath.styleToString,
     borderLeft: borderSideToCssString,
     borderLeftColor: colorToString,
-    borderLeftWidth: Len.styleToString,
+    borderLeftWidth: LengthMath.styleToString,
     borderRadius: borderRadiusToCssString,
     borderRight: borderSideToCssString,
     borderRightColor: colorToString,
-    borderRightWidth: Len.styleToString,
+    borderRightWidth: LengthMath.styleToString,
     borderStyle: valueToString,
     borderSpacing: borderSpacingToCssString,
     borderTop: borderSideToCssString,
     borderTopColor: colorToString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
-    borderTopWidth: Len.styleToString,
-    borderWidth: multiLenToStringWithSpace,
+    borderTopWidth: LengthMath.styleToString,
+    borderWidth: LengthMath.multiStyleToStringWithSpace,
 
-    bottom: Len.styleToString,
+    bottom: LengthMath.styleToString,
     boxShadow: valueToString,
 
     caretColor: colorToString,
     clip: clipToCssString,
     color: colorToString,
-    columnGap: Len.styleToString,
+    columnGap: LengthMath.styleToString,
     columnRule: columnRuleToCssString,
     columnRuleColor: colorToString,
     columnRuleStyle: valueToString,
-    columnRuleWidth: multiLenToStringWithSpace,
+    columnRuleWidth: LengthMath.multiStyleToStringWithSpace,
     columns: columnsToCssString,
 
     flex: flexToCssString,
     floodColor: colorToString,
-    fontSize: Len.styleToString,
+    fontSize: LengthMath.styleToString,
     fontStyle: fontStyleToCssString,
 
-    gap: multiLenToStringWithSpace,
-    gridColumnGap: Len.styleToString,
-    gridRowGap: Len.styleToString,
+    gap: LengthMath.multiStyleToStringWithSpace,
+    gridColumnGap: LengthMath.styleToString,
+    gridRowGap: LengthMath.styleToString,
 
-    height: Len.styleToString,
+    height: LengthMath.styleToString,
 
-    inlineSize: Len.styleToString,
+    inlineSize: LengthMath.styleToString,
 
-    left: Len.styleToString,
-    letterSpacing: Len.styleToString,
+    left: LengthMath.styleToString,
+    letterSpacing: LengthMath.styleToString,
     lightingColor: colorToString,
 
-    margin: multiLenToStringWithSpace,
-    marginBlockEnd: Len.styleToString,
-    marginBlockStart: Len.styleToString,
-    marginBottom: Len.styleToString,
-    marginInlineEnd: Len.styleToString,
-    marginInlineStart: Len.styleToString,
-    marginLeft: Len.styleToString,
-    marginRight: Len.styleToString,
-    marginTop: Len.styleToString,
-    maxBlockSize: Len.styleToString,
-    maxHeight: Len.styleToString,
-    maxInlineSize: Len.styleToString,
-    maxWidth: Len.styleToString,
-    maxZoom: Len.styleToString,
-    minBlockSize: Len.styleToString,
-    minHeight: Len.styleToString,
-    minInlineSize: Len.styleToString,
-	minWidth: Len.styleToString,
-    minZoom: Len.styleToString,
+    margin: LengthMath.multiStyleToStringWithSpace,
+    marginBlockEnd: LengthMath.styleToString,
+    marginBlockStart: LengthMath.styleToString,
+    marginBottom: LengthMath.styleToString,
+    marginInlineEnd: LengthMath.styleToString,
+    marginInlineStart: LengthMath.styleToString,
+    marginLeft: LengthMath.styleToString,
+    marginRight: LengthMath.styleToString,
+    marginTop: LengthMath.styleToString,
+    maxBlockSize: LengthMath.styleToString,
+    maxHeight: LengthMath.styleToString,
+    maxInlineSize: LengthMath.styleToString,
+    maxWidth: LengthMath.styleToString,
+    maxZoom: LengthMath.styleToString,
+    minBlockSize: LengthMath.styleToString,
+    minHeight: LengthMath.styleToString,
+    minInlineSize: LengthMath.styleToString,
+	minWidth: LengthMath.styleToString,
+    minZoom: LengthMath.styleToString,
 
     objectPosition: positionToString,
     outlineColor: colorToString,
-    outlineOffset: Len.styleToString,
+    outlineOffset: LengthMath.styleToString,
     outlineStyle: valueToString,
 
-    padding: multiLenToStringWithSpace,
-    paddingBlockEnd: Len.styleToString,
-    paddingBlockStart: Len.styleToString,
-    paddingBottom: Len.styleToString,
-    paddingInlineEnd: Len.styleToString,
-    paddingInlineStart: Len.styleToString,
-    paddingLeft: Len.styleToString,
-    paddingRight: Len.styleToString,
-    paddingTop: Len.styleToString,
-    perspective: Len.styleToString,
+    padding: LengthMath.multiStyleToStringWithSpace,
+    paddingBlockEnd: LengthMath.styleToString,
+    paddingBlockStart: LengthMath.styleToString,
+    paddingBottom: LengthMath.styleToString,
+    paddingInlineEnd: LengthMath.styleToString,
+    paddingInlineStart: LengthMath.styleToString,
+    paddingLeft: LengthMath.styleToString,
+    paddingRight: LengthMath.styleToString,
+    paddingTop: LengthMath.styleToString,
+    perspective: LengthMath.styleToString,
     perspectiveOrigin: positionToString,
 
-    right: Len.styleToString,
-    rowGap: Len.styleToString,
+    right: LengthMath.styleToString,
+    rowGap: LengthMath.styleToString,
 
-    scrollMargin: multiLenToStringWithSpace,
-    scrollMarginBlock: multiLenToStringWithSpace,
-    scrollMarginBlockEnd: Len.styleToString,
-    scrollMarginBlockStart: Len.styleToString,
-    scrollMarginBottom: Len.styleToString,
-    scrollMarginInline: multiLenToStringWithSpace,
-    scrollMarginInlineEnd: Len.styleToString,
-    scrollMarginInlineStart: Len.styleToString,
-    scrollMarginLeft: Len.styleToString,
-    scrollMarginRight: Len.styleToString,
-    scrollMarginTop: Len.styleToString,
-    scrollPadding: multiLenToStringWithSpace,
-    scrollPaddingBlock: multiLenToStringWithSpace,
-    scrollPaddingBlockEnd: Len.styleToString,
-    scrollPaddingBlockStart: Len.styleToString,
-    scrollPaddingBottom: Len.styleToString,
-    scrollPaddingInline: multiLenToStringWithSpace,
-    scrollPaddingInlineEnd: Len.styleToString,
-    scrollPaddingInlineStart: Len.styleToString,
-    scrollPaddingLeft: Len.styleToString,
-    scrollPaddingRight: Len.styleToString,
-    scrollPaddingTop: Len.styleToString,
+    scrollMargin: LengthMath.multiStyleToStringWithSpace,
+    scrollMarginBlock: LengthMath.multiStyleToStringWithSpace,
+    scrollMarginBlockEnd: LengthMath.styleToString,
+    scrollMarginBlockStart: LengthMath.styleToString,
+    scrollMarginBottom: LengthMath.styleToString,
+    scrollMarginInline: LengthMath.multiStyleToStringWithSpace,
+    scrollMarginInlineEnd: LengthMath.styleToString,
+    scrollMarginInlineStart: LengthMath.styleToString,
+    scrollMarginLeft: LengthMath.styleToString,
+    scrollMarginRight: LengthMath.styleToString,
+    scrollMarginTop: LengthMath.styleToString,
+    scrollPadding: LengthMath.multiStyleToStringWithSpace,
+    scrollPaddingBlock: LengthMath.multiStyleToStringWithSpace,
+    scrollPaddingBlockEnd: LengthMath.styleToString,
+    scrollPaddingBlockStart: LengthMath.styleToString,
+    scrollPaddingBottom: LengthMath.styleToString,
+    scrollPaddingInline: LengthMath.multiStyleToStringWithSpace,
+    scrollPaddingInlineEnd: LengthMath.styleToString,
+    scrollPaddingInlineStart: LengthMath.styleToString,
+    scrollPaddingLeft: LengthMath.styleToString,
+    scrollPaddingRight: LengthMath.styleToString,
+    scrollPaddingTop: LengthMath.styleToString,
     stopColor: colorToString,
 
-    tabSize: Len.styleToString,
+    tabSize: LengthMath.styleToString,
     textDecorationColor: colorToString,
-    textDecorationThickness: Len.styleToString,
+    textDecorationThickness: LengthMath.styleToString,
     textEmphasisColor: colorToString,
     textEmphasisPosition: textEmphasisPositionToCssString,
     textIndent: textIndentToCssString,
-    top: Len.styleToString,
+    top: LengthMath.styleToString,
     translate: translateToCssString,
 
-    width: Len.styleToString,
+    width: LengthMath.styleToString,
 
-    zoom: Len.styleToString,
+    zoom: LengthMath.styleToString,
 };
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// CSS selector.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Converts the selector object into full selector string.
- */
-export function selectorToCssString( selector: StyleTypes.CssSelector): string
-{
-	if (!selector)
-		return "";
-	else if (typeof selector === "string")
-		return selector;
-	else if (typeof selector.valueToString === "function")
-		return selector.valueToString();
-	else
-		return selector.toString();
-}
 
 
 

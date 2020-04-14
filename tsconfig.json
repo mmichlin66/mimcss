@@ -6,8 +6,8 @@
 		"noImplicitAny": false,
 		"strictNullChecks": false,
 		"module": "commonjs",
-		"target": "es6",
-		"lib": [ "es6", "dom" ],
+		"target": "ES2017",
+		"lib": [ "ES2017", "dom" ],
 		"experimentalDecorators": true,
 		"jsx": "react",
 		"preserveConstEnums": false

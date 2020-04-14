@@ -8,7 +8,7 @@ import {CssColor} from "./ColorTypes";
 
 /**
  * The IImageProxy interface represents an invocation of one of CSS functions that are used for
- * secifying images. This interface is returned from functions like: linearGradient, paint(),
+ * secifying images. This interface is returned from functions like: linearGradient(), paint(),
  * element(), etc.
  */
 export interface IImageProxy extends IValueProxy

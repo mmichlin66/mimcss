@@ -25,7 +25,7 @@ class Stylesheet<T extends {} = {}> extends RuleContainer<T> implements IStylesh
 		// part of the derived class.
 		let baseClass = this.definitionClass;
 		while( (baseClass = Object.getPrototypeOf( baseClass)) !== Function.prototype)
-			$use( baseClass);
+			use( baseClass);
 
 		this.processStylesheet();
 	}
@@ -249,27 +249,12 @@ function findNameForRuleInPrototypeChain( definitionClass: IStylesheetClass, rul
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
- * will be created by appending a unique number to the given prefix. If the prefix is not
- * specified, the standard prefix "n" will be used.
- * @param optimize
- * @param prefix
- */
-export function useOptimizedStyleNames( optimize: boolean, prefix?: string): void
-{
-	useUniqueStyleNames = optimize;
-	uniqueStyleNamesPrefix = prefix ? prefix : "n";
-}
-
-
-
-/**
  * Processes the given stylesheet definition and returns the Stylesheet object that contains
  * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
  * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T extends {}>( stylesheetDefinitionClass: IStylesheetClass<T>): IStylesheet<T>
+export function use<T extends {}>( stylesheetDefinitionClass: IStylesheetClass<T>): IStylesheet<T>
 {
 	// if the stylesheet definition is multiplex, create new Stylesheet object every time;
 	// otherwise, check whether the style sheet definition object has already been processed. This
@@ -298,7 +283,7 @@ export function $use<T extends {}>( stylesheetDefinitionClass: IStylesheetClass<
  * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
  * up to 1.
  */
-export function $activate<T extends {}>( stylesheetOrDefinition: IStylesheet<T> | IStylesheetClass<T>): IStylesheet<T>
+export function activate<T extends {}>( stylesheetOrDefinition: IStylesheet<T> | IStylesheetClass<T>): IStylesheet<T>
 {
 	if (!stylesheetOrDefinition)
 		return null;
@@ -310,7 +295,7 @@ export function $activate<T extends {}>( stylesheetOrDefinition: IStylesheet<T> 
 	}
 	else
 	{
-		let stylesheet = $use( stylesheetOrDefinition as IStylesheetClass<T>);
+		let stylesheet = use( stylesheetOrDefinition as IStylesheetClass<T>);
 		(stylesheet as Stylesheet<T>).activate();
 		return stylesheet;
 	}
@@ -323,10 +308,25 @@ export function $activate<T extends {}>( stylesheetOrDefinition: IStylesheet<T> 
  * object maintains a reference counter of how many times it was activated and deactivated. The
  * rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function $deactivate( stylesheet: IStylesheet): void
+export function deactivate( stylesheet: IStylesheet): void
 {
 	if (stylesheet)
 		(stylesheet as Stylesheet).deactivate();
+}
+
+
+
+/**
+ * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
+ * will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix "n" will be used.
+ * @param enable
+ * @param prefix
+ */
+export function enableOptimizedStyleNames( enable: boolean, prefix?: string): void
+{
+	useUniqueStyleNames = enable;
+	uniqueStyleNamesPrefix = prefix ? prefix : "n";
 }
 
 

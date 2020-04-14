@@ -1,7 +1,9 @@
 import {IStyleRule, ExtendedStyleset, RuleType, IVarRule} from "./RuleTypes";
-import {IStyleset, Styleset, CssSelector} from "../styles/StyleTypes"
+import {IStyleset, Styleset} from "../styles/StyleTypes"
+import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, IRuleContainerOwner} from "./Rule";
-import {mergeStylesets, stylesetToCssString, stylePropToCssString, selectorToCssString} from "../styles/StyleFuncs"
+import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
+import {selectorToCssString} from "../styles/SelectorFuncs"
 
 
 
