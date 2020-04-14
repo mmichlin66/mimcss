@@ -8,6 +8,6 @@ export * from "./styles/SelectorTypes";
 export * from "./styles/MediaTypes";
 export * from "./styles/FontFaceTypes";
 export * from "./rules/RuleTypes";
-export * from "./api/sh";
-export * from "./api/rules";
 export * from "./api/utils";
+export * from "./api/rules";
+export * from "./api/sh";

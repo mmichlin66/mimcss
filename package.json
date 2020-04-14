@@ -1,6 +1,6 @@
 {
 	"name": "mimcss",
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"description": "Authoring CSS in TypeScript",
 	"homepage": "https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html",
 	"repository": "github:mmichlin66/mimcss",
@@ -36,15 +36,15 @@
 		"lib/mimcss.js.map",
 		"lib/mimcssTypes.d.ts",
 		"lib/styles/UtilTypes.d.ts",
-		"lib/styles/UtilFuncs.d.ts",
 		"lib/styles/ColorTypes.d.ts",
-		"lib/styles/ColorFuncs.d.ts",
+		"lib/styles/ImageTypes.d.ts",
 		"lib/styles/StyleTypes.d.ts",
+		"lib/styles/SelectorTypes.d.ts",
 		"lib/styles/MediaTypes.d.ts",
 		"lib/styles/FontFaceTypes.d.ts",
-		"lib/styles/sh.d.ts",
 		"lib/rules/RuleTypes.d.ts",
-		"lib/rules/RuleFuncs.d.ts",
-		"lib/rules/Stylesheet.d.ts"
+		"lib/api/utils.d.ts",
+		"lib/api/rules.d.ts"
+		"lib/api/sh.d.ts",
 	]
 }
