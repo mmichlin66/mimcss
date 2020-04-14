@@ -44,7 +44,7 @@
 		"lib/styles/FontFaceTypes.d.ts",
 		"lib/rules/RuleTypes.d.ts",
 		"lib/api/utils.d.ts",
-		"lib/api/rules.d.ts"
-		"lib/api/sh.d.ts",
+		"lib/api/rules.d.ts",
+		"lib/api/sh.d.ts"
 	]
 }
