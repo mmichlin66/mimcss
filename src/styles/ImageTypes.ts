@@ -81,3 +81,10 @@ export type RadialGradientExtent = Extended<"closest-corner" | "closest-side" | 
 
 
 
+/**
+ * Type representing parameters for the `cross-fade()` CSS function.
+ */
+export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<CssNumber>];
+
+
+

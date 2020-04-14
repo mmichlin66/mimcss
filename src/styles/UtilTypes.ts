@@ -247,9 +247,12 @@ export type HorizontalKeyword = "left" | "center" | "right";
 /** Type describing the horizontal position */
 export type VerticalKeyword = "top" | "center" | "bottom";
 
-/** Type describing the `<position>` CSS type */
-export type CssPosition = HorizontalKeyword | VerticalKeyword | Extended<CssNumber> |
-    [HorizontalKeyword | Extended<CssNumber>, VerticalKeyword | Extended<CssNumber>] | 
+/** Type describing a simple 1 or two values `<position>` CSS type */
+export type SimpleCssPosition = HorizontalKeyword | VerticalKeyword | Extended<CssNumber> |
+    [HorizontalKeyword | Extended<CssNumber>, VerticalKeyword | Extended<CssNumber>];
+
+/** Type describing the full up to 4 values `<position>` CSS type */
+export type CssPosition = SimpleCssPosition | 
     [HorizontalKeyword, Extended<CssNumber>, VerticalKeyword] |
     [HorizontalKeyword, VerticalKeyword, Extended<CssNumber>] |
     [HorizontalKeyword, Extended<CssNumber>, VerticalKeyword, Extended<CssNumber>];

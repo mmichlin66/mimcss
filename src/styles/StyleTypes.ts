@@ -162,7 +162,7 @@ export type BackgroundClipStyleType = OneOrMany<SingleBackgroundClip>;
 
 
 /** Type for background-image style property */
-export type BackgroundImageStyleType = "none" | CssImage;
+export type BackgroundImageStyleType = "none" | OneOrMany<CssImage>;
 
 
 

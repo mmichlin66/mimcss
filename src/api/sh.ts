@@ -1,5 +1,5 @@
 ﻿import {
-    IStringProxy, Extended, CssNumber, IUrlProxy, CssPosition
+    IStringProxy, Extended, CssNumber, IUrlProxy, CssPosition, SimpleCssPosition
 } from "../styles/UtilTypes"
 import {StringProxy, valueToString} from "../styles/UtilFuncs"
 import {IStyleset} from "../styles/StyleTypes"
@@ -164,41 +164,58 @@ export class sh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Creates an IImageProxy object representing the CSS `linear-gradient()` function.
+     * Creates an IImageProxy object representing the `linear-gradient()` CSS function.
      */
-    public static linearGradient( angle: ImageTypes.LinearGradAngle,
+    public static linearGradient( angle?: ImageTypes.LinearGradAngle,
         ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
     {
         return new ImageFuncs.LinearGradientProxy( "linear-gradient", angle, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the CSS `repeating-linear-gradient()` function.
+     * Creates an IImageProxy object representing the `repeating-linear-gradient()` CSS function.
      */
-    public static repeatingLinearGradient( angle: ImageTypes.LinearGradAngle = "to bottom",
+    public static repeatingLinearGradient( angle?: ImageTypes.LinearGradAngle,
         ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
     {
         return new ImageFuncs.LinearGradientProxy( "repeating-linear-gradient", angle, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the CSS `radial-gradient()` function.
+     * Creates an IImageProxy object representing the `radial-gradient()` CSS function.
      */
-    public static radialGradient( shape: ImageTypes.RadialGradientShape,
-        extent: ImageTypes.RadialGradientExtent, pos: CssPosition,
+    public static radialGradient( shape?: ImageTypes.RadialGradientShape,
+        extent?: ImageTypes.RadialGradientExtent, pos?: CssPosition,
         ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
     {
         return new ImageFuncs.RadialGradientProxy( "radial-gradient", shape, extent, pos, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the CSS `repeating-radial-gradient()` function.
+     * Creates an IImageProxy object representing the `repeating-radial-gradient()` CSS function.
      */
-    public static repeatingRadialGradient( shape: ImageTypes.RadialGradientShape,
-        extent: ImageTypes.RadialGradientExtent, pos: CssPosition,
+    public static repeatingRadialGradient( shape?: ImageTypes.RadialGradientShape,
+        extent?: ImageTypes.RadialGradientExtent, pos?: CssPosition,
         ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
     {
         return new ImageFuncs.RadialGradientProxy( "repeating-radial-gradient", shape, extent, pos, stopsOrHints);
+    }
+
+    /**
+     * Creates an IImageProxy object representing the`conic-gradient()`  CSS function.
+     */
+    public static conicGradient( angle?: Extended<CssNumber>, pos?: SimpleCssPosition,
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+    {
+        return new ImageFuncs.ConicGradientProxy( angle, pos, stopsOrHints);
+    }
+
+    /**
+     * Creates an IImageProxy object representing the `cross-fade()` CSS function.
+     */
+    public static crossFade( ...args: ImageTypes.CrossFadeParam[]): ImageTypes.IImageProxy
+    {
+        return new ImageFuncs.CrossFadeProxy( args);
     }
 
 
