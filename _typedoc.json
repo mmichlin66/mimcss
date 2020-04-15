@@ -1,0 +1,20 @@
+{
+	"mode": "file",
+	"readme": "none",
+	"excludeExternals": true,
+	"excludeNotExported": true,
+	"excludePrivate": true,
+	"out": "./reference",
+	"inputFiles": [
+		"./src/api",
+		"./src/styles/UtilTypes.ts",
+		"./src/styles/ColorTypes.ts",
+		"./src/styles/ImageTypes.ts",
+		"./src/styles/StyleTypes.ts",
+		"./src/styles/SelectorTypes.ts",
+		"./src/styles/MediaTypes.ts",
+		"./src/styles/FontFaceTypes.ts",
+		"./src/rules/RuleTypes.ts",
+		"./src/styles/SelectorTypes.ts"
+	]
+}
