@@ -146,69 +146,27 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
 
 
 /**
- * Converts border spacing style value to the CSS string.
- */
-function borderSpacingToCssString( val: StyleTypes.BorderSpacingStyleType): string
-{
-    return valueToString( val, {
-        arrayItemFunc: LengthMath.styleToString,
-        fromAny: LengthMath.styleToString
-    });
-}
-
-
-
-/**
- * Converts border color style value to the CSS string.
- */
-function borderColorToCssString( val: StyleTypes.BorderColorStyleType): string
-{
-    return valueToString( val, {
-        arrayItemFunc: colorToString,
-        fromAny: colorToString
-    });
-}
-
-
-
-/**
  * Converts border side style value to the CSS string.
  */
-function borderSideToCssString( val: StyleTypes.BorderSide_StyleType): string
+function borderToString( val: StyleTypes.BorderStyleType): string
 {
     return valueToString( val, {
-        fromArray: val =>
-        {
-            let s = "";
-            if (typeof val[0] === "string")
-                return val[0];
-            else if (typeof val[0] === "object")
-                return val[0].toString();
-            else if (val[0] != null)
-                s += LengthMath.styleToString( val[0]) + " ";
-
-            if (val[1])
-                s += val[1] + " ";
-
-            if (val[2])
-                s += colorToString( val[2]) + " ";
-
-            return s;
-        },
         fromNumber: LengthMath.styleToString,
+        fromArray: v =>
+        {
+            let buf: string[] = [];
+            if (v[0] != null)
+                buf.push( LengthMath.styleToString( v[0]))
+
+            if (v[1] != null)
+                buf.push( valueToString(v[1]));
+
+            if (v[2] != null)
+                buf.push( colorToString(v[2]));
+
+            return buf.join(" ");
+        },
         fromAny: colorToString
-    });
-}
-
-
-
-/**
- * Converts border-image-outset style value to the CSS string.
- */
-function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleType): string
-{
-    return valueToString( val, {
-        arrayItemFunc: borderImageOutsetToCssString
     });
 }
 
@@ -220,7 +178,7 @@ function borderImageOutsetToCssString( val: StyleTypes.BorderImageOutsetStyleTyp
 function clipToCssString( val: StyleTypes.ClipStyleType): string
 {
     return valueToString( val, {
-        fromArray: val => `rect(${arrayToCssString( val, LengthMath.styleToString, " ")}`
+        fromArray: v => `rect(${LengthMath.multiStyleToStringWithSpace(v)}`
     });
 }
 
@@ -571,37 +529,41 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
 
     baselineShift: LengthMath.styleToString,
 
-    border: borderSideToCssString,
-    borderBlockEnd: borderSideToCssString,
+    border: borderToString,
+    borderBlockEnd: borderToString,
     borderBlockEndColor: colorToString,
     borderBlockEndWidth: LengthMath.styleToString,
-    borderBlockStart: borderSideToCssString,
+    borderBlockStart: borderToString,
     borderBlockStartColor: colorToString,
     borderBlockStartWidth: LengthMath.styleToString,
-    borderBottom: borderSideToCssString,
+    borderBottom: borderToString,
     borderBottomColor: colorToString,
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
     borderBottomWidth: LengthMath.styleToString,
-    borderColor: borderColorToCssString,
-    borderImageOutset: borderImageOutsetToCssString,
+
+    borderColor: {
+        arrayItemFunc: colorToString,
+        fromAny: colorToString
+    },
+
     borderImageWidth: LengthMath.multiStyleToStringWithSpace,
-    borderInlineEnd: borderSideToCssString,
+    borderInlineEnd: borderToString,
     borderInlineEndColor: colorToString,
     borderInlineEndWidth: LengthMath.styleToString,
-    borderInlineStart: borderSideToCssString,
+    borderInlineStart: borderToString,
     borderInlineStartColor: colorToString,
     borderInlineStartWidth: LengthMath.styleToString,
-    borderLeft: borderSideToCssString,
+    borderLeft: borderToString,
     borderLeftColor: colorToString,
     borderLeftWidth: LengthMath.styleToString,
     borderRadius: borderRadiusToCssString,
-    borderRight: borderSideToCssString,
+    borderRight: borderToString,
     borderRightColor: colorToString,
     borderRightWidth: LengthMath.styleToString,
     borderStyle: valueToString,
-    borderSpacing: borderSpacingToCssString,
-    borderTop: borderSideToCssString,
+    borderSpacing: LengthMath.multiStyleToStringWithSpace,
+    borderTop: borderToString,
     borderTopColor: colorToString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,

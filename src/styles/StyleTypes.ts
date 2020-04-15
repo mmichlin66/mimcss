@@ -220,23 +220,23 @@ export type BorderRadiusStyleType = OneOrPair<NumberBox>;
 
 
 /** Type for single border side style property */
-export type BorderSideStyle_StyleType = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
+export type BorderStyleKeyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
     "groove" | "ridge" | "inset" | "outset";
 
 
 
 /** Type for border-style style property */
-export type BorderStyleStyleType = OneOrBox<BorderSideStyle_StyleType>;
+export type BorderStyleStyleType = OneOrBox<BorderStyleKeyword>;
 
 
 
 /** Type for border side width style property */
-export type BorderSideLength_StyleType = "thin" | "medium" | "thick" | CssNumber;
+export type BorderSideLengthStyleType = "thin" | "medium" | "thick" | CssNumber;
 
 
 
 /** Type for border-width style property */
-export type BorderLengthStyleType = NumberBox;
+export type BorderLengthStyleType = OneOrBox<BorderSideLengthStyleType>;
 
 
 
@@ -256,13 +256,13 @@ export type BorderColorStyleType = OneOrBox<CssColor>;
 
 
 /** Type for border side style property */
-export type BorderSide_StyleType = CssNumber |  BorderSideStyle_StyleType | CssColor |
-    [Extended<CssNumber>?, Extended<BorderSideStyle_StyleType>?, Extended<CssColor>?];
+export type BorderStyleType = CssNumber | BorderStyleKeyword | CssColor |
+    [Extended<CssNumber>?, Extended<BorderStyleKeyword>?, Extended<CssColor>?];
 
 
 
 /** Type for border-image-outset style property */
-export type BorderImageOutsetStyleType = OneOrBox<string | number>;
+export type BorderImageOutsetStyleType = OneOrBox<CssNumber>;
 
 
 
@@ -803,22 +803,22 @@ export interface ICssStyleset
     backgroundRepeatY?: DefaultStyleType;
     backgroundSize?: BackgroundSizeStyleType;
     baselineShift?: BaselineShiftStyleType;
-    blockSize?: DefaultStyleType;
-    border?: BorderSide_StyleType;
-    borderBlockEnd?: BorderSide_StyleType;
+    blockSize?: CssNumber;
+    border?: BorderStyleType;
+    borderBlockEnd?: BorderStyleType;
     borderBlockEndColor?: CssColor;
-    borderBlockEndStyle?: BorderSideStyle_StyleType;
-    borderBlockEndWidth?: BorderSideLength_StyleType;
-    borderBlockStart?: BorderSide_StyleType;
+    borderBlockEndStyle?: BorderStyleKeyword;
+    borderBlockEndWidth?: BorderSideLengthStyleType;
+    borderBlockStart?: BorderStyleType;
     borderBlockStartColor?: CssColor;
-    borderBlockStartStyle?: BorderSideStyle_StyleType;
-    borderBlockStartWidth?: BorderSideLength_StyleType;
-    borderBottom?: BorderSide_StyleType;
+    borderBlockStartStyle?: BorderStyleKeyword;
+    borderBlockStartWidth?: BorderSideLengthStyleType;
+    borderBottom?: BorderStyleType;
     borderBottomColor?: CssColor;
     borderBottomLeftRadius?: SingleCornerRadius_StyleType;
     borderBottomRightRadius?: SingleCornerRadius_StyleType;
-    borderBottomStyle?: BorderSideStyle_StyleType;
-    borderBottomWidth?: BorderSideLength_StyleType;
+    borderBottomStyle?: BorderStyleKeyword;
+    borderBottomWidth?: BorderSideLengthStyleType;
     borderCollapse?: BorderColapseStyleType;
     borderColor?: BorderColorStyleType;
     borderImage?: DefaultStyleType;
@@ -827,32 +827,32 @@ export interface ICssStyleset
     borderImageSlice?: DefaultStyleType;
     borderImageSource?: DefaultStyleType;
     borderImageWidth?: NumberBox;
-    borderInlineEnd?: BorderSide_StyleType;
+    borderInlineEnd?: BorderStyleType;
     borderInlineEndColor?: CssColor;
-    borderInlineEndStyle?: BorderSideStyle_StyleType;
-    borderInlineEndWidth?: BorderSideLength_StyleType;
-    borderInlineStart?: BorderSide_StyleType;
+    borderInlineEndStyle?: BorderStyleKeyword;
+    borderInlineEndWidth?: BorderSideLengthStyleType;
+    borderInlineStart?: BorderStyleType;
     borderInlineStartColor?: CssColor;
-    borderInlineStartStyle?: BorderSideStyle_StyleType;
-    borderInlineStartWidth?: BorderSideLength_StyleType;
-    borderLeft?: BorderSide_StyleType;
+    borderInlineStartStyle?: BorderStyleKeyword;
+    borderInlineStartWidth?: BorderSideLengthStyleType;
+    borderLeft?: BorderStyleType;
     borderLeftColor?: CssColor;
-    borderLeftStyle?: BorderSideStyle_StyleType;
-    borderLeftWidth?: BorderSideLength_StyleType;
+    borderLeftStyle?: BorderStyleKeyword;
+    borderLeftWidth?: BorderSideLengthStyleType;
     borderRadius?: BorderRadiusStyleType;
     bufferedRendering?: DefaultStyleType;
-    borderRight?: BorderSide_StyleType;
+    borderRight?: BorderStyleType;
     borderRightColor?: CssColor;
-    borderRightStyle?: BorderSideStyle_StyleType;
-    borderRightWidth?: BorderSideLength_StyleType;
+    borderRightStyle?: BorderStyleKeyword;
+    borderRightWidth?: BorderSideLengthStyleType;
     borderSpacing?: BorderSpacingStyleType;
     borderStyle?: BorderStyleStyleType;
-    borderTop?: BorderSide_StyleType;
+    borderTop?: BorderStyleType;
     borderTopColor?: CssColor;
     borderTopLeftRadius?: SingleCornerRadius_StyleType;
     borderTopRightRadius?: SingleCornerRadius_StyleType;
-    borderTopStyle?: BorderSideStyle_StyleType;
-    borderTopWidth?: BorderSideLength_StyleType;
+    borderTopStyle?: BorderStyleKeyword;
+    borderTopWidth?: BorderSideLengthStyleType;
     borderWidth?: BorderLengthStyleType;
     bottom?: CssNumber;
     boxShadow?: BoxShadowStyleType;
@@ -875,8 +875,8 @@ export interface ICssStyleset
     columnGap?: "normal" | SingleGapStyleType;
     columnRule?: ColumnRuleStyleType;
     columnRuleColor?: CssColor;
-    columnRuleStyle?: BorderSideStyle_StyleType;
-    columnRuleWidth?: BorderSideLength_StyleType;
+    columnRuleStyle?: BorderStyleKeyword;
+    columnRuleWidth?: BorderSideLengthStyleType;
     columnSpan?: ColumnSpanStyleType;
     columnWidth?: CssNumber;
     columns?: ColumnsStyleType;
@@ -1058,11 +1058,11 @@ export interface ICssStyleset
     order?: CssNumber;
     orientation?: DefaultStyleType;
     orphans?: CssNumber;
-    outline?: BorderSide_StyleType;
+    outline?: BorderStyleType;
     outlineColor?: CssColor;
     outlineOffset?: CssNumber;
     outlineStyle?: BorderStyleStyleType;
-    outlineWidth?: BorderSideLength_StyleType;
+    outlineWidth?: BorderSideLengthStyleType;
     overflow?: OverflowStyleType;
     overflowAnchor?: OverflowAnchorStyleType;
     overflowWrap?: OverflowWrapStyleType;
