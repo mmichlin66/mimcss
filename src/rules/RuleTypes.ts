@@ -3,8 +3,8 @@
  */
 
 
-import {ICustomVar} from "../styles/UtilTypes";
-import {IStyleset, Styleset} from "../styles/StyleTypes";
+import {IVarProxy} from "../styles/UtilTypes";
+import {IStyleset, Styleset, ICssStyleset} from "../styles/StyleTypes";
 import {IAnimationNameProxy} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 
@@ -301,7 +301,7 @@ export interface IPageRule extends IStyleRule
 /**
  * The IVarRule interface represents a CSS custom property definition.
  */
-export interface IVarRule<K extends keyof IStyleset = any> extends INamedEntity, ICustomVar<IStyleset[K]>
+export interface IVarRule<K extends keyof ICssStyleset = any> extends INamedEntity, IVarProxy<ICssStyleset[K]>
 {
 	/**
 	 * Name of the property on the rule definition object to which this rule is assigned.

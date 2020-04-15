@@ -70,14 +70,17 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | IStrin
 
 
 /**
- * The ICustomVar interface represents a CSS custom property object with values of the given type.
+ * The IVarProxy interface represents a CSS custom property object with values of the given type.
  * we need this interface because every style property can accept value in the form of var()
  * CSS function.
  */
-export interface ICustomVar<T = any> extends IValueProxy
+export interface IVarProxy<T = any> extends IValueProxy
 {
-    // Type of the internally held value.
-    value: T;
+    /**
+     * Returns true - this is only needed to indicate that this object implements the IVarProxy
+     * interface for the given type
+     */
+    isVarProxy( o: T): boolean;
 }
 
 
@@ -86,9 +89,9 @@ export interface ICustomVar<T = any> extends IValueProxy
  * Type that extends the given type with the following types:
  * - basic style values that are valid for all style properties.
  * - IStringProxy type that allows specifying raw string value.
- * - ICustomVar object that allows using a CSS custom property.
+ * - IVarProxy object that allows using a CSS custom property.
  */
-export type Extended<T> = T | Base_StyleType | ICustomVar<Extended<T>>;
+export type Extended<T> = T | Base_StyleType | IVarProxy<T>;
 
 
 

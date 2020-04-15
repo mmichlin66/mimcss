@@ -5,7 +5,7 @@
 
 import * as RuleTypes from "../rules/RuleTypes";
 import * as StylesheetFuncs from "../rules/Stylesheet"
-import {IStyleset, SupportsQuery, Styleset} from "../styles/StyleTypes";
+import {IStyleset, SupportsQuery, Styleset, ICssStyleset} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass, SelectorTokenType} from "../styles/SelectorTypes";
 import {SelectorProxy} from "../styles/SelectorFuncs";
 import {MediaQuery} from "../styles/MediaTypes"
@@ -79,10 +79,11 @@ export function $keyframes( frames?: RuleTypes.AnimationFrame[], nameOverride?: 
  * Creates new custom variable object that defines a custom CSS property. The variable name will
  * be created when the rule is processed as part of the style definition class. The name can be
  * also overridden by providing either an explicit name or another custom variable rule. The
- * function can be called without parameters just to "declare" the variable. Such variable can be
- * later used either in conditional grouping rules or in derived style definition classes.
+ * function can be called without specifying the value just to "declare" the variable. Such
+ * variable can be later used either in conditional grouping rules or in derived style definition
+ * classes.
  */
-export function $var<K extends keyof IStyleset>( template: K, propVal?: IStyleset[K],
+export function $var<K extends keyof ICssStyleset>( template: K, propVal?: IStyleset[K],
 				nameOverride?: string | RuleTypes.IVarRule<K>): RuleTypes.IVarRule<K>
 	{ return new VarRule( template, propVal, nameOverride); }
 
