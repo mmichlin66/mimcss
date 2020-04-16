@@ -2,7 +2,7 @@
 import {IStyleset} from "./StyleTypes"
 import {Extended, MultiCssPosition} from "./UtilTypes";
 import {camelToDash, valueToString, arrayToCssString, objectToCssString,
-    IValueConvertOptions, positionToString, multiPositionToString, LengthMath, TimeMath, NumMath, AngleMath
+    IValueConvertOptions, positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath, CssAngleMath
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 
@@ -22,10 +22,10 @@ function multiPositionToStringWithComma( val: Extended<MultiCssPosition>): strin
 function singleAnimation_fromObject( val: StyleTypes.SingleAnimation): string
 {
     return objectToCssString( val, false,
-            ["duration", TimeMath.styleToString],
+            ["duration", CssTimeMath.styleToString],
             ["func", singleAnimationTimingFunction_fromStyle],
-            ["delay", TimeMath.styleToString],
-            ["count", NumMath.styleToString],
+            ["delay", CssTimeMath.styleToString],
+            ["count", CssNumberMath.styleToString],
             "direction",
             "mode",
             "state",
@@ -98,8 +98,8 @@ function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.Singl
 function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgroundSize>): string
 {
     return valueToString( val, {
-        fromNumber: LengthMath.styleToString,
-        fromArray: LengthMath.multiStyleToStringWithSpace
+        fromNumber: CssLengthMath.styleToString,
+        fromArray: CssLengthMath.multiStyleToStringWithSpace
     });
 }
 
@@ -111,8 +111,8 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgrou
 function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_StyleType): string
 {
     return valueToString( val, {
-        arrayItemFunc: LengthMath.styleToString,
-        fromAny: LengthMath.styleToString
+        arrayItemFunc: CssLengthMath.styleToString,
+        fromAny: CssLengthMath.styleToString
     });
 }
 
@@ -129,17 +129,17 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
             if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = arrayToCssString( v[0], LengthMath.styleToString, " ");
+                let s = arrayToCssString( v[0], CssLengthMath.styleToString, " ");
                 s += " / ";
-                return s + arrayToCssString( v[1], LengthMath.styleToString, " ");
+                return s + arrayToCssString( v[1], CssLengthMath.styleToString, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return arrayToCssString( v, LengthMath.styleToString, " ");
+                return arrayToCssString( v, CssLengthMath.styleToString, " ");
             }
         },
-        fromAny: LengthMath.styleToString
+        fromAny: CssLengthMath.styleToString
     });
 }
 
@@ -151,12 +151,12 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
 function borderToString( val: StyleTypes.BorderStyleType): string
 {
     return valueToString( val, {
-        fromNumber: LengthMath.styleToString,
+        fromNumber: CssLengthMath.styleToString,
         fromArray: v =>
         {
             let buf: string[] = [];
             if (v[0] != null)
-                buf.push( LengthMath.styleToString( v[0]))
+                buf.push( CssLengthMath.styleToString( v[0]))
 
             if (v[1] != null)
                 buf.push( valueToString(v[1]));
@@ -178,7 +178,7 @@ function borderToString( val: StyleTypes.BorderStyleType): string
 function clipToCssString( val: StyleTypes.ClipStyleType): string
 {
     return valueToString( val, {
-        fromArray: v => `rect(${LengthMath.multiStyleToStringWithSpace(v)}`
+        fromArray: v => `rect(${CssLengthMath.multiStyleToStringWithSpace(v)}`
     });
 }
 
@@ -192,7 +192,7 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 {
     return valueToString( val, {
         fromObject: val => objectToCssString( val, false,
-            ["width", LengthMath.multiStyleToStringWithSpace],
+            ["width", CssLengthMath.multiStyleToStringWithSpace],
             ["style", valueToString],
             ["color", colorToString]
         )
@@ -207,7 +207,7 @@ function columnRuleToCssString( val: StyleTypes.ColumnRuleStyleType): string
 function columnsToCssString( val: StyleTypes.ColumnsStyleType): string
 {
     return valueToString( val, {
-        fromArray: val => val[0] + " " + LengthMath.styleToString( val[1])
+        fromArray: val => val[0] + " " + CssLengthMath.styleToString( val[1])
     });
 }
 
@@ -224,9 +224,9 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
             if (val.length === 2)
                 return val.join( " ");
             else
-                return val[0] + " " + val[1] + " "+ LengthMath.styleToString( val[2]);
+                return val[0] + " " + val[1] + " "+ CssLengthMath.styleToString( val[2]);
         },
-        fromAny: LengthMath.styleToString
+        fromAny: CssLengthMath.styleToString
     });
 }
 
@@ -238,7 +238,7 @@ function flexToCssString( val: StyleTypes.FlexStyleType): string
 function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
 {
     return valueToString( val, {
-        fromNumber: val => "oblique " + AngleMath.styleToString( val)
+        fromNumber: val => "oblique " + CssAngleMath.styleToString( val)
     });
 }
 
@@ -250,7 +250,7 @@ function fontStyleToCssString( val: StyleTypes.FontStyleStyleType): string
 function textEmphasisPositionToCssString( val: StyleTypes.TextEmphasisPositionStyleType): string
 {
     return valueToString( val, {
-        fromNumber: LengthMath.styleToString
+        fromNumber: CssLengthMath.styleToString
     });
 }
 
@@ -264,13 +264,13 @@ function textIndentToCssString( val: StyleTypes.TextIndentStyleType): string
     return valueToString( val, {
         fromArray: val =>
         {
-            let s = `${LengthMath.styleToString( val[0])} ${val[1]}`;
+            let s = `${CssLengthMath.styleToString( val[0])} ${val[1]}`;
             if (val[2])
                 s += " " + val[2];
 
             return s;
         },
-        fromAny: LengthMath.styleToString
+        fromAny: CssLengthMath.styleToString
     });
 }
 
@@ -282,8 +282,8 @@ function textIndentToCssString( val: StyleTypes.TextIndentStyleType): string
 function translateToCssString( val: StyleTypes.TranslateStyleType): string
 {
     return valueToString( val, {
-        fromArray: LengthMath.multiStyleToStringWithSpace,
-        fromAny: LengthMath.styleToString
+        fromArray: CssLengthMath.multiStyleToStringWithSpace,
+        fromAny: CssLengthMath.styleToString
     });
 }
 
@@ -502,8 +502,8 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
         fromAny: singleAnimation_fromStyle
     },
 
-    animationDelay: TimeMath.multiStyleToStringWithComma,
-    animationDuration: TimeMath.multiStyleToStringWithComma,
+    animationDelay: CssTimeMath.multiStyleToStringWithComma,
+    animationDuration: CssTimeMath.multiStyleToStringWithComma,
     animationIterationCount: commaArraySeparator,
     animationFillMode: commaArraySeparator,
     animationName: commaArraySeparator,
@@ -522,160 +522,160 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     backgroundPosition: multiPositionToStringWithComma,
     backgroundRepeat: commaArraySeparator,
     backgroundSize: {
-        fromNumber: LengthMath.styleToString,
+        fromNumber: CssLengthMath.styleToString,
         arrayItemFunc: singleBackgroundSize_fromStyle,
         arraySeparator: ","
     },
 
-    baselineShift: LengthMath.styleToString,
+    baselineShift: CssLengthMath.styleToString,
 
     border: borderToString,
     borderBlockEnd: borderToString,
     borderBlockEndColor: colorToString,
-    borderBlockEndWidth: LengthMath.styleToString,
+    borderBlockEndWidth: CssLengthMath.styleToString,
     borderBlockStart: borderToString,
     borderBlockStartColor: colorToString,
-    borderBlockStartWidth: LengthMath.styleToString,
+    borderBlockStartWidth: CssLengthMath.styleToString,
     borderBottom: borderToString,
     borderBottomColor: colorToString,
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
-    borderBottomWidth: LengthMath.styleToString,
+    borderBottomWidth: CssLengthMath.styleToString,
 
     borderColor: {
         arrayItemFunc: colorToString,
         fromAny: colorToString
     },
 
-    borderImageWidth: LengthMath.multiStyleToStringWithSpace,
+    borderImageWidth: CssLengthMath.multiStyleToStringWithSpace,
     borderInlineEnd: borderToString,
     borderInlineEndColor: colorToString,
-    borderInlineEndWidth: LengthMath.styleToString,
+    borderInlineEndWidth: CssLengthMath.styleToString,
     borderInlineStart: borderToString,
     borderInlineStartColor: colorToString,
-    borderInlineStartWidth: LengthMath.styleToString,
+    borderInlineStartWidth: CssLengthMath.styleToString,
     borderLeft: borderToString,
     borderLeftColor: colorToString,
-    borderLeftWidth: LengthMath.styleToString,
+    borderLeftWidth: CssLengthMath.styleToString,
     borderRadius: borderRadiusToCssString,
     borderRight: borderToString,
     borderRightColor: colorToString,
-    borderRightWidth: LengthMath.styleToString,
+    borderRightWidth: CssLengthMath.styleToString,
     borderStyle: valueToString,
-    borderSpacing: LengthMath.multiStyleToStringWithSpace,
+    borderSpacing: CssLengthMath.multiStyleToStringWithSpace,
     borderTop: borderToString,
     borderTopColor: colorToString,
     borderTopLeftRadius: singleCornerRadiusToCssString,
     borderTopRightRadius: singleCornerRadiusToCssString,
-    borderTopWidth: LengthMath.styleToString,
-    borderWidth: LengthMath.multiStyleToStringWithSpace,
+    borderTopWidth: CssLengthMath.styleToString,
+    borderWidth: CssLengthMath.multiStyleToStringWithSpace,
 
-    bottom: LengthMath.styleToString,
+    bottom: CssLengthMath.styleToString,
     boxShadow: valueToString,
 
     caretColor: colorToString,
     clip: clipToCssString,
     color: colorToString,
-    columnGap: LengthMath.styleToString,
+    columnGap: CssLengthMath.styleToString,
     columnRule: columnRuleToCssString,
     columnRuleColor: colorToString,
     columnRuleStyle: valueToString,
-    columnRuleWidth: LengthMath.multiStyleToStringWithSpace,
+    columnRuleWidth: CssLengthMath.multiStyleToStringWithSpace,
     columns: columnsToCssString,
 
     flex: flexToCssString,
     floodColor: colorToString,
-    fontSize: LengthMath.styleToString,
+    fontSize: CssLengthMath.styleToString,
     fontStyle: fontStyleToCssString,
 
-    gap: LengthMath.multiStyleToStringWithSpace,
-    gridColumnGap: LengthMath.styleToString,
-    gridRowGap: LengthMath.styleToString,
+    gap: CssLengthMath.multiStyleToStringWithSpace,
+    gridColumnGap: CssLengthMath.styleToString,
+    gridRowGap: CssLengthMath.styleToString,
 
-    height: LengthMath.styleToString,
+    height: CssLengthMath.styleToString,
 
-    inlineSize: LengthMath.styleToString,
+    inlineSize: CssLengthMath.styleToString,
 
-    left: LengthMath.styleToString,
-    letterSpacing: LengthMath.styleToString,
+    left: CssLengthMath.styleToString,
+    letterSpacing: CssLengthMath.styleToString,
     lightingColor: colorToString,
 
-    margin: LengthMath.multiStyleToStringWithSpace,
-    marginBlockEnd: LengthMath.styleToString,
-    marginBlockStart: LengthMath.styleToString,
-    marginBottom: LengthMath.styleToString,
-    marginInlineEnd: LengthMath.styleToString,
-    marginInlineStart: LengthMath.styleToString,
-    marginLeft: LengthMath.styleToString,
-    marginRight: LengthMath.styleToString,
-    marginTop: LengthMath.styleToString,
-    maxBlockSize: LengthMath.styleToString,
-    maxHeight: LengthMath.styleToString,
-    maxInlineSize: LengthMath.styleToString,
-    maxWidth: LengthMath.styleToString,
-    maxZoom: LengthMath.styleToString,
-    minBlockSize: LengthMath.styleToString,
-    minHeight: LengthMath.styleToString,
-    minInlineSize: LengthMath.styleToString,
-	minWidth: LengthMath.styleToString,
-    minZoom: LengthMath.styleToString,
+    margin: CssLengthMath.multiStyleToStringWithSpace,
+    marginBlockEnd: CssLengthMath.styleToString,
+    marginBlockStart: CssLengthMath.styleToString,
+    marginBottom: CssLengthMath.styleToString,
+    marginInlineEnd: CssLengthMath.styleToString,
+    marginInlineStart: CssLengthMath.styleToString,
+    marginLeft: CssLengthMath.styleToString,
+    marginRight: CssLengthMath.styleToString,
+    marginTop: CssLengthMath.styleToString,
+    maxBlockSize: CssLengthMath.styleToString,
+    maxHeight: CssLengthMath.styleToString,
+    maxInlineSize: CssLengthMath.styleToString,
+    maxWidth: CssLengthMath.styleToString,
+    maxZoom: CssLengthMath.styleToString,
+    minBlockSize: CssLengthMath.styleToString,
+    minHeight: CssLengthMath.styleToString,
+    minInlineSize: CssLengthMath.styleToString,
+	minWidth: CssLengthMath.styleToString,
+    minZoom: CssLengthMath.styleToString,
 
     objectPosition: positionToString,
     outlineColor: colorToString,
-    outlineOffset: LengthMath.styleToString,
+    outlineOffset: CssLengthMath.styleToString,
     outlineStyle: valueToString,
 
-    padding: LengthMath.multiStyleToStringWithSpace,
-    paddingBlockEnd: LengthMath.styleToString,
-    paddingBlockStart: LengthMath.styleToString,
-    paddingBottom: LengthMath.styleToString,
-    paddingInlineEnd: LengthMath.styleToString,
-    paddingInlineStart: LengthMath.styleToString,
-    paddingLeft: LengthMath.styleToString,
-    paddingRight: LengthMath.styleToString,
-    paddingTop: LengthMath.styleToString,
-    perspective: LengthMath.styleToString,
+    padding: CssLengthMath.multiStyleToStringWithSpace,
+    paddingBlockEnd: CssLengthMath.styleToString,
+    paddingBlockStart: CssLengthMath.styleToString,
+    paddingBottom: CssLengthMath.styleToString,
+    paddingInlineEnd: CssLengthMath.styleToString,
+    paddingInlineStart: CssLengthMath.styleToString,
+    paddingLeft: CssLengthMath.styleToString,
+    paddingRight: CssLengthMath.styleToString,
+    paddingTop: CssLengthMath.styleToString,
+    perspective: CssLengthMath.styleToString,
     perspectiveOrigin: positionToString,
 
-    right: LengthMath.styleToString,
-    rowGap: LengthMath.styleToString,
+    right: CssLengthMath.styleToString,
+    rowGap: CssLengthMath.styleToString,
 
-    scrollMargin: LengthMath.multiStyleToStringWithSpace,
-    scrollMarginBlock: LengthMath.multiStyleToStringWithSpace,
-    scrollMarginBlockEnd: LengthMath.styleToString,
-    scrollMarginBlockStart: LengthMath.styleToString,
-    scrollMarginBottom: LengthMath.styleToString,
-    scrollMarginInline: LengthMath.multiStyleToStringWithSpace,
-    scrollMarginInlineEnd: LengthMath.styleToString,
-    scrollMarginInlineStart: LengthMath.styleToString,
-    scrollMarginLeft: LengthMath.styleToString,
-    scrollMarginRight: LengthMath.styleToString,
-    scrollMarginTop: LengthMath.styleToString,
-    scrollPadding: LengthMath.multiStyleToStringWithSpace,
-    scrollPaddingBlock: LengthMath.multiStyleToStringWithSpace,
-    scrollPaddingBlockEnd: LengthMath.styleToString,
-    scrollPaddingBlockStart: LengthMath.styleToString,
-    scrollPaddingBottom: LengthMath.styleToString,
-    scrollPaddingInline: LengthMath.multiStyleToStringWithSpace,
-    scrollPaddingInlineEnd: LengthMath.styleToString,
-    scrollPaddingInlineStart: LengthMath.styleToString,
-    scrollPaddingLeft: LengthMath.styleToString,
-    scrollPaddingRight: LengthMath.styleToString,
-    scrollPaddingTop: LengthMath.styleToString,
+    scrollMargin: CssLengthMath.multiStyleToStringWithSpace,
+    scrollMarginBlock: CssLengthMath.multiStyleToStringWithSpace,
+    scrollMarginBlockEnd: CssLengthMath.styleToString,
+    scrollMarginBlockStart: CssLengthMath.styleToString,
+    scrollMarginBottom: CssLengthMath.styleToString,
+    scrollMarginInline: CssLengthMath.multiStyleToStringWithSpace,
+    scrollMarginInlineEnd: CssLengthMath.styleToString,
+    scrollMarginInlineStart: CssLengthMath.styleToString,
+    scrollMarginLeft: CssLengthMath.styleToString,
+    scrollMarginRight: CssLengthMath.styleToString,
+    scrollMarginTop: CssLengthMath.styleToString,
+    scrollPadding: CssLengthMath.multiStyleToStringWithSpace,
+    scrollPaddingBlock: CssLengthMath.multiStyleToStringWithSpace,
+    scrollPaddingBlockEnd: CssLengthMath.styleToString,
+    scrollPaddingBlockStart: CssLengthMath.styleToString,
+    scrollPaddingBottom: CssLengthMath.styleToString,
+    scrollPaddingInline: CssLengthMath.multiStyleToStringWithSpace,
+    scrollPaddingInlineEnd: CssLengthMath.styleToString,
+    scrollPaddingInlineStart: CssLengthMath.styleToString,
+    scrollPaddingLeft: CssLengthMath.styleToString,
+    scrollPaddingRight: CssLengthMath.styleToString,
+    scrollPaddingTop: CssLengthMath.styleToString,
     stopColor: colorToString,
 
-    tabSize: LengthMath.styleToString,
+    tabSize: CssLengthMath.styleToString,
     textDecorationColor: colorToString,
-    textDecorationThickness: LengthMath.styleToString,
+    textDecorationThickness: CssLengthMath.styleToString,
     textEmphasisColor: colorToString,
     textEmphasisPosition: textEmphasisPositionToCssString,
     textIndent: textIndentToCssString,
-    top: LengthMath.styleToString,
+    top: CssLengthMath.styleToString,
     translate: translateToCssString,
 
-    width: LengthMath.styleToString,
+    width: CssLengthMath.styleToString,
 
-    zoom: LengthMath.styleToString,
+    zoom: CssLengthMath.styleToString,
 };
 
 

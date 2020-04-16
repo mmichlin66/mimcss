@@ -4,7 +4,7 @@
 } from "./ImageTypes"
 import {colorToString} from "./ColorFuncs";
 import {CssPosition, CssNumber, Extended, SimpleCssPosition} from "./UtilTypes";
-import {valueToString, INumberMathClass, AngleMath, positionToString, PercentMath} from "./UtilFuncs";
+import {valueToString, INumberMathClass, CssAngleMath, positionToString, CssPercentMath} from "./UtilFuncs";
 
 
 
@@ -31,8 +31,8 @@ function gradientColorAndLengthToString( val: GradientColorAndLength,
 function linearGradientToString( name: string, angle: LinearGradAngle,
     stopsOrHints: GradientStopOrHint[]): string
 {
-    let angleString = angle ? AngleMath.styleToString( angle) + "," : "";
-    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, PercentMath));
+    let angleString = angle ? CssAngleMath.styleToString( angle) + "," : "";
+    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, CssPercentMath));
     return `${name}(${angleString}${buf.join(",")})`;
 }
 
@@ -46,7 +46,7 @@ function radialGradientToString( name: string, shape: RadialGradientShape,
     let extentString = extent ? extent : "";
     let posString = pos ? `at ${positionToString( pos)}` : "";
     let whatAndWhere = shape || extentString || pos ? `${shapeString} ${extentString} ${posString},` : "";
-    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, PercentMath));
+    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, CssPercentMath));
     return `${name}(${whatAndWhere}${buf.join(",")})`;
 }
 
@@ -55,10 +55,10 @@ function radialGradientToString( name: string, shape: RadialGradientShape,
 function conicGradientToString( angle: Extended<CssNumber>, pos: SimpleCssPosition,
     stopsOrHints: GradientStopOrHint[]): string
 {
-    let angleString = angle ? `from ${AngleMath.styleToString( angle)}` : "";
+    let angleString = angle ? `from ${CssAngleMath.styleToString( angle)}` : "";
     let posString = pos ? `at ${positionToString( pos)}` : "";
     let whatAndWhere = angle || pos ? `${angleString} ${posString},` : "";
-    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, AngleMath));
+    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, CssAngleMath));
     return `conic-gradient(${whatAndWhere}${buf.join(",")})`;
 }
 
@@ -67,7 +67,7 @@ function conicGradientToString( angle: Extended<CssNumber>, pos: SimpleCssPositi
 function crossFadeParamToString( val: CrossFadeParam): string
 {
     return valueToString( val, {
-        fromArray: v => `${valueToString(v[0])},${PercentMath.styleToString(v[1])}`
+        fromArray: v => `${valueToString(v[0])},${CssPercentMath.styleToString(v[1])}`
     });
 }
 

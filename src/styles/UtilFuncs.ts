@@ -1,5 +1,10 @@
-﻿import {Extended, IStringProxy, INumberProxy, CssNumber, MultiCssNumber, INumberMath,
-    IFractionMath, CssPosition, MultiCssPosition
+﻿import {
+    Extended, IStringProxy, INumberProxy, CssNumber, CssMultiNumber, INumberMath,
+    ICssFractionMath, CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
+    LengthUnits, PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits,
+    FractionUnits, CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
+    CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency, CssFraction,
+    CssMultiFraction, CssPercent, CssMultiPercent
 } from "./UtilTypes"
 
 
@@ -11,8 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts names with dashes into names in camelCase, where every character after a dash is
- * capitalized and dashes are removed.
+ * Converts dashe-case to camelCase, e.g. font-size to fontSize.
  * @param dash
  */
 export function dashToCamel( dash: string): string
@@ -26,7 +30,7 @@ export function dashToCamel( dash: string): string
 
 
 /**
- * Converts camelCase to dash-case.
+ * Converts camelCase to dash-case, e.g. fontSize to font-size.
  * @param camel
  */
 export function camelToDash( camel: string): string
@@ -255,7 +259,7 @@ function numberToCssString( n: number, intUnit: string = "", floatUint: string =
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function styleToString( val: Extended<CssNumber>, convertFunc?: ConvertNumberFuncType): string
+function styleToString( val: Extended<NumberBase>, convertFunc?: ConvertNumberFuncType): string
 {
     return valueToString( val, { fromNumber: convertFunc});
 }
@@ -266,7 +270,7 @@ function styleToString( val: Extended<CssNumber>, convertFunc?: ConvertNumberFun
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiStyleToString( val: Extended<MultiCssNumber>,
+function multiStyleToString( val: Extended<MultiNumberBase>,
                 convertFunc: ConvertNumberFuncType, separator: string): string
 {
     return valueToString( val, {
@@ -284,7 +288,7 @@ function multiStyleToString( val: Extended<MultiCssNumber>,
  * @param convertFunc 
  * @param params 
  */
-function formatNumbers( format: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType): string
+function formatNumbers( format: string, params: Extended<NumberBase>[], convertFunc?: ConvertNumberFuncType): string
 {
     function replacer( token: string, ...args: any[]): string
     {
@@ -309,12 +313,15 @@ function formatNumbers( format: string, params: Extended<CssNumber>[], convertFu
  * The NumberProxy class implements the INumberProxy interface by encapsulating parameters of a
  * mathematic CSS function that accepts one or more parameters of type CssNumber.
  */
-abstract class NumberProxy implements INumberProxy
+abstract class NumberProxy<T extends string | null = null> implements INumberProxy<T>
 {
-    /** Flag indicating that this object implements the INumerProxy interface */
-    public get isNumberProxy(): boolean { return true; }
+    /**
+     * Returns true - needed only to indicate that this object implements the INumerProxy interface
+     * for a given type
+     */
+    public isNumberProxy( o: T): boolean { return true; }
 
-    constructor( params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
+    constructor( params: Extended<NumberBase<T>>[], convertFunc?: ConvertNumberFuncType)
     {
         this.convertFunc = convertFunc;
         this.params = params;
@@ -328,7 +335,7 @@ abstract class NumberProxy implements INumberProxy
     protected convertFunc: ConvertNumberFuncType;
 
     // Array of CssNumber parameters to the mathematical function.
-    protected params: Extended<CssNumber>[];
+    protected params: Extended<NumberBase<T>>[];
 }
 
 
@@ -337,9 +344,9 @@ abstract class NumberProxy implements INumberProxy
  * The MathFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
  * mathematic CSS function that accepts one or more parameters of type CssNumber.
  */
-class MathFuncProxy extends NumberProxy
+class MathFuncProxy<T extends string | null = null> extends NumberProxy<T>
 {
-    constructor( name: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
+    constructor( name: string, params: Extended<NumberBase<T>>[], convertFunc?: ConvertNumberFuncType)
     {
         super( params, convertFunc);
         this.name = name;
@@ -361,9 +368,9 @@ class MathFuncProxy extends NumberProxy
  * The CalcFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
  * calc() CSS function that accepts a formula string and zero or more parameters of type CssNumber.
  */
-class CalcFuncProxy extends NumberProxy
+class CalcFuncProxy<T extends string | null = null> extends NumberProxy<T>
 {
-    constructor( formula: string, params: Extended<CssNumber>[], convertFunc?: ConvertNumberFuncType)
+    constructor( formula: string, params: Extended<NumberBase<T>>[], convertFunc?: ConvertNumberFuncType)
     {
         super( params, convertFunc);
         this.formula = formula;
@@ -386,7 +393,7 @@ class CalcFuncProxy extends NumberProxy
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
  */
-class NumberMath implements INumberMath
+class NumberMath<T extends string | null = null> implements INumberMath<T>
 {
     constructor( protected convertFunc: ConvertNumberFuncType)
     {
@@ -397,32 +404,32 @@ class NumberMath implements INumberMath
         return this.convertFunc( n);
     }
 
-    public styleToString = (val: Extended<CssNumber>): string =>
+    public styleToString = (val: Extended<NumberBase<T>>): string =>
     {
         return styleToString( val, this.convertFunc);
     }
 
-    public multiStyleToString = (val: Extended<MultiCssNumber>, separator: string = " "): string =>
+    public multiStyleToString = (val: Extended<MultiNumberBase<T>>, separator: string = " "): string =>
     {
         return multiStyleToString( val, this.convertFunc, separator);
     }
 
-    public min( ...params: Extended<CssNumber>[]): INumberProxy
+    public min( ...params: Extended<NumberBase<T>>[]): INumberProxy<T>
     {
         return new MathFuncProxy( "min", params, this.convertFunc);
     }
 
-    public max( ...params: Extended<CssNumber>[]): INumberProxy
+    public max( ...params: Extended<NumberBase<T>>[]): INumberProxy<T>
     {
         return new MathFuncProxy( "max", params, this.convertFunc);
     }
 
-    public clamp( min: Extended<CssNumber>, pref: Extended<CssNumber>, max: Extended<CssNumber>): INumberProxy
+    public clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): INumberProxy<T>
     {
         return new MathFuncProxy( "clamp", [min, pref, max], this.convertFunc);
     }
 
-    public calc( formula: string, ...params: Extended<CssNumber>[]): INumberProxy
+    public calc( formula: string, ...params: Extended<NumberBase<T>>[]): INumberProxy<T>
     {
         return new CalcFuncProxy( formula, params, this.convertFunc);
     }
@@ -434,50 +441,50 @@ class NumberMath implements INumberMath
  * The INumberMathClass interface represents a "static" side of classes derived from the
  * NumberMath class.
  */
-export interface INumberMathClass
+export interface INumberMathClass<T extends string | null = null>
 {
     convertFunc( n: number): string;
 
-    styleToString( val: Extended<CssNumber>): string;
+    styleToString( val: Extended<NumberBase<T>>): string;
 
-    multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string;
+    multiStyleToString( val: Extended<MultiNumberBase<T>>, separator: string): string;
 
-    multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string;
+    multiStyleToStringWithSpace( val: Extended<MultiNumberBase<T>>): string;
 
-    multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string;
+    multiStyleToStringWithComma( val: Extended<MultiNumberBase<T>>): string;
 
-    new(): INumberMath;
+    new(): INumberMath<T>;
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Num - unitless number
+// Unitless number
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The NumMath class contains methods that implement CSS mathematic functions on the
+ * The CssNumberMath class contains methods that implement CSS mathematic functions on the
  * <number> CSS types.
  */
-export class NumMath extends NumberMath
+export class CssNumberMath extends NumberMath<null>
 {
     public static convertFunc( n: number): string { return n.toString(); }
 
     public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, NumMath.convertFunc); }
+        { return styleToString( val, CssNumberMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, NumMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiNumber>, separator: string): string
+        { return multiStyleToString( val, CssNumberMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, NumMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiNumber>): string
+        { return multiStyleToString( val, CssNumberMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, NumMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiNumber>): string
+        { return multiStyleToString( val, CssNumberMath.convertFunc, ","); }
 
-    constructor() { super( NumMath.convertFunc) }
+    constructor() { super( CssNumberMath.convertFunc) }
 }
 
 
@@ -489,26 +496,26 @@ export class NumMath extends NumberMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The LengthMath class contains methods that implement CSS mathematic functions on the
+ * The CssLengthMath class contains methods that implement CSS mathematic functions on the
  * <length> CSS types.
  */
-export class LengthMath extends NumberMath
+export class CssLengthMath extends NumberMath<"Length" | "Percent">
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "px", "em"); }
 
-    public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, LengthMath.convertFunc); }
+    public static styleToString( val: Extended<CssLength>): string
+        { return styleToString( val, CssLengthMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, LengthMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiLength>, separator: string): string
+        { return multiStyleToString( val, CssLengthMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, LengthMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiLength>): string
+        { return multiStyleToString( val, CssLengthMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, LengthMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiLength>): string
+        { return multiStyleToString( val, CssLengthMath.convertFunc, ","); }
 
-    constructor() { super( LengthMath.convertFunc) }
+    constructor() { super( CssLengthMath.convertFunc) }
 }
 
 
@@ -520,26 +527,26 @@ export class LengthMath extends NumberMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The AngleMath class contains methods that implement CSS mathematic functions on the
+ * The CssAngleMath class contains methods that implement CSS mathematic functions on the
  * <angle> CSS types.
  */
-export class AngleMath extends NumberMath
+export class CssAngleMath extends NumberMath<"Angle" | "Percent">
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "deg", "rad"); }
 
-    public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, AngleMath.convertFunc); }
+    public static styleToString( val: Extended<CssAngle>): string
+        { return styleToString( val, CssAngleMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, AngleMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiAngle>, separator: string): string
+        { return multiStyleToString( val, CssAngleMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, AngleMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiAngle>): string
+        { return multiStyleToString( val, CssAngleMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, AngleMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiAngle>): string
+        { return multiStyleToString( val, CssAngleMath.convertFunc, ","); }
 
-    constructor() { super( AngleMath.convertFunc) }
+    constructor() { super( CssAngleMath.convertFunc) }
 }
 
 
@@ -551,26 +558,26 @@ export class AngleMath extends NumberMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The TimeMath class contains methods that implement CSS mathematic functions on the
+ * The CssTimeMath class contains methods that implement CSS mathematic functions on the
  * <time> CSS types.
  */
-export class TimeMath extends NumberMath
+export class CssTimeMath extends NumberMath<"Time" | "Percent">
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "ms", "s"); }
 
-    public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, TimeMath.convertFunc); }
+    public static styleToString( val: Extended<CssTime>): string
+        { return styleToString( val, CssTimeMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, TimeMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiTime>, separator: string): string
+        { return multiStyleToString( val, CssTimeMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, TimeMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiTime>): string
+        { return multiStyleToString( val, CssTimeMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, TimeMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiTime>): string
+        { return multiStyleToString( val, CssTimeMath.convertFunc, ","); }
 
-    constructor() { super( TimeMath.convertFunc) }
+    constructor() { super( CssTimeMath.convertFunc) }
 }
 
 
@@ -582,26 +589,26 @@ export class TimeMath extends NumberMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The ResolutionMath class contains methods that implement CSS mathematic functions on the
+ * The CssResolutionMath class contains methods that implement CSS mathematic functions on the
  * <resolution> CSS types.
  */
-export class ResolutionMath extends NumberMath
+export class CssResolutionMath extends NumberMath<"Resolution" | "Percent">
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "dpi", "x"); }
 
-    public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, ResolutionMath.convertFunc); }
+    public static styleToString( val: Extended<CssResolution>): string
+        { return styleToString( val, CssResolutionMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, ResolutionMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiResolution>, separator: string): string
+        { return multiStyleToString( val, CssResolutionMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, ResolutionMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiResolution>): string
+        { return multiStyleToString( val, CssResolutionMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, ResolutionMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiResolution>): string
+        { return multiStyleToString( val, CssResolutionMath.convertFunc, ","); }
 
-    constructor() { super( ResolutionMath.convertFunc) }
+    constructor() { super( CssResolutionMath.convertFunc) }
 }
 
 
@@ -613,26 +620,26 @@ export class ResolutionMath extends NumberMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The FrequencyMath class contains methods that implement CSS mathematic functions on the
+ * The CssFrequencyMath class contains methods that implement CSS mathematic functions on the
  * <frequence> CSS types.
  */
-export class FrequencyMath extends NumberMath
+export class CssFrequencyMath extends NumberMath<"Frequency" | "Percent">
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "Hz", "kHz"); }
 
-    public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, FrequencyMath.convertFunc); }
+    public static styleToString( val: Extended<CssFrequency>): string
+        { return styleToString( val, CssFrequencyMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, FrequencyMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiFrequency>, separator: string): string
+        { return multiStyleToString( val, CssFrequencyMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, FrequencyMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiFrequency>): string
+        { return multiStyleToString( val, CssFrequencyMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, FrequencyMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiFrequency>): string
+        { return multiStyleToString( val, CssFrequencyMath.convertFunc, ","); }
 
-    constructor() { super( FrequencyMath.convertFunc) }
+    constructor() { super( CssFrequencyMath.convertFunc) }
 }
 
 
@@ -644,30 +651,30 @@ export class FrequencyMath extends NumberMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The FractionMath class contains methods that implement CSS mathematic functions on the
+ * The CssFractionMath class contains methods that implement CSS mathematic functions on the
  * <fraction> CSS types.
  */
-export class FractionMath extends NumberMath implements IFractionMath
+export class CssFractionMath extends NumberMath<"Fraction" | "Percent"> implements ICssFractionMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "fr", "fr"); }
 
-    public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, FractionMath.convertFunc); }
+    public static styleToString( val: Extended<CssFraction>): string
+        { return styleToString( val, CssFractionMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, FractionMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiFraction>, separator: string): string
+        { return multiStyleToString( val, CssFractionMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, FractionMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiFraction>): string
+        { return multiStyleToString( val, CssFractionMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, FractionMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiFraction>): string
+        { return multiStyleToString( val, CssFractionMath.convertFunc, ","); }
 
-    constructor() { super( FractionMath.convertFunc) }
+    constructor() { super( CssFractionMath.convertFunc) }
 
-    public minmax( min: Extended<CssNumber>, max: Extended<CssNumber>): INumberProxy
+    public minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): INumberProxy<"Fraction" | "Percent">
     {
-        return new MathFuncProxy( "minmax", [min, max], this.convertFunc);
+        return new MathFuncProxy( "minmax", [min, max], CssFractionMath.convertFunc);
     }
 }
 
@@ -680,27 +687,27 @@ export class FractionMath extends NumberMath implements IFractionMath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The PercentMath class contains methods that implement CSS mathematic functions on the
+ * The CssPercentMath class contains methods that implement CSS mathematic functions on the
  * <percent> CSS types.
  */
-export class PercentMath extends NumberMath
+export class CssPercentMath extends NumberMath<"Percent">
 {
     public static convertFunc( n: number): string
         { return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%"; }
 
-    public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, PercentMath.convertFunc); }
+    public static styleToString( val: Extended<CssPercent>): string
+        { return styleToString( val, CssPercentMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<MultiCssNumber>, separator: string): string
-        { return multiStyleToString( val, PercentMath.convertFunc, separator); }
+    public static multiStyleToString( val: Extended<CssMultiPercent>, separator: string): string
+        { return multiStyleToString( val, CssPercentMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, PercentMath.convertFunc, " "); }
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiPercent>): string
+        { return multiStyleToString( val, CssPercentMath.convertFunc, " "); }
 
-    public static multiStyleToStringWithComma( val: Extended<MultiCssNumber>): string
-        { return multiStyleToString( val, PercentMath.convertFunc, ","); }
+    public static multiStyleToStringWithComma( val: Extended<CssMultiNumber>): string
+        { return multiStyleToString( val, CssPercentMath.convertFunc, ","); }
 
-    constructor() { super( FractionMath.convertFunc) }
+    constructor() { super( CssFractionMath.convertFunc) }
 }
 
 
@@ -718,8 +725,8 @@ export function positionToString( val: Extended<CssPosition>): string
 {
     return valueToString( val, {
         fromNull: v => null,
-        fromNumber: LengthMath.styleToString,
-        fromArray: LengthMath.multiStyleToStringWithSpace
+        fromNumber: CssLengthMath.styleToString,
+        fromArray: CssLengthMath.multiStyleToStringWithSpace
     });
 }
 

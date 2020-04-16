@@ -8,7 +8,7 @@ import * as UtilFuncs from "../styles/UtilFuncs"
  * CSS type. When arguments for these functions are of the number JavaScript type they are
  * converted to strings without appending any units to them.
  */
-export let Num: UtilTypes.INumberMath = new UtilFuncs.NumMath();
+export let Num: UtilTypes.ICssNumberMath = new UtilFuncs.CssNumberMath();
 
 
 
@@ -17,7 +17,7 @@ export let Num: UtilTypes.INumberMath = new UtilFuncs.NumMath();
  * CSS type by appending a length unit suffix.
  * Integer numbers use "px"; floating point numbers use "em".
  */
-export let Len: UtilTypes.INumberMath = new UtilFuncs.LengthMath();
+export let Len: UtilTypes.ICssLengthMath = new UtilFuncs.CssLengthMath();
 
 
 
@@ -26,7 +26,7 @@ export let Len: UtilTypes.INumberMath = new UtilFuncs.LengthMath();
  * CSS type by appending an angle unit suffix.
  * Integer numbers use "deg"; floating point numbers use "rad".
  */
-export let Angle: UtilTypes.INumberMath = new UtilFuncs.AngleMath();
+export let Angle: UtilTypes.ICssAngleMath = new UtilFuncs.CssAngleMath();
 
 
 
@@ -35,7 +35,7 @@ export let Angle: UtilTypes.INumberMath = new UtilFuncs.AngleMath();
  * CSS type by appending a time unit suffix.
  * Integer numbers use "ms"; floating point numbers use "s".
  */
-export let Time: UtilTypes.INumberMath = new UtilFuncs.TimeMath();
+export let Time: UtilTypes.ICssTimeMath = new UtilFuncs.CssTimeMath();
 
 
 
@@ -44,7 +44,7 @@ export let Time: UtilTypes.INumberMath = new UtilFuncs.TimeMath();
  * <resolution> CSS type by appending a resolution unit suffix.
  * Integer numbers use "dpi"; floating point numbers use "dpcm".
  */
-export let Resolution: UtilTypes.INumberMath = new UtilFuncs.ResolutionMath();
+export let Resolution: UtilTypes.ICssResolutionMath = new UtilFuncs.CssResolutionMath();
 
 
 
@@ -53,7 +53,7 @@ export let Resolution: UtilTypes.INumberMath = new UtilFuncs.ResolutionMath();
  * <frequency> CSS type by appending a frequency unit suffix.
  * Integer numbers use "Hz"; floating point numbers use "kHz".
  */
-export let Frequency: UtilTypes.INumberMath = new UtilFuncs.FrequencyMath();
+export let Frequency: UtilTypes.ICssFrequencyMath = new UtilFuncs.CssFrequencyMath();
 
 
 
@@ -62,7 +62,7 @@ export let Frequency: UtilTypes.INumberMath = new UtilFuncs.FrequencyMath();
  * <fraction> CSS type by appending a fraction unit suffix.
  * Integer numbers use "fr"; floating point numbers use "%".
  */
-export let Fraction: UtilTypes.IFractionMath = new UtilFuncs.FractionMath();
+export let Fraction: UtilTypes.ICssFractionMath = new UtilFuncs.CssFractionMath();
 
 
 
@@ -70,7 +70,7 @@ export let Fraction: UtilTypes.IFractionMath = new UtilFuncs.FractionMath();
  * The Percent object contains static methods that implement CSS mathematic functions on the
  * <percentage> CSS type by appending a "%" unit suffix.
  */
-export let Percent: UtilTypes.INumberMath = new UtilFuncs.PercentMath();
+export let Percent: UtilTypes.ICssPercentMath = new UtilFuncs.CssPercentMath();
 
 
 

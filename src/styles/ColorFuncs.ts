@@ -1,5 +1,5 @@
 ﻿import {INamedColors, CssColor, IColorProxy, Colors} from "./ColorTypes"
-import {PercentMath, AngleMath, valueToString} from "./UtilFuncs"
+import {CssPercentMath, CssAngleMath, valueToString} from "./UtilFuncs"
 import {Extended} from "./UtilTypes";
 
 
@@ -54,7 +54,7 @@ export function colorToString( val: Extended<CssColor>): string
 
 function colorSeparationToString( c: number | string): string
 {
-    return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : PercentMath.convertFunc(c);
+    return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : CssPercentMath.convertFunc(c);
 }
 
 
@@ -64,7 +64,7 @@ function rgbToString( r: number | string, g: number | string, b: number | string
     r = colorSeparationToString( r);
     g = colorSeparationToString( g);
     b = colorSeparationToString( b);
-    a = a == null ? null : PercentMath.styleToString( a);
+    a = a == null ? null : CssPercentMath.styleToString( a);
 
     return !a ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;
 }
@@ -73,10 +73,10 @@ function rgbToString( r: number | string, g: number | string, b: number | string
 
 function hslToString( h: number | string, s: number | string, l: number | string, a?: number | string): string
 {
-    h = AngleMath.styleToString(h);
-    s = s == null ? "100%" : PercentMath.styleToString( s);
-    l = l == null ? "100%" : PercentMath.styleToString( l);
-    a = a == null ? null : PercentMath.styleToString( a);
+    h = CssAngleMath.styleToString(h);
+    s = s == null ? "100%" : CssPercentMath.styleToString( s);
+    l = l == null ? "100%" : CssPercentMath.styleToString( l);
+    a = a == null ? null : CssPercentMath.styleToString( a);
 
     return !a ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
 }
