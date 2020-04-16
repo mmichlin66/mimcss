@@ -46,9 +46,9 @@ export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
  *         ":hover" : {
  *             backgroundColor: "gray"
  *         },
- *         "&": { selector: "li > &", style: {
- *            backgroundColor: "yellow"
- *         }}
+ *         "&": [
+ *             [ "li > &", { backgroundColor: "yellow" } ]
+ *         ]
  *     })
  * }
  * ```
@@ -117,7 +117,7 @@ export interface IRule
 
 /**
  * The INamedRule interface is a base interface implemented by all rules that have a name; that is,
- * class, ID, animation and custom CSS property.
+ * class, ID, keyframes and custom CSS property.
  */
 export interface INamedEntity
 {
@@ -183,6 +183,7 @@ export interface IAbstractRule extends IStyleRule
 
 /**
  * The ITagRule interface represents a style rule that applies to elements identified by a tag name.
+ * Objects implementing this interface are returned from the [[$tag]] function.
  */
 export interface ITagRule extends IStyleRule
 {
@@ -194,6 +195,7 @@ export interface ITagRule extends IStyleRule
 
 /**
  * The IClassRule interface represents a style rule that applies to elements identified by a class.
+ * Objects implementing this interface are returned from the [[$class]] function.
  */
 export interface IClassRule extends IStyleRule, INamedEntity
 {
@@ -205,6 +207,7 @@ export interface IClassRule extends IStyleRule, INamedEntity
 
 /**
  * The IIDRule interface representsa a style rule that applies to elements identified by an ID.
+ * Objects implementing this interface are returned from the [[$id]] function.
  */
 export interface IIDRule extends IStyleRule, INamedEntity
 {
@@ -217,6 +220,7 @@ export interface IIDRule extends IStyleRule, INamedEntity
 /**
  * The ISelectorRule interface representsa a styleset that applies to elements identifies by the
  * given selector.
+ * Objects implementing this interface are returned from the [[$style]] function.
  */
 export interface ISelectorRule extends IStyleRule
 {
@@ -228,6 +232,7 @@ export interface ISelectorRule extends IStyleRule
 
 /**
  * The IAnimationRule interface represents the @keyframes rule.
+ * Objects implementing this interface are returned from the [[$keyframes]] function.
  */
 export interface IAnimationRule extends IRule, INamedEntity, IAnimationNameProxy
 {
@@ -247,6 +252,7 @@ export type AnimationFrame = ["from" | "to" | number, Omit<ExtendedStyleset,"!">
 
 /**
  * The IImportRule interface represents the CSS @import rule.
+ * Objects implementing this interface are returned from the [[$import]] function.
  */
 export interface IImportRule extends IRule
 {
@@ -258,6 +264,7 @@ export interface IImportRule extends IRule
 
 /**
  * The IFontFaceRule interface represents the CSS @font-face rule.
+ * Objects implementing this interface are returned from the [[$fontface]] function.
  */
 export interface IFontFaceRule extends IRule
 {
@@ -269,6 +276,7 @@ export interface IFontFaceRule extends IRule
 
 /**
  * The INamespaceRule interface represents the CSS @namespace rule.
+ * Objects implementing this interface are returned from the [[$namespace]] function.
  */
 export interface INamespaceRule extends IRule
 {
@@ -286,6 +294,7 @@ export interface INamespaceRule extends IRule
 
 /**
  * The IPageRule interface represents the CSS @page rule.
+ * Objects implementing this interface are returned from the [[$page]] function.
  */
 export interface IPageRule extends IStyleRule
 {
@@ -300,6 +309,7 @@ export interface IPageRule extends IStyleRule
 
 /**
  * The IVarRule interface represents a CSS custom property definition.
+ * Objects implementing this interface are returned from the [[$var]] function.
  */
 export interface IVarRule<K extends keyof ICssStyleset = any> extends INamedEntity, IVarProxy<ICssStyleset[K]>
 {
@@ -354,6 +364,7 @@ export interface IRuleContainer<T extends {} = {}>
  * has been processed. The stylesheet object contains names of IDs, classes and animations, which
  * can be used in the application code. The interface also provides methods that are used to
  * manipulate the rules and their stylesets.
+ * Objects implementing this interface are returned from the [[$use]] and [[$activate]] functions.
  */
 export interface IStylesheet<T extends {} = {}> extends IRuleContainer<T>
 {
@@ -384,12 +395,38 @@ export interface IStylesheetClass<T extends {} = {}>
 
 
 /**
- * The NestedGroup class is a base for all classes that define nested grouping rules.
+ * The NestedGroup class is a base for all classes that define nested grouping rules. Use it the
+ * following way:
+ * 
+ * ```typescript
+ * class MyStyles
+ * {
+ *     // 8px padding on regular devices
+ *     defaultPadding = $var( "padding", 8)
+ * 
+ *     ifNarrowDevice = $media( {maxWidth: 600 },
+ *         class extends NestedGroup<MyStyles>
+ *         {
+ *             // 4px padding on narrow devices
+ *             defaultPadding = $var( "padding", Len.calc( "{0} / 2", this.owner.defaultPadding))
+ *         }
+ *     )
+ * }
+ * ```
  * @typeparam O Stylesheet definition class, which is the owner of this grouping rule.
  */
-export abstract class NestedGroup<O extends {} = {}>
+export abstract class NestedGroup<T extends {}>
 {
-	constructor( protected owner: O) {}
+	constructor( owner: T)
+	{
+		this.owner = owner;
+	}
+
+	/**
+	 * Refers to the style definition class which is the owner of this grouping rule. Through this
+	 * memeber, all rules defined in the definition class can be accessed.
+	 */
+	protected owner: T;
 }
 
 
@@ -397,7 +434,7 @@ export abstract class NestedGroup<O extends {} = {}>
 /**
  * "Constructor" interface defining how group rule definition classes can be created.
  */
-export interface INestedGroupClass<T extends NestedGroup<O>, O extends {} = {}>
+export interface INestedGroupClass<T extends NestedGroup<O>, O extends {}>
 {
 	/** All group rule definition classes should conform to this constructor */
 	new( owner?: O): T;
@@ -407,6 +444,7 @@ export interface INestedGroupClass<T extends NestedGroup<O>, O extends {} = {}>
 
 /**
  * The ISupportRule interface represents the CSS @supports rule.
+ * Objects implementing this interface are returned from the [[$supports]] function.
  */
 export interface ISupportsRule<T = {}> extends IRuleContainer<T>, IRule
 {
@@ -418,6 +456,7 @@ export interface ISupportsRule<T = {}> extends IRuleContainer<T>, IRule
 
 /**
  * The IMediaRule interface represents the CSS @media rule.
+ * Objects implementing this interface are returned from the [[$media]] function.
  */
 export interface IMediaRule<T = {}> extends IRuleContainer<T>, IRule
 {

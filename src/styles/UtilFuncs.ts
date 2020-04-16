@@ -4,7 +4,7 @@
     LengthUnits, PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits,
     FractionUnits, CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
     CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency, CssFraction,
-    CssMultiFraction, CssPercent, CssMultiPercent
+    CssMultiFraction, CssPercent, CssMultiPercent, IUrlProxy
 } from "./UtilTypes"
 
 
@@ -739,6 +739,38 @@ export function multiPositionToString( val: Extended<MultiCssPosition>, separato
         arrayItemFunc: positionToString,
         arraySeparator: separator
     });
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// URLs
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The UrlProxy class represents an invocation of the CSS url() function.
+ */
+export class UrlProxy implements IUrlProxy
+{
+    /** Flag indicating that this object implements the INumerProxy interface */
+    public get isUrlProxy(): boolean { return true; }
+
+    constructor( url: Extended<string>)
+    {
+        this.url = url;
+    }
+
+    /** Converts internally held value(s) to string */
+    public valueToString(): string
+    {
+        let s = valueToString( this.url);
+        return s && !s.startsWith("url(") ? `url(${s})` : s;
+    }
+
+    // Array of CssNumber parameters to the mathematical function.
+    private url: Extended<string>;
 }
 
 

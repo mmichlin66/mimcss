@@ -1,46 +1,14 @@
 ﻿import {
     IStringProxy, Extended, CssNumber, IUrlProxy, CssPosition, SimpleCssPosition
 } from "../styles/UtilTypes"
-import {StringProxy, valueToString} from "../styles/UtilFuncs"
 import {IStyleset} from "../styles/StyleTypes"
 import * as ColorTypes from "../styles/ColorTypes"
 import * as ColorFuncs from "../styles/ColorFuncs"
 import * as ImageTypes from "../styles/ImageTypes"
 import * as ImageFuncs from "../styles/ImageFuncs"
 import * as StyleTypes from "../styles/StyleTypes"
+import {StringProxy, valueToString, UrlProxy} from "../styles/UtilFuncs"
 import {stylePropToCssString} from "../styles/StyleFuncs";
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// URLs
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The UrlProxy class represents an invocation of the CSS url() function.
- */
-class UrlProxy implements IUrlProxy
-{
-    /** Flag indicating that this object implements the INumerProxy interface */
-    public get isUrlProxy(): boolean { return true; }
-
-    constructor( url: Extended<string>)
-    {
-        this.url = url;
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        let s = valueToString( this.url);
-        return s && !s.startsWith("url(") ? `url(${s})` : s;
-    }
-
-    // Array of CssNumber parameters to the mathematical function.
-    private url: Extended<string>;
-}
 
 
 
