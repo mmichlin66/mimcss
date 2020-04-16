@@ -1,5 +1,5 @@
 ﻿import {
-    IStringProxy, Extended, CssNumber, IUrlProxy, CssPosition, SimpleCssPosition
+    IStringProxy, Extended, IUrlProxy, CssPosition, SimpleCssPosition, CssTime, CssAngle
 } from "../styles/UtilTypes"
 import {IStyleset} from "../styles/StyleTypes"
 import * as ColorTypes from "../styles/ColorTypes"
@@ -172,7 +172,7 @@ export class sh
     /**
      * Creates an IImageProxy object representing the`conic-gradient()`  CSS function.
      */
-    public static conicGradient( angle?: Extended<CssNumber>, pos?: SimpleCssPosition,
+    public static conicGradient( angle?: Extended<CssAngle>, pos?: SimpleCssPosition,
         ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
     {
         return new ImageFuncs.ConicGradientProxy( angle, pos, stopsOrHints);
@@ -214,9 +214,9 @@ export class sh
      * @param state Animation state. The default value is "running".
      */
     public static animation( name: Extended<StyleTypes.SingleAnimationName>,
-        duration: Extended<CssNumber> = 1000,
+        duration: Extended<CssTime> = 1000,
         func: Extended<StyleTypes.SingleAnimationTimingFunction> = "ease",
-        delay: Extended<CssNumber> = 0,
+        delay: Extended<CssTime> = 0,
         count: Extended<StyleTypes.SingleAnimationIterationCount> = 1,
         direction: Extended<StyleTypes.SingleAnimationDirection> = "normal",
         mode: Extended<StyleTypes.SingleAnimationFillMode> = "none",

@@ -1,6 +1,6 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumberBox, CssNumber, CssMultiNumber,
-    CssPosition, MultiCssPosition, IValueProxy, CssTime, CssLength, CssAngle, CssPercent, CssLengthBox,
+    CssPosition, MultiCssPosition, IValueProxy, CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -777,9 +777,9 @@ export interface ICssStyleset
     alignSelf?: AlignSelfStyleType;
     alignmentBaseline?: AlignmentBaselineStyleType;
     animation?: AnimationStyleType;
-    animationDelay?: CssMultiNumber;
+    animationDelay?: CssMultiTime;
     animationDirection?: AnimationDirectionStyleType;
-    animationDuration?: CssMultiNumber;
+    animationDuration?: CssMultiTime;
     animationFillMode?: AnimationFillModeStyleType;
     animationIterationCount?: AnimationIterationCountStyleType;
     animationName?: AnimationNameStyleType;
@@ -1125,13 +1125,13 @@ export interface ICssStyleset
     scrollPaddingBlock?: CssLengthBox;
     scrollPaddingBlockEnd?: CssLength;
     scrollPaddingBlockStart?: CssLength;
-    scrollPaddingBottom?: CssNumber;
-    scrollPaddingInline?: CssNumberBox;
-    scrollPaddingInlineEnd?: CssNumber;
-    scrollPaddingInlineStart?: CssNumber;
-    scrollPaddingLeft?: CssNumber;
-    scrollPaddingRight?: CssNumber;
-    scrollPaddingTop?: CssNumber;
+    scrollPaddingBottom?: CssLength;
+    scrollPaddingInline?: CssLengthBox;
+    scrollPaddingInlineEnd?: CssLength;
+    scrollPaddingInlineStart?: CssLength;
+    scrollPaddingLeft?: CssLength;
+    scrollPaddingRight?: CssLength;
+    scrollPaddingTop?: CssLength;
     scrollSnapAlign?: DefaultStyleType;
     scrollSnapStop?: DefaultStyleType;
     scrollSnapType?: DefaultStyleType;
@@ -1150,7 +1150,7 @@ export interface ICssStyleset
     strokeOpacity?: DefaultStyleType;
     strokeWidth?: DefaultStyleType;
 
-    tabSize?: CssNumber;
+    tabSize?: CssLength;
     tableLayout?: TableLayoutStyleType;
     textAlign?: TextAlignStyleType;
     textAlignLast?: TextAlignLastStyleType;

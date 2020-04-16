@@ -205,7 +205,7 @@ export interface INumberMath<T extends string = null>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for single style property of the `<number>` CSS type*/
-export type CssNumber = NumberBase<null>;
+export type CssNumber = NumberBase<"Number">;
 
 /** Type for multi-part style property of the `<number>` CSS type*/
 export type CssMultiNumber = OneOrMany<CssNumber>;
@@ -217,7 +217,7 @@ export type CssNumberBox = OneOrBox<CssNumber>;
  * The ICssNumberMath interface contains methods that implement CSS mathematic functions on the
  * `<number>` CSS types.
  */
-export interface ICssNumberMath extends INumberMath<null> {}
+export interface ICssNumberMath extends INumberMath<"Number"> {}
 
 
 
@@ -240,11 +240,77 @@ export type CssMultiLength = OneOrMany<CssLength>;
 /** Type for 1-to-four-part style property of the `<length>` CSS type*/
 export type CssLengthBox = OneOrBox<CssLength>;
 
+/** Proxy type that represents values of the `<length>` CSS type*/
+export interface ILengthProxy extends INumberProxy<"Length" | "Percent"> {}
+
 /**
  * The ICssLengthMath interface contains methods that implement CSS mathematic functions on the
  * `<length>` CSS types.
  */
-export interface ICssLengthMath extends INumberMath<"Length" | "Percent"> {}
+export interface ICssLengthMath extends INumberMath<"Length" | "Percent">
+{
+    /** Creates length value in quaters of an inch */
+    Q( n: number): ILengthProxy;
+
+    /** Creates length value in ch units */
+    ch( n: number): ILengthProxy;
+
+    /** Creates length value in cantimeters */
+    cm( n: number): ILengthProxy;
+
+    /** Creates length value in calculated font-sizes of the element */
+    em( n: number): ILengthProxy;
+
+    /** Creates length value in heights of lowercase letter 'x' in the font */
+    ex( n: number): ILengthProxy;
+
+    /** Creates length value in ic units */
+    ic( n: number): ILengthProxy;
+
+    /** Creates length value in inches */
+    in( n: number): ILengthProxy;
+
+    /** Creates length value in line-heights of the element */
+    lh( n: number): ILengthProxy;
+
+    /** Creates length value in millimeters */
+    mm( n: number): ILengthProxy;
+
+    /** Creates length value in picas */
+    pc( n: number): ILengthProxy;
+
+    /** Creates length value in points */
+    pt( n: number): ILengthProxy;
+
+    /** Creates length value in pixels */
+    px( n: number): ILengthProxy;
+
+    /** Creates length value in 1% of the size of the initial containing block, in the direction
+     * of the root element’s block axis */
+    vb( n: number): ILengthProxy;
+
+    /** Creates length value in 1% of the height of the viewport's initial containing block */
+    vh( n: number): ILengthProxy;
+
+    /** Creates length value in 1% of the size of the initial containing block, in the direction
+     * of the root element’s inline axis */
+    vi( n: number): ILengthProxy;
+
+    /** Creates length value in 1% of the width of the viewport's initial containing block */
+    vw( n: number): ILengthProxy;
+
+    /** Creates length value in fontsizes of the root element (<html>) */
+    rem( n: number): ILengthProxy;
+
+    /** Creates length value in line-heights of the root element (<html>) */
+    rlh( n: number): ILengthProxy;
+
+    /** Creates length value in the units which are a smaller value between vw and vh */
+    vmax( n: number): ILengthProxy;
+
+    /** Creates length value in the units which are a larger value between vw and vh */
+    vmin( n: number): ILengthProxy;
+}
 
 
                 
@@ -266,11 +332,27 @@ export type CssMultiAngle = OneOrMany<CssAngle>;
 /** Type for 1-to-four-part style property of the `<angle>` CSS type*/
 export type CssAngleBox = OneOrBox<CssAngle>;
 
+/** Proxy type that represents values of the `<angle>` CSS type*/
+export interface IAngleProxy extends INumberProxy<"Angle" | "Percent"> {}
+
 /**
  * The ICssAngleMath interface contains methods that implement CSS mathematic functions on the
  * `<angle>` CSS types.
  */
-export interface ICssAngleMath extends INumberMath<"Angle" | "Percent"> {}
+export interface ICssAngleMath extends INumberMath<"Angle" | "Percent">
+{
+    /** Creates angle value in degrees */
+     deg( n: number): IAngleProxy;
+
+    /** Creates angle value in radians */
+    rad( n: number): IAngleProxy;
+
+    /** Creates angle value in gradians */
+    grad( n: number): IAngleProxy;
+
+    /** Creates angle value in turns */
+    turn( n: number): IAngleProxy;
+}
 
 
 
@@ -292,11 +374,21 @@ export type CssMultiTime = OneOrMany<CssTime>;
 /** Type for 1-to-four-part style property of the `<time>` CSS type*/
 export type CssTimeBox = OneOrBox<CssTime>;
 
+/** Proxy type that represents values of the `<time>` CSS type*/
+export interface ITimeProxy extends INumberProxy<"Time" | "Percent"> {}
+
 /**
  * The ICssTimeMath interface contains methods that implement CSS mathematic functions on the
  * `<time>` CSS types.
  */
-export interface ICssTimeMath extends INumberMath<"Time" | "Percent"> {}
+export interface ICssTimeMath extends INumberMath<"Time" | "Percent">
+{
+    /** Creates frequency value in milliseconds */
+    ms( n: number): ITimeProxy;
+
+    /** Creates frequency value in seconds */
+    s( n: number): ITimeProxy;
+}
 
 
 
@@ -318,11 +410,27 @@ export type CssMultiResolution = OneOrMany<CssResolution>;
 /** Type for 1-to-four-part style property of the `<resolution>` CSS type*/
 export type CssResolutionBox = OneOrBox<CssResolution>;
 
+/** Proxy type that represents values of the `<resolution>` CSS type*/
+export interface IResolutionProxy extends INumberProxy<"Resolution" | "Percent"> {}
+
 /**
  * The ICssResolutionMath interface contains methods that implement CSS mathematic functions on the
  * `<resolution>` CSS types.
  */
-export interface ICssResolutionMath extends INumberMath<"Resolution" | "Percent"> {}
+export interface ICssResolutionMath extends INumberMath<"Resolution" | "Percent">
+{
+    /** Creates resolution value in DPI */
+    dpi( n: number): IResolutionProxy;
+
+    /** Creates resolution value in DPCM */
+    dpcm( n: number): IResolutionProxy;
+
+    /** Creates resolution value in DPPX */
+    dppx( n: number): IResolutionProxy;
+
+    /** Creates resolution value in X */
+    x( n: number): IResolutionProxy;
+}
 
 
 
@@ -344,11 +452,21 @@ export type CssMultiFrequency = OneOrMany<CssFrequency>;
 /** Type for 1-to-four-part style property of the `<frequency>` CSS type*/
 export type CssFrequencyBox = OneOrBox<CssFrequency>;
 
+/** Proxy type that represents values of the `<frequency>` CSS type*/
+export interface IFrequencyProxy extends INumberProxy<"Frequency" | "Percent"> {}
+
 /**
  * The ICssFrequencyMath interface contains methods that implement CSS mathematic functions on the
  * `<frequency>` CSS types.
  */
-export interface ICssFrequencyMath extends INumberMath<"Frequency" | "Percent"> {}
+export interface ICssFrequencyMath extends INumberMath<"Frequency" | "Percent">
+{
+    /** Creates frequency value in Hertz */
+    hz( n: number): IFrequencyProxy
+
+    /** Creates frequency value in Kilo-Hertz */
+    khz( n: number): IFrequencyProxy
+}
 
 
 
@@ -370,6 +488,9 @@ export type CssMultiFraction = OneOrMany<CssFraction>;
 /** Type for 1-to-four-part style property of the `<fraction>` CSS type*/
 export type CssFractionBox = OneOrBox<CssFraction>;
 
+/** Proxy type that represents values of the `<fraction>` CSS type*/
+export interface IFractionProxy extends INumberProxy<"Fraction" | "Percent"> {}
+
 /**
  * The IFractionMath interface contains methods that implement CSS mathematic functions on the
  * `<fraction>` CSS types.
@@ -378,6 +499,9 @@ export interface ICssFractionMath extends INumberMath<"Fraction" | "Percent">
 {
     /** Creates property value using the CSS minmax() function. */
     minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): INumberProxy<"Fraction" | "Percent">;
+
+    /** Creates fraction value for flex */
+    fr( n: number): IFractionProxy;
 }
 
 
@@ -400,11 +524,20 @@ export type CssMultiPercent = OneOrMany<CssPercent>;
 /** Type for 1-to-four-part style property of the `<percent>` CSS type*/
 export type CssPercentBox = OneOrBox<CssPercent>;
 
+/** Proxy type that represents values of the `<percent>` CSS type*/
+export interface IPercentProxy extends INumberProxy<"Percent"> {}
+
 /**
  * The IFractionMath interface contains methods that implement CSS mathematic functions on the
  * `<percent>` CSS types.
  */
-export interface ICssPercentMath extends INumberMath<"Percent"> {}
+export interface ICssPercentMath extends INumberMath<"Percent">
+{
+    /**
+     * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
+     */
+    percent( n: number): IPercentProxy;
+}
 
 
 

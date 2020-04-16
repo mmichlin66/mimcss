@@ -2,7 +2,7 @@
  * This module contains types used to define CSS `<image>` type and related functions.
  */
 
-import {IValueProxy, IUrlProxy, Extended, CssNumber} from "./UtilTypes"
+import {IValueProxy, IUrlProxy, Extended, CssNumber, CssAngle} from "./UtilTypes"
 import {CssColor} from "./ColorTypes";
 
 
@@ -58,7 +58,7 @@ export type LinearGradSideOrCorner = Extended<"to bottom" | "to left" | "to top"
 /**
  * Type that represents the angle of the `linear-gradient()` CSS function.
  */
-export type LinearGradAngle = Extended<CssNumber> | LinearGradSideOrCorner;
+export type LinearGradAngle = Extended<CssAngle> | LinearGradSideOrCorner;
 
 
 

@@ -4,7 +4,7 @@
     LengthUnits, PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits,
     FractionUnits, CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
     CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency, CssFraction,
-    CssMultiFraction, CssPercent, CssMultiPercent, IUrlProxy
+    CssMultiFraction, CssPercent, CssMultiPercent, IUrlProxy, ICssNumberMath, ICssLengthMath, ICssAngleMath, ICssPercentMath
 } from "./UtilTypes"
 
 
@@ -389,6 +389,35 @@ class CalcFuncProxy<T extends string | null = null> extends NumberProxy<T>
 
 
 /**
+ * The CalcFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
+ * calc() CSS function that accepts a formula string and zero or more parameters of type CssNumber.
+ */
+class UnitProxy<T extends string | null = null> implements INumberProxy<T>
+{
+    /**
+     * Returns true - needed only to indicate that this object implements the INumerProxy interface
+     * for a given type
+     */
+    public isNumberProxy( o: T): boolean { return true; }
+
+    constructor( n: number, unit: string)
+    {
+        this.s = n + unit;
+    }
+
+    /** Converts internally held value(s) to string */
+    public valueToString(): string
+    {
+        return this.s;
+    }
+
+    // Resulting string combining the number with the unit.
+    private s: string;
+}
+
+
+
+/**
  * The NummberMath class contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
@@ -433,6 +462,11 @@ class NumberMath<T extends string | null = null> implements INumberMath<T>
     {
         return new CalcFuncProxy( formula, params, this.convertFunc);
     }
+
+    protected unit( n: number, unit: string): INumberProxy<T>
+    {
+        return new UnitProxy<T>( n, unit);
+    }
 }
 
 
@@ -458,6 +492,7 @@ export interface INumberMathClass<T extends string | null = null>
 
 
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Unitless number
@@ -468,7 +503,7 @@ export interface INumberMathClass<T extends string | null = null>
  * The CssNumberMath class contains methods that implement CSS mathematic functions on the
  * <number> CSS types.
  */
-export class CssNumberMath extends NumberMath<null>
+export class CssNumberMath extends NumberMath<"Number">
 {
     public static convertFunc( n: number): string { return n.toString(); }
 
@@ -499,7 +534,7 @@ export class CssNumberMath extends NumberMath<null>
  * The CssLengthMath class contains methods that implement CSS mathematic functions on the
  * <length> CSS types.
  */
-export class CssLengthMath extends NumberMath<"Length" | "Percent">
+export class CssLengthMath extends NumberMath<"Length" | "Percent"> implements ICssLengthMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "px", "em"); }
 
@@ -516,6 +551,27 @@ export class CssLengthMath extends NumberMath<"Length" | "Percent">
         { return multiStyleToString( val, CssLengthMath.convertFunc, ","); }
 
     constructor() { super( CssLengthMath.convertFunc) }
+
+    public Q( n: number) { return this.unit( n, "Q"); }
+    public ch( n: number) { return this.unit( n, "ch"); }
+    public cm( n: number) { return this.unit( n, "cm"); }
+    public em( n: number) { return this.unit( n, "em"); }
+    public ex( n: number) { return this.unit( n, "ex"); }
+    public ic( n: number) { return this.unit( n, "ic"); }
+    public in( n: number) { return this.unit( n, "in"); }
+    public lh( n: number) { return this.unit( n, "lh"); }
+    public mm( n: number) { return this.unit( n, "mm"); }
+    public pc( n: number) { return this.unit( n, "pc"); }
+    public pt( n: number) { return this.unit( n, "pt"); }
+    public px( n: number) { return this.unit( n, "px"); }
+    public vb( n: number) { return this.unit( n, "vb"); }
+    public vh( n: number) { return this.unit( n, "vh"); }
+    public vi( n: number) { return this.unit( n, "vi"); }
+    public vw( n: number) { return this.unit( n, "vw"); }
+    public rem( n: number) { return this.unit( n, "rem"); }
+    public rlh( n: number) { return this.unit( n, "rlh"); }
+    public vmax( n: number) { return this.unit( n, "vmax"); }
+    public vmin( n: number) { return this.unit( n, "vmin"); }
 }
 
 
@@ -530,7 +586,7 @@ export class CssLengthMath extends NumberMath<"Length" | "Percent">
  * The CssAngleMath class contains methods that implement CSS mathematic functions on the
  * <angle> CSS types.
  */
-export class CssAngleMath extends NumberMath<"Angle" | "Percent">
+export class CssAngleMath extends NumberMath<"Angle" | "Percent"> implements ICssAngleMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "deg", "rad"); }
 
@@ -547,6 +603,11 @@ export class CssAngleMath extends NumberMath<"Angle" | "Percent">
         { return multiStyleToString( val, CssAngleMath.convertFunc, ","); }
 
     constructor() { super( CssAngleMath.convertFunc) }
+
+    public deg( n: number) { return this.unit( n, "deg"); }
+    public rad( n: number) { return this.unit( n, "rad"); }
+    public grad( n: number) { return this.unit( n, "grad"); }
+    public turn( n: number) { return this.unit( n, "turn"); }
 }
 
 
@@ -578,6 +639,9 @@ export class CssTimeMath extends NumberMath<"Time" | "Percent">
         { return multiStyleToString( val, CssTimeMath.convertFunc, ","); }
 
     constructor() { super( CssTimeMath.convertFunc) }
+
+    public ms( n: number) { return this.unit( n, "ms"); }
+    public s( n: number) { return this.unit( n, "s"); }
 }
 
 
@@ -609,6 +673,18 @@ export class CssResolutionMath extends NumberMath<"Resolution" | "Percent">
         { return multiStyleToString( val, CssResolutionMath.convertFunc, ","); }
 
     constructor() { super( CssResolutionMath.convertFunc) }
+
+    /** Creates resolution value in DPI */
+    public dpi( n: number) { return this.unit( n, "dpi"); }
+
+    /** Creates resolution value in DPCM */
+    public dpcm( n: number) { return this.unit( n, "dpcm"); }
+
+    /** Creates resolution value in DPPX */
+    public dppx( n: number) { return this.unit( n, "dppx"); }
+
+    /** Creates resolution value in DPPX */
+    public x( n: number) { return this.unit( n, "x"); }
 }
 
 
@@ -640,6 +716,9 @@ export class CssFrequencyMath extends NumberMath<"Frequency" | "Percent">
         { return multiStyleToString( val, CssFrequencyMath.convertFunc, ","); }
 
     constructor() { super( CssFrequencyMath.convertFunc) }
+
+    public hz( n: number) { return this.unit( n, "Hz"); }
+    public khz( n: number) { return this.unit( n, "kHz"); }
 }
 
 
@@ -676,6 +755,8 @@ export class CssFractionMath extends NumberMath<"Fraction" | "Percent"> implemen
     {
         return new MathFuncProxy( "minmax", [min, max], CssFractionMath.convertFunc);
     }
+
+    public fr( n: number) { return this.unit( n, "fr"); }
 }
 
 
@@ -708,6 +789,8 @@ export class CssPercentMath extends NumberMath<"Percent">
         { return multiStyleToString( val, CssPercentMath.convertFunc, ","); }
 
     constructor() { super( CssFractionMath.convertFunc) }
+
+    public percent( n: number) { return this.unit( n, "%"); }
 }
 
 

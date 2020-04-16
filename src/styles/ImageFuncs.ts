@@ -3,7 +3,7 @@
     RadialGradientExtent, IImageProxy, CrossFadeParam
 } from "./ImageTypes"
 import {colorToString} from "./ColorFuncs";
-import {CssPosition, CssNumber, Extended, SimpleCssPosition} from "./UtilTypes";
+import {CssPosition, CssNumber, Extended, SimpleCssPosition, CssAngle} from "./UtilTypes";
 import {valueToString, INumberMathClass, CssAngleMath, positionToString, CssPercentMath} from "./UtilFuncs";
 
 
@@ -52,7 +52,7 @@ function radialGradientToString( name: string, shape: RadialGradientShape,
 
 
 
-function conicGradientToString( angle: Extended<CssNumber>, pos: SimpleCssPosition,
+function conicGradientToString( angle: Extended<CssAngle>, pos: SimpleCssPosition,
     stopsOrHints: GradientStopOrHint[]): string
 {
     let angleString = angle ? `from ${CssAngleMath.styleToString( angle)}` : "";
@@ -152,7 +152,7 @@ export class RadialGradientProxy extends GradientProxy
  */
 export class ConicGradientProxy extends GradientProxy
 {
-    constructor( private angle: Extended<CssNumber>, private pos: SimpleCssPosition,
+    constructor( private angle: Extended<CssAngle>, private pos: SimpleCssPosition,
         stopsOrHints: GradientStopOrHint[])
     {
         super( "", stopsOrHints);
