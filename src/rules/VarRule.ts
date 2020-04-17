@@ -1,6 +1,6 @@
 import {IVarRule} from "./RuleTypes"
 import {RuleContainer} from "./RuleContainer"
-import {IStyleset, ICssStyleset} from "../styles/StyleTypes"
+import {IStyleset, ICssStyleset, VarValueType, VarTemplateName} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs"
 import {createNames, IRuleContainerOwner} from "./Rule";
 
@@ -16,15 +16,15 @@ import {createNames, IRuleContainerOwner} from "./Rule";
  * type IStileset[K], whcih is Extended<ICssStyleset[K]>. This allows specifying values that are
  * valid for the Extended roperty type.
  */
-export class VarRule<K extends keyof ICssStyleset = any> implements IVarRule<K>
+export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 {
     /**
      * Returns true - this is only needed to indicate that this object implements the IVarProxy
      * interface for the given type
      */
-    public isVarProxy( o: ICssStyleset[K]): boolean { return true; }
+    public isVarProxy( o: VarValueType<K>): boolean { return true; }
 
-	public constructor( template: K, value?: IStyleset[K], nameOverride?: string | IVarRule<K>)
+	public constructor( template: K, value?: VarValueType<K>, nameOverride?: string | IVarRule<K>)
 	{
 		this.template = template;
 		this.value = value;
@@ -37,7 +37,7 @@ export class VarRule<K extends keyof ICssStyleset = any> implements IVarRule<K>
 	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
 	{
 		this.container = container;
-		this.ruleName = ruleName;
+		// this.ruleName = ruleName;
 
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");
 	}
@@ -74,16 +74,16 @@ export class VarRule<K extends keyof ICssStyleset = any> implements IVarRule<K>
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setValue( value: IStyleset[K], important?: boolean): void
+	public setValue( value: VarValueType<K>, important?: boolean): void
 	{
 		this.container.setCustomVarValue( this.cssName, stylePropToCssString( this.template, value, true), important)
 	}
 
 
 	
-	// Name of the property of the stylesheet definition to which this rule was assigned. This is
-	// null for Stylesheet.
-	public ruleName: string;
+	// // Name of the property of the stylesheet definition to which this rule was assigned. This is
+	// // null for Stylesheet.
+	// public ruleName: string;
 
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
 	public template: K;
@@ -103,7 +103,7 @@ export class VarRule<K extends keyof ICssStyleset = any> implements IVarRule<K>
 	public cssName: string;
 
 	// Value of the custom CSS property.
-	public value: IStyleset[K];
+	public value: VarValueType<K>;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

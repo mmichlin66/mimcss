@@ -1,6 +1,7 @@
 ﻿import {
-    Extended, OneOrPair, OneOrBox, OneOrMany, CssNumberBox, CssNumber, CssMultiNumber,
-    CssPosition, MultiCssPosition, IValueProxy, CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
+    Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
+    IValueProxy, CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
+    CssFrequency, CssFraction, CssResolution,
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -1018,54 +1019,6 @@ export interface ICssStyleset
     minWidth?: CssLength;
     minZoom?: CssPercent;
 
-    msContentZoomChaining?: DefaultStyleType;
-    msContentZoomLimit?: DefaultStyleType;
-    msContentZoomLimitMax?: DefaultStyleType;
-    msContentZoomLimitMin?: DefaultStyleType;
-    msContentZoomSnap?: DefaultStyleType;
-    msContentZoomSnapPoints?: DefaultStyleType;
-    msContentZoomSnapType?: DefaultStyleType;
-    msContentZooming?: DefaultStyleType;
-    msFlowFrom?: DefaultStyleType;
-    msFlowInto?: DefaultStyleType;
-    msFontFeatureSettings?: DefaultStyleType;
-    msGridColumn?: DefaultStyleType;
-    msGridColumnAlign?: DefaultStyleType;
-    msGridColumnSpan?: DefaultStyleType;
-    msGridColumns?: DefaultStyleType;
-    msGridRow?: DefaultStyleType;
-    msGridRowAlign?: DefaultStyleType;
-    msGridRowSpan?: DefaultStyleType;
-    msGridRows?: DefaultStyleType;
-    msHighContrastAdjust?: DefaultStyleType;
-    msHyphenateLimitChars?: DefaultStyleType;
-    msHyphenateLimitLines?: DefaultStyleType;
-    msHyphenateLimitZone?: DefaultStyleType;
-    msHyphens?: DefaultStyleType;
-    msImeAlign?: DefaultStyleType;
-    msOverflowStyle?: DefaultStyleType;
-    msScrollChaining?: DefaultStyleType;
-    msScrollLimit?: DefaultStyleType;
-    msScrollLimitXMax?: DefaultStyleType;
-    msScrollLimitXMin?: DefaultStyleType;
-    msScrollLimitYMax?: DefaultStyleType;
-    msScrollLimitYMin?: DefaultStyleType;
-    msScrollRails?: DefaultStyleType;
-    msScrollSnapPointsX?: DefaultStyleType;
-    msScrollSnapPointsY?: DefaultStyleType;
-    msScrollSnapType?: DefaultStyleType;
-    msScrollSnapX?: DefaultStyleType;
-    msScrollSnapY?: DefaultStyleType;
-    msScrollTranslation?: DefaultStyleType;
-    msTextCombineHorizontal?: DefaultStyleType;
-    msTextSizeAdjust?: DefaultStyleType;
-    msTouchAction?: DefaultStyleType;
-    msTouchSelect?: DefaultStyleType;
-    msUserSelect?: DefaultStyleType;
-    msWrapFlow?: DefaultStyleType;
-    msWrapMargin?: DefaultStyleType;
-    msWrapThrough?: DefaultStyleType;
-
     objectFit?: ObjectFitStyleType;
     objectPosition?: CssPosition;
     offset?: DefaultStyleType;
@@ -1215,27 +1168,6 @@ export interface ICssStyleset
     visibility?: DefaultStyleType;
     vectorEffect?: DefaultStyleType;
 
-    webkitBorderImage?: DefaultStyleType;
-    webkitBoxDirection?: DefaultStyleType;
-    webkitBoxOrient?: DefaultStyleType;
-    webkitColumnBreakAfter?: DefaultStyleType;
-    webkitColumnBreakBefore?: DefaultStyleType;
-    webkitColumnBreakInside?: DefaultStyleType;
-    webkitColumnCount?: ColumnCountStyleType;
-    webkitColumnGap?: SingleGapStyleType;
-    webkitColumnRule?: ColumnRuleStyleType;
-    webkitColumnRuleColor?: CssColor;
-    webkitColumnRuleStyle?: ColumnRuleStyleType;
-    webkitColumnRuleWidth?: BorderLengthStyleType;
-    webkitColumnSpan?: DefaultStyleType;
-    webkitColumnWidth?: DefaultStyleType;
-    webkitColumns?: DefaultStyleType;
-    webkitLineClamp?: DefaultStyleType;
-    webkitTapHighlightColor?: DefaultStyleType;
-    webkitUserModify?: DefaultStyleType;
-    webkitUserSelect?: DefaultStyleType;
-    webkitWritingMode?: DefaultStyleType;
-
     whiteSpace?: WhiteSpaceStyleType;
     widows?: WidowsStyleType;
     width?: CssLength;
@@ -1247,14 +1179,183 @@ export interface ICssStyleset
 
     zIndex?: ZIndexStyleType;
     zoom?: ZoomStyleType;
+
+    // webkitBorderImage?: DefaultStyleType;
+    // webkitBoxDirection?: DefaultStyleType;
+    // webkitBoxOrient?: DefaultStyleType;
+    // webkitColumnBreakAfter?: DefaultStyleType;
+    // webkitColumnBreakBefore?: DefaultStyleType;
+    // webkitColumnBreakInside?: DefaultStyleType;
+    // webkitColumnCount?: ColumnCountStyleType;
+    // webkitColumnGap?: SingleGapStyleType;
+    // webkitColumnRule?: ColumnRuleStyleType;
+    // webkitColumnRuleColor?: CssColor;
+    // webkitColumnRuleStyle?: ColumnRuleStyleType;
+    // webkitColumnRuleWidth?: BorderLengthStyleType;
+    // webkitColumnSpan?: DefaultStyleType;
+    // webkitColumnWidth?: DefaultStyleType;
+    // webkitColumns?: DefaultStyleType;
+    // webkitLineClamp?: DefaultStyleType;
+    // webkitTapHighlightColor?: DefaultStyleType;
+    // webkitUserModify?: DefaultStyleType;
+    // webkitUserSelect?: DefaultStyleType;
+    // webkitWritingMode?: DefaultStyleType;
+
+    // msContentZoomChaining?: DefaultStyleType;
+    // msContentZoomLimit?: DefaultStyleType;
+    // msContentZoomLimitMax?: DefaultStyleType;
+    // msContentZoomLimitMin?: DefaultStyleType;
+    // msContentZoomSnap?: DefaultStyleType;
+    // msContentZoomSnapPoints?: DefaultStyleType;
+    // msContentZoomSnapType?: DefaultStyleType;
+    // msContentZooming?: DefaultStyleType;
+    // msFlowFrom?: DefaultStyleType;
+    // msFlowInto?: DefaultStyleType;
+    // msFontFeatureSettings?: DefaultStyleType;
+    // msGridColumn?: DefaultStyleType;
+    // msGridColumnAlign?: DefaultStyleType;
+    // msGridColumnSpan?: DefaultStyleType;
+    // msGridColumns?: DefaultStyleType;
+    // msGridRow?: DefaultStyleType;
+    // msGridRowAlign?: DefaultStyleType;
+    // msGridRowSpan?: DefaultStyleType;
+    // msGridRows?: DefaultStyleType;
+    // msHighContrastAdjust?: DefaultStyleType;
+    // msHyphenateLimitChars?: DefaultStyleType;
+    // msHyphenateLimitLines?: DefaultStyleType;
+    // msHyphenateLimitZone?: DefaultStyleType;
+    // msHyphens?: DefaultStyleType;
+    // msImeAlign?: DefaultStyleType;
+    // msOverflowStyle?: DefaultStyleType;
+    // msScrollChaining?: DefaultStyleType;
+    // msScrollLimit?: DefaultStyleType;
+    // msScrollLimitXMax?: DefaultStyleType;
+    // msScrollLimitXMin?: DefaultStyleType;
+    // msScrollLimitYMax?: DefaultStyleType;
+    // msScrollLimitYMin?: DefaultStyleType;
+    // msScrollRails?: DefaultStyleType;
+    // msScrollSnapPointsX?: DefaultStyleType;
+    // msScrollSnapPointsY?: DefaultStyleType;
+    // msScrollSnapType?: DefaultStyleType;
+    // msScrollSnapX?: DefaultStyleType;
+    // msScrollSnapY?: DefaultStyleType;
+    // msScrollTranslation?: DefaultStyleType;
+    // msTextCombineHorizontal?: DefaultStyleType;
+    // msTextSizeAdjust?: DefaultStyleType;
+    // msTouchAction?: DefaultStyleType;
+    // msTouchSelect?: DefaultStyleType;
+    // msUserSelect?: DefaultStyleType;
+    // msWrapFlow?: DefaultStyleType;
+    // msWrapMargin?: DefaultStyleType;
+    // msWrapThrough?: DefaultStyleType;
 }
 
 
 
 /**
- * Interface representing a collection of style properties and their values.
+ * The IStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
+ * "extended" versions of their types. These extended types are defined using the [[Extended]]
+ * generic type, which adds basic keywords (e.g. "reset", "initial", etc.) as well as
+ * [[IStringProxy]] and [[IVarProxy]] to the type that is defined in the ICssStyleset
+ * interface.
  */
 export type IStyleset = { [K in keyof ICssStyleset]: Extended<ICssStyleset[K]> }
+
+
+
+/**
+ * The ICssVarTemplates interface maps template names to the types, whcih can be used for
+ * defining custom CSS properties (a.k.a. variables). Normally, variables are defined using the
+ * names of the style properties and their type is determined by the type of this property in the
+ * IStyleset interface. Sometimes, however, there is a need to define variables of some other
+ * types, for which ther is no suitable style property. The ICssVarTemplates interface provides
+ * many basic types and it can also be extended using the TypeScript's module augmentation.
+ */
+export interface ICssVarTemplates extends ICssStyleset
+{
+    /** Allows having CSS variables that accept value of any type */
+    "any"?: any;
+
+    /** Allows having CSS variables that accept a string value */
+    "CssString"?: string;
+
+    /** Allows having CSS variables that accept a `<number>` CSS value */
+    "CssNumber"?: CssNumber;
+
+    /** Allows having CSS variables that accept a `<length>` CSS value */
+    "CssLength"?: CssLength;
+
+    /** Allows having CSS variables that accept a `<angle>` CSS value */
+    "CssAngle"?: CssAngle;
+
+    /** Allows having CSS variables that accept a `<time>` CSS value */
+    "CssTime"?: CssTime;
+
+    /** Allows having CSS variables that accept a `<resolution>` CSS value */
+    "CssResolution"?: CssResolution;
+
+    /** Allows having CSS variables that accept a `<frequency>` CSS value */
+    "CssFrequency"?: CssFrequency;
+
+    /** Allows having CSS variables that accept a `<fraction>` CSS value */
+    "CssFraction"?: CssFraction;
+
+    /** Allows having CSS variables that accept a `<percent>` CSS value */
+    "CssPercent"?: CssPercent;
+
+    /** Allows having CSS variables that accept a `<position>` CSS value */
+    "CssPosition"?: CssPosition;
+
+    /** Allows having CSS variables that accept a `<color>` CSS value */
+    "CssColor"?: CssColor;
+
+    /** Allows having CSS variables that accept a `<image>` CSS value */
+    "CssImage"?: CssImage;
+}
+
+
+
+/**
+ * The IVarTemplates type maps all template properties defined in the [[ICssVarTemplates]]
+ * interface to the "extended" versions of their types. These extended types are defined using
+ * the [[Extended]] generic type, which adds basic keywords (e.g. "reset", "initial", etc.) as
+ * well as [[IStringProxy]] and [[IVarProxy]] to the type that is defined in the ICssVarTemplates
+ * interface.
+ */
+export type IVarTemplates = { [K in keyof ICssVarTemplates]: Extended<ICssVarTemplates[K]> }
+
+
+
+// /**
+//  * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
+//  * custom CSS properties using the [[$var]] function.
+//  */
+// export type VarTemplateName = keyof IStyleset | keyof IVarTemplates;
+
+
+
+// /**
+//  * The VarValueType generic type defines the type of the value that can be assigned to the custom
+//  * CSS property using the generic type K as its template.
+//  */
+// export type VarValueType<K extends VarTemplateName> = K extends keyof IVarTemplates
+//                 ? IVarTemplates[K] : K extends keyof IStyleset ? IStyleset[K] : string;
+
+
+
+/**
+ * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
+ * custom CSS properties using the [[$var]] function.
+ */
+export type VarTemplateName = keyof IVarTemplates;
+
+
+
+/**
+ * The VarValueType generic type defines the type of the value that can be assigned to the custom
+ * CSS property using the generic type K as its template.
+ */
+export type VarValueType<K extends VarTemplateName> = IVarTemplates[K];
 
 
 
@@ -1305,8 +1406,8 @@ import {IVarRule} from "../rules/RuleTypes";
  * .blue { --different-olor: "blue"; }
  * ```
  */
-export type CustomVarStyleType<K extends keyof IStyleset = any> = 
-    [IVarRule<K>, IStyleset[K]] | [string, K, IStyleset[K]]
+export type CustomVarStyleType<K extends VarTemplateName = any> = 
+    [IVarRule<K>, VarValueType<K>] | [string, K, VarValueType<K>]
 
 
 

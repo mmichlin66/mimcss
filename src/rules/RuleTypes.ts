@@ -4,7 +4,7 @@
 
 
 import {IVarProxy} from "../styles/UtilTypes";
-import {IStyleset, Styleset, ICssStyleset} from "../styles/StyleTypes";
+import {IStyleset, Styleset, ICssStyleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {IAnimationNameProxy} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 
@@ -164,7 +164,7 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	setCustomProp<K extends keyof IStyleset>( customVar: IVarRule<K>, value: IStyleset[K], important?: boolean): void;
+	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: VarValueType<K>, important?: boolean): void;
 }
 
 
@@ -311,12 +311,12 @@ export interface IPageRule extends IStyleRule
  * The IVarRule interface represents a CSS custom property definition.
  * Objects implementing this interface are returned from the [[$var]] function.
  */
-export interface IVarRule<K extends keyof ICssStyleset = any> extends INamedEntity, IVarProxy<ICssStyleset[K]>
+export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, IVarProxy<VarValueType<K>>
 {
-	/**
-	 * Name of the property on the rule definition object to which this rule is assigned.
-	 */
-	readonly ruleName: string;
+	// /**
+	//  * Name of the property on the rule definition object to which this rule is assigned.
+	//  */
+	// readonly ruleName: string;
 
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly template: K;
@@ -328,7 +328,7 @@ export interface IVarRule<K extends keyof ICssStyleset = any> extends INamedEnti
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	setValue( value: IStyleset[K], important?: boolean): void;
+	setValue( value: VarValueType<K>, important?: boolean): void;
 }
 
 

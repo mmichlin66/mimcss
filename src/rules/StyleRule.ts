@@ -1,5 +1,5 @@
 import {IStyleRule, ExtendedStyleset, RuleType, IVarRule} from "./RuleTypes";
-import {IStyleset, Styleset} from "../styles/StyleTypes"
+import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, IRuleContainerOwner} from "./Rule";
 import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
@@ -212,11 +212,11 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	/**
 	 * Adds/replaces the value of the given custmom cSS property in this rule.
-	 * @param customVar ICUstomVar object defining a custom CSS property.
+	 * @param varDef IVarRule object defining a custom CSS property.
 	 * @param varValue New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setCustomProp<K extends keyof IStyleset>( varDef: IVarRule<K>, varValue: IStyleset[K], important?: boolean): void
+	public setCustomProp<K extends VarTemplateName>( varDef: IVarRule<K>, varValue: VarValueType<K>, important?: boolean): void
 	{
 		if (!varDef || !this.cssStyleRule)
 			return;

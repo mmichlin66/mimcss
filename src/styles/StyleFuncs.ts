@@ -1,8 +1,10 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
 import {Extended, MultiCssPosition} from "./UtilTypes";
-import {camelToDash, valueToString, arrayToCssString, objectToCssString,
-    IValueConvertOptions, positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath, CssAngleMath
+import {
+    camelToDash, valueToString, arrayToCssString, objectToCssString, IValueConvertOptions,
+    positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
+    CssAngleMath, CssFrequencyMath, CssFractionMath, CssPercentMath, CssResolutionMath
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 
@@ -434,14 +436,13 @@ export function stylesetToCssString( styleset: StyleTypes.Styleset): string | nu
  * @param propVal 
  * @param valueOnly 
  */
-export function customPropToCssString<K extends keyof IStyleset>(
-    propVal: StyleTypes.CustomVarStyleType<K>, valueOnly?: boolean): string | null
+function customPropToCssString( propVal: StyleTypes.CustomVarStyleType, valueOnly?: boolean): string | null
 {
     if (!propVal)
         return null;
 
     let varName: string;
-    let template: K;
+    let template: string;
     let value: any;
     if (propVal.length === 2)
     {
@@ -470,12 +471,53 @@ export function customPropToCssString<K extends keyof IStyleset>(
 
 
 
+// /**
+//  * Converts the given custom CSS property definition to string.
+//  * @param propVal 
+//  * @param valueOnly 
+//  */
+// function customPropToCssString<K extends StyleTypes.VarTemplateName>(
+//     propVal: StyleTypes.CustomVarStyleType<K>, valueOnly?: boolean): string | null
+// {
+//     if (!propVal)
+//         return null;
+
+//     let varName: string;
+//     let template: K;
+//     let value: any;
+//     if (propVal.length === 2)
+//     {
+//         varName = propVal[0].cssName;
+//         template = propVal[0].template;
+//         value = propVal[1]
+//     }
+//     else
+//     {
+//         varName = propVal[0];
+//         if (!varName)
+//             return null;
+//         else if (!varName.startsWith("--"))
+//             varName = "--" + varName;
+
+//         template = propVal[1];
+//         if (!varName || !template)
+//             return null;
+
+//         value = propVal[2];
+//     }
+
+//     let varValue = stylePropToCssString( template, value, true);
+//     return valueOnly ? varValue : `${varName}:${varValue}`;
+// }
+
+
+
 /**
  * Converts the given style property to the CSS style string
  * @param style 
  */
-export function stylePropToCssString<K extends keyof IStyleset>(
-    propName: K, propVal: IStyleset[K], valueOnly?: boolean): string | null
+export function stylePropToCssString(
+    propName: string, propVal: any, valueOnly?: boolean): string | null
 {
     if (!propName)
         return null;
@@ -487,13 +529,40 @@ export function stylePropToCssString<K extends keyof IStyleset>(
         ? valueToString( propVal)
         : typeof info === "object"
             ? valueToString( propVal, info as IValueConvertOptions)
-            : (info as PropToStringFunc<K>)( propVal);
+            : (info as PropToStringFunc)( propVal);
 
     if (!varValue)
         varValue = "initial";
         
     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
 }
+
+
+
+// /**
+//  * Converts the given style property to the CSS style string
+//  * @param style 
+//  */
+// export function stylePropToCssString<K extends StyleTypes.VarTemplateName>(
+//     propName: K, propVal: StyleTypes.VarValueType<K>, valueOnly?: boolean): string | null
+// {
+//     if (!propName)
+//         return null;
+
+//     // find information object for the property
+//     let info: any = StylePropertyInfos[propName];
+
+//     let varValue = !info
+//         ? valueToString( propVal)
+//         : typeof info === "object"
+//             ? valueToString( propVal, info as IValueConvertOptions)
+//             : (info as PropToStringFunc<K>)( propVal);
+
+//     if (!varValue)
+//         varValue = "initial";
+        
+//     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
+// }
 
 
 
@@ -504,7 +573,7 @@ export function stylePropToCssString<K extends keyof IStyleset>(
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type defnition of a function that takes property value and converts it to string */
-type PropToStringFunc<K extends keyof IStyleset> = (val: IStyleset[K]) => string;
+type PropToStringFunc<K extends StyleTypes.VarTemplateName = any> = (val: StyleTypes.VarValueType<K>) => string;
 
 
 
@@ -518,7 +587,7 @@ let commaArraySeparator = { arraySeparator: "," };
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValueConvertOptions) } =
+const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFunc<K> | IValueConvertOptions) } =
 {
     animation: {
         fromObject: singleAnimation_fromObject,
@@ -701,6 +770,17 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     width: CssLengthMath.styleToString,
 
     zoom: CssLengthMath.styleToString,
+
+    // special properties for IVarRule types
+    "CssLength": CssLengthMath.styleToString,
+    "CssAngle": CssAngleMath.styleToString,
+    "CssTime": CssTimeMath.styleToString,
+    "CssResolution": CssResolutionMath.styleToString,
+    "CssFrequency": CssFrequencyMath.styleToString,
+    "CssFraction": CssFractionMath.styleToString,
+    "CssPercent": CssPercentMath.styleToString,
+    "CssPosition": positionToString,
+    "CssColor": colorToString,
 };
 
 

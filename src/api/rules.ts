@@ -5,7 +5,7 @@
 
 import * as RuleTypes from "../rules/RuleTypes";
 import * as StylesheetFuncs from "../rules/Stylesheet"
-import {IStyleset, SupportsQuery, Styleset, ICssStyleset} from "../styles/StyleTypes";
+import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass, SelectorTokenType} from "../styles/SelectorTypes";
 import {SelectorProxy} from "../styles/SelectorFuncs";
 import {MediaQuery} from "../styles/MediaTypes"
@@ -83,7 +83,7 @@ export function $keyframes( frames?: RuleTypes.AnimationFrame[], nameOverride?: 
  * variable can be later used either in conditional grouping rules or in derived style definition
  * classes.
  */
-export function $var<K extends keyof ICssStyleset>( template: K, propVal?: IStyleset[K],
+export function $var<K extends VarTemplateName>( template: K, propVal?: VarValueType<K>,
 				nameOverride?: string | RuleTypes.IVarRule<K>): RuleTypes.IVarRule<K>
 	{ return new VarRule( template, propVal, nameOverride); }
 

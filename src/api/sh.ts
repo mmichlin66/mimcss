@@ -7,7 +7,7 @@ import * as ColorFuncs from "../styles/ColorFuncs"
 import * as ImageTypes from "../styles/ImageTypes"
 import * as ImageFuncs from "../styles/ImageFuncs"
 import * as StyleTypes from "../styles/StyleTypes"
-import {StringProxy, valueToString, UrlProxy} from "../styles/UtilFuncs"
+import {StringProxy, UrlProxy} from "../styles/UtilFuncs"
 import {stylePropToCssString} from "../styles/StyleFuncs";
 
 
@@ -40,7 +40,7 @@ export class sh
      * to a CSS compliant string.
      * @param stylePropValue Value to convert.
      */
-    public static val<K extends keyof IStyleset>( stylePropName: K, stylePropValue: IStyleset[K]): string | null
+    public static val<K extends StyleTypes.VarTemplateName>( stylePropName: K, stylePropValue: StyleTypes.VarValueType<K>): string | null
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }

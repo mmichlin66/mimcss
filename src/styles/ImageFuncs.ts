@@ -1,6 +1,6 @@
 ﻿import {
     GradientStopOrHint, GradientColorAndLength, LinearGradAngle, RadialGradientShape,
-    RadialGradientExtent, IImageProxy, CrossFadeParam
+    RadialGradientExtent, IImageProxy, CrossFadeParam, CssImage
 } from "./ImageTypes"
 import {colorToString} from "./ColorFuncs";
 import {CssPosition, Extended, SimpleCssPosition, CssAngle} from "./UtilTypes";

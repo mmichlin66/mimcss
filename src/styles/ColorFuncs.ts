@@ -36,22 +36,6 @@ function colorNumberToString( val: number): string
 
 
 
-/**
- * Converts color style value to the CSS time string. If a string value is in the Colors object we
- * need to get its number and convert it to the rgb[a]() function because it might be a custom
- * color name added via INamedColors module augmentation. For numeric values, we check if this is
- * one of the predefined
- */
-export function colorToString( val: Extended<CssColor>): string
-{
-    return valueToString( val, {
-        fromString: v => Colors[v] ? colorNumberToString( Colors[v]) : v,
-        fromNumber: colorNumberToString
-    });
-}
-
-
-
 function colorSeparationToString( c: number | string): string
 {
     return c == null ? "0" : typeof c === "string" ? c : Number.isInteger(c) ? c.toString() : CssPercentMath.convertFunc(c);
@@ -177,6 +161,22 @@ let reversedColorMap = new Map<number,string>();
 
 // build Reversed Color Map
 Object.entries( Colors).forEach( ([name, value]) => reversedColorMap.set( value, name) );
+
+
+
+/**
+ * Converts color style value to the CSS time string. If a string value is in the Colors object we
+ * need to get its number and convert it to the rgb[a]() function because it might be a custom
+ * color name added via INamedColors module augmentation. For numeric values, we check if this is
+ * one of the predefined
+ */
+export function colorToString( val: Extended<CssColor>): string
+{
+    return valueToString( val, {
+        fromString: v => Colors[v] ? colorNumberToString( Colors[v]) : v,
+        fromNumber: colorNumberToString
+    });
+}
 
 
 
