@@ -220,10 +220,39 @@ export class sh
         count: Extended<StyleTypes.SingleAnimationIterationCount> = 1,
         direction: Extended<StyleTypes.SingleAnimationDirection> = "normal",
         mode: Extended<StyleTypes.SingleAnimationFillMode> = "none",
-        state: Extended<StyleTypes.SingleAnimationPlayState> = "running",
-        ): StyleTypes.SingleAnimation
+        state: Extended<StyleTypes.SingleAnimationPlayState> = "running"): StyleTypes.SingleAnimation
     {
         return { name, duration, func, delay,count, direction, state, mode };
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Background
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns an object that can be assigned to the animation property.
+     * @param color Color value.
+     * @param position
+     * @param size
+     * @param repeat Background repeat value. The default value is "repeat".
+     * @param attachment Background attachment. The default value is "scroll".
+     * @param origin Background origin. The default value is "padding-box".
+     * @param clip Background clip. The default value is "border-box".
+     */
+    public static background( color?: ColorTypes.CssColor,
+        image?: ImageTypes.CssImage,
+        position?: CssPosition,
+        size?: StyleTypes.SingleBackgroundSize,
+        repeat: StyleTypes.SingleBackgroundRepeat = "repeat",
+        attachment: StyleTypes.SingleBackgroundAttachment = "scroll",
+        origin: StyleTypes.SingleBackgroundOrigin = "padding-box",
+        clip: StyleTypes.SingleBackgroundClip = "border-box"): StyleTypes.Background_Single
+    {
+        return { color, image, position, size, repeat, attachment, origin, clip };
     }
 }
 

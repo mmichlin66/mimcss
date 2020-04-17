@@ -1,10 +1,10 @@
 ﻿import {
     Extended, IStringProxy, INumberProxy, CssNumber, CssMultiNumber, INumberMath,
     ICssFractionMath, CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
-    LengthUnits, PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits,
-    FractionUnits, CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
+    CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
     CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency, CssFraction,
-    CssMultiFraction, CssPercent, CssMultiPercent, IUrlProxy, ICssNumberMath, ICssLengthMath, ICssAngleMath, ICssPercentMath
+    CssMultiFraction, CssPercent, CssMultiPercent, IUrlProxy, ICssLengthMath,
+    ICssAngleMath, ICssPercentMath, ICssFrequencyMath, ICssResolutionMath, ICssTimeMath
 } from "./UtilTypes"
 
 
@@ -172,12 +172,12 @@ export function arrayToCssString( val: any[], func?: (v) => string, separator: s
  * @param val Object to convert to string.
  * @param usePropNames Flag indicating whether the names of the object's proprties should be added to the string.
  * @param propsAndFuncs Array of property names and optionally functions. The order of the names determines in
- *     which oprder the properties should be added to the string. If a function is present for the property,
+ *     which order the properties should be added to the string. If a function is present for the property,
  *     it will be used to convert the property's value to the string. If a function is not present, then the
  *     property value should be converted to the string using the valueToString function.
  */
 export function objectToCssString( val: any, usePropNames: boolean,
-    ...propsAndFuncs: (string | [string, (val: any) => string])[] ): string
+    ...propsAndFuncs: (string | [string, (val: any) => string, string?])[] ): string
 {
     if (val == null || propsAndFuncs.length === 0)
         return "";
@@ -186,7 +186,6 @@ export function objectToCssString( val: any, usePropNames: boolean,
     propsAndFuncs.forEach( propAndFunc =>
         {
             let propName = typeof propAndFunc === "string" ? propAndFunc : propAndFunc[0];
-            let func = typeof propAndFunc === "string" ? undefined : propAndFunc[1];
 
             let propVal = val[propName];
             if (propVal == null)
@@ -195,6 +194,11 @@ export function objectToCssString( val: any, usePropNames: boolean,
             if (usePropNames)
                 buf.push( propName);
 
+            let prefix = typeof propAndFunc === "string" ? undefined : propAndFunc[2];
+            if (prefix)
+                buf.push( prefix);
+
+            let func = typeof propAndFunc === "string" ? undefined : propAndFunc[1];
             if (func)
                 buf.push( func( propVal));
             else if (propVal != null)
@@ -622,7 +626,7 @@ export class CssAngleMath extends NumberMath<"Angle" | "Percent"> implements ICs
  * The CssTimeMath class contains methods that implement CSS mathematic functions on the
  * <time> CSS types.
  */
-export class CssTimeMath extends NumberMath<"Time" | "Percent">
+export class CssTimeMath extends NumberMath<"Time" | "Percent"> implements ICssTimeMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "ms", "s"); }
 
@@ -656,7 +660,7 @@ export class CssTimeMath extends NumberMath<"Time" | "Percent">
  * The CssResolutionMath class contains methods that implement CSS mathematic functions on the
  * <resolution> CSS types.
  */
-export class CssResolutionMath extends NumberMath<"Resolution" | "Percent">
+export class CssResolutionMath extends NumberMath<"Resolution" | "Percent"> implements ICssResolutionMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "dpi", "x"); }
 
@@ -699,7 +703,7 @@ export class CssResolutionMath extends NumberMath<"Resolution" | "Percent">
  * The CssFrequencyMath class contains methods that implement CSS mathematic functions on the
  * <frequence> CSS types.
  */
-export class CssFrequencyMath extends NumberMath<"Frequency" | "Percent">
+export class CssFrequencyMath extends NumberMath<"Frequency" | "Percent"> implements ICssFrequencyMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "Hz", "kHz"); }
 
@@ -771,7 +775,7 @@ export class CssFractionMath extends NumberMath<"Fraction" | "Percent"> implemen
  * The CssPercentMath class contains methods that implement CSS mathematic functions on the
  * <percent> CSS types.
  */
-export class CssPercentMath extends NumberMath<"Percent">
+export class CssPercentMath extends NumberMath<"Percent"> implements ICssPercentMath
 {
     public static convertFunc( n: number): string
         { return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%"; }

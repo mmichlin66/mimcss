@@ -3,7 +3,7 @@
     RadialGradientExtent, IImageProxy, CrossFadeParam
 } from "./ImageTypes"
 import {colorToString} from "./ColorFuncs";
-import {CssPosition, CssNumber, Extended, SimpleCssPosition, CssAngle} from "./UtilTypes";
+import {CssPosition, Extended, SimpleCssPosition, CssAngle} from "./UtilTypes";
 import {valueToString, INumberMathClass, CssAngleMath, positionToString, CssPercentMath} from "./UtilFuncs";
 
 

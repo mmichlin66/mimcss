@@ -95,6 +95,31 @@ function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.Singl
 
 
 
+function singleBackground_fromObject( val: StyleTypes.Background_Single): string
+{
+    return objectToCssString( val, false,
+            ["color", colorToString],
+            "image",
+            ["position", positionToString],
+            ["size", CssLengthMath.multiStyleToStringWithSpace, "/"],
+            "repeat",
+            "attachment",
+            "origin",
+            "clip");
+}
+
+
+
+function singleBackground_fromStyle( val: Extended<StyleTypes.Background_Single>): string
+{
+    return valueToString( val, {
+        fromNumber: colorToString,
+        fromObject: singleBackground_fromObject
+    });
+}
+
+
+
 function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgroundSize>): string
 {
     return valueToString( val, {
@@ -496,24 +521,29 @@ let commaArraySeparator = { arraySeparator: "," };
 const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValueConvertOptions) } =
 {
     animation: {
+        fromObject: singleAnimation_fromObject,
+        fromAny: singleAnimation_fromStyle,
         arrayItemFunc: singleAnimation_fromStyle,
         arraySeparator: ",",
-        fromObject: singleAnimation_fromObject,
-        fromAny: singleAnimation_fromStyle
     },
-
     animationDelay: CssTimeMath.multiStyleToStringWithComma,
     animationDuration: CssTimeMath.multiStyleToStringWithComma,
     animationIterationCount: commaArraySeparator,
     animationFillMode: commaArraySeparator,
     animationName: commaArraySeparator,
     animationPlayState: commaArraySeparator,
-
     animationTimingFunction: {
         fromNumber: animationTimingFunction_fromNumber,
         fromArray: animationTimingFunction_fromArray
     },
 
+    background: {
+        fromNumber: colorToString,
+        fromObject: singleBackground_fromObject,
+        fromAny: singleBackground_fromStyle,
+        arrayItemFunc: singleBackground_fromStyle,
+        arraySeparator: ",",
+    },
     backgroundAttachment: commaArraySeparator,
     backgroundBlendMode: commaArraySeparator,
     backgroundClip: commaArraySeparator,
@@ -526,9 +556,7 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
         arrayItemFunc: singleBackgroundSize_fromStyle,
         arraySeparator: ","
     },
-
     baselineShift: CssLengthMath.styleToString,
-
     border: borderToString,
     borderBlockEnd: borderToString,
     borderBlockEndColor: colorToString,
@@ -541,12 +569,10 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     borderBottomLeftRadius: singleCornerRadiusToCssString,
     borderBottomRightRadius: singleCornerRadiusToCssString,
     borderBottomWidth: CssLengthMath.styleToString,
-
     borderColor: {
         arrayItemFunc: colorToString,
         fromAny: colorToString
     },
-
     borderImageWidth: CssLengthMath.multiStyleToStringWithSpace,
     borderInlineEnd: borderToString,
     borderInlineEndColor: colorToString,
@@ -569,7 +595,6 @@ const StylePropertyInfos: { [K in keyof IStyleset]: (PropToStringFunc<K> | IValu
     borderTopRightRadius: singleCornerRadiusToCssString,
     borderTopWidth: CssLengthMath.styleToString,
     borderWidth: CssLengthMath.multiStyleToStringWithSpace,
-
     bottom: CssLengthMath.styleToString,
     boxShadow: valueToString,
 

@@ -135,6 +135,24 @@ export type BackfaceVisibilityModeStyleType = "visible" | "hidden";
 
 
 
+/** Type for single background value */
+export type Background_Single = string | CssColor |
+    {
+        color?: CssColor
+        image?: CssImage,
+        position?: CssPosition,
+        size?: SingleBackgroundSize,
+        repeat?: SingleBackgroundRepeat,
+        attachment?: SingleBackgroundAttachment,
+        origin?: SingleBackgroundOrigin,
+        clip?: SingleBackgroundClip,
+    };
+
+/** Type for background style property */
+export type Background_StyleType = OneOrMany<Background_Single>;
+
+
+
 /** Type for single background attachment */
 export type SingleBackgroundAttachment = "scroll" | "fixed" | "local";
 
@@ -788,7 +806,7 @@ export interface ICssStyleset
 
     backdropFilter?: DefaultStyleType;
     backfaceVisibility?: BackfaceVisibilityModeStyleType;
-    background?: DefaultStyleType;
+    background?: Background_StyleType;
     backgroundAttachment?: BackgroundAttachmentStyleType;
     backgroundBlendMode?: BackgroundBlendModeStyleType;
     backgroundClip?: BackgroundClipStyleType;
