@@ -1,7 +1,7 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     IValueProxy, CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
-    CssFrequency, CssFraction, CssResolution,
+    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius,
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -42,44 +42,44 @@ export type AlignmentBaselineStyleType = "auto" | "baseline" | "before-edge" | "
 
 
 /** Type for single animation */
-export type SingleAnimation = string |
+export type Animation_Single = string |
     {
         delay?: Extended<CssTime>;
-        func?: Extended<SingleAnimationTimingFunction>;
+        func?: Extended<AnimationTimingFunction_Single>;
         duration?: Extended<CssTime>;
-        count?: Extended<SingleAnimationIterationCount>;
-        direction?: Extended<SingleAnimationDirection>;
-        state?: Extended<SingleAnimationPlayState>;
-        mode?: Extended<SingleAnimationFillMode>;
-        name?: Extended<SingleAnimationName>;
+        count?: Extended<AnimationIterationCount_Single>;
+        direction?: Extended<AnimationDirection_Single>;
+        state?: Extended<AnimationPlayState_Single>;
+        mode?: Extended<AnimationFillMode_Single>;
+        name?: Extended<AnimationName_Single>;
     };
 
 /** Type for animation style property */
-export type AnimationStyleType = OneOrMany<SingleAnimation>;
+export type Animation_StyleType = OneOrMany<Animation_Single>;
 
 
 
 /** Type for single animation direction */
-export type SingleAnimationDirection = "normal" | "reverse" | "alternate" | "alternate-reverse";
+export type AnimationDirection_Single = "normal" | "reverse" | "alternate" | "alternate-reverse";
 
 /** Type for animation-direction style property */
-export type AnimationDirectionStyleType = OneOrMany<SingleAnimationDirection>;
+export type AnimationDirection_StyleType = OneOrMany<AnimationDirection_Single>;
 
 
 
 /** Type for single animation fill mode */
-export type SingleAnimationFillMode = "none" | "forwards" | "backwards" | "both";
+export type AnimationFillMode_Single = "none" | "forwards" | "backwards" | "both";
 
 /** Type for animation-fill-mode style property */
-export type AnimationFillModeStyleType = OneOrMany<SingleAnimationDirection>;
+export type AnimationFillMode_StyleType = OneOrMany<AnimationDirection_Single>;
 
 
 
 /** Type for single animation iteration count */
-export type SingleAnimationIterationCount = "infinite" | CssNumber;
+export type AnimationIterationCount_Single = "infinite" | CssNumber;
 
 /** Type for animation-iteration-count style property */
-export type AnimationIterationCountStyleType = OneOrMany<SingleAnimationIterationCount>;
+export type AnimationIterationCount_StyleType = OneOrMany<AnimationIterationCount_Single>;
 
 
 
@@ -96,18 +96,18 @@ export interface IAnimationNameProxy extends IValueProxy
 }
 
 /** Type for single animation name */
-export type SingleAnimationName = "none" | string | IAnimationNameProxy;
+export type AnimationName_Single = "none" | string | IAnimationNameProxy;
 
 /** Type for animation-name style property */
-export type AnimationNameStyleType = OneOrMany<SingleAnimationName>;
+export type AnimationName_StyleType = OneOrMany<AnimationName_Single>;
 
 
 
 /** Type for single animation play state */
-export type SingleAnimationPlayState = "paused" | "running";
+export type AnimationPlayState_Single = "paused" | "running";
 
 /** Type for animation-play-state style property */
-export type AnimationPlayStateStyleType = OneOrMany<SingleAnimationPlayState>;
+export type AnimationPlayState_StyleType = OneOrMany<AnimationPlayState_Single>;
 
 
 
@@ -124,29 +124,29 @@ export type AnimationTimingFunction_Step = number | [Extended<number>, Extended<
 export type AnimationTimingFunction_Bezier = [Extended<number>, Extended<number>, Extended<number>, Extended<number>];
 
 /** Type for single animation timing function */
-export type SingleAnimationTimingFunction = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier;
+export type AnimationTimingFunction_Single = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier;
 
 /** Type for animation-timing-function style property */
-export type AnimationTimingFunctionStyleType = OneOrMany<SingleAnimationTimingFunction>;
+export type AnimationTimingFunction_StyleType = OneOrMany<AnimationTimingFunction_Single>;
 
 
 
 /** Type for backface-visibility style property */
-export type BackfaceVisibilityModeStyleType = "visible" | "hidden";
+export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 
 
 
 /** Type for single background value */
 export type Background_Single = string | CssColor |
     {
-        color?: CssColor
-        image?: CssImage,
-        position?: CssPosition,
-        size?: SingleBackgroundSize,
-        repeat?: SingleBackgroundRepeat,
-        attachment?: SingleBackgroundAttachment,
-        origin?: SingleBackgroundOrigin,
-        clip?: SingleBackgroundClip,
+        color?: Extended<CssColor>,
+        image?: Extended<CssImage>,
+        position?: Extended<CssPosition>,
+        size?: Extended<BackgroundSize_Single>,
+        repeat?: Extended<BackgroundRepeat_Single>,
+        attachment?: Extended<BackgroundAttachment_Single>,
+        origin?: Extended<BackgroundOrigin_Single>,
+        clip?: Extended<BackgroundClip_Single>,
     };
 
 /** Type for background style property */
@@ -155,57 +155,57 @@ export type Background_StyleType = OneOrMany<Background_Single>;
 
 
 /** Type for single background attachment */
-export type SingleBackgroundAttachment = "scroll" | "fixed" | "local";
+export type BackgroundAttachment_Single = "scroll" | "fixed" | "local";
 
 /** Type for background-attachment style property */
-export type BackgroundAttachmentStyleType = OneOrMany<SingleBackgroundAttachment>;
+export type BackgroundAttachment_StyleType = OneOrMany<BackgroundAttachment_Single>;
 
 
 
 /** Type for single background blend mode */
-export type SingleBackgroundBlendMode = "normal" | "multiply" | "screen" | "overlay" | "darken" |
+export type BackgroundBlendMode_Single = "normal" | "multiply" | "screen" | "overlay" | "darken" |
     "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" |
     "exclusion" | "hue" | "saturation" | "color" | "luminosity";
 
 /** Type for commaArraySeparator style property */
-export type BackgroundBlendModeStyleType = OneOrMany<SingleBackgroundBlendMode>;
+export type BackgroundBlendMode_StyleType = OneOrMany<BackgroundBlendMode_Single>;
 
 
 
 /** Type for single background clip */
-export type SingleBackgroundClip = "border-box" | "padding-box" | "content-box" | "text";
+export type BackgroundClip_Single = "border-box" | "padding-box" | "content-box" | "text";
 
 /** Type for background-clip style property */
-export type BackgroundClipStyleType = OneOrMany<SingleBackgroundClip>;
+export type BackgroundClip_StyleType = OneOrMany<BackgroundClip_Single>;
 
 
 
 /** Type for background-image style property */
-export type BackgroundImageStyleType = "none" | OneOrMany<CssImage>;
+export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
 
 
 
 /** Type for single background origin */
-export type SingleBackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text";
+export type BackgroundOrigin_Single = "border-box" | "padding-box" | "content-box" | "text";
 
 /** Type for background-origin style property */
-export type BackgroundOriginStyleType = OneOrMany<SingleBackgroundOrigin>;
+export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin_Single>;
 
 
 
 /** Type for single background repeat */
-export type SingleBackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat";
+export type BackgroundRepeatKeyword_Single = "repeat" | "space" | "round" | "no-repeat";
 
 /** Type for single background repeat */
-export type SingleBackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<SingleBackgroundRepeatKeyword>;
+export type BackgroundRepeat_Single = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeyword_Single>;
 
 /** Type for background-repeat style property */
-export type BackgroundRepeatStyleType = OneOrMany<SingleBackgroundRepeat>;
+export type BackgroundRepeat_StyleType = OneOrMany<BackgroundRepeat_Single>;
 
 
 
 /** Type for background size */
-export type SingleBackgroundSize = "cover" | "contain" | OneOrPair<CssLength | "auto">;
+export type BackgroundSize_Single = "cover" | "contain" | OneOrPair<CssLength | "auto">;
 
 /**
  * Type for background-size style property. The background-size style can specify one or more
@@ -219,17 +219,12 @@ export type SingleBackgroundSize = "cover" | "contain" | OneOrPair<CssLength | "
  * to specify both width and height you must use array within array - even for a single size:
  * [[100,200]] wll be interpreted as "100px 200px".
  */
-export type BackgroundSizeStyleType = OneOrMany<SingleBackgroundSize>;
-
-
-
-/** Type for a single corner radius */
-export type SingleCornerRadius_StyleType = OneOrPair<CssLength>;
+export type BackgroundSize_StyleType = OneOrMany<BackgroundSize_Single>;
 
 
 
 /** Type for baseline-shift style property */
-export type BaselineShiftStyleType = "sub" | "super" | CssLength;
+export type BaselineShift_StyleType = "sub" | "super" | CssLength;
 
 
 
@@ -239,89 +234,92 @@ export type BorderRadiusStyleType = OneOrPair<CssLengthBox>;
 
 
 /** Type for single border side style property */
-export type BorderStyleKeyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
+export type BorderStyle_Keyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
     "groove" | "ridge" | "inset" | "outset";
 
 
 
 /** Type for border-style style property */
-export type BorderStyleStyleType = OneOrBox<BorderStyleKeyword>;
+export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
 
 
 
 /** Type for border side width style property */
-export type BorderSideLengthStyleType = "thin" | "medium" | "thick" | CssLength;
+export type BorderWidth__Single = "thin" | "medium" | "thick" | CssLength;
 
 
 
 /** Type for border-width style property */
-export type BorderLengthStyleType = OneOrBox<BorderSideLengthStyleType>;
+export type BorderWidth_StyleType = OneOrBox<BorderWidth__Single>;
 
 
 
 /** Type for border-collapse style property */
-export type BorderColapseStyleType = "collapse" | "separate";
+export type BorderColapse_StyleType = "collapse" | "separate";
 
 
 
 /** Type for border-spacing style property */
-export type BorderSpacingStyleType = OneOrPair<CssLength>;
+export type BorderSpacing_StyleType = OneOrPair<CssLength>;
 
 
 
 /** Type for border-color style property */
-export type BorderColorStyleType = OneOrBox<CssColor>;
+export type BorderColor_StyleType = OneOrBox<CssColor>;
 
 
 
 /** Type for border side style property */
-export type BorderStyleType = CssLength | BorderStyleKeyword | CssColor |
-    [Extended<CssLength>?, Extended<BorderStyleKeyword>?, Extended<CssColor>?];
-
-
-
-/** Type for border-image-outset style property */
-export type BorderImageOutsetStyleType = OneOrBox<CssLength>;
+export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
+    [Extended<CssLength>?, Extended<BorderStyle_Keyword>?, Extended<CssColor>?];
 
 
 
 /** Type for border-image-repeat keywords */
-export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space";
+export type BorderImageRepeat_Keyword = "stretch" | "repeat" | "round" | "space";
 
 /** Type for border-image-repeat style property */
-export type BorderImageRepeatStyleType = OneOrPair<BorderImageRepeatKeyword>;
+export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeat_Keyword>;
 
 
 
 /** Type for single box shadow. */
-export type SingleBoxShadow = "none" | string;
+export type BoxShadow_Single = "none" | string |
+    {
+        x: Extended<CssLength>,
+        y: Extended<CssLength>,
+        blur?: Extended<CssLength>,
+        spread?: Extended<CssLength>,
+        color?: Extended<CssColor>,
+        inset?: Extended<boolean>
+    };
 
 /** Type for box shadow style property */
-export type BoxShadowStyleType = OneOrMany<SingleBoxShadow>;
+export type BoxShadow_StyleType = OneOrMany<BoxShadow_Single>;
 
 
 
 /** Type for box-sizing style property */
-export type BoxSizingStyleType = "content-box" | "border-box";
+export type BoxSizing_StyleType = "content-box" | "border-box";
 
 
 
 /** Type for break-after style property */
-export type BreakAfterStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
+export type BreakAfter_StyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
     "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
     "avoid-region" | "region";
 
 
 
 /** Type for break-before style property */
-export type BreakBeforeStyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
+export type BreakBefore_StyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
     "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
     "avoid-region" | "region";
 
 
 
 /** Type for break-inside style property */
-export type BreakInsideStyleType = "auto" | "avoid" | "avoid-page" | "avoid-column" | "avoid-region";
+export type BreakInside_StyleType = "auto" | "avoid" | "avoid-page" | "avoid-column" | "avoid-region";
 
 
 
@@ -368,9 +366,9 @@ export type ColumnFillStyleType = "auto" | "balance" | "balance-all";
 export type ColumnRuleStyleType = string |
     {
         /** Column rule width. */
-        width?: BorderLengthStyleType;
+        width?: BorderWidth_StyleType;
         /** Column rule style. */
-        style?: BorderStyleStyleType;
+        style?: BorderStyle_StyleType;
         /** Column rule color. */
         color?: CssColor;
     };
@@ -795,90 +793,90 @@ export interface ICssStyleset
     alignItems?: AlignItemsStyleType;
     alignSelf?: AlignSelfStyleType;
     alignmentBaseline?: AlignmentBaselineStyleType;
-    animation?: AnimationStyleType;
+    animation?: Animation_StyleType;
     animationDelay?: CssMultiTime;
-    animationDirection?: AnimationDirectionStyleType;
+    animationDirection?: AnimationDirection_StyleType;
     animationDuration?: CssMultiTime;
-    animationFillMode?: AnimationFillModeStyleType;
-    animationIterationCount?: AnimationIterationCountStyleType;
-    animationName?: AnimationNameStyleType;
-    animationPlayState?: AnimationPlayStateStyleType;
-    animationTimingFunction?: AnimationTimingFunctionStyleType;
+    animationFillMode?: AnimationFillMode_StyleType;
+    animationIterationCount?: AnimationIterationCount_StyleType;
+    animationName?: AnimationName_StyleType;
+    animationPlayState?: AnimationPlayState_StyleType;
+    animationTimingFunction?: AnimationTimingFunction_StyleType;
 
     backdropFilter?: DefaultStyleType;
-    backfaceVisibility?: BackfaceVisibilityModeStyleType;
+    backfaceVisibility?: BackfaceVisibilityMode_StyleType;
     background?: Background_StyleType;
-    backgroundAttachment?: BackgroundAttachmentStyleType;
-    backgroundBlendMode?: BackgroundBlendModeStyleType;
-    backgroundClip?: BackgroundClipStyleType;
+    backgroundAttachment?: BackgroundAttachment_StyleType;
+    backgroundBlendMode?: BackgroundBlendMode_StyleType;
+    backgroundClip?: BackgroundClip_StyleType;
     backgroundColor?: CssColor;
-    backgroundImage?: BackgroundImageStyleType;
-    backgroundOrigin?: BackgroundOriginStyleType;
+    backgroundImage?: BackgroundImage_StyleType;
+    backgroundOrigin?: BackgroundOrigin_StyleType;
     backgroundPosition?: MultiCssPosition;
     backgroundPositionX?: DefaultStyleType;
     backgroundPositionY?: DefaultStyleType;
-    backgroundRepeat?: BackgroundRepeatStyleType;
+    backgroundRepeat?: BackgroundRepeat_StyleType;
     backgroundRepeatX?: DefaultStyleType;
     backgroundRepeatY?: DefaultStyleType;
-    backgroundSize?: BackgroundSizeStyleType;
-    baselineShift?: BaselineShiftStyleType;
+    backgroundSize?: BackgroundSize_StyleType;
+    baselineShift?: BaselineShift_StyleType;
     blockSize?: CssLength;
-    border?: BorderStyleType;
-    borderBlockEnd?: BorderStyleType;
+    border?: Border_StyleType;
+    borderBlockEnd?: Border_StyleType;
     borderBlockEndColor?: CssColor;
-    borderBlockEndStyle?: BorderStyleKeyword;
-    borderBlockEndWidth?: BorderSideLengthStyleType;
-    borderBlockStart?: BorderStyleType;
+    borderBlockEndStyle?: BorderStyle_Keyword;
+    borderBlockEndWidth?: BorderWidth__Single;
+    borderBlockStart?: Border_StyleType;
     borderBlockStartColor?: CssColor;
-    borderBlockStartStyle?: BorderStyleKeyword;
-    borderBlockStartWidth?: BorderSideLengthStyleType;
-    borderBottom?: BorderStyleType;
+    borderBlockStartStyle?: BorderStyle_Keyword;
+    borderBlockStartWidth?: BorderWidth__Single;
+    borderBottom?: Border_StyleType;
     borderBottomColor?: CssColor;
-    borderBottomLeftRadius?: SingleCornerRadius_StyleType;
-    borderBottomRightRadius?: SingleCornerRadius_StyleType;
-    borderBottomStyle?: BorderStyleKeyword;
-    borderBottomWidth?: BorderSideLengthStyleType;
-    borderCollapse?: BorderColapseStyleType;
-    borderColor?: BorderColorStyleType;
+    borderBottomLeftRadius?: CssRadius;
+    borderBottomRightRadius?: CssRadius;
+    borderBottomStyle?: BorderStyle_Keyword;
+    borderBottomWidth?: BorderWidth__Single;
+    borderCollapse?: BorderColapse_StyleType;
+    borderColor?: BorderColor_StyleType;
     borderImage?: DefaultStyleType;
-    borderImageOutset?: BorderImageOutsetStyleType;
-    borderImageRepeat?: BorderImageRepeatStyleType;
+    borderImageOutset?: CssNumberBox;
+    borderImageRepeat?: BorderImageRepeat_StyleType;
     borderImageSlice?: DefaultStyleType;
-    borderImageSource?: DefaultStyleType;
-    borderImageWidth?: CssLengthBox;
-    borderInlineEnd?: BorderStyleType;
+    borderImageSource?: CssImage;
+    borderImageWidth?: OneOrBox<CssNumber | "auto">;
+    borderInlineEnd?: Border_StyleType;
     borderInlineEndColor?: CssColor;
-    borderInlineEndStyle?: BorderStyleKeyword;
-    borderInlineEndWidth?: BorderSideLengthStyleType;
-    borderInlineStart?: BorderStyleType;
+    borderInlineEndStyle?: BorderStyle_Keyword;
+    borderInlineEndWidth?: BorderWidth__Single;
+    borderInlineStart?: Border_StyleType;
     borderInlineStartColor?: CssColor;
-    borderInlineStartStyle?: BorderStyleKeyword;
-    borderInlineStartWidth?: BorderSideLengthStyleType;
-    borderLeft?: BorderStyleType;
+    borderInlineStartStyle?: BorderStyle_Keyword;
+    borderInlineStartWidth?: BorderWidth__Single;
+    borderLeft?: Border_StyleType;
     borderLeftColor?: CssColor;
-    borderLeftStyle?: BorderStyleKeyword;
-    borderLeftWidth?: BorderSideLengthStyleType;
+    borderLeftStyle?: BorderStyle_Keyword;
+    borderLeftWidth?: BorderWidth__Single;
     borderRadius?: BorderRadiusStyleType;
-    bufferedRendering?: DefaultStyleType;
-    borderRight?: BorderStyleType;
+    borderRight?: Border_StyleType;
     borderRightColor?: CssColor;
-    borderRightStyle?: BorderStyleKeyword;
-    borderRightWidth?: BorderSideLengthStyleType;
-    borderSpacing?: BorderSpacingStyleType;
-    borderStyle?: BorderStyleStyleType;
-    borderTop?: BorderStyleType;
+    borderRightStyle?: BorderStyle_Keyword;
+    borderRightWidth?: BorderWidth__Single;
+    borderSpacing?: BorderSpacing_StyleType;
+    borderStyle?: BorderStyle_StyleType;
+    borderTop?: Border_StyleType;
     borderTopColor?: CssColor;
-    borderTopLeftRadius?: SingleCornerRadius_StyleType;
-    borderTopRightRadius?: SingleCornerRadius_StyleType;
-    borderTopStyle?: BorderStyleKeyword;
-    borderTopWidth?: BorderSideLengthStyleType;
-    borderWidth?: BorderLengthStyleType;
+    borderTopLeftRadius?: CssRadius;
+    borderTopRightRadius?: CssRadius;
+    borderTopStyle?: BorderStyle_Keyword;
+    borderTopWidth?: BorderWidth__Single;
+    borderWidth?: BorderWidth_StyleType;
     bottom?: CssLength;
-    boxShadow?: BoxShadowStyleType;
-    boxSizing?: BoxSizingStyleType;
-    breakAfter?: BreakAfterStyleType;
-    breakBefore?: BreakBeforeStyleType;
-    breakInside?: BreakInsideStyleType;
+    boxShadow?: BoxShadow_StyleType;
+    boxSizing?: BoxSizing_StyleType;
+    breakAfter?: BreakAfter_StyleType;
+    breakBefore?: BreakBefore_StyleType;
+    breakInside?: BreakInside_StyleType;
+    bufferedRendering?: DefaultStyleType;
 
     captionSide?: CaptionSideStyleType;
     caretColor?: CaretColorStyleType;
@@ -894,8 +892,8 @@ export interface ICssStyleset
     columnGap?: "normal" | SingleGapStyleType;
     columnRule?: ColumnRuleStyleType;
     columnRuleColor?: CssColor;
-    columnRuleStyle?: BorderStyleKeyword;
-    columnRuleWidth?: BorderSideLengthStyleType;
+    columnRuleStyle?: BorderStyle_Keyword;
+    columnRuleWidth?: BorderWidth__Single;
     columnSpan?: ColumnSpanStyleType;
     columnWidth?: CssLength;
     columns?: ColumnsStyleType;
@@ -1029,11 +1027,11 @@ export interface ICssStyleset
     order?: CssNumber;
     orientation?: DefaultStyleType;
     orphans?: CssNumber;
-    outline?: BorderStyleType;
+    outline?: Border_StyleType;
     outlineColor?: CssColor;
     outlineOffset?: CssLength;
-    outlineStyle?: BorderStyleStyleType;
-    outlineWidth?: BorderSideLengthStyleType;
+    outlineStyle?: BorderStyle_StyleType;
+    outlineWidth?: BorderWidth__Single;
     overflow?: OverflowStyleType;
     overflowAnchor?: OverflowAnchorStyleType;
     overflowWrap?: OverflowWrapStyleType;
@@ -1058,9 +1056,9 @@ export interface ICssStyleset
     paddingTop?: CssLength;
     page?: DefaultStyleType;
     paintOrder?: DefaultStyleType;
-    pageBreakAfter?: BreakAfterStyleType;
-    pageBreakBefore?: BreakBeforeStyleType;
-    pageBreakInside?: BreakInsideStyleType;
+    pageBreakAfter?: BreakAfter_StyleType;
+    pageBreakBefore?: BreakBefore_StyleType;
+    pageBreakInside?: BreakInside_StyleType;
     perspective?: "none" | CssLength;
     perspectiveOrigin?: CssPosition;
     placeContent?: PlaceContentStyleType;

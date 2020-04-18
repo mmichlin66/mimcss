@@ -1,6 +1,6 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
-import {Extended, MultiCssPosition} from "./UtilTypes";
+import {Extended, MultiCssPosition, CssRadius} from "./UtilTypes";
 import {
     camelToDash, valueToString, arrayToCssString, objectToCssString, IValueConvertOptions,
     positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
@@ -21,7 +21,7 @@ function multiPositionToStringWithComma( val: Extended<MultiCssPosition>): strin
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-function singleAnimation_fromObject( val: StyleTypes.SingleAnimation): string
+function singleAnimation_fromObject( val: StyleTypes.Animation_Single): string
 {
     return objectToCssString( val, false,
             ["duration", CssTimeMath.styleToString],
@@ -36,7 +36,7 @@ function singleAnimation_fromObject( val: StyleTypes.SingleAnimation): string
 
 
 
-function singleAnimation_fromStyle( val: Extended<StyleTypes.SingleAnimation>): string
+function singleAnimation_fromStyle( val: Extended<StyleTypes.Animation_Single>): string
 {
     return valueToString( val, {
         fromObject: singleAnimation_fromObject
@@ -55,13 +55,13 @@ function animationTimingFunction_fromNumber( val: number): string
 function animationTimingFunction_fromArray( val: any[]): string
 {
     return typeof val[0] === "number"
-        ? singleAnimationTimingFunction_fromStyle( val as StyleTypes.SingleAnimationTimingFunction)
+        ? singleAnimationTimingFunction_fromStyle( val as StyleTypes.AnimationTimingFunction_Single)
         : arrayToCssString( val, singleAnimationTimingFunction_fromStyle, ",");
 }
 
 
 
-function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.SingleAnimationTimingFunction>): string
+function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.AnimationTimingFunction_Single>): string
 {
     return valueToString( val, {
         fromNumber: animationTimingFunction_fromNumber,
@@ -122,7 +122,7 @@ function singleBackground_fromStyle( val: Extended<StyleTypes.Background_Single>
 
 
 
-function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgroundSize>): string
+function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize_Single>): string
 {
     return valueToString( val, {
         fromNumber: CssLengthMath.styleToString,
@@ -132,10 +132,23 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.SingleBackgrou
 
 
 
+function singleBoxShadow_fromObject( val: StyleTypes.Background_Single): string
+{
+    return objectToCssString( val, false,
+            ["inset", v => v ? "inset" : ""],
+            ["x", CssLengthMath.styleToString],
+            ["y", CssLengthMath.styleToString],
+            ["blur", CssLengthMath.styleToString],
+            ["spread", CssLengthMath.styleToString],
+            ["color", colorToString]);
+}
+
+
+
 /**
  * Converts corner radius style value to the CSS string.
  */
-function singleCornerRadiusToCssString( val: StyleTypes.SingleCornerRadius_StyleType): string
+function singleCornerRadiusToCssString( val: CssRadius): string
 {
     return valueToString( val, {
         arrayItemFunc: CssLengthMath.styleToString,
@@ -175,7 +188,7 @@ function borderRadiusToCssString( val: StyleTypes.BorderRadiusStyleType): string
 /**
  * Converts border side style value to the CSS string.
  */
-function borderToString( val: StyleTypes.BorderStyleType): string
+function borderToString( val: StyleTypes.Border_StyleType): string
 {
     return valueToString( val, {
         fromNumber: CssLengthMath.styleToString,
@@ -471,47 +484,6 @@ function customPropToCssString( propVal: StyleTypes.CustomVarStyleType, valueOnl
 
 
 
-// /**
-//  * Converts the given custom CSS property definition to string.
-//  * @param propVal 
-//  * @param valueOnly 
-//  */
-// function customPropToCssString<K extends StyleTypes.VarTemplateName>(
-//     propVal: StyleTypes.CustomVarStyleType<K>, valueOnly?: boolean): string | null
-// {
-//     if (!propVal)
-//         return null;
-
-//     let varName: string;
-//     let template: K;
-//     let value: any;
-//     if (propVal.length === 2)
-//     {
-//         varName = propVal[0].cssName;
-//         template = propVal[0].template;
-//         value = propVal[1]
-//     }
-//     else
-//     {
-//         varName = propVal[0];
-//         if (!varName)
-//             return null;
-//         else if (!varName.startsWith("--"))
-//             varName = "--" + varName;
-
-//         template = propVal[1];
-//         if (!varName || !template)
-//             return null;
-
-//         value = propVal[2];
-//     }
-
-//     let varValue = stylePropToCssString( template, value, true);
-//     return valueOnly ? varValue : `${varName}:${varValue}`;
-// }
-
-
-
 /**
  * Converts the given style property to the CSS style string
  * @param style 
@@ -536,33 +508,6 @@ export function stylePropToCssString(
         
     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
 }
-
-
-
-// /**
-//  * Converts the given style property to the CSS style string
-//  * @param style 
-//  */
-// export function stylePropToCssString<K extends StyleTypes.VarTemplateName>(
-//     propName: K, propVal: StyleTypes.VarValueType<K>, valueOnly?: boolean): string | null
-// {
-//     if (!propName)
-//         return null;
-
-//     // find information object for the property
-//     let info: any = StylePropertyInfos[propName];
-
-//     let varValue = !info
-//         ? valueToString( propVal)
-//         : typeof info === "object"
-//             ? valueToString( propVal, info as IValueConvertOptions)
-//             : (info as PropToStringFunc<K>)( propVal);
-
-//     if (!varValue)
-//         varValue = "initial";
-        
-//     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
-// }
 
 
 
@@ -642,7 +587,6 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
         arrayItemFunc: colorToString,
         fromAny: colorToString
     },
-    borderImageWidth: CssLengthMath.multiStyleToStringWithSpace,
     borderInlineEnd: borderToString,
     borderInlineEndColor: colorToString,
     borderInlineEndWidth: CssLengthMath.styleToString,
@@ -656,7 +600,6 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     borderRight: borderToString,
     borderRightColor: colorToString,
     borderRightWidth: CssLengthMath.styleToString,
-    borderStyle: valueToString,
     borderSpacing: CssLengthMath.multiStyleToStringWithSpace,
     borderTop: borderToString,
     borderTopColor: colorToString,
@@ -665,7 +608,10 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     borderTopWidth: CssLengthMath.styleToString,
     borderWidth: CssLengthMath.multiStyleToStringWithSpace,
     bottom: CssLengthMath.styleToString,
-    boxShadow: valueToString,
+    boxShadow: {
+        fromObject: singleBoxShadow_fromObject,
+        arraySeparator: ",",
+    },
 
     caretColor: colorToString,
     clip: clipToCssString,

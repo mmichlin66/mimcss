@@ -1,5 +1,5 @@
 ﻿import {
-    IStringProxy, Extended, IUrlProxy, CssPosition, SimpleCssPosition, CssTime, CssAngle
+    IStringProxy, Extended, IUrlProxy, CssPosition, SimpleCssPosition, CssTime, CssAngle, CssLength
 } from "../styles/UtilTypes"
 import {IStyleset} from "../styles/StyleTypes"
 import * as ColorTypes from "../styles/ColorTypes"
@@ -213,14 +213,14 @@ export class sh
      * @param mode Animation fill mode. The default value is "none".
      * @param state Animation state. The default value is "running".
      */
-    public static animation( name: Extended<StyleTypes.SingleAnimationName>,
+    public static animation( name: Extended<StyleTypes.AnimationName_Single>,
         duration: Extended<CssTime> = 1000,
-        func: Extended<StyleTypes.SingleAnimationTimingFunction> = "ease",
+        func: Extended<StyleTypes.AnimationTimingFunction_Single> = "ease",
         delay: Extended<CssTime> = 0,
-        count: Extended<StyleTypes.SingleAnimationIterationCount> = 1,
-        direction: Extended<StyleTypes.SingleAnimationDirection> = "normal",
-        mode: Extended<StyleTypes.SingleAnimationFillMode> = "none",
-        state: Extended<StyleTypes.SingleAnimationPlayState> = "running"): StyleTypes.SingleAnimation
+        count: Extended<StyleTypes.AnimationIterationCount_Single> = 1,
+        direction: Extended<StyleTypes.AnimationDirection_Single> = "normal",
+        mode: Extended<StyleTypes.AnimationFillMode_Single> = "none",
+        state: Extended<StyleTypes.AnimationPlayState_Single> = "running"): StyleTypes.Animation_Single
     {
         return { name, duration, func, delay,count, direction, state, mode };
     }
@@ -243,16 +243,47 @@ export class sh
      * @param origin Background origin. The default value is "padding-box".
      * @param clip Background clip. The default value is "border-box".
      */
-    public static background( color?: ColorTypes.CssColor,
-        image?: ImageTypes.CssImage,
-        position?: CssPosition,
-        size?: StyleTypes.SingleBackgroundSize,
-        repeat: StyleTypes.SingleBackgroundRepeat = "repeat",
-        attachment: StyleTypes.SingleBackgroundAttachment = "scroll",
-        origin: StyleTypes.SingleBackgroundOrigin = "padding-box",
-        clip: StyleTypes.SingleBackgroundClip = "border-box"): StyleTypes.Background_Single
+    public static background(
+            color?: Extended<ColorTypes.CssColor>,
+            image?: Extended<ImageTypes.CssImage>,
+            position?: Extended<CssPosition>,
+            size?: Extended<StyleTypes.BackgroundSize_Single>,
+            repeat: Extended<StyleTypes.BackgroundRepeat_Single> = "repeat",
+            attachment: Extended<StyleTypes.BackgroundAttachment_Single> = "scroll",
+            origin: Extended<StyleTypes.BackgroundOrigin_Single> = "padding-box",
+            clip: Extended<StyleTypes.BackgroundClip_Single> = "border-box"
+        ): StyleTypes.Background_Single
     {
         return { color, image, position, size, repeat, attachment, origin, clip };
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Shadow
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns an object that can be assigned to the box-shadow or text-shadow property.
+     * @param color Color value.
+     * @param position
+     * @param size
+     * @param repeat Background repeat value. The default value is "repeat".
+     * @param attachment Background attachment. The default value is "scroll".
+     * @param origin Background origin. The default value is "padding-box".
+     * @param clip Background clip. The default value is "border-box".
+     */
+    public static shadow(
+                    x: Extended<CssLength>,
+                    y: Extended<CssLength>,
+                    color: Extended<ColorTypes.CssColor>,
+                    blur: Extended<CssLength> = 1,
+                    spread: Extended<CssLength> = 0,
+                    inset: Extended<boolean> = false)
+    {
+        return { x, y, color, blur, spread, inset };
     }
 }
 
