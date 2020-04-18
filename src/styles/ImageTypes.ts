@@ -2,7 +2,7 @@
  * This module contains types used to define CSS `<image>` type and related functions.
  */
 
-import {IValueProxy, IUrlProxy, Extended, CssNumber, CssAngle} from "./UtilTypes"
+import {IUrlProxy, Extended, CssNumber, CssAngle} from "./UtilTypes"
 import {CssColor} from "./ColorTypes";
 
 
@@ -11,7 +11,7 @@ import {CssColor} from "./ColorTypes";
  * secifying images. This interface is returned from functions like: linearGradient(), paint(),
  * element(), etc.
  */
-export interface IImageProxy extends IValueProxy
+export interface IImageProxy
 {
     /** Flag indicating that this object implements the IImageProxy interface */
     readonly isImageProxy: boolean;

@@ -1,6 +1,6 @@
 import {IVarRule} from "./RuleTypes"
 import {RuleContainer} from "./RuleContainer"
-import {IStyleset, ICssStyleset, VarValueType, VarTemplateName} from "../styles/StyleTypes"
+import {VarValueType, VarTemplateName} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs"
 import {createNames, IRuleContainerOwner} from "./Rule";
 
@@ -18,12 +18,6 @@ import {createNames, IRuleContainerOwner} from "./Rule";
  */
 export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 {
-    /**
-     * Returns true - this is only needed to indicate that this object implements the IVarProxy
-     * interface for the given type
-     */
-    public isVarProxy( o: VarValueType<K>): boolean { return true; }
-
 	public constructor( template: K, value?: VarValueType<K>, nameOverride?: string | IVarRule<K>)
 	{
 		this.template = template;
@@ -103,7 +97,7 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	public cssName: string;
 
 	// Value of the custom CSS property.
-	public value: VarValueType<K>;
+	private value: VarValueType<K>;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

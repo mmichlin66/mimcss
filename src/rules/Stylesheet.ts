@@ -193,8 +193,8 @@ let uniqueStyleNamesPrefix: string = "n";
 // Next number to use when generating unique identifiers.
 let nextUniqueID: number = 1;
 
-// Map of class definition classes to their singlton instances. Non-multiplex style definition
-// classes are added to this map upon calling the $use function on them.
+// Map of style definition classes to their singlton Stylesheet objects. Non-multiplex style
+// definition classes are added to this map upon calling the $use function on them.
 let classToInstanceMap = new Map<IStylesheetClass,Stylesheet>();
 
 
@@ -223,7 +223,7 @@ function generateUniqueName( prefix?: string): string
 
 
 
-// Looks up a property with the given name in the prototype  chain of the given style definition
+// Looks up a property with the given name in the prototype chain of the given style definition
 // class. If found and if the property is a rule, then returns the name assigned for it.
 function findNameForRuleInPrototypeChain( definitionClass: IStylesheetClass, ruleName: string)
 {

@@ -1,4 +1,4 @@
-﻿import {IValueProxy, IStringProxy} from "./UtilTypes"
+﻿import {IStringProxy} from "./UtilTypes"
 import * as RuleTypes from "../rules/RuleTypes"
 
 
@@ -40,7 +40,7 @@ export type SelectorTokenType = RuleTypes.ITagRule | RuleTypes.IClassRule | Rule
  * The ISelectorProxy interface represents an object that can produce a CSS selector string. This
  * interface is returned from the `$selector` function.
  */
-export interface ISelectorProxy extends IValueProxy
+export interface ISelectorProxy
 {
     /** Flag indicating that this object implements the ISelectorProxy interface */
     readonly isSelectorProxy: boolean;

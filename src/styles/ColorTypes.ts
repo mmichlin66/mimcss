@@ -2,8 +2,6 @@
  * This module contains types for working with CSS colors.
  */
 
-import {IStringProxy, OneOrBox, IValueProxy} from "./UtilTypes"
-
 
 
 /**
@@ -168,7 +166,7 @@ export interface INamedColors
  * The IColorProxy interface represents an invocation of one of CSS functions that are used for
  * secifying colors. This interface is returned from functions like: rgb(), alpha(), etc.
  */
-export interface IColorProxy extends IValueProxy
+export interface IColorProxy
 {
     /** Flag indicating that this object implements the IColorProxy interface */
     readonly isColorProxy: boolean;

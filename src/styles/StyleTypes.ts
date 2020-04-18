@@ -1,6 +1,6 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
-    IValueProxy, CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
+    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
     CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius,
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
@@ -89,7 +89,7 @@ export type AnimationIterationCount_StyleType = OneOrMany<AnimationIterationCoun
  * primary object that implements this interface is AnimationRule returned from the $keyframes
  * function.
  */
-export interface IAnimationNameProxy extends IValueProxy
+export interface IAnimationNameProxy
 {
     /** Flag indicating that this object implements the IAnimationNameProxy interface */
     readonly isAnimationNameProxy: boolean;

@@ -230,7 +230,7 @@ export class StringProxy implements IStringProxy
         return this.s == null ? "" : typeof this.s === "string" ? this.s : this.s.toString();
     }
 
-    private s?: string | StringProxy;
+    private s?: string | IStringProxy;
 }
 
 

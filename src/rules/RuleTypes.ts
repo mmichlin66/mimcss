@@ -413,7 +413,7 @@ export interface IStylesheetClass<T extends {} = {}>
  *     )
  * }
  * ```
- * @typeparam O Stylesheet definition class, which is the owner of this grouping rule.
+ * @typeparam O Top-level stylet definition class, which is the owner of this class.
  */
 export abstract class NestedGroup<T extends {}>
 {
@@ -423,8 +423,10 @@ export abstract class NestedGroup<T extends {}>
 	}
 
 	/**
-	 * Refers to the style definition class which is the owner of this grouping rule. Through this
-	 * memeber, all rules defined in the definition class can be accessed.
+	 * Refers to the singleton instance of the style definition class which is the **owner** of
+	 * this style definition object. The owner is the top-level class in the chain of grouping
+	 * rules. Through this memeber, all rules and other memebers defined in the owner definition
+	 * class can be accessed.
 	 */
 	protected owner: T;
 }
@@ -437,7 +439,7 @@ export abstract class NestedGroup<T extends {}>
 export interface INestedGroupClass<T extends NestedGroup<O>, O extends {}>
 {
 	/** All group rule definition classes should conform to this constructor */
-	new( owner?: O): T;
+	new( owner: O): T;
 }
 
 

@@ -19,7 +19,7 @@ export function selectorToCssString( selector: SelectorTypes.CssSelector): strin
 		return "";
 	else if (typeof selector === "string")
 		return selector;
-	else if (typeof selector.valueToString === "function")
+	else if (selector instanceof SelectorProxy)
 		return selector.valueToString();
 	else
 		return selector.toString();

@@ -1,19 +1,5 @@
 ﻿/**
  * This file contains basic types and functions used to define CSS property types.
- */
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Basic types.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The IValueProxy interface represents an object that can produce a string, which is returned
- * via the valueToString() method. This interface is used as a base for other interfaces that
- * represents different CSS types, such as `<number>`, <length>`, `<url>`, `<image>`, etc.
  * 
  * All CSS properties should accept string as the type of their value even if normally
  * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
@@ -30,20 +16,21 @@
  * into DOM the initialization will have already occurred and the valueToString method will
  * return a correct string.
  * 
- * Note that the IValueProxy interface is never used directly when specifying property types;
- * only its derivatives are used directly. This is because we want to distinguish between
- * different CSS types, so that a function used for one CSS type cannot be used for a different
- * CSS type. For example, the `calc()` function returns the INumberProxy interface, while the
+ * Note that the IXxxProxy interfaces have a property or method that distinguishes them from
+ * other proxy interface. This is because we want to distinguish between different CSS types,
+ * so that a function used for one CSS type cannot be used for a different CSS type. For
+ * example, the `calc()` function returns the INumberProxy interface, while the
  * `linearIngradient()` function returns the IImageProxy interface. Thus you cannot use the
  * 'calc()` function for image-based CSS properties and vice versa.
  */
-export interface IValueProxy
-{
-    /** Converts internally held value(s) to string */
-    valueToString(): string;
-}
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Basic types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * The IStringProxy interface represents an object that can be assigned to any CSS property. This
@@ -54,7 +41,7 @@ export interface IValueProxy
  * typing rules and specifying a string directly. This might be useful, when a string value is
  * obtained from some external calculations.
  */
-export interface IStringProxy extends IValueProxy
+export interface IStringProxy
 {
     /** Flag indicating that this object implements the IStringProxy interface */
     readonly isStringProxy: boolean;
@@ -74,14 +61,9 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | IStrin
  * we need this interface because every style property can accept value in the form of var()
  * CSS function.
  */
-export interface IVarProxy<T = any> extends IValueProxy
+export interface IVarProxy<T = any>
 {
-    /**
-     * Returns true - this is only needed to indicate that this object implements the IVarProxy
-     * interface for the given type so that custom properties of different types cannot be
-     * mistakenly assigned to wrong types.
-     */
-    isVarProxy( o: T): boolean;
+	setValue( value: T, important?: boolean): void;
 }
 
 
@@ -127,7 +109,7 @@ export type Many<T> = Extended<T>[];
  * to properties of the CSS numeric types. This interface is returned from functions like min(),
  * max() and calc().
  */
-export interface INumberProxy<T extends string = null> extends IValueProxy
+export interface INumberProxy<T extends string = null>
 {
     /**
      * Returns true - needed only to indicate that this object implements the INumerProxy interface
@@ -588,7 +570,7 @@ export type CssRadius = OneOrPair<CssLength>;
 /**
  * The IUrlProxy interface represents an invocation of the CSS url() function.
  */
-export interface IUrlProxy extends IValueProxy
+export interface IUrlProxy
 {
     /** Flag indicating that this object implements the IUrlProxy interface */
     readonly isUrlProxy: boolean;
