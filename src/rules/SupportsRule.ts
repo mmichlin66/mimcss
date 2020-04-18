@@ -15,8 +15,7 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 	{
 		super( RuleType.SUPPORTS, definitionClass);
 
-		// convert the query to its string form
-		this.queryString = supportsQueryToCssString( query);
+		this.query = query;
 	}
 
 
@@ -24,7 +23,7 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 	// Creates a copy of the rule.
 	public clone(): SupportsRule<T,O>
 	{
-		return new SupportsRule<T,O>( this.queryString, this.definitionClass);
+		return new SupportsRule<T,O>( this.query, this.definitionClass);
 	}
 
 
@@ -32,19 +31,22 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule
 	{
+		// convert the query to its string form
+		let queryString = supportsQueryToCssString( this.query);
+
 		// determine whether the query is supported and if it is not, don't insert the rule
-		return CSS.supports( this.queryString)
-			? Rule.addRuleToDOM( `@supports ${this.queryString} {}`, parent)
+		return CSS.supports( queryString)
+			? Rule.addRuleToDOM( `@supports ${queryString} {}`, parent) as CSSSupportsRule
 			: null;
 	}
 
 
 
 	/** SOM supports rule */
-	public get cssSupportsRule(): CSSSupportsRule { return this.cssRule as CSSSupportsRule; }
+	public cssRule: CSSSupportsRule;
 
 	// support query for this rule in a string form.
-	public queryString: string;
+	public query: SupportsQuery;
 }
 
 

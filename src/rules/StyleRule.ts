@@ -167,7 +167,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
 		if (this.styleset)
-			this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent);
+			this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent) as CSSStyleRule;
 
 		// if nested rules exist, insert them under the same parent
 		if (this.nestedRules)
@@ -201,10 +201,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 */
 	public setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void
 	{
-		if (!this.cssStyleRule)
+		if (!this.cssRule)
 			return;
 
-		this.cssStyleRule.style.setProperty( name,
+		this.cssRule.style.setProperty( name,
 			stylePropToCssString( name, value, true), important ? "!important" : null)
 	}
 
@@ -218,17 +218,17 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 */
 	public setCustomProp<K extends VarTemplateName>( varDef: IVarRule<K>, varValue: VarValueType<K>, important?: boolean): void
 	{
-		if (!varDef || !this.cssStyleRule)
+		if (!varDef || !this.cssRule)
 			return;
 
-		this.cssStyleRule.style.setProperty( varDef.cssName,
+		this.cssRule.style.setProperty( varDef.cssName,
 			stylePropToCssString( varDef.template, varValue, true), important ? "!important" : null)
 	}
 
 
 
 	/** SOM style rule */
-	public get cssStyleRule(): CSSStyleRule { return this.cssRule as CSSStyleRule; }
+	public cssRule: CSSStyleRule;
 
 	// Resultant Styleset object defining properties to be inserted into DOM.
 	protected styleset: Styleset;

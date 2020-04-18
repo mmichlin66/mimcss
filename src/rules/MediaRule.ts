@@ -32,13 +32,13 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 	public insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule
 	{
 		let queryString = typeof this.query === "string" ? this.query : mediaQueryToCssString( this.query);
-		return Rule.addRuleToDOM( `@media ${queryString} {}`, parent);
+		return Rule.addRuleToDOM( `@media ${queryString} {}`, parent) as CSSMediaRule;
 	}
 
 
 
 	/** SOM media rule */
-	public get cssMediaRule(): CSSMediaRule { return this.cssRule as CSSMediaRule; }
+	public cssRule: CSSMediaRule;
 
 	// media query for this rule.
 	public query: string | MediaQuery;

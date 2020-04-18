@@ -114,7 +114,7 @@ export interface INamedEntity
 export interface IStyleRule extends IRule
 {
 	/** SOM style rule */
-	readonly cssStyleRule: CSSStyleRule;
+	readonly cssRule: CSSStyleRule;
 
 	/**
 	 * Adds/replaces the value of the given CSS property in this rule.
@@ -203,7 +203,7 @@ export interface ISelectorRule extends IStyleRule
 export interface IAnimationRule extends IRule, INamedEntity, IAnimationNameProxy
 {
 	/** SOM keyframes rule */
-	readonly cssKeyframesRule: CSSKeyframesRule;
+	readonly cssRule: CSSKeyframesRule;
 }
 
 /**
@@ -223,7 +223,7 @@ export type AnimationFrame = ["from" | "to" | number, Omit<ExtendedStyleset,"!">
 export interface IImportRule extends IRule
 {
 	/** SOM import rule */
-	readonly cssImportRule: CSSImportRule;
+	readonly cssRule: CSSImportRule;
 }
 
 
@@ -235,7 +235,7 @@ export interface IImportRule extends IRule
 export interface IFontFaceRule extends IRule
 {
 	/** SOM font-face rule */
-	readonly cssFontFaceRule: CSSFontFaceRule;
+	readonly cssRule: CSSFontFaceRule;
 }
 
 
@@ -253,7 +253,7 @@ export interface INamespaceRule extends IRule
 	readonly prefix: string | undefined;
 
 	/** SOM namespace rule */
-	readonly cssNamespaceRule: CSSNamespaceRule;
+	readonly cssRule: CSSNamespaceRule;
 }
 
 
@@ -268,7 +268,7 @@ export interface IPageRule extends IStyleRule
 	readonly pseudoClass: PagePseudoClass | undefined;
 
 	/** SOM namespace rule */
-	readonly cssPageRule: CSSPageRule;
+	readonly cssRule: CSSPageRule;
 }
 
 
@@ -296,55 +296,6 @@ export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity,
 	 */
 	setValue( value: VarValueType<K>, important?: boolean): void;
 }
-
-
-
-// /**
-//  * The IRuleContainer interface represents an object that contains CSS rules.
-//  */
-// export interface IRuleContainer<T extends {} = {}>
-// {
-// 	/** Map of names of properties defining class rules to actual class names. */
-// 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
-
-// 	/** Map of names of properties defining ID rules to actual IDs. */
-// 	readonly ids: NamesOfPropsOfType<T,IIDRule>;
-
-// 	/** Map of names of properties defining animation rules to actual animation names. */
-// 	readonly animations: NamesOfPropsOfType<T,IAnimationRule>;
-
-// 	/** Map of names of properties defining custom property rules to the IVarRule objects. */
-// 	readonly vars: PropsOfType<T,IVarRule>;
-
-// 	/** Map of property names to rule objects. */
-// 	readonly rules: PropsOfType<T,IRule>;
-
-// 	/**  Map of property names to external stylesheets created using the $use function. */
-// 	readonly uses: PropsOfType<T,IStylesheet>;
-// }
-
-
-
-// /**
-//  * The IStyleDefinition interface is implemented by the [[StyleDefinition]] class and thus
-//  * is implemented by all style definition classes.
-//  * @typeparam O Top-level style definition class, which is the owner of this class.
-//  */
-// export interface IStyleDefinition<O extends IStyleDefinition | null = null>
-// {
-// 	/**
-// 	 * Refers to the singleton instance of the style definition class which is the **owner** of
-// 	 * this style definition object. The owner is the top-level class in the chain of style
-// 	 * definition classes. Through this memeber, all rules and other memebers defined in the owner
-// 	 * definition class can be accessed.
-// 	 */
-// 	readonly owner: O;
-
-// 	/**
-// 	 * DOM style element that contains CSS style sheet with rules defined by this class.
-// 	 */
-// 	readonly domStyleElm: HTMLStyleElement;
-// }
 
 
 
@@ -419,7 +370,7 @@ export interface IStyleDefinitionClass<T extends StyleDefinition<O> = any, O ext
 export interface ISupportsRule<T = {}> extends IRule
 {
 	/** SOM supports rule */
-	readonly cssSupportsRule: CSSSupportsRule;
+	readonly cssRule: CSSSupportsRule;
 }
 
 
@@ -431,7 +382,7 @@ export interface ISupportsRule<T = {}> extends IRule
 export interface IMediaRule<T = {}> extends IRule
 {
 	/** SOM media rule */
-	readonly cssMediaRule: CSSMediaRule;
+	readonly cssRule: CSSMediaRule;
 }
 
 

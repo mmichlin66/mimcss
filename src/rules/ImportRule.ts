@@ -57,13 +57,14 @@ export class ImportRule extends Rule implements IImportRule
 				? this.mediaQuery
 				: mediaQueryToCssString( this.mediaQuery);
 				
-		this.cssRule = Rule.addRuleToDOM( `@import ${url} ${supportsQueryString} ${mediaQueryString}`, parent);
+		this.cssRule = Rule.addRuleToDOM( `@import ${url} ${supportsQueryString} ${mediaQueryString}`,
+			parent) as CSSImportRule;
 }
 
 
 
 	/** SOM import rule */
-	public get cssImportRule(): CSSImportRule { return this.cssRule as CSSImportRule; }
+	public cssRule: CSSImportRule;
 
 	// URL to import from.
 	public url: string;

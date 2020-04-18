@@ -28,13 +28,14 @@ export class FontFaceRule extends Rule implements IFontFaceRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		this.cssRule = Rule.addRuleToDOM( `@font-face ${fontFaceToCssString( this.fontface)}`, parent);
+		this.cssRule = Rule.addRuleToDOM( `@font-face ${fontFaceToCssString( this.fontface)}`,
+			parent) as CSSFontFaceRule;
 	}
 
 
 
 	/** SOM font-face rule */
-	public get cssFontFaceRule(): CSSFontFaceRule { return this.cssRule as CSSFontFaceRule; }
+	public cssRule: CSSFontFaceRule;
 
 	// Object defining font-face properties.
 	public fontface: Fontface;

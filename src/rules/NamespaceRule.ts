@@ -33,13 +33,14 @@ export class NamespaceRule extends Rule implements INamespaceRule
 			return;
 
 		let url = this.namespace.startsWith( "url(") ? this.namespace : `url(${this.namespace})`;
-		this.cssRule = Rule.addRuleToDOM( `@namespace ${this.prefix ? this.prefix : ""} ${url}`, parent);
+		this.cssRule = Rule.addRuleToDOM( `@namespace ${this.prefix ? this.prefix : ""} ${url}`,
+			parent) as CSSNamespaceRule;
 	}
 
 
 
 	/** SOM namespace rule */
-	public get cssNamespaceRule(): CSSNamespaceRule { return this.cssRule as CSSNamespaceRule; }
+	public cssRule: CSSNamespaceRule;
 
 	/** Namespace string for the rule */
 	public namespace: string;

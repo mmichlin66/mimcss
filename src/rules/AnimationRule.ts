@@ -52,7 +52,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 		if (!this.frameRules)
 			return;
 
-		this.cssRule = Rule.addRuleToDOM( `@keyframes ${this.name} {}`, parent);
+		this.cssRule = Rule.addRuleToDOM( `@keyframes ${this.name} {}`, parent) as CSSKeyframesRule;
 
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
 		for( let keyframeRule of this.frameRules)
@@ -77,7 +77,7 @@ export class AnimationRule extends Rule implements IAnimationRule
     public valueToString(): string { return this.name; }
 
 	/** SOM keyframes rule */
-	public get cssKeyframesRule(): CSSKeyframesRule { return this.cssRule as CSSKeyframesRule; }
+	public cssRule: CSSKeyframesRule;
 
 	/** Only needed to distinguish from class and ID rules */
 	public frameRules: AnimationFrameRule[];
