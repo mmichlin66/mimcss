@@ -1,4 +1,5 @@
-import {IPageRule, RuleType} from "./RuleTypes"
+import {IPageRule} from "./RuleTypes"
+import {RuleType} from "./Rule";
 import {StyleRule} from "./StyleRule";
 import {Styleset} from "../styles/StyleTypes";
 import {PagePseudoClass} from "../styles/SelectorTypes";

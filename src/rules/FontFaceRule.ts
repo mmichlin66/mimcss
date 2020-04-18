@@ -1,7 +1,7 @@
-import {IFontFaceRule, RuleType} from "./RuleTypes";
+import {IFontFaceRule} from "./RuleTypes";
 import {Fontface} from "../styles/FontFaceTypes"
 import {fontFaceToCssString} from "../styles/FontFaceFuncs"
-import {Rule} from "./Rule";
+import {Rule, RuleType} from "./Rule";
 
 
 

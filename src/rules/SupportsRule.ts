@@ -1,5 +1,5 @@
-import {ISupportsRule, RuleType, INestedGroupClass, NestedGroup} from "./RuleTypes"
-import {Rule} from "./Rule"
+import {ISupportsRule, IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
+import {RuleType, Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {SupportsQuery} from "../styles/StyleTypes"
 import {supportsQueryToCssString} from "../styles/StyleFuncs"
@@ -9,9 +9,9 @@ import {supportsQueryToCssString} from "../styles/StyleFuncs"
 /**
  * The SupportRule class describes a CSS @supports rule.
  */
-export class SupportsRule<T extends NestedGroup<O>, O extends {}> extends GroupRule<T,O> implements ISupportsRule<T>
+export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( query: SupportsQuery, definitionClass: INestedGroupClass<T,O>)
+	public constructor( query: SupportsQuery, definitionClass: IStyleDefinitionClass<T,O>)
 	{
 		super( RuleType.SUPPORTS, definitionClass);
 

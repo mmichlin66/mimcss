@@ -1,6 +1,6 @@
-import {IClassRule, ExtendedStyleset, RuleType, INamedEntity} from "./RuleTypes"
+import {IClassRule, ExtendedStyleset} from "./RuleTypes"
 import {StyleRule} from "./StyleRule";
-import {createNames, IRuleContainerOwner} from "./Rule";
+import {createNames, ITopLevelRuleContainer, RuleType} from "./Rule";
 
 
 
@@ -19,7 +19,7 @@ export class ClassRule extends StyleRule implements IClassRule
 
 
 	// Processes the given rule.
-	public process( owner: IRuleContainerOwner, ruleName: string): void
+	public process( owner: ITopLevelRuleContainer, ruleName: string): void
 	{
 		super.process( owner, ruleName);
 

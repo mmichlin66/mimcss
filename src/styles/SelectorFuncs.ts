@@ -1,6 +1,10 @@
 ﻿import * as SelectorTypes from "./SelectorTypes"
 import * as RuleTypes from "../rules/RuleTypes"
-import {Rule} from "../rules/Rule";
+import {Rule, RuleType} from "../rules/Rule";
+import {TagRule} from "../rules/TagRule"
+import {ClassRule} from "../rules/ClassRule"
+import {IDRule} from "../rules/IDRule"
+import {SelectorRule} from "../rules/SelectorRule"
 
 
 
@@ -62,14 +66,23 @@ export class SelectorProxy implements SelectorTypes.ISelectorProxy
 					arr.push( item);
 				else if (item instanceof Rule)
 				{
-					if (item.ruleType === RuleTypes.RuleType.TAG)
-						arr.push( (item as any as RuleTypes.ITagRule).tag);
-					else if (item.ruleType === RuleTypes.RuleType.CLASS)
-						arr.push( (item as any as RuleTypes.IClassRule).cssName);
-					else if (item.ruleType === RuleTypes.RuleType.ID)
-						arr.push( (item as any as RuleTypes.IIDRule).cssName);
-					else if (item.ruleType === RuleTypes.RuleType.SELECTOR)
-						arr.push( (item as any as RuleTypes.ISelectorRule).selectorText);
+					// if (item.ruleType === RuleType.TAG)
+					// 	arr.push( (item as any as RuleTypes.ITagRule).tag);
+					// else if (item.ruleType === RuleType.CLASS)
+					// 	arr.push( (item as any as RuleTypes.IClassRule).cssName);
+					// else if (item.ruleType === RuleType.ID)
+					// 	arr.push( (item as any as RuleTypes.IIDRule).cssName);
+					// else if (item.ruleType === RuleType.SELECTOR)
+					// 	arr.push( (item as any as RuleTypes.ISelectorRule).selectorText);
+
+					if (item instanceof TagRule)
+						arr.push( item.tag);
+					else if (item instanceof ClassRule)
+						arr.push( item.cssName);
+					else if (item instanceof IDRule)
+						arr.push( item.cssName);
+					else if (item instanceof SelectorRule)
+						arr.push( item.selectorText);
 				}
 				else 
 					arr.push( item.toString());

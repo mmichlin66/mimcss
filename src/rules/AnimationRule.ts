@@ -1,5 +1,5 @@
-import {IAnimationRule, AnimationFrame, RuleType, INamedEntity} from "./RuleTypes"
-import {Rule, IRuleContainerOwner, createNames} from "./Rule"
+import {IAnimationRule, AnimationFrame, INamedEntity} from "./RuleTypes"
+import {Rule, RuleType, ITopLevelRuleContainer, createNames} from "./Rule"
 import {StyleRule} from "./StyleRule";
 
 
@@ -22,7 +22,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process(  owner: IRuleContainerOwner, ruleName: string)
+	public process(  owner: ITopLevelRuleContainer, ruleName: string)
 	{
 		super.process( owner, ruleName);
 

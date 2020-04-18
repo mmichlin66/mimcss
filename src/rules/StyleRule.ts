@@ -1,7 +1,7 @@
-import {IStyleRule, ExtendedStyleset, RuleType, IVarRule} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, IVarRule} from "./RuleTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
-import {Rule, IRuleContainerOwner} from "./Rule";
+import {Rule, RuleType, ITopLevelRuleContainer} from "./Rule";
 import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
 import {selectorToCssString} from "../styles/SelectorFuncs"
 
@@ -122,7 +122,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( owner: IRuleContainerOwner, ruleName: string): void
+	public process( owner: ITopLevelRuleContainer, ruleName: string): void
 	{
 		super.process( owner, ruleName);
 

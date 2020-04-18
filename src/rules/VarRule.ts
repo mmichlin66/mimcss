@@ -2,7 +2,7 @@ import {IVarRule} from "./RuleTypes"
 import {RuleContainer} from "./RuleContainer"
 import {VarValueType, VarTemplateName} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs"
-import {createNames, IRuleContainerOwner} from "./Rule";
+import {createNames, ITopLevelRuleContainer} from "./Rule";
 
 
 
@@ -28,11 +28,9 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 
 
 	// Processes the given rule.
-	public process( container: RuleContainer, owner: IRuleContainerOwner, ruleName: string): void
+	public process( container: RuleContainer, owner: ITopLevelRuleContainer, ruleName: string): void
 	{
 		this.container = container;
-		// this.ruleName = ruleName;
-
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");
 	}
 

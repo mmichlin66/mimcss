@@ -71,44 +71,10 @@ export type ExtendedStyleset = Styleset & { [K in PseudoClass | PseudoElement]?:
 
 
 /**
- * The RuleType enumeration lists types of rules that Mimcss library works with.
- */
-export const enum RuleType
-{
-    TAG = 1,
-    CLASS,
-    ID,
-    SELECTOR,
-    ANIMATION,
-    KEYFRAME,
-    SUPPORTS,
-    MEDIA,
-    FONTFACE,
-    IMPORT,
-    NAMESPACE,
-    PAGE,
-	VIEWPORT,
-	DOCUMENT,
-
-	// not real rules but derive from the Rule object
-    SCOPE = 50,
-	ABSTRACT,
-	NESTED,
-}
-
-
-
-/**
  * The IRule interface is a base interface that is implemented by all rules.
  */
 export interface IRule
 {
-	/** Name of the property on the rule definition object to which this rule is assigned. */
-	readonly ruleName: string;
-
-	/** Type of the rule */
-	readonly ruleType: RuleType;
-
 	/** SOM rule */
 	readonly cssRule: CSSRule;
 }
@@ -333,60 +299,112 @@ export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity,
 
 
 
+// /**
+//  * The IRuleContainer interface represents an object that contains CSS rules.
+//  */
+// export interface IRuleContainer<T extends {} = {}>
+// {
+// 	/** Map of names of properties defining class rules to actual class names. */
+// 	readonly classes: NamesOfPropsOfType<T,IClassRule>;
+
+// 	/** Map of names of properties defining ID rules to actual IDs. */
+// 	readonly ids: NamesOfPropsOfType<T,IIDRule>;
+
+// 	/** Map of names of properties defining animation rules to actual animation names. */
+// 	readonly animations: NamesOfPropsOfType<T,IAnimationRule>;
+
+// 	/** Map of names of properties defining custom property rules to the IVarRule objects. */
+// 	readonly vars: PropsOfType<T,IVarRule>;
+
+// 	/** Map of property names to rule objects. */
+// 	readonly rules: PropsOfType<T,IRule>;
+
+// 	/**  Map of property names to external stylesheets created using the $use function. */
+// 	readonly uses: PropsOfType<T,IStylesheet>;
+// }
+
+
+
+// /**
+//  * The IStyleDefinition interface is implemented by the [[StyleDefinition]] class and thus
+//  * is implemented by all style definition classes.
+//  * @typeparam O Top-level style definition class, which is the owner of this class.
+//  */
+// export interface IStyleDefinition<O extends IStyleDefinition | null = null>
+// {
+// 	/**
+// 	 * Refers to the singleton instance of the style definition class which is the **owner** of
+// 	 * this style definition object. The owner is the top-level class in the chain of style
+// 	 * definition classes. Through this memeber, all rules and other memebers defined in the owner
+// 	 * definition class can be accessed.
+// 	 */
+// 	readonly owner: O;
+
+// 	/**
+// 	 * DOM style element that contains CSS style sheet with rules defined by this class.
+// 	 */
+// 	readonly domStyleElm: HTMLStyleElement;
+// }
+
+
+
 /**
- * The IRuleContainer interface represents an object that contains CSS rules.
+ * The StyleDefinition class is a base for all classes that define CSS rules. Use it the
+ * following way:
+ * 
+ * ```typescript
+ * class MyStyles extend StyleDefinition
+ * {
+ *     // 8px padding on regular devices
+ *     defaultPadding = $var( "padding", 8)
+ * 
+ *     ifNarrowDevice = $media( {maxWidth: 600 },
+ *         class extends StyleDefinition<MyStyles>
+ *         {
+ *             // 4px padding on narrow devices
+ *             defaultPadding = $var( "padding", Len.calc( "{0} / 2", this.owner.defaultPadding))
+ *         }
+ *     )
+ * }
+ * ```
+ * @typeparam O Top-level style definition class, which is the owner of this class.
  */
-export interface IRuleContainer<T extends {} = {}>
+export abstract class StyleDefinition<O extends StyleDefinition = any>
 {
-	/** Map of names of properties defining class rules to actual class names. */
-	readonly classes: NamesOfPropsOfType<T,IClassRule>;
-
-	/** Map of names of properties defining ID rules to actual IDs. */
-	readonly ids: NamesOfPropsOfType<T,IIDRule>;
-
-	/** Map of names of properties defining animation rules to actual animation names. */
-	readonly animations: NamesOfPropsOfType<T,IAnimationRule>;
-
-	/** Map of names of properties defining custom property rules to the IVarRule objects. */
-	readonly vars: PropsOfType<T,IVarRule>;
-
-	/** Map of property names to rule objects. */
-	readonly rules: PropsOfType<T,IRule>;
-
-	/**  Map of property names to external stylesheets created using the $use function. */
-	readonly uses: PropsOfType<T,IStylesheet>;
-}
-
-
-
-/**
- * The IStylesheet interface represents the resultant stylesheet after the stylesheet definition
- * has been processed. The stylesheet object contains names of IDs, classes and animations, which
- * can be used in the application code. The interface also provides methods that are used to
- * manipulate the rules and their stylesets.
- * Objects implementing this interface are returned from the [[$use]] and [[$activate]] functions.
- */
-export interface IStylesheet<T extends {} = {}> extends IRuleContainer<T>
-{
-	/** DOM style element that contains CSS style sheet that contains rules defined by this stylesheet*/
-	readonly domStyleElm: HTMLStyleElement;
-}
-
-
-
-/**
- * "Constructor" interface defining how stylesheet definition classes can be created.
- */
-export interface IStylesheetClass<T extends {} = {}>
-{
-	/** All stylesheet definition objects should conform to this constructor */
-	new(): T;
+	/**
+	 * Style definition classes are never created directly - they are instantiated only when
+	 * either the [[$use]] or [[$activate]] function is called.
+	 * @param owner Reference to the top-level style definition class
+	 */
+	public constructor( owner: O)
+	{
+		this.owner = owner;
+	}
 
 	/**
-	 * Flag inidicating that multiple stylesheets can be created for this stylesheet definition -
+	 * Refers to the singleton instance of the style definition class which is the **owner** of
+	 * this style definition object. The owner is the top-level class in the chain of style
+	 * definition classes. Through this memeber, all rules and other memebers defined in the owner
+	 * definition class can be accessed.
+	 */
+	public readonly owner: O;
+}
+
+
+
+/**
+ * "Constructor" interface defining how style definition classes can be created.
+ */
+export interface IStyleDefinitionClass<T extends StyleDefinition<O> = any, O extends StyleDefinition = any>
+{
+	/** All style definition classes should conform to this constructor */
+	new( owner: O): T;
+
+	/**
+	 * Flag inidicating that multiple instances can be created for this style definition -
 	 * each time with unique rule IDs. This is useful for styles created for a control - e.g. tree
 	 * or accordeon - which can be used multiple times on the same page but with different styles.
-	 * By default, stylesheet definitions are singular, that is a single instance of a stylesheet
+	 * By default, style definitions are singular, that is a single instance of a style definition
 	 * object is created for them and inserted into DOM.
 	 */
 	isMultiplex?: boolean;
@@ -395,60 +413,10 @@ export interface IStylesheetClass<T extends {} = {}>
 
 
 /**
- * The NestedGroup class is a base for all classes that define nested grouping rules. Use it the
- * following way:
- * 
- * ```typescript
- * class MyStyles
- * {
- *     // 8px padding on regular devices
- *     defaultPadding = $var( "padding", 8)
- * 
- *     ifNarrowDevice = $media( {maxWidth: 600 },
- *         class extends NestedGroup<MyStyles>
- *         {
- *             // 4px padding on narrow devices
- *             defaultPadding = $var( "padding", Len.calc( "{0} / 2", this.owner.defaultPadding))
- *         }
- *     )
- * }
- * ```
- * @typeparam O Top-level stylet definition class, which is the owner of this class.
- */
-export abstract class NestedGroup<T extends {}>
-{
-	constructor( owner: T)
-	{
-		this.owner = owner;
-	}
-
-	/**
-	 * Refers to the singleton instance of the style definition class which is the **owner** of
-	 * this style definition object. The owner is the top-level class in the chain of grouping
-	 * rules. Through this memeber, all rules and other memebers defined in the owner definition
-	 * class can be accessed.
-	 */
-	protected owner: T;
-}
-
-
-
-/**
- * "Constructor" interface defining how group rule definition classes can be created.
- */
-export interface INestedGroupClass<T extends NestedGroup<O>, O extends {}>
-{
-	/** All group rule definition classes should conform to this constructor */
-	new( owner: O): T;
-}
-
-
-
-/**
  * The ISupportRule interface represents the CSS @supports rule.
  * Objects implementing this interface are returned from the [[$supports]] function.
  */
-export interface ISupportsRule<T = {}> extends IRuleContainer<T>, IRule
+export interface ISupportsRule<T = {}> extends IRule
 {
 	/** SOM supports rule */
 	readonly cssSupportsRule: CSSSupportsRule;
@@ -460,7 +428,7 @@ export interface ISupportsRule<T = {}> extends IRuleContainer<T>, IRule
  * The IMediaRule interface represents the CSS @media rule.
  * Objects implementing this interface are returned from the [[$media]] function.
  */
-export interface IMediaRule<T = {}> extends IRuleContainer<T>, IRule
+export interface IMediaRule<T = {}> extends IRule
 {
 	/** SOM media rule */
 	readonly cssMediaRule: CSSMediaRule;

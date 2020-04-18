@@ -1,15 +1,15 @@
-import {RuleType, INestedGroupClass, NestedGroup} from "./RuleTypes"
-import {RuleContainer} from "./RuleContainer"
-import {IRuleContainerOwner} from "./Rule"
+import {IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
+import {RuleContainer, processStyleDefinitionClass, getContainerFromDefinition} from "./RuleContainer"
+import {ITopLevelRuleContainer, RuleType, Rule} from "./Rule"
 
 
 
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends RuleContainer<T>
+export abstract class GroupRule<T extends StyleDefinition> extends Rule
 {
-	public constructor( type: RuleType, definitionClass: INestedGroupClass<T,O>)
+	public constructor( type: RuleType, definitionClass: IStyleDefinitionClass<T>)
 	{
 		super( type);
 		this.definitionClass = definitionClass;
@@ -18,28 +18,12 @@ export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends 
 
 
 	// Processes the given rule.
-	public process( owner: IRuleContainerOwner, ruleName: string)
+	public process( owner: ITopLevelRuleContainer, ruleName: string)
 	{
 		super.process( owner, ruleName);
 
-		// process sub-rules
-		this.processRules();
-	}
-
-
-
-	// Returns an instance of the definition class or null if failure
-	protected createDefinitionInstance(): T | null
-	{
-		try
-		{
-			return new this.definitionClass( this.owner.getDefinitionInstance() as O);
-		}
-		catch( err)
-		{
-			console.error( `Error instantiating Group Rule Definition Class '${this.definitionClass.name}'`, err);
-			return null;
-		}
+		this.definition = processStyleDefinitionClass( this.definitionClass, owner.getDefinitionInstance());
+		this.ruleContainer = getContainerFromDefinition( this.definition);
 	}
 
 
@@ -51,7 +35,7 @@ export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends 
 
 		// insert sub-rules
 		if (this.cssRule)
-			this.insertRules( this.cssRule as CSSGroupingRule);
+			this.ruleContainer.insertRules( this.cssRule as CSSGroupingRule);
 	}
 
 
@@ -67,13 +51,19 @@ export abstract class GroupRule<T extends NestedGroup<O>, O extends {}> extends 
 		super.clear();
 
 		// clear sub-rules
-		this.clearRules();
+		this.ruleContainer.clearRules();
 	}
 
 
 
-	// Class that defined this stylesheet.
-	protected definitionClass: INestedGroupClass<T,O>;
+	// Style definition class that defines rules under this grouping rule.
+	protected definitionClass: IStyleDefinitionClass;
+
+	// Style definition instance.
+	protected definition: StyleDefinition;
+
+	// Rule container for the definition instance.
+	protected ruleContainer: RuleContainer;
 }
 
 

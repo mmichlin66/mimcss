@@ -1,5 +1,5 @@
-import {INamespaceRule, RuleType} from "./RuleTypes"
-import {Rule} from "./Rule"
+import {INamespaceRule} from "./RuleTypes"
+import {Rule, RuleType} from "./Rule"
 
 
 

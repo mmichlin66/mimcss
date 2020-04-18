@@ -1,4 +1,5 @@
-import {ISelectorRule, ExtendedStyleset, RuleType} from "./RuleTypes"
+import {ISelectorRule, ExtendedStyleset} from "./RuleTypes"
+import {RuleType} from "./Rule";
 import {StyleRule} from "./StyleRule"
 import {CssSelector} from "../styles/SelectorTypes";
 import {selectorToCssString} from "../styles/SelectorFuncs";

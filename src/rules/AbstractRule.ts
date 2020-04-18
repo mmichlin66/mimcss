@@ -1,4 +1,5 @@
-import {IAbstractRule, ExtendedStyleset, RuleType} from "./RuleTypes"
+import {IAbstractRule, ExtendedStyleset} from "./RuleTypes"
+import {RuleType} from "./Rule"
 import {StyleRule} from "./StyleRule";
 
 

@@ -1,4 +1,4 @@
-import {IRule, RuleType, INamedEntity, IStylesheet} from "./RuleTypes"
+import {IRule, INamedEntity, StyleDefinition} from "./RuleTypes"
 
 
 
@@ -6,16 +6,40 @@ import {IRule, RuleType, INamedEntity, IStylesheet} from "./RuleTypes"
  * The IRuleContainerOwner interface represents a stylesheet that "owns" the rules under this
  * container. In particular, the owner's job is to generate "scoped" unique names.
  */
-export interface IRuleContainerOwner
+export interface ITopLevelRuleContainer
 {
 	/** Returns the instance of the stylesheet definition class */
-	getDefinitionInstance(): any;
-
-	/** Adds an external stylesheet to this stylesheet */
-	addExternalStylesheet( stylesheet: IStylesheet): void;
+	getDefinitionInstance(): StyleDefinition;
 
 	/** Generates a name, which will be unique in this stylesheet */
 	getScopedRuleName( ruleName: string): string;
+}
+
+
+
+/**
+ * The RuleType enumeration lists types of rules that Mimcss library works with.
+ */
+export const enum RuleType
+{
+    TAG = 1,
+    CLASS,
+    ID,
+    SELECTOR,
+    ANIMATION,
+    KEYFRAME,
+    SUPPORTS,
+    MEDIA,
+    FONTFACE,
+    IMPORT,
+    NAMESPACE,
+    PAGE,
+	VIEWPORT,
+	DOCUMENT,
+
+	// not real rules but derive from the Rule object
+	ABSTRACT,
+	NESTED,
 }
 
 
@@ -35,7 +59,7 @@ export abstract class Rule implements IRule
 
 
 	// Processes the rule.
-	public process( owner: IRuleContainerOwner, ruleName: string): void
+	public process( owner: ITopLevelRuleContainer, ruleName: string): void
 	{
 		this.owner = owner;
 		this.ruleName = ruleName;
@@ -75,7 +99,7 @@ export abstract class Rule implements IRule
 	public readonly ruleType: RuleType;
 
 	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
-	public owner: IRuleContainerOwner;
+	public owner: ITopLevelRuleContainer;
 
 	// Name of the property of the stylesheet definition to which this rule was assigned. This is
 	// null for Stylesheet.
@@ -89,7 +113,7 @@ export abstract class Rule implements IRule
 
 
 /** Creates scoped names based on the given parameters */
-export function createNames( owner: IRuleContainerOwner, ruleName: string, nameOverride: string | INamedEntity,
+export function createNames( owner: ITopLevelRuleContainer, ruleName: string, nameOverride: string | INamedEntity,
 	cssPrefix?: string): [string,string]
 {
 	let name = !nameOverride

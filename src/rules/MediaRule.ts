@@ -1,5 +1,5 @@
-import {IMediaRule, RuleType, INestedGroupClass, NestedGroup} from "./RuleTypes"
-import {Rule} from "./Rule"
+import {IMediaRule, IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
+import {RuleType, Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
@@ -9,9 +9,9 @@ import {mediaQueryToCssString} from "../styles/MediaFuncs";
 /**
  * The MediaRule class describes a CSS @media rule.
  */
-export class MediaRule<T extends NestedGroup<O>, O extends {}> extends GroupRule<T,O> implements IMediaRule<T>
+export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( query: string | MediaQuery, definitionClass: INestedGroupClass<T,O>)
+	public constructor( query: string | MediaQuery, definitionClass: IStyleDefinitionClass<T,O>)
 	{
 		super( RuleType.MEDIA, definitionClass);
 

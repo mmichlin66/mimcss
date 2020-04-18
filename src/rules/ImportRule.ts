@@ -1,5 +1,5 @@
-import {IImportRule, RuleType} from "./RuleTypes"
-import {Rule} from "./Rule"
+import {IImportRule} from "./RuleTypes"
+import {Rule, RuleType} from "./Rule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {SupportsQuery} from "../styles/StyleTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";

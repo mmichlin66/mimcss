@@ -1,4 +1,5 @@
-import {ITagRule, ExtendedStyleset, RuleType} from "./RuleTypes"
+import {ITagRule, ExtendedStyleset} from "./RuleTypes"
+import {RuleType} from "./Rule";
 import {StyleRule} from "./StyleRule";
 
 
