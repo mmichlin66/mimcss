@@ -1,6 +1,6 @@
 import {ISupportsRule, IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
-import {RuleType, Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
+import {Rule} from "./Rule"
 import {SupportsQuery} from "../styles/StyleTypes"
 import {supportsQueryToCssString} from "../styles/StyleFuncs"
 
@@ -13,7 +13,7 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 {
 	public constructor( query: SupportsQuery, definitionClass: IStyleDefinitionClass<T,O>)
 	{
-		super( RuleType.SUPPORTS, definitionClass);
+		super( definitionClass);
 
 		this.query = query;
 	}

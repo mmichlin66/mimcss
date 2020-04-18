@@ -1,7 +1,7 @@
 import {IFontFaceRule} from "./RuleTypes";
 import {Fontface} from "../styles/FontFaceTypes"
 import {fontFaceToCssString} from "../styles/FontFaceFuncs"
-import {Rule, RuleType} from "./Rule";
+import {Rule} from "./Rule";
 
 
 
@@ -12,7 +12,7 @@ export class FontFaceRule extends Rule implements IFontFaceRule
 {
 	public constructor( fontface: Fontface)
 	{
-		super( RuleType.FONTFACE);
+		super();
 
 		this.fontface = fontface;
 	}

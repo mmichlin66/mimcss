@@ -1,6 +1,6 @@
 import {IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
 import {RuleContainer, processStyleDefinitionClass, getContainerFromDefinition} from "./RuleContainer"
-import {ITopLevelRuleContainer, RuleType, Rule} from "./Rule"
+import {ITopLevelRuleContainer, Rule} from "./Rule"
 
 
 
@@ -9,9 +9,9 @@ import {ITopLevelRuleContainer, RuleType, Rule} from "./Rule"
  */
 export abstract class GroupRule<T extends StyleDefinition> extends Rule
 {
-	public constructor( type: RuleType, definitionClass: IStyleDefinitionClass<T>)
+	public constructor( definitionClass: IStyleDefinitionClass<T>)
 	{
-		super( type);
+		super();
 		this.definitionClass = definitionClass;
 	}
 

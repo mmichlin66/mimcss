@@ -1,5 +1,5 @@
 import {INamespaceRule} from "./RuleTypes"
-import {Rule, RuleType} from "./Rule"
+import {Rule} from "./Rule"
 
 
 
@@ -10,7 +10,7 @@ export class NamespaceRule extends Rule implements INamespaceRule
 {
 	public constructor( namespace: string, prefix?: string)
 	{
-		super( RuleType.NAMESPACE);
+		super();
 
 		this.namespace = namespace;
 		this.prefix = prefix;

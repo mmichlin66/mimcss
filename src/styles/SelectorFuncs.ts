@@ -1,6 +1,5 @@
 ﻿import * as SelectorTypes from "./SelectorTypes"
-import * as RuleTypes from "../rules/RuleTypes"
-import {Rule, RuleType} from "../rules/Rule";
+import {Rule} from "../rules/Rule";
 import {TagRule} from "../rules/TagRule"
 import {ClassRule} from "../rules/ClassRule"
 import {IDRule} from "../rules/IDRule"
@@ -66,15 +65,6 @@ export class SelectorProxy implements SelectorTypes.ISelectorProxy
 					arr.push( item);
 				else if (item instanceof Rule)
 				{
-					// if (item.ruleType === RuleType.TAG)
-					// 	arr.push( (item as any as RuleTypes.ITagRule).tag);
-					// else if (item.ruleType === RuleType.CLASS)
-					// 	arr.push( (item as any as RuleTypes.IClassRule).cssName);
-					// else if (item.ruleType === RuleType.ID)
-					// 	arr.push( (item as any as RuleTypes.IIDRule).cssName);
-					// else if (item.ruleType === RuleType.SELECTOR)
-					// 	arr.push( (item as any as RuleTypes.ISelectorRule).selectorText);
-
 					if (item instanceof TagRule)
 						arr.push( item.tag);
 					else if (item instanceof ClassRule)

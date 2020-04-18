@@ -1,6 +1,6 @@
 import {IIDRule, ExtendedStyleset} from "./RuleTypes"
 import {StyleRule} from "./StyleRule";
-import {createNames, ITopLevelRuleContainer, RuleType} from "./Rule";
+import {createNames, ITopLevelRuleContainer} from "./Rule";
 
 
 
@@ -11,7 +11,7 @@ export class IDRule extends StyleRule implements IIDRule
 {
 	public constructor( style?: ExtendedStyleset, nameOverride?: string | IIDRule)
 	{
-		super( RuleType.ID, style);
+		super( style);
 
 		this.nameOverride = nameOverride;
 	}

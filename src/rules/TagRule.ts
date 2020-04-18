@@ -1,5 +1,4 @@
 import {ITagRule, ExtendedStyleset} from "./RuleTypes"
-import {RuleType} from "./Rule";
 import {StyleRule} from "./StyleRule";
 
 
@@ -11,7 +10,7 @@ export class TagRule extends StyleRule implements ITagRule
 {
 	public constructor( tag: string, style?: ExtendedStyleset)
 	{
-		super( RuleType.TAG, style);
+		super( style);
 		this.tag = tag;
 	}
 

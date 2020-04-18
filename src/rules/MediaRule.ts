@@ -1,5 +1,5 @@
 import {IMediaRule, IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
-import {RuleType, Rule} from "./Rule"
+import {Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
@@ -13,7 +13,7 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 {
 	public constructor( query: string | MediaQuery, definitionClass: IStyleDefinitionClass<T,O>)
 	{
-		super( RuleType.MEDIA, definitionClass);
+		super( definitionClass);
 
 		this.query = query;
 	}

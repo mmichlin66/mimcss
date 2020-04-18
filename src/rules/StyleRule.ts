@@ -1,7 +1,7 @@
 import {IStyleRule, ExtendedStyleset, IVarRule} from "./RuleTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
-import {Rule, RuleType, ITopLevelRuleContainer} from "./Rule";
+import {Rule, ITopLevelRuleContainer} from "./Rule";
 import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
 import {selectorToCssString} from "../styles/SelectorFuncs"
 
@@ -15,9 +15,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 {
 	// The styleset can be an ExtendedStyleset for many rules; however, for some it is just
 	// of the Styleset type.
-	public constructor( type: RuleType, styleset?: Styleset)
+	public constructor( styleset?: Styleset)
 	{
-		super( type);
+		super();
 
 		if (styleset)
 			this.parseInputStyleset( styleset);
@@ -246,7 +246,7 @@ class NestedRule extends StyleRule
 {
 	public constructor( containingRule?: StyleRule, selector?: CssSelector, style?: ExtendedStyleset)
 	{
-		super( RuleType.NESTED, style);
+		super( style);
 		this.selector = selector;
 		this.containingRule = containingRule;
 	}

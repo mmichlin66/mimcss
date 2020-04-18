@@ -1,5 +1,4 @@
 import {IPageRule} from "./RuleTypes"
-import {RuleType} from "./Rule";
 import {StyleRule} from "./StyleRule";
 import {Styleset} from "../styles/StyleTypes";
 import {PagePseudoClass} from "../styles/SelectorTypes";
@@ -13,7 +12,7 @@ export class PageRule extends StyleRule implements IPageRule
 {
 	public constructor( style?: Styleset, pseudoClass?: PagePseudoClass)
 	{
-		super( RuleType.PAGE, style);
+		super( style);
 		this.pseudoClass = pseudoClass;
 	}
 

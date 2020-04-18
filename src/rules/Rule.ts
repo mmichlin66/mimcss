@@ -18,46 +18,12 @@ export interface ITopLevelRuleContainer
 
 
 /**
- * The RuleType enumeration lists types of rules that Mimcss library works with.
- */
-export const enum RuleType
-{
-    TAG = 1,
-    CLASS,
-    ID,
-    SELECTOR,
-    ANIMATION,
-    KEYFRAME,
-    SUPPORTS,
-    MEDIA,
-    FONTFACE,
-    IMPORT,
-    NAMESPACE,
-    PAGE,
-	VIEWPORT,
-	DOCUMENT,
-
-	// not real rules but derive from the Rule object
-	ABSTRACT,
-	NESTED,
-}
-
-
-
-/**
  * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
  * class is also an ancestor for Stylesheet; however, most of its the fields are undefined in
  * te Stylesheet instances.
  */
 export abstract class Rule implements IRule
 {
-	constructor( ruleType: RuleType)
-	{
-		this.ruleType = ruleType;
-	}
-
-
-
 	// Processes the rule.
 	public process( owner: ITopLevelRuleContainer, ruleName: string): void
 	{
@@ -94,9 +60,6 @@ export abstract class Rule implements IRule
 	}
 
 
-
-	/** Type of the rule */
-	public readonly ruleType: RuleType;
 
 	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
 	public owner: ITopLevelRuleContainer;

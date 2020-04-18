@@ -1,5 +1,5 @@
 import {IImportRule} from "./RuleTypes"
-import {Rule, RuleType} from "./Rule"
+import {Rule} from "./Rule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {SupportsQuery} from "../styles/StyleTypes"
 import {mediaQueryToCssString} from "../styles/MediaFuncs";
@@ -14,7 +14,7 @@ export class ImportRule extends Rule implements IImportRule
 {
 	public constructor( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery)
 	{
-		super( RuleType.IMPORT);
+		super();
 
 		this.url = url;
 		this.mediaQuery = mediaQuery;

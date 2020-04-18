@@ -1,5 +1,5 @@
 import {IAnimationRule, AnimationFrame, INamedEntity} from "./RuleTypes"
-import {Rule, RuleType, ITopLevelRuleContainer, createNames} from "./Rule"
+import {Rule, ITopLevelRuleContainer, createNames} from "./Rule"
 import {StyleRule} from "./StyleRule";
 
 
@@ -11,7 +11,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 {
 	public constructor( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule)
 	{
-		super( RuleType.ANIMATION);
+		super();
 
 		if (frames)
 			this.frameRules = frames.map( (keyframe) => new AnimationFrameRule( keyframe));
@@ -110,7 +110,7 @@ class AnimationFrameRule extends StyleRule
 {
 	public constructor( frame?: AnimationFrame)
 	{
-		super( RuleType.KEYFRAME, frame ? frame[1] : undefined);
+		super( frame ? frame[1] : undefined);
 
 		if (frame)
 			this.waypoint = typeof frame[0] === "string" ? frame[0] : frame[0] + "%";

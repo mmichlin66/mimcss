@@ -1,5 +1,4 @@
 import {IAbstractRule, ExtendedStyleset} from "./RuleTypes"
-import {RuleType} from "./Rule"
 import {StyleRule} from "./StyleRule";
 
 
@@ -12,7 +11,7 @@ export class AbstractRule extends StyleRule implements IAbstractRule
 {
 	public constructor( style?: ExtendedStyleset)
 	{
-		super( RuleType.ABSTRACT, style);
+		super( style);
 	}
 
 
