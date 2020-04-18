@@ -9,17 +9,17 @@ import {IAnimationNameProxy} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 
 
-/** Utility type that represents all properties of type T that are of type U */
-type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
+// /** Utility type that represents all properties of type T that are of type U */
+// type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
 
-/** Utility type that represents names of all properties of type T that are of type U */
-type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
+// /** Utility type that represents names of all properties of type T that are of type U */
+// type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
 
-/** Utility type that represents string values mapped to names of properties of type T that are of type U. */
-export type NamesOfPropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: string };
+// /** Utility type that represents string values mapped to names of properties of type T that are of type U. */
+// export type NamesOfPropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: string };
 
-/** Type that represents all properties of type T that are of type U */
-export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
+// /** Type that represents all properties of type T that are of type U */
+// export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
 
 
 
@@ -93,13 +93,6 @@ export interface INamedEntity
 	 * properties (--).
 	 */
 	readonly name: string;
-
-	/**
-	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
-	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
-	 * `name` property.
-	 */
-	readonly cssName: string;
 }
 
 

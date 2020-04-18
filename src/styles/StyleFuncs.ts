@@ -7,6 +7,7 @@ import {
     CssAngleMath, CssFrequencyMath, CssFractionMath, CssPercentMath, CssResolutionMath
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
+import {VarRule} from "../rules/VarRule";
 
 
 
@@ -459,7 +460,7 @@ function customPropToCssString( propVal: StyleTypes.CustomVarStyleType, valueOnl
     let value: any;
     if (propVal.length === 2)
     {
-        varName = propVal[0].cssName;
+        varName = (propVal[0] as VarRule).cssName;
         template = propVal[0].template;
         value = propVal[1]
     }

@@ -4,6 +4,7 @@ import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer} from "./Rule";
 import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
 import {selectorToCssString} from "../styles/SelectorFuncs"
+import {VarRule} from "./VarRule";
 
 
 
@@ -212,17 +213,17 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	/**
 	 * Adds/replaces the value of the given custmom cSS property in this rule.
-	 * @param varDef IVarRule object defining a custom CSS property.
+	 * @param varObj IVarRule object defining a custom CSS property.
 	 * @param varValue New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setCustomProp<K extends VarTemplateName>( varDef: IVarRule<K>, varValue: VarValueType<K>, important?: boolean): void
+	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, varValue: VarValueType<K>, important?: boolean): void
 	{
-		if (!varDef || !this.cssRule)
+		if (!varObj || !this.cssRule || !(varObj instanceof VarRule))
 			return;
 
-		this.cssRule.style.setProperty( varDef.cssName,
-			stylePropToCssString( varDef.template, varValue, true), important ? "!important" : null)
+		this.cssRule.style.setProperty( varObj.cssName,
+			stylePropToCssString( varObj.template, varValue, true), important ? "!important" : null)
 	}
 
 
