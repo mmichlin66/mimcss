@@ -3,7 +3,7 @@ import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/Styl
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer} from "./Rule";
 import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
-import {selectorToCssString} from "../styles/SelectorFuncs"
+import {valueToString} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
 
 
@@ -270,7 +270,7 @@ class NestedRule extends StyleRule
 	{
 		// get selector string and replace all occurrences of the ampersand symbol with the
 		// selector string of the parent rule.
-		return selectorToCssString( this.selector).replace( "&", this.containingRule.getSelectorString());
+		return valueToString( this.selector).replace( "&", this.containingRule.getSelectorString());
 	}
 
 

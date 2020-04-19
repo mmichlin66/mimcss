@@ -70,17 +70,8 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 
-    /** Flag indicating that this object implements the IAnimationNameProxy interface */
-    public get isAnimationNameProxy(): boolean { return true; }
-
-    /** Converts internally held value(s) to string - returns the name of the animation */
-    public valueToString(): string { return this.name; }
-
 	/** SOM keyframes rule */
 	public cssRule: CSSKeyframesRule;
-
-	/** Only needed to distinguish from class and ID rules */
-	public frameRules: AnimationFrameRule[];
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -95,6 +86,9 @@ export class AnimationRule extends Rule implements IAnimationRule
 	 * `name` property.
 	 */
 	public cssName: string;
+
+	/** Only needed to distinguish from class and ID rules */
+	private frameRules: AnimationFrameRule[];
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

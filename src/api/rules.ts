@@ -7,7 +7,6 @@ import * as RuleTypes from "../rules/RuleTypes";
 import * as StylesheetFuncs from "../rules/RuleContainer"
 import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass, SelectorTokenType} from "../styles/SelectorTypes";
-import {SelectorProxy} from "../styles/SelectorFuncs";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
 import {AbstractRule} from "../rules/AbstractRule"
@@ -23,6 +22,7 @@ import {NamespaceRule} from "../rules/NamespaceRule";
 import {PageRule} from "../rules/PageRule";
 import {SupportsRule} from "../rules/SupportsRule"
 import {MediaRule} from "../rules/MediaRule"
+import { formatSelector } from "../styles/SelectorFuncs";
 
 
 
@@ -134,7 +134,7 @@ export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTyp
  */
 export function $selector( template: string, ...args: SelectorTokenType[]): CssSelector
 {
-	return !template ? "" : args.length === 0 ? template : new SelectorProxy( template, args);
+	return () => formatSelector( template, args);
 }
 
 

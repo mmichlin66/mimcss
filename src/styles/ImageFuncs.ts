@@ -1,6 +1,6 @@
 ﻿import {
     GradientStopOrHint, GradientColorAndLength, LinearGradAngle, RadialGradientShape,
-    RadialGradientExtent, IImageProxy, CrossFadeParam, CssImage
+    RadialGradientExtent, ImageProxy, CrossFadeParam, CssImage
 } from "./ImageTypes"
 import {colorToString} from "./ColorFuncs";
 import {CssPosition, Extended, SimpleCssPosition, CssAngle} from "./UtilTypes";
@@ -28,7 +28,7 @@ function gradientColorAndLengthToString( val: GradientColorAndLength,
 
 
 
-function linearGradientToString( name: string, angle: LinearGradAngle,
+export function linearGradientToString( name: string, angle: LinearGradAngle,
     stopsOrHints: GradientStopOrHint[]): string
 {
     let angleString = angle ? CssAngleMath.styleToString( angle) + "," : "";
@@ -38,7 +38,7 @@ function linearGradientToString( name: string, angle: LinearGradAngle,
 
 
 
-function radialGradientToString( name: string, shape: RadialGradientShape,
+export function radialGradientToString( name: string, shape: RadialGradientShape,
     extent: RadialGradientExtent, pos: CssPosition,
     stopsOrHints: GradientStopOrHint[]): string
 {
@@ -52,7 +52,7 @@ function radialGradientToString( name: string, shape: RadialGradientShape,
 
 
 
-function conicGradientToString( angle: Extended<CssAngle>, pos: SimpleCssPosition,
+export function conicGradientToString( angle: Extended<CssAngle>, pos: SimpleCssPosition,
     stopsOrHints: GradientStopOrHint[]): string
 {
     let angleString = angle ? `from ${CssAngleMath.styleToString( angle)}` : "";
@@ -73,7 +73,7 @@ function crossFadeParamToString( val: CrossFadeParam): string
 
 
 
-function crossFadeToString( args: CrossFadeParam[]): string
+export function crossFadeToString( args: CrossFadeParam[]): string
 {
     let paramsString = valueToString( args, {
         arrayItemFunc: crossFadeParamToString,
@@ -81,110 +81,6 @@ function crossFadeToString( args: CrossFadeParam[]): string
     })
 
     return `cross-fade(${paramsString})`;
-}
-
-
-
-/**
- * The GradientProxy class is a base for IImageProxy-implemented classes that encapsulates
- * parameters common for linear and radial gradients.
- */
-export abstract class GradientProxy implements IImageProxy
-{
-    /** Flag indicating that this object implements the IImageProxy interface */
-    public get isImageProxy(): boolean { return true; }
-
-    constructor( protected name: string, protected stopsOrHints: GradientStopOrHint[])
-    {
-    }
-
-    /** Converts internally held value(s) to string */
-    abstract valueToString(): string;
-}
-
-
-
-/**
- * The LinearGradientProxy class implements the IImageProxy interface by encapsulating parameters
- * of the `linear-gradient()` or `repeating-linear-gradient()` CSS functions.
- */
-export class LinearGradientProxy extends GradientProxy
-{
-    constructor( name: string, private angle: LinearGradAngle, stopsOrHints: GradientStopOrHint[])
-    {
-        super( name, stopsOrHints);
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return linearGradientToString( this.name, this.angle, this.stopsOrHints);
-    }
-}
-
-
-
-/**
- * The LinearGradientProxy class implements the IImageProxy interface by encapsulating parameters
- * of the `radial-gradient()` or `repeating-radial-gradient()` CSS functions.
- */
-export class RadialGradientProxy extends GradientProxy
-{
-    constructor( name: string, private shape: RadialGradientShape,
-        private extent: RadialGradientExtent, private pos: CssPosition,
-        stopsOrHints: GradientStopOrHint[])
-    {
-        super( name, stopsOrHints);
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return radialGradientToString( this.name, this.shape, this.extent, this.pos, this.stopsOrHints);
-    }
-}
-
-
-
-/**
- * The ConicGradientProxy class implements the IImageProxy interface by encapsulating parameters
- * of the `conic-gradient()` CSS function.
- */
-export class ConicGradientProxy extends GradientProxy
-{
-    constructor( private angle: Extended<CssAngle>, private pos: SimpleCssPosition,
-        stopsOrHints: GradientStopOrHint[])
-    {
-        super( "", stopsOrHints);
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return conicGradientToString( this.angle, this.pos, this.stopsOrHints);
-    }
-}
-
-
-
-/**
- * The CrossFadeProxy class implements the IImageProxy interface by encapsulating parameters
- * of the `conic-gradient()` CSS function.
- */
-export class CrossFadeProxy implements IImageProxy
-{
-    /** Flag indicating that this object implements the IImageProxy interface */
-    public get isImageProxy(): boolean { return true; }
-
-    constructor( private args: CrossFadeParam[])
-    {
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return crossFadeToString( this.args);
-    }
 }
 
 

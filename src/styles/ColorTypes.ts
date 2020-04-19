@@ -163,14 +163,10 @@ export interface INamedColors
 
 
 /**
- * The IColorProxy interface represents an invocation of one of CSS functions that are used for
+ * The ColorProxy type represents an invocation of one of CSS functions that are used for
  * secifying colors. This interface is returned from functions like: rgb(), alpha(), etc.
  */
-export interface IColorProxy
-{
-    /** Flag indicating that this object implements the IColorProxy interface */
-    readonly isColorProxy: boolean;
-}
+export type ColorProxy = (p?: "color") => string;
 
 
 
@@ -182,7 +178,7 @@ export interface IColorProxy
  *     - positive integer numbers greater than 0xFFFFFF are treated as RGBA separations 0xRRGGBBAA.
  *     - negative and floating point numbers are rejected.
  */
-export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | IColorProxy;
+export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | ColorProxy;
 
 
 

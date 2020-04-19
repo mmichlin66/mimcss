@@ -4,8 +4,7 @@
 
 
 import {IVarProxy} from "../styles/UtilTypes";
-import {IStyleset, Styleset, ICssStyleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
-import {IAnimationNameProxy} from "../styles/StyleTypes";
+import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 
 
@@ -179,7 +178,7 @@ export interface ISelectorRule extends IStyleRule
  * The IAnimationRule interface represents the @keyframes rule.
  * Objects implementing this interface are returned from the [[$keyframes]] function.
  */
-export interface IAnimationRule extends IRule, INamedEntity, IAnimationNameProxy
+export interface IAnimationRule extends IRule, INamedEntity
 {
 	/** SOM keyframes rule */
 	readonly cssRule: CSSKeyframesRule;

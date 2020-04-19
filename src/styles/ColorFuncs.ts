@@ -1,4 +1,4 @@
-﻿import {INamedColors, CssColor, IColorProxy, Colors} from "./ColorTypes"
+﻿import {INamedColors, CssColor, Colors} from "./ColorTypes"
 import {CssPercentMath, CssAngleMath, valueToString} from "./UtilFuncs"
 import {Extended} from "./UtilTypes";
 
@@ -43,7 +43,7 @@ function colorSeparationToString( c: number | string): string
 
 
 
-function rgbToString( r: number | string, g: number | string, b: number | string, a?: number | string): string
+export function rgbToString( r: number | string, g: number | string, b: number | string, a?: number | string): string
 {
     r = colorSeparationToString( r);
     g = colorSeparationToString( g);
@@ -55,7 +55,7 @@ function rgbToString( r: number | string, g: number | string, b: number | string
 
 
 
-function hslToString( h: number | string, s: number | string, l: number | string, a?: number | string): string
+export function hslToString( h: number | string, s: number | string, l: number | string, a?: number | string): string
 {
     h = CssAngleMath.styleToString(h);
     s = s == null ? "100%" : CssPercentMath.styleToString( s);
@@ -67,89 +67,10 @@ function hslToString( h: number | string, s: number | string, l: number | string
 
 
 
-function alphaToString( c: number | keyof INamedColors, a: number | string): string
+export function alphaToString( c: number | keyof INamedColors, a: number | string): string
 {
     let rgbVal = typeof c === "string" ? this[c] : c;
     return rgbToString( (rgbVal & 0xFF0000) >> 16, (rgbVal & 0x00FF00) >> 8, rgbVal & 0x0000FF, a);
-}
-
-
-
-/**
- * The ColorProxy class implements the IColorProxy and serves as a base for other color proxies.
- */
-abstract class ColorProxy implements IColorProxy
-{
-    /** Flag indicating that this object implements the IImageProxy interface */
-    public get isColorProxy(): boolean { return true; }
-
-    /** Converts internally held value(s) to string */
-    abstract valueToString(): string
-}
-
-
-
-/**
- * The RgbProxy class implements the IColorProxy interface by encapsulating parameters of the
- * `rgb()` or `rgba()` CSS functions.
- */
-export class RgbProxy extends ColorProxy
-{
-    /** Flag indicating that this object implements the IImageProxy interface */
-    public get isColorProxy(): boolean { return true; }
-
-    constructor( private r: number | string, private g: number | string, private b: number | string,
-        private a?: number | string)
-    {
-        super();
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return rgbToString( this.r, this.g, this.b, this.a);
-    }
-}
-
-
-
-/**
- * The HslProxy class implements the IColorProxy interface by encapsulating parameters of the
- * `hsl()` or `hsla()` CSS functions.
- */
-export class HslProxy extends ColorProxy
-{
-    constructor( private h: number | string, private s: number | string, private l: number | string,
-        private a?: number | string)
-    {
-        super();
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return hslToString( this.h, this.s, this.l, this.a);
-    }
-}
-
-
-
-/**
- * The AlphaProxy class implements the IColorProxy interface by applying the given alpha mask
- * to the color specified as either a number or a named color.
- */
-export class AlphaProxy extends ColorProxy
-{
-    constructor( private c: number | keyof INamedColors, private a: number | string)
-    {
-        super();
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return alphaToString( this.c, this.a);
-    }
 }
 
 

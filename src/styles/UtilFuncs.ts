@@ -1,10 +1,10 @@
 ﻿import {
-    Extended, IStringProxy, INumberProxy, CssNumber, CssMultiNumber, INumberMath,
+    Extended, NumberProxy, CssNumber, CssMultiNumber, INumberMath,
     ICssFractionMath, CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
     CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
     CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency, CssFraction,
-    CssMultiFraction, CssPercent, CssMultiPercent, IUrlProxy, ICssLengthMath,
-    ICssAngleMath, ICssPercentMath, ICssFrequencyMath, ICssResolutionMath, ICssTimeMath
+    CssMultiFraction, CssPercent, CssMultiPercent, UrlProxy, ICssLengthMath,
+    ICssAngleMath, ICssPercentMath, ICssFrequencyMath, ICssResolutionMath, ICssTimeMath, NumberType, LengthType, PercentType, AngleType, TimeType, ResolutionType, FrequencyType, FractionType
 } from "./UtilTypes"
 
 
@@ -88,8 +88,8 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
    if (!options)
     {
         // standard processing:
-        // - null/undefined become "initial".
-        // - call valueToString (IStringProxy and the like) if exist.
+        // - null/undefined become empty string.
+        // - call valueToString (proxy objects) if exist.
         // - function: call without parameters.
         // - everything else: call toString().
         if (val == null)
@@ -98,10 +98,10 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             return val;
         else if (Array.isArray(val))
             return arrayToCssString( val);
-        else if (typeof val.valueToString === "function")
-            return val.valueToString();
         else if (typeof val === "function")
             return val();
+        else if (typeof val.valueToString === "function")
+            return val.valueToString();
         else
             return val.toString();
     }
@@ -113,10 +113,10 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             return options.fromNull ? options.fromNull( val) : "";
         else if (typeof val === "string")
             return options.fromString ? options.fromString( val) : val;
-        else if (typeof val === "boolean")
-            return options.fromBool ? options.fromBool( val) : options.fromAny ? options.fromAny( val) : val.toString();
         else if (typeof val === "number")
             return options.fromNumber ? options.fromNumber( val) : options.fromAny ? options.fromAny( val) : val.toString();
+        else if (typeof val === "function")
+            return valueToString( options.funcArgs ? val( ...options.funcArgs) : val());
         else if (Array.isArray(val))
         {
             if (options.fromArray)
@@ -143,8 +143,8 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             else
                 return val.toString();
         }
-        else if (typeof val === "function")
-            return valueToString( options.funcArgs ? val( ...options.funcArgs) : val());
+        else if (typeof val === "boolean")
+            return options.fromBool ? options.fromBool( val) : options.fromAny ? options.fromAny( val) : val.toString();
         else if (options.fromAny)
             return options.fromAny( val);
         else
@@ -207,30 +207,6 @@ export function objectToCssString( val: any, usePropNames: boolean,
     );
 
 	return buf.join(" ");
-}
-
-
-
-/**
- * The StringProxy class implements the IStringProxy interface by encapsulating the string.
- */
-export class StringProxy implements IStringProxy
-{
-    /** Flag indicating that this object implements the IStringProxy interface */
-    public get isStringProxy(): boolean { return true; }
-
-    constructor( s?: string | IStringProxy)
-    {
-        this.s = s;
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return this.s == null ? "" : typeof this.s === "string" ? this.s : this.s.toString();
-    }
-
-    private s?: string | IStringProxy;
 }
 
 
@@ -314,109 +290,34 @@ function formatNumbers( format: string, params: Extended<NumberBase>[], convertF
 
 
 /**
- * The NumberProxy class implements the INumberProxy interface by encapsulating parameters of a
- * mathematic CSS function that accepts one or more parameters of type CssNumber.
+ * The mathFunc function returns one of the mathematic CSS function that accepts one or more
+ * parameters whoe type is derived from NumberBase<T>.
  */
-abstract class NumberProxy<T extends string | null = null> implements INumberProxy<T>
+function mathFunc<T extends string>( name: string, params: Extended<NumberBase<T>>[],
+    convertFunc?: ConvertNumberFuncType): string
 {
-    /**
-     * Returns true - needed only to indicate that this object implements the INumerProxy interface
-     * for a given type
-     */
-    public isNumberProxy( o: T): boolean { return true; }
-
-    constructor( params: Extended<NumberBase<T>>[], convertFunc?: ConvertNumberFuncType)
-    {
-        this.convertFunc = convertFunc;
-        this.params = params;
-    }
-
-    /** Converts internally held value(s) to string - should be implemented by the derived classes */
-    abstract valueToString(): string;
-
-    // Function that converts JavaScript numbers to strings (e.g. by appending a suffix for units).
-    // If not defined, numbers are converted to strings without appending any suffix.
-    protected convertFunc: ConvertNumberFuncType;
-
-    // Array of CssNumber parameters to the mathematical function.
-    protected params: Extended<NumberBase<T>>[];
+    return `${name}(${multiStyleToString( params, convertFunc, ",")})`;
 }
 
 
 
 /**
- * The MathFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
- * mathematic CSS function that accepts one or more parameters of type CssNumber.
+ * The calcFunc function returns the string representation of the calc() CSS function.
  */
-class MathFuncProxy<T extends string | null = null> extends NumberProxy<T>
+function calcFunc<T extends string>( formula: string, params: Extended<NumberBase<T>>[],
+    convertFunc?: ConvertNumberFuncType): string
 {
-    constructor( name: string, params: Extended<NumberBase<T>>[], convertFunc?: ConvertNumberFuncType)
-    {
-        super( params, convertFunc);
-        this.name = name;
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return `${this.name}(${multiStyleToString( this.params, this.convertFunc, ",")})`;
-    }
-
-    // Name of the mathematical function.
-    private name: string;
+    return `calc(${formatNumbers( formula, params, convertFunc)})`;
 }
 
 
 
 /**
- * The CalcFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
- * calc() CSS function that accepts a formula string and zero or more parameters of type CssNumber.
+ * The unitFunc function returns string representation of the given number with the given units.
  */
-class CalcFuncProxy<T extends string | null = null> extends NumberProxy<T>
+function unitFunc<T extends string>( n: number, unit: string): string
 {
-    constructor( formula: string, params: Extended<NumberBase<T>>[], convertFunc?: ConvertNumberFuncType)
-    {
-        super( params, convertFunc);
-        this.formula = formula;
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return `calc(${formatNumbers( this.formula, this.params, this.convertFunc)})`;
-    }
-
-    // Calculation formula with placeholders.
-    private formula: string;
-}
-
-
-
-/**
- * The CalcFuncProxy class implements the INumberProxy interface by encapsulating parameters of a
- * calc() CSS function that accepts a formula string and zero or more parameters of type CssNumber.
- */
-class UnitProxy<T extends string | null = null> implements INumberProxy<T>
-{
-    /**
-     * Returns true - needed only to indicate that this object implements the INumerProxy interface
-     * for a given type
-     */
-    public isNumberProxy( o: T): boolean { return true; }
-
-    constructor( n: number, unit: string)
-    {
-        this.s = n + unit;
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        return this.s;
-    }
-
-    // Resulting string combining the number with the unit.
-    private s: string;
+    return n + unit;
 }
 
 
@@ -447,29 +348,29 @@ class NumberMath<T extends string | null = null> implements INumberMath<T>
         return multiStyleToString( val, this.convertFunc, separator);
     }
 
-    public min( ...params: Extended<NumberBase<T>>[]): INumberProxy<T>
+    public min( ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
     {
-        return new MathFuncProxy( "min", params, this.convertFunc);
+        return () => mathFunc( "min", params, this.convertFunc);
     }
 
-    public max( ...params: Extended<NumberBase<T>>[]): INumberProxy<T>
+    public max( ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
     {
-        return new MathFuncProxy( "max", params, this.convertFunc);
+        return () => mathFunc( "max", params, this.convertFunc);
     }
 
-    public clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): INumberProxy<T>
+    public clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): NumberProxy<T>
     {
-        return new MathFuncProxy( "clamp", [min, pref, max], this.convertFunc);
+        return () => mathFunc( "clamp", [min, pref, max], this.convertFunc);
     }
 
-    public calc( formula: string, ...params: Extended<NumberBase<T>>[]): INumberProxy<T>
+    public calc( formula: string, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
     {
-        return new CalcFuncProxy( formula, params, this.convertFunc);
+        return () => calcFunc( formula, params, this.convertFunc);
     }
 
-    protected unit( n: number, unit: string): INumberProxy<T>
+    protected unit( n: number, unit: string): NumberProxy<T>
     {
-        return new UnitProxy<T>( n, unit);
+        return () => unitFunc<T>( n, unit);
     }
 }
 
@@ -507,7 +408,7 @@ export interface INumberMathClass<T extends string | null = null>
  * The CssNumberMath class contains methods that implement CSS mathematic functions on the
  * <number> CSS types.
  */
-export class CssNumberMath extends NumberMath<"Number">
+export class CssNumberMath extends NumberMath<NumberType>
 {
     public static convertFunc( n: number): string { return n.toString(); }
 
@@ -530,6 +431,40 @@ export class CssNumberMath extends NumberMath<"Number">
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// Percent
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The CssPercentMath class contains methods that implement CSS mathematic functions on the
+ * <percent> CSS types.
+ */
+export class CssPercentMath extends NumberMath<PercentType> implements ICssPercentMath
+{
+    public static convertFunc( n: number): string
+        { return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%"; }
+
+    public static styleToString( val: Extended<CssPercent>): string
+        { return styleToString( val, CssPercentMath.convertFunc); }
+
+    public static multiStyleToString( val: Extended<CssMultiPercent>, separator: string): string
+        { return multiStyleToString( val, CssPercentMath.convertFunc, separator); }
+
+    public static multiStyleToStringWithSpace( val: Extended<CssMultiPercent>): string
+        { return multiStyleToString( val, CssPercentMath.convertFunc, " "); }
+
+    public static multiStyleToStringWithComma( val: Extended<CssMultiNumber>): string
+        { return multiStyleToString( val, CssPercentMath.convertFunc, ","); }
+
+    constructor() { super( CssFractionMath.convertFunc) }
+
+    public percent( n: number) { return this.unit( n, "%"); }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Length
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -538,7 +473,7 @@ export class CssNumberMath extends NumberMath<"Number">
  * The CssLengthMath class contains methods that implement CSS mathematic functions on the
  * <length> CSS types.
  */
-export class CssLengthMath extends NumberMath<"Length" | "Percent"> implements ICssLengthMath
+export class CssLengthMath extends NumberMath<LengthType | PercentType> implements ICssLengthMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "px", "em"); }
 
@@ -590,7 +525,7 @@ export class CssLengthMath extends NumberMath<"Length" | "Percent"> implements I
  * The CssAngleMath class contains methods that implement CSS mathematic functions on the
  * <angle> CSS types.
  */
-export class CssAngleMath extends NumberMath<"Angle" | "Percent"> implements ICssAngleMath
+export class CssAngleMath extends NumberMath<AngleType | PercentType> implements ICssAngleMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "deg", "rad"); }
 
@@ -626,7 +561,7 @@ export class CssAngleMath extends NumberMath<"Angle" | "Percent"> implements ICs
  * The CssTimeMath class contains methods that implement CSS mathematic functions on the
  * <time> CSS types.
  */
-export class CssTimeMath extends NumberMath<"Time" | "Percent"> implements ICssTimeMath
+export class CssTimeMath extends NumberMath<TimeType | PercentType> implements ICssTimeMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "ms", "s"); }
 
@@ -660,7 +595,7 @@ export class CssTimeMath extends NumberMath<"Time" | "Percent"> implements ICssT
  * The CssResolutionMath class contains methods that implement CSS mathematic functions on the
  * <resolution> CSS types.
  */
-export class CssResolutionMath extends NumberMath<"Resolution" | "Percent"> implements ICssResolutionMath
+export class CssResolutionMath extends NumberMath<ResolutionType | PercentType> implements ICssResolutionMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "dpi", "x"); }
 
@@ -703,7 +638,7 @@ export class CssResolutionMath extends NumberMath<"Resolution" | "Percent"> impl
  * The CssFrequencyMath class contains methods that implement CSS mathematic functions on the
  * <frequence> CSS types.
  */
-export class CssFrequencyMath extends NumberMath<"Frequency" | "Percent"> implements ICssFrequencyMath
+export class CssFrequencyMath extends NumberMath<FrequencyType | PercentType> implements ICssFrequencyMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "Hz", "kHz"); }
 
@@ -737,7 +672,7 @@ export class CssFrequencyMath extends NumberMath<"Frequency" | "Percent"> implem
  * The CssFractionMath class contains methods that implement CSS mathematic functions on the
  * <fraction> CSS types.
  */
-export class CssFractionMath extends NumberMath<"Fraction" | "Percent"> implements ICssFractionMath
+export class CssFractionMath extends NumberMath<FractionType | PercentType> implements ICssFractionMath
 {
     public static convertFunc( n: number): string { return numberToCssString( n, "fr", "fr"); }
 
@@ -755,46 +690,12 @@ export class CssFractionMath extends NumberMath<"Fraction" | "Percent"> implemen
 
     constructor() { super( CssFractionMath.convertFunc) }
 
-    public minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): INumberProxy<"Fraction" | "Percent">
+    public minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): NumberProxy<FractionType | PercentType>
     {
-        return new MathFuncProxy( "minmax", [min, max], CssFractionMath.convertFunc);
+        return () => mathFunc( "minmax", [min, max], CssFractionMath.convertFunc);
     }
 
     public fr( n: number) { return this.unit( n, "fr"); }
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Percent
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The CssPercentMath class contains methods that implement CSS mathematic functions on the
- * <percent> CSS types.
- */
-export class CssPercentMath extends NumberMath<"Percent"> implements ICssPercentMath
-{
-    public static convertFunc( n: number): string
-        { return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%"; }
-
-    public static styleToString( val: Extended<CssPercent>): string
-        { return styleToString( val, CssPercentMath.convertFunc); }
-
-    public static multiStyleToString( val: Extended<CssMultiPercent>, separator: string): string
-        { return multiStyleToString( val, CssPercentMath.convertFunc, separator); }
-
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiPercent>): string
-        { return multiStyleToString( val, CssPercentMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiNumber>): string
-        { return multiStyleToString( val, CssPercentMath.convertFunc, ","); }
-
-    constructor() { super( CssFractionMath.convertFunc) }
-
-    public percent( n: number) { return this.unit( n, "%"); }
 }
 
 
@@ -826,38 +727,6 @@ export function multiPositionToString( val: Extended<MultiCssPosition>, separato
         arrayItemFunc: positionToString,
         arraySeparator: separator
     });
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// URLs
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The UrlProxy class represents an invocation of the CSS url() function.
- */
-export class UrlProxy implements IUrlProxy
-{
-    /** Flag indicating that this object implements the INumerProxy interface */
-    public get isUrlProxy(): boolean { return true; }
-
-    constructor( url: Extended<string>)
-    {
-        this.url = url;
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-        let s = valueToString( this.url);
-        return s && !s.startsWith("url(") ? `url(${s})` : s;
-    }
-
-    // Array of CssNumber parameters to the mathematical function.
-    private url: Extended<string>;
 }
 
 

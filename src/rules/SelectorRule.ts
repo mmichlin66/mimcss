@@ -1,7 +1,7 @@
 import {ISelectorRule, ExtendedStyleset} from "./RuleTypes"
 import {StyleRule} from "./StyleRule"
 import {CssSelector} from "../styles/SelectorTypes";
-import {selectorToCssString} from "../styles/SelectorFuncs";
+import {valueToString} from "../styles/UtilFuncs";
 import {ITopLevelRuleContainer} from "./Rule";
 
 
@@ -25,7 +25,7 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	{
 		super.process( owner, ruleName);
 
-		this.selectorText = selectorToCssString( this.selector);
+		this.selectorText = valueToString( this.selector);
 	}
 
 

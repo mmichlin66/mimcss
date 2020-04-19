@@ -5,6 +5,8 @@
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
+import {IVarRule, IAnimationRule} from "../rules/RuleTypes";
+
 
 
 
@@ -83,20 +85,8 @@ export type AnimationIterationCount_StyleType = OneOrMany<AnimationIterationCoun
 
 
 
-/**
- * The IAnimationNameProvider interface represents an object that provides a name of an animation.
- * Objects that implement this interface can be used whereever animation name is required. The
- * primary object that implements this interface is AnimationRule returned from the $keyframes
- * function.
- */
-export interface IAnimationNameProxy
-{
-    /** Flag indicating that this object implements the IAnimationNameProxy interface */
-    readonly isAnimationNameProxy: boolean;
-}
-
 /** Type for single animation name */
-export type AnimationName_Single = "none" | string | IAnimationNameProxy;
+export type AnimationName_Single = "none" | string | IAnimationRule;
 
 /** Type for animation-name style property */
 export type AnimationName_StyleType = OneOrMany<AnimationName_Single>;
@@ -1254,7 +1244,7 @@ export interface ICssStyleset
  * The IStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
  * "extended" versions of their types. These extended types are defined using the [[Extended]]
  * generic type, which adds basic keywords (e.g. "reset", "initial", etc.) as well as
- * [[IStringProxy]] and [[IVarProxy]] to the type that is defined in the ICssStyleset
+ * [[StringProxy]] and [[IVarProxy]] to the type that is defined in the ICssStyleset
  * interface.
  */
 export type IStyleset = { [K in keyof ICssStyleset]: Extended<ICssStyleset[K]> }
@@ -1356,8 +1346,6 @@ export type VarTemplateName = keyof IVarTemplates;
 export type VarValueType<K extends VarTemplateName> = IVarTemplates[K];
 
 
-
-import {IVarRule} from "../rules/RuleTypes";
 
 /**
  * The CustomVarStyleType type represents a custom CSS property name and value that are used to

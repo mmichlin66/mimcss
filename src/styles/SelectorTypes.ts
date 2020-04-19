@@ -1,4 +1,4 @@
-﻿import {IStringProxy} from "./UtilTypes"
+﻿import {StringProxy} from "./UtilTypes"
 import * as RuleTypes from "../rules/RuleTypes"
 
 
@@ -32,24 +32,20 @@ export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | ":
 
 /** Type for a single selector token that can be used as an argument to the $selector function */
 export type SelectorTokenType = RuleTypes.ITagRule | RuleTypes.IClassRule | RuleTypes.IIDRule |
-    RuleTypes.ISelectorRule | number | string | IStringProxy;
+    RuleTypes.ISelectorRule | number | string | StringProxy;
 
 
 
 /**
- * The ISelectorProxy interface represents an object that can produce a CSS selector string. This
- * interface is returned from the `$selector` function.
+ * The SelectorProxy function returns a CSS selector string. This type is returned from the
+ * `$selector` function.
  */
-export interface ISelectorProxy
-{
-    /** Flag indicating that this object implements the ISelectorProxy interface */
-    readonly isSelectorProxy: boolean;
-}
+export type SelectorProxy = (p?: "selector") => string;
 
 
 
 /** Type for a selector */
-export type CssSelector = string | ISelectorProxy;
+export type CssSelector = string | SelectorProxy;
 
 
 

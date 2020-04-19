@@ -14,77 +14,49 @@ import {SelectorRule} from "../rules/SelectorRule"
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts the selector object into full selector string.
+ * Returns a string representation of a selector using the given template string with optional
+ * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
+ * possible types.
  */
-export function selectorToCssString( selector: SelectorTypes.CssSelector): string
+export function formatSelector( template: string, params: SelectorTypes.SelectorTokenType[]): string
 {
-	if (!selector)
-		return "";
-	else if (typeof selector === "string")
-		return selector;
-	else if (selector instanceof SelectorProxy)
-		return selector.valueToString();
-	else
-		return selector.toString();
-}
-
-
-
-/**
- * The SelectorProxy class implements the IStringProxy interface by encapsulating a selector
- * template string with optional placeholders (e.g. {0}), which will be replaced by names
- * of tags, classes and IDs and other possible types.
- */
-export class SelectorProxy implements SelectorTypes.ISelectorProxy
-{
-    /** Flag indicating that this object implements the ISelectorProxy interface */
-    public get isSelectorProxy(): boolean { return true; }
-
-    constructor( private template: string, private params: SelectorTypes.SelectorTokenType[])
-    {
-    }
-
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-		let tokens: string[] = this.template.split( /{(\d+)}/g);
-		let tokenIsNumber = false;
-		let arr: string[] = [];
-		for (let token of tokens)
+	let tokens: string[] = template.split( /{(\d+)}/g);
+	let tokenIsNumber = false;
+	let arr: string[] = [];
+	for (let token of tokens)
+	{
+		if (tokenIsNumber)
 		{
-			if (tokenIsNumber)
-			{
-				let index = parseInt( token, 10);
-				if (index >= this.params.length)
-					continue;
+			let index = parseInt( token, 10);
+			if (index >= params.length)
+				continue;
 
-				let item = this.params[index];
-				if (item == null)
-					continue;
-				else if (typeof item === "string")
-					arr.push( item);
-				else if (item instanceof Rule)
-				{
-					if (item instanceof TagRule)
-						arr.push( item.tag);
-					else if (item instanceof ClassRule)
-						arr.push( item.cssName);
-					else if (item instanceof IDRule)
-						arr.push( item.cssName);
-					else if (item instanceof SelectorRule)
-						arr.push( item.selectorText);
-				}
-				else 
-					arr.push( item.toString());
+			let item = params[index];
+			if (item == null)
+				continue;
+			else if (typeof item === "string")
+				arr.push( item);
+			else if (item instanceof Rule)
+			{
+				if (item instanceof TagRule)
+					arr.push( item.tag);
+				else if (item instanceof ClassRule)
+					arr.push( item.cssName);
+				else if (item instanceof IDRule)
+					arr.push( item.cssName);
+				else if (item instanceof SelectorRule)
+					arr.push( item.selectorText);
 			}
-			else if (token)
-				arr.push( token);
-	
-			tokenIsNumber = !tokenIsNumber;
+			else 
+				arr.push( item.toString());
 		}
-	
-		return arr.join( "");
-    }
+		else if (token)
+			arr.push( token);
+
+		tokenIsNumber = !tokenIsNumber;
+	}
+
+	return arr.join( "");
 }
 
 

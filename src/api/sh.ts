@@ -1,13 +1,12 @@
 ﻿import {
-    IStringProxy, Extended, IUrlProxy, CssPosition, SimpleCssPosition, CssTime, CssAngle, CssLength
+    StringProxy, Extended, UrlProxy, CssPosition, SimpleCssPosition, CssTime, CssAngle, CssLength
 } from "../styles/UtilTypes"
-import {IStyleset} from "../styles/StyleTypes"
 import * as ColorTypes from "../styles/ColorTypes"
 import * as ColorFuncs from "../styles/ColorFuncs"
 import * as ImageTypes from "../styles/ImageTypes"
 import * as ImageFuncs from "../styles/ImageFuncs"
 import * as StyleTypes from "../styles/StyleTypes"
-import {StringProxy, UrlProxy} from "../styles/UtilFuncs"
+import {valueToString} from "../styles/UtilFuncs"
 import {stylePropToCssString} from "../styles/StyleFuncs";
 
 
@@ -25,11 +24,11 @@ export class sh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Creates an IStringProxy object from the given string or another IStringProxy object.
+     * Returns a StringProxy function encapsulating the given string-like parameter.
      */
-    public static raw( s: string | IStringProxy): IStringProxy
+    public static raw( val: Extended<string>): StringProxy
     {
-        return typeof s === "string" ? new StringProxy(s) : s;
+        return () => valueToString(val);
     }
 
 
@@ -40,7 +39,8 @@ export class sh
      * to a CSS compliant string.
      * @param stylePropValue Value to convert.
      */
-    public static val<K extends StyleTypes.VarTemplateName>( stylePropName: K, stylePropValue: StyleTypes.VarValueType<K>): string | null
+    public static val<K extends StyleTypes.VarTemplateName>( stylePropName: K,
+        stylePropValue: StyleTypes.VarValueType<K>): string | null
     {
         return stylePropToCssString( stylePropName, stylePropValue, true);
     }
@@ -48,12 +48,12 @@ export class sh
 
 
     /**
-     * Creates an IUrlProxy object representing the CSS `url()` function. The string parameter
+     * Returns a UrlProxy function representing the CSS `url()` function. The string parameter
      * will be wrapped in a "url()" invocation unless it already is.
      */
-    public static url( val: Extended<string>): IUrlProxy
+    public static url( val: Extended<string>): UrlProxy
     {
-        return new UrlProxy( val);
+        return () => `url(${valueToString(val)})`;
     }
 
 
@@ -82,9 +82,9 @@ export class sh
      * @param b Blue separation value.
      * @param a Optional alpha mask as a percentage value.
      */
-    public static rgb( r: number | string, g: number | string, b: number | string, a?: number | string): ColorTypes.IColorProxy
+    public static rgb( r: number | string, g: number | string, b: number | string, a?: number | string): ColorTypes.ColorProxy
     {
-        return new ColorFuncs.RgbProxy( r, g, b, a);
+        return () => ColorFuncs.rgbToString( r, g, b, a);
     }
 
     /**
@@ -101,9 +101,9 @@ export class sh
      * @param l Lightness component as a percentage value.
      * @param a Optional alpha mask as a percentage value.
      */
-    public static hsl( h: number | string, s: number | string, l: number | string, a?: number | string): ColorTypes.IColorProxy
+    public static hsl( h: number | string, s: number | string, l: number | string, a?: number | string): ColorTypes.ColorProxy
     {
-        return new ColorFuncs.HslProxy( h, s, l, a);
+        return () => ColorFuncs.hslToString( h, s, l, a);
     }
 
     /**
@@ -118,9 +118,9 @@ export class sh
      * @param c 
      * @param a 
      */
-    public static alpha( c: number | keyof ColorTypes.INamedColors, a: number | string): ColorTypes.IColorProxy
+    public static alpha( c: number | keyof ColorTypes.INamedColors, a: number | string): ColorTypes.ColorProxy
     {
-        return new ColorFuncs.AlphaProxy( c, a);
+        return () => ColorFuncs.alphaToString( c, a);
     }
 
     
@@ -132,58 +132,58 @@ export class sh
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Creates an IImageProxy object representing the `linear-gradient()` CSS function.
+     * Returns an ImageProxy function representing the `linear-gradient()` CSS function.
      */
     public static linearGradient( angle?: ImageTypes.LinearGradAngle,
-        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.ImageProxy
     {
-        return new ImageFuncs.LinearGradientProxy( "linear-gradient", angle, stopsOrHints);
+        return () => ImageFuncs.linearGradientToString( "linear-gradient", angle, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the `repeating-linear-gradient()` CSS function.
+     * Returns an ImageProxy function representing the `repeating-linear-gradient()` CSS function.
      */
     public static repeatingLinearGradient( angle?: ImageTypes.LinearGradAngle,
-        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.ImageProxy
     {
-        return new ImageFuncs.LinearGradientProxy( "repeating-linear-gradient", angle, stopsOrHints);
+        return () => ImageFuncs.linearGradientToString( "repeating-linear-gradient", angle, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the `radial-gradient()` CSS function.
+     * Returns an ImageProxy function representing the `radial-gradient()` CSS function.
      */
     public static radialGradient( shape?: ImageTypes.RadialGradientShape,
         extent?: ImageTypes.RadialGradientExtent, pos?: CssPosition,
-        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.ImageProxy
     {
-        return new ImageFuncs.RadialGradientProxy( "radial-gradient", shape, extent, pos, stopsOrHints);
+        return () => ImageFuncs.radialGradientToString( "radial-gradient", shape, extent, pos, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the `repeating-radial-gradient()` CSS function.
+     * Returns an ImageProxy function representing the `repeating-radial-gradient()` CSS function.
      */
     public static repeatingRadialGradient( shape?: ImageTypes.RadialGradientShape,
         extent?: ImageTypes.RadialGradientExtent, pos?: CssPosition,
-        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.ImageProxy
     {
-        return new ImageFuncs.RadialGradientProxy( "repeating-radial-gradient", shape, extent, pos, stopsOrHints);
+        return () => ImageFuncs.radialGradientToString( "repeating-radial-gradient", shape, extent, pos, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the`conic-gradient()`  CSS function.
+     * Returns an ImageProxy function representing the`conic-gradient()`  CSS function.
      */
     public static conicGradient( angle?: Extended<CssAngle>, pos?: SimpleCssPosition,
-        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): ImageTypes.IImageProxy
+        ...stopsOrHints: ImageTypes.GradientStopOrHint[]): (img?:"image") => string
     {
-        return new ImageFuncs.ConicGradientProxy( angle, pos, stopsOrHints);
+        return () => ImageFuncs.conicGradientToString( angle, pos, stopsOrHints);
     }
 
     /**
-     * Creates an IImageProxy object representing the `cross-fade()` CSS function.
+     * Returns an ImageProxy function representing the `cross-fade()` CSS function.
      */
-    public static crossFade( ...args: ImageTypes.CrossFadeParam[]): ImageTypes.IImageProxy
+    public static crossFade( ...args: ImageTypes.CrossFadeParam[]): ImageTypes.ImageProxy
     {
-        return new ImageFuncs.CrossFadeProxy( args);
+        return () => ImageFuncs.crossFadeToString( args);
     }
 
 
@@ -267,13 +267,12 @@ export class sh
 
     /**
      * Returns an object that can be assigned to the box-shadow or text-shadow property.
-     * @param color Color value.
-     * @param position
-     * @param size
-     * @param repeat Background repeat value. The default value is "repeat".
-     * @param attachment Background attachment. The default value is "scroll".
-     * @param origin Background origin. The default value is "padding-box".
-     * @param clip Background clip. The default value is "border-box".
+     * @param x Horizontal offset of the shadow.
+     * @param y Vertical offset of the shadow.
+     * @param color Color of the shadow.
+     * @param blur Value of the shadow's blurring. The default value is 1 pixel.
+     * @param spread Value of the shadow's spreading. The default value is 0.
+     * @param inset Flag indicating whether the shadow goes inside the shape. The default value is false.
      */
     public static shadow(
                     x: Extended<CssLength>,
