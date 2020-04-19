@@ -6,7 +6,7 @@ import * as UtilFuncs from "./UtilFuncs"
 /**
  * Converts the given font face definition object to the CSS string
  */
-export function fontFaceToCssString( fontface: FontFaceTypes.Fontface): string | null
+export function fontFaceToString( fontface: FontFaceTypes.Fontface): string | null
 {
     if (!fontface || !fontface.fontFamily)
         return null;
@@ -18,13 +18,13 @@ export function fontFaceToCssString( fontface: FontFaceTypes.Fontface): string |
         s += `${UtilFuncs.camelToDash( propName)}:`;
         let propVal = fontface[propName];
         if (propName === "fontStretch")
-            s += fontStretchToCssString( propVal);
+            s += fontStretchToString( propVal);
         else if (propName === "fontStyle")
-            s += fontStyleToCssString( propVal);
+            s += fontStyleToString( propVal);
         else if (propName === "fontWeight")
-            s += fontWeightToCssString( propVal);
+            s += fontWeightToString( propVal);
         else if (propName === "src")
-            s += fontSrcToCssString( propVal);
+            s += fontSrcToString( propVal);
         else
             s += propVal;
 
@@ -36,7 +36,7 @@ export function fontFaceToCssString( fontface: FontFaceTypes.Fontface): string |
 
 
 
-function fontStretchToCssString( val: FontFaceTypes.FontStretchType): string
+function fontStretchToString( val: FontFaceTypes.FontStretchType): string
 {
     if (typeof val === "string")
         return val;
@@ -48,7 +48,7 @@ function fontStretchToCssString( val: FontFaceTypes.FontStretchType): string
 
 
 
-function fontStyleToCssString( val: FontFaceTypes.FontStyleType): string
+function fontStyleToString( val: FontFaceTypes.FontStyleType): string
 {
     if (typeof val === "string")
         return val;
@@ -77,7 +77,7 @@ function fontStyleToCssString( val: FontFaceTypes.FontStyleType): string
 
 
 
-function fontWeightToCssString( val: FontFaceTypes.FontWeightType): string
+function fontWeightToString( val: FontFaceTypes.FontWeightType): string
 {
     if (typeof val === "string")
         return val;
@@ -89,17 +89,17 @@ function fontWeightToCssString( val: FontFaceTypes.FontWeightType): string
 
 
 
-function fontSrcToCssString( val: FontFaceTypes.FontSrcType): string
+function fontSrcToString( val: FontFaceTypes.FontSrcType): string
 {
     if (typeof val === "string" || !Array.isArray(val))
-        return fontSingleSrcToCssString( val as FontFaceTypes.FontSingleSrcType);
+        return fontSingleSrcToString( val as FontFaceTypes.FontSingleSrcType);
     else
-        return val.map( singleVal => fontSingleSrcToCssString( singleVal)).join(",");
+        return val.map( singleVal => fontSingleSrcToString( singleVal)).join(",");
 }
 
 
 
-function fontSingleSrcToCssString( val: FontFaceTypes.FontSingleSrcType): string
+function fontSingleSrcToString( val: FontFaceTypes.FontSingleSrcType): string
 {
     if (typeof val === "string")
     {

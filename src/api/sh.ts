@@ -7,7 +7,7 @@ import * as ImageTypes from "../styles/ImageTypes"
 import * as ImageFuncs from "../styles/ImageFuncs"
 import * as StyleTypes from "../styles/StyleTypes"
 import {valueToString} from "../styles/UtilFuncs"
-import {stylePropToCssString} from "../styles/StyleFuncs";
+import {stylePropToString} from "../styles/StyleFuncs";
 
 
 
@@ -42,7 +42,7 @@ export class sh
     public static val<K extends StyleTypes.VarTemplateName>( stylePropName: K,
         stylePropValue: StyleTypes.VarValueType<K>): string | null
     {
-        return stylePropToCssString( stylePropName, stylePropValue, true);
+        return stylePropToString( stylePropName, stylePropValue, true);
     }
 
 

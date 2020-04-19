@@ -2,7 +2,7 @@ import {IMediaRule, IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {GroupRule} from "./GroupRule"
 import {MediaQuery} from "../styles/MediaTypes"
-import {mediaQueryToCssString} from "../styles/MediaFuncs";
+import {mediaQueryToString} from "../styles/MediaFuncs";
 
 
 
@@ -31,7 +31,7 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string
 	{
-		let queryString = typeof this.query === "string" ? this.query : mediaQueryToCssString( this.query);
+		let queryString = typeof this.query === "string" ? this.query : mediaQueryToString( this.query);
 		return `@media ${queryString}`;
 	}
 

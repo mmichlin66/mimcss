@@ -1,6 +1,6 @@
 import {IFontFaceRule} from "./RuleTypes";
 import {Fontface} from "../styles/FontFaceTypes"
-import {fontFaceToCssString} from "../styles/FontFaceFuncs"
+import {fontFaceToString} from "../styles/FontFaceFuncs"
 import {Rule} from "./Rule";
 
 
@@ -28,7 +28,7 @@ export class FontFaceRule extends Rule implements IFontFaceRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		this.cssRule = Rule.addRuleToDOM( `@font-face ${fontFaceToCssString( this.fontface)}`,
+		this.cssRule = Rule.addRuleToDOM( `@font-face ${fontFaceToString( this.fontface)}`,
 			parent) as CSSFontFaceRule;
 	}
 

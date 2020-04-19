@@ -3,21 +3,21 @@ import * as MediaTypes from "./MediaTypes"
 
 
 
-function aspectRatioToCssString( val: MediaTypes.AspectRatioFeatureType): string
+function aspectRatioToString( val: MediaTypes.AspectRatioFeatureType): string
 {
     return typeof val === "string" ? val : val[0] + "/" + val[1];
 }
 
 
 
-function lengthFeatureToCssString( val: MediaTypes.LengthFeatureType): string
+function lengthFeatureToString( val: MediaTypes.LengthFeatureType): string
 {
     return typeof val === "string" ? val : val + "px";
 }
 
 
 
-function resolutionFeatureToCssString( val: MediaTypes.ResolutionFeatureType): string
+function resolutionFeatureToString( val: MediaTypes.ResolutionFeatureType): string
 {
     return typeof val === "string" ? val : val + "dpi";
 }
@@ -55,14 +55,14 @@ type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = conver
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function mediaQueryToCssString( query: MediaTypes.MediaQuery): string | null
+export function mediaQueryToString( query: MediaTypes.MediaQuery): string | null
 {
     if (!query)
         return null;
     else if (Array.isArray(query))
-        return query.map( (singleQuery) => singleMediaQueryToCssString( singleQuery)).join(", ");
+        return query.map( (singleQuery) => singleMediaQueryToString( singleQuery)).join(", ");
     else
-        return singleMediaQueryToCssString( query);
+        return singleMediaQueryToString( query);
 }
 
 
@@ -70,7 +70,7 @@ export function mediaQueryToCssString( query: MediaTypes.MediaQuery): string | n
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function singleMediaQueryToCssString( query: MediaTypes.SingleMediaQuery): string | null
+export function singleMediaQueryToString( query: MediaTypes.SingleMediaQuery): string | null
 {
     if (!query)
         return null;
@@ -89,7 +89,7 @@ export function singleMediaQueryToCssString( query: MediaTypes.SingleMediaQuery)
             continue;
 
         if (query[propName])
-            items.push( `(${mediaFeatureToCssString( propName, query[propName])})`);
+            items.push( `(${mediaFeatureToString( propName, query[propName])})`);
     }
 
     return `${negate ? "not " : ""}${items.join(" and ")}`;
@@ -100,7 +100,7 @@ export function singleMediaQueryToCssString( query: MediaTypes.SingleMediaQuery)
 /**
  * Converts the given media feature to the CSS media query string
  */
-export function mediaFeatureToCssString( featureName: string, propVal: any, valueOnly?: boolean): string | null
+export function mediaFeatureToString( featureName: string, propVal: any, valueOnly?: boolean): string | null
 {
     if (!featureName || propVal == null)
         return null;
@@ -119,20 +119,20 @@ export function mediaFeatureToCssString( featureName: string, propVal: any, valu
     let isRange = typeof info === "boolean" ? info : typeof info === "object" ? info.isRange : undefined;
     if (isRange && !valueOnly && Array.isArray( propVal) && propVal.length === 2)
     {
-        let s1 = mediaFeatureSingleValueToCssString( convert, propVal[0]);
-        let s2 = mediaFeatureSingleValueToCssString( convert, propVal[1]);
+        let s1 = mediaFeatureSingleValueToString( convert, propVal[0]);
+        let s2 = mediaFeatureSingleValueToString( convert, propVal[1]);
         return `${s1} <= ${realFeatureName} <= ${s2}`;
     }
     else
     {
-        let s = mediaFeatureSingleValueToCssString( convert, propVal);
+        let s = mediaFeatureSingleValueToString( convert, propVal);
         return valueOnly ? s : realFeatureName + ":" + s;
     }
 }
 
 
 
-function mediaFeatureSingleValueToCssString( convert: convertFuncType, propVal: any): string | null
+function mediaFeatureSingleValueToString( convert: convertFuncType, propVal: any): string | null
 {
     if (propVal == null)
         return null;
@@ -142,7 +142,7 @@ function mediaFeatureSingleValueToCssString( convert: convertFuncType, propVal: 
     else if (typeof propVal === "string")
         return propVal;
     else if (Array.isArray( propVal))
-        return UtilFuncs.arrayToCssString( propVal);
+        return UtilFuncs.arrayToString( propVal);
     else
         return propVal.toString();
 }
@@ -151,21 +151,21 @@ function mediaFeatureSingleValueToCssString( convert: convertFuncType, propVal: 
 
 let mediaFeatures: { [K in keyof MediaTypes.MediaFeatureset]?: MediaFeatureInfo<K> } =
 {
-    aspectRatio: aspectRatioToCssString,
-    minAspectRatio: aspectRatioToCssString,
-    maxAspectRatio: aspectRatioToCssString,
+    aspectRatio: aspectRatioToString,
+    minAspectRatio: aspectRatioToString,
+    maxAspectRatio: aspectRatioToString,
     color: { defaultValue: 0, isRange: true },
     colorIndex: { defaultValue: 0, isRange: true },
-    height: { convert: lengthFeatureToCssString, isRange: true },
-    minHeight: lengthFeatureToCssString,
-    maxHeight: lengthFeatureToCssString,
+    height: { convert: lengthFeatureToString, isRange: true },
+    minHeight: lengthFeatureToString,
+    maxHeight: lengthFeatureToString,
     monochrome: { defaultValue: 0, isRange: true },
-    resolution: { convert: resolutionFeatureToCssString, isRange: true },
-    minResolution: resolutionFeatureToCssString,
-    maxResolution: resolutionFeatureToCssString,
-    width: { convert: lengthFeatureToCssString, isRange: true },
-    minWidth: lengthFeatureToCssString,
-    maxWidth: lengthFeatureToCssString,
+    resolution: { convert: resolutionFeatureToString, isRange: true },
+    minResolution: resolutionFeatureToString,
+    maxResolution: resolutionFeatureToString,
+    width: { convert: lengthFeatureToString, isRange: true },
+    minWidth: lengthFeatureToString,
+    maxWidth: lengthFeatureToString,
 };
 
 

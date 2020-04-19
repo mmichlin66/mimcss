@@ -2,7 +2,7 @@ import {IStyleRule, ExtendedStyleset, IVarRule} from "./RuleTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer} from "./Rule";
-import {mergeStylesets, stylesetToCssString, stylePropToCssString} from "../styles/StyleFuncs"
+import {mergeStylesets, stylesetToString, stylePropToString} from "../styles/StyleFuncs"
 import {valueToString} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
 
@@ -158,7 +158,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public toCssString(): string
 	{
 		return this.styleset
-			? `${this.getSelectorString()} ${stylesetToCssString( this.styleset)}`
+			? `${this.getSelectorString()} ${stylesetToString( this.styleset)}`
 			: null;
 	}
 
@@ -206,7 +206,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			return;
 
 		this.cssRule.style.setProperty( name,
-			stylePropToCssString( name, value, true), important ? "!important" : null)
+			stylePropToString( name, value, true), important ? "!important" : null)
 	}
 
 
@@ -223,7 +223,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			return;
 
 		this.cssRule.style.setProperty( varObj.cssName,
-			stylePropToCssString( varObj.template, varValue, true), important ? "!important" : null)
+			stylePropToString( varObj.template, varValue, true), important ? "!important" : null)
 	}
 
 

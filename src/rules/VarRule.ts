@@ -1,6 +1,6 @@
 import {IVarRule} from "./RuleTypes"
 import {VarValueType, VarTemplateName} from "../styles/StyleTypes"
-import {stylePropToCssString} from "../styles/StyleFuncs"
+import {stylePropToString} from "../styles/StyleFuncs"
 import {createNames, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 
 
@@ -46,7 +46,7 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	// Converts the rule to CSS string.
 	public toCssString(): string
 	{
-		return `${this.cssName}: ${stylePropToCssString( this.template, this.value, true)}`;
+		return `${this.cssName}: ${stylePropToString( this.template, this.value, true)}`;
 	}
 
 
@@ -67,7 +67,7 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	 */
 	public setValue( value: VarValueType<K>, important?: boolean): void
 	{
-		this.container.setCustomVarValue( this.cssName, stylePropToCssString( this.template, value, true), important)
+		this.container.setCustomVarValue( this.cssName, stylePropToString( this.template, value, true), important)
 	}
 
 

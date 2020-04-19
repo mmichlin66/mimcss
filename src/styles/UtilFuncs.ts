@@ -3,8 +3,9 @@
     ICssFractionMath, CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
     CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
     CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency, CssFraction,
-    CssMultiFraction, CssPercent, CssMultiPercent, UrlProxy, ICssLengthMath,
-    ICssAngleMath, ICssPercentMath, ICssFrequencyMath, ICssResolutionMath, ICssTimeMath, NumberType, LengthType, PercentType, AngleType, TimeType, ResolutionType, FrequencyType, FractionType
+    CssMultiFraction, CssPercent, CssMultiPercent, ICssLengthMath,
+    ICssAngleMath, ICssPercentMath, ICssFrequencyMath, ICssResolutionMath, ICssTimeMath,
+    NumberType, LengthType, PercentType, AngleType, TimeType, ResolutionType, FrequencyType, FractionType
 } from "./UtilTypes"
 
 
@@ -97,7 +98,7 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         else if (typeof val === "string")
             return val;
         else if (Array.isArray(val))
-            return arrayToCssString( val);
+            return arrayToString( val);
         else if (typeof val === "function")
             return val();
         else if (typeof val.valueToString === "function")
@@ -125,11 +126,11 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             {
                 let separator = options.arraySeparator != null ? options.arraySeparator : " ";
                 if (options.arrayItemFunc)
-                    return arrayToCssString( val, options.arrayItemFunc, separator);
+                    return arrayToString( val, options.arrayItemFunc, separator);
                 else if (options.fromAny)
                     return options.fromAny( val);
                 else
-                    return arrayToCssString( val, undefined, separator);
+                    return arrayToString( val, undefined, separator);
             }
         }
         else if (typeof val === "object")
@@ -158,7 +159,7 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
  * Converts an array of the given typeto a single string using the given separator.
  * Elements of the array are converted to strings using the given function.
  */
-export function arrayToCssString( val: any[], func?: (v) => string, separator: string = " "): string
+export function arrayToString( val: any[], func?: (v) => string, separator: string = " "): string
 {
     return !val || val.length === 0
         ? ""
@@ -176,7 +177,7 @@ export function arrayToCssString( val: any[], func?: (v) => string, separator: s
  *     it will be used to convert the property's value to the string. If a function is not present, then the
  *     property value should be converted to the string using the valueToString function.
  */
-export function objectToCssString( val: any, usePropNames: boolean,
+export function objectToString( val: any, usePropNames: boolean,
     ...propsAndFuncs: (string | [string, (val: any) => string, string?])[] ): string
 {
     if (val == null || propsAndFuncs.length === 0)
@@ -229,7 +230,7 @@ type ConvertNumberFuncType = (n: number) => string;
  * @param intUnit Units to append if the number is integer.
  * @param floatUnit Units to append if the number is floating point.
  */
-function numberToCssString( n: number, intUnit: string = "", floatUint: string = ""): string
+function numberToString( n: number, intUnit: string = "", floatUint: string = ""): string
 {
     return Number.isInteger(n) ?  n + intUnit : n + floatUint;
 }
@@ -475,7 +476,7 @@ export class CssPercentMath extends NumberMath<PercentType> implements ICssPerce
  */
 export class CssLengthMath extends NumberMath<LengthType | PercentType> implements ICssLengthMath
 {
-    public static convertFunc( n: number): string { return numberToCssString( n, "px", "em"); }
+    public static convertFunc( n: number): string { return numberToString( n, "px", "em"); }
 
     public static styleToString( val: Extended<CssLength>): string
         { return styleToString( val, CssLengthMath.convertFunc); }
@@ -527,7 +528,7 @@ export class CssLengthMath extends NumberMath<LengthType | PercentType> implemen
  */
 export class CssAngleMath extends NumberMath<AngleType | PercentType> implements ICssAngleMath
 {
-    public static convertFunc( n: number): string { return numberToCssString( n, "deg", "rad"); }
+    public static convertFunc( n: number): string { return numberToString( n, "deg", "rad"); }
 
     public static styleToString( val: Extended<CssAngle>): string
         { return styleToString( val, CssAngleMath.convertFunc); }
@@ -563,7 +564,7 @@ export class CssAngleMath extends NumberMath<AngleType | PercentType> implements
  */
 export class CssTimeMath extends NumberMath<TimeType | PercentType> implements ICssTimeMath
 {
-    public static convertFunc( n: number): string { return numberToCssString( n, "ms", "s"); }
+    public static convertFunc( n: number): string { return numberToString( n, "ms", "s"); }
 
     public static styleToString( val: Extended<CssTime>): string
         { return styleToString( val, CssTimeMath.convertFunc); }
@@ -597,7 +598,7 @@ export class CssTimeMath extends NumberMath<TimeType | PercentType> implements I
  */
 export class CssResolutionMath extends NumberMath<ResolutionType | PercentType> implements ICssResolutionMath
 {
-    public static convertFunc( n: number): string { return numberToCssString( n, "dpi", "x"); }
+    public static convertFunc( n: number): string { return numberToString( n, "dpi", "x"); }
 
     public static styleToString( val: Extended<CssResolution>): string
         { return styleToString( val, CssResolutionMath.convertFunc); }
@@ -640,7 +641,7 @@ export class CssResolutionMath extends NumberMath<ResolutionType | PercentType> 
  */
 export class CssFrequencyMath extends NumberMath<FrequencyType | PercentType> implements ICssFrequencyMath
 {
-    public static convertFunc( n: number): string { return numberToCssString( n, "Hz", "kHz"); }
+    public static convertFunc( n: number): string { return numberToString( n, "Hz", "kHz"); }
 
     public static styleToString( val: Extended<CssFrequency>): string
         { return styleToString( val, CssFrequencyMath.convertFunc); }
@@ -674,7 +675,7 @@ export class CssFrequencyMath extends NumberMath<FrequencyType | PercentType> im
  */
 export class CssFractionMath extends NumberMath<FractionType | PercentType> implements ICssFractionMath
 {
-    public static convertFunc( n: number): string { return numberToCssString( n, "fr", "fr"); }
+    public static convertFunc( n: number): string { return numberToString( n, "fr", "fr"); }
 
     public static styleToString( val: Extended<CssFraction>): string
         { return styleToString( val, CssFractionMath.convertFunc); }

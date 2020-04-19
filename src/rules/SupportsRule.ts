@@ -2,7 +2,7 @@ import {ISupportsRule, IStyleDefinitionClass, StyleDefinition} from "./RuleTypes
 import {GroupRule} from "./GroupRule"
 import {Rule} from "./Rule"
 import {SupportsQuery} from "../styles/StyleTypes"
-import {supportsQueryToCssString} from "../styles/StyleFuncs"
+import {supportsQueryToString} from "../styles/StyleFuncs"
 
 
 
@@ -32,7 +32,7 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 	protected getGroupSelectorText(): string
 	{
 		// convert the query to its string form
-		let queryString = supportsQueryToCssString( this.query);
+		let queryString = supportsQueryToString( this.query);
 
 		// determine whether the query is supported and if it is not, don't insert the rule
 		return CSS.supports( queryString) ? `@supports ${queryString}` : null;

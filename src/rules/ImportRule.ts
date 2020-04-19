@@ -2,8 +2,8 @@ import {IImportRule} from "./RuleTypes"
 import {Rule} from "./Rule"
 import {MediaQuery} from "../styles/MediaTypes"
 import {SupportsQuery} from "../styles/StyleTypes"
-import {mediaQueryToCssString} from "../styles/MediaFuncs";
-import {supportsQueryToCssString} from "../styles/StyleFuncs";
+import {mediaQueryToString} from "../styles/MediaFuncs";
+import {supportsQueryToString} from "../styles/StyleFuncs";
 
 
 
@@ -46,7 +46,7 @@ export class ImportRule extends Rule implements IImportRule
 			? ""
 			: typeof this.supportsQuery === "string"
 				? this.supportsQuery
-				: supportsQueryToCssString( this.supportsQuery);
+				: supportsQueryToString( this.supportsQuery);
 
 		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
 		supportsQueryString = `supports( ${supportsQueryString} )`;
@@ -55,7 +55,7 @@ export class ImportRule extends Rule implements IImportRule
 			? ""
 			: typeof this.mediaQuery === "string"
 				? this.mediaQuery
-				: mediaQueryToCssString( this.mediaQuery);
+				: mediaQueryToString( this.mediaQuery);
 				
 		this.cssRule = Rule.addRuleToDOM( `@import ${url} ${supportsQueryString} ${mediaQueryString}`,
 			parent) as CSSImportRule;
