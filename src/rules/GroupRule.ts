@@ -1,6 +1,6 @@
 import {IStyleDefinitionClass, StyleDefinition, IGroupRule} from "./RuleTypes"
-import {RuleContainer, processStyleDefinitionClass, getContainerFromDefinition} from "./RuleContainer"
-import {ITopLevelRuleContainer, Rule} from "./Rule"
+import {processStyleDefinitionClass, getContainerFromDefinition} from "./RuleContainer"
+import {IRuleContainer, ITopLevelRuleContainer, Rule} from "./Rule"
 
 
 
@@ -74,7 +74,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 	protected definition: StyleDefinition;
 
 	// Rule container for the definition instance.
-	protected ruleContainer: RuleContainer;
+	protected ruleContainer: IRuleContainer;
 
 	// Instance of the style definition class defining the rules under this grouping rule
 	public get rules(): T { return this.definition as T; }

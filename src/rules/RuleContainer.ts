@@ -21,16 +21,24 @@ const symRuleContainer = Symbol("ruleContainer");
 
 
 /**
- * 
- * @param definition 
+ * Returns rule container object associated with the given style definition object.
  */
 export function getContainerFromDefinition( definition: StyleDefinition): RuleContainer
 {
-	return definition[symRuleContainer];
+	return definition ? definition[symRuleContainer] : null;
 }
 
 
 
+/**
+ * Processes the given style definition class by creating its instance and associating a
+ * rule container object with it. The class will be associated with the instance using the
+ * Symbol property. The owner parameter is a reference to the top-level style defiition
+ * object or null if the given class is itself a top-level class (that is, is not a class
+ * that defines rulese within nested grouping rules.)
+ * @param definitionClass 
+ * @param owner 
+ */
 export function processStyleDefinitionClass( definitionClass: IStyleDefinitionClass,
 	owner: StyleDefinition): StyleDefinition
 {
@@ -57,7 +65,7 @@ export function processStyleDefinitionClass( definitionClass: IStyleDefinitionCl
  * object via the [symRuleContainer] symbol. It contains all the functionality for parsing rule
  * definitions, name assignment and activation/deactivation.
  */
-export class RuleContainer implements ITopLevelRuleContainer
+class RuleContainer implements ITopLevelRuleContainer
 {
 	constructor( definitionClass: IStyleDefinitionClass, owner: StyleDefinition)
 	{
@@ -199,6 +207,17 @@ export class RuleContainer implements ITopLevelRuleContainer
 		return this.definition;
 	}
 
+
+
+	// Sets the given value for the custom CSS roperty with the given name.
+	public setCustomVarValue( name: string, value: string, important?: boolean): void
+	{
+		if (this.cssCustomVarStyleRule)
+			this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
+	}
+
+
+
 	/** Generates a name, which will be unique in this stylesheet */
 	public getScopedRuleName( ruleName: string): string
 	{
@@ -219,6 +238,54 @@ export class RuleContainer implements ITopLevelRuleContainer
 					? generateUniqueName()
 					: generateName( this.definitionClass.name, ruleName);
 		}
+	}
+
+
+
+	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
+	public insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
+	{
+		// activate referenced style definitions
+		for( let ref of this.refs)
+			ref[symRuleContainer].activate();
+
+		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
+		// rule, don't insert @import and @namespace rules at all
+		if (parent instanceof CSSStyleSheet)
+		{
+			this.imports && this.imports.forEach( rule => rule.insert( parent));
+			this.namespaces && this.namespaces.forEach( rule => rule.insert( parent));
+		}
+
+		// isert our custom variables in a ":root" rule
+		if (this.vars.length > 0)
+		{
+			this.cssCustomVarStyleRule = Rule.addRuleToDOM( `:root {${this.vars.map( varObj =>
+				varObj.toCssString()).join(";")}}`, parent) as CSSStyleRule;
+		}
+
+		// insert all other rules
+		this.otherRules.forEach( rule => rule.insert( parent));
+	}
+
+
+
+	/** Clears all CSS rule objects defined in this container. */
+	public clearRules(): void
+	{
+		if (this.owner === this.definition)
+		{
+			this.imports && this.imports.forEach( rule => rule.clear());
+			this.namespaces && this.namespaces.forEach( rule => rule.clear());
+		}
+
+		this.cssCustomVarStyleRule = null;
+
+		this.otherRules.forEach( rule => rule.clear());
+
+		// deactivate imported stylesheets
+		for( let ref of this.refs)
+			ref[symRuleContainer].deactivate();
 	}
 
 
@@ -261,63 +328,6 @@ export class RuleContainer implements ITopLevelRuleContainer
 
 			this.domStyleElm = null;
 		}
-	}
-
-
-
-	// Inserts all rules defined in this container to either the style sheet or grouping rule.
-	public insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
-	{
-		// activate referenced style definitions
-		for( let ref of this.refs)
-			ref[symRuleContainer].activate();
-
-		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
-		// rule, don't insert @import and @namespace rules at all
-		if (parent instanceof CSSStyleSheet)
-		{
-			this.imports && this.imports.forEach( rule => rule.insert( parent));
-			this.namespaces && this.namespaces.forEach( rule => rule.insert( parent));
-		}
-
-		// isert our custom variables in a ":root" rule
-		if (this.vars.length > 0)
-		{
-			this.cssCustomVarStyleRule = Rule.addRuleToDOM( `:root {${this.vars.map( varObj =>
-				varObj.toCssString()).join(";")}}`, parent) as CSSStyleRule;
-		}
-
-		// insert all other rules
-		this.otherRules.forEach( rule => rule.insert( parent));
-	}
-
-
-
-	// Clears all CSS rule objects defined in this container.
-	public clearRules(): void
-	{
-		if (this.owner === this.definition)
-		{
-			this.imports && this.imports.forEach( rule => rule.clear());
-			this.namespaces && this.namespaces.forEach( rule => rule.clear());
-		}
-
-		this.cssCustomVarStyleRule = null;
-
-		this.otherRules.forEach( rule => rule.clear());
-
-		// deactivate imported stylesheets
-		for( let ref of this.refs)
-			ref[symRuleContainer].deactivate();
-	}
-
-
-
-	// Sets the given value for the property with the given name
-	public setCustomVarValue( name: string, value: string, important?: boolean): void
-	{
-		if (this.cssCustomVarStyleRule)
-			this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
 	}
 
 

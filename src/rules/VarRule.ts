@@ -1,8 +1,7 @@
 import {IVarRule} from "./RuleTypes"
-import {RuleContainer} from "./RuleContainer"
 import {VarValueType, VarTemplateName} from "../styles/StyleTypes"
 import {stylePropToCssString} from "../styles/StyleFuncs"
-import {createNames, ITopLevelRuleContainer} from "./Rule";
+import {createNames, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 
 
 
@@ -28,7 +27,7 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 
 
 	// Processes the given rule.
-	public process( container: RuleContainer, owner: ITopLevelRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string): void
 	{
 		this.container = container;
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");
@@ -101,8 +100,9 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | IVarRule<K>;
 
-	// Rule container to which this rule belongs. This is "this" for Stylesheet.
-	public container: RuleContainer;
+	// Rule container to which this rule belongs and which hase the CSSStyleRule through which
+	// the value of this custom variable can be changed.
+	public container: IRuleContainer;
 }
 
 

@@ -3,14 +3,33 @@ import {IRule, INamedEntity, StyleDefinition} from "./RuleTypes"
 
 
 /**
- * The IRuleContainerOwner interface represents a stylesheet that "owns" the rules under this
- * container. In particular, the owner's job is to generate "scoped" unique names.
+ * The IRuleContainer interface represents an object that accompanies and is associated with
+ * a style definition object.
  */
-export interface ITopLevelRuleContainer
+export interface IRuleContainer
 {
 	/** Returns the instance of the stylesheet definition class */
 	getDefinitionInstance(): StyleDefinition;
 
+	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
+	insertRules( parent: CSSStyleSheet | CSSGroupingRule): void;
+
+	/** Clears all CSS rule objects defined in this container. */
+	clearRules(): void;
+
+	/** Sets the given value for the custom CSS roperty with the given name. */
+	setCustomVarValue( name: string, value: string, important?: boolean): void;
+}
+
+
+
+/**
+ * The ITopLevelRuleContainer interface represents a top-level style definition object that "owns"
+ * the rules under this container. In particular, the owner's job is to generate "scoped" unique
+ * names.
+ */
+export interface ITopLevelRuleContainer extends IRuleContainer
+{
 	/** Generates a name, which will be unique in this stylesheet */
 	getScopedRuleName( ruleName: string): string;
 }
