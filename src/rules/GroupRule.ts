@@ -1,4 +1,4 @@
-import {IStyleDefinitionClass, StyleDefinition} from "./RuleTypes"
+import {IStyleDefinitionClass, StyleDefinition, IGroupRule} from "./RuleTypes"
 import {RuleContainer, processStyleDefinitionClass, getContainerFromDefinition} from "./RuleContainer"
 import {ITopLevelRuleContainer, Rule} from "./Rule"
 
@@ -7,7 +7,7 @@ import {ITopLevelRuleContainer, Rule} from "./Rule"
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends StyleDefinition> extends Rule
+export abstract class GroupRule<T extends StyleDefinition> extends Rule implements IGroupRule<T>
 {
 	public constructor( definitionClass: IStyleDefinitionClass<T>)
 	{
@@ -31,17 +31,21 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		this.cssRule = this.insertGroupingRule( parent);
+		let selector = this.getGroupSelectorText();
+		if (!selector)
+			return;
+
+		this.cssRule = Rule.addRuleToDOM( `${selector} {}`, parent) as CSSSupportsRule;
 
 		// insert sub-rules
 		if (this.cssRule)
-			this.ruleContainer.insertRules( this.cssRule as CSSGroupingRule);
+			this.ruleContainer.insertRules( this.cssRule);
 	}
 
 
 
-	// Inserts this rule into the given parent rule or stylesheet.
-	protected abstract insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule;
+	// Returns the selector string of this grouping rule.
+	protected abstract getGroupSelectorText(): string;
 
 
 
@@ -64,6 +68,12 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule
 
 	// Rule container for the definition instance.
 	protected ruleContainer: RuleContainer;
+
+	// Instance of the style definition class defining the rules under this grouping rule
+	public get rules(): T { return this.definition as T; }
+
+	/** SOM supports rule */
+	public cssRule: CSSGroupingRule;
 }
 
 

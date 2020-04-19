@@ -28,16 +28,14 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 
 
 
-	// Inserts this rule into the given parent rule or stylesheet.
-	public insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule
+	// Returns the selector string of this grouping rule.
+	protected getGroupSelectorText(): string
 	{
 		// convert the query to its string form
 		let queryString = supportsQueryToCssString( this.query);
 
 		// determine whether the query is supported and if it is not, don't insert the rule
-		return CSS.supports( queryString)
-			? Rule.addRuleToDOM( `@supports ${queryString} {}`, parent) as CSSSupportsRule
-			: null;
+		return CSS.supports( queryString) ? `@supports ${queryString}` : null;
 	}
 
 

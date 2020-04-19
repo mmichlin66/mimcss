@@ -28,11 +28,11 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 
 
 
-	// Inserts this rule into the given parent rule or stylesheet.
-	public insertGroupingRule( parent: CSSStyleSheet | CSSGroupingRule): CSSRule
+	// Returns the selector string of this grouping rule.
+	protected getGroupSelectorText(): string
 	{
 		let queryString = typeof this.query === "string" ? this.query : mediaQueryToCssString( this.query);
-		return Rule.addRuleToDOM( `@media ${queryString} {}`, parent) as CSSMediaRule;
+		return `@media ${queryString}`;
 	}
 
 

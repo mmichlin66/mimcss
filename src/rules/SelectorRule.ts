@@ -2,6 +2,7 @@ import {ISelectorRule, ExtendedStyleset} from "./RuleTypes"
 import {StyleRule} from "./StyleRule"
 import {CssSelector} from "../styles/SelectorTypes";
 import {selectorToCssString} from "../styles/SelectorFuncs";
+import {ITopLevelRuleContainer} from "./Rule";
 
 
 
@@ -19,6 +20,16 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 
 
 
+	// Processes the given rule.
+	public process( owner: ITopLevelRuleContainer, ruleName: string): void
+	{
+		super.process( owner, ruleName);
+
+		this.selectorText = selectorToCssString( this.selector);
+	}
+
+
+
 	// Creates a copy of the rule.
 	public clone(): SelectorRule
 	{
@@ -32,16 +43,16 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return selectorToCssString( this.selector);
+		return this.selectorText;
 	}
 
 
 
 	/** CSS rule selector string */
-	public get selectorText(): string { return selectorToCssString( this.selector); }
+	public selectorText: string;
 
 	// selector object for this rule.
-	public selector: CssSelector;
+	private selector: CssSelector;
 }
 
 

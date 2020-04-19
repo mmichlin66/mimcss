@@ -63,6 +63,11 @@ export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | IStrin
  */
 export interface IVarProxy<T = any>
 {
+	/**
+	 * Sets new value of this custom CSS property.
+	 * @param value New value for the CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 */
 	setValue( value: T, important?: boolean): void;
 }
 

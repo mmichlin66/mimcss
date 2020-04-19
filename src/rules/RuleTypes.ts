@@ -9,20 +9,6 @@ import {IAnimationNameProxy} from "../styles/StyleTypes";
 import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 
 
-// /** Utility type that represents all properties of type T that are of type U */
-// type PropsOfTypeOrNever<T,U> = { [K in keyof T]: T[K] extends U ? K : never };
-
-// /** Utility type that represents names of all properties of type T that are of type U */
-// type PropNamesOfType<T,U> = PropsOfTypeOrNever<T,U>[keyof T];
-
-// /** Utility type that represents string values mapped to names of properties of type T that are of type U. */
-// export type NamesOfPropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: string };
-
-// /** Type that represents all properties of type T that are of type U */
-// export type PropsOfType<T,U> = { readonly [K in PropNamesOfType<T,U>]: T[K] };
-
-
-
 /**
  * The ExtendedStyleset type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset and allow building nested styles:
@@ -272,22 +258,8 @@ export interface IPageRule extends IStyleRule
  */
 export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, IVarProxy<VarValueType<K>>
 {
-	// /**
-	//  * Name of the property on the rule definition object to which this rule is assigned.
-	//  */
-	// readonly ruleName: string;
-
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly template: K;
-
-	/** Sets new value of this custom CSS property. */
-
-	/**
-	 * Sets new value of this custom CSS property.
-	 * @param value New value for the CSS property.
-	 * @param important Flag indicating whether to set the "!important" flag on the property value.
-	 */
-	setValue( value: VarValueType<K>, important?: boolean): void;
 }
 
 
@@ -360,7 +332,22 @@ export interface IStyleDefinitionClass<T extends StyleDefinition<O> = any, O ext
  * The ISupportRule interface represents the CSS @supports rule.
  * Objects implementing this interface are returned from the [[$supports]] function.
  */
-export interface ISupportsRule<T = {}> extends IRule
+export interface IGroupRule<T extends StyleDefinition = any> extends IRule
+{
+	// Instance of the style definition class defining the rules under this grouping rule
+	readonly rules: T;
+
+	/** SOM supports rule */
+	readonly cssRule: CSSGroupingRule;
+}
+
+
+
+/**
+ * The ISupportRule interface represents the CSS @supports rule.
+ * Objects implementing this interface are returned from the [[$supports]] function.
+ */
+export interface ISupportsRule<T extends StyleDefinition = any> extends IGroupRule<T>
 {
 	/** SOM supports rule */
 	readonly cssRule: CSSSupportsRule;
@@ -372,7 +359,7 @@ export interface ISupportsRule<T = {}> extends IRule
  * The IMediaRule interface represents the CSS @media rule.
  * Objects implementing this interface are returned from the [[$media]] function.
  */
-export interface IMediaRule<T = {}> extends IRule
+export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<T>
 {
 	/** SOM media rule */
 	readonly cssRule: CSSMediaRule;
