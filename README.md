@@ -27,7 +27,7 @@ Let's assume that we need to create several simple styles for a couple of classe
 /* MyStyles.ts */
 import {$class, $id} from "mimcss"
 
-class MyStyles
+class MyStyles extends StyleDefinition
 {
     vbox = $class({
         display: "flex",
@@ -53,16 +53,16 @@ export let myStyles = $activate( MyStyles);
 
 render()
 {
-    return <div className={myStyles.classes.vbox}>
-        <p id={myStyles.ids.importantElement}>Hello!</p>
-        <div className={myStyles.classes.hbox}/>Hello!</div>
+    return <div className={myStyles.vbox.name}>
+        <p id={myStyles.importantElement.name}>Hello!</p>
+        <div className={myStyles.hbox.name}/>Hello!</div>
    </div>
 }
 ```
 
-As we define our classes and IDs as properties of the MyStyles class, they automatically become properties of the `myStyles.classes` and `myStyles.ids` objects. This immediately brings us the following advantages:
+This immediately brings us the following advantages:
 
-- The Intellisense/autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `myStyles.classes` the IDE will present the list of all the classes defined in our style definition object. Note that Mimcss puts names of classes and IDs (as well as animations and custom properties) into different objects, so that the chances that you use an ID name instead of a class name are lower.
+- The Intellisense/autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `this.styles.` the IDE will present the list of all the properties defined in our style definition object.
 - If we change the name of or remove the property in the `MyStyles` class and forget to change it in our component's `render` method, the project will not build. Thus a compile time error will prevent a much-harder-to-find run-time error.
 - If you noticed, there was a misspelling of the identifier name in the CSS-based `render` method above: we "accidentally" used the underscore instead of the dash. With regular CSS, such errors would only manifest themselves at run-time and they are notoriously difficult to find. In Mimcss-based code, such run-time errors are simply not possible because they will be detected at compile time.
 - Notice how we used numbers instead of strings when defining `color` and `fontWeight` properties. Although seemingly a minor feature, this can add extra convenience and speed during development. Mimcss defines types of each style property so that it can be set in a type-safe and easy-to-use way.
