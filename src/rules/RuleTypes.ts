@@ -265,8 +265,18 @@ export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity,
 
 
 /**
- * The StyleDefinition class is a base for all classes that define CSS rules. Use it the
- * following way:
+ * Symbol that is used for the property in the StyleDefinition class that keeps reference to the
+ * top-level style definition class. Developers can use this property to access rules in the
+ * chain of nested grouping rules. We need to avoid enumerating this property when processing
+ * the rules in the style definition object.
+ */
+export const symOwner = Symbol("owner");
+
+
+
+/**
+ * The StyleDefinition class is a base for all classes that contain defininitions of CSS rules.
+ * Use it the following way:
  * 
  * ```typescript
  * class MyStyles extend StyleDefinition
@@ -294,7 +304,7 @@ export abstract class StyleDefinition<O extends StyleDefinition = any>
 	 */
 	public constructor( owner: O)
 	{
-		this.owner = owner;
+		this[symOwner] = owner;
 	}
 
 	/**
@@ -303,7 +313,7 @@ export abstract class StyleDefinition<O extends StyleDefinition = any>
 	 * definition classes. Through this memeber, all rules and other memebers defined in the owner
 	 * definition class can be accessed.
 	 */
-	public readonly owner: O;
+	public get owner(): O { return this[symOwner]; }
 }
 
 

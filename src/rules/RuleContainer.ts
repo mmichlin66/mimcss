@@ -9,15 +9,21 @@ import {NamespaceRule} from "./NamespaceRule"
 // Define symbols that are used for keeping important information on the style definition
 // instances that we don't want to be visible to developers.
 
-// Property on the style definition class pointing to the singlton instance.
+/** Property on the style definition class pointing to the singlton instance. */
 const symDefinition = Symbol("definition");
 
-// Property on the style definition instance pointing to the RuleContainer object that is
-// responsible for processing rules.
+/**
+ * Property on the style definition instance pointing to the RuleContainer object that is
+ * responsible for processing rules.
+ */
 const symRuleContainer = Symbol("ruleContainer");
 
 
 
+/**
+ * 
+ * @param definition 
+ */
 export function getContainerFromDefinition( definition: StyleDefinition): RuleContainer
 {
 	return definition[symRuleContainer];
@@ -25,7 +31,8 @@ export function getContainerFromDefinition( definition: StyleDefinition): RuleCo
 
 
 
-export function processStyleDefinitionClass( definitionClass: IStyleDefinitionClass, owner: StyleDefinition): StyleDefinition
+export function processStyleDefinitionClass( definitionClass: IStyleDefinitionClass,
+	owner: StyleDefinition): StyleDefinition
 {
 	try
 	{
@@ -219,10 +226,6 @@ export class RuleContainer implements ITopLevelRuleContainer
 	/** Inserts this stylesheet into DOM. */
 	public activate(): void
 	{
-		// activate referenced style definitions
-		for( let ref of this.refs)
-			ref[symRuleContainer].activate();
-
 		if (++this.activationRefCount === 1)
 		{
 			// only the top-level style defiition creates the `<style>` element
@@ -258,10 +261,6 @@ export class RuleContainer implements ITopLevelRuleContainer
 
 			this.domStyleElm = null;
 		}
-
-		// deactivate imported stylesheets
-		for( let ref of this.refs)
-			ref[symRuleContainer].deactivate();
 	}
 
 
@@ -269,6 +268,10 @@ export class RuleContainer implements ITopLevelRuleContainer
 	// Inserts all rules defined in this container to either the style sheet or grouping rule.
 	public insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
+		// activate referenced style definitions
+		for( let ref of this.refs)
+			ref[symRuleContainer].activate();
+
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
 		if (parent instanceof CSSStyleSheet)
@@ -302,6 +305,10 @@ export class RuleContainer implements ITopLevelRuleContainer
 		this.cssCustomVarStyleRule = null;
 
 		this.otherRules.forEach( rule => rule.clear());
+
+		// deactivate imported stylesheets
+		for( let ref of this.refs)
+			ref[symRuleContainer].deactivate();
 	}
 
 
@@ -509,7 +516,8 @@ export function deactivate( definition: StyleDefinition): void
 		return;
 
 	let ruleContainer = definition[symRuleContainer] as RuleContainer;
-	ruleContainer.deactivate();
+	if (ruleContainer)
+		ruleContainer.deactivate();
 }
 
 

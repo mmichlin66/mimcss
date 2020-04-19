@@ -23,6 +23,9 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 		super.process( owner, ruleName);
 
 		this.definition = processStyleDefinitionClass( this.definitionClass, owner.getDefinitionInstance());
+		if (!this.definition)
+			return;
+
 		this.ruleContainer = getContainerFromDefinition( this.definition);
 	}
 
@@ -31,6 +34,9 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
+		if (!this.ruleContainer)
+			return;
+
 		let selector = this.getGroupSelectorText();
 		if (!selector)
 			return;
@@ -55,7 +61,8 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 		super.clear();
 
 		// clear sub-rules
-		this.ruleContainer.clearRules();
+		if (this.ruleContainer)
+			this.ruleContainer.clearRules();
 	}
 
 
