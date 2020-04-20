@@ -167,6 +167,12 @@ export interface INumberMath<T extends string>
      * @param params 
      */
     calc( formula: string, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>;
+
+    /**
+     * Converts the given number into percents. Values between -1.0 and 1.0 non-inclusive are
+     * multiplied by 100.
+     */
+    percent( n: number): NumberProxy<T>;
 }
 
 

@@ -369,7 +369,12 @@ class NumberMath<T extends string | null = null> implements INumberMath<T>
         return () => calcFunc( formula, params, this.convertFunc);
     }
 
-    protected unit( n: number, unit: string): NumberProxy<T>
+    public percent( n: number)
+    {
+        return () => CssPercentMath.convertFunc(n);
+    }
+
+    public unit( n: number, unit: string): NumberProxy<T>
     {
         return () => unitFunc<T>( n, unit);
     }
@@ -458,8 +463,6 @@ export class CssPercentMath extends NumberMath<PercentType> implements ICssPerce
         { return multiStyleToString( val, CssPercentMath.convertFunc, ","); }
 
     constructor() { super( CssFractionMath.convertFunc) }
-
-    public percent( n: number) { return this.unit( n, "%"); }
 }
 
 
