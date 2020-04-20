@@ -323,16 +323,7 @@ export abstract class StyleDefinition<O extends StyleDefinition = any>
 export interface IStyleDefinitionClass<T extends StyleDefinition<O> = any, O extends StyleDefinition = any>
 {
 	/** All style definition classes should conform to this constructor */
-	new( owner: O): T;
-
-	/**
-	 * Flag inidicating that multiple instances can be created for this style definition -
-	 * each time with unique rule IDs. This is useful for styles created for a control - e.g. tree
-	 * or accordeon - which can be used multiple times on the same page but with different styles.
-	 * By default, style definitions are singular, that is a single instance of a style definition
-	 * object is created for them and inserted into DOM.
-	 */
-	isMultiplex?: boolean;
+	new( owner?: O): T;
 }
 
 

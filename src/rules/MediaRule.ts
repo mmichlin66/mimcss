@@ -11,9 +11,9 @@ import {mediaQueryToString} from "../styles/MediaFuncs";
  */
 export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( query: string | MediaQuery, definitionClass: IStyleDefinitionClass<T,O>)
+	public constructor( query: string | MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>)
 	{
-		super( definitionClass);
+		super( instanceOrClass);
 
 		this.query = query;
 	}
@@ -23,7 +23,7 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 	// Creates a copy of the rule.
 	public clone(): MediaRule<T,O>
 	{
-		return new MediaRule<T,O>( this.query, this.definitionClass);
+		return new MediaRule<T,O>( this.query, this.instanceOrClass);
 	}
 
 

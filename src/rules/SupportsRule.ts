@@ -11,9 +11,9 @@ import {supportsQueryToString} from "../styles/StyleFuncs"
  */
 export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( query: SupportsQuery, definitionClass: IStyleDefinitionClass<T,O>)
+	public constructor( query: SupportsQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>)
 	{
-		super( definitionClass);
+		super( instanceOrClass);
 
 		this.query = query;
 	}
@@ -23,7 +23,7 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 	// Creates a copy of the rule.
 	public clone(): SupportsRule<T,O>
 	{
-		return new SupportsRule<T,O>( this.query, this.definitionClass);
+		return new SupportsRule<T,O>( this.query, this.instanceOrClass);
 	}
 
 

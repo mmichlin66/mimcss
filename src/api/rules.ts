@@ -115,15 +115,15 @@ export function $page( style?: Styleset, pseudoClass?: PagePseudoClass): RuleTyp
  * Creates new supports rule.
  */
 export function $supports<T extends RuleTypes.StyleDefinition<O>, O extends RuleTypes.StyleDefinition>( query: SupportsQuery,
-				definitionClass: RuleTypes.IStyleDefinitionClass<T,O>): RuleTypes.ISupportsRule<T>
-	{ return new SupportsRule( query, definitionClass); }
+	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T,O>): RuleTypes.ISupportsRule<T>
+	{ return new SupportsRule( query, instanceOrClass); }
 
 /**
  * Creates new media rule.
  */
 export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTypes.StyleDefinition>( query: string | MediaQuery,
-	definitionClass: RuleTypes.IStyleDefinitionClass<T,O>): RuleTypes.IMediaRule<T>
-	{ return new MediaRule( query, definitionClass); }
+	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T,O>): RuleTypes.IMediaRule<T>
+	{ return new MediaRule( query, instanceOrClass); }
 
 
 
@@ -145,9 +145,9 @@ export function $selector( template: string, ...args: SelectorTokenType[]): CssS
  * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T extends RuleTypes.StyleDefinition>( definitionClass: RuleTypes.IStyleDefinitionClass<T>): T
+export function $use<T extends RuleTypes.StyleDefinition>( instanceOrClass: RuleTypes.IStyleDefinitionClass<T>): T
 {
-	return StylesheetFuncs.use( definitionClass);
+	return StylesheetFuncs.processInstanceOrClass( instanceOrClass, null) as T;
 }
 
 
@@ -159,9 +159,9 @@ export function $use<T extends RuleTypes.StyleDefinition>( definitionClass: Rule
  * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
  * up to 1.
  */
-export function $activate<T extends RuleTypes.StyleDefinition>( definitionOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T
+export function $activate<T extends RuleTypes.StyleDefinition>( instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T
 {
-	return StylesheetFuncs.activate( definitionOrClass);
+	return StylesheetFuncs.activate( instanceOrClass);
 }
 
 
@@ -171,9 +171,9 @@ export function $activate<T extends RuleTypes.StyleDefinition>( definitionOrClas
  * object maintains a reference counter of how many times it was activated and deactivated. The
  * rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function $deactivate( stylesheet: RuleTypes.StyleDefinition): void
+export function $deactivate( instance: RuleTypes.StyleDefinition): void
 {
-	return StylesheetFuncs.deactivate( stylesheet);
+	return StylesheetFuncs.deactivate( instance);
 }
 
 

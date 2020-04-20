@@ -1,5 +1,5 @@
 import {IStyleDefinitionClass, StyleDefinition, IGroupRule} from "./RuleTypes"
-import {processStyleDefinitionClass, getContainerFromDefinition} from "./RuleContainer"
+import {getContainerFromDefinition, processInstanceOrClass} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule} from "./Rule"
 
 
@@ -9,10 +9,10 @@ import {IRuleContainer, ITopLevelRuleContainer, Rule} from "./Rule"
  */
 export abstract class GroupRule<T extends StyleDefinition> extends Rule implements IGroupRule<T>
 {
-	public constructor( definitionClass: IStyleDefinitionClass<T>)
+	public constructor( instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super();
-		this.definitionClass = definitionClass;
+		this.instanceOrClass = instanceOrClass;
 	}
 
 
@@ -22,11 +22,11 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 	{
 		super.process( owner, ruleName);
 
-		this.definition = processStyleDefinitionClass( this.definitionClass, owner.getDefinitionInstance());
-		if (!this.definition)
+		this.instance = processInstanceOrClass( this.instanceOrClass, owner.getDefinitionInstance());
+		if (!this.instance)
 			return;
 
-		this.ruleContainer = getContainerFromDefinition( this.definition);
+		this.ruleContainer = getContainerFromDefinition( this.instance);
 	}
 
 
@@ -68,16 +68,16 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 
 	// Style definition class that defines rules under this grouping rule.
-	protected definitionClass: IStyleDefinitionClass;
+	protected instanceOrClass: T | IStyleDefinitionClass;
 
 	// Style definition instance.
-	protected definition: StyleDefinition;
+	protected instance: StyleDefinition;
 
 	// Rule container for the definition instance.
 	protected ruleContainer: IRuleContainer;
 
 	// Instance of the style definition class defining the rules under this grouping rule
-	public get rules(): T { return this.definition as T; }
+	public get rules(): T { return this.instance as T; }
 
 	/** SOM supports rule */
 	public cssRule: CSSGroupingRule;
