@@ -359,11 +359,6 @@ let uniqueStyleNamesPrefix: string = "n";
 // Next number to use when generating unique identifiers.
 let nextUniqueID: number = 1;
 
-// Map of style definition classes to their singlton Stylesheet objects. Non-multiplex style
-// definition classes are added to this map upon calling the $use function on them.
-let classToInstanceMap = new Map<IStyleDefinitionClass,StyleDefinition>();
-
-
 
 
 /**
@@ -400,12 +395,15 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
 	let baseClass = definitionClass;
 	while( (baseClass = Object.getPrototypeOf( baseClass)) !== StyleDefinition)
 	{
-		// check if the base class has an instance in the global map of used definition classes;
-		// if yes, check whether it hase a property with the given rule name. If yes, then
-		// use this rule's already generated name (if exists).
-		let baseInst = classToInstanceMap.get( baseClass);
-		if (baseInst && ruleName in baseInst && "name" in baseInst[ruleName])
-			return baseInst[ruleName].name;
+		// check if the base class already has an associated instance; if yes, check whether
+		// it hase a property with the given rule name. If yes, then use this rule's already
+		// generated name (if exists).
+		if (baseClass.hasOwnProperty(symInstance))
+		{
+			let baseInst = baseClass[symInstance];
+			if (baseInst && ruleName in baseInst && "name" in baseInst[ruleName])
+				return baseInst[ruleName].name;
+		}
 	}
 
 	return null;
@@ -415,19 +413,9 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// API functions
+// Processing functions
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns rule container object associated with the given style definition object.
- */
-export function getContainerFromDefinition( definition: StyleDefinition): RuleContainer
-{
-	return definition ? definition[symRuleContainer] : null;
-}
-
-
 
 /**
  * Processes the given style definition class by creating its instance and associating a
@@ -467,7 +455,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
 
 
 /**
- * Processes the given stylesheet definition class or instance and assignes names to its rules.
+ * Processes the given stylesheet definition class or instance and assigns names to its rules.
  * If the parameter is a style definition class we check whether there is an instance already
  * created for it as a class will have only a single associated instane no matter how many times
  * this function is called.
@@ -493,18 +481,20 @@ export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyl
 	}
 	else
 	{
-		let instance = classToInstanceMap.get( instanceOrClass);
-		if (!instance)
-		{
-			instance = processClass( instanceOrClass, owner);
-			if (!instance)
-				return null;
-				
-			classToInstanceMap.set( instanceOrClass, instance);
-		}
-
-		return instance;
+		return instanceOrClass.hasOwnProperty(symInstance)
+			? instanceOrClass[symInstance]
+			: processClass( instanceOrClass, owner);
 	}
+}
+
+
+
+/**
+ * Returns rule container object associated with the given style definition object.
+ */
+export function getContainerFromDefinition( definition: StyleDefinition): RuleContainer
+{
+	return definition ? definition[symRuleContainer] : null;
 }
 
 

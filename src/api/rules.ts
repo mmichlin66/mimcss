@@ -94,7 +94,7 @@ export function $import( url: string, mediaQuery?: string | MediaQuery, supports
 	{ return new ImportRule( url, mediaQuery, supportsQuery); }
 
 /**
- * Creates new fon-face rule.
+ * Creates new font-face rule.
  */
 export function $fontface( fontface: Fontface): RuleTypes.IFontFaceRule
 	{ return new FontFaceRule( fontface); }
