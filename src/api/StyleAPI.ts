@@ -1,24 +1,17 @@
 ﻿import {Extended, CssPosition, CssTime, CssLength} from "../styles/UtilTypes"
-import * as ColorTypes from "../styles/ColorTypes"
-import * as ImageTypes from "../styles/ImageTypes"
-import * as StyleTypes from "../styles/StyleTypes"
-import * as StyleFuncs from "../styles/StyleFuncs"
+import {CssColor} from "../styles/ColorTypes"
+import {CssImage} from "../styles/ImageTypes"
+import {
+	VarTemplateName, VarValueType, AnimationName_Single, AnimationTimingFunction_Single,
+	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
+	AnimationPlayState_Single, Animation_Single, BackgroundSize_Single, BackgroundRepeat_Single,
+	BackgroundAttachment_Single, BackgroundOrigin_Single, BackgroundClip_Single,
+	Background_Single
+} from "../styles/StyleTypes"
+import { stylePropToString } from "../styles/StyleFuncs"
+import {Styleset} from "../styles/StyleTypes"
 import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
 import {formatSelector} from "../styles/SelectorFuncs";
-
-
-
-/**
- * Converts the given value corresponding to the given style property to a CSS string.
- * @param stylePropName Style property name that determines how the value should be converted
- * to a CSS compliant string.
- * @param stylePropValue Value to convert.
- */
-export function getStylePropValue<K extends StyleTypes.VarTemplateName>( stylePropName: K,
-	stylePropValue: StyleTypes.VarValueType<K>): string | null
-{
-	return StyleFuncs.stylePropToString( stylePropName, stylePropValue, true);
-}
 
 
 
@@ -30,6 +23,115 @@ export function getStylePropValue<K extends StyleTypes.VarTemplateName>( stylePr
 export function $selector( template: string, ...args: SelectorTokenType[]): CssSelector
 {
 	return () => formatSelector( template, args);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Styleset manipulation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the given value corresponding to the given style property to a CSS string.
+ * @param stylePropName Style property name that determines how the value should be converted
+ * to a CSS compliant string.
+ * @param stylePropValue Value to convert.
+ */
+export function getStylePropValue<K extends VarTemplateName>( stylePropName: K,
+	stylePropValue: VarValueType<K>): string | null
+{
+	return stylePropToString( stylePropName, stylePropValue, true);
+}
+
+
+
+/**
+ * Sets values of the style properties from the given Styleset object to the `style` attribute
+ * of the given HTML element.
+ * @param elm HTML element whose styles will be set.
+ * @param styleset Styleset object which provides values for style properties.
+ */
+export function setElementStyle( elm: HTMLElement, styleset: Styleset): void
+{
+	if (styleset == undefined)
+		elm.removeAttribute( "style");
+	else
+	{
+		let elmStyle = elm.style;
+		Object.keys(styleset).forEach( key => elmStyle[key] = stylePropToString( key, styleset[key], true));
+	}
+}
+
+
+
+
+/**
+ * Compares two Styleset objects by converting style properties to strings and returns an object
+ * that contains string values of properties that were new or have different values in the new
+ * styleset and undefined values for properties that exist in the old styleset but don't exist
+ * in the new one.
+ * @param oldStyleset 
+ * @param newStyleset 
+ */
+export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): { [K: string]: string }
+{
+	const updateVal = {};
+	let changesExist = false;
+
+	// loop over keys in the old style object and find those that are not in the new one. These
+	// will be removed.
+	for( let key in oldStyleset)
+	{
+		let newVal = newStyleset[key];
+		if (newVal == null)
+		{
+			changesExist = true;
+			updateVal[key] = undefined;
+		}
+		else
+		{
+			let oldStringVal = stylePropToString( key, oldStyleset[key], true);
+			let newStringVal = stylePropToString( key, newVal, true);
+			if (oldStringVal !== newStringVal)
+			{
+				changesExist = true;
+				updateVal[key] = newStringVal;
+			}
+		}
+	}
+
+	// loop over keys in the new style object and find those that are not in the old one. These
+	// will be added.
+	for( let key in newStyleset)
+	{
+		let oldVal = oldStyleset[key];
+		if (oldVal == null)
+		{
+			changesExist = true;
+			updateVal[key] = stylePropToString( key, newStyleset[key], true);
+		}
+	}
+
+	return changesExist ? updateVal : undefined;
+}
+
+
+
+/**
+ * Compares two Styleset objects by converting style properties to strings and returns an object
+ * that contains string values of properties that were new or have different values in the new
+ * styleset and undefined values for properties that exist in the old styleset but don't exist
+ * in the new one.
+ * @param oldStyleset 
+ * @param newStyleset 
+ */
+export function stylesetToStringObject( styleset: Styleset): { [K: string]: string }
+{
+	let res = {};
+	Object.keys( styleset).forEach( key => res[key] = stylePropToString( key, styleset[key], true));
+	return res;
 }
 
 
@@ -59,14 +161,14 @@ export function $selector( template: string, ...args: SelectorTokenType[]): CssS
  * @param mode Animation fill mode. The default value is "none".
  * @param state Animation state. The default value is "running".
  */
-export function animation( name: Extended<StyleTypes.AnimationName_Single>,
+export function animation( name: Extended<AnimationName_Single>,
 	duration: Extended<CssTime> = 1000,
-	func: Extended<StyleTypes.AnimationTimingFunction_Single> = "ease",
+	func: Extended<AnimationTimingFunction_Single> = "ease",
 	delay: Extended<CssTime> = 0,
-	count: Extended<StyleTypes.AnimationIterationCount_Single> = 1,
-	direction: Extended<StyleTypes.AnimationDirection_Single> = "normal",
-	mode: Extended<StyleTypes.AnimationFillMode_Single> = "none",
-	state: Extended<StyleTypes.AnimationPlayState_Single> = "running"): StyleTypes.Animation_Single
+	count: Extended<AnimationIterationCount_Single> = 1,
+	direction: Extended<AnimationDirection_Single> = "normal",
+	mode: Extended<AnimationFillMode_Single> = "none",
+	state: Extended<AnimationPlayState_Single> = "running"): Animation_Single
 {
 	return { name, duration, func, delay,count, direction, state, mode };
 }
@@ -90,15 +192,15 @@ export function animation( name: Extended<StyleTypes.AnimationName_Single>,
  * @param clip Background clip. The default value is "border-box".
  */
 export function background(
-		color?: Extended<ColorTypes.CssColor>,
-		image?: Extended<ImageTypes.CssImage>,
+		color?: Extended<CssColor>,
+		image?: Extended<CssImage>,
 		position?: Extended<CssPosition>,
-		size?: Extended<StyleTypes.BackgroundSize_Single>,
-		repeat: Extended<StyleTypes.BackgroundRepeat_Single> = "repeat",
-		attachment: Extended<StyleTypes.BackgroundAttachment_Single> = "scroll",
-		origin: Extended<StyleTypes.BackgroundOrigin_Single> = "padding-box",
-		clip: Extended<StyleTypes.BackgroundClip_Single> = "border-box"
-	): StyleTypes.Background_Single
+		size?: Extended<BackgroundSize_Single>,
+		repeat: Extended<BackgroundRepeat_Single> = "repeat",
+		attachment: Extended<BackgroundAttachment_Single> = "scroll",
+		origin: Extended<BackgroundOrigin_Single> = "padding-box",
+		clip: Extended<BackgroundClip_Single> = "border-box"
+	): Background_Single
 {
 	return { color, image, position, size, repeat, attachment, origin, clip };
 }
@@ -123,7 +225,7 @@ export function background(
 export function shadow(
 				x: Extended<CssLength>,
 				y: Extended<CssLength>,
-				color: Extended<ColorTypes.CssColor>,
+				color: Extended<CssColor>,
 				blur: Extended<CssLength> = 1,
 				spread: Extended<CssLength> = 0,
 				inset: Extended<boolean> = false)

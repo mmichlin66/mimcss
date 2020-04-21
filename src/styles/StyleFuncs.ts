@@ -504,7 +504,7 @@ export function stylePropToString(
             ? valueToString( propVal, info as IValueConvertOptions)
             : (info as PropToStringFunc)( propVal);
 
-    if (!varValue)
+    if (!varValue && !valueOnly)
         varValue = "initial";
         
     return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
