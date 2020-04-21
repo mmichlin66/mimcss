@@ -29,10 +29,10 @@ const symRuleContainer = Symbol("ruleContainer");
  */
 class RuleContainer implements ITopLevelRuleContainer
 {
-	constructor( instance: StyleDefinition)
+	constructor( instance: StyleDefinition, name: string)
 	{
 		this.instance = instance;
-		// this.definitionClass = Object.getPrototypeOf(instance).constructor;
+		this.name = name;
 		this.definitionClass = instance.constructor as IStyleDefinitionClass;
 		this.owner = instance.owner;
 
@@ -60,12 +60,6 @@ class RuleContainer implements ITopLevelRuleContainer
 		}
 		else
 			this.topLevelContainer = this.owner[symRuleContainer];
-
-		// get the name for our container
-		if (useUniqueStyleNames || !this.definitionClass.name)
-			this.name = generateUniqueName( "s");
-		else
-			this.name = this.definitionClass.name;
 
 		// if our container is not the top-level container, prefix our name with the upper one
 		if (!this.isTopLevel)
@@ -119,10 +113,10 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Processes the given Rule-derived object.
 	private processRule( propName: string, rule: Rule): void
 	{
-		// if the rule object is already assigned to a stylesheet, we create a clone of the
-		// rule and assign it to our stylesheet.
+		// if the rule object is already processed as part of another instance, we create a clone
+		// of the rule and set it to our instance.
 		if (rule.owner)
-			rule = rule.clone();
+			this.instance[propName] = rule = rule.clone();
 
 		rule.process( this.topLevelContainer, propName);
 
@@ -258,7 +252,7 @@ class RuleContainer implements ITopLevelRuleContainer
 			if (this.isTopLevel)
 			{
 				this.domStyleElm = document.createElement( "style");
-				this.domStyleElm.id = this.definitionClass.name;
+				this.domStyleElm.id = this.name;
 				document.head.appendChild( this.domStyleElm);
 			}
 			else
@@ -441,7 +435,13 @@ function processClass( definitionClass: IStyleDefinitionClass,
 	{
 		// create the instance of the definition class
 		let instance = new definitionClass( owner);
-		new RuleContainer( instance);
+
+		// get the name for our container
+		let name = useUniqueStyleNames || !definitionClass.name
+			? generateUniqueName()
+			: definitionClass.name;
+
+		new RuleContainer( instance, name);
 		definitionClass[symInstance] = instance;
 		return instance;
 	}
@@ -475,7 +475,18 @@ export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyl
 		// check whether this definition instance has already been processed
 		let ruleContainer = instanceOrClass[symRuleContainer] as RuleContainer;
 		if (!ruleContainer)
-			new RuleContainer( instanceOrClass);
+		{
+			// get the name for our container
+			let name = generateUniqueName();;
+			if (!useUniqueStyleNames)
+			{
+				let definitionClass = instanceOrClass.constructor;
+				if (definitionClass.name)
+					name += "_" + definitionClass.name;
+			}
+
+			new RuleContainer( instanceOrClass, name);
+		}
 
 		return instanceOrClass;
 	}
