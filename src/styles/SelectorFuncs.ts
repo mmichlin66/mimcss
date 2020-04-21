@@ -1,9 +1,6 @@
 ﻿import * as SelectorTypes from "./SelectorTypes"
 import {Rule} from "../rules/Rule";
-import {TagRule} from "../rules/TagRule"
-import {ClassRule} from "../rules/ClassRule"
-import {IDRule} from "../rules/IDRule"
-import {SelectorRule} from "../rules/SelectorRule"
+import {TagRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 
 
 

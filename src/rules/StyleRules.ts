@@ -1,7 +1,7 @@
-import {IStyleRule, ExtendedStyleset, IVarRule} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, IVarRule, IAbstractRule, IClassRule, IIDRule, ISelectorRule, ITagRule} from "./RuleTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
-import {Rule, ITopLevelRuleContainer} from "./Rule";
+import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString} from "../styles/StyleFuncs"
 import {valueToString} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
@@ -280,6 +280,269 @@ class NestedRule extends StyleRule
 
 	// Parent style within which this rule is nested.
 	public containingRule: StyleRule;
+}
+
+
+
+/**
+ * The AbstractRule class describes a styleset that can only be used as a base for other style
+ * rules.
+ */
+export class AbstractRule extends StyleRule implements IAbstractRule
+{
+	public constructor( style?: ExtendedStyleset)
+	{
+		super( style);
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): AbstractRule
+	{
+		let newRule = new AbstractRule();
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Overrides the StyleRule's implementation to do nothing. No CSSStyleRule is created for
+	// abstract rules.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	{
+	}
+
+	// Returns the selector part of the style rule.
+	public getSelectorString(): string
+	{
+		return null;
+	}
+
+
+
+	/** Only needed to distinguish from other rules */
+	public get isAbstractRule(): boolean { return true; }
+}
+
+
+
+/**
+ * The ClassRule class describes a styleset that applies to elements identified by a CSS class.
+ */
+export class ClassRule extends StyleRule implements IClassRule
+{
+	public constructor( style?: ExtendedStyleset, nameOverride?: string | IClassRule)
+	{
+		super( style);
+
+		this.nameOverride = nameOverride;
+	}
+
+
+
+	// Processes the given rule.
+	public process( owner: ITopLevelRuleContainer, ruleName: string): void
+	{
+		super.process( owner, ruleName);
+
+		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, ".");
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): ClassRule
+	{
+		let newRule = new ClassRule( undefined, this.nameOverride);
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Returns the selector part of the style rule.
+	public getSelectorString(): string
+	{
+		return this.cssName;
+	}
+
+
+
+	/** Only needed to distinguish from other rules */
+	public get isClassRule(): boolean { return true; }
+
+	/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	public cssName: string;
+
+	// Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	private nameOverride?: string | IClassRule;
+}
+
+
+
+/**
+ * The IDRule class describes a styleset that applies to elements identified by an ID.
+ */
+export class IDRule extends StyleRule implements IIDRule
+{
+	public constructor( style?: ExtendedStyleset, nameOverride?: string | IIDRule)
+	{
+		super( style);
+
+		this.nameOverride = nameOverride;
+	}
+
+
+
+	// Processes the given rule.
+	public process( owner: ITopLevelRuleContainer, ruleName: string): void
+	{
+		super.process( owner, ruleName);
+
+		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "#");
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): IDRule
+	{
+		let newRule = new IDRule( undefined, this.nameOverride);
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Returns the selector part of the style rule.
+	public getSelectorString(): string
+	{
+		return this.cssName;
+	}
+
+
+
+	/** Only needed to distinguish from other rules */
+	public get isIDRule(): boolean { return true; }
+
+	/**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	/**
+	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
+	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
+	 * `name` property.
+	 */
+	public cssName: string;
+
+	// Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	private nameOverride?: string | IIDRule;
+}
+
+
+
+/**
+ * The SelectorRule type describes a styleset that applies to elements identified by a CSS selector.
+ */
+export class SelectorRule extends StyleRule implements ISelectorRule
+{
+	public constructor( selector: CssSelector, style?: ExtendedStyleset)
+	{
+		super( style);
+
+		this.selector = selector;
+	}
+
+
+
+	// Processes the given rule.
+	public process( owner: ITopLevelRuleContainer, ruleName: string): void
+	{
+		super.process( owner, ruleName);
+
+		this.selectorText = valueToString( this.selector);
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): SelectorRule
+	{
+		let newRule = new SelectorRule( this.selector);
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Returns the selector part of the style rule.
+	public getSelectorString(): string
+	{
+		return this.selectorText;
+	}
+
+
+
+	/** CSS rule selector string */
+	public selectorText: string;
+
+	// selector object for this rule.
+	private selector: CssSelector;
+}
+
+
+
+/**
+ * The TagRule class describes a styleset that applies to elements identified by a tag name.
+ */
+export class TagRule extends StyleRule implements ITagRule
+{
+	public constructor( tag: string, style?: ExtendedStyleset)
+	{
+		super( style);
+		this.tag = tag;
+	}
+
+
+
+	// Creates a copy of the rule.
+	public clone(): TagRule
+	{
+		let newRule = new TagRule( this.tag);
+		newRule.copyFrom( this);
+		return newRule;
+	}
+
+
+
+	// Returns the selector part of the style rule.
+	public getSelectorString(): string
+	{
+		return this.tag;
+	}
+
+
+
+	/** Name of the HTML tag */
+	public tag: string;
 }
 
 

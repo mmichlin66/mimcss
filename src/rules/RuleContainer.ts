@@ -1,8 +1,7 @@
 import {StyleDefinition, IStyleDefinitionClass} from "./RuleTypes"
 import {Rule, ITopLevelRuleContainer} from "./Rule"
 import {VarRule} from "./VarRule"
-import {ImportRule} from "./ImportRule"
-import {NamespaceRule} from "./NamespaceRule"
+import {ImportRule, NamespaceRule} from "./MiscRules"
 
 
 

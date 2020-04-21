@@ -1,6 +1,6 @@
 import {IAnimationRule, AnimationFrame, INamedEntity} from "./RuleTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule"
-import {StyleRule} from "./StyleRule";
+import {StyleRule} from "./StyleRules";
 
 
 

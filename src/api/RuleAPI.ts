@@ -9,19 +9,11 @@ import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/
 import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
-import {AbstractRule} from "../rules/AbstractRule"
-import {TagRule} from "../rules/TagRule"
-import {ClassRule} from "../rules/ClassRule"
-import {IDRule} from "../rules/IDRule"
-import {SelectorRule} from "../rules/SelectorRule"
+import {AbstractRule, TagRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
-import {ImportRule} from "../rules/ImportRule"
-import {FontFaceRule} from "../rules/FontFaceRule"
-import {NamespaceRule} from "../rules/NamespaceRule";
-import {PageRule} from "../rules/PageRule";
-import {SupportsRule} from "../rules/SupportsRule"
-import {MediaRule} from "../rules/MediaRule"
+import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
+import {SupportsRule, MediaRule} from "../rules/GroupRules"
 
 
 
