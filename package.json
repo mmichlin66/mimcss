@@ -46,7 +46,8 @@
 		"lib/api/UtilAPI.d.ts",
 		"lib/api/ColorAPI.d.ts",
 		"lib/api/ImageAPI.d.ts",
-		"lib/api/RuleAPI.d.ts",
-		"lib/api/StyleAPI.d.ts"
+		"lib/api/StyleAPI.d.ts",
+		"lib/api/FilterAPI.d.ts",
+		"lib/api/RuleAPI.d.ts"
 	]
 }

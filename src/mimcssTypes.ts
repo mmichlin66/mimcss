@@ -12,4 +12,5 @@ export * from "./api/UtilAPI";
 export * from "./api/ColorAPI";
 export * from "./api/ImageAPI";
 export * from "./api/StyleAPI";
+export * from "./api/FilterAPI";
 export * from "./api/RuleAPI";

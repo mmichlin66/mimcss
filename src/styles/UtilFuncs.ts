@@ -63,7 +63,7 @@ export interface IValueConvertOptions
     fromArray?: (val: any[]) => string;
 
     // Called if value is an object
-    fromObject?: (val: {[K: string]: any}) => string;
+    fromObject?: (val: any) => string;
 
     // Called if type-specific function is not defined
     fromAny?: (val: any) => string;
@@ -450,7 +450,7 @@ export class CssNumberMath extends NumberMath<NumberType>
 export class CssPercentMath extends NumberMath<PercentType> implements ICssPercentMath
 {
     public static convertFunc( n: number): string
-        { return (Number.isInteger(n) ? n : n > -1.0 && n < 1.0 ? Math.round( n * 100) : Math.round(n)) + "%"; }
+        { return (Number.isInteger(n) ? n : Math.round(n * 100)) + "%"; }
 
     public static styleToString( val: Extended<CssPercent>): string
         { return styleToString( val, CssPercentMath.convertFunc); }

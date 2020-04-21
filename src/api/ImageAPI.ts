@@ -13,6 +13,8 @@ export function linearGradient( angle?: ImageTypes.LinearGradAngle,
     return () => ImageFuncs.linearGradientToString( "linear-gradient", angle, stopsOrHints);
 }
 
+
+
 /**
  * Returns an ImageProxy function representing the `repeating-linear-gradient()` CSS function.
  */
@@ -21,6 +23,8 @@ export function repeatingLinearGradient( angle?: ImageTypes.LinearGradAngle,
 {
     return () => ImageFuncs.linearGradientToString( "repeating-linear-gradient", angle, stopsOrHints);
 }
+
+
 
 /**
  * Returns an ImageProxy function representing the `radial-gradient()` CSS function.
@@ -32,6 +36,8 @@ export function radialGradient( shape?: ImageTypes.RadialGradientShape,
     return () => ImageFuncs.radialGradientToString( "radial-gradient", shape, extent, pos, stopsOrHints);
 }
 
+
+
 /**
  * Returns an ImageProxy function representing the `repeating-radial-gradient()` CSS function.
  */
@@ -42,6 +48,8 @@ export function repeatingRadialGradient( shape?: ImageTypes.RadialGradientShape,
     return () => ImageFuncs.radialGradientToString( "repeating-radial-gradient", shape, extent, pos, stopsOrHints);
 }
 
+
+
 /**
  * Returns an ImageProxy function representing the`conic-gradient()`  CSS function.
  */
@@ -50,6 +58,8 @@ export function conicGradient( angle?: Extended<CssAngle>, pos?: SimpleCssPositi
 {
     return () => ImageFuncs.conicGradientToString( angle, pos, stopsOrHints);
 }
+
+
 
 /**
  * Returns an ImageProxy function representing the `cross-fade()` CSS function.

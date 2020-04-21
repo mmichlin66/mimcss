@@ -133,7 +133,7 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize
 
 
 
-function singleBoxShadow_fromObject( val: StyleTypes.Background_Single): string
+export function singleBoxShadow_fromObject( val: StyleTypes.BoxShadow_Single): string
 {
     return objectToString( val, false,
             ["inset", v => v ? "inset" : ""],

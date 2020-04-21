@@ -1,7 +1,7 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
-    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius,
+    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius, FilterProxy,
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -793,7 +793,7 @@ export interface ICssStyleset
     animationPlayState?: AnimationPlayState_StyleType;
     animationTimingFunction?: AnimationTimingFunction_StyleType;
 
-    backdropFilter?: DefaultStyleType;
+    backdropFilter?: string | FilterProxy;
     backfaceVisibility?: BackfaceVisibilityMode_StyleType;
     background?: Background_StyleType;
     backgroundAttachment?: BackgroundAttachment_StyleType;
@@ -902,7 +902,7 @@ export interface ICssStyleset
     fill?: DefaultStyleType;
     fillOpacity?: DefaultStyleType;
     fillRule?: FillRuleStyleType;
-    filter?: DefaultStyleType;
+    filter?: string | FilterProxy;
     flex?: FlexStyleType;
     flexBasis?: FlexBasisStyleType;
     flexDirection?: FlexDirectionStyleType;

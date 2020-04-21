@@ -6,11 +6,10 @@ import {
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
 	AnimationPlayState_Single, Animation_Single, BackgroundSize_Single, BackgroundRepeat_Single,
 	BackgroundAttachment_Single, BackgroundOrigin_Single, BackgroundClip_Single,
-	Background_Single
+	Background_Single, BoxShadow_Single, Styleset
 } from "../styles/StyleTypes"
-import { stylePropToString } from "../styles/StyleFuncs"
-import {Styleset} from "../styles/StyleTypes"
 import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
+import {stylePropToString} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
 
 
@@ -225,10 +224,13 @@ export function background(
 export function shadow(
 				x: Extended<CssLength>,
 				y: Extended<CssLength>,
-				color: Extended<CssColor>,
+				color?: Extended<CssColor>,
 				blur: Extended<CssLength> = 1,
 				spread: Extended<CssLength> = 0,
-				inset: Extended<boolean> = false)
+				inset: Extended<boolean> = false): BoxShadow_Single
 {
 	return { x, y, color, blur, spread, inset };
 }
+
+
+
