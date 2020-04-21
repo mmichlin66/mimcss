@@ -183,7 +183,7 @@ export function objectToString( val: any, usePropNames: boolean,
     if (val == null || propsAndFuncs.length === 0)
         return "";
 
-    let buf: string[] = [];
+    let buf: (string)[] = [];
     propsAndFuncs.forEach( propAndFunc =>
         {
             let propName = typeof propAndFunc === "string" ? propAndFunc : propAndFunc[0];
@@ -240,7 +240,8 @@ function numberToString( n: number, intUnit: string = "", floatUint: string = ""
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function styleToString( val: Extended<NumberBase>, convertFunc?: ConvertNumberFuncType): string
+function styleToString<T extends string>( val: Extended<NumberBase<T>>,
+    convertFunc?: ConvertNumberFuncType): string
 {
     return valueToString( val, { fromNumber: convertFunc});
 }
@@ -251,8 +252,8 @@ function styleToString( val: Extended<NumberBase>, convertFunc?: ConvertNumberFu
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiStyleToString( val: Extended<MultiNumberBase>,
-                convertFunc: ConvertNumberFuncType, separator: string): string
+function multiStyleToString<T extends string>( val: Extended<MultiNumberBase<T>>,
+                convertFunc?: ConvertNumberFuncType, separator: string = " "): string
 {
     return valueToString( val, {
         fromNumber: convertFunc,
@@ -269,7 +270,8 @@ function multiStyleToString( val: Extended<MultiNumberBase>,
  * @param convertFunc 
  * @param params 
  */
-function formatNumbers( format: string, params: Extended<NumberBase>[], convertFunc?: ConvertNumberFuncType): string
+function formatNumbers<T extends string>( format: string, params: Extended<NumberBase<T>>[],
+    convertFunc?: ConvertNumberFuncType): string
 {
     function replacer( token: string, ...args: any[]): string
     {
@@ -282,7 +284,7 @@ function formatNumbers( format: string, params: Extended<NumberBase>[], convertF
         if (unit && typeof param === "number")
             return param + unit;
         else
-            return styleToString( param, convertFunc);
+            return styleToString( param, convertFunc)!;
     }
 
     return format.replace( /{\s*(\d*)\s*(?:\|\s*([a-zA-Z\%]+)\s*)?}/g, replacer);
@@ -328,7 +330,7 @@ function unitFunc<T extends string>( n: number, unit: string): string
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
  */
-class NumberMath<T extends string | null = null> implements INumberMath<T>
+class NumberMath<T extends string> implements INumberMath<T>
 {
     constructor( protected convertFunc: ConvertNumberFuncType)
     {
@@ -386,7 +388,7 @@ class NumberMath<T extends string | null = null> implements INumberMath<T>
  * The INumberMathClass interface represents a "static" side of classes derived from the
  * NumberMath class.
  */
-export interface INumberMathClass<T extends string | null = null>
+export interface INumberMathClass<T extends string>
 {
     convertFunc( n: number): string;
 
@@ -477,7 +479,7 @@ export class CssPercentMath extends NumberMath<PercentType> implements ICssPerce
  * The CssLengthMath class contains methods that implement CSS mathematic functions on the
  * <length> CSS types.
  */
-export class CssLengthMath extends NumberMath<LengthType | PercentType> implements ICssLengthMath
+export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "px", "em"); }
 
@@ -529,7 +531,7 @@ export class CssLengthMath extends NumberMath<LengthType | PercentType> implemen
  * The CssAngleMath class contains methods that implement CSS mathematic functions on the
  * <angle> CSS types.
  */
-export class CssAngleMath extends NumberMath<AngleType | PercentType> implements ICssAngleMath
+export class CssAngleMath extends NumberMath<AngleType> implements ICssAngleMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "deg", "rad"); }
 
@@ -565,7 +567,7 @@ export class CssAngleMath extends NumberMath<AngleType | PercentType> implements
  * The CssTimeMath class contains methods that implement CSS mathematic functions on the
  * <time> CSS types.
  */
-export class CssTimeMath extends NumberMath<TimeType | PercentType> implements ICssTimeMath
+export class CssTimeMath extends NumberMath<TimeType> implements ICssTimeMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "ms", "s"); }
 
@@ -599,7 +601,7 @@ export class CssTimeMath extends NumberMath<TimeType | PercentType> implements I
  * The CssResolutionMath class contains methods that implement CSS mathematic functions on the
  * <resolution> CSS types.
  */
-export class CssResolutionMath extends NumberMath<ResolutionType | PercentType> implements ICssResolutionMath
+export class CssResolutionMath extends NumberMath<ResolutionType> implements ICssResolutionMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "dpi", "x"); }
 
@@ -642,7 +644,7 @@ export class CssResolutionMath extends NumberMath<ResolutionType | PercentType> 
  * The CssFrequencyMath class contains methods that implement CSS mathematic functions on the
  * <frequence> CSS types.
  */
-export class CssFrequencyMath extends NumberMath<FrequencyType | PercentType> implements ICssFrequencyMath
+export class CssFrequencyMath extends NumberMath<FrequencyType> implements ICssFrequencyMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "Hz", "kHz"); }
 
@@ -676,7 +678,7 @@ export class CssFrequencyMath extends NumberMath<FrequencyType | PercentType> im
  * The CssFractionMath class contains methods that implement CSS mathematic functions on the
  * <fraction> CSS types.
  */
-export class CssFractionMath extends NumberMath<FractionType | PercentType> implements ICssFractionMath
+export class CssFractionMath extends NumberMath<FractionType> implements ICssFractionMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "fr", "fr"); }
 
@@ -694,7 +696,7 @@ export class CssFractionMath extends NumberMath<FractionType | PercentType> impl
 
     constructor() { super( CssFractionMath.convertFunc) }
 
-    public minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): NumberProxy<FractionType | PercentType>
+    public minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): NumberProxy<FractionType>
     {
         return () => mathFunc( "minmax", [min, max], CssFractionMath.convertFunc);
     }
@@ -716,7 +718,7 @@ export class CssFractionMath extends NumberMath<FractionType | PercentType> impl
 export function positionToString( val: Extended<CssPosition>): string
 {
     return valueToString( val, {
-        fromNull: v => null,
+        fromNull: v => "",
         fromNumber: CssLengthMath.styleToString,
         fromArray: CssLengthMath.multiStyleToStringWithSpace
     });

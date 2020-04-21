@@ -75,9 +75,9 @@ export function setElementStyle( elm: HTMLElement, styleset: Styleset): void
  * @param oldStyleset 
  * @param newStyleset 
  */
-export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): { [K: string]: string }
+export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): { [K: string]: string | undefined } | null
 {
-	const updateVal = {};
+	const updateVal: { [K: string]: string | undefined } = {};
 	let changesExist = false;
 
 	// loop over keys in the old style object and find those that are not in the new one. These
@@ -114,7 +114,7 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): { 
 		}
 	}
 
-	return changesExist ? updateVal : undefined;
+	return changesExist ? updateVal : null;
 }
 
 

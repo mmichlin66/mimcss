@@ -1,8 +1,4 @@
-﻿import * as UtilFuncs from "./UtilFuncs"
-
-
-
-/** Possible media types */
+﻿/** Possible media types */
 export type MediaType = "all" | "braille" | "embossed" | "handheld" | "print" | "projection" | "screen" | "speech" | "tty" | "tv";
 
 

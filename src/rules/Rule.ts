@@ -18,7 +18,7 @@ export interface IRuleContainer
 	clearRules(): void;
 
 	/** Sets the given value for the custom CSS roperty with the given name. */
-	setCustomVarValue( name: string, value: string, important?: boolean): void;
+	setCustomVarValue( name: string, value: string | null, important?: boolean): void;
 }
 
 
@@ -44,14 +44,14 @@ export interface ITopLevelRuleContainer extends IRuleContainer
 export abstract class Rule implements IRule
 {
 	// Processes the rule.
-	public process( owner: ITopLevelRuleContainer, ruleName: string): void
+	public process( owner: ITopLevelRuleContainer, ruleName: string | null): void
 	{
 		this.owner = owner;
 		this.ruleName = ruleName;
 	}
 
 	// Creates a copy of the rule.
-	public clone(): Rule { return null; }
+	public abstract clone(): Rule;
 
 	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
 	// style definition class, to which this rule belongs, is activated.
@@ -64,7 +64,7 @@ export abstract class Rule implements IRule
 
 
 	// Inserts the given rule into the given parent rule or stylesheet.
-	public static addRuleToDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule
+	public static addRuleToDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule | null
 	{
 		try
 		{
@@ -85,21 +85,24 @@ export abstract class Rule implements IRule
 
 	// Name of the property of the stylesheet definition to which this rule was assigned. This is
 	// null for Stylesheet.
-	public ruleName: string;
+	public ruleName: string | null;
 
 	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
 	// the styles sheet or the parent rule. This is undefined for Stylesheet objects.
-	public cssRule: CSSRule;
+	public cssRule: CSSRule | null;
 }
 
 
 
 /** Creates scoped names based on the given parameters */
-export function createNames( owner: ITopLevelRuleContainer, ruleName: string, nameOverride: string | INamedEntity,
+export function createNames( owner: ITopLevelRuleContainer, ruleName: string | null, nameOverride?: string | INamedEntity,
 	cssPrefix?: string): [string,string]
 {
+	if (!ruleName && !nameOverride)
+		return ["", ""];
+
 	let name = !nameOverride
-		? owner.getScopedRuleName( ruleName)
+		? owner.getScopedRuleName( ruleName!)
 		: typeof nameOverride === "string"
 			? nameOverride
 			: nameOverride.name;

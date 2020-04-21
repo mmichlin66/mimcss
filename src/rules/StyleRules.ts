@@ -35,8 +35,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// prepare local variables to accumulate parsing results. We do it in local varibales
 		// because in case there are parents, we want first copy properties from them so that
 		// our own properties can override them.
-		let parentRules: StyleRule[];
-		let nestedRules: NestedRule[];
+		let parentRules: StyleRule[] | null = null;
+		let nestedRules: NestedRule[] | null = null;
 		let styleset: Styleset = {};
 
 		for( let propName in inputStyleset)
@@ -57,7 +57,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				if (!nestedRules)
 					nestedRules = [];
 
-				nestedRules.push( new NestedRule( this, "&" + propName, propVal as ExtendedStyleset));
+				nestedRules.push( new NestedRule( "&" + propName, propVal as ExtendedStyleset, this));
 			}
 			else if (propName === "&")
 			{
@@ -68,7 +68,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					if (!nestedRules)
 						nestedRules = [];
 
-					tuples.forEach( tuple => nestedRules.push( new NestedRule( this, tuple[0], tuple[1])));
+					tuples.forEach( tuple => nestedRules!.push( new NestedRule( tuple[0], tuple[1], this)));
 				}
 			}
 			else
@@ -123,7 +123,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( owner: ITopLevelRuleContainer, ruleName: string): void
+	public process( owner: ITopLevelRuleContainer, ruleName: string | null): void
 	{
 		super.process( owner, ruleName);
 
@@ -159,7 +159,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		return this.styleset
 			? `${this.getSelectorString()} ${stylesetToString( this.styleset)}`
-			: null;
+			: "";
 	}
 
 
@@ -168,7 +168,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
 		if (this.styleset)
-			this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent) as CSSStyleRule;
+			this.cssRule = Rule.addRuleToDOM( this.toCssString()!, parent) as CSSStyleRule;
 
 		// if nested rules exist, insert them under the same parent
 		if (this.nestedRules)
@@ -245,7 +245,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
  */
 class NestedRule extends StyleRule
 {
-	public constructor( containingRule?: StyleRule, selector?: CssSelector, style?: ExtendedStyleset)
+	public constructor( selector: CssSelector, style?: ExtendedStyleset, containingRule?: StyleRule)
 	{
 		super( style);
 		this.selector = selector;
@@ -257,7 +257,7 @@ class NestedRule extends StyleRule
 	// Creates a copy of the rule.
 	public clone(): NestedRule
 	{
-		let newRule = new NestedRule();
+		let newRule = new NestedRule( this.selector);
 		newRule.copyFrom( this);
 		newRule.selector = this.selector;
 		return newRule;
@@ -270,7 +270,7 @@ class NestedRule extends StyleRule
 	{
 		// get selector string and replace all occurrences of the ampersand symbol with the
 		// selector string of the parent rule.
-		return valueToString( this.selector).replace( "&", this.containingRule.getSelectorString());
+		return valueToString( this.selector).replace( "&", this.containingRule!.getSelectorString());
 	}
 
 
@@ -279,7 +279,7 @@ class NestedRule extends StyleRule
 	private selector: CssSelector;
 
 	// Parent style within which this rule is nested.
-	public containingRule: StyleRule;
+	public containingRule?: StyleRule;
 }
 
 
@@ -316,7 +316,7 @@ export class AbstractRule extends StyleRule implements IAbstractRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return null;
+		return "";
 	}
 
 

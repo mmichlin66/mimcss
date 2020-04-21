@@ -27,7 +27,7 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
 	{
 		this.container = container;
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");

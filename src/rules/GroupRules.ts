@@ -26,11 +26,12 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 	{
 		super.process( owner, ruleName);
 
-		this.instance = processInstanceOrClass( this.instanceOrClass, owner.getDefinitionInstance());
-		if (!this.instance)
+		let instance = processInstanceOrClass( this.instanceOrClass, owner.getDefinitionInstance());
+		if (!instance)
 			return;
 
-		this.ruleContainer = getContainerFromDefinition( this.instance);
+		this.instance = instance;
+		this.ruleContainer = getContainerFromDefinition( instance);
 	}
 
 
@@ -55,7 +56,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 
 	// Returns the selector string of this grouping rule.
-	protected abstract getGroupSelectorText(): string;
+	protected abstract getGroupSelectorText(): string | null;
 
 
 
@@ -84,7 +85,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 	public get rules(): T { return this.instance as T; }
 
 	/** SOM supports rule */
-	public cssRule: CSSGroupingRule;
+	public cssRule: CSSGroupingRule | null;
 }
 
 
@@ -112,7 +113,7 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 
 
 	// Returns the selector string of this grouping rule.
-	protected getGroupSelectorText(): string
+	protected getGroupSelectorText(): string | null
 	{
 		// convert the query to its string form
 		let queryString = supportsQueryToString( this.query);
@@ -124,7 +125,7 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 
 
 	/** SOM supports rule */
-	public cssRule: CSSSupportsRule;
+	public cssRule: CSSSupportsRule | null;
 
 	// support query for this rule in a string form.
 	public query: SupportsQuery;
@@ -155,7 +156,7 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 
 
 	// Returns the selector string of this grouping rule.
-	protected getGroupSelectorText(): string
+	protected getGroupSelectorText(): string | null
 	{
 		let queryString = typeof this.query === "string" ? this.query : mediaQueryToString( this.query);
 		return `@media ${queryString}`;
@@ -164,7 +165,7 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 
 
 	/** SOM media rule */
-	public cssRule: CSSMediaRule;
+	public cssRule: CSSMediaRule | null;
 
 	// media query for this rule.
 	public query: string | MediaQuery;

@@ -396,12 +396,12 @@ export function mergeStylesets( target: StyleTypes.Styleset, source: StyleTypes.
 
 
 /** Converts the given styleset to its string representation */
-export function stylesetToString( styleset: StyleTypes.Styleset): string | null
+export function stylesetToString( styleset: StyleTypes.Styleset): string
 {
     if (!styleset)
-        return null;
+        return "";
 
-    let impProps: Set<string> = null;
+    let impProps: Set<string> | null = null;
     if (styleset["!"])
     {
         // value is either a single name or an array of names of CSS properties to add the !important flag
@@ -410,7 +410,7 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string | null
         if (typeof impPropVal === "string")
             impProps.add( impPropVal);
         else
-            impPropVal.forEach( v => impProps.add( v));
+            impPropVal.forEach( v => impProps!.add( v));
     }
 
     let buf: string[] = [];
@@ -450,10 +450,10 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string | null
  * @param propVal 
  * @param valueOnly 
  */
-function customPropToString( propVal: StyleTypes.CustomVarStyleType, valueOnly?: boolean): string | null
+function customPropToString( propVal: StyleTypes.CustomVarStyleType, valueOnly?: boolean): string
 {
     if (!propVal)
-        return null;
+        return "";
 
     let varName: string;
     let template: string;
@@ -468,13 +468,13 @@ function customPropToString( propVal: StyleTypes.CustomVarStyleType, valueOnly?:
     {
         varName = propVal[0];
         if (!varName)
-            return null;
+            return "";
         else if (!varName.startsWith("--"))
             varName = "--" + varName;
 
         template = propVal[1];
         if (!varName || !template)
-            return null;
+            return "";
 
         value = propVal[2];
     }
@@ -490,10 +490,10 @@ function customPropToString( propVal: StyleTypes.CustomVarStyleType, valueOnly?:
  * @param style 
  */
 export function stylePropToString(
-    propName: string, propVal: any, valueOnly?: boolean): string | null
+    propName: string, propVal: any, valueOnly?: boolean): string
 {
     if (!propName)
-        return null;
+        return "";
 
     // find information object for the property
     let info: any = StylePropertyInfos[propName];
@@ -518,8 +518,11 @@ export function stylePropToString(
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// /** Type defnition of a function that takes property value and converts it to string */
+// type PropToStringFunc<K extends StyleTypes.VarTemplateName = any> = (val: StyleTypes.VarValueType<K>) => string;
+
 /** Type defnition of a function that takes property value and converts it to string */
-type PropToStringFunc<K extends StyleTypes.VarTemplateName = any> = (val: StyleTypes.VarValueType<K>) => string;
+type PropToStringFunc = (val: any) => string;
 
 
 
@@ -533,7 +536,7 @@ let commaArraySeparator = { arraySeparator: "," };
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFunc<K> | IValueConvertOptions) } =
+const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFunc | IValueConvertOptions) } =
 {
     animation: {
         fromObject: singleAnimation_fromObject,

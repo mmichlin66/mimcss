@@ -79,7 +79,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 	// Processes the properties of the style definition instance. This creates names for classes,
 	// IDs, animations and custom variables.
-	private processProperty( propName: string, propVal: any): void
+	private processProperty( propName: string | null, propVal: any): void
 	{
 		if (propVal instanceof StyleDefinition)
 			this.processReference( propVal)
@@ -102,7 +102,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Processes custom CSS property.
-	private processVarRule( propName: string, varObj: VarRule): void
+	private processVarRule( propName: string | null, varObj: VarRule): void
 	{
 		// if the object is already assigned to a stylesheet, we create a clone of the
 		// rule and assign it to our stylesheet.
@@ -116,12 +116,20 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Processes the given Rule-derived object.
-	private processRule( propName: string, rule: Rule): void
+	private processRule( propName: string | null, rule: Rule): void
 	{
 		// if the rule object is already processed as part of another instance, we create a clone
 		// of the rule and set it to our instance.
 		if (rule.owner)
-			this.instance[propName] = rule = rule.clone();
+		{
+			if (propName)
+				this.instance[propName] = rule = rule.clone();
+			else
+			{
+				// TODO: support already used rules in an array
+				return;
+			}
+		}
 
 		rule.process( this.topLevelContainer, propName);
 
@@ -254,7 +262,7 @@ class RuleContainer implements ITopLevelRuleContainer
 			else
 				this.domStyleElm = this.topLevelContainer.domStyleElm;
 
-			this.insertRules( this.domStyleElm.sheet as CSSStyleSheet);
+			this.insertRules( this.domStyleElm!.sheet as CSSStyleSheet);
 		}
 	}
 
@@ -273,7 +281,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 			// only the top-level style defiition creates the `<style>` element
 			if (this.isTopLevel)
-				this.domStyleElm.remove();
+				this.domStyleElm!.remove();
 
 			this.domStyleElm = null;
 		}
@@ -321,13 +329,13 @@ class RuleContainer implements ITopLevelRuleContainer
 	private otherRules: Rule[];
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
-	private cssCustomVarStyleRule: CSSStyleRule;
+	private cssCustomVarStyleRule: CSSStyleRule | null;
 
 	// Reference count of activation requests.
 	private activationRefCount: number;
 
 	// DOM style elemnt
-	public domStyleElm: HTMLStyleElement;
+	public domStyleElm: HTMLStyleElement | null;
 }
 
 
@@ -417,7 +425,7 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
  * @param owner 
  */
 function processClass( definitionClass: IStyleDefinitionClass,
-	owner: StyleDefinition): StyleDefinition
+	owner?: StyleDefinition): StyleDefinition | null
 {
 	// call the 'use' function for all the base classes so that rule names are generated. We
 	// don't activate styles for these clases because derived classes will have all the
@@ -444,7 +452,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
 	catch( err)
 	{
 		console.error( `Error instantiating Style Definition Class '${definitionClass.name}'`, err);
-		return;
+		return null;
 	}
 }
 
@@ -461,7 +469,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
  * to its rules.
  */
 export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyleDefinitionClass,
-	owner: StyleDefinition): StyleDefinition
+	owner?: StyleDefinition): StyleDefinition | null
 {
 	if (!instanceOrClass)
 		return null;
@@ -473,7 +481,7 @@ export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyl
 		if (!ruleContainer)
 		{
 			// get the name for our container
-			let name = generateUniqueName();;
+			let name = generateUniqueName();
 			if (!useUniqueStyleNames)
 			{
 				let definitionClass = instanceOrClass.constructor;
@@ -513,9 +521,9 @@ export function getContainerFromDefinition( definition: StyleDefinition): RuleCo
  * it was activated and deactivated. The rules are inserted to DOM only when this reference counter
  * goes up to 1.
  */
-export function activate<T extends StyleDefinition>( instanceOrClass: T | IStyleDefinitionClass<T>): T
+export function activate<T extends StyleDefinition>( instanceOrClass: T | IStyleDefinitionClass<T>): T | null
 {
-	let instance = processInstanceOrClass( instanceOrClass, null) as T;
+	let instance = processInstanceOrClass( instanceOrClass) as T;
 	if (!instance)
 		return null;
 

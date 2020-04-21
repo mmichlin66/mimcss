@@ -124,9 +124,10 @@ export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTyp
  * definition class there is a single stylesheet object, no matter how many times this function
  * is invoked.
  */
-export function $use<T extends RuleTypes.StyleDefinition>( instanceOrClass: RuleTypes.IStyleDefinitionClass<T>): T
+export function $use<T extends RuleTypes.StyleDefinition>(
+	instanceOrClass: RuleTypes.IStyleDefinitionClass<T>): T | null
 {
-	return RuleContainerFuncs.processInstanceOrClass( instanceOrClass, null) as T;
+	return RuleContainerFuncs.processInstanceOrClass( instanceOrClass) as T;
 }
 
 
@@ -138,7 +139,8 @@ export function $use<T extends RuleTypes.StyleDefinition>( instanceOrClass: Rule
  * activated and deactivated. The rules are inserted to DOM only when this reference counter goes
  * up to 1.
  */
-export function $activate<T extends RuleTypes.StyleDefinition>( instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T
+export function $activate<T extends RuleTypes.StyleDefinition>(
+	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
 {
 	return RuleContainerFuncs.activate( instanceOrClass);
 }

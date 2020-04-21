@@ -1314,23 +1314,6 @@ export type IVarTemplates = { [K in keyof ICssVarTemplates]: Extended<ICssVarTem
 
 
 
-// /**
-//  * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
-//  * custom CSS properties using the [[$var]] function.
-//  */
-// export type VarTemplateName = keyof IStyleset | keyof IVarTemplates;
-
-
-
-// /**
-//  * The VarValueType generic type defines the type of the value that can be assigned to the custom
-//  * CSS property using the generic type K as its template.
-//  */
-// export type VarValueType<K extends VarTemplateName> = K extends keyof IVarTemplates
-//                 ? IVarTemplates[K] : K extends keyof IStyleset ? IStyleset[K] : string;
-
-
-
 /**
  * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
  * custom CSS properties using the [[$var]] function.

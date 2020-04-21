@@ -61,7 +61,7 @@ export type ExtendedStyleset = Styleset & { [K in PseudoClass | PseudoElement]?:
 export interface IRule
 {
 	/** SOM rule */
-	readonly cssRule: CSSRule;
+	readonly cssRule: CSSRule | null;
 }
 
 
@@ -92,7 +92,7 @@ export interface INamedEntity
 export interface IStyleRule extends IRule
 {
 	/** SOM style rule */
-	readonly cssRule: CSSStyleRule;
+	readonly cssRule: CSSStyleRule | null;
 
 	/**
 	 * Adds/replaces the value of the given CSS property in this rule.
@@ -181,7 +181,7 @@ export interface ISelectorRule extends IStyleRule
 export interface IAnimationRule extends IRule, INamedEntity
 {
 	/** SOM keyframes rule */
-	readonly cssRule: CSSKeyframesRule;
+	readonly cssRule: CSSKeyframesRule | null;
 }
 
 /**
@@ -201,7 +201,7 @@ export type AnimationFrame = ["from" | "to" | number, Omit<ExtendedStyleset,"!">
 export interface IImportRule extends IRule
 {
 	/** SOM import rule */
-	readonly cssRule: CSSImportRule;
+	readonly cssRule: CSSImportRule | null;
 }
 
 
@@ -213,7 +213,7 @@ export interface IImportRule extends IRule
 export interface IFontFaceRule extends IRule
 {
 	/** SOM font-face rule */
-	readonly cssRule: CSSFontFaceRule;
+	readonly cssRule: CSSFontFaceRule | null;
 }
 
 
@@ -231,7 +231,7 @@ export interface INamespaceRule extends IRule
 	readonly prefix: string | undefined;
 
 	/** SOM namespace rule */
-	readonly cssRule: CSSNamespaceRule;
+	readonly cssRule: CSSNamespaceRule | null;
 }
 
 
@@ -246,7 +246,7 @@ export interface IPageRule extends IStyleRule
 	readonly pseudoClass: PagePseudoClass | undefined;
 
 	/** SOM namespace rule */
-	readonly cssRule: CSSPageRule;
+	readonly cssRule: CSSPageRule | null;
 }
 
 
@@ -301,7 +301,7 @@ export abstract class StyleDefinition<O extends StyleDefinition = any>
 	 * either the [[$use]] or [[$activate]] function is called.
 	 * @param owner Reference to the top-level style definition class
 	 */
-	public constructor( owner: O)
+	public constructor( owner: O | null)
 	{
 		this[symOwner] = owner;
 	}
@@ -312,7 +312,7 @@ export abstract class StyleDefinition<O extends StyleDefinition = any>
 	 * definition classes. Through this memeber, all rules and other memebers defined in the owner
 	 * definition class can be accessed.
 	 */
-	public get owner(): O { return this[symOwner]; }
+	public get owner(): O | null { return this[symOwner]; }
 }
 
 
@@ -338,7 +338,7 @@ export interface IGroupRule<T extends StyleDefinition = any> extends IRule
 	readonly rules: T;
 
 	/** SOM supports rule */
-	readonly cssRule: CSSGroupingRule;
+	readonly cssRule: CSSGroupingRule | null;
 }
 
 
@@ -350,7 +350,7 @@ export interface IGroupRule<T extends StyleDefinition = any> extends IRule
 export interface ISupportsRule<T extends StyleDefinition = any> extends IGroupRule<T>
 {
 	/** SOM supports rule */
-	readonly cssRule: CSSSupportsRule;
+	readonly cssRule: CSSSupportsRule | null;
 }
 
 
@@ -362,7 +362,7 @@ export interface ISupportsRule<T extends StyleDefinition = any> extends IGroupRu
 export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<T>
 {
 	/** SOM media rule */
-	readonly cssRule: CSSMediaRule;
+	readonly cssRule: CSSMediaRule | null;
 }
 
 

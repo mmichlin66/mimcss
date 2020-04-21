@@ -119,23 +119,23 @@ export function mediaFeatureToString( featureName: string, propVal: any, valueOn
     let isRange = typeof info === "boolean" ? info : typeof info === "object" ? info.isRange : undefined;
     if (isRange && !valueOnly && Array.isArray( propVal) && propVal.length === 2)
     {
-        let s1 = mediaFeatureSingleValueToString( convert, propVal[0]);
-        let s2 = mediaFeatureSingleValueToString( convert, propVal[1]);
+        let s1 = mediaFeatureSingleValueToString( propVal[0], convert);
+        let s2 = mediaFeatureSingleValueToString( propVal[1], convert);
         return `${s1} <= ${realFeatureName} <= ${s2}`;
     }
     else
     {
-        let s = mediaFeatureSingleValueToString( convert, propVal);
+        let s = mediaFeatureSingleValueToString( propVal, convert);
         return valueOnly ? s : realFeatureName + ":" + s;
     }
 }
 
 
 
-function mediaFeatureSingleValueToString( convert: convertFuncType, propVal: any): string | null
+function mediaFeatureSingleValueToString( propVal: any, convert?: convertFuncType): string
 {
     if (propVal == null)
-        return null;
+        return "";
 
     if (convert)
         return convert( propVal);

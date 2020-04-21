@@ -115,7 +115,7 @@ export class ImportRule extends Rule implements IImportRule
 	public mediaQuery?: string | MediaQuery;
 
 	// Optional supports query for this rule.
-	public supportsQuery: string | SupportsQuery;
+	public supportsQuery?: string | SupportsQuery;
 }
 
 

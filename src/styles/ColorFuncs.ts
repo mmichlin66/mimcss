@@ -48,7 +48,7 @@ export function rgbToString( r: number | string, g: number | string, b: number |
     r = colorSeparationToString( r);
     g = colorSeparationToString( g);
     b = colorSeparationToString( b);
-    a = a == null ? null : CssPercentMath.styleToString( a);
+    a = a == null ? undefined : CssPercentMath.styleToString( a);
 
     return !a ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;
 }
@@ -60,7 +60,7 @@ export function hslToString( h: number | string, s: number | string, l: number |
     h = CssAngleMath.styleToString(h);
     s = s == null ? "100%" : CssPercentMath.styleToString( s);
     l = l == null ? "100%" : CssPercentMath.styleToString( l);
-    a = a == null ? null : CssPercentMath.styleToString( a);
+    a = a == null ? undefined : CssPercentMath.styleToString( a);
 
     return !a ? `hsl(${h},${s},${l})` : `hsla(${h},${s},${l},${a})`;
 }
