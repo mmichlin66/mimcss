@@ -16,58 +16,65 @@ The goal of the Mimcss library is to support all CSS features in a type-safe and
 - Stylesheet classes support inheritance - elegant way to implement theming.
 - Type safety and autocomplete support for CSS property values to eliminate misspellings.
 - Using numbers for default units of length, angle, percent and other CSS property types.
-- Using Booleans, numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate misspellings.
-- Convenience functions for specifying complex property values (e.g. colors, calc(), var(), etc.)
-- Access to CSSRule-derived objects for direct rule and property manipulation.
+- Using numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate misspellings.
+- Convenience functions for specifying complex property values (e.g. colors, calc(), var(), linerGradient(), etc.)
+- Access to CSSRule-derived objects for direct style manipulation.
 
 ### Quick Start
 Let's assume that we need to create several simple styles for a couple of classes and an ID. With Mimcss, you create a TypeScript class and then, in your component's TypeScript code, you refer to the CSS classes and IDs using their names as properties:
 
 ```tsx
 /* MyStyles.ts */
-import {$class, $id} from "mimcss"
+import * as css from "mimcss"
 
-class MyStyles extends StyleDefinition
+class MyStyles extends css.StyleDefinition
 {
-    vbox = $class({
+    vbox = css.$class({
         display: "flex",
         flexDirection: "column",
     });
 
-    hbox = $class({
+    hbox = css.$class({
         display: "flex",
         flexDirection: "row",
     });
 
-    importantElement = $id({
+    importantElement = css.$id({
         color: 0xFFCC88,
         fontWeight: 700,
     });
 }
 
 /* MyComponent.tsx */
-import {$activate} from "mimcss"
 import {myStyles} from "./MyStyles"
+import * as React from "react"
+import * as css from "mimcss"
 
-export let myStyles = $activate( MyStyles);
-
-render()
+class MyComponent extends React.Component
 {
-    return <div className={myStyles.vbox.name}>
-        <p id={myStyles.importantElement.name}>Hello!</p>
-        <div className={myStyles.hbox.name}/>Hello!</div>
-   </div>
+    myStyles = css.$activate( MyStyles);
+
+    componentWillUnmount()
+    {
+        css.$deactivate( this.myStyles);
+    }
+
+    render()
+    {
+        return <div className={this.myStyles.vbox.name}>
+            <p id={this.myStyles.importantElement.name}>Hello!</p>
+            <div className={this.myStyles.hbox.name}/>Hello!</div>
+        </div>
+    }
 }
 ```
 
 This immediately brings us the following advantages:
 
-- The Intellisense/autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `this.styles.` the IDE will present the list of all the properties defined in our style definition object.
+- The autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `myStyles.` the IDE will present the list of all the properties defined in our style definition object.
 - If we change the name of or remove the property in the `MyStyles` class and forget to change it in our component's `render` method, the project will not build. Thus a compile time error will prevent a much-harder-to-find run-time error.
-- If you noticed, there was a misspelling of the identifier name in the CSS-based `render` method above: we "accidentally" used the underscore instead of the dash. With regular CSS, such errors would only manifest themselves at run-time and they are notoriously difficult to find. In Mimcss-based code, such run-time errors are simply not possible because they will be detected at compile time.
-- Notice how we used numbers instead of strings when defining `color` and `fontWeight` properties. Although seemingly a minor feature, this can add extra convenience and speed during development. Mimcss defines types of each style property so that it can be set in a type-safe and easy-to-use way.
-- The styles are not present in the browser's memory until the component that defines them is mounted. The `$activate` function inserts the styles into DOM. Upon unmounting the styles are removed from DOM. This is only one of the possible activation strategies - more will be discussed later in this guide. The point is that the developers are in full control of when the rules are activated. Moreover, since activating rules means writing to DOM, components can synchronize this process with other DOM-writing activities.
+- Notice how we used numbers instead of strings when defining `color` and `fontWeight` properties. Although seemingly a minor feature, this can add extra convenience and speed during development. Mimcss defines types of each style property and provides numerous functions so that properties can be set in a type-safe and easy-to-use way.
+- The styles are not present in the browser's memory until the component that defines them is mounted. The `$activate` function inserts the styles into DOM. Upon unmounting the styles are removed from DOM. This is only one of the possible activation strategies - more are discussed in the Mimcss guide. The point is that the developers are in full control of when the rules are activated. Moreover, since activating rules means writing to DOM, components can synchronize this process with other DOM-writing activities.
 - The names we are using in our code are not actually the names that will be used in the resulting HTML. The actual names to use in HTML will be auto-generated by the Mimcss infrastructure, which ensures that they will be globally unique. In Debug mode the generated names reflect the names used in the code, while in Release mode, the names are created with minimal length.
-- The `import "./MyStyles.css"` statement in the CSS-based component file doesn't work on its own but only with the help of a plug-in to our bundler (e.g. Webpack). In Mimcss code, there is no need in such plug-ins - everything is just a pure TypeScript code.
 
-For more information please check out [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html)
+This is really just scratching the surface - for more information please see [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html).

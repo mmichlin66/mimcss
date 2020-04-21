@@ -73,17 +73,23 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// loop over the properties of the definition object and process them.
 		for( let propName in this.instance)
-		{
-			let propVal = this.instance[propName];
-			if (propVal instanceof StyleDefinition)
-				this.processReference( propVal)
-			else if (propVal instanceof VarRule)
-				this.processVarRule( propName, propVal)
-			else if (propVal instanceof Rule)
-				this.processRule( propName, propVal);
-			else if (Array.isArray(propVal))
-				this.processArray( propVal)
-		}
+			this.processProperty( propName, this.instance[propName]);
+	}
+
+
+
+	// Processes the properties of the style definition instance. This creates names for classes,
+	// IDs, animations and custom variables.
+	private processProperty( propName: string, propVal: any): void
+	{
+		if (propVal instanceof StyleDefinition)
+			this.processReference( propVal)
+		else if (propVal instanceof VarRule)
+			this.processVarRule( propName, propVal)
+		else if (propVal instanceof Rule)
+			this.processRule( propName, propVal);
+		else if (Array.isArray(propVal))
+			this.processArray( propVal)
 	}
 
 
@@ -138,16 +144,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// loop over the properties of the definition object and process those that are rules.
 		for( let propVal of propVals)
-		{
-			if (propVal instanceof StyleDefinition)
-				this.processReference( propVal)
-			else if (propVal instanceof VarRule)
-				this.processVarRule( null, propVal)
-			else if (propVal instanceof Rule)
-				this.processRule( null, propVal);
-			else if (Array.isArray(propVal))
-				this.processArray( propVal)
-		}
+			this.processProperty( null, propVal);
 	}
 
 

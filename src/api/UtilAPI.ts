@@ -74,3 +74,24 @@ export let Percent: UtilTypes.ICssPercentMath = new UtilFuncs.CssPercentMath();
 
 
 
+/**
+ * Returns a StringProxy function encapsulating the given string-like parameter.
+ */
+export function raw( val: UtilTypes.Extended<string>): UtilTypes.StringProxy
+{
+	return () => UtilFuncs.valueToString(val);
+}
+
+
+
+/**
+ * Returns a UrlProxy function representing the CSS `url()` function. The string parameter
+ * will be wrapped in a "url()" invocation unless it already is.
+ */
+export function url( val: UtilTypes.Extended<string>): UtilTypes.UrlProxy
+{
+	return () => `url(${UtilFuncs.valueToString(val)})`;
+}
+
+
+

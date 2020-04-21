@@ -4,9 +4,9 @@
 
 
 import * as RuleTypes from "../rules/RuleTypes";
-import * as StylesheetFuncs from "../rules/RuleContainer"
+import * as RuleContainerFuncs from "../rules/RuleContainer"
 import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
-import {CssSelector, PagePseudoClass, SelectorTokenType} from "../styles/SelectorTypes";
+import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {Fontface} from "../styles/FontFaceTypes";
 import {AbstractRule} from "../rules/AbstractRule"
@@ -22,7 +22,6 @@ import {NamespaceRule} from "../rules/NamespaceRule";
 import {PageRule} from "../rules/PageRule";
 import {SupportsRule} from "../rules/SupportsRule"
 import {MediaRule} from "../rules/MediaRule"
-import { formatSelector } from "../styles/SelectorFuncs";
 
 
 
@@ -128,18 +127,6 @@ export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTyp
 
 
 /**
- * Returns a string representation of a selector using the given template string with optional
- * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
- * possible types.
- */
-export function $selector( template: string, ...args: SelectorTokenType[]): CssSelector
-{
-	return () => formatSelector( template, args);
-}
-
-
-
-/**
  * Processes the given stylesheet definition and returns the Stylesheet object that contains
  * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
  * definition class there is a single stylesheet object, no matter how many times this function
@@ -147,7 +134,7 @@ export function $selector( template: string, ...args: SelectorTokenType[]): CssS
  */
 export function $use<T extends RuleTypes.StyleDefinition>( instanceOrClass: RuleTypes.IStyleDefinitionClass<T>): T
 {
-	return StylesheetFuncs.processInstanceOrClass( instanceOrClass, null) as T;
+	return RuleContainerFuncs.processInstanceOrClass( instanceOrClass, null) as T;
 }
 
 
@@ -161,7 +148,7 @@ export function $use<T extends RuleTypes.StyleDefinition>( instanceOrClass: Rule
  */
 export function $activate<T extends RuleTypes.StyleDefinition>( instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T
 {
-	return StylesheetFuncs.activate( instanceOrClass);
+	return RuleContainerFuncs.activate( instanceOrClass);
 }
 
 
@@ -173,7 +160,7 @@ export function $activate<T extends RuleTypes.StyleDefinition>( instanceOrClass:
  */
 export function $deactivate( instance: RuleTypes.StyleDefinition): void
 {
-	return StylesheetFuncs.deactivate( instance);
+	return RuleContainerFuncs.deactivate( instance);
 }
 
 
@@ -187,7 +174,7 @@ export function $deactivate( instance: RuleTypes.StyleDefinition): void
  */
 export function $enableOptimizedStyleNames( enable: boolean, prefix?: string): void
 {
-	return StylesheetFuncs.enableOptimizedStyleNames( enable, prefix);
+	return RuleContainerFuncs.enableOptimizedStyleNames( enable, prefix);
 }
 
 
