@@ -597,14 +597,18 @@ export type UrlProxy = (p?: "url") => string;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Filters.
+// attr() function support
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" | "angle" | "time" | "frequency";
+
+export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnits | ResolutionUnits | FrequencyUnits;
+
 /**
- * The FilterProxy function represents an invocation of one the CSS filter functions.
+ * The AttrProxy function represents an invocation of the CSS attr() functions.
  */
-export type FilterProxy = (p?: "filter") => string;
+export type AttrProxy = (p?: "attr") => string;
 
 
 

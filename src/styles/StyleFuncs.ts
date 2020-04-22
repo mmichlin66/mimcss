@@ -214,38 +214,9 @@ function borderToString( val: StyleTypes.Border_StyleType): string
 
 
 /**
- * Converts clip style value to its CSS string value.
- */
-function clipToString( val: StyleTypes.ClipStyleType): string
-{
-    return valueToString( val, {
-        fromArray: v => `rect(${CssLengthMath.multiStyleToStringWithSpace(v)}`
-    });
-}
-
-
-
-/**
- * Converts column rule style represented as an object with fields corresponding to column rule
- * properties to its CSS string value.
- */
-function columnRuleToString( val: StyleTypes.ColumnRuleStyleType): string
-{
-    return valueToString( val, {
-        fromObject: val => objectToString( val, false,
-            ["width", CssLengthMath.multiStyleToStringWithSpace],
-            ["style", valueToString],
-            ["color", colorToString]
-        )
-    });
-}
-
-
-
-/**
  * Converts columns style to its CSS string value.
  */
-function columnsToString( val: StyleTypes.ColumnsStyleType): string
+function columnsToString( val: StyleTypes.Columns_StyleType): string
 {
     return valueToString( val, {
         fromArray: val => val[0] + " " + CssLengthMath.styleToString( val[1])
@@ -618,14 +589,17 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     },
 
     caretColor: colorToString,
-    clip: clipToString,
+    clip:  {
+        fromArray: v => `rect(${CssLengthMath.multiStyleToStringWithSpace(v)}`
+    },
     color: colorToString,
     columnGap: CssLengthMath.styleToString,
-    columnRule: columnRuleToString,
+    columnRule: borderToString,
     columnRuleColor: colorToString,
     columnRuleStyle: valueToString,
     columnRuleWidth: CssLengthMath.multiStyleToStringWithSpace,
     columns: columnsToString,
+    columnWidth: CssLengthMath.styleToString,
 
     flex: flexToString,
     floodColor: colorToString,

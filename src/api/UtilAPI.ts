@@ -95,3 +95,20 @@ export function url( val: UtilTypes.Extended<string>): UtilTypes.UrlProxy
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// attr()
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns an AttrProxy function representing the `attr()` CSS function.
+ */
+export function attr( attrName: string, typeOrUnit?: UtilTypes.AttrTypeKeyword | UtilTypes.AttrUnitKeyword,
+	fallback?: UtilTypes.Extended<string>): UtilTypes.AttrProxy
+{
+    return () => `attr(${attrName}${typeOrUnit ? " " + typeOrUnit : ""}${fallback ? "," + fallback : ""})`;
+}
+
+
+

@@ -1,7 +1,7 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
-    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
-    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius, FilterProxy,
+    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, Many,
+    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius, UrlProxy, AttrProxy
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -314,69 +314,78 @@ export type BreakInside_StyleType = "auto" | "avoid" | "avoid-page" | "avoid-col
 
 
 /** Type for caption-side style property */
-export type CaptionSideStyleType = "top" | "bottom" | "block-start" | "block-end" | "inline-start" | "inline-end";
+export type CaptionSide_StyleType = "top" | "bottom" | "block-start" | "block-end" | "inline-start" | "inline-end";
 
 
 
 /** Type for caret-color style property */
-export type CaretColorStyleType = "auto" | CssColor;
+export type CaretColor_StyleType = "auto" | CssColor;
 
 
 
 /** Type for clear style property */
-export type ClearStyleType = "none" | "left" | "right" | "both" | "inline-start" | "inline-end";
+export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start" | "inline-end";
 
 
 
 /** Type for clear style property */
-export type ClipStyleType = "auto" | CssLengthBox;
+export type Clip_StyleType = "auto" | CssLengthBox;
+
+
+
+/** Type for clear style property */
+export type ClipPath_StyleType = UrlProxy | BasicShapeProxy | "margin-box" | "border-box" |
+    "padding-box" | "content-box" | "fill-box" | "stroke-box" | "view-box";
 
 
 
 /** Type for color-interpolation-filters style property */
-export type ColorInterpolationFiltersStyleType = "auto" | "sRGB" | "linearRGB";
+export type ColorInterpolation_StyleType = "auto" | "sRGB" | "linearRGB";
 
 
 
 /** Type for column-count style property */
-export type ColumnCountStyleType = "auto" | number;
+export type ColumnCount_StyleType = "auto" | number;
 
 
 
 /** Type for column-fill style property */
-export type ColumnFillStyleType = "auto" | "balance" | "balance-all";
-
-
-
-/**
- * Type for column rule. Column rule can be presented by the following types:
- *   - string - literal CSS box shadow string.
- *   - object - fields specify column rule parts.
- */
-export type ColumnRuleStyleType = string |
-    {
-        /** Column rule width. */
-        width?: BorderWidth_StyleType;
-        /** Column rule style. */
-        style?: BorderStyle_StyleType;
-        /** Column rule color. */
-        color?: CssColor;
-    };
+export type ColumnFill_StyleType = "auto" | "balance" | "balance-all";
 
 
 
 /** Type for column-span style property */
-export type ColumnSpanStyleType = "none" | "all";
+export type ColumnSpan_StyleType = "none" | "all";
 
 
 
-/** Type for columns style property */
-export type ColumnsStyleType = "auto" | number | ["auto" | number, CssLength];
+/**
+ * Type for columns style property. The value can be provided in one of the following forms and
+ * and will be converted to string as follows:
+ * 
+ * - string: will be treated as is.
+ * - number: will be converted to a unitless number - count of columns.
+ * - LengthProxy (e.g. Len.px(8)): converted to anumber with the proper length units.
+ * - two variants of two element arrays: one of the elements will be treated as a number of columns
+ *   while another as the column width.
+ */
+export type Columns_StyleType = "auto" | CssNumber | CssLength |
+    ["auto" | Extended<CssNumber>, "auto" | Exclude<Extended<CssLength>,number>] |
+    ["auto" | Exclude<Extended<CssLength>,number>, "auto" | Extended<CssNumber>];
+// Note that no special coversion function is required for this property because number type will
+// always be converted to a unitless number
 
 
 
-/** Type for float (cssFloat) style property */
-export type FloatStyleType = "left" | "right" | "none" | "inline-start" | "inline-end";
+/** Type for contain style property */
+export type Contain_StyleType = "none" | "strict" | "content" | "size" | "layout" | "style" | "paint" |
+    Many<"size" | "layout" | "style" | "paint">;
+
+
+
+/** Type for content style property */
+export type Content_StyleType = OneOrMany<CssImage | AttrProxy | "none" | "normal" |
+    "open-quote" | "close-quote" | "no-open-quote" | "no-close-quote">;
 
 
 
@@ -450,6 +459,11 @@ export type FlexFlowStyleType = FlexDirectionStyleType | FlexWrapStyleType |
 
 
 
+/** Type for float (cssFloat) style property */
+export type FloatStyleType = "left" | "right" | "none" | "inline-start" | "inline-end";
+
+
+
 /** Type for font-style style property */
 export type FontStyleStyleType = "normal" | "italic" | "oblique" | CssAngle;
 
@@ -466,10 +480,10 @@ export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" | num
 
 
 /** Type for a row-gap or column-gap style property */
-export type SingleGapStyleType = "normal" | CssLength;
+export type Gap_Single = "normal" | CssLength;
 
 /** Type for a row-gap or column-gap style property */
-export type GapStyleType = OneOrPair<SingleGapStyleType>;
+export type Gap_StyleType = OneOrPair<Gap_Single>;
 
 
 
@@ -769,6 +783,24 @@ export type DefaultStyleType = string;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// Proxy types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The FilterProxy function represents an invocation of one the CSS `<filter>` functions.
+ */
+export type FilterProxy = (p?: "filter") => string;
+
+/**
+ * The BasicShapeProxy function represents an invocation of one the CSS `<basic-shape>` functions.
+ */
+export type BasicShapeProxy = (p?: "basic-shape") => string;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Styleset types.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -868,26 +900,26 @@ export interface ICssStyleset
     breakInside?: BreakInside_StyleType;
     bufferedRendering?: DefaultStyleType;
 
-    captionSide?: CaptionSideStyleType;
-    caretColor?: CaretColorStyleType;
-    clear?: ClearStyleType;
-    clip?: ClipStyleType;
-    clipPath?: DefaultStyleType;
+    captionSide?: CaptionSide_StyleType;
+    caretColor?: CaretColor_StyleType;
+    clear?: Clear_StyleType;
+    clip?: Clip_StyleType;
+    clipPath?: ClipPath_StyleType;
     clipRule?: DefaultStyleType;
     color?: CssColor;
-    colorInterpolation?: DefaultStyleType;
-    colorInterpolationFilters?: ColorInterpolationFiltersStyleType;
-    columnCount?: ColumnCountStyleType;
-    columnFill?: ColumnFillStyleType;
-    columnGap?: "normal" | SingleGapStyleType;
-    columnRule?: ColumnRuleStyleType;
+    colorInterpolation?: ColorInterpolation_StyleType;
+    colorInterpolationFilters?: ColorInterpolation_StyleType;
+    columnCount?: ColumnCount_StyleType;
+    columnFill?: ColumnFill_StyleType;
+    columnGap?: "normal" | Gap_Single;
+    columnRule?: Border_StyleType;
     columnRuleColor?: CssColor;
     columnRuleStyle?: BorderStyle_Keyword;
     columnRuleWidth?: BorderWidth__Single;
-    columnSpan?: ColumnSpanStyleType;
+    columnSpan?: ColumnSpan_StyleType;
     columnWidth?: CssLength;
-    columns?: ColumnsStyleType;
-    contain?: DefaultStyleType;
+    columns?: Columns_StyleType;
+    contain?: Contain_StyleType;
     content?: DefaultStyleType;
     counterIncrement?: DefaultStyleType;
     counterReset?: DefaultStyleType;
@@ -933,7 +965,7 @@ export interface ICssStyleset
     fontVariationSettings?: DefaultStyleType;
     fontWeight?: FontWeightStyleType;
 
-    gap?: GapStyleType;
+    gap?: Gap_StyleType;
     grid?: DefaultStyleType;
     gridArea?: DefaultStyleType;
     gridAutoColumns?: DefaultStyleType;
@@ -941,12 +973,12 @@ export interface ICssStyleset
     gridAutoRows?: DefaultStyleType;
     gridColumn?: DefaultStyleType;
     gridColumnEnd?: DefaultStyleType;
-    gridColumnGap?: SingleGapStyleType;
+    gridColumnGap?: Gap_Single;
     gridColumnStart?: DefaultStyleType;
     gridGap?: DefaultStyleType;
     gridRow?: DefaultStyleType;
     gridRowEnd?: DefaultStyleType;
-    gridRowGap?: SingleGapStyleType;
+    gridRowGap?: Gap_Single;
     gridRowStart?: DefaultStyleType;
     gridTemplate?: DefaultStyleType;
     gridTemplateAreas?: DefaultStyleType;
@@ -1062,7 +1094,7 @@ export interface ICssStyleset
     resize?: ResizeStyleType;
     right?: CssLength;
     rotate?: DefaultStyleType;
-    rowGap?: SingleGapStyleType;
+    rowGap?: Gap_Single;
     rubyAlign?: DefaultStyleType;
     rubyOverhang?: DefaultStyleType;
     rubyPosition?: DefaultStyleType;
