@@ -470,6 +470,23 @@ export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inli
 
 
 
+/** Type for font style property */
+export type Font_SystemKeyword = "caption" | "icon" | "menu" | "message-box" | "small-caption" | "status-bar";
+
+/** Type for font style property */
+export type Font_StyleType = Font_SystemKeyword |
+    {
+        size: Extended<CssLength>;
+        family: string;
+        style?: Extended<FontStyle_StyleType>;
+        variant?: Extended<"normal" | "small-caps">;
+        weight?: Extended<FontWeight_StyleType>;
+        stretch?: Extended<Exclude<FontStretch_Single,number>>;
+        lineHeight?: Extended<CssNumber>
+    };
+
+
+
 /** Type for font-kerning style property */
 export type FontKerning_StyleType = "auto" | "normal" | "none";
 
@@ -972,7 +989,7 @@ export interface ICssStyleset
     float?: Float_StyleType;
     floodColor?: CssColor;
     floodOpacity?: CssPercent;
-    font?: DefaultStyleType;
+    font?: Font_StyleType;
     fontDisplay?: DefaultStyleType;
     fontFamily?: DefaultStyleType;
     fontFeatureSettings?: DefaultStyleType;

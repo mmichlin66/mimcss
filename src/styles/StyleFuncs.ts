@@ -247,6 +247,30 @@ function flexToString( val: StyleTypes.Flex_StyleType): string
 
 
 
+function font_fromObject( val: any): string
+{
+    return objectToString( val, [
+        ["style", fontStyleToString],
+        "variant",
+        "weight",
+        "stretch",
+        ["size", CssLengthMath.styleToString],
+        ["lineHeight", v => v.toString() , "/"],
+        "family"
+    ]);
+}
+
+
+
+function fontStyleToString( val: StyleTypes.Flex_StyleType): string
+{
+    return valueToString( val, {
+        fromNumber: v => "oblique " + CssAngleMath.styleToString( v)
+    });
+}
+
+
+
 /**
  * Converts text-emphasis style value to the CSS string.
  */
@@ -597,10 +621,11 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     flex: flexToString,
     flexBasis: CssLengthMath.styleToString,
     floodColor: colorToString,
-    fontSize: CssLengthMath.styleToString,
-    fontStyle: {
-        fromNumber: v => "oblique " + CssAngleMath.styleToString( v)
+    font: {
+        fromObject: font_fromObject
     },
+    fontSize: CssLengthMath.styleToString,
+    fontStyle: fontStyleToString,
 
     gap: CssLengthMath.multiStyleToStringWithSpace,
     gridColumnGap: CssLengthMath.styleToString,

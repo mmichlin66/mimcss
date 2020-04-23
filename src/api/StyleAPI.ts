@@ -1,4 +1,4 @@
-﻿import {Extended, CssPosition, CssTime, CssLength, CssPercent, CssAngle} from "../styles/UtilTypes"
+﻿import {Extended, CssPosition, CssTime, CssLength, CssPercent, CssAngle, CssNumber} from "../styles/UtilTypes"
 import {CssColor} from "../styles/ColorTypes"
 import {CssImage} from "../styles/ImageTypes"
 import {
@@ -6,12 +6,13 @@ import {
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
 	AnimationPlayState_Single, Animation_Single, BackgroundSize_Single, BackgroundRepeat_Single,
 	BackgroundAttachment_Single, BackgroundOrigin_Single, BackgroundClip_Single,
-	Background_Single, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy
+	Background_Single, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy, FontStyle_StyleType, FontWeight_StyleType, Font_StyleType
 } from "../styles/StyleTypes"
 import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
 import {stylePropToString, singleBoxShadow_fromObject} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
 import { CssPercentMath, CssLengthMath } from "../styles/UtilFuncs";
+import { FontStretch_Single } from "../styles/FontFaceTypes";
 
 
 
@@ -162,13 +163,14 @@ export function stylesetToStringObject( styleset: Styleset): { [K: string]: stri
  * @param state Animation state. The default value is "running".
  */
 export function animation( name: Extended<AnimationName_Single>,
-	duration: Extended<CssTime> = 1000,
-	func: Extended<AnimationTimingFunction_Single> = "ease",
-	delay: Extended<CssTime> = 0,
-	count: Extended<AnimationIterationCount_Single> = 1,
-	direction: Extended<AnimationDirection_Single> = "normal",
-	mode: Extended<AnimationFillMode_Single> = "none",
-	state: Extended<AnimationPlayState_Single> = "running"): Animation_Single
+		duration: Extended<CssTime> = 1000,
+		func: Extended<AnimationTimingFunction_Single> = "ease",
+		delay: Extended<CssTime> = 0,
+		count: Extended<AnimationIterationCount_Single> = 1,
+		direction: Extended<AnimationDirection_Single> = "normal",
+		mode: Extended<AnimationFillMode_Single> = "none",
+		state: Extended<AnimationPlayState_Single> = "running"
+	): Animation_Single
 {
 	return { name, duration, func, delay,count, direction, state, mode };
 }
@@ -223,14 +225,46 @@ export function background(
  * @param inset Flag indicating whether the shadow goes inside the shape. The default value is false.
  */
 export function shadow(
-				x: Extended<CssLength>,
-				y: Extended<CssLength>,
-				color?: Extended<CssColor>,
-				blur: Extended<CssLength> = 1,
-				spread: Extended<CssLength> = 0,
-				inset: Extended<boolean> = false): BoxShadow_Single
+		x: Extended<CssLength>,
+		y: Extended<CssLength>,
+		color?: Extended<CssColor>,
+		blur: Extended<CssLength> = 1,
+		spread: Extended<CssLength> = 0,
+		inset: Extended<boolean> = false
+	): BoxShadow_Single
 {
 	return { x, y, color, blur, spread, inset };
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Font
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns an object that can be assigned to the font property.
+ * @param family Font family.
+ * @param size Font size.
+ * @param style Font style.
+ * @param variant Font variant.
+ * @param weight Font weight.
+ * @param stretch Font stretch.
+ * @param lineHeight Line height.
+ */
+export function font(
+		family: string,
+		size: Extended<CssLength>,
+		style?: Extended<FontStyle_StyleType>,
+		weight?: Extended<FontWeight_StyleType>,
+		lineHeight?: Extended<CssNumber>,
+		variant?: Extended<"normal" | "small-caps">,
+		stretch?: Extended<Exclude<FontStretch_Single,number>>
+	): Font_StyleType
+{
+	return { size, family, style, variant, weight, stretch, lineHeight };
 }
 
 
@@ -347,7 +381,7 @@ export function dropShadow(
     blur: Extended<CssLength> = 1,
     spread: Extended<CssLength> = 0): FilterProxy
 {
-return () => singleBoxShadow_fromObject( { x, y, color, blur, spread});
+	return () => singleBoxShadow_fromObject( { x, y, color, blur, spread});
 }
 
 
