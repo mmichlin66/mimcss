@@ -6,7 +6,7 @@ import * as UtilFuncs from "./UtilFuncs"
 /**
  * Converts the given font face definition object to the CSS string
  */
-export function fontFaceToString( fontface: FontFaceTypes.Fontface): string | null
+export function fontFaceToString( fontface: FontFaceTypes.IFontFace): string | null
 {
     if (!fontface || !fontface.fontFamily)
         return null;
@@ -36,96 +36,62 @@ export function fontFaceToString( fontface: FontFaceTypes.Fontface): string | nu
 
 
 
-function fontStretchToString( val: FontFaceTypes.FontStretchType): string
+function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val + "%";
-    else
-        return `${val[0]}% ${val[1]}%`;
+    return UtilFuncs.valueToString( val, {
+        fromNumber: UtilFuncs.CssPercentMath.styleToString,
+        arrayItemFunc: UtilFuncs.CssPercentMath.styleToString
+    });
 }
 
 
 
-function fontStyleToString( val: FontFaceTypes.FontStyleType): string
+function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return `oblique ${val}deg`;
-    else
-    {
-        let s = "oblique ";
-        if (typeof val[0] === "string")
-            s += val[0];
-        else
-            s += `${val[0]}deg`;
-
-        if (val[1])
-        {
-            s += " ";
-            if (typeof val[1] === "string")
-                s += val[1];
-            else
-                s += `${val[1]}deg`;
-        }
-
-        return s;
-    }
+    return UtilFuncs.valueToString( val, {
+        fromNumber: v => `oblique ${UtilFuncs.CssAngleMath.styleToString(v)}`,
+        fromArray: v => `oblique ${UtilFuncs.arrayToString( v, UtilFuncs.CssAngleMath.styleToString)}`
+    });
 }
 
 
 
-function fontWeightToString( val: FontFaceTypes.FontWeightType): string
+function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
 {
-    if (typeof val === "string")
-        return val;
-    else if (typeof val === "number")
-        return val.toString();
-    else
-        return `${val[0].toString()} ${val[1].toString()}`;
+    return UtilFuncs.valueToString( val, {
+        fromAny: UtilFuncs.CssNumberMath.styleToString
+    });
 }
 
 
 
-function fontSrcToString( val: FontFaceTypes.FontSrcType): string
+function fontSrcToString( val: FontFaceTypes.FontSrc_FontFaceType): string
 {
-    if (typeof val === "string" || !Array.isArray(val))
-        return fontSingleSrcToString( val as FontFaceTypes.FontSingleSrcType);
-    else
-        return val.map( singleVal => fontSingleSrcToString( singleVal)).join(",");
+    return UtilFuncs.valueToString( val, {
+        fromAny: fontSingleSrcToString,
+        arraySeparator: ","
+    });
 }
 
 
 
-function fontSingleSrcToString( val: FontFaceTypes.FontSingleSrcType): string
+function fontSingleSrcToString( val: FontFaceTypes.FontSrc_Single): string
 {
-    if (typeof val === "string")
-    {
-        if (val.startsWith("local(") || val.startsWith("url("))
-            return val;
-        else
-            return `url(${val})`;
-    }
-    else if ( "local" in val)
-        return `local(${val.local})`;
-    else
-    {
-        let s = `url(${val.url})`;
-        if (val.format)
-        {
-            s += " format(";
-            if (typeof val.format === "string")
-                s += `\"${val.format}\"`;
-            else
-                s += val.format.map( (v) => `\"${v}\"`).join( ",");
+    return UtilFuncs.objectToString( val, [
+        ["local", v => `local(${v})`],
+        ["url", v => `url(${v})`],
+        ["format", v => `format(${fontFormatToString(v)})`]
+    ]);
+}
 
-            s += ")";
-        }
 
-        return s;
-    }
+
+function fontFormatToString( val: FontFaceTypes.FontSrc_Single): string
+{
+    return UtilFuncs.valueToString( val, {
+        fromString: v => `\"${v}\"`,
+        arraySeparator: ","
+    });
 }
 
 

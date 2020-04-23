@@ -5,6 +5,7 @@
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
+import {FontStretch_Single} from "./FontFaceTypes";
 import {IVarRule, IAnimationRule} from "../rules/RuleTypes";
 
 
@@ -389,8 +390,13 @@ export type Content_StyleType = OneOrMany<CssImage | AttrProxy | "none" | "norma
 
 
 
+/** Type for counter-increment, counter-reset and counter-set style properties */
+export type Counter_StyleType = OneOrMany<string | [Extended<string>, Extended<number>]>;
+
+
+
 /** Type for cursor style property */
-export type CursorStyleType = "auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
+export type Cursor_StyleType = "auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
     "wait" | "cell" | "crosshair" | "text" | "vertical-text" | "alias" | "copy" | "move" |
     "no-drop" | "not-allowed" | "e-resize" | "n-resize" | "ne-resize" | "nw-resize" |
     "s-resize" | "se-resize" | "sw-resize" | "w-resize" | "ew-resize" | "ns-resize" |
@@ -400,12 +406,12 @@ export type CursorStyleType = "auto" | "default" | "none" | "context-menu" | "he
 
 
 /** Type for direction style property */
-export type DirectionStyleType = "ltr" | "rtl";
+export type Direction_StyleType = "ltr" | "rtl";
 
 
 
 /** Type for display style property */
-export type DisplayStyleType = "block" | "inline" | "run-in" | "contents" | "none" |
+export type Display_StyleType = "block" | "inline" | "run-in" | "contents" | "none" |
     "inline-block" | "inline-list-item" | "inline-table" | "inline-flex" | "inline-grid" |
     "flow" | "flow-root" | "table" | "flex" | "grid" | "ruby" |
     "table-row-group" | "table-header-group" | "table-footer-group" | "table-row" | "table-cell" |
@@ -417,65 +423,86 @@ export type DisplayStyleType = "block" | "inline" | "run-in" | "contents" | "non
                 
 
 /** Type for dominant-baseline style property */
-export type DominantBaselineStyleType = "auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
+export type DominantBaseline_StyleType = "auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
     "central" | "mathematical" | "hanging" | "text-top";
 
 
 
 /** Type for empty-cells style property */
-export type EmptyCellsStyleType = "show" | "hide";
+export type EmptyCells_StyleType = "show" | "hide";
 
 
 
 /** Type for fill-rule style property */
-export type FillRuleStyleType = "nonzero" | "evenodd";
+export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 
 /** Type for flex-basis style property */
-export type FlexBasisStyleType = "auto" | "content" | CssLength;
+export type FlexBasis_StyleType = "auto" | "content" | CssLength;
 
 
 
 /** Type for flex style property */
-export type FlexStyleType = FlexBasisStyleType | [Extended<number>, Extended<number>] |
-    [Extended<number>, Extended<number>, Extended<FlexBasisStyleType>];
+export type Flex_StyleType = FlexBasis_StyleType | [Extended<number>, Extended<number>] |
+    [Extended<number>, Extended<number>, Extended<FlexBasis_StyleType>];
 
 
 
 /** Type for flex-direction style property */
-export type FlexDirectionStyleType = "row" | "row-reverse" | "column" | "column-reverse";
-
-
-
-/** Type for flex-wrap style property */
-export type FlexWrapStyleType = "nowrap" | "wrap" | "wrap-reverse";
+export type FlexDirection_StyleType = "row" | "row-reverse" | "column" | "column-reverse";
 
 
 
 /** Type for flex-flow style property */
-export type FlexFlowStyleType = FlexDirectionStyleType | FlexWrapStyleType |
-    [Extended<FlexDirectionStyleType>, Extended<FlexWrapStyleType>];
+export type FlexFlow_StyleType = FlexDirection_StyleType | FlexWrap_StyleType |
+    [Extended<FlexDirection_StyleType>, Extended<FlexWrap_StyleType>];
+
+
+
+/** Type for flex-wrap style property */
+export type FlexWrap_StyleType = "nowrap" | "wrap" | "wrap-reverse";
 
 
 
 /** Type for float (cssFloat) style property */
-export type FloatStyleType = "left" | "right" | "none" | "inline-start" | "inline-end";
-
-
-
-/** Type for font-style style property */
-export type FontStyleStyleType = "normal" | "italic" | "oblique" | CssAngle;
+export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inline-end";
 
 
 
 /** Type for font-kerning style property */
-export type FontKerningStyleType = "auto" | "normal" | "none";
+export type FontKerning_StyleType = "auto" | "normal" | "none";
+
+
+
+/** Type for font-optical-sizing style property */
+export type FontOpticalSizing_StyleType = "auto" | "none";
+
+
+
+/** Type for font-style style property */
+export type FontStyle_StyleType = "normal" | "italic" | "oblique" | CssAngle;
+
+
+
+/** Type for font-synthesis style property */
+export type FontSynthesis_StyleType = "none" | "weight" | "style" | "weight style";
 
 
 
 /** Type for font-weight style property */
-export type FontWeightStyleType = "normal" | "bold" | "bolder" | "lighter" | number;
+export type FontWeight_StyleType = "normal" | "bold" | "bolder" | "lighter" | number;
+
+
+
+/** Type for font-variant-caps style property */
+export type FontVariantCaps_StyleType = "normal" | "small-caps" | "all-small-caps" |
+    "petite-caps" | "all-petite-caps" | "unicase" | "titling-caps";
+
+
+
+/** Type for font-variant-position style property */
+export type FontVariantPosition_StyleType = "normal" | "sub" | "super";
 
 
 
@@ -920,50 +947,50 @@ export interface ICssStyleset
     columnWidth?: CssLength;
     columns?: Columns_StyleType;
     contain?: Contain_StyleType;
-    content?: DefaultStyleType;
-    counterIncrement?: DefaultStyleType;
-    counterReset?: DefaultStyleType;
-    cursor?: CursorStyleType;
+    content?: Content_StyleType;
+    counterIncrement?: Counter_StyleType;
+    counterReset?: Counter_StyleType;
+    cursor?: Cursor_StyleType;
 
-    direction?: DirectionStyleType;
-    display?: DisplayStyleType;
-    dominantBaseline?: DominantBaselineStyleType;
+    direction?: Direction_StyleType;
+    display?: Display_StyleType;
+    dominantBaseline?: DominantBaseline_StyleType;
 
-    emptyCells?: EmptyCellsStyleType;
+    emptyCells?: EmptyCells_StyleType;
 
-    fill?: DefaultStyleType;
-    fillOpacity?: DefaultStyleType;
-    fillRule?: FillRuleStyleType;
+    fill?: CssColor;
+    fillOpacity?: CssPercent;
+    fillRule?: FillRule_StyleType;
     filter?: string | FilterProxy;
-    flex?: FlexStyleType;
-    flexBasis?: FlexBasisStyleType;
-    flexDirection?: FlexDirectionStyleType;
-    flexFlow?: FlexFlowStyleType;
+    flex?: Flex_StyleType;
+    flexBasis?: FlexBasis_StyleType;
+    flexDirection?: FlexDirection_StyleType;
+    flexFlow?: FlexFlow_StyleType;
     flexGrow?: CssNumber;
     flexShrink?: CssNumber;
-    flexWrap?: FlexWrapStyleType;
-    float?: FloatStyleType;
+    flexWrap?: FlexWrap_StyleType;
+    float?: Float_StyleType;
     floodColor?: CssColor;
-    floodOpacity?: DefaultStyleType;
+    floodOpacity?: CssPercent;
     font?: DefaultStyleType;
     fontDisplay?: DefaultStyleType;
     fontFamily?: DefaultStyleType;
     fontFeatureSettings?: DefaultStyleType;
-    fontKerning?: FontKerningStyleType;
-    fontOpticalSizing?: DefaultStyleType;
+    fontKerning?: FontKerning_StyleType;
+    fontOpticalSizing?: FontOpticalSizing_StyleType;
     fontSize?: CssLength;
-    fontSizeAdjust?: DefaultStyleType;
-    fontStretch?: DefaultStyleType;
-    fontStyle?: FontStyleStyleType;
-    fontSynthesis?: DefaultStyleType;
+    fontSizeAdjust?: number;
+    fontStretch?: FontStretch_Single;
+    fontStyle?: FontStyle_StyleType;
+    fontSynthesis?: FontSynthesis_StyleType;
     fontVariant?: DefaultStyleType;
-    fontVariantCaps?: DefaultStyleType;
+    fontVariantCaps?: FontVariantCaps_StyleType;
     fontVariantEastAsian?: DefaultStyleType;
     fontVariantLigatures?: DefaultStyleType;
     fontVariantNumeric?: DefaultStyleType;
-    fontVariantPosition?: DefaultStyleType;
+    fontVariantPosition?: FontVariantPosition_StyleType;
     fontVariationSettings?: DefaultStyleType;
-    fontWeight?: FontWeightStyleType;
+    fontWeight?: FontWeight_StyleType;
 
     gap?: Gap_StyleType;
     grid?: DefaultStyleType;
@@ -996,7 +1023,7 @@ export interface ICssStyleset
     justifyItems?: JustifyItemsStyleType;
     justifySelf?: JustifySelfStyleType;
 
-    kerning?: FontKerningStyleType;
+    kerning?: FontKerning_StyleType;
 
     left?: CssLength;
     letterSpacing?: LetterSpacingStyleType;

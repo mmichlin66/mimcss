@@ -24,15 +24,16 @@ function multiPositionToStringWithComma( val: Extended<MultiCssPosition>): strin
 
 function singleAnimation_fromObject( val: StyleTypes.Animation_Single): string
 {
-    return objectToString( val, false,
-            ["duration", CssTimeMath.styleToString],
-            ["func", singleAnimationTimingFunction_fromStyle],
-            ["delay", CssTimeMath.styleToString],
-            ["count", CssNumberMath.styleToString],
-            "direction",
-            "mode",
-            "state",
-            "name");
+    return objectToString( val, [
+        ["duration", CssTimeMath.styleToString],
+        ["func", singleAnimationTimingFunction_fromStyle],
+        ["delay", CssTimeMath.styleToString],
+        ["count", CssNumberMath.styleToString],
+        "direction",
+        "mode",
+        "state",
+        "name"
+    ]);
 }
 
 
@@ -100,15 +101,16 @@ function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.Anima
 
 function singleBackground_fromObject( val: StyleTypes.Background_Single): string
 {
-    return objectToString( val, false,
-            ["color", colorToString],
-            "image",
-            ["position", positionToString],
-            ["size", CssLengthMath.multiStyleToStringWithSpace, "/"],
-            "repeat",
-            "attachment",
-            "origin",
-            "clip");
+    return objectToString( val, [
+        ["color", colorToString],
+        "image",
+        ["position", positionToString],
+        ["size", CssLengthMath.multiStyleToStringWithSpace, "/"],
+        "repeat",
+        "attachment",
+        "origin",
+        "clip"
+    ]);
 }
 
 
@@ -135,13 +137,14 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize
 
 export function singleBoxShadow_fromObject( val: StyleTypes.BoxShadow_Single): string
 {
-    return objectToString( val, false,
-            ["inset", v => v ? "inset" : ""],
-            ["x", CssLengthMath.styleToString],
-            ["y", CssLengthMath.styleToString],
-            ["blur", CssLengthMath.styleToString],
-            ["spread", CssLengthMath.styleToString],
-            ["color", colorToString]);
+    return objectToString( val, [
+        ["inset", v => v ? "inset" : ""],
+        ["x", CssLengthMath.styleToString],
+        ["y", CssLengthMath.styleToString],
+        ["blur", CssLengthMath.styleToString],
+        ["spread", CssLengthMath.styleToString],
+        ["color", colorToString]
+    ]);
 }
 
 
@@ -219,7 +222,7 @@ function borderToString( val: StyleTypes.Border_StyleType): string
 function columnsToString( val: StyleTypes.Columns_StyleType): string
 {
     return valueToString( val, {
-        fromArray: val => val[0] + " " + CssLengthMath.styleToString( val[1])
+        fromArray: v => v[0] + " " + CssLengthMath.styleToString( v[1])
     });
 }
 
@@ -228,29 +231,17 @@ function columnsToString( val: StyleTypes.Columns_StyleType): string
 /**
  * Converts flex style value to the CSS string.
  */
-function flexToString( val: StyleTypes.FlexStyleType): string
+function flexToString( val: StyleTypes.Flex_StyleType): string
 {
     return valueToString( val, {
-        fromArray: val =>
+        fromArray: v =>
         {
-            if (val.length === 2)
-                return val.join( " ");
+            if (v.length === 2)
+                return v.join( " ");
             else
-                return val[0] + " " + val[1] + " "+ CssLengthMath.styleToString( val[2]);
+                return v[0] + " " + v[1] + " " + CssLengthMath.styleToString( v[2]);
         },
         fromAny: CssLengthMath.styleToString
-    });
-}
-
-
-
-/**
- * Converts font style value to the CSS string.
- */
-function fontStyleToString( val: StyleTypes.FontStyleStyleType): string
-{
-    return valueToString( val, {
-        fromNumber: val => "oblique " + CssAngleMath.styleToString( val)
     });
 }
 
@@ -601,10 +592,15 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     columns: columnsToString,
     columnWidth: CssLengthMath.styleToString,
 
+    fill: colorToString,
+    fillOpacity: CssPercentMath.styleToString,
     flex: flexToString,
+    flexBasis: CssLengthMath.styleToString,
     floodColor: colorToString,
     fontSize: CssLengthMath.styleToString,
-    fontStyle: fontStyleToString,
+    fontStyle: {
+        fromNumber: v => "oblique " + CssAngleMath.styleToString( v)
+    },
 
     gap: CssLengthMath.multiStyleToStringWithSpace,
     gridColumnGap: CssLengthMath.styleToString,

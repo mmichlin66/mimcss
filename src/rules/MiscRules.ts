@@ -1,5 +1,5 @@
 import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule} from "./RuleTypes";
-import {Fontface} from "../styles/FontFaceTypes"
+import {IFontFace} from "../styles/FontFaceTypes"
 import {fontFaceToString} from "../styles/FontFaceFuncs"
 import {Rule} from "./Rule";
 import {MediaQuery} from "../styles/MediaTypes";
@@ -16,7 +16,7 @@ import {PagePseudoClass} from "../styles/SelectorTypes";
  */
 export class FontFaceRule extends Rule implements IFontFaceRule
 {
-	public constructor( fontface: Fontface)
+	public constructor( fontface: IFontFace)
 	{
 		super();
 
@@ -44,7 +44,7 @@ export class FontFaceRule extends Rule implements IFontFaceRule
 	public cssRule: CSSFontFaceRule;
 
 	// Object defining font-face properties.
-	public fontface: Fontface;
+	public fontface: IFontFace;
 }
 
 

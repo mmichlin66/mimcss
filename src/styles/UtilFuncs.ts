@@ -125,12 +125,7 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
             else
             {
                 let separator = options.arraySeparator != null ? options.arraySeparator : " ";
-                if (options.arrayItemFunc)
-                    return arrayToString( val, options.arrayItemFunc, separator);
-                else if (options.fromAny)
-                    return options.fromAny( val);
-                else
-                    return arrayToString( val, undefined, separator);
+                return arrayToString( val, options.arrayItemFunc || options.fromAny || undefined, separator);
             }
         }
         else if (typeof val === "object")
@@ -177,8 +172,8 @@ export function arrayToString( val: any[], func?: (v) => string, separator: stri
  *     it will be used to convert the property's value to the string. If a function is not present, then the
  *     property value should be converted to the string using the valueToString function.
  */
-export function objectToString( val: any, usePropNames: boolean,
-    ...propsAndFuncs: (string | [string, (val: any) => string, string?])[] ): string
+export function objectToString( val: any,propsAndFuncs: (string | [string, (val: any) => string, string?])[],
+    separator: string = " ", usePropNames: boolean = false): string
 {
     if (val == null || propsAndFuncs.length === 0)
         return "";
@@ -207,7 +202,7 @@ export function objectToString( val: any, usePropNames: boolean,
         }
     );
 
-	return buf.join(" ");
+	return buf.join(separator);
 }
 
 

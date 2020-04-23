@@ -8,7 +8,7 @@ import * as RuleContainerFuncs from "../rules/RuleContainer"
 import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 import {MediaQuery} from "../styles/MediaTypes"
-import {Fontface} from "../styles/FontFaceTypes";
+import {IFontFace} from "../styles/FontFaceTypes";
 import {AbstractRule, TagRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
@@ -87,7 +87,7 @@ export function $import( url: string, mediaQuery?: string | MediaQuery, supports
 /**
  * Creates new font-face rule.
  */
-export function $fontface( fontface: Fontface): RuleTypes.IFontFaceRule
+export function $fontface( fontface: IFontFace): RuleTypes.IFontFaceRule
 	{ return new FontFaceRule( fontface); }
 
 /**
