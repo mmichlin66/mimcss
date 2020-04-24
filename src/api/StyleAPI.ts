@@ -6,7 +6,10 @@ import {
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
 	AnimationPlayState_Single, Animation_Single, BackgroundSize_Single, BackgroundRepeat_Single,
 	BackgroundAttachment_Single, BackgroundOrigin_Single, BackgroundClip_Single,
-	Background_Single, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy, FontStyle_StyleType, FontWeight_StyleType, Font_StyleType
+	Background_Single, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy,
+	FontStyle_StyleType, FontWeight_StyleType, Font_StyleType, TextDecorationLine_StyleType,
+	TextDecorationStyle_StyleType, TextDecorationThickness_StyleType, TextDecoration_StyleType,
+	TextShadow_Single
 } from "../styles/StyleTypes"
 import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
 import {stylePropToString, singleBoxShadow_fromObject} from "../styles/StyleFuncs"
@@ -211,12 +214,12 @@ export function background(
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Shadow
+// Shadows
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an object that can be assigned to the box-shadow or text-shadow property.
+ * Returns an object that can be assigned to the box-shadow property.
  * @param x Horizontal offset of the shadow.
  * @param y Vertical offset of the shadow.
  * @param color Color of the shadow.
@@ -224,7 +227,7 @@ export function background(
  * @param spread Value of the shadow's spreading. The default value is 0.
  * @param inset Flag indicating whether the shadow goes inside the shape. The default value is false.
  */
-export function shadow(
+export function boxShadow(
 		x: Extended<CssLength>,
 		y: Extended<CssLength>,
 		color?: Extended<CssColor>,
@@ -234,6 +237,23 @@ export function shadow(
 	): BoxShadow_Single
 {
 	return { x, y, color, blur, spread, inset };
+}
+
+/**
+ * Returns an object that can be assigned to the text-shadow property.
+ * @param x Horizontal offset of the shadow.
+ * @param y Vertical offset of the shadow.
+ * @param color Color of the shadow.
+ * @param blur Value of the shadow's blurring. The default value is 1 pixel.
+ */
+export function textShadow(
+		x: Extended<CssLength>,
+		y: Extended<CssLength>,
+		color?: Extended<CssColor>,
+		blur: Extended<CssLength> = 1,
+	): TextShadow_Single
+{
+	return { x, y, color, blur };
 }
 
 
@@ -265,6 +285,31 @@ export function font(
 	): Font_StyleType
 {
 	return { size, family, style, variant, weight, stretch, lineHeight };
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Text decoration
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns an object that can be assigned to the font property.
+ * @param line Type of line.
+ * @param color Line color.
+ * @param style Line style.
+ * @param thickness Line size.
+ */
+export function textDecoration(
+        line?: Extended<TextDecorationLine_StyleType>,
+        color?: Extended<CssColor>,
+        style?: Extended<TextDecorationStyle_StyleType>,
+        thickness?: Extended<TextDecorationThickness_StyleType>,
+	): TextDecoration_StyleType
+{
+	return { line, style, color, thickness };
 }
 
 

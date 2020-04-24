@@ -271,47 +271,14 @@ function fontStyleToString( val: StyleTypes.Flex_StyleType): string
 
 
 
-/**
- * Converts text-emphasis style value to the CSS string.
- */
-function textEmphasisPositionToString( val: StyleTypes.TextEmphasisPositionStyleType): string
+function textDecoration_fromObject( val: StyleTypes.TextDecoration_StyleType): string
 {
-    return valueToString( val, {
-        fromNumber: CssLengthMath.styleToString
-    });
-}
-
-
-
-/**
- * Converts text-indent style value to the CSS string.
- */
-function textIndentToString( val: StyleTypes.TextIndentStyleType): string
-{
-    return valueToString( val, {
-        fromArray: val =>
-        {
-            let s = `${CssLengthMath.styleToString( val[0])} ${val[1]}`;
-            if (val[2])
-                s += " " + val[2];
-
-            return s;
-        },
-        fromAny: CssLengthMath.styleToString
-    });
-}
-
-
-
-/**
- * Converts translate style value to the CSS string.
- */
-function translateToString( val: StyleTypes.TranslateStyleType): string
-{
-    return valueToString( val, {
-        fromArray: CssLengthMath.multiStyleToStringWithSpace,
-        fromAny: CssLengthMath.styleToString
-    });
+    return objectToString( val, [
+        "line",
+        "style",
+        ["color", colorToString],
+        ["thickness", CssLengthMath.styleToString],
+    ]);
 }
 
 
@@ -652,14 +619,15 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     maxHeight: CssLengthMath.styleToString,
     maxInlineSize: CssLengthMath.styleToString,
     maxWidth: CssLengthMath.styleToString,
-    maxZoom: CssLengthMath.styleToString,
+    maxZoom: CssPercentMath.styleToString,
     minBlockSize: CssLengthMath.styleToString,
     minHeight: CssLengthMath.styleToString,
     minInlineSize: CssLengthMath.styleToString,
 	minWidth: CssLengthMath.styleToString,
-    minZoom: CssLengthMath.styleToString,
+    minZoom: CssPercentMath.styleToString,
 
     objectPosition: positionToString,
+    outline: borderToString,
     outlineColor: colorToString,
     outlineOffset: CssLengthMath.styleToString,
     outlineStyle: valueToString,
@@ -675,6 +643,10 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     paddingTop: CssLengthMath.styleToString,
     perspective: CssLengthMath.styleToString,
     perspectiveOrigin: positionToString,
+
+    quotes: {
+        arrayItemFunc: v => `"${v}"`
+    },
 
     right: CssLengthMath.styleToString,
     rowGap: CssLengthMath.styleToString,
@@ -701,20 +673,48 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     scrollPaddingLeft: CssLengthMath.styleToString,
     scrollPaddingRight: CssLengthMath.styleToString,
     scrollPaddingTop: CssLengthMath.styleToString,
+    shapeMargin: CssLengthMath.styleToString,
     stopColor: colorToString,
 
     tabSize: CssLengthMath.styleToString,
+    textCombineUpright: {
+        fromNumber: v => `digits ${v}`
+    },
+    textDecoration: {
+        fromNumber: colorToString,
+        fromObject: textDecoration_fromObject
+    },
     textDecorationColor: colorToString,
     textDecorationThickness: CssLengthMath.styleToString,
+    textEmphasis: {
+        arrayItemFunc: colorToString
+    },
     textEmphasisColor: colorToString,
-    textEmphasisPosition: textEmphasisPositionToString,
-    textIndent: textIndentToString,
+    textIndent: {
+        fromNumber: CssLengthMath.styleToString,
+        arrayItemFunc: CssLengthMath.styleToString
+    },
+    textShadow: {
+        fromObject: singleBoxShadow_fromObject,
+        arraySeparator: ",",
+    },
+    textSizeAdjust: CssPercentMath.styleToString,
     top: CssLengthMath.styleToString,
-    translate: translateToString,
+    translate: {
+        fromAny: CssLengthMath.styleToString
+    },
+
+    verticalAlign: {
+        fromNumber: CssLengthMath.styleToString
+    },
 
     width: CssLengthMath.styleToString,
+    willChange: {
+        fromString: camelToDash
+    },
+    wordSpacing: CssLengthMath.styleToString,
 
-    zoom: CssLengthMath.styleToString,
+    zoom: CssPercentMath.styleToString,
 
     // special properties for IVarRule types
     "CssLength": CssLengthMath.styleToString,

@@ -334,9 +334,12 @@ export type Clip_StyleType = "auto" | CssLengthBox;
 
 
 
-/** Type for clear style property */
-export type ClipPath_StyleType = UrlProxy | BasicShapeProxy | "margin-box" | "border-box" |
-    "padding-box" | "content-box" | "fill-box" | "stroke-box" | "view-box";
+/** Type used for several properties */
+export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
+    "fill-box" | "stroke-box" | "view-box";
+
+/** Type for clip-path style property */
+export type ClipPath_StyleType = UrlProxy | BasicShapeProxy | GeometryBoxKeyword;
 
 
 
@@ -532,22 +535,22 @@ export type Gap_StyleType = OneOrPair<Gap_Single>;
 
 
 /** Type for hyphens style property */
-export type HyphensStyleType = "none" | "manual" | "auto";
+export type Hyphens_StyleType = "none" | "manual" | "auto";
 
 
 
 /** Type for image-rendering style property */
-export type ImageRenderingStyleType = "auto" | "crisp-edges" | "pixelated";
+export type ImageRendering_StyleType = "auto" | "crisp-edges" | "pixelated";
 
 
 
 /** Type for isolation style property */
-export type IsolationStyleType = "auto" | "isolate";
+export type Isolation_StyleType = "auto" | "isolate";
 
 
 
 /** Type for justify-content style property */
-export type JustifyContentStyleType = "normal" | "space-between" | "space-around" | "space-evenly" | "stretch" |
+export type JustifyContent_StyleType = "normal" | "space-between" | "space-around" | "space-evenly" | "stretch" |
     "center" | "start" | "end" | "flex-start" | "flex-end" | "left" | "right" |
     "safe center" | "safe start" | "safe end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
     "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right";
@@ -555,7 +558,7 @@ export type JustifyContentStyleType = "normal" | "space-between" | "space-around
 
 
 /** Type for justify-items style property */
-export type JustifyItemsStyleType = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
+export type JustifyItems_StyleType = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
     "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" |
     "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
     "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" |
@@ -564,7 +567,7 @@ export type JustifyItemsStyleType = "normal" | "stretch" | "baseline" | "first b
 
 
 /** Type for justify-self style property */
-export type JustifySelfStyleType = "auto" | "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
+export type JustifySelf_StyleType = "auto" | "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" |
     "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" |
     "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" |
     "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right";
@@ -572,22 +575,22 @@ export type JustifySelfStyleType = "auto" | "normal" | "stretch" | "baseline" | 
 
 
 /** Type for letter-spacing style property */
-export type LetterSpacingStyleType = "normal" | CssLength;
+export type LetterSpacing_StyleType = "normal" | CssLength;
 
 
 
 /** Type for line-break style property */
-export type LineBreakStyleType = "auto" | "loose" | "normal" | "strict" | "anywhere";
+export type LineBreak_StyleType = "auto" | "loose" | "normal" | "strict" | "anywhere";
 
 
 
-/** Type for line-height style property */
-export type LineHeightStyleType = CssNumber;
+/** Type for line-style-image style property */
+export type ListStyleImage_StyleType = "none" | UrlProxy;
 
 
 
 /** Type for list-style-type style property */
-export type ListStyleTypeStyleType = "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
+export type ListStyleType_StyleType = "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
     "cjk-decimal" | "cjk-earthly-branch" | "cjk-heavenly-stem" | "cjk-ideographic" |
     "lower-roman" | "upper-roman" | "lower-greek" | "lower-alpha" | "lower-latin" | "upper-alpha" | "upper-latin" |
     "arabic-indic" | "armenian" | "bengali" | "cambodian" | "devanagari" | "georgian" | "gujarati" | "gurmukhi" | "hebrew" |
@@ -597,168 +600,258 @@ export type ListStyleTypeStyleType = "disc" | "circle" | "square" | "decimal" | 
     "tamil" | "telugu" | "thai" | "tibetan" | "trad-chinese-formal" | "trad-chinese-informal" | "upper-armenian" |
     "disclosure-open" | "disclosure-closed";
 
-/** Type for list-style-position style property */
-export type ListStylePositionStyleType = "inside" | "outside";
+
 
 /** Type for list-style-position style property */
-export type ListStyleStyleType = ListStyleTypeStyleType | ListStylePositionStyleType |
-    [Extended<ListStyleTypeStyleType>, Extended<ListStylePositionStyleType>, Extended<string>?];
+export type ListStylePosition_StyleType = "inside" | "outside";
+
+
+
+/** Type for list-style style property */
+export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_StyleType | ListStyleImage_StyleType |
+    [Extended<ListStyleImage_StyleType>, Extended<ListStylePosition_StyleType>] |
+    [Extended<ListStyleImage_StyleType>, Extended<ListStyleType_StyleType>?] |
+    [Extended<ListStyleType_StyleType>, Extended<ListStylePosition_StyleType>] |
+    [Extended<ListStyleImage_StyleType>, Extended<ListStylePosition_StyleType>, Extended<ListStyleType_StyleType>?];
 
 
 
 /** Type for the object-fit style property */
-export type ObjectFitStyleType = "fill" | "contain" | "cover" | "none" | "scale-down";
+export type ObjectFit_StyleType = "fill" | "contain" | "cover" | "none" | "scale-down";
+
+
+
+/** Type for the orientation style property */
+export type Orientation_StyleType = "landscape" | "portrait";
+
+
+
+/** Type for the overflow-x/y style property */
+export type Overflow_Single_StyleType = "visible" | "hidden" | "clip" | "scroll" | "auto";
+
+/** Type for the overflow- style property */
+export type Overflow_StyleType = OneOrPair<Overflow_Single_StyleType>;
 
 
 
 /** Type for the overflow-anchor style property */
-export type OverflowAnchorStyleType = "auto" | "none";
+export type OverflowAnchor_StyleType = "auto" | "none";
+
+
 
 /** Type for the overflow-wrap style property */
-export type OverflowWrapStyleType = "normal" | "break-word" | "anywhere";
+export type OverflowWrap_StyleType = "normal" | "break-word" | "anywhere";
 
-/** Type for the overflow-x/y style property */
-export type SingleOverflowStyleType = "visible" | "hidden" | "clip" | "scroll" | "auto";
 
-/** Type for the overflow- style property */
-export type OverflowStyleType = OneOrPair<SingleOverflowStyleType>;
+
+/** Type for the overscroll-behavior-x/y style property */
+export type OverscrollBehavior_Single_StyleType = "contain" | "none" | "auto";
+
+/** Type for the overflow-behavior style property */
+export type OverscrollBehavior_StyleType = OneOrPair<OverscrollBehavior_Single_StyleType>;
+
+
+
+/** Type for the paint-order style property */
+export type PaintOrder_StyleType = "normal" | OneOrMany<"fill" | "stroke" | "markers">;
 
 
 
 /** Type for the place-content style property */
-export type PlaceContentStyleType = AlignContentStyleType | [Extended<AlignContentStyleType>, Extended<JustifyContentStyleType>];
+export type PlaceContent_StyleType = AlignContentStyleType | [Extended<AlignContentStyleType>, Extended<JustifyContent_StyleType>];
+
+
 
 /** Type for the place-items style property */
-export type PlaceItemsStyleType = AlignItemsStyleType | [Extended<AlignItemsStyleType>, Extended<JustifyItemsStyleType>];
+export type PlaceItems_StyleType = AlignItemsStyleType | [Extended<AlignItemsStyleType>, Extended<JustifyItems_StyleType>];
+
+
 
 /** Type for the place-self style property */
-export type PlaceSelfStyleType = AlignSelfStyleType | [Extended<AlignSelfStyleType>, Extended<JustifySelfStyleType>];
+export type PlaceSelf_StyleType = AlignSelfStyleType | [Extended<AlignSelfStyleType>, Extended<JustifySelf_StyleType>];
 
 
 
 /** Type for the pointer-events style property */
-export type PointerEventsStyleType = "auto" | "none" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" |
+export type PointerEvents_StyleType = "auto" | "none" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" |
     "painted" | "fill" | "stroke" | "all";
 
 
 
 /** Type for the position style property */
-export type PositionStyleType = "static" | "relative" | "absolute" | "sticky" | "fixed";
+export type Position_StyleType = "static" | "relative" | "absolute" | "sticky" | "fixed";
+
+
+
+/** Type for the quotes style property */
+export type Quotes_StyleType = "none" | "auto" | Many<string>;
 
 
 
 /** Type for the resize style property */
-export type ResizeStyleType = "none" | "both" | "horizontal" | "vertical" | "block" | "inline";
+export type Resize_StyleType = "none" | "both" | "horizontal" | "vertical" | "block" | "inline";
 
 
 
 /** Type for the scroll-behavior style property */
-export type ScrollBehaviorStyleType = "auto" | "smooth";
+export type ScrollBehavior_StyleType = "auto" | "smooth";
+
+
+
+/** Type for the scroll-snap-align style property */
+export type ScrollSnapAlign_StyleType = OneOrPair<"none" | "start" | "end" | "center">;
+
+
+
+/** Type for the scroll-snap-stop style property */
+export type ScrollSnapStop_StyleType = "normal" | "always";
+
+
+
+/** Type for the scroll-snap-type style property */
+export type ScrollSnapType_StyleType = "none" |
+    [Extended<"x" | "y" | "block" | "inline" | "both">, Extended<"mandatory" | "proximity">];
+
+
+
+/** Type for shape-outside style property */
+export type ShapeOutside_StyleType = UrlProxy | BasicShapeProxy | GeometryBoxKeyword | Exclude<CssImage,string>;
+
+
+
+/** Type for the shape-rendering style property */
+export type ShapeRendering_StyleType = "auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision";
 
 
 
 /** Type for the stop-opacity style property */
-export type StopOpacityStyleType = number;
+export type StopOpacity_StyleType = number;
 
 
 
 /** Type for the table-layout style property */
-export type TableLayoutStyleType = "auto" | "fixed";
+export type TableLayout_StyleType = "auto" | "fixed";
 
 
 
 /** Type for the text-align style property */
-export type TextAlignStyleType = "start" | "end" | "left" | "right" | "center" | "justify" | "match-parent";
+export type TextAlign_StyleType = "start" | "end" | "left" | "right" | "center" | "justify" | "match-parent";
 
 
 
 /** Type for the text-align-last style property */
-export type TextAlignLastStyleType = "auto" | "start" | "end" | "left" | "right" | "center" | "justify";
+export type TextAlignLast_StyleType = "auto" | "start" | "end" | "left" | "right" | "center" | "justify";
 
 
 
 /** Type for the text-anchor style property */
-export type TextAnchorStyleType = "start" | "middle" | "end";
+export type TextAnchor_StyleType = "start" | "middle" | "end";
+
+
+
+/** Type for the text-combine-upright style property */
+export type TextCombineUpright_StyleType = "none" | "all" | "digits" | number;
 
 
 
 /** Type for the text-decoration-line style property */
-export type TextDecorationLineStyleType = "none" | "underline" | "overline" | "line-through" | "blink" |
-    "spelling-error" | "grammar-error";
+export type TextDecorationLine_StyleType = "none" | "spelling-error" | "grammar-error" |
+    OneOrMany<"underline" | "overline" | "line-through">; 
 
 /** Type for the text-decoration-style style property */
-export type TextDecorationStyleStyleType = "solid" | "double" | "dotted" | "dashed" | "wavy";
+export type TextDecorationStyle_StyleType = "solid" | "double" | "dotted" | "dashed" | "wavy";
 
 /** Type for the text-decoration-thickness style property */
-export type TextDecorationThicknessStyleType = "auto" | "from-font" | CssLength;
+export type TextDecorationThickness_StyleType = "auto" | "from-font" | CssLength;
 
-// /** Type for the text-decoration-line style property */
-// export type TextDecorationStyleType = TextDecorationLineStyleType | TextDecorationStyleStyleType |
-//     Color_StyleType | TextDecorationThicknessStyleType |
-//     [TextDecorationLineStyleType, TextDecorationStyleStyleType?, Color_StyleType?, TextDecorationThicknessStyleType?];
+/** Type for the text-decoration-skip-ink style property */
+export type TextDecorationSkipInk_StyleType = "none" | "auto" | "all";
+
+/**
+ * Type for the text-decoration-line style property. If a number is specified, it will be interpreted
+ * as color - not as thickness.
+ */
+export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecorationStyle_StyleType | CssColor |
+    {
+        line?: Extended<TextDecorationLine_StyleType>,
+        style?: Extended<TextDecorationStyle_StyleType>,
+        color?: Extended<CssColor>,
+        thickness?: Extended<TextDecorationThickness_StyleType>,
+    };
 
 
-
-/** Type for the text-emphasis-position style property */
-export type TextEmphasisPositionStyleType = [Extended<"over" | "under">, Extended<"left" | "right">] | CssLength;
-
-/** Type for the text-emphasis-style style property */
-export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame";
-
-/** Type for the text-emphasis-style style property */
-export type TextEmphasisStyleStyleType = "none" | number | TextEmphasisShape |
-    [Extended<"filled" | "open">, Extended<TextEmphasisShape>];
 
 // /** Type for the text-emphasis style property */
-// export type TextEmphasisStyleType = TextEmphasisStyleStyleType | Color_StyleType | [TextEmphasisStyleStyleType, Color_StyleType];
+export type TextEmphasis_StyleType = TextEmphasisStyle_StyleType | CssColor |
+    [Extended<TextEmphasisStyle_StyleType>, Extended<CssColor>];
+
+/** Type for the text-emphasis-position style property */
+export type TextEmphasisPosition_StyleType = string | [Extended<"over" | "under">, Extended<"left" | "right">];
+
+/** Shape for the text-emphasis-style style property */
+export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame";
+
+/** Fill option for the text-emphasis-style style property */
+export type TextEmphasisFill = "filled" | "open";
+
+/** Type for the text-emphasis-style style property */
+export type TextEmphasisStyle_StyleType = "none" | TextEmphasisShape | TextEmphasisFill |
+    [Extended<TextEmphasisFill>, Extended<TextEmphasisShape>];
 
 
 
 /** Type for the text-indent style property */
-export type TextIndentStyleType = CssLength |
-    [Extended<CssLength>, Extended<"each-line" | "hanging" | "each-line hanging">?];
+export type TextIndent_StyleType = CssLength |
+    [Extended<CssLength>, Extended<OneOrMany<"each-line" | "hanging" | "each-line hanging">>];
 
 
 
 /** Type for the text-justify style property */
-export type TextJustifyStyleType = "auto" | "inter-character" | "inter-word" | "none" | CssLength;
+export type TextJustify_StyleType = "auto" | "inter-character" | "inter-word" | "none";
 
 
 
 /** Type for the text-orientation style property */
-export type TextOrientationStyleType = "mixed" | "upright" | "sideways";
+export type TextOrientation_StyleType = "mixed" | "upright" | "sideways";
 
 
 
 /** Type for the text-overflow style property */
-export type SingleTextOverflowStyleType = "clip" | "ellipsis" | "fade" | string;
-
-/** Type for the text-overflow style property */
-export type TextOverflowStyleType = OneOrPair<SingleTextOverflowStyleType>;
+export type TextOverflow_StyleType = OneOrPair<"clip" | "ellipsis" | "fade" | string>;
 
 
 
-// /** Type for the text-shadow style property */
-// export type TextShadowStyleType = string> |
-//     [Number_StyleType, Number_StyleType] |
-//     [Number_StyleType, Number_StyleType, Number_StyleType] |
-//     [Number_StyleType, Number_StyleType, Color_StyleType] |
-//     [Number_StyleType, Number_StyleType, Number_StyleType, Color_StyleType];
+/** Type for the single value of the text-shadow style property */
+export type TextShadow_Single = "none" | string |
+    {
+        x: Extended<CssLength>,
+        y: Extended<CssLength>,
+        blur?: Extended<CssLength>,
+        color?: Extended<CssColor>,
+    };
+
+/** Type for the text-shadow style property */
+export type TextShadow_StyleType = OneOrMany<TextShadow_Single>;
 
 
 
-// /** Type for the text-transform style property */
-export type TextTransformStyleType = "none" | "capitalize" | "uppercase" | "lowercase" | "full-width" | "full-size-kana";
+/** Type for the text-size-adjust style property */
+export type TextSizeAdjust_StyleType = "none" | "auto" | CssPercent;
 
 
 
-// /** Type for the text-underlinePosition style property */
-export type TextUnderlinePositionStyleType = "auto" | "under" | "left" | "right" | "auto-pos" | "above" | "below";
+/** Type for the text-transform style property */
+export type TextTransform_StyleType = "none" | "capitalize" | "uppercase" | "lowercase" | "full-width" | "full-size-kana";
+
+
+
+/** Type for the text-underlinePosition style property */
+export type TextUnderlinePosition_StyleType = "auto" | "under" | "left" | "right" | "auto-pos" | "above" | "below";
 
 
 
 /** Type for the touch-action style property */
-export type TouchActionStyleType = "auto" | "none" | "manipulation" |
+export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
     "pan-x" | "pan-left" | "pan-right" | "pan-y" | "pan-up" | "pan-down" | "pinch-zoom" |
     "pan-x pinch-zoom" | "pan-left pinch-zoom" | "pan-right pinch-zoom" | "pan-y pinch-zoom" | "pan-up pinch-zoom" | "pan-down pinch-zoom" |
     "pan-x pan-y" | "pan-x pan-y pinch-zoom" | "pan-x pan-up" | "pan-x pan-up pinch-zoom" | "pan-x pan-down" | "pan-x pan-down pinch-zoom" |
@@ -771,56 +864,78 @@ export type TouchActionStyleType = "auto" | "none" | "manipulation" |
 
 
 /** Type for the translate style property */
-export type TranslateStyleType = "none" | CssLength |
+export type Translate_StyleType = "none" | CssLength |
     [Extended<CssLength>, Extended<CssLength>, Extended<CssLength>?];
 
 
 
 /** Type for the unicode-bidi style property */
-export type UnicodeBidiStyleType = "normal" | "embed" | "isolate" | "bidi-override" | "isolate-override" | "plaintext";
+export type UnicodeBidi_StyleType = "normal" | "embed" | "isolate" | "bidi-override" | "isolate-override" | "plaintext";
 
 
 
 /** Type for the user-select style property */
-export type UserSelectStyleType = "auto" | "text" | "none" | "contain" | "all";
+export type UserSelect_StyleType = "auto" | "text" | "none" | "contain" | "all";
+
+
+
+/** Type for the vertical-align style property */
+export type VerticalAlign_StyleType = "baseline" | "sub" | "super" | "text-top" | "text-bottom" |
+    "middle" | "top" | "bottom" | CssLength;
+
+
+
+/** Type for the visibility style property */
+export type Visibility_StyleType = "visible | hidden | collapse";
+
+
+
+/** Type for the vector-effect style property */
+export type VectorEffect_StyleType = "none" | "non-scaling-stroke" | "non-scaling-size" | "non-rotation" | "fixed-position";
 
 
 
 /** Type for the white-space style property */
-export type WhiteSpaceStyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "pre-line" | "break-spaces";
+export type WhiteSpace_StyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "pre-line" | "break-spaces";
 
 
 
 /** Type for widows style property */
-export type WidowsStyleType = number;
+export type Widows_StyleType = CssNumber;
+
+
+
+/** Type for will-change style property */
+export type WillChange_StyleType = "auto" | OneOrMany<"scroll-position" | "contents" | Exclude<keyof ICssStyleset,"willChange">>;
 
 
 
 /** Type for the word-break style property */
-export type WordBreakStyleType = "normal" | "break-all" | "keep-all" | "break-word";
+export type WordBreak_StyleType = "normal" | "break-all" | "keep-all" | "break-word";
 
 
 
 /** Type for the word-spacing style property */
-export type WordSpacingStyleType = "normal" | CssLength;
+export type WordSpacing_StyleType = "normal" | CssLength;
 
 
 
 /** Type for the writing-mode style property */
-export type WritingModeStyleType = "horizontal-tb" | "vertical-rl" | "vertical-lr" | "sideways-rl" | "sideways-lr";
+export type WritingMode_StyleType = "horizontal-tb" | "vertical-rl" | "vertical-lr" | "sideways-rl" | "sideways-lr";
 
 
 
 /** Type for the z-index style property */
-export type ZIndexStyleType = "auto" | number;
+export type ZIndex_StyleType = "auto" | CssNumber;
 
 
 
 /** Type for the zoom style property */
-export type ZoomStyleType = "normal" | "reset" | CssPercent;
+export type Zoom_StyleType = "normal" | "reset" | CssPercent;
 
 
 
+/** Type for style properties for which there is no special type defined. */
 export type DefaultStyleType = string;
 
 
@@ -1030,27 +1145,27 @@ export interface ICssStyleset
     gridTemplateRows?: DefaultStyleType;
 
     height?: CssLength;
-    hyphens?: HyphensStyleType;
+    hyphens?: Hyphens_StyleType;
 
-    imageRendering?: ImageRenderingStyleType;
+    imageRendering?: ImageRendering_StyleType;
     inlineSize?: CssLength;
-    isolation?: IsolationStyleType;
+    isolation?: Isolation_StyleType;
 
-    justifyContent?: JustifyContentStyleType;
-    justifyItems?: JustifyItemsStyleType;
-    justifySelf?: JustifySelfStyleType;
+    justifyContent?: JustifyContent_StyleType;
+    justifyItems?: JustifyItems_StyleType;
+    justifySelf?: JustifySelf_StyleType;
 
     kerning?: FontKerning_StyleType;
 
     left?: CssLength;
-    letterSpacing?: LetterSpacingStyleType;
+    letterSpacing?: LetterSpacing_StyleType;
     lightingColor?: CssColor;
-    lineBreak?: LineBreakStyleType;
-    lineHeight?: LineHeightStyleType;
-    listStyle?: ListStyleStyleType;
-    listStyleImage?: DefaultStyleType;
-    listStylePosition?: ListStylePositionStyleType;
-    listStyleType?: ListStyleTypeStyleType;
+    lineBreak?: LineBreak_StyleType;
+    lineHeight?: CssNumber;
+    listStyle?: ListStyle_StyleType;
+    listStyleImage?: ListStyleImage_StyleType;
+    listStylePosition?: ListStylePosition_StyleType;
+    listStyleType?: ListStyleType_StyleType;
 
     margin?: CssLengthBox;
     marginBlockEnd?: CssLength;
@@ -1083,7 +1198,7 @@ export interface ICssStyleset
     minWidth?: CssLength;
     minZoom?: CssPercent;
 
-    objectFit?: ObjectFitStyleType;
+    objectFit?: ObjectFit_StyleType;
     objectPosition?: CssPosition;
     offset?: DefaultStyleType;
     offsetDistance?: DefaultStyleType;
@@ -1091,25 +1206,25 @@ export interface ICssStyleset
     offsetRotate?: DefaultStyleType;
     opacity?: CssPercent;
     order?: CssNumber;
-    orientation?: DefaultStyleType;
+    orientation?: Orientation_StyleType;
     orphans?: CssNumber;
     outline?: Border_StyleType;
     outlineColor?: CssColor;
     outlineOffset?: CssLength;
     outlineStyle?: BorderStyle_StyleType;
     outlineWidth?: BorderWidth__Single;
-    overflow?: OverflowStyleType;
-    overflowAnchor?: OverflowAnchorStyleType;
-    overflowWrap?: OverflowWrapStyleType;
-    overflowX?: SingleOverflowStyleType;
-    overflowY?: SingleOverflowStyleType;
-    overflowInline?: SingleOverflowStyleType;
-    overflowBlock?: SingleOverflowStyleType;
-    overscrollBehavior?: DefaultStyleType;
-    overscrollBehaviorBlock?: DefaultStyleType;
-    overscrollBehaviorInline?: DefaultStyleType;
-    overscrollBehaviorX?: DefaultStyleType;
-    overscrollBehaviorY?: DefaultStyleType;
+    overflow?: Overflow_StyleType;
+    overflowAnchor?: OverflowAnchor_StyleType;
+    overflowWrap?: OverflowWrap_StyleType;
+    overflowX?: Overflow_Single_StyleType;
+    overflowY?: Overflow_Single_StyleType;
+    overflowInline?: Overflow_Single_StyleType;
+    overflowBlock?: Overflow_Single_StyleType;
+    overscrollBehavior?: OverscrollBehavior_StyleType;
+    overscrollBehaviorBlock?: OverscrollBehavior_Single_StyleType;
+    overscrollBehaviorInline?: OverscrollBehavior_Single_StyleType;
+    overscrollBehaviorX?: OverscrollBehavior_Single_StyleType;
+    overscrollBehaviorY?: OverscrollBehavior_Single_StyleType;
 
     padding?: CssLengthBox;
     paddingBlockEnd?: CssLength;
@@ -1121,21 +1236,21 @@ export interface ICssStyleset
     paddingRight?: CssLength;
     paddingTop?: CssLength;
     page?: DefaultStyleType;
-    paintOrder?: DefaultStyleType;
+    paintOrder?: PaintOrder_StyleType;
     pageBreakAfter?: BreakAfter_StyleType;
     pageBreakBefore?: BreakBefore_StyleType;
     pageBreakInside?: BreakInside_StyleType;
     perspective?: "none" | CssLength;
     perspectiveOrigin?: CssPosition;
-    placeContent?: PlaceContentStyleType;
-    placeItems?: PlaceItemsStyleType;
-    placeSelf?: PlaceSelfStyleType;
-    pointerEvents?: PointerEventsStyleType;
-    position?: PositionStyleType;
+    placeContent?: PlaceContent_StyleType;
+    placeItems?: PlaceItems_StyleType;
+    placeSelf?: PlaceSelf_StyleType;
+    pointerEvents?: PointerEvents_StyleType;
+    position?: Position_StyleType;
 
-    quotes?: DefaultStyleType;
+    quotes?: Quotes_StyleType;
 
-    resize?: ResizeStyleType;
+    resize?: Resize_StyleType;
     right?: CssLength;
     rotate?: DefaultStyleType;
     rowGap?: Gap_Single;
@@ -1144,7 +1259,7 @@ export interface ICssStyleset
     rubyPosition?: DefaultStyleType;
 
     scale?: DefaultStyleType;
-    scrollBehavior?: ScrollBehaviorStyleType;
+    scrollBehavior?: ScrollBehavior_StyleType;
     scrollMargin?: CssLengthBox;
     scrollMarginBlock?: CssLengthBox;
     scrollMarginBlockEnd?: CssLength;
@@ -1167,15 +1282,15 @@ export interface ICssStyleset
     scrollPaddingLeft?: CssLength;
     scrollPaddingRight?: CssLength;
     scrollPaddingTop?: CssLength;
-    scrollSnapAlign?: DefaultStyleType;
-    scrollSnapStop?: DefaultStyleType;
-    scrollSnapType?: DefaultStyleType;
-    shapeImageThreshold?: DefaultStyleType;
-    shapeMargin?: DefaultStyleType;
-    shapeOutside?: DefaultStyleType;
-    shapeRendering?: DefaultStyleType;
+    scrollSnapAlign?: ScrollSnapAlign_StyleType;
+    scrollSnapStop?: ScrollSnapStop_StyleType;
+    scrollSnapType?: ScrollSnapType_StyleType;
+    shapeImageThreshold?: CssNumber;
+    shapeMargin?: CssLength;
+    shapeOutside?: ShapeOutside_StyleType;
+    shapeRendering?: ShapeRendering_StyleType;
     stopColor?: CssColor;
-    stopOpacity?: StopOpacityStyleType;
+    stopOpacity?: StopOpacity_StyleType;
     stroke?: DefaultStyleType;
     strokeDasharray?: DefaultStyleType;
     strokeDashoffset?: DefaultStyleType;
@@ -1186,33 +1301,33 @@ export interface ICssStyleset
     strokeWidth?: DefaultStyleType;
 
     tabSize?: CssLength;
-    tableLayout?: TableLayoutStyleType;
-    textAlign?: TextAlignStyleType;
-    textAlignLast?: TextAlignLastStyleType;
-    textAnchor?: TextAnchorStyleType;
-    textCombineUpright?: DefaultStyleType;
-    textDecoration?: DefaultStyleType;
+    tableLayout?: TableLayout_StyleType;
+    textAlign?: TextAlign_StyleType;
+    textAlignLast?: TextAlignLast_StyleType;
+    textAnchor?: TextAnchor_StyleType;
+    textCombineUpright?: TextCombineUpright_StyleType;
+    textDecoration?: TextDecoration_StyleType;
     textDecorationColor?: CssColor;
-    textDecorationLine?: TextDecorationLineStyleType;
-    textDecorationSkipInk?: DefaultStyleType;
-    textDecorationStyle?: TextDecorationStyleStyleType;
-    textDecorationThickness?: TextDecorationThicknessStyleType;
-    textEmphasis?: DefaultStyleType;
+    textDecorationLine?: TextDecorationLine_StyleType;
+    textDecorationSkipInk?: TextDecorationSkipInk_StyleType;
+    textDecorationStyle?: TextDecorationStyle_StyleType;
+    textDecorationThickness?: TextDecorationThickness_StyleType;
+    textEmphasis?: TextEmphasisFill;
     textEmphasisColor?: CssColor;
-    textEmphasisPosition?: TextEmphasisPositionStyleType;
-    textEmphasisStyle?: TextEmphasisStyleStyleType;
-    textIndent?: TextIndentStyleType;
-    textJustify?: TextJustifyStyleType;
+    textEmphasisPosition?: TextEmphasisPosition_StyleType;
+    textEmphasisStyle?: TextEmphasisStyle_StyleType;
+    textIndent?: TextIndent_StyleType;
+    textJustify?: TextJustify_StyleType;
     textKashida?: DefaultStyleType;
     textKashidaSpace?: DefaultStyleType;
-    textOrientation?: TextOrientationStyleType;
-    textOverflow?: TextOverflowStyleType;
-    textShadow?: DefaultStyleType;
-    textSizeAdjust?: DefaultStyleType;
-    textTransform?: TextTransformStyleType;
-    textUnderlinePosition?: TextUnderlinePositionStyleType;
+    textOrientation?: TextOrientation_StyleType;
+    textOverflow?: TextOverflow_StyleType;
+    textShadow?: TextShadow_StyleType;
+    textSizeAdjust?: TextSizeAdjust_StyleType;
+    textTransform?: TextTransform_StyleType;
+    textUnderlinePosition?: TextUnderlinePosition_StyleType;
     top?: CssLength;
-    touchAction?: TouchActionStyleType;
+    touchAction?: TouchAction_StyleType;
     transform?: DefaultStyleType;
     transformBox?: DefaultStyleType;
     transformOrigin?: DefaultStyleType;
@@ -1222,27 +1337,27 @@ export interface ICssStyleset
     transitionDuration?: DefaultStyleType;
     transitionProperty?: DefaultStyleType;
     transitionTimingFunction?: DefaultStyleType;
-    translate?: TranslateStyleType;
+    translate?: Translate_StyleType;
 
-    unicodeBidi?: UnicodeBidiStyleType;
-    userSelect?: UserSelectStyleType;
+    unicodeBidi?: UnicodeBidi_StyleType;
+    userSelect?: UserSelect_StyleType;
     userZoom?: DefaultStyleType;
 
-    verticalAlign?: DefaultStyleType;
-    visibility?: DefaultStyleType;
-    vectorEffect?: DefaultStyleType;
+    verticalAlign?: VerticalAlign_StyleType;
+    visibility?: Visibility_StyleType;
+    vectorEffect?: VectorEffect_StyleType;
 
-    whiteSpace?: WhiteSpaceStyleType;
-    widows?: WidowsStyleType;
+    whiteSpace?: WhiteSpace_StyleType;
+    widows?: Widows_StyleType;
     width?: CssLength;
-    willChange?: DefaultStyleType;
-    wordBreak?: WordBreakStyleType;
-    wordSpacing?: WordSpacingStyleType;
+    willChange?: WillChange_StyleType;
+    wordBreak?: WordBreak_StyleType;
+    wordSpacing?: WordSpacing_StyleType;
     wordWrap?: DefaultStyleType;
-    writingMode?: WritingModeStyleType;
+    writingMode?: WritingMode_StyleType;
 
-    zIndex?: ZIndexStyleType;
-    zoom?: ZoomStyleType;
+    zIndex?: ZIndex_StyleType;
+    zoom?: Zoom_StyleType;
 
     // webkitBorderImage?: DefaultStyleType;
     // webkitBoxDirection?: DefaultStyleType;
@@ -1349,7 +1464,7 @@ export interface ICssVarTemplates extends ICssStyleset
     /** Allows having CSS variables that accept a `<length>` CSS value */
     "CssLength"?: CssLength;
 
-    /** Allows having CSS variables that accept a `<angle>` CSS value */
+    /** Allows having CSS variables that accept an `<angle>` CSS value */
     "CssAngle"?: CssAngle;
 
     /** Allows having CSS variables that accept a `<time>` CSS value */
@@ -1373,7 +1488,7 @@ export interface ICssVarTemplates extends ICssStyleset
     /** Allows having CSS variables that accept a `<color>` CSS value */
     "CssColor"?: CssColor;
 
-    /** Allows having CSS variables that accept a `<image>` CSS value */
+    /** Allows having CSS variables that accept an `<image>` CSS value */
     "CssImage"?: CssImage;
 }
 
