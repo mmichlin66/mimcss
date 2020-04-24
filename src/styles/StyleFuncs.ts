@@ -1,6 +1,6 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
-import {Extended, MultiCssPosition, CssRadius} from "./UtilTypes";
+import {Extended, MultiCssPosition, CssRadius, OneOrMany} from "./UtilTypes";
 import {
     camelToDash, valueToString, arrayToString, objectToString, IValueConvertOptions,
     positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
@@ -26,7 +26,7 @@ function singleAnimation_fromObject( val: StyleTypes.Animation_Single): string
 {
     return objectToString( val, [
         ["duration", CssTimeMath.styleToString],
-        ["func", singleAnimationTimingFunction_fromStyle],
+        ["func", singleTimingFunction_fromStyle],
         ["delay", CssTimeMath.styleToString],
         ["count", CssNumberMath.styleToString],
         "direction",
@@ -47,26 +47,36 @@ function singleAnimation_fromStyle( val: Extended<StyleTypes.Animation_Single>):
 
 
 
-function animationTimingFunction_fromNumber( val: number): string
+function timingFunctionToString( val: OneOrMany<StyleTypes.TimingFunction_Single>): string
+{
+    return valueToString( val, {
+        fromNumber: timingFunction_fromNumber,
+        fromArray: timingFunction_fromArray
+    });
+}
+
+
+
+function timingFunction_fromNumber( val: number): string
 {
     return `steps(${val})`;
 }
 
 
 
-function animationTimingFunction_fromArray( val: any[]): string
+function timingFunction_fromArray( val: any[]): string
 {
     return typeof val[0] === "number"
-        ? singleAnimationTimingFunction_fromStyle( val as StyleTypes.AnimationTimingFunction_Single)
-        : arrayToString( val, singleAnimationTimingFunction_fromStyle, ",");
+        ? singleTimingFunction_fromStyle( val as StyleTypes.TimingFunction_Single)
+        : arrayToString( val, singleTimingFunction_fromStyle, ",");
 }
 
 
 
-function singleAnimationTimingFunction_fromStyle( val: Extended<StyleTypes.AnimationTimingFunction_Single>): string
+function singleTimingFunction_fromStyle( val: Extended<StyleTypes.TimingFunction_Single>): string
 {
     return valueToString( val, {
-        fromNumber: animationTimingFunction_fromNumber,
+        fromNumber: timingFunction_fromNumber,
         fromArray: v =>
         {
             if (v.length < 3)
@@ -283,6 +293,27 @@ function textDecoration_fromObject( val: StyleTypes.TextDecoration_StyleType): s
 
 
 
+function singleTransition_fromObject( val: StyleTypes.Animation_Single): string
+{
+    return objectToString( val, [
+        ["property", camelToDash],
+        ["duration", CssTimeMath.styleToString],
+        ["func", singleTimingFunction_fromStyle],
+        ["delay", CssTimeMath.styleToString]
+    ]);
+}
+
+
+
+function singleTransition_fromStyle( val: Extended<StyleTypes.Animation_Single>): string
+{
+    return valueToString( val, {
+        fromObject: singleTransition_fromObject
+    });
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Functions for handling Stylesets.
@@ -494,7 +525,6 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     animation: {
         fromObject: singleAnimation_fromObject,
         fromAny: singleAnimation_fromStyle,
-        arrayItemFunc: singleAnimation_fromStyle,
         arraySeparator: ",",
     },
     animationDelay: CssTimeMath.multiStyleToStringWithComma,
@@ -503,10 +533,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     animationFillMode: commaArraySeparator,
     animationName: commaArraySeparator,
     animationPlayState: commaArraySeparator,
-    animationTimingFunction: {
-        fromNumber: animationTimingFunction_fromNumber,
-        fromArray: animationTimingFunction_fromArray
-    },
+    animationTimingFunction: timingFunctionToString,
 
     background: {
         fromNumber: colorToString,
@@ -700,6 +727,23 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     },
     textSizeAdjust: CssPercentMath.styleToString,
     top: CssLengthMath.styleToString,
+    transformOrigin: {
+        fromAny: CssLengthMath.styleToString
+    },
+    transition: {
+        fromObject: singleTransition_fromObject,
+        fromAny: singleTransition_fromStyle,
+        arraySeparator: ",",
+    },
+    transitionDelay: {
+        fromAny: CssTimeMath.styleToString,
+        arraySeparator: ","
+    },
+    transitionDuration: {
+        fromAny: CssTimeMath.styleToString,
+        arraySeparator: ","
+    },
+    transitionTimingFunction: timingFunctionToString,
     translate: {
         fromAny: CssLengthMath.styleToString
     },

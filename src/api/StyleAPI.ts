@@ -2,14 +2,14 @@
 import {CssColor} from "../styles/ColorTypes"
 import {CssImage} from "../styles/ImageTypes"
 import {
-	VarTemplateName, VarValueType, AnimationName_Single, AnimationTimingFunction_Single,
+	VarTemplateName, VarValueType, AnimationName_Single, TimingFunction_Single,
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
 	AnimationPlayState_Single, Animation_Single, BackgroundSize_Single, BackgroundRepeat_Single,
 	BackgroundAttachment_Single, BackgroundOrigin_Single, BackgroundClip_Single,
 	Background_Single, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy,
 	FontStyle_StyleType, FontWeight_StyleType, Font_StyleType, TextDecorationLine_StyleType,
 	TextDecorationStyle_StyleType, TextDecorationThickness_StyleType, TextDecoration_StyleType,
-	TextShadow_Single
+	TextShadow_Single, TransformProxy, Transition_Single, TransitionProperty_Single
 } from "../styles/StyleTypes"
 import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
 import {stylePropToString, singleBoxShadow_fromObject} from "../styles/StyleFuncs"
@@ -167,7 +167,7 @@ export function stylesetToStringObject( styleset: Styleset): { [K: string]: stri
  */
 export function animation( name: Extended<AnimationName_Single>,
 		duration: Extended<CssTime> = 1000,
-		func: Extended<AnimationTimingFunction_Single> = "ease",
+		func: Extended<TimingFunction_Single> = "ease",
 		delay: Extended<CssTime> = 0,
 		count: Extended<AnimationIterationCount_Single> = 1,
 		direction: Extended<AnimationDirection_Single> = "normal",
@@ -208,6 +208,37 @@ export function background(
 	): Background_Single
 {
 	return { color, image, position, size, repeat, attachment, origin, clip };
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Transitions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns an object that can be assigned to the transition property.
+ * @param property Name of the property to transition. The default value is "all".
+ * @param duration Transition duration. Integer numbers for milliseconds, floating point
+ * numbers for seconds. The default value is 1 second.
+ * @param func Timing function. Default value is "ease". This can be one of the following types:
+ *   - one of pre-defined timing function names.
+ *   - a number of steps in the steps function. The step position will be set to jump-start.
+ *   - one- or two-item array that defines a step function. The first item defines the number
+ *     of steps. The optional second item is one of pre-defined step postion names.
+ *   - four-item array that defines cubic-bezier function.
+ * @param delay Delay before the transition starts. Integer numbers for milliseconds, floating
+ * point numbers for seconds. The default value is 0.
+ */
+export function transition( property: Extended<TransitionProperty_Single> = "all",
+	duration: Extended<CssTime> = 1000,
+	func: Extended<TimingFunction_Single> = "ease",
+	delay: Extended<CssTime> = 0
+	): Transition_Single
+{
+return { property, duration, func, delay };
 }
 
 
@@ -451,6 +482,22 @@ export function hueRotate( amount: Extended<CssAngle>): FilterProxy
  * Returns an BasicShapeProxy function representing the `circle()` CSS function.
  */
 export function circle(): BasicShapeProxy
+{
+    return () => "";
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Transforms
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns an TransformProxy function representing the `matrix()` CSS function.
+ */
+export function matrix(): TransformProxy
 {
     return () => "";
 }

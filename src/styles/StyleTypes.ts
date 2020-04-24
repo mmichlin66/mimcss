@@ -1,7 +1,8 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, Many,
-    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius, UrlProxy, AttrProxy
+    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius, UrlProxy, AttrProxy,
+    HorizontalPositionKeyword, VerticalPositionKeyword
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -47,14 +48,14 @@ export type AlignmentBaselineStyleType = "auto" | "baseline" | "before-edge" | "
 /** Type for single animation */
 export type Animation_Single = string |
     {
-        delay?: Extended<CssTime>;
-        func?: Extended<AnimationTimingFunction_Single>;
+        name?: Extended<AnimationName_Single>;
         duration?: Extended<CssTime>;
+        func?: Extended<TimingFunction_Single>;
+        delay?: Extended<CssTime>;
         count?: Extended<AnimationIterationCount_Single>;
         direction?: Extended<AnimationDirection_Single>;
-        state?: Extended<AnimationPlayState_Single>;
         mode?: Extended<AnimationFillMode_Single>;
-        name?: Extended<AnimationName_Single>;
+        state?: Extended<AnimationPlayState_Single>;
     };
 
 /** Type for animation style property */
@@ -103,22 +104,22 @@ export type AnimationPlayState_StyleType = OneOrMany<AnimationPlayState_Single>;
 
 
 /** Type for simple animation timing functions - those that don't have parameters */
-export type AnimationTimingFunction_Simple = "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out" | "step-start" | "step-end";
+export type TimingFunction_Simple = "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out" | "step-start" | "step-end";
 
 /** Type for step animation timing function position */
-export type AnimationTimingFunction_StepPosition = "jump-start" | "jump-end" | "jump-none" | "jump-both" | "start" | "end";
+export type TimingFunction_StepPosition = "jump-start" | "jump-end" | "jump-none" | "jump-both" | "start" | "end";
 
 /** Type for step animation timing function */
-export type AnimationTimingFunction_Step = number | [Extended<number>, Extended<AnimationTimingFunction_StepPosition>?];
+export type TimingFunction_Step = number | [Extended<number>, Extended<TimingFunction_StepPosition>?];
 
 /** Type for Bezier animation timing function */
-export type AnimationTimingFunction_Bezier = [Extended<number>, Extended<number>, Extended<number>, Extended<number>];
+export type TimingFunction_Bezier = [Extended<number>, Extended<number>, Extended<number>, Extended<number>];
 
 /** Type for single animation timing function */
-export type AnimationTimingFunction_Single = AnimationTimingFunction_Simple | AnimationTimingFunction_Step | AnimationTimingFunction_Bezier;
+export type TimingFunction_Single = TimingFunction_Simple | TimingFunction_Step | TimingFunction_Bezier;
 
 /** Type for animation-timing-function style property */
-export type AnimationTimingFunction_StyleType = OneOrMany<AnimationTimingFunction_Single>;
+export type AnimationTimingFunction_StyleType = OneOrMany<TimingFunction_Single>;
 
 
 
@@ -863,6 +864,54 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
 
 
 
+/** Type for transform style property */
+export type Transform_StyleType = "none" | TransformProxy;
+
+
+
+/** Type for transform-box style property */
+export type TransformBox_StyleType = "content-box" | "border-box" | "fill-box" | "stroke-box" | "view-box";
+
+
+
+/** Type for transform-origin style property */
+export type TransformOrigin_StyleType = HorizontalPositionKeyword | VerticalPositionKeyword | CssLength |
+    [Extended<HorizontalPositionKeyword | CssLength>, Extended<VerticalPositionKeyword | CssLength>, Extended<CssLength>?];
+
+
+
+/** Type for transform-style style property */
+export type TransformStyle_StyleType = "flat" | "preserve-3d";
+
+
+
+/** Type for single transition */
+export type Transition_Single = string |
+    {
+        property?: Extended<AnimationName_Single>;
+        duration?: Extended<CssTime>;
+        func?: Extended<TimingFunction_Single>;
+        delay?: Extended<CssTime>;
+    };
+
+/** Type for transition style property */
+export type Transition_StyleType = OneOrMany<Transition_Single>;
+
+
+
+/** Type for single transition-property */
+export type TransitionProperty_Single = "none" | "all" | keyof ICssStyleset;
+
+/** Type for transition-property style property */
+export type TransitionProperty_StyleType = OneOrMany<TransitionProperty_Single>;
+
+
+
+/** Type for transition-timing-function style property */
+export type TransitionTimingFunction_StyleType = OneOrMany<TimingFunction_Single>;
+
+
+
 /** Type for the translate style property */
 export type Translate_StyleType = "none" | CssLength |
     [Extended<CssLength>, Extended<CssLength>, Extended<CssLength>?];
@@ -955,6 +1004,11 @@ export type FilterProxy = (p?: "filter") => string;
  * The BasicShapeProxy function represents an invocation of one the CSS `<basic-shape>` functions.
  */
 export type BasicShapeProxy = (p?: "basic-shape") => string;
+
+/**
+ * The TransformProxy function represents an invocation of one the CSS `<basic-shape>` functions.
+ */
+export type TransformProxy = (p?: "transform") => string;
 
 
 
@@ -1134,7 +1188,7 @@ export interface ICssStyleset
     gridColumnEnd?: DefaultStyleType;
     gridColumnGap?: Gap_Single;
     gridColumnStart?: DefaultStyleType;
-    gridGap?: DefaultStyleType;
+    gridGap?: Gap_StyleType;
     gridRow?: DefaultStyleType;
     gridRowEnd?: DefaultStyleType;
     gridRowGap?: Gap_Single;
@@ -1328,15 +1382,15 @@ export interface ICssStyleset
     textUnderlinePosition?: TextUnderlinePosition_StyleType;
     top?: CssLength;
     touchAction?: TouchAction_StyleType;
-    transform?: DefaultStyleType;
-    transformBox?: DefaultStyleType;
-    transformOrigin?: DefaultStyleType;
-    transformStyle?: DefaultStyleType;
-    transition?: DefaultStyleType;
-    transitionDelay?: DefaultStyleType;
-    transitionDuration?: DefaultStyleType;
-    transitionProperty?: DefaultStyleType;
-    transitionTimingFunction?: DefaultStyleType;
+    transform?: Transform_StyleType;
+    transformBox?: TransformBox_StyleType;
+    transformOrigin?: TransformOrigin_StyleType;
+    transformStyle?: TransformStyle_StyleType;
+    transition?: Transition_StyleType;
+    transitionDelay?: OneOrMany<CssTime>;
+    transitionDuration?: OneOrMany<CssTime>;
+    transitionProperty?: TransitionProperty_StyleType;
+    transitionTimingFunction?: TransitionTimingFunction_StyleType;
     translate?: Translate_StyleType;
 
     unicodeBidi?: UnicodeBidi_StyleType;
