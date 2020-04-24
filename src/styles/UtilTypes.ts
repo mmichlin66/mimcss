@@ -106,7 +106,7 @@ export type Many<T> = Extended<T>[];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The INumberProxy function represents a string value can be assigned to properties of the CSS
+ * The NumberProxy function represents a string value can be assigned to properties of the CSS
  * numeric types. This function is returned from functions like min(), max() and calc().
  */
 export type NumberProxy<T extends string> = (p?: T) => string;
@@ -120,9 +120,9 @@ export type MultiNumberBase<T extends string> = OneOrMany<NumberBase<T>>;
 
 
 /**
- * The INummberMath interface contains methods that implement CSS mathematic functions on the
+ * The INumberMath interface contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number type, they are converted
- * to strings by calling a function specified in the constructor.
+ * to strings using the `numberToString` method.
  */
 export interface INumberMath<T extends string>
 {
@@ -187,7 +187,7 @@ export interface INumberMath<T extends string>
 export type NumberType = "Number";
 
 /** Type for single style property of the `<number>` CSS type*/
-export type CssNumber = NumberBase<NumberType>;
+export type CssNumber = Exclude<NumberBase<NumberType>,string>;
 
 /** Type for multi-part style property of the `<number>` CSS type*/
 export type CssMultiNumber = OneOrMany<CssNumber>;
@@ -557,14 +557,14 @@ export type HorizontalPositionKeyword = "left" | "center" | "right";
 export type VerticalPositionKeyword = "top" | "center" | "bottom";
 
 /** Type describing a simple 1 or two values `<position>` CSS type */
-export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyword | Extended<CssNumber> |
-    [HorizontalPositionKeyword | Extended<CssNumber>, VerticalPositionKeyword | Extended<CssNumber>];
+export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyword | Extended<CssLength> |
+    [HorizontalPositionKeyword | Extended<CssLength>, VerticalPositionKeyword | Extended<CssLength>];
 
 /** Type describing the full up to 4 values `<position>` CSS type */
 export type CssPosition = SimpleCssPosition | 
-    [HorizontalPositionKeyword, Extended<CssNumber>, VerticalPositionKeyword] |
-    [HorizontalPositionKeyword, VerticalPositionKeyword, Extended<CssNumber>] |
-    [HorizontalPositionKeyword, Extended<CssNumber>, VerticalPositionKeyword, Extended<CssNumber>];
+    [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword] |
+    [HorizontalPositionKeyword, VerticalPositionKeyword, Extended<CssLength>] |
+    [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword, Extended<CssLength>];
 
 /** Type describing multiple `<position>` CSS types */
 export type MultiCssPosition = Extended<CssPosition>[];

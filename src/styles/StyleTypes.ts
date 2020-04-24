@@ -131,7 +131,7 @@ export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 export type Background_Single = string | CssColor |
     {
         color?: Extended<CssColor>,
-        image?: Extended<CssImage>,
+        image?: Extended<CssImage | string>,
         position?: Extended<CssPosition>,
         size?: Extended<BackgroundSize_Single>,
         repeat?: Extended<BackgroundRepeat_Single>,
@@ -172,7 +172,7 @@ export type BackgroundClip_StyleType = OneOrMany<BackgroundClip_Single>;
 
 
 /** Type for background-image style property */
-export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
+export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage | string>;
 
 
 
@@ -388,7 +388,7 @@ export type Contain_StyleType = "none" | "strict" | "content" | "size" | "layout
 
 
 /** Type for content style property */
-export type Content_StyleType = OneOrMany<CssImage | AttrProxy | "none" | "normal" |
+export type Content_StyleType = string | OneOrMany<CssImage | AttrProxy | "none" | "normal" |
     "open-quote" | "close-quote" | "no-open-quote" | "no-close-quote">;
 
 
@@ -715,7 +715,7 @@ export type ScrollSnapType_StyleType = "none" |
 
 
 /** Type for shape-outside style property */
-export type ShapeOutside_StyleType = UrlProxy | BasicShapeProxy | GeometryBoxKeyword | Exclude<CssImage,string>;
+export type ShapeOutside_StyleType = UrlProxy | BasicShapeProxy | GeometryBoxKeyword | CssImage;
 
 
 
@@ -1023,7 +1023,7 @@ export interface ICssStyleset
     borderImageOutset?: CssNumberBox;
     borderImageRepeat?: BorderImageRepeat_StyleType;
     borderImageSlice?: DefaultStyleType;
-    borderImageSource?: CssImage;
+    borderImageSource?: CssImage | string;
     borderImageWidth?: OneOrBox<CssNumber | "auto">;
     borderInlineEnd?: Border_StyleType;
     borderInlineEndColor?: CssColor;

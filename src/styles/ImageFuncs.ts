@@ -3,7 +3,7 @@
     RadialGradientExtent, CrossFadeParam
 } from "./ImageTypes"
 import {colorToString} from "./ColorFuncs";
-import {CssPosition, Extended, SimpleCssPosition, CssAngle, NumberBase} from "./UtilTypes";
+import {CssPosition, Extended, SimpleCssPosition, CssAngle} from "./UtilTypes";
 import {valueToString, INumberMathClass, CssAngleMath, positionToString, CssPercentMath} from "./UtilFuncs";
 
 
@@ -23,8 +23,8 @@ function gradientStopOrHintToString<T extends string>( val: GradientStopOrHint,
 function gradientColorAndLengthToString<T extends string>( val: GradientColorAndLength,
     mathClass: INumberMathClass<T>): string
 {
-    let secondStop = val.length > 2 ? mathClass.styleToString( val[1] as NumberBase<T>) : "";
-    return `${colorToString(val[0])} ${mathClass.styleToString( val[1] as NumberBase<T>)} ${secondStop}`;
+    let secondStop = val.length > 2 ? mathClass.styleToString( val[2]) : "";
+    return `${colorToString(val[0])} ${mathClass.styleToString( val[1])} ${secondStop}`;
 }
 
 

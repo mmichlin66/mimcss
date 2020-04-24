@@ -2,7 +2,7 @@
  * This module contains types used to define CSS `<image>` type and related functions.
  */
 
-import {UrlProxy, Extended, CssNumber, CssAngle} from "./UtilTypes"
+import {UrlProxy, Extended, CssNumber, CssAngle, NumberBase} from "./UtilTypes"
 import {CssColor} from "./ColorTypes";
 
 
@@ -18,22 +18,27 @@ export type ImageProxy = (img?:"image") => string;
 /**
  * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
  */
-export type CssImage = string | UrlProxy | ImageProxy;
+export type CssImage = UrlProxy | ImageProxy;
 
 
+
+/**
+ * Value of a hint for the `gradient` CSS functions is expressed as a CSS numeric value.
+ */
+export type GradientHintValue = Extended<NumberBase<any>>;
 
 /**
  * Color hint for the `gradient` CSS functions is expressed as a single-item array that
  * contains a CSS numeric value.
  */
-export type GradientHint = [Extended<CssNumber>];
+export type GradientHint = [GradientHintValue];
 
 /**
  * Represents a color stop with indication of length for the `gradient` CSS functions. The first
  * item is the color value, the second item is the position of where the color starts and the
  * optional third item is the position where the color stops.
  */
-export type GradientColorAndLength = [Extended<CssColor>, Extended<CssNumber>, Extended<CssNumber>?];
+export type GradientColorAndLength = [Extended<CssColor>, GradientHintValue, GradientHintValue?];
 
 /**
  * Color stop for the `gradient` CSS functions is expressed as either a single color value
