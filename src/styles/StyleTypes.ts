@@ -658,6 +658,12 @@ export type PaintOrder_StyleType = "normal" | OneOrMany<"fill" | "stroke" | "mar
 
 
 
+/** Type for the perspective-origin style property */
+export type PerspectiveOrigin_StyleType = HorizontalPositionKeyword | VerticalPositionKeyword | CssLength |
+    [Extended<HorizontalPositionKeyword | CssLength>, Extended<VerticalPositionKeyword | CssLength>];
+
+
+
 /** Type for the place-content style property */
 export type PlaceContent_StyleType = AlignContentStyleType | [Extended<AlignContentStyleType>, Extended<JustifyContent_StyleType>];
 
@@ -865,7 +871,7 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
 
 
 /** Type for transform style property */
-export type Transform_StyleType = "none" | TransformProxy;
+export type Transform_StyleType = "none" | string | OneOrMany<TransformProxy>;
 
 
 
@@ -1295,7 +1301,7 @@ export interface ICssStyleset
     pageBreakBefore?: BreakBefore_StyleType;
     pageBreakInside?: BreakInside_StyleType;
     perspective?: "none" | CssLength;
-    perspectiveOrigin?: CssPosition;
+    perspectiveOrigin?: PerspectiveOrigin_StyleType;
     placeContent?: PlaceContent_StyleType;
     placeItems?: PlaceItems_StyleType;
     placeSelf?: PlaceSelf_StyleType;

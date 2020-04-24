@@ -669,7 +669,9 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     paddingRight: CssLengthMath.styleToString,
     paddingTop: CssLengthMath.styleToString,
     perspective: CssLengthMath.styleToString,
-    perspectiveOrigin: positionToString,
+    perspectiveOrigin: {
+        fromAny: CssLengthMath.styleToString
+    },
 
     quotes: {
         arrayItemFunc: v => `"${v}"`

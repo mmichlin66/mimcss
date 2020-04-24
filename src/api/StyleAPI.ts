@@ -1,6 +1,8 @@
 ﻿import {Extended, CssPosition, CssTime, CssLength, CssPercent, CssAngle, CssNumber} from "../styles/UtilTypes"
 import {CssColor} from "../styles/ColorTypes"
 import {CssImage} from "../styles/ImageTypes"
+import {FontStretch_Single } from "../styles/FontFaceTypes";
+import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
 import {
 	VarTemplateName, VarValueType, AnimationName_Single, TimingFunction_Single,
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
@@ -11,11 +13,9 @@ import {
 	TextDecorationStyle_StyleType, TextDecorationThickness_StyleType, TextDecoration_StyleType,
 	TextShadow_Single, TransformProxy, Transition_Single, TransitionProperty_Single
 } from "../styles/StyleTypes"
-import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
 import {stylePropToString, singleBoxShadow_fromObject} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
-import { CssPercentMath, CssLengthMath } from "../styles/UtilFuncs";
-import { FontStretch_Single } from "../styles/FontFaceTypes";
+import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath} from "../styles/UtilFuncs";
 
 
 
@@ -497,9 +497,255 @@ export function circle(): BasicShapeProxy
 /**
  * Returns an TransformProxy function representing the `matrix()` CSS function.
  */
-export function matrix(): TransformProxy
+export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
+	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): TransformProxy
 {
-    return () => "";
+    return () => `matrix(${arrayToString( [a, b, c, d, tx, ty], undefined, ",")})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `matrix3d()` CSS function.
+ */
+export function matrix3d(
+		a1: Extended<CssNumber>, b1: Extended<CssNumber>, c1: Extended<CssNumber>, d1: Extended<CssNumber>,
+		a2: Extended<CssNumber>, b2: Extended<CssNumber>, c2: Extended<CssNumber>, d2: Extended<CssNumber>,
+		a3: Extended<CssNumber>, b3: Extended<CssNumber>, c3: Extended<CssNumber>, d3: Extended<CssNumber>,
+		a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>,
+	): TransformProxy
+{
+    return () => `matrix(${arrayToString( [a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4], undefined, ",")})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `perspective()` CSS function.
+ */
+export function perspective( d: Extended<CssLength>): TransformProxy
+{
+    return () => `perspective(${CssLengthMath.styleToString(d)})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the given CSS rotation function.
+ */
+function rotateImpl( name: string, a: Extended<CssAngle>): TransformProxy
+{
+    return () => `${name}(${CssAngleMath.styleToString(a)})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `rotate()` CSS function.
+ */
+export function rotate( a: Extended<CssAngle>): TransformProxy
+{
+    return rotateImpl( "rotate", a);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `rotateX()` CSS function.
+ */
+export function rotateX( a: Extended<CssAngle>): TransformProxy
+{
+    return rotateImpl( "rotateX", a);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `rotateY()` CSS function.
+ */
+export function rotateY( a: Extended<CssAngle>): TransformProxy
+{
+    return rotateImpl( "rotateY", a);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `rotateZ()` CSS function.
+ */
+export function rotateZ( a: Extended<CssAngle>): TransformProxy
+{
+    return rotateImpl( "rotateZ", a);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `rotate3d()` CSS function.
+ */
+export function rotate3d(
+	x: Extended<CssNumber>, y: Extended<CssNumber>, z: Extended<CssNumber>,
+	a: Extended<CssAngle>): TransformProxy
+{
+	let v = [CssNumberMath.styleToString(x), CssNumberMath.styleToString(y),
+		CssNumberMath.styleToString(z), CssAngleMath.styleToString(a)].join(",");
+    return () => `rotate3d(${v})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `scale()` CSS function.
+ */
+export function scale( cx: Extended<CssNumber>, sy?: Extended<CssNumber>): TransformProxy
+{
+    return () => `scale(${CssNumberMath.styleToString(cx)}${sy != null ? "," + CssNumberMath.styleToString(sy) : ""})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the given scale CSS function.
+ */
+function scaleImpl( name: string, s: Extended<CssNumber>): TransformProxy
+{
+    return () => `${name}(${CssNumberMath.styleToString(s)})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `scaleX()` CSS function.
+ */
+export function scaleX( s: Extended<CssNumber>): TransformProxy
+{
+    return scaleImpl( "scaleX", s);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `scaleY()` CSS function.
+ */
+export function scaleY( s: Extended<CssNumber>): TransformProxy
+{
+    return scaleImpl( "scaleY", s);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `scaleZ()` CSS function.
+ */
+export function scaleZ( s: Extended<CssNumber>): TransformProxy
+{
+    return scaleImpl( "scaleZ", s);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `scale3d()` CSS function.
+ */
+export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
+	sz: Extended<CssNumber>): TransformProxy
+{
+	let v = [CssNumberMath.styleToString(sx), CssNumberMath.styleToString(sy),
+		CssNumberMath.styleToString(sz)].join(",");
+    return () => `scale3d(${v})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `skew()` CSS function.
+ */
+export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): TransformProxy
+{
+    return () => `skew(${CssAngleMath.styleToString(ax)}${ay != null ? "," + CssAngleMath.styleToString(ay) : ""})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `skewX()` CSS function.
+ */
+export function skewX( ax: Extended<CssAngle>): TransformProxy
+{
+    return () => `skewX(${CssAngleMath.styleToString(ax)})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `skewY()` CSS function.
+ */
+export function skewY( ay: Extended<CssAngle>): TransformProxy
+{
+    return () => `skewX(${CssAngleMath.styleToString(ay)})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `translate()` CSS function.
+ */
+export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): TransformProxy
+{
+    return () => `translate(${CssLengthMath.styleToString(x)}${y != null ? "," + CssLengthMath.styleToString(y) : ""})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the given translate CSS function.
+ */
+function translateImpl( name: string, s: Extended<CssLength>): TransformProxy
+{
+    return () => `${name}(${CssLengthMath.styleToString(s)})`;
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `translateX()` CSS function.
+ */
+export function translateX( x: Extended<CssLength>): TransformProxy
+{
+    return translateImpl( "translateX", x);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `translateY()` CSS function.
+ */
+export function translateY( y: Extended<CssLength>): TransformProxy
+{
+    return translateImpl( "translateY", y);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `translateZ()` CSS function.
+ */
+export function translateZ( z: Extended<CssLength>): TransformProxy
+{
+    return translateImpl( "translateZ", z);
+}
+
+
+
+/**
+ * Returns an TransformProxy function representing the `translate3d()` CSS function.
+ */
+export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
+	z: Extended<CssLength>): TransformProxy
+{
+	let v = [CssLengthMath.styleToString(x), CssLengthMath.styleToString(y),
+		CssLengthMath.styleToString(z)].join(",");
+    return () => `translate3d(${v})`;
 }
 
 
