@@ -336,6 +336,13 @@ export interface ICssLengthMath extends INumberMath<LengthType>
 }
 
 
+
+/**
+ * Type representing a point using x and y coordinates.
+ */
+export type CssPoint = [Extended<CssLength>, Extended<CssLength>];
+
+
                 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //

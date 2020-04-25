@@ -47,7 +47,7 @@ function singleAnimation_fromStyle( val: Extended<StyleTypes.Animation_Single>):
 
 
 
-function timingFunctionToString( val: OneOrMany<StyleTypes.TimingFunction_Single>): string
+function timingFunctionToString( val: Extended<OneOrMany<StyleTypes.TimingFunction_Single>>): string
 {
     return valueToString( val, {
         fromNumber: timingFunction_fromNumber,
@@ -162,7 +162,7 @@ export function singleBoxShadow_fromObject( val: StyleTypes.BoxShadow_Single): s
 /**
  * Converts corner radius style value to the CSS string.
  */
-function singleCornerRadiusToString( val: CssRadius): string
+function singleCornerRadiusToString( val: Extended<CssRadius>): string
 {
     return valueToString( val, {
         arrayItemFunc: CssLengthMath.styleToString,
@@ -175,7 +175,7 @@ function singleCornerRadiusToString( val: CssRadius): string
 /**
  * Converts border radius style value to the CSS string.
  */
-function borderRadiusToString( val: StyleTypes.BorderRadiusStyleType): string
+export function borderRadiusToString( val: Extended<StyleTypes.BorderRadius_StyleType>): string
 {
     return valueToString( val, {
         fromArray: v =>
@@ -202,7 +202,7 @@ function borderRadiusToString( val: StyleTypes.BorderRadiusStyleType): string
 /**
  * Converts border side style value to the CSS string.
  */
-function borderToString( val: StyleTypes.Border_StyleType): string
+function borderToString( val: Extended<StyleTypes.Border_StyleType>): string
 {
     return valueToString( val, {
         fromNumber: CssLengthMath.styleToString,
@@ -229,7 +229,7 @@ function borderToString( val: StyleTypes.Border_StyleType): string
 /**
  * Converts columns style to its CSS string value.
  */
-function columnsToString( val: StyleTypes.Columns_StyleType): string
+function columnsToString( val: Extended<StyleTypes.Columns_StyleType>): string
 {
     return valueToString( val, {
         fromArray: v => v[0] + " " + CssLengthMath.styleToString( v[1])
@@ -241,7 +241,7 @@ function columnsToString( val: StyleTypes.Columns_StyleType): string
 /**
  * Converts flex style value to the CSS string.
  */
-function flexToString( val: StyleTypes.Flex_StyleType): string
+function flexToString( val: Extended<StyleTypes.Flex_StyleType>): string
 {
     return valueToString( val, {
         fromArray: v =>
@@ -272,7 +272,7 @@ function font_fromObject( val: any): string
 
 
 
-function fontStyleToString( val: StyleTypes.Flex_StyleType): string
+function fontStyleToString( val: Extended<StyleTypes.Font_StyleType>): string
 {
     return valueToString( val, {
         fromNumber: v => "oblique " + CssAngleMath.styleToString( v)
@@ -281,7 +281,7 @@ function fontStyleToString( val: StyleTypes.Flex_StyleType): string
 
 
 
-function textDecoration_fromObject( val: StyleTypes.TextDecoration_StyleType): string
+function textDecoration_fromObject( val: Extended<StyleTypes.TextDecoration_StyleType>): string
 {
     return objectToString( val, [
         "line",
@@ -293,7 +293,7 @@ function textDecoration_fromObject( val: StyleTypes.TextDecoration_StyleType): s
 
 
 
-function singleTransition_fromObject( val: StyleTypes.Animation_Single): string
+function singleTransition_fromObject( val: Extended<StyleTypes.Transition_Single>): string
 {
     return objectToString( val, [
         ["property", camelToDash],
@@ -305,7 +305,7 @@ function singleTransition_fromObject( val: StyleTypes.Animation_Single): string
 
 
 
-function singleTransition_fromStyle( val: Extended<StyleTypes.Animation_Single>): string
+function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>): string
 {
     return valueToString( val, {
         fromObject: singleTransition_fromObject

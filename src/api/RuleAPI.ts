@@ -5,6 +5,7 @@
 
 import * as RuleTypes from "../rules/RuleTypes";
 import * as RuleContainerFuncs from "../rules/RuleContainer"
+import {Extended} from "../styles/UtilTypes";
 import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 import {MediaQuery} from "../styles/MediaTypes"
@@ -14,6 +15,7 @@ import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
+import {valueToString} from "../styles/UtilFuncs";
 
 
 
@@ -169,6 +171,22 @@ export function $deactivate( instance: RuleTypes.StyleDefinition): void
 export function $enableOptimizedStyleNames( enable: boolean, prefix?: string): void
 {
 	return RuleContainerFuncs.enableOptimizedStyleNames( enable, prefix);
+}
+
+
+
+/**
+ * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
+ * will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix "n" will be used.
+ * @param enable
+ * @param prefix
+ */
+export function classes( ...classes: (RuleTypes.IClassRule | Extended<string>)[]): string
+{
+	return valueToString( classes, {
+		arrayItemFunc: v => v instanceof ClassRule ? v.name : valueToString(v)
+	});
 }
 
 

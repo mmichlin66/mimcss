@@ -1,4 +1,4 @@
-﻿import {Extended, CssPosition, CssTime, CssLength, CssPercent, CssAngle, CssNumber} from "../styles/UtilTypes"
+﻿import {Extended, CssPosition, CssTime, CssLength, CssPercent, CssAngle, CssNumber, OneOrBox, CssPoint} from "../styles/UtilTypes"
 import {CssColor} from "../styles/ColorTypes"
 import {CssImage} from "../styles/ImageTypes"
 import {FontStretch_Single } from "../styles/FontFaceTypes";
@@ -11,11 +11,11 @@ import {
 	Background_Single, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy,
 	FontStyle_StyleType, FontWeight_StyleType, Font_StyleType, TextDecorationLine_StyleType,
 	TextDecorationStyle_StyleType, TextDecorationThickness_StyleType, TextDecoration_StyleType,
-	TextShadow_Single, TransformProxy, Transition_Single, TransitionProperty_Single
+	TextShadow_Single, TransformProxy, Transition_Single, TransitionProperty_Single, BorderRadius_StyleType, FillRule_StyleType
 } from "../styles/StyleTypes"
-import {stylePropToString, singleBoxShadow_fromObject} from "../styles/StyleFuncs"
+import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
-import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath} from "../styles/UtilFuncs";
+import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString} from "../styles/UtilFuncs";
 
 
 
@@ -479,11 +479,64 @@ export function hueRotate( amount: Extended<CssAngle>): FilterProxy
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Returns an BasicShapeProxy function representing the `inset()` CSS function.
+ */
+export function inset( offset: Extended<OneOrBox<CssLength>>, radius?: Extended<BorderRadius_StyleType>): BasicShapeProxy
+{
+	let r = radius != null ? "round " + borderRadiusToString( radius) : "";
+    return () => `inset(${CssLengthMath.multiStyleToStringWithSpace(offset)}${r})`;
+}
+
+
+
+export type ShapeRadius = Extended<CssLength | "closest-side" | "farthest-side">;
+
+
+
+/**
  * Returns an BasicShapeProxy function representing the `circle()` CSS function.
  */
-export function circle(): BasicShapeProxy
+export function circle( center?: ShapeRadius, position?: Extended<CssPosition>): BasicShapeProxy
 {
-    return () => "";
+    let c =  center != null ? CssLengthMath.styleToString(center) : "";
+	let pos = position != null ? " at " + positionToString( position) : "";
+    return () => `circle(${c}${pos})`;
+}
+
+
+
+/**
+ * Returns an BasicShapeProxy function representing the `ellipse()` CSS function.
+ */
+export function ellipse( rx?: ShapeRadius, ry?: ShapeRadius,
+	position?: Extended<CssPosition>): BasicShapeProxy
+{
+    let rxs =  rx != null ? CssLengthMath.styleToString(rx) : "";
+    let rys =  ry != null ? " " + CssLengthMath.styleToString(ry) : "";
+	let pos = position != null ? " at " + positionToString( position) : "";
+    return () => `ellipse(${rxs}${rys}${pos})`;
+}
+
+
+
+/**
+ * Returns an BasicShapeProxy function representing the `polygon()` CSS function.
+ */
+export function polygon( pointOrRule: CssPoint | FillRule_StyleType,
+	...points: CssPoint[]): BasicShapeProxy
+{
+	return () =>
+	{
+		let s = "polygon(";
+		if (typeof pointOrRule === "string")
+			s += pointOrRule + ",";
+		else
+			s += `${CssLengthMath.multiStyleToStringWithSpace( pointOrRule)},`;
+
+		s += points.map( pt => CssLengthMath.multiStyleToStringWithSpace( pt)).join(",");
+
+		return s + ")";
+	};
 }
 
 

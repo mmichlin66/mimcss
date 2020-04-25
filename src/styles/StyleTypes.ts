@@ -221,7 +221,7 @@ export type BaselineShift_StyleType = "sub" | "super" | CssLength;
 
 
 /** Type for border-radius style property */
-export type BorderRadiusStyleType = OneOrPair<CssLengthBox>;
+export type BorderRadius_StyleType = OneOrPair<CssLengthBox>;
 
 
 
@@ -330,7 +330,7 @@ export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start
 
 
 
-/** Type for clear style property */
+/** Type for clip style property */
 export type Clip_StyleType = "auto" | CssLengthBox;
 
 
@@ -1097,7 +1097,7 @@ export interface ICssStyleset
     borderLeftColor?: CssColor;
     borderLeftStyle?: BorderStyle_Keyword;
     borderLeftWidth?: BorderWidth__Single;
-    borderRadius?: BorderRadiusStyleType;
+    borderRadius?: BorderRadius_StyleType;
     borderRight?: Border_StyleType;
     borderRightColor?: CssColor;
     borderRightStyle?: BorderStyle_Keyword;
