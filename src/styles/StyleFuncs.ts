@@ -239,6 +239,36 @@ function columnsToString( val: Extended<StyleTypes.Columns_StyleType>): string
 
 
 /**
+ * Converts cursor style to its CSS string value.
+ */
+function cursorToString( val: Extended<StyleTypes.Cursor_StyleType>): string
+{
+    // the value can be either a string or a function or an array. If it is an array,
+    // if the first element is a function, then we need to use space as a separator (because
+    // this is a URL with optional numbers for the hot spot); otherwise, we use comma as a
+    // separator - because these are multiple cursor definitions.
+    return valueToString( val, {
+        fromArray: v => {
+            if (v.length === 0)
+                return "";
+            else if (v.length === 1)
+                return valueToString(v);
+            else if (typeof v[1] === "number")
+                return valueToString( v, { arraySeparator: " "})
+            else
+            {
+                return valueToString( v, {
+                    arrayItemFunc: cursorToString,
+                    arraySeparator: ","
+                })
+            }
+        }
+    });
+}
+
+
+
+/**
  * Converts flex style value to the CSS string.
  */
 function flexToString( val: Extended<StyleTypes.Flex_StyleType>): string
@@ -609,6 +639,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     columnRuleWidth: CssLengthMath.multiStyleToStringWithSpace,
     columns: columnsToString,
     columnWidth: CssLengthMath.styleToString,
+    cursor: cursorToString,
 
     fill: colorToString,
     fillOpacity: CssPercentMath.styleToString,

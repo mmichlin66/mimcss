@@ -399,13 +399,19 @@ export type Counter_StyleType = OneOrMany<string | [Extended<string>, Extended<n
 
 
 
-/** Type for cursor style property */
-export type Cursor_StyleType = "auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
+/** Type for cursor pre-defined names */
+export type Cursor_Keyword = "auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
     "wait" | "cell" | "crosshair" | "text" | "vertical-text" | "alias" | "copy" | "move" |
     "no-drop" | "not-allowed" | "e-resize" | "n-resize" | "ne-resize" | "nw-resize" |
     "s-resize" | "se-resize" | "sw-resize" | "w-resize" | "ew-resize" | "ns-resize" |
     "nesw-resize" | "nwse-resize" | "col-resize" | "row-resize" | "all-scroll" | "zoom-in" |
     "zoom-out" | "grab" | "grabbing";
+
+/** Type for cursor style property single value */
+export type Cursor_Single = Cursor_Keyword | UrlProxy | [UrlProxy, Extended<CssNumber>, Extended<CssNumber>];
+
+/** Type for cursor style property */
+export type Cursor_StyleType = OneOrMany<Cursor_Single>;
 
 
 
@@ -1221,7 +1227,7 @@ export interface ICssStyleset
     letterSpacing?: LetterSpacing_StyleType;
     lightingColor?: CssColor;
     lineBreak?: LineBreak_StyleType;
-    lineHeight?: CssNumber;
+    lineHeight?: CssNumber | string;
     listStyle?: ListStyle_StyleType;
     listStyleImage?: ListStyleImage_StyleType;
     listStylePosition?: ListStylePosition_StyleType;
