@@ -176,11 +176,9 @@ export function $enableOptimizedStyleNames( enable: boolean, prefix?: string): v
 
 
 /**
- * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
- * will be created by appending a unique number to the given prefix. If the prefix is not
- * specified, the standard prefix "n" will be used.
- * @param enable
- * @param prefix
+ * Concatenates the names of the given classes into a single string that can be assigned to a
+ * `cass` property of an HTML element.
+ * @param classes
  */
 export function classes( ...classes: (RuleTypes.IClassRule | Extended<string>)[]): string
 {

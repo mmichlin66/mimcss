@@ -2,7 +2,7 @@
 import {CssColor} from "../styles/ColorTypes"
 import {CssImage} from "../styles/ImageTypes"
 import {FontStretch_Single } from "../styles/FontFaceTypes";
-import {CssSelector, SelectorTokenType} from "../styles/SelectorTypes";
+import {CssSelector} from "../styles/SelectorTypes";
 import {
 	VarTemplateName, VarValueType, AnimationName_Single, TimingFunction_Single,
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
@@ -13,6 +13,7 @@ import {
 	TextDecorationStyle_StyleType, TextDecorationThickness_StyleType, TextDecoration_StyleType,
 	TextShadow_Single, TransformProxy, Transition_Single, TransitionProperty_Single, BorderRadius_StyleType, FillRule_StyleType
 } from "../styles/StyleTypes"
+import {SelectorTokenType} from "../rules/RuleTypes";
 import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
 import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString} from "../styles/UtilFuncs";
@@ -124,12 +125,9 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): { 
 
 
 /**
- * Compares two Styleset objects by converting style properties to strings and returns an object
- * that contains string values of properties that were new or have different values in the new
- * styleset and undefined values for properties that exist in the old styleset but don't exist
- * in the new one.
- * @param oldStyleset 
- * @param newStyleset 
+ * Converts the given [[Styleset]] object into an object, where each Styleset's property is
+ * converted to its string value.
+ * @param styleset 
  */
 export function stylesetToStringObject( styleset: Styleset): { [K: string]: string }
 {
@@ -296,7 +294,7 @@ export function textShadow(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an object that can be assigned to the font property.
+ * Returns an object that can be assigned to the `font` property.
  * @param family Font family.
  * @param size Font size.
  * @param style Font style.
@@ -327,7 +325,7 @@ export function font(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an object that can be assigned to the font property.
+ * Returns an object that can be assigned to the `text-decoration` property.
  * @param line Type of line.
  * @param color Line color.
  * @param style Line style.
@@ -489,6 +487,9 @@ export function inset( offset: Extended<OneOrBox<CssLength>>, radius?: Extended<
 
 
 
+/**
+ * Type that is used to specify a radius in [[circle]] and [[ellipse]] functions.
+ */
 export type ShapeRadius = Extended<CssLength | "closest-side" | "farthest-side">;
 
 

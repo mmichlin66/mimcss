@@ -1,6 +1,7 @@
-﻿import * as SelectorTypes from "./SelectorTypes"
-import {Rule} from "../rules/Rule";
+﻿import {SelectorTokenType} from "../rules/RuleTypes";
 import {TagRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
+import {Rule} from "../rules/Rule";
+import { valueToString } from "./UtilFuncs";
 
 
 
@@ -15,7 +16,7 @@ import {TagRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
  * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
  * possible types.
  */
-export function formatSelector( template: string, params: SelectorTypes.SelectorTokenType[]): string
+export function formatSelector( template: string, params: SelectorTokenType[]): string
 {
 	let tokens: string[] = template.split( /{(\d+)}/g);
 	let tokenIsNumber = false;
@@ -54,6 +55,22 @@ export function formatSelector( template: string, params: SelectorTypes.Selector
 	}
 
 	return arr.join( "");
+}
+
+
+
+/**
+ * Returns a string representation of a parameterized pseudo entity.
+ */
+export function pseudoEntityToString( entityName: string, val: any): string
+{
+	if (!entityName)
+		return "";
+
+	if (entityName.startsWith( ":nth"))
+		return valueToString( val, { fromArray: v => `${v[0]}n+${v[1]}` });
+	else
+		return valueToString(val);
 }
 
 

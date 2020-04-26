@@ -5,6 +5,7 @@ import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString} from "../styles/StyleFuncs"
 import {valueToString} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
+import { pseudoEntityToString } from "../styles/SelectorFuncs";
 
 
 
@@ -57,7 +58,16 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				if (!nestedRules)
 					nestedRules = [];
 
-				nestedRules.push( new NestedRule( "&" + propName, propVal as ExtendedStyleset, this));
+				// if the value is an array, then this is a parameterised pseudo entity where the first element
+				// is the parameter value (string) and the second the ExtendedStyleset. Otherwise, the value is
+				// just the ExtendedStyleset.
+				let nestedRule: NestedRule;
+				if (Array.isArray(propVal))
+					nestedRule = new NestedRule( propName, propVal[0], propVal[1] as ExtendedStyleset, this);
+				else
+					nestedRule = new NestedRule( "&" + propName, undefined, propVal as ExtendedStyleset, this);
+
+				nestedRules.push( nestedRule);
 			}
 			else if (propName === "&")
 			{
@@ -68,7 +78,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					if (!nestedRules)
 						nestedRules = [];
 
-					tuples.forEach( tuple => nestedRules!.push( new NestedRule( tuple[0], tuple[1], this)));
+					tuples.forEach( tuple => nestedRules!.push( new NestedRule( tuple[0], undefined, tuple[1], this)));
 				}
 			}
 			else
@@ -245,10 +255,14 @@ export abstract class StyleRule extends Rule implements IStyleRule
  */
 class NestedRule extends StyleRule
 {
-	public constructor( selector: CssSelector, style?: ExtendedStyleset, containingRule?: StyleRule)
+	// for regular selectors, pseudo classes and pseudo elements, the selector already contains
+	// the ampersand. For parameterized pseudo classes and asudo elements, the selector is just
+	// the entity name.
+	public constructor( selector: CssSelector, selectorParam?: any, style?: ExtendedStyleset, containingRule?: StyleRule)
 	{
 		super( style);
 		this.selector = selector;
+		this.selectorParam = selectorParam;
 		this.containingRule = containingRule;
 	}
 
@@ -260,6 +274,7 @@ class NestedRule extends StyleRule
 		let newRule = new NestedRule( this.selector);
 		newRule.copyFrom( this);
 		newRule.selector = this.selector;
+		newRule.selectorParam = this.selectorParam;
 		return newRule;
 	}
 
@@ -268,15 +283,27 @@ class NestedRule extends StyleRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		// get selector string and replace all occurrences of the ampersand symbol with the
-		// selector string of the parent rule.
-		return valueToString( this.selector).replace( "&", this.containingRule!.getSelectorString());
+		let parentSelector = this.containingRule!.getSelectorString();
+		if (this.selectorParam)
+		{
+			let selector = this.selector as string;
+			return `${parentSelector}${selector}(${pseudoEntityToString( selector, this.selectorParam)})`;
+		}
+		else
+		{
+			// replace all occurrences of the ampersand symbol in the selector string with the
+			// selector string of the parent rule.
+			return valueToString( this.selector).replace( "&", parentSelector);
+		}
 	}
 
 
 
 	// Partial selector that should be appended to the parent selector.
 	private selector: CssSelector;
+
+	// Optional parameters for the selector - used for parameterized pseudo classes and elements.
+	private selectorParam?: any;
 
 	// Parent style within which this rule is nested.
 	public containingRule?: StyleRule;

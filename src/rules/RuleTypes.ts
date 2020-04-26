@@ -3,9 +3,11 @@
  */
 
 
-import {IVarProxy} from "../styles/UtilTypes";
+import {IVarProxy, StringProxy, Extended} from "../styles/UtilTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
-import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
+import {
+	PseudoClass, PseudoElement, CssSelector, PagePseudoClass, IParameterizedPseudoEntities
+} from "../styles/SelectorTypes";
 
 
 /**
@@ -14,6 +16,11 @@ import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../style
  * - The `+` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation.
  * - Properties with pseudo class names (e.g. ":hover") or pseudo element names (e.g. "::after").
+ *   These properties define a styleset that will be assigned to the selector obtained by using
+ *   the original styleset's owner followed by the given pseudo class or pseudo element.
+ * - Properties with names of parameterized pseudo classes (e.g. ":nth-child") or parameterized
+ *   pseudo elements (e.g. "::slotted"). These properties contain a tuple, where the first
+ *   element is the parameter for the selector and the second element is the stylset.
  *   These properties define a styleset that will be assigned to the selector obtained by using
  *   the original styleset's owner followed by the given pseudo class or pseudo element.
  * - The "&" property that contains array of two-element tuples each defining a selector and a
@@ -46,10 +53,18 @@ import {PseudoClass, PseudoElement, CssSelector, PagePseudoClass} from "../style
  * li > .m123 { backgroundColor: yellow; }
  * ```
  */
-export type ExtendedStyleset = Styleset & { [K in PseudoClass | PseudoElement]?: ExtendedStyleset } &
+export type ExtendedStyleset = Styleset &
+	{
+		[K in PseudoClass | PseudoElement]?: ExtendedStyleset
+	}
+		&
 	{
 		"+"?: IStyleRule | IStyleRule[],
 		"&"?: [CssSelector, ExtendedStyleset][],
+	}
+		&
+	{
+		[K in keyof IParameterizedPseudoEntities]?: [Extended<IParameterizedPseudoEntities[K]>, ExtendedStyleset]
 	};
 	
 
@@ -364,6 +379,12 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 	/** SOM media rule */
 	readonly cssRule: CSSMediaRule | null;
 }
+
+
+
+/** Type for a single selector token that can be used as an argument to the $selector function */
+export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
+    ISelectorRule | number | string | StringProxy;
 
 
 
