@@ -8,7 +8,9 @@
 	"module": "./lib/mimcss.js",
 	"types": "./lib/mimcssTypes.d.ts",
 	"scripts": {
-		"build": "tsc -b src && webpack --config src/webpack.config.js",
+		"compile": "tsc -b",
+		"build": "tsc -b && webpack",
+		"build-tests": "tsc -b && webpack --config src/test/webpack.config.js",
 		"start": "onchange lib/mimcss.dev.js -- echo yes"
 	},
 	"author": {
@@ -23,6 +25,7 @@
 	],
 	"license": "MIT",
 	"devDependencies": {
+		"@types/jasmine": "^3.5.10",
 		"ifdef-loader": "^2.1.5",
 		"onchange": "^7.0.0",
 		"source-map-loader": "^0.2.4",

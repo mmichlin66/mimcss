@@ -13,7 +13,7 @@ module.exports =
         output:
         {
             filename: "mimcss.dev.js",
-            path: __dirname + "/../lib",
+            path: __dirname + "/lib",
             library: 'mimcss',
             libraryTarget: 'umd',
             globalObject: 'this'
@@ -42,7 +42,7 @@ module.exports =
         output:
         {
             filename: "mimcss.js",
-            path: __dirname + "/../lib",
+            path: __dirname + "/lib",
             library: 'mimcss',
             libraryTarget: 'umd',
             globalObject: 'this'

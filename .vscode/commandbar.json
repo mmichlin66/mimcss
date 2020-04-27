@@ -5,7 +5,7 @@
 	"commands":
 	[
         {
-            "text": "mimcss",
+            "text": "mimcss build",
             "color": "white",
             "commandType": "script",
             "command": "build",
@@ -13,7 +13,15 @@
             "priority": 1
         },
         {
-            "text": "mimcss Doc",
+            "text": "mimcss test",
+            "color": "yellow",
+            "commandType": "script",
+            "command": "build-tests",
+            "alignment": "left",
+            "priority": 1
+        },
+        {
+            "text": "mimcss doc",
             "color": "pink",
             "commandType": "exec",
             "command": "doc.bat",
