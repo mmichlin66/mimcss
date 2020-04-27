@@ -8,8 +8,8 @@
 	"module": "./lib/mimcss.js",
 	"types": "./lib/mimcssTypes.d.ts",
 	"scripts": {
-		"buildDev": "webpack --display-error-details",
-		"buildProd": "webpack -p --display-error-details"
+		"build": "tsc -b src && webpack --config src/webpack.config.js",
+		"start": "onchange lib/mimcss.dev.js -- echo yes"
 	},
 	"author": {
 		"name": "Michael Michlin",
@@ -24,6 +24,7 @@
 	"license": "MIT",
 	"devDependencies": {
 		"ifdef-loader": "^2.1.5",
+		"onchange": "^7.0.0",
 		"source-map-loader": "^0.2.4",
 		"terser-webpack-plugin": "^2.0.1",
 		"ts-loader": "^6.2.2",

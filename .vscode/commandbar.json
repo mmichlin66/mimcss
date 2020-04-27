@@ -5,18 +5,10 @@
 	"commands":
 	[
         {
-            "text": "mimcss Dev",
+            "text": "mimcss",
             "color": "white",
             "commandType": "script",
-            "command": "buildDev",
-            "alignment": "left",
-            "priority": 1
-        },
-        {
-            "text": "mimcss Prod",
-            "color": "yellow",
-            "commandType": "script",
-            "command": "buildProd",
+            "command": "build",
             "alignment": "left",
             "priority": 1
         },

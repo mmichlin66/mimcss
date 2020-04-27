@@ -1,13 +1,13 @@
 {
-	"compilerOptions": {
+	"compileOnSave": true,
+	"compilerOptions":
+	{
 		"declaration": true,
-		"outDir": "./lib/",
 		"sourceMap": true,
 		"noImplicitAny": false,
 		"noImplicitReturns": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": false,
-		"strictNullChecks": true,
 		"module": "commonjs",
 		"target": "ES2017",
 		"lib": [ "ES2017", "dom" ],
@@ -15,8 +15,4 @@
 		"jsx": "react",
 		"preserveConstEnums": false
 	},
-
-	"include": [
-		"./src/**/*"
-	]
 }
