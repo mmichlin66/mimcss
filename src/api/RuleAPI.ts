@@ -101,8 +101,8 @@ export function $namespace( namespace: string, prefix?: string): RuleTypes.IName
 /**
  * Creates new page rule.
  */
-export function $page( style?: Styleset, pseudoClass?: PagePseudoClass): RuleTypes.IPageRule
-	{ return new PageRule( style, pseudoClass); }
+export function $page( pseudoClass?: PagePseudoClass, style?: Styleset): RuleTypes.IPageRule
+	{ return new PageRule( pseudoClass, style); }
 
 /**
  * Creates new supports rule.

@@ -125,7 +125,7 @@ export class ImportRule extends Rule implements IImportRule
  */
 export class PageRule extends StyleRule implements IPageRule
 {
-	public constructor( style?: Styleset, pseudoClass?: PagePseudoClass)
+	public constructor( pseudoClass?: PagePseudoClass, style?: Styleset)
 	{
 		super( style);
 		this.pseudoClass = pseudoClass;
@@ -136,7 +136,7 @@ export class PageRule extends StyleRule implements IPageRule
 	// Creates a copy of the rule.
 	public clone(): PageRule
 	{
-		let newRule = new PageRule( undefined, this.pseudoClass);
+		let newRule = new PageRule( this.pseudoClass);
 		newRule.copyFrom( this);
 		return newRule;
 	}

@@ -528,7 +528,7 @@ export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthM
  */
 export class CssAngleMath extends NumberMath<AngleType> implements ICssAngleMath
 {
-    public static convertFunc( n: number): string { return numberToString( n, "deg", "rad"); }
+    public static convertFunc( n: number): string { return numberToString( n, "deg", "turn"); }
 
     public static styleToString( val: Extended<CssAngle>): string
         { return styleToString( val, CssAngleMath.convertFunc); }

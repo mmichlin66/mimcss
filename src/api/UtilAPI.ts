@@ -31,7 +31,7 @@ export let Len: ICssLengthMath = new CssLengthMath();
 /**
  * The Angle object contains static methods that implement CSS mathematic functions on the `<angle>`
  * CSS type by appending an angle unit suffix.
- * Integer numbers use "deg"; floating point numbers use "rad".
+ * Integer numbers use "deg"; floating point numbers use "turn".
  */
 export let Angle: ICssAngleMath = new CssAngleMath();
 

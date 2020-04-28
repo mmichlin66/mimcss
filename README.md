@@ -1,27 +1,15 @@
 # Mimcss: Style Authoring in TypeScript
 
+[![NPM version][npm-image]][npm-url]
+
 Mimcss is a TypeScript library that allows authoring CSS styles without creating CSS files. Instead, the styles are created via TypeScript programming. You code your styling rules including CSS classes, selectors, animations (keyframes), media etc., by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
 
-### Features
-The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. Mimcss provides the following capabilities:
+* [Quick Start](#quick-start)
+* [Features](#features)
+* [Examples](#examples)
 
-- Compatible with and independent of any library: use with React, Angular, Vue etc.
-- Stylesheets are defined as TypeScript classes.
-- Names of classes, IDs, animations and custom CSS properties are auto-generated, while developers use properties that return these names.
-- Stylesheets can be dynamically activated and deactivated.
-- All CSS rule types are supported including style rules and at-rules.
-- Custom CSS properties are supported in a type safe manner by defining what standard CSS property type they represent.
-- Style rules can be nested and can extend other style rules.
-- All pseudo styles and pseudo elements are supported using convenient and compact notation.
-- Stylesheet classes support inheritance - elegant way to implement theming.
-- Type safety and autocomplete support for CSS property values to eliminate misspellings.
-- Using numbers for default units of length, angle, percent and other CSS property types.
-- Using numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate misspellings.
-- Convenience functions for specifying complex property values (e.g. colors, calc(), var(), linerGradient(), etc.)
-- Access to CSSRule-derived objects for direct style manipulation.
-
-### Quick Start
-Let's assume that we need to create several simple styles for a couple of classes and an ID. With Mimcss, you create a TypeScript class and then, in your component's TypeScript code, you refer to the CSS classes and IDs using their names as properties:
+## Quick Start
+The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. Let's assume that we need to create several styles for a couple of classes and an ID. With Mimcss, you create a TypeScript class and then, in your component's TypeScript code, you refer to the CSS classes and IDs using the TypeScript class's properties:
 
 ```tsx
 /* MyStyles.ts */
@@ -34,14 +22,17 @@ class MyStyles extends css.StyleDefinition
         flexDirection: "column",
     });
 
-    hbox = css.$class({
-        display: "flex",
-        flexDirection: "row",
-    });
-
     importantElement = css.$id({
         color: 0xFFCC88,
         fontWeight: 700,
+    });
+
+    shadow = css.$class({
+        padding: 8,
+        border: [1, "solid", "blue"],
+        boxShadow: { blur: 4, color: "cyan" },
+        backgroundImage: css.conicGradient( 45, "center", Color.orange, Color.pink),
+        ":hover": { opacity: 0.7 }
     });
 }
 
@@ -50,31 +41,291 @@ import {myStyles} from "./MyStyles"
 import * as React from "react"
 import * as css from "mimcss"
 
+let myStyles = css.$activate( MyStyles);
+
 class MyComponent extends React.Component
 {
-    myStyles = css.$activate( MyStyles);
-
-    componentWillUnmount()
-    {
-        css.$deactivate( this.myStyles);
-    }
-
     render()
     {
-        return <div className={this.myStyles.vbox.name}>
-            <p id={this.myStyles.importantElement.name}>Hello!</p>
-            <div className={this.myStyles.hbox.name}/>Hello!</div>
+        return <div className={myStyles.vbox.name}>
+            <p id={myStyles.importantElement.name}>Hello!</p>
+            <div className={myStyles.hbox.name}/>Hello!</div>
         </div>
     }
 }
 ```
 
-This immediately brings us the following advantages:
+Coding CSS styles in TypeScript brings us the following advantages:
 
-- The autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `myStyles.` the IDE will present the list of all the properties defined in our style definition object.
+- The autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `myStyles.` the IDE will present the list of all the properties defined in our style definition class.
 - If we change the name of or remove the property in the `MyStyles` class and forget to change it in our component's `render` method, the project will not build. Thus a compile time error will prevent a much-harder-to-find run-time error.
-- Notice how we used numbers instead of strings when defining `color` and `fontWeight` properties. Although seemingly a minor feature, this can add extra convenience and speed during development. Mimcss defines types of each style property and provides numerous functions so that properties can be set in a type-safe and easy-to-use way.
-- The styles are not present in the browser's memory until the component that defines them is mounted. The `$activate` function inserts the styles into DOM. Upon unmounting the styles are removed from DOM. This is only one of the possible activation strategies - more are discussed in the Mimcss guide. The point is that the developers are in full control of when the rules are activated. Moreover, since activating rules means writing to DOM, components can synchronize this process with other DOM-writing activities.
+- Notice how we used numbers instead of strings when defining `color` and `fontWeight` properties. Notice also how we used array, object and function notations to specify complex style properties for the `shadow` class. Mimcss defines types for all style properties and provides numerous methods to set their values in a type-safe and easy-to-use way.
+- The styles are not present in the browser's memory until the code that uses them calls the `$activate` function that inserts the styles into DOM. There are several activation strategies suitable for different scenarios - from styles that are shared by entire application to those that are used by only a single component. The developers are in full control of when the rules are activated. Moreover, since activating rules means writing to DOM, components can synchronize this process with other DOM-writing activities.
 - The names we are using in our code are not actually the names that will be used in the resulting HTML. The actual names to use in HTML will be auto-generated by the Mimcss infrastructure, which ensures that they will be globally unique. In Debug mode the generated names reflect the names used in the code, while in Release mode, the names are created with minimal length.
 
-This is really just scratching the surface - for more information please see [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html).
+## Features
+
+- Compatible with and independent of any library: use with React, Angular, Vue etc.
+- Co-exists with regular CSS files - doesn't require re-writing of all existing styles at once or at all. You can gradually introduce Mimcss into you project.
+- Stylesheets are defined as TypeScript classes.
+- Stylesheets can be dynamically activated (inserted into DOM) and deactivated (removed from DOM).
+- Names of classes, IDs, animations and custom CSS properties are auto-generated, while developers use properties that return these names.
+- All CSS rule types are supported including style rules and at-rules.
+- Custom CSS properties are supported in a type safe manner by defining what standard CSS property type they represent.
+- Style rules can be nested and can extend other style rules.
+- All pseudo styles and pseudo elements are supported using convenient and compact notation.
+- Stylesheet classes support inheritance - elegant way to implement theming.
+- Type safety and autocomplete support for CSS property values to eliminate misspellings.
+- Using numbers for default units of length, angle, percent and other CSS property types.
+- Using numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate misspellings.
+- Convenience functions for specifying complex property values (e.g. colors, calc(), var(), linerGradient(), etc.)
+- Access to CSSRule-derived objects for direct style manipulation.
+
+## Examples
+The following short sections provide examples of Mimcss capabilities. This is really just scratching the surface - for more information please see [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html).
+
+### Supported CSS Rules
+Mimcss supports all types of CSS rules (except @charset):
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+    // class
+    redClass = css.$class({ color: "red" })
+
+    // element ID
+    redElm = css.$id({ color: "red" })
+
+    // tag
+    h1 = css.$tag( "h1", { fontSize: 24 })
+
+    // arbitrary complex selectors
+    all = css.$style( "*", { boxSizing: "border-box" })
+    li = css.$style( css.$selector("article > {0} > ul > li", this.redClass), { color: "brown" })
+
+    // custom CSS variables (with style-property-specific value types)
+    defaultColor = css.$var( "color", "black")
+    defaultPadding = css.$var( "padding", [4,6])
+
+    // @font-face
+	font = css.$fontface( {
+		fontFamily: "Roboto",
+		fontWeight: 400,
+		src: [{ url: 'roboto.woff', format: 'woff' }]
+	});
+
+    // @import (with @media and @supports queries)
+	external = css.$import( "external.css", { width: [200, 400] }, { justifySelf: "baseline" })
+
+    // @keyframes
+	move = css.$keyframes( [
+		[ "from", { top: 0 } ],
+		[ 50, { top: 150 } ],
+		[ "to", { top: "100%" } ]
+	])
+
+    // @page
+	firstPage = css.$page( ":first", { margin: "auto" })
+
+    // @namespace
+    htmlNamespcae = css.$namespace( css.WebNamespaces.HTML)
+    svgNamespcae = css.$namespace( css.WebNamespaces.SVG, "svg")
+
+    // @media
+    ifSmallDevice = css.$media( { maxWidth: 600 },
+        class extends css.StyleDefinition<MyStyles>
+        {
+            h1 = css.$tag( "h1", { fontSize: 20 });
+        }
+    )
+
+    // @supports
+	ifGridSupported = css.$supports( {display: "grid"},
+		class extends css.StyleDefinition<MyStyles>
+		{
+            gridLayout =css.$class({ display: "grid" })
+        }
+    )
+}
+```
+
+It is essential to assign rules that produce names - classes, IDs, animations, custom variables - to properties because that's the way these names will be used in the code. Other types of rules don't have to be assigned to properties; instead, they can be put into an array, which is assigned to a single property:
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+
+    unnamed =
+    [
+        css.$tag( "h1", { fontSize: 24 }),
+        css.$style( "*", { boxSizing: "border-box" }),
+        css.$style( css.$selector("article > {0} > ul > li", this.redClass), { color: "brown" }),
+
+        css.$fontface( {
+            fontFamily: "Roboto",
+            fontWeight: 400,
+            src: [{ url: 'roboto.woff', format: 'woff' }]
+        }),
+
+        css.$import( "external.css", { width: [200, 400] }, { justifySelf: "baseline" }),
+
+        css.$page( ":first", { margin: "auto" }),
+
+        css.$namespace( css.WebNamespaces.HTML),
+        css.$namespace( css.WebNamespaces.SVG, "svg"),
+
+        css.$media( { maxWidth: 600 },
+            class extends css.StyleDefinition<MyStyles>
+            {
+                h1 = css.$tag( "h1", { fontSize: 20 });
+            }
+        ),
+
+        // @supports
+        css.$supports( {display: "grid"},
+            class extends css.StyleDefinition<MyStyles>
+            {
+                gridLayout =css.$class({ display: "grid" })
+            }
+        )
+    ]
+}
+```
+
+### Extending Style Rules
+The `"+"` property allows specifying one or more style rules you want your style rule to extend:
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+    red = css.$class({ color: "red" })
+
+    bold = css.$class({ fontWeight: 700 })
+
+    // extending one style rule
+    important = css.$class(
+    {
+        "+": this.red,
+        fontSize: 16
+    })
+
+    // extending multiple style rules
+    superImportant = css.$class(
+    {
+        "+": [this.important, this.bold]
+    })
+}
+```
+
+This is equivalent to the following CSS:
+
+```css
+.red {
+    color: red;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.important {
+    color: red;
+    font-size: 16px;
+}
+
+.superImportant {
+    color: red;
+    font-size: 16px;
+    font-weight: 700;
+}
+```
+
+
+### Pseudo Classes and Pseudo Elements
+While pseudo classes and pseudo elements can be defined using regular style rules (via the `$style` function), there is an easier way to define them:
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+    link = css.$class({
+        color: "blue",
+        ":hover": { color: "navy" }
+    })
+}
+```
+
+This is equivalent to the following CSS:
+
+```css
+.link {
+    color: blue;
+}
+
+.link:hover {
+    color: navy;
+}
+```
+
+### Pseudo Classes with Parameters
+Some pseudo classes require parameters, e.g. `:nth-child(2n+1)`. This is how it is expressed in Mimcss:
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+    row = css.$tag( "tr", {
+        ":nth-child": [ [2,1], { backgroundColor: 0xF8F8F8 } ]
+    })
+
+    cell = css.$tag( "td", {
+        ":nth-of-type": [ 5, { backgroundColor: "cyan" } ]
+    })
+}
+```
+
+This is equivalent to the following CSS:
+
+```css
+tr:nth-child(2n+1) {
+    backgroundColor: #F8F8F8;
+}
+
+td:nth-of-type(5) {
+    backgroundColor: cyan;
+}
+```
+
+### Complex Related Selectors
+We often define a CSS class (or tag or ID) rule and then define related rules with complex selectors. You can use the `"&"` property to define such rules in Mimcss. Within the selectors, every occurrence of the `"&"` symbol will be replaced with the "parent" selector.
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+    ul = css.$tag( "ul", {
+        color: "brown",
+        "&": [
+            [ "& > li:first-child, & > li > a", { color: "red" } ],
+            [ "td > &:hover", { fontStyle: "italic" } ]
+        ]
+    })
+}
+```
+
+This is equivalent to the following CSS:
+
+```css
+ul {
+    color: brown;
+}
+
+ul > li:first-child, ul > li > a {
+    color: red;
+}
+
+td > ul:hover {
+    font-style: italic;
+}
+```
+
+
+
+
