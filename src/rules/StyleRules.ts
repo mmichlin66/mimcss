@@ -293,7 +293,7 @@ class NestedRule extends StyleRule
 		{
 			// replace all occurrences of the ampersand symbol in the selector string with the
 			// selector string of the parent rule.
-			return valueToString( this.selector).replace( "&", parentSelector);
+			return valueToString( this.selector).replace( /&/g, parentSelector);
 		}
 	}
 

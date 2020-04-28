@@ -31,6 +31,9 @@ module.exports =
                     test: /\.js$/,
                     use: [{ loader: "ifdef-loader", options: dev_ifdefLoaderOptions }]
                 },
+
+                // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+                { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
             ]
         },
     },
@@ -61,6 +64,9 @@ module.exports =
                     test: /\.js$/,
                     use: [{ loader: "ifdef-loader", options: prod_ifdefLoaderOptions }]
                 },
+
+                // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+                { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
             ]
         },
     }

@@ -10,8 +10,7 @@
 	"scripts": {
 		"compile": "tsc -b",
 		"build": "tsc -b && webpack",
-		"build-tests": "tsc -b && webpack --config src/test/webpack.config.js",
-		"start": "onchange lib/mimcss.dev.js -- echo yes"
+		"build-tests": "tsc -b && webpack --config src/test/webpack.config.js"
 	},
 	"author": {
 		"name": "Michael Michlin",

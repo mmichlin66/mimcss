@@ -2,7 +2,11 @@ module.exports =
 [
     // development
     {
-        entry: "./lib/test/specs/first.js",
+        entry:
+        [
+            "./lib/test/specs/activation.js",
+            "./lib/test/specs/styleRules.js",
+        ],
 
         output:
         {
@@ -15,5 +19,15 @@ module.exports =
 
         mode: "development",
         devtool: "#inline-source-map",
+
+        resolve: { extensions: [".js"] },
+        module:
+        {
+            rules:
+            [
+                // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+                { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+            ]
+        },
     }
 ];
