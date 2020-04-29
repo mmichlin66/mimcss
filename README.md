@@ -1,6 +1,7 @@
 # Mimcss: Style Authoring in TypeScript
 
-[![NPM version][npm-image]][npm-url]
+[![npm version](https://badge.fury.io/js/mimcss.svg)](https://badge.fury.io/js/mimcss)
+[![GitHub version](https://badge.fury.io/gh/mmichlin66%2Fmimcss.svg)](https://badge.fury.io/gh/mmichlin66%2Fmimcss)
 
 Mimcss is a TypeScript library that allows authoring CSS styles without creating CSS files. Instead, the styles are created via TypeScript programming. You code your styling rules including CSS classes, selectors, animations (keyframes), media etc., by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
 
@@ -108,24 +109,24 @@ class MyStyles extends css.StyleDefinition
     defaultPadding = css.$var( "padding", [4,6])
 
     // @font-face
-	font = css.$fontface( {
-		fontFamily: "Roboto",
-		fontWeight: 400,
-		src: [{ url: 'roboto.woff', format: 'woff' }]
-	});
+    font = css.$fontface( {
+        fontFamily: "Roboto",
+        fontWeight: 400,
+        src: [{ url: 'roboto.woff', format: 'woff' }]
+    });
 
     // @import (with @media and @supports queries)
-	external = css.$import( "external.css", { width: [200, 400] }, { justifySelf: "baseline" })
+    external = css.$import( "external.css", { width: [200, 400] }, { justifySelf: "baseline" })
 
     // @keyframes
-	move = css.$keyframes( [
-		[ "from", { top: 0 } ],
-		[ 50, { top: 150 } ],
-		[ "to", { top: "100%" } ]
-	])
+    move = css.$keyframes( [
+        [ "from", { top: 0 } ],
+        [ 50, { top: 150 } ],
+        [ "to", { top: "100%" } ]
+    ])
 
     // @page
-	firstPage = css.$page( ":first", { margin: "auto" })
+    firstPage = css.$page( ":first", { margin: "auto" })
 
     // @namespace
     htmlNamespcae = css.$namespace( css.WebNamespaces.HTML)
@@ -140,21 +141,20 @@ class MyStyles extends css.StyleDefinition
     )
 
     // @supports
-	ifGridSupported = css.$supports( {display: "grid"},
-		class extends css.StyleDefinition<MyStyles>
-		{
+    ifGridSupported = css.$supports( {display: "grid"},
+        class extends css.StyleDefinition<MyStyles>
+        {
             gridLayout =css.$class({ display: "grid" })
         }
     )
 }
 ```
 
-It is essential to assign rules that produce names - classes, IDs, animations, custom variables - to properties because that's the way these names will be used in the code. Other types of rules don't have to be assigned to properties; instead, they can be put into an array, which is assigned to a single property:
+It is essential to assign rules that produce names (classes, IDs, animations, custom variables) to properties because the code that needs these names will access them through these properties. Other rule types, however, don't have to be assigned to properties; instead, they can be put into an array, which is assigned to a single property:
 
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-
     unnamed =
     [
         css.$tag( "h1", { fontSize: 24 }),
@@ -277,7 +277,7 @@ class MyStyles extends css.StyleDefinition
     })
 
     cell = css.$tag( "td", {
-        ":nth-of-type": [ 5, { backgroundColor: "cyan" } ]
+        ":nth-of-type": [ "odd", { backgroundColor: "cyan" } ]
     })
 }
 ```
@@ -289,7 +289,7 @@ tr:nth-child(2n+1) {
     backgroundColor: #F8F8F8;
 }
 
-td:nth-of-type(5) {
+td:nth-of-type(odd) {
     backgroundColor: cyan;
 }
 ```
@@ -336,13 +336,13 @@ class MyStyles extends css.StyleDefinition
     defaultColor = css.$var( "color", "black")
     defaultBgColor = css.$var( "color", "white")
 
-    // use the custom property by referring to the previously defined object
+    // use the custom properties by referring to the previously defined objects
     div = css.$tag( "div", {
         color: this.defaultColor,
         backgroundColor: this.defaultBgColor,
     })
 
-    // overriding the value of the custom property
+    // overriding the values of the custom properties
     footer = css.$tag( "footer", {
         "--": [
             [this.defaultColor, "yellow"],
@@ -371,11 +371,11 @@ footer {
 }
 ```
 
-Values of the custom CSS properties can be changed programmatically:
+Values of custom CSS properties can be changed programmatically:
 
 ```tsx
 let myStyles = css.$activate(MyStyles);
-...
+
 // change the top-level value; that is, the value defined under the :root` selector.
 myStyles.defaultColor.setValue( "navy");
 
@@ -391,13 +391,13 @@ In CSS, there is a list of pre-defined colors, which can be specified by name. I
 // Some TypeScript trickery to "extend" the INamedColors interface with you own name
 declare module "mimcss/lib/styles/ColorTypes"
 {
-	interface INamedColors
-	{
-		myColor?: number;
-	}
+    interface INamedColors
+    {
+        myColor?: number;
+    }
 }
 
-// Provide the value for your color - it must be a number in the form OxRRGGBB
+// Provide the value for your color - it must be a number in the form OxRRGGBB(AA)
 css.Colors.myFavColor = 0x123456;
 
 // Use it just as any other named color
@@ -441,7 +441,8 @@ class MyStyles extends css.StyleDefinition
 
 > Note: in JavaScript "1.0" is not a floating point number but rather an integer.
 
-
+## Conclusion
+Hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html) to find more information.
 
 
 
