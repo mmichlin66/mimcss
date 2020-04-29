@@ -286,11 +286,11 @@ This is equivalent to the following CSS:
 
 ```css
 tr:nth-child(2n+1) {
-    backgroundColor: #F8F8F8;
+    background-color: #F8F8F8;
 }
 
 td:nth-of-type(odd) {
-    backgroundColor: cyan;
+    background-color: cyan;
 }
 ```
 
