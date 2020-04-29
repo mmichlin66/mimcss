@@ -27,7 +27,7 @@ class MyStyles extends css.StyleDefinition
         fontWeight: 700,
     });
 
-    shadow = css.$class({
+    greeting = css.$class({
         padding: 8,
         border: [1, "solid", "blue"],
         boxShadow: { blur: 4, color: "cyan" },
@@ -48,8 +48,8 @@ class MyComponent extends React.Component
     render()
     {
         return <div className={myStyles.vbox.name}>
-            <p id={myStyles.importantElement.name}>Hello!</p>
-            <div className={myStyles.hbox.name}/>Hello!</div>
+            <p id={myStyles.importantElement.name}>Mimcss is easy to use.</p>
+            <div className={myStyles.greeting.name}/>Hello!</div>
         </div>
     }
 }
@@ -325,6 +325,123 @@ td > ul:hover {
     font-style: italic;
 }
 ```
+
+### Custom CSS Properties
+Although custom CSS properties by themselves are not CSS rules, in Mimcss they are defined using the same notation as the rules.
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+    // define custom properties at the root level
+    defaultColor = css.$var( "color", "black")
+    defaultBgColor = css.$var( "color", "white")
+
+    // use the custom property by referring to the previously defined object
+    div = css.$tag( "div", {
+        color: this.defaultColor,
+        backgroundColor: this.defaultBgColor,
+    })
+
+    // overriding the value of the custom property
+    footer = css.$tag( "footer", {
+        "--": [
+            [this.defaultColor, "yellow"],
+            [this.defaultBgColor, "blue"]
+        ]
+    })
+}
+```
+
+This is equivalent to the following CSS:
+
+```css
+:root {
+    --defaultColor: black;
+    --defaultBgColor: white;
+}
+
+div {
+    color: var(--defaultColor);
+    background-color: var(--defaultBgColor);
+}
+
+footer {
+    --defaultColor: yellow;
+    --defaultBgColor: blue;
+}
+```
+
+Values of the custom CSS properties can be changed programmatically:
+
+```tsx
+let myStyles = css.$activate(MyStyles);
+...
+// change the top-level value; that is, the value defined under the :root` selector.
+myStyles.defaultColor.setValue( "navy");
+
+// change the value under the 'footer' selector.
+myStyles.footer.setCustomProp( myStyles.defaultColor, "darkgreen");
+
+```
+
+### Named Colors
+In CSS, there is a list of pre-defined colors, which can be specified by name. In Mimcss, you can define your own named color and refer to it by name.
+
+```tsx
+// Some TypeScript trickery to "extend" the INamedColors interface with you own name
+declare module "mimcss/lib/styles/ColorTypes"
+{
+	interface INamedColors
+	{
+		myColor?: number;
+	}
+}
+
+// Provide the value for your color - it must be a number in the form OxRRGGBB
+css.Colors.myFavColor = 0x123456;
+
+// Use it just as any other named color
+class MyStyles extends css.StyleDefinition
+{
+    anchor = css.$tag( "a", { color: "myColor" })
+}
+```
+
+### Working with Units
+In CSS, values of many properties should be specified with units corresponding to the CSS type of the property. For example, the `<length>` type has units such as "px", "rem", "in", "cm", etc.; the `<angle>` type has units such as "deg", "rad", "turn", etc. For many properties, CSS also allows using percentages - "%".
+
+Mimcss supports all these CSS types and, for the developer convenience, allows specifying values in three ways: as an integer number, as a floating point number and as a string. For each CSS type, Mimcss defines a default unit to use with the integer number and the default unit to use with the floating point number. For example, for the `<length>` CSS type, Mimcss will treat integer numbers as having the "px" unit and floating point numbers as having the "em" unit. For the `<angle>` type, the default is "deg" for integers and "turn" for floating point numbers.
+
+Here are several examples:
+
+```tsx
+class MyStyles extends css.StyleDefinition
+{
+    // top and bottom padding will be set to 0.5em, while left and right - to 8px.
+    cls1 = css.$class({ padding: [0.5, 8] })
+
+    // width is 80%, min-width is 1.5em and max-width is 500px.
+    cls2 = css.$class({
+        width: "80%",
+        minWidth: 1.5,
+        maxWidth: 500
+    })
+
+    // initial angle for the conic gradient will be 45deg.
+    cls3 = css.$class({
+        backgroundImage: css.conicGradient( 45, "center", "red", "blue")
+    })
+
+    // initial angle for the conic gradient will be 0.25turn.
+    cls3 = css.$class({
+        backgroundImage: css.conicGradient( 0.25, "center", "red", "blue")
+    })
+}
+```
+
+> Note: in JavaScript "1.0" is not a floating point number but rather an integer.
+
+
 
 
 

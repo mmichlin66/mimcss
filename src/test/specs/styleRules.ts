@@ -111,6 +111,7 @@ describe("style rules:", () =>
 		class A extends css.StyleDefinition
 		{
 			cls1 = css.$class({ color: "black" })
+
 			cls = css.$class({
 				color: "red",
 				"&": [
@@ -130,6 +131,40 @@ describe("style rules:", () =>
 		expect((cssRules[1] as CSSStyleRule).selectorText).toEqual(".A_cls");
 		expect((cssRules[2] as CSSStyleRule).selectorText).toEqual(".A_cls.other, .other.A_cls div > span");
 		expect((cssRules[3] as CSSStyleRule).selectorText).toEqual(".A_cls.A_cls1, .A_cls1.A_cls + table");
+
+		css.$deactivate( a!);
+	})
+
+
+
+	it("should copy all style properties, including pseudo and dependent, when extending another style rule", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			cls = css.$class({
+				color: "red",
+				"&": [
+					[ "&.other, .other& div > span", { color: "brown" } ],
+					[ "& > table", { color: "brown" } ]
+				]
+			})
+
+			clsCopy = css.$class({ "+": this.cls })
+		}
+
+		let a = css.$activate( A);
+		let elm = dom.getStyleElementWithID( "A");
+		expect(elm).toBeTruthy();
+		let cssRules = (elm!.sheet as CSSStyleSheet).cssRules;
+		expect(cssRules.length).toEqual(6);
+
+		expect((cssRules[0] as CSSStyleRule).selectorText).toEqual(".A_cls");
+		expect((cssRules[1] as CSSStyleRule).selectorText).toEqual(".A_cls.other, .other.A_cls div > span");
+		expect((cssRules[2] as CSSStyleRule).selectorText).toEqual(".A_cls > table");
+
+		expect((cssRules[3] as CSSStyleRule).selectorText).toEqual(".A_clsCopy");
+		expect((cssRules[4] as CSSStyleRule).selectorText).toEqual(".A_clsCopy.other, .other.A_clsCopy div > span");
+		expect((cssRules[5] as CSSStyleRule).selectorText).toEqual(".A_clsCopy > table");
 
 		css.$deactivate( a!);
 	})
