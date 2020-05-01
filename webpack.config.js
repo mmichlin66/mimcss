@@ -1,73 +1,42 @@
-// define preprocessor variables for ifdef-loader
 const dev_ifdefLoaderOptions = { DEBUG: true };
 const prod_ifdefLoaderOptions = { DEBUG: false };
+
+
+function config( outFileName, mode, devtool, ifdefLoaderOptions)
+{
+    return {
+        entry: "./lib/mimcssTypes.js",
+
+        output:
+        {
+            filename: outFileName,
+            path: __dirname + "/lib",
+            library: 'mimcss',
+            libraryTarget: 'umd',
+            globalObject: 'this'
+        },
+
+        mode: mode,
+        devtool: devtool,
+        resolve: { extensions: [".js"] },
+
+        module:
+        {
+            rules:
+            [
+                { test: /\.js$/, use: [{ loader: "ifdef-loader", options: ifdefLoaderOptions }] },
+                { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+            ]
+        }
+    }
+}
 
 
 
 module.exports =
 [
-    // development
-    {
-        entry: "./lib/mimcssTypes.js",
-
-        output:
-        {
-            filename: "mimcss.dev.js",
-            path: __dirname + "/lib",
-            library: 'mimcss',
-            libraryTarget: 'umd',
-            globalObject: 'this'
-        },
-
-        mode: "development",
-        devtool: "#inline-source-map",
-
-        resolve: { extensions: [".js"] },
-        module:
-        {
-            rules:
-            [
-                {
-                    test: /\.js$/,
-                    use: [{ loader: "ifdef-loader", options: dev_ifdefLoaderOptions }]
-                },
-
-                // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-                { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
-            ]
-        },
-    },
-
-    // production
-    {
-        entry: "./lib/mimcssTypes.js",
-
-        output:
-        {
-            filename: "mimcss.js",
-            path: __dirname + "/lib",
-            library: 'mimcss',
-            libraryTarget: 'umd',
-            globalObject: 'this'
-        },
-
-        mode: "production",
-        devtool: "source-map",
-        optimization: { minimize: true },
-
-        resolve: { extensions: [".js"] },
-        module:
-        {
-            rules:
-            [
-                {
-                    test: /\.js$/,
-                    use: [{ loader: "ifdef-loader", options: prod_ifdefLoaderOptions }]
-                },
-
-                // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-                { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
-            ]
-        },
-    }
+    config( "mimcss.dev.js", "development", "#inline-source-map", dev_ifdefLoaderOptions),
+    config( "mimcss.js", "production", "source-map", prod_ifdefLoaderOptions),
 ];
+
+
