@@ -17,7 +17,7 @@ describe("style rules:", () =>
 		{
 			cls = css.$class()
 			id = css.$id()
-			tag = css.$tag( "h1", {})
+			tag = css.$style( "h1", {})
 			selector = css.$style( "div > span", {})
 		}
 
@@ -38,7 +38,7 @@ describe("style rules:", () =>
 		{
 			cls = css.$class({ color: "red" })
 			id = css.$id({ color: "red" })
-			tag = css.$tag( "h1", { color: "red" })
+			tag = css.$style( "h1", { color: "red" })
 			selector = css.$style( "div > span", { color: "red" })
 		}
 
@@ -63,7 +63,7 @@ describe("style rules:", () =>
 		{
 			cls = css.$class({ color: "red" })
 			id = css.$id({ color: "red" })
-			tag = css.$tag( "h1", { color: "red" })
+			tag = css.$style( "h1", { color: "red" })
 			selector = css.$style( "div > span", { color: "red" })
 		}
 

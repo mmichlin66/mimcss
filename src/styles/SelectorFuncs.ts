@@ -1,5 +1,5 @@
 ﻿import {SelectorTokenType} from "../rules/RuleTypes";
-import {TagRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
+import {ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {Rule} from "../rules/Rule";
 import { valueToString } from "./UtilFuncs";
 
@@ -36,9 +36,7 @@ export function formatSelector( template: string, params: SelectorTokenType[]): 
 				arr.push( item);
 			else if (item instanceof Rule)
 			{
-				if (item instanceof TagRule)
-					arr.push( item.tag);
-				else if (item instanceof ClassRule)
+				if (item instanceof ClassRule)
 					arr.push( item.cssName);
 				else if (item instanceof IDRule)
 					arr.push( item.cssName);

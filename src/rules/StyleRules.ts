@@ -1,4 +1,4 @@
-import {IStyleRule, ExtendedStyleset, IVarRule, IAbstractRule, IClassRule, IIDRule, ISelectorRule, ITagRule} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, IVarRule, IAbstractRule, IClassRule, IIDRule, ISelectorRule} from "./RuleTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
@@ -533,43 +533,6 @@ export class SelectorRule extends StyleRule implements ISelectorRule
 
 	// selector object for this rule.
 	private selector: CssSelector;
-}
-
-
-
-/**
- * The TagRule class describes a styleset that applies to elements identified by a tag name.
- */
-export class TagRule extends StyleRule implements ITagRule
-{
-	public constructor( tag: string, style?: ExtendedStyleset)
-	{
-		super( style);
-		this.tag = tag;
-	}
-
-
-
-	// Creates a copy of the rule.
-	public clone(): TagRule
-	{
-		let newRule = new TagRule( this.tag);
-		newRule.copyFrom( this);
-		return newRule;
-	}
-
-
-
-	// Returns the selector part of the style rule.
-	public getSelectorString(): string
-	{
-		return this.tag;
-	}
-
-
-
-	/** Name of the HTML tag */
-	public tag: string;
 }
 
 

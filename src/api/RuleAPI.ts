@@ -10,7 +10,7 @@ import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/
 import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 import {MediaQuery} from "../styles/MediaTypes"
 import {IFontFace} from "../styles/FontFaceTypes";
-import {AbstractRule, TagRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
+import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
@@ -25,12 +25,6 @@ import {valueToString} from "../styles/UtilFuncs";
  */
 export function $abstract( style: RuleTypes.ExtendedStyleset): RuleTypes.IAbstractRule
 	{ return new AbstractRule( style); }
-
-/**
- * Creates new tag rule. The tag parameter can be any of the HTML or SVG tags.
- */
-export function $tag( tag: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap, style: RuleTypes.ExtendedStyleset): RuleTypes.ITagRule
-	{ return new TagRule( tag, style); }
 
 /**
  * Creates new class rule. The class name will be created when the rule is processed as part of

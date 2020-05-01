@@ -141,18 +141,6 @@ export interface IAbstractRule extends IStyleRule
 
 
 /**
- * The ITagRule interface represents a style rule that applies to elements identified by a tag name.
- * Objects implementing this interface are returned from the [[$tag]] function.
- */
-export interface ITagRule extends IStyleRule
-{
-	/** Name of the HTML tag */
-	readonly tag: string;
-}
-
-
-
-/**
  * The IClassRule interface represents a style rule that applies to elements identified by a class.
  * Objects implementing this interface are returned from the [[$class]] function.
  */
@@ -383,8 +371,7 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 
 
 /** Type for a single selector token that can be used as an argument to the $selector function */
-export type SelectorTokenType = ITagRule | IClassRule | IIDRule |
-    ISelectorRule | number | string | StringProxy;
+export type SelectorTokenType = IClassRule | IIDRule | ISelectorRule | number | string | StringProxy;
 
 
 
