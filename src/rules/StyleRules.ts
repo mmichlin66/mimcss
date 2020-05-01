@@ -5,7 +5,7 @@ import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString} from "../styles/StyleFuncs"
 import {valueToString} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
-import { pseudoEntityToString } from "../styles/SelectorFuncs";
+import { pseudoEntityToString, selectorToString } from "../styles/SelectorFuncs";
 
 
 
@@ -29,7 +29,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	/**
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
-	 * important properties and nested rules.
+	 * important properties and dependent rules.
 	 */
 	private parseInputStyleset( inputStyleset: Styleset): void
 	{
@@ -37,7 +37,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// because in case there are parents, we want first copy properties from them so that
 		// our own properties can override them.
 		let parentRules: StyleRule[] | null = null;
-		let nestedRules: NestedRule[] | null = null;
+		let dependentRules: DependentRule[] | null = null;
 		let styleset: Styleset = {};
 
 		for( let propName in inputStyleset)
@@ -55,19 +55,19 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			else if (propName.startsWith(":"))
 			{
 				// value is a styleset for a pseudo class or pseudo element
-				if (!nestedRules)
-					nestedRules = [];
+				if (!dependentRules)
+					dependentRules = [];
 
 				// if the value is an array, then this is a parameterised pseudo entity where the first element
 				// is the parameter value (string) and the second the ExtendedStyleset. Otherwise, the value is
 				// just the ExtendedStyleset.
-				let nestedRule: NestedRule;
+				let dependentRule: DependentRule;
 				if (Array.isArray(propVal))
-					nestedRule = new NestedRule( propName, propVal[0], propVal[1] as ExtendedStyleset, this);
+					dependentRule = new DependentRule( propName, propVal[0], propVal[1] as ExtendedStyleset, this);
 				else
-					nestedRule = new NestedRule( "&" + propName, undefined, propVal as ExtendedStyleset, this);
+					dependentRule = new DependentRule( "&" + propName, undefined, propVal as ExtendedStyleset, this);
 
-				nestedRules.push( nestedRule);
+				dependentRules.push( dependentRule);
 			}
 			else if (propName === "&")
 			{
@@ -75,10 +75,39 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				let tuples = propVal as [CssSelector, ExtendedStyleset][];
 				if (tuples.length > 0)
 				{
-					if (!nestedRules)
-						nestedRules = [];
+					if (!dependentRules)
+						dependentRules = [];
 
-					tuples.forEach( tuple => nestedRules!.push( new NestedRule( tuple[0], undefined, tuple[1], this)));
+					tuples.forEach( tuple => dependentRules!.push( new DependentRule( tuple[0],
+						undefined, tuple[1], this)));
+				}
+			}
+			else if (propName.startsWith("&"))
+			{
+				// value is an array of two-element tuples with selector and styleset
+				let tuples = propVal as [CssSelector, ExtendedStyleset][];
+				if (tuples.length > 0)
+				{
+					if (!dependentRules)
+						dependentRules = [];
+
+					tuples.forEach( tuple => dependentRules!.push( new DependentRule(
+						() => propName + selectorToString( tuple[0]),
+						undefined, tuple[1], this)));
+				}
+			}
+			else if (propName.endsWith("&"))
+			{
+				// value is an array of two-element tuples with selector and styleset
+				let tuples = propVal as [CssSelector, ExtendedStyleset][];
+				if (tuples.length > 0)
+				{
+					if (!dependentRules)
+						dependentRules = [];
+
+					tuples.forEach( tuple => dependentRules!.push( new DependentRule(
+						() => selectorToString( tuple[0]) + propName,
+						undefined, tuple[1], this)));
 				}
 			}
 			else
@@ -89,7 +118,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		}
 
 		// by now we went over all properties of the input styleset. If we have parent style
-		// rules, copy styleset, important and nested rules data from them.
+		// rules, copy styleset, important and dependent rules data from them.
 		if (parentRules && parentRules.length > 0)
 		{
 			parentRules.forEach( parent =>
@@ -97,16 +126,16 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				if (parent.styleset)
 					this.styleset = mergeStylesets( this.styleset, parent.styleset);
 
-				if (parent.nestedRules && parent.nestedRules.length > 0)
+				if (parent.dependentRules && parent.dependentRules.length > 0)
 				{
-					if (!this.nestedRules)
-						this.nestedRules = [];
+					if (!this.dependentRules)
+						this.dependentRules = [];
 
-					parent.nestedRules.forEach( nestedRule =>
+					parent.dependentRules.forEach( dependentRule =>
 					{
-						let newNestedRule = nestedRule.clone();
-						newNestedRule.containingRule = this;
-						this.nestedRules.push( newNestedRule);
+						let newDependentRule = dependentRule.clone();
+						newDependentRule.containingRule = this;
+						this.dependentRules.push( newDependentRule);
 					});
 				}
 			});
@@ -121,12 +150,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				mergeStylesets( this.styleset, styleset);
 		}
 
-		if (nestedRules && nestedRules.length > 0)
+		if (dependentRules && dependentRules.length > 0)
 		{
-			if (!this.nestedRules)
-				this.nestedRules = nestedRules;
+			if (!this.dependentRules)
+				this.dependentRules = dependentRules;
 			else
-				nestedRules.forEach( nestedRule => this.nestedRules.push( nestedRule));
+				dependentRules.forEach( dependentRule => this.dependentRules.push( dependentRule));
 		}
 	}
 
@@ -137,9 +166,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		super.process( owner, ruleName);
 
-		// if nested rules exist, process them under the same container
-		if (this.nestedRules)
-			this.nestedRules.forEach( nestedRule => nestedRule.process( owner, null));
+		// if dependent rules exist, process them under the same container
+		if (this.dependentRules)
+			this.dependentRules.forEach( dependentRule => dependentRule.process( owner, null));
 	}
 
 
@@ -149,15 +178,15 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		this.styleset = src.styleset;
 
-		// if nested rules exist, clone them
-		if (src.nestedRules)
+		// if dependent rules exist, clone them
+		if (src.dependentRules)
 		{
-			this.nestedRules = [];
-			for( let srcNestedRule of src.nestedRules)
+			this.dependentRules = [];
+			for( let srcDependentRule of src.dependentRules)
 			{
-				let newNestedRule = srcNestedRule.clone();
-				newNestedRule.containingRule = this;
-				this.nestedRules.push( newNestedRule);
+				let newDependentRule = srcDependentRule.clone();
+				newDependentRule.containingRule = this;
+				this.dependentRules.push( newDependentRule);
 			}
 		}
 	}
@@ -180,9 +209,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.styleset)
 			this.cssRule = Rule.addRuleToDOM( this.toCssString()!, parent) as CSSStyleRule;
 
-		// if nested rules exist, insert them under the same parent
-		if (this.nestedRules)
-			this.nestedRules.forEach( nestedRule => nestedRule.insert( parent));
+		// if dependent rules exist, insert them under the same parent
+		if (this.dependentRules)
+			this.dependentRules.forEach( dependentRule => dependentRule.insert( parent));
 	}
 
 
@@ -192,9 +221,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		super.clear();
 
-		// if nested rules exist, clear them too
-		if (this.nestedRules)
-			this.nestedRules.forEach( nestedRule => nestedRule.clear());
+		// if dependent rules exist, clear them too
+		if (this.dependentRules)
+			this.dependentRules.forEach( dependentRule => dependentRule.clear());
 	}
 
 
@@ -244,21 +273,25 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Resultant Styleset object defining properties to be inserted into DOM.
 	protected styleset: Styleset;
 
-	// List of nested styles.
-	private nestedRules: NestedRule[];
+	// List of dependent styles.
+	private dependentRules: DependentRule[];
 }
 
 
 
 /**
- * The NestedRule class describes a styleset that is nested within another style rule.
+ * The DependentRule class describes a styleset that depends on the containing style rule. This
+ * is used for pseudo classes, pseudo elements, combinators and other selectors that combine the
+ * containing rule's selector with additional selector items.
  */
-class NestedRule extends StyleRule
+class DependentRule extends StyleRule
 {
 	// for regular selectors, pseudo classes and pseudo elements, the selector already contains
-	// the ampersand. For parameterized pseudo classes and asudo elements, the selector is just
-	// the entity name.
-	public constructor( selector: CssSelector, selectorParam?: any, style?: ExtendedStyleset, containingRule?: StyleRule)
+	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, psudo
+	// elements and combinators, the selectorParam is defined and the selector is just the entity
+	// name.
+	public constructor( selector: CssSelector, selectorParam?: any, style?: ExtendedStyleset,
+		containingRule?: StyleRule)
 	{
 		super( style);
 		this.selector = selector;
@@ -269,9 +302,9 @@ class NestedRule extends StyleRule
 
 
 	// Creates a copy of the rule.
-	public clone(): NestedRule
+	public clone(): DependentRule
 	{
-		let newRule = new NestedRule( this.selector);
+		let newRule = new DependentRule( this.selector);
 		newRule.copyFrom( this);
 		newRule.selector = this.selector;
 		newRule.selectorParam = this.selectorParam;
@@ -291,9 +324,16 @@ class NestedRule extends StyleRule
 		}
 		else
 		{
-			// replace all occurrences of the ampersand symbol in the selector string with the
-			// selector string of the parent rule.
-			return valueToString( this.selector).replace( /&/g, parentSelector);
+			// convert selector to string.
+			let selector = selectorToString( this.selector);
+
+			// if the selector string doesn't have any occurrences of the ampersand symbol, we
+			// simply append the selector to the parent selector; otherwise, we replace all
+			// occurrences of the ampersand symbol in the selector string with the selector
+			// string of the parent rule.
+			return selector.indexOf( "&") < 0
+				? `${parentSelector}${selector}`
+				: selector.replace( /&/g, parentSelector);
 		}
 	}
 
@@ -305,7 +345,7 @@ class NestedRule extends StyleRule
 	// Optional parameters for the selector - used for parameterized pseudo classes and elements.
 	private selectorParam?: any;
 
-	// Parent style within which this rule is nested.
+	// Parent style rule of which this rule is dependent.
 	public containingRule?: StyleRule;
 }
 

@@ -2,7 +2,7 @@
 import {CssColor} from "../styles/ColorTypes"
 import {CssImage} from "../styles/ImageTypes"
 import {FontStretch_Single } from "../styles/FontFaceTypes";
-import {CssSelector} from "../styles/SelectorTypes";
+import {CssSelector, SelectorItem} from "../styles/SelectorTypes";
 import {
 	VarTemplateName, VarValueType, AnimationName_Single, TimingFunction_Single,
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
@@ -13,7 +13,6 @@ import {
 	TextDecorationStyle_StyleType, TextDecorationThickness_StyleType, TextDecoration_StyleType,
 	TextShadow_Single, TransformProxy, Transition_Single, TransitionProperty_Single, BorderRadius_StyleType, FillRule_StyleType
 } from "../styles/StyleTypes"
-import {SelectorTokenType} from "../rules/RuleTypes";
 import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
 import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString} from "../styles/UtilFuncs";
@@ -25,7 +24,7 @@ import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMat
  * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
  * possible types.
  */
-export function $selector( template: string, ...args: SelectorTokenType[]): CssSelector
+export function $selector( template: string, ...args: SelectorItem[]): CssSelector
 {
 	return () => formatSelector( template, args);
 }

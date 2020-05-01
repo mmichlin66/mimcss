@@ -1,4 +1,5 @@
-﻿import {OneOrPair} from "./UtilTypes";
+﻿import {StringProxy} from "./UtilTypes";
+import {IClassRule, IIDRule, ISelectorRule} from "../rules/RuleTypes";
 
 
 
@@ -10,8 +11,13 @@ export type SelectorProxy = (p?: "selector") => string;
 
 
 
+/** Type for a single selector token that can be used as an argument to the $selector function */
+export type SelectorItem = string | IClassRule | IIDRule | ISelectorRule | StringProxy | SelectorProxy;
+
+
+
 /** Type for a selector */
-export type CssSelector = string | SelectorProxy;
+export type CssSelector = SelectorItem | SelectorItem[];
 
 
 
@@ -38,9 +44,12 @@ export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | ":
 
 
 /**
- * Type for expression An+B, which is used for parameterized pseudo classes like `nth-child`
+ * Type for expression An+B, which is used for parameterized pseudo classes like `nth-child`. It
+ * can be a string, a single number or a tuple with one or two numbers. If it is a single number,
+ * the 'n' in An+B will not be used - as in `nth-child(2)`. If it is a tuple, the 'n' will be used
+ * even if the first tuple's element is 0.
  */
-export type NthChildExpression = string | OneOrPair<number>;
+export type NthChildExpression = "odd" | "even" | number | [number, number?] | StringProxy;
 
 
 
@@ -64,6 +73,11 @@ export interface IParameterizedPseudoEntities
 	"::part": string;
 	"::slotted": string;
 }
+
+
+
+/** Represents possible pseudo elements */
+export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" | " &" | ">&" | "+&" | "~&";
 
 
 

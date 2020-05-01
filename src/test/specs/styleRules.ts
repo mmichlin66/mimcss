@@ -106,6 +106,31 @@ describe("style rules:", () =>
 
 
 
+	it("should create dependent style rules for combinators", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			cls1 = css.$class({})
+			cls2 = css.$class({
+				"&>": [ [ this.cls1, { color: "pink" } ]],
+				"+&": [ [ this.cls1, { color: "pink" } ]]
+			})
+		}
+
+		let a = css.$activate( A);
+		let elm = dom.getStyleElementWithID( "A");
+		expect(elm).toBeTruthy();
+		let cssRules = (elm!.sheet as CSSStyleSheet).cssRules;
+		expect(cssRules.length).toEqual(2);
+
+		expect((cssRules[0] as CSSStyleRule).selectorText).toEqual(".A_cls2 > .A_cls1");
+		expect((cssRules[1] as CSSStyleRule).selectorText).toEqual(".A_cls1 + .A_cls2");
+
+		css.$deactivate( a!);
+	})
+
+
+
 	it("should create dependent style rule for complex selector", () =>
 	{
 		class A extends css.StyleDefinition

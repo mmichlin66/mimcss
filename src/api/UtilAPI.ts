@@ -95,6 +95,9 @@ export let Percent: ICssPercentMath = new CssPercentMath();
  */
 export function raw( val: string, ...params: any[]): StringProxy
 {
+	if (params.length === 0)
+		return () => val;
+
 	function replacer( token: string, ...args: any[]): string
 	{
 		let index = parseInt( args[0]);

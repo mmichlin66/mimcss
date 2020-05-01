@@ -3,10 +3,11 @@
  */
 
 
-import {IVarProxy, StringProxy, Extended} from "../styles/UtilTypes";
+import {IVarProxy} from "../styles/UtilTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {
-	PseudoClass, PseudoElement, CssSelector, PagePseudoClass, IParameterizedPseudoEntities
+	PseudoClass, PseudoElement, CssSelector, PagePseudoClass, IParameterizedPseudoEntities,
+	SelectorCombinator
 } from "../styles/SelectorTypes";
 
 
@@ -23,23 +24,24 @@ import {
  *   element is the parameter for the selector and the second element is the stylset.
  *   These properties define a styleset that will be assigned to the selector obtained by using
  *   the original styleset's owner followed by the given pseudo class or pseudo element.
- * - The "&" property that contains array of two-element tuples each defining a selector and a
- *   style corresponding to this selector. Selectors can use the ampersand symbol ('&') to refer
- *   to the parent style selector.
+ * - Properties with the ampersand symbol ('&') that contain arrays of two-element tuples each
+ *   defining a selector and a style corresponding to this selector. Selectors can use the
+ *   ampersand symbol to refer to the parent style selector. If the ampersand symbol is not used,
+ *   the selector will be simply appended to the parent selector.
  * 
  * Functions that return style rules (e.g. $class) accept the ExtendedStyleset as a parameter,
  * for example:
  * 
  * ```typescript
- * class MyStyles
+ * class MyStyles extends css.StyleDefinition
  * {
- *     myClass = $class( {
+ *     class1 = css.$class({})
+ *     class2 = css.$class({
  *         backgroundColor: "white",
- *         ":hover" : {
- *             backgroundColor: "gray"
- *         },
+ *         ":hover" : { backgroundColor: "grey" },
  *         "&": [
- *             [ "li > &", { backgroundColor: "yellow" } ]
+ *             [ "li > &", { backgroundColor: "yellow" } ],
+ *             [ this.class1, { backgroundColor: "orange" } ]
  *         ]
  *     })
  * }
@@ -49,23 +51,16 @@ import {
  * 
  * ```css
  * .m123 { backgroundColor: white; }
- * .m123:hover { backgroundColor: gray; }
+ * .m123:hover { backgroundColor: grey; }
  * li > .m123 { backgroundColor: yellow; }
+ * .m123.m122 { backgroundColor: orange; }
  * ```
  */
 export type ExtendedStyleset = Styleset &
-	{
-		[K in PseudoClass | PseudoElement]?: ExtendedStyleset
-	}
-		&
-	{
-		"+"?: IStyleRule | IStyleRule[],
-		"&"?: [CssSelector, ExtendedStyleset][],
-	}
-		&
-	{
-		[K in keyof IParameterizedPseudoEntities]?: [Extended<IParameterizedPseudoEntities[K]>, ExtendedStyleset]
-	};
+	{ [K in PseudoClass | PseudoElement]?: ExtendedStyleset } &
+	{ "+"?: IStyleRule | IStyleRule[] } &
+	{ [K in SelectorCombinator]?: [CssSelector, ExtendedStyleset][] } &
+	{ [K in keyof IParameterizedPseudoEntities]?: [IParameterizedPseudoEntities[K], ExtendedStyleset] };
 	
 
 
@@ -367,11 +362,6 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 	/** SOM media rule */
 	readonly cssRule: CSSMediaRule | null;
 }
-
-
-
-/** Type for a single selector token that can be used as an argument to the $selector function */
-export type SelectorTokenType = IClassRule | IIDRule | ISelectorRule | number | string | StringProxy;
 
 
 
