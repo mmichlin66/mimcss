@@ -97,9 +97,6 @@ class MyStyles extends css.StyleDefinition
     // element ID
     redElm = css.$id({ color: "red" })
 
-    // tag
-    h1 = css.$tag( "h1", { fontSize: 24 })
-
     // arbitrary complex selectors
     all = css.$style( "*", { boxSizing: "border-box" })
     li = css.$style( css.$selector("article > {0} > ul > li", this.redClass), { color: "brown" })
@@ -129,14 +126,13 @@ class MyStyles extends css.StyleDefinition
     firstPage = css.$page( ":first", { margin: "auto" })
 
     // @namespace
-    htmlNamespcae = css.$namespace( css.WebNamespaces.HTML)
     svgNamespcae = css.$namespace( css.WebNamespaces.SVG, "svg")
 
     // @media
     ifSmallDevice = css.$media( { maxWidth: 600 },
         class extends css.StyleDefinition<MyStyles>
         {
-            h1 = css.$tag( "h1", { fontSize: 20 });
+            h1 = css.$style( "h1", { fontSize: 20 });
         }
     )
 
@@ -157,7 +153,6 @@ class MyStyles extends css.StyleDefinition
 {
     unnamed =
     [
-        css.$tag( "h1", { fontSize: 24 }),
         css.$style( "*", { boxSizing: "border-box" }),
         css.$style( css.$selector("article > {0} > ul > li", this.redClass), { color: "brown" }),
 
@@ -171,17 +166,15 @@ class MyStyles extends css.StyleDefinition
 
         css.$page( ":first", { margin: "auto" }),
 
-        css.$namespace( css.WebNamespaces.HTML),
         css.$namespace( css.WebNamespaces.SVG, "svg"),
 
         css.$media( { maxWidth: 600 },
             class extends css.StyleDefinition<MyStyles>
             {
-                h1 = css.$tag( "h1", { fontSize: 20 });
+                h1 = css.$style( "h1", { fontSize: 20 });
             }
         ),
 
-        // @supports
         css.$supports( {display: "grid"},
             class extends css.StyleDefinition<MyStyles>
             {
@@ -272,11 +265,11 @@ Some pseudo classes require parameters, e.g. `:nth-child(2n+1)`. This is how it 
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    row = css.$tag( "tr", {
+    row = css.$style( "tr", {
         ":nth-child": [ [2,1], { backgroundColor: 0xF8F8F8 } ]
     })
 
-    cell = css.$tag( "td", {
+    cell = css.$style( "p", {
         ":nth-of-type": [ "odd", { backgroundColor: "cyan" } ]
     })
 }
@@ -289,7 +282,7 @@ tr:nth-child(2n+1) {
     background-color: #F8F8F8;
 }
 
-td:nth-of-type(odd) {
+p:nth-of-type(odd) {
     background-color: cyan;
 }
 ```
@@ -300,7 +293,7 @@ We often define a CSS class (or tag or ID) rule and then define related rules wi
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    ul = css.$tag( "ul", {
+    ul = css.$style( "ul", {
         color: "brown",
         "&": [
             [ "& > li:first-child, & > li > a", { color: "red" } ],
@@ -337,13 +330,13 @@ class MyStyles extends css.StyleDefinition
     defaultBgColor = css.$var( "color", "white")
 
     // use the custom properties by referring to the previously defined objects
-    div = css.$tag( "div", {
+    div = css.$style( "div", {
         color: this.defaultColor,
         backgroundColor: this.defaultBgColor,
     })
 
     // overriding the values of the custom properties
-    footer = css.$tag( "footer", {
+    footer = css.$style( "footer", {
         "--": [
             [this.defaultColor, "yellow"],
             [this.defaultBgColor, "blue"]
@@ -388,7 +381,7 @@ myStyles.footer.setCustomProp( myStyles.defaultColor, "darkgreen");
 In CSS, there is a list of pre-defined colors, which can be specified by name. In Mimcss, you can define your own named color and refer to it by name.
 
 ```tsx
-// Some TypeScript trickery to "extend" the INamedColors interface with you own name
+// Some TypeScript trickery to "extend" the INamedColors interface with your own name
 declare module "mimcss/lib/styles/ColorTypes"
 {
     interface INamedColors
@@ -403,7 +396,7 @@ css.Colors.myFavColor = 0x123456;
 // Use it just as any other named color
 class MyStyles extends css.StyleDefinition
 {
-    anchor = css.$tag( "a", { color: "myColor" })
+    anchor = css.$style( "a", { color: "myColor" })
 }
 ```
 
@@ -442,7 +435,7 @@ class MyStyles extends css.StyleDefinition
 > Note: in JavaScript "1.0" is not a floating point number but rather an integer.
 
 ## Conclusion
-Hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html) to find more information.
+We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html) to find more information.
 
 
 

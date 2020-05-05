@@ -947,7 +947,7 @@ export type VerticalAlign_StyleType = "baseline" | "sub" | "super" | "text-top" 
 
 
 /** Type for the visibility style property */
-export type Visibility_StyleType = "visible | hidden | collapse";
+export type Visibility_StyleType = "visible" | "hidden" | "collapse";
 
 
 
