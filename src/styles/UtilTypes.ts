@@ -167,12 +167,6 @@ export interface INumberMath<T extends string>
      * @param params 
      */
     calc( formula: string, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>;
-
-    /**
-     * Converts the given number into percents. Values between -1.0 and 1.0 non-inclusive are
-     * multiplied by 100.
-     */
-    percent( n: number): NumberProxy<T>;
 }
 
 
@@ -333,6 +327,12 @@ export interface ICssLengthMath extends INumberMath<LengthType>
 
     /** Creates length value in the units which are a larger value between vw and vh */
     vmin( n: number): LengthProxy;
+
+    /**
+     * Converts the given number into percents. Values between -1.0 and 1.0 non-inclusive are
+     * multiplied by 100.
+     */
+    percent( n: number): LengthProxy;
 }
 
 
@@ -385,6 +385,12 @@ export interface ICssAngleMath extends INumberMath<AngleType>
 
     /** Creates angle value in turns */
     turn( n: number): AngleProxy;
+
+    /**
+     * Converts the given number into percents. Values between -1.0 and 1.0 non-inclusive are
+     * multiplied by 100.
+     */
+    percent( n: number): AngleProxy;
 }
 
 
@@ -399,7 +405,7 @@ export interface ICssAngleMath extends INumberMath<AngleType>
 export type TimeUnits = "s" | "ms";
 
 /** Unique string literal that distinguishes the Time type from other numeric types */
-export type TimeType = "Time" | PercentType;
+export type TimeType = "Time";
 
 /** Type for single style property of the `<time>` CSS type */
 export type CssTime = NumberBase<TimeType>;
@@ -438,7 +444,7 @@ export interface ICssTimeMath extends INumberMath<TimeType>
 export type ResolutionUnits = "dpi" | "dpcm" | "dppx" | "x";
 
 /** Unique string literal that distinguishes the Resolution type from other numeric types */
-export type ResolutionType = "Resolution" | PercentType;
+export type ResolutionType = "Resolution";
 
 /** Type for single style property of the `<resolution>` CSS type */
 export type CssResolution = NumberBase<ResolutionType>;
@@ -483,7 +489,7 @@ export interface ICssResolutionMath extends INumberMath<ResolutionType>
 export type FrequencyUnits = "Hz" | "kHz";
 
 /** Unique string literal that distinguishes the Frequency type from other numeric types */
-export type FrequencyType = "Frequency" | PercentType;
+export type FrequencyType = "Frequency";
 
 /** Type for single style property of the `<frequency>` CSS type */
 export type CssFrequency = NumberBase<FrequencyType>;
@@ -547,6 +553,12 @@ export interface ICssFractionMath extends INumberMath<FractionType>
 
     /** Creates fraction value for flex */
     fr( n: number): FractionProxy;
+
+    /**
+     * Converts the given number into percents. Values between -1.0 and 1.0 non-inclusive are
+     * multiplied by 100.
+     */
+    percent( n: number): FractionProxy;
 }
 
 

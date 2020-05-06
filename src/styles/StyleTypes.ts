@@ -484,7 +484,7 @@ export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inli
 export type Font_SystemKeyword = "caption" | "icon" | "menu" | "message-box" | "small-caption" | "status-bar";
 
 /** Type for font style property */
-export type Font_StyleType = Font_SystemKeyword |
+export type Font_StyleType = string | Font_SystemKeyword |
     {
         size: Extended<CssLength>;
         family: string;

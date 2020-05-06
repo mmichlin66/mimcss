@@ -69,14 +69,17 @@ export function hslToString( h: number | string, s: number | string, l: number |
 
 export function alphaToString( c: number | keyof INamedColors, a: number | string): string
 {
-    let rgbVal = typeof c === "string" ? this[c] : c;
+    let rgbVal = typeof c === "string" ? Colors[c] : c;
     return rgbToString( (rgbVal & 0xFF0000) >> 16, (rgbVal & 0x00FF00) >> 8, rgbVal & 0x0000FF, a);
 }
 
 
 
 /**
- * Map of predefined color names by their numeric values
+ * Map of predefined color names by their numeric values. Only built-in color names will be in
+ * this map - those named colors that are added using module augmentation will NOT reside in
+ * this map. This is needed to convert the numeric color values set using the Color.brown
+ * notation to their names when inserting CSS rules.
  */
 let reversedColorMap = new Map<number,string>();
 
@@ -89,7 +92,7 @@ Object.entries( Colors).forEach( ([name, value]) => reversedColorMap.set( value,
  * Converts color style value to the CSS time string. If a string value is in the Colors object we
  * need to get its number and convert it to the rgb[a]() function because it might be a custom
  * color name added via INamedColors module augmentation. For numeric values, we check if this is
- * one of the predefined
+ * one of the predefined colors and return its string representation
  */
 export function colorToString( val: Extended<CssColor>): string
 {

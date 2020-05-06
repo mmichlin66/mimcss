@@ -3,11 +3,11 @@
 [![npm version](https://badge.fury.io/js/mimcss.svg)](https://badge.fury.io/js/mimcss)
 [![GitHub version](https://badge.fury.io/gh/mmichlin66%2Fmimcss.svg)](https://badge.fury.io/gh/mmichlin66%2Fmimcss)
 
-Mimcss is a TypeScript library that allows authoring CSS styles without creating CSS files. Instead, the styles are created via TypeScript programming. You code your styling rules including CSS classes, selectors, animations (keyframes), media etc., by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
-
 * [Quick Start](#quick-start)
 * [Features](#features)
 * [Examples](#examples)
+
+Mimcss is a TypeScript library that allows authoring CSS styles without creating CSS files. Instead, the styles are created via TypeScript programming. You code your styling rules including CSS classes, selectors, animations (keyframes), media etc., by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
 
 ## Quick Start
 The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. Let's assume that we need to create several styles for a couple of classes and an ID. With Mimcss, you create a TypeScript class and then, in your component's TypeScript code, you refer to the CSS classes and IDs using the TypeScript class's properties:
