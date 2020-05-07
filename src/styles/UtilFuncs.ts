@@ -260,36 +260,8 @@ function multiStyleToString<T extends string>( val: Extended<MultiNumberBase<T>>
 
 
 /**
- * Replaces patterns {index[|unit]} in the format string with values from the given array.
- * @param format 
- * @param convertFunc 
- * @param params 
- */
-function formatNumbers<T extends string>( format: string, params: Extended<NumberBase<T>>[],
-    convertFunc?: ConvertNumberFuncType): string
-{
-    function replacer( token: string, ...args: any[]): string
-    {
-        let index = parseInt( args[0]);
-        if (index >= params.length)
-            return "0";
-
-        let unit = args[1];
-        let param = params[index];
-        if (unit && typeof param === "number")
-            return param + unit;
-        else
-            return styleToString( param, convertFunc)!;
-    }
-
-    return format.replace( /{\s*(\d*)\s*(?:\|\s*([a-zA-Z\%]+)\s*)?}/g, replacer);
-}
-
-
-
-/**
  * The mathFunc function returns one of the mathematic CSS function that accepts one or more
- * parameters whoe type is derived from NumberBase<T>.
+ * parameters whose type is derived from NumberBase<T>.
  */
 function mathFunc<T extends string>( name: string, params: Extended<NumberBase<T>>[],
     convertFunc?: ConvertNumberFuncType): string
@@ -302,10 +274,22 @@ function mathFunc<T extends string>( name: string, params: Extended<NumberBase<T
 /**
  * The calcFunc function returns the string representation of the calc() CSS function.
  */
-function calcFunc<T extends string>( formula: string, params: Extended<NumberBase<T>>[],
+function calcFunc<T extends string>( parts: TemplateStringsArray, params: Extended<NumberBase<T>>[],
     convertFunc?: ConvertNumberFuncType): string
 {
-    return `calc(${formatNumbers( formula, params, convertFunc)})`;
+    // number of parameters is always 1 less than the number of string parts
+    let paramsLen = params.length;
+    if (paramsLen === 0)
+        return parts[0];
+
+    let buf: string[] = [];
+    for( let i = 0; i < paramsLen; i++)
+    {
+        buf.push( parts[i]);
+        buf.push( styleToString( params[i], convertFunc));
+    }
+
+    return `calc(${buf.join("")}${parts[paramsLen]})`;
 }
 
 
@@ -361,9 +345,9 @@ class NumberMath<T extends string> implements INumberMath<T>
         return () => mathFunc( "clamp", [min, pref, max], this.convertFunc);
     }
 
-    public calc( formula: string, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
+    public calc( formulaParts: TemplateStringsArray, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
     {
-        return () => calcFunc( formula, params, this.convertFunc);
+        return () => calcFunc( formulaParts, params, this.convertFunc);
     }
 
     public percent( n: number)

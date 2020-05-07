@@ -133,7 +133,7 @@ describe("style properties of type <length>:", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				c = css.$class( { width: css.Len.calc( "(90% - {0}) / 2 + {1}", 250, 2.5)})
+				c = css.$class( { width: css.Len.calc `(90% - ${250}) / 2 + ${2.5}`})
 			}
 
 			let a = css.$activate( A);

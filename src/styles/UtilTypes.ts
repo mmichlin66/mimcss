@@ -145,28 +145,20 @@ export interface INumberMath<T extends string>
     clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): NumberProxy<T>;
 
     /**
-     * Creates property value using the CSS calc() function. This function accepts a formular
-     * string and an arbitrary number of parameters. The formular string can contain placeholders
-     * that will be replaced by the parameters. Placeholders have the following format:
-     * 
-     * ```
-     * {<index> [| <unit>]}
-     * ```
-     * The `<index>` token is a zero-based index in the parameter array. The optional `<unit>` token is
-     * a measurement unit (length, percent, angle, etc.) and is used if the corresponding parameter
-     * is a number.
+     * Creates property value using the CSS calc() function. This method is a tag function and must
+     * be invoked with a template string without parentheses.
      * 
      * ```typescript
      * class MyStyles
      * {
      *     wallGap = $var( "width", 16);
-     *     myClass = $class({ maxWidth: Len.calc("100% - 2*{0}", this.wallGap)})
+     *     myClass = $class({ maxWidth: css.Len.calc `100% - 2 * {this.wallGap}` })
      * }
      * ```
      * @param formula 
      * @param params 
      */
-    calc( formula: string, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>;
+    calc( formulaParts: TemplateStringsArray, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>;
 }
 
 

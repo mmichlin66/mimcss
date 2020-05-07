@@ -220,39 +220,8 @@ export type BaselineShift_StyleType = "sub" | "super" | CssLength;
 
 
 
-/** Type for border-radius style property */
-export type BorderRadius_StyleType = OneOrPair<CssLengthBox>;
-
-
-
-/** Type for single border side style property */
-export type BorderStyle_Keyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
-    "groove" | "ridge" | "inset" | "outset";
-
-
-
-/** Type for border-style style property */
-export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
-
-
-
-/** Type for border side width style property */
-export type BorderWidth__Single = "thin" | "medium" | "thick" | CssLength;
-
-
-
-/** Type for border-width style property */
-export type BorderWidth_StyleType = OneOrBox<BorderWidth__Single>;
-
-
-
 /** Type for border-collapse style property */
 export type BorderColapse_StyleType = "collapse" | "separate";
-
-
-
-/** Type for border-spacing style property */
-export type BorderSpacing_StyleType = OneOrPair<CssLength>;
 
 
 
@@ -261,17 +230,16 @@ export type BorderColor_StyleType = OneOrBox<CssColor>;
 
 
 
-/** Type for border side style property */
-export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
-    [Extended<CssLength>?, Extended<BorderStyle_Keyword>?, Extended<CssColor>?];
-
-
-
 /** Type for border-image-repeat keywords */
 export type BorderImageRepeat_Keyword = "stretch" | "repeat" | "round" | "space";
 
 /** Type for border-image-repeat style property */
 export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeat_Keyword>;
+
+
+
+/** Type for border-radius style property */
+export type BorderRadius_StyleType = OneOrPair<CssLengthBox>;
 
 
 
@@ -293,6 +261,36 @@ export type BoxShadow_StyleType = OneOrMany<BoxShadow_Single>;
 
 /** Type for box-sizing style property */
 export type BoxSizing_StyleType = "content-box" | "border-box";
+
+
+
+/** Type for border-spacing style property */
+export type BorderSpacing_StyleType = OneOrPair<CssLength>;
+
+
+
+/** Type for single border side style property */
+export type BorderStyle_Keyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
+    "groove" | "ridge" | "inset" | "outset";
+
+
+
+/** Type for border-style style property */
+export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
+
+
+
+/** Type for border side style property */
+export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
+    [Extended<CssLength>?, Extended<BorderStyle_Keyword>?, Extended<CssColor>?];
+
+
+
+/** Type for border side width style property */
+export type BorderWidth__Single = "thin" | "medium" | "thick" | CssLength;
+
+/** Type for border-width style property */
+export type BorderWidth_StyleType = OneOrBox<BorderWidth__Single>;
 
 
 

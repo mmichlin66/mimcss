@@ -91,33 +91,24 @@ export let Percent: ICssPercentMath = new CssPercentMath();
  * Returns a StringProxy function encapsulating the given string-like parameter. This function
  * allows specifying arbitrary text for properties whose type normally doesn't allow strings.
  * This is used as an "escape hatch" when a string value already exists and there is no sense
- * to convert it to a proper type.
+ * to convert it to a proper type. This function is a tag function and must be invoked with
+ * the template string without parentheses.
  */
-export function raw( val: string, ...params: any[]): StringProxy
+export function raw( parts: TemplateStringsArray, ...params: any[]): StringProxy
 {
-	if (params.length === 0)
-		return () => val;
+    // number of parameters is always 1 less than the number of string parts
+    let paramsLen = params.length;
+    if (paramsLen === 0)
+        return () => parts[0];
 
-	function replacer( token: string, ...args: any[]): string
-	{
-		let index = parseInt( args[0]);
-		return index < params.length ? valueToString( params[index]) : "";
-	}
+    let buf: string[] = [];
+    for( let i = 0; i < paramsLen; i++)
+    {
+        buf.push( parts[i]);
+        buf.push( valueToString( params[i]));
+    }
 
-	return () =>
-	{
-		try
-		{
-			return val.replace( /{\s*(\d*)\s*}/g, replacer);
-		}
-		catch(err)
-		{
-			/// #if DEBUG
-				console.error( "Invalid placeholder in raw string:", val)
-			/// #endif
-			return val;
-		}
-	}
+	return () => `${buf.join("")}${parts[paramsLen]}`;
 }
 
 

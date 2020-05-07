@@ -3,7 +3,7 @@ import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/Styl
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString} from "../styles/StyleFuncs"
-import {valueToString} from "../styles/UtilFuncs";
+import {valueToString, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
 import { pseudoEntityToString, selectorToString } from "../styles/SelectorFuncs";
 
@@ -244,7 +244,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (!this.cssRule)
 			return;
 
-		this.cssRule.style.setProperty( name,
+		this.cssRule.style.setProperty( camelToDash( name),
 			stylePropToString( name, value, true), important ? "!important" : null)
 	}
 

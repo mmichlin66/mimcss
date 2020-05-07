@@ -295,17 +295,18 @@ export const symOwner = Symbol("owner");
 export abstract class StyleDefinition<O extends StyleDefinition = any>
 {
 	/**
-	 * Style definition classes are never created directly - they are instantiated only when
-	 * either the [[$use]] or [[$activate]] function is called.
+	 * Style definition classes are created directly only by the *styled components* - that is,
+	 * components that use different styles for each instance. Otherwise, style definition
+	 * class instances are created when either the [[$use]] or [[$activate]] function is called.
 	 * @param owner Reference to the top-level style definition class
 	 */
-	public constructor( owner: O | null)
+	public constructor( owner: O | null = null)
 	{
 		this[symOwner] = owner;
 	}
 
 	/**
-	 * Refers to the singleton instance of the style definition class which is the **owner** of
+	 * Refers to the singleton instance of the style definition class which is the *owner* of
 	 * this style definition object. The owner is the top-level class in the chain of style
 	 * definition classes. Through this memeber, all rules and other memebers defined in the owner
 	 * definition class can be accessed.
