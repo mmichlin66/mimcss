@@ -558,7 +558,7 @@ export function deactivate( definition: StyleDefinition): void
  * @param enable
  * @param prefix
  */
-export function enableOptimizedStyleNames( enable: boolean, prefix?: string): void
+export function enableShortNames( enable: boolean, prefix?: string): void
 {
 	useUniqueStyleNames = enable;
 	uniqueStyleNamesPrefix = prefix ? prefix : "n";

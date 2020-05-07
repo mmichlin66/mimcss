@@ -348,9 +348,7 @@ export function textDecoration(
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Returns an FilterProxy function representing the `brightness()` CSS function.
- */
+// Helper function converting percent value to invocation of the given CSS function.
 function percentFilter( name: string, amount: Extended<CssPercent>): FilterProxy
 {
     return () => `${name}(${CssPercentMath.styleToString( amount)})`;

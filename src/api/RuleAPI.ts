@@ -162,9 +162,9 @@ export function $deactivate( instance: RuleTypes.StyleDefinition): void
  * @param enable
  * @param prefix
  */
-export function $enableOptimizedStyleNames( enable: boolean, prefix?: string): void
+export function $enableShortNames( enable: boolean, prefix?: string): void
 {
-	return RuleContainerFuncs.enableOptimizedStyleNames( enable, prefix);
+	return RuleContainerFuncs.enableShortNames( enable, prefix);
 }
 
 
