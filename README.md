@@ -378,7 +378,7 @@ myStyles.footer.setCustomProp( myStyles.defaultColor, "darkgreen");
 ```
 
 ### Named Colors
-In CSS, there is a list of pre-defined colors, which can be specified by name. In Mimcss, you can define your own named color and refer to it by name.
+In CSS, there is a list of pre-defined colors, which can be specified by names. In Mimcss, you can use these colors and you can also define your own named colors and refer to them by names.
 
 ```tsx
 // Some TypeScript trickery to "extend" the INamedColors interface with your own name
@@ -426,13 +426,13 @@ class MyStyles extends css.StyleDefinition
     })
 
     // initial angle for the conic gradient will be 0.25turn.
-    cls3 = css.$class({
+    cls4 = css.$class({
         backgroundImage: css.conicGradient( 0.25, "center", "red", "blue")
     })
 }
 ```
 
-> Note: in JavaScript "1.0" is not a floating point number but rather an integer.
+> Note: in JavaScript `1.0` is not a floating point number but rather an integer.
 
 ## Conclusion
 We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html) to find more information.
