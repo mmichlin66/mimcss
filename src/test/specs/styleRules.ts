@@ -141,7 +141,7 @@ describe("style rules:", () =>
 				color: "red",
 				"&": [
 					[ "&.other, .other& div > span", { color: "brown" } ],
-					[ css.$selector( "&{0}, {0}& + {1}", this.cls1, "table"), { color: "brown" } ]
+					[ css.selector`&${this.cls1}, ${this.cls1}& + ${"table"}`, { color: "brown" } ]
 				]
 			})
 		}

@@ -47,7 +47,7 @@ export function $id( style?: RuleTypes.ExtendedStyleset, nameOverride?: string |
 	{ return new IDRule( style, nameOverride); }
 
 /**
- * Creates new selector rule. Selector can be specified as a string or via the $selector function.
+ * Creates new selector rule. Selector can be specified as a string or via the selector function.
  */
 export function $style( selector: CssSelector, style: RuleTypes.ExtendedStyleset): RuleTypes.ISelectorRule
 	{ return new SelectorRule( selector, style); }

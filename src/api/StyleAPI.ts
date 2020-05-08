@@ -2,7 +2,7 @@
 import {CssColor} from "../styles/ColorTypes"
 import {CssImage} from "../styles/ImageTypes"
 import {FontStretch_Single } from "../styles/FontFaceTypes";
-import {CssSelector, SelectorItem} from "../styles/SelectorTypes";
+import {SelectorItem, SelectorProxy} from "../styles/SelectorTypes";
 import {
 	VarTemplateName, VarValueType, AnimationName_Single, TimingFunction_Single,
 	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
@@ -20,13 +20,12 @@ import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMat
 
 
 /**
- * Returns a string representation of a selector using the given template string with optional
- * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
- * possible types.
+ * Returns a string representation of a selector. This function is a tag function and must be
+ * invoked with the template string without parentheses.
  */
-export function $selector( template: string, ...args: SelectorItem[]): CssSelector
+export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]): SelectorProxy
 {
-	return () => formatSelector( template, args);
+	return () => formatSelector( parts, params);
 }
 
 

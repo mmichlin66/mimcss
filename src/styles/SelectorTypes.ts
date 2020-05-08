@@ -5,13 +5,13 @@ import {IClassRule, IIDRule, ISelectorRule} from "../rules/RuleTypes";
 
 /**
  * The SelectorProxy function returns a CSS selector string. This type is returned from the
- * [[$selector]] function.
+ * [[selector]] function.
  */
 export type SelectorProxy = (p?: "selector") => string;
 
 
 
-/** Type for a single selector token that can be used as an argument to the $selector function */
+/** Type for a single selector token that can be used as an argument to the [[selector]] function */
 export type SelectorItem = string | IClassRule | IIDRule | ISelectorRule | StringProxy | SelectorProxy;
 
 

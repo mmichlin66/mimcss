@@ -68,32 +68,21 @@ export function selectorToString( val: CssSelector): string
  * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
  * possible types.
  */
-export function formatSelector( template: string, items: SelectorItem[]): string
+export function formatSelector( parts: TemplateStringsArray, params: SelectorItem[]): string
 {
-	let tokens: string[] = template.split( /{(\d+)}/g);
+    // number of parameters is always 1 less than the number of string parts
+    let paramsLen = params.length;
+    if (paramsLen === 0)
+        return parts[0];
 
-	// the split method produces an array, whcih starts with a string and has strings and numbers
-	// alternating. As we go over the list of tokens, the tokenIsNumber tells us whether the
-	// current token is a string or is a number that we need to substitute with a parameter.
-	let tokenIsNumber = false;
-	let arr: string[] = [];
-	for (let token of tokens)
-	{
-		if (tokenIsNumber)
-		{
-			// the token must be the number because it was selected as such by RegEx, so no need
-			// in try/catch
-			let index = parseInt( token, 10);
-			if (index < items.length)
-				arr.push( selectorItemToString( items[index]));
-		}
-		else if (token)
-			arr.push( token);
+    let buf: string[] = [];
+    for( let i = 0; i < paramsLen; i++)
+    {
+        buf.push( parts[i]);
+        buf.push( selectorItemToString( params[i]));
+    }
 
-		tokenIsNumber = !tokenIsNumber;
-	}
-
-	return arr.join( "");
+	return `${buf.join("")}${parts[paramsLen]}`;
 }
 
 

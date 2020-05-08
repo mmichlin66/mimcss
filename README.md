@@ -99,7 +99,7 @@ class MyStyles extends css.StyleDefinition
 
     // arbitrary complex selectors
     all = css.$style( "*", { boxSizing: "border-box" })
-    li = css.$style( css.$selector("article > {0} > ul > li", this.redClass), { color: "brown" })
+    li = css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" })
 
     // custom CSS variables (with style-property-specific value types)
     defaultColor = css.$var( "color", "black")
@@ -154,7 +154,7 @@ class MyStyles extends css.StyleDefinition
     unnamed =
     [
         css.$style( "*", { boxSizing: "border-box" }),
-        css.$style( css.$selector("article > {0} > ul > li", this.redClass), { color: "brown" }),
+        css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" }),
 
         css.$fontface( {
             fontFamily: "Roboto",
