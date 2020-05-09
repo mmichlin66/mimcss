@@ -898,7 +898,7 @@ export type TransformStyle_StyleType = "flat" | "preserve-3d";
 /** Type for single transition */
 export type Transition_Single = string |
     {
-        property?: Extended<AnimationName_Single>;
+        property?: Extended<TransitionProperty_Single>;
         duration?: Extended<CssTime>;
         func?: Extended<TimingFunction_Single>;
         delay?: Extended<CssTime>;
@@ -1651,7 +1651,7 @@ export type Styleset = IStyleset &
         "--"?: CustomVarStyleType[];
 
         /**
-         * Special property "!" specifies one or more names of styleset properties that shuld be
+         * Special property "!" specifies one or more names of styleset properties that should be
          * considered "important". When the rule is inserted into DOM, the "!important" flag is
          * added to the property value.
          */

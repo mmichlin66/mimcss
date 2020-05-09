@@ -357,10 +357,11 @@ function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>
  * @param source 
  * @returns Reference to the target styleset if not null or a new styleset otherwise.
  */
-export function mergeStylesets( target: StyleTypes.Styleset, source: StyleTypes.Styleset): StyleTypes.Styleset
+export function mergeStylesets( target: StyleTypes.Styleset | undefined | null,
+    source: StyleTypes.Styleset): StyleTypes.Styleset
 {
     if (!source)
-        return target;
+        return target ? target : {};
 
     // if target is not defined, create it as an empty object. This object will be returned after
     // properties from the source are copied to it.
@@ -381,6 +382,35 @@ export function mergeStylesets( target: StyleTypes.Styleset, source: StyleTypes.
         return target;
     }
 
+    // merge custom and important properties
+    mergeStylesetSpecialProps( target, source);
+
+    // copy all other properties from the source
+	for( let propName in source)
+	{
+        if (propName === "!" || propName === "--")
+            continue;
+        else
+            target[propName] = source[propName];
+	}
+
+    return target;
+}
+
+
+
+/**
+ * Merges "--" and "!" properties from the source styleset to the target styleset.
+ */
+export function mergeStylesetSpecialProps( target: StyleTypes.Styleset,
+    source: StyleTypes.Styleset): void
+{
+    // check whether custom properties and important properties are defined
+    let sourceCustomProps = source["--"];
+    let sourceImpProps = source["!"];
+    if (!sourceCustomProps && !sourceImpProps)
+        return;
+
     // merge custom properties
     if (sourceCustomProps)
     {
@@ -394,17 +424,6 @@ export function mergeStylesets( target: StyleTypes.Styleset, source: StyleTypes.
         let targetImpProps = target["!"];
         target["!"] = !targetImpProps ? sourceImpProps.slice() : targetImpProps.concat( sourceImpProps);
     }
-
-    // copy all other properties from the source
-	for( let propName in source)
-	{
-        if (propName === "!" || propName === "--")
-            continue;
-        else
-            target[propName] = source[propName];
-	}
-
-    return target;
 }
 
 
@@ -454,7 +473,7 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string
 	}
 
     // join all elements in the array except nulls, undefined and empty strings
-    return `{${buf.filter( (item) => !!item).join(";")}}`;
+    return buf.filter( item => item != null).join(";");
 }
 
 

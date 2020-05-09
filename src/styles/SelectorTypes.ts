@@ -43,18 +43,23 @@ export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | ":
 
 
 
+/** Combines names of non-parameterized pseudo classes and pseudo elements */
+export type PseudoEntity = PseudoClass | PseudoElement;
+
+
+
 /**
  * Type for expression An+B, which is used for parameterized pseudo classes like `nth-child`. It
  * can be a string, a single number or a tuple with one or two numbers. If it is a single number,
  * the 'n' in An+B will not be used - as in `nth-child(2)`. If it is a tuple, the 'n' will be used
  * even if the first tuple's element is 0.
  */
-export type NthChildExpression = "odd" | "even" | number | [number, number?] | StringProxy;
+export type NthChildExpression = "odd" | "even" | number | [number, number?] | string | StringProxy;
 
 
 
 /**
- * The IParameterizedPseudoEntities interface maps names of pseudo classes and pseudo elements
+ * The IParameterizedPseudoEntity interface maps names of pseudo classes and pseudo elements
  * that require parameters to the type that can be used to specify these parameters
  */
 export interface IParameterizedPseudoEntity

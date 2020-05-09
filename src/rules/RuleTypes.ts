@@ -6,7 +6,7 @@
 import {IVarProxy} from "../styles/UtilTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {
-	PseudoClass, PseudoElement, CssSelector, PagePseudoClass, IParameterizedPseudoEntity
+	PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity
 } from "../styles/SelectorTypes";
 
 
@@ -61,11 +61,11 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
  * ```
  */
 export type ExtendedStyleset = Styleset &
-	{ [K in PseudoClass | PseudoElement]?: ExtendedStyleset } &
 	{ "+"?: IStyleRule | IStyleRule[] } &
+	{ [K in PseudoEntity]?: ExtendedStyleset } &
 	{ [K in SelectorCombinator]?: [CssSelector, ExtendedStyleset][] } &
-	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], ExtendedStyleset] };
-	
+	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], ExtendedStyleset][] };
+
 
 
 
@@ -97,6 +97,17 @@ export interface INamedEntity
 
 
 /**
+ * Type representing an object that contains dependent rules of a style rule
+ */
+export type DependentRules =
+	{ [K in PseudoEntity]?: IStyleRule } &
+	{ [K in SelectorCombinator]?: IStyleRule[] } &
+	{ [K in keyof IParameterizedPseudoEntity]?: IStyleRule[] };
+
+
+
+
+/**
  * The IStyleRule interface represents a styling rule in a style sheet. Style rules can be used
  * anywhere where style properties can be defined: class rules, ID rules, selector rules,
  * keyframes, etc. StyleRule defines a styleset and can optionally point to one or more style rules
@@ -109,6 +120,13 @@ export interface IStyleRule extends IRule
 	readonly cssRule: CSSStyleRule | null;
 
 	/**
+	 * Object containing dependent rules. Property names are taken from special properties
+	 * of the ExtendedStyleset. This object allows callers to access dependent rules to change
+	 * style property values programmatically.
+	 */
+	dependentRules: DependentRules;
+
+	/**
 	 * Adds/replaces/removes the value of the given CSS property in this rule.
 	 * @param name Name of the CSS property.
 	 * @param value New value of the CSS property. If this value is undefined or null, the property
@@ -119,7 +137,7 @@ export interface IStyleRule extends IRule
 
 	/**
 	 * Adds/replaces/removes the value of the given custmom CSS property in this rule.
-	 * @param customVar ICUstomVar object defining a custom CSS property.
+	 * @param customVar IVarRule object defining a custom CSS property.
 	 * @param value New value of the custom CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.

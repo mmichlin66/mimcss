@@ -1,8 +1,8 @@
-import {IStyleRule, ExtendedStyleset, IVarRule, IAbstractRule, IClassRule, IIDRule, ISelectorRule} from "./RuleTypes";
+import {IStyleRule, ExtendedStyleset, IVarRule, IAbstractRule, IClassRule, IIDRule, ISelectorRule, DependentRules} from "./RuleTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType, CustomVarStyleType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
-import {mergeStylesets, stylesetToString, stylePropToString} from "../styles/StyleFuncs"
+import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetSpecialProps} from "../styles/StyleFuncs"
 import {valueToString, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
 import {pseudoEntityToString, selectorToString} from "../styles/SelectorFuncs";
@@ -21,8 +21,11 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		super();
 
+		this.styleset = {};
+		this.dependentRules = {};
+
 		if (styleset)
-			this.parseInputStyleset( styleset);
+			this.parseInputStyleset( styleset as ExtendedStyleset);
 	}
 
 
@@ -31,43 +34,59 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
 	 * important properties and dependent rules.
 	 */
-	private parseInputStyleset( inputStyleset: Styleset): void
+	private parseInputStyleset( inputStyleset: ExtendedStyleset): void
 	{
-		// prepare local variables to accumulate parsing results. We do it in local varibales
-		// because in case there are parents, we want first copy properties from them so that
-		// our own properties can override them.
-		let parentRules: StyleRule[] | null = null;
-		let dependentRules: DependentRule[] | null = null;
-		let styleset: Styleset = {};
+		// if we have parents, we first copy properties from them so that our own properties
+		// can override them.
+		if (inputStyleset["+"])
+		{
+			// the value is a single StyleRule or an array of StyleRules to copy properties from
+			let extendsPropVal = inputStyleset["+"] as (StyleRule | StyleRule[]);
+			let parentRules: StyleRule[];
+			if (extendsPropVal instanceof StyleRule)
+				parentRules = [extendsPropVal];
+			else
+				parentRules = extendsPropVal;
+
+			// If we have parent rules, copy stylesets and dependent rules from them.
+			if (parentRules && parentRules.length > 0)
+			{
+				parentRules.forEach( parent =>
+				{
+					this.styleset = mergeStylesets( this.styleset, parent.styleset);
+					this.copyDependentRulesFrom( parent);
+				});
+			}
+		}
+
+		// merge custom and important properties
+		mergeStylesetSpecialProps( this.styleset, inputStyleset);
 
 		for( let propName in inputStyleset)
 		{
+			// skip over already processed parents, important and custom properties
+			if (propName === "+" || propName === "!" || propName === "--")
+				continue;
+
 			let propVal = inputStyleset[propName];
-			if (propName === "+")
+			if (propName.startsWith(":"))
 			{
-				// the value is a single or an array of StyleRules to copy properties from
-				let extendsPropVal = propVal as (StyleRule | StyleRule[]);
-				if (extendsPropVal instanceof StyleRule)
-					parentRules = [extendsPropVal];
-				else
-					parentRules = extendsPropVal;
-			}
-			else if (propName.startsWith(":"))
-			{
-				// value is a styleset for a pseudo class or pseudo element
-				if (!dependentRules)
-					dependentRules = [];
-
-				// if the value is an array, then this is a parameterised pseudo entity where the first element
-				// is the parameter value (string) and the second the ExtendedStyleset. Otherwise, the value is
-				// just the ExtendedStyleset.
-				let dependentRule: DependentRule;
+				// if the value is an array, then this is an array of tuples representing
+				// parameterised pseudo entities where the first element is the parameter value
+				// (string) and the second the ExtendedStyleset. Otherwise, the value is just an
+				// ExtendedStyleset.
 				if (Array.isArray(propVal))
-					dependentRule = new DependentRule( propName, propVal[0], propVal[1] as ExtendedStyleset, this);
+				{
+					let tuples = propVal as [any, ExtendedStyleset][];
+					if (tuples.length > 0)
+					{
+						this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
+							propName, tuple[0], tuple[1], this));
+					}
+				}
 				else
-					dependentRule = new DependentRule( "&" + propName, undefined, propVal as ExtendedStyleset, this);
-
-				dependentRules.push( dependentRule);
+					this.dependentRules[propName] = new DependentRule( "&" + propName, undefined,
+						propVal as ExtendedStyleset, this);
 			}
 			else if (propName === "&")
 			{
@@ -75,11 +94,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				let tuples = propVal as [CssSelector, ExtendedStyleset][];
 				if (tuples.length > 0)
 				{
-					if (!dependentRules)
-						dependentRules = [];
-
-					tuples.forEach( tuple => dependentRules!.push( new DependentRule( tuple[0],
-						undefined, tuple[1], this)));
+					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
+						tuple[0], undefined, tuple[1], this));
 				}
 			}
 			else if (propName.startsWith("&"))
@@ -88,12 +104,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				let tuples = propVal as [CssSelector, ExtendedStyleset][];
 				if (tuples.length > 0)
 				{
-					if (!dependentRules)
-						dependentRules = [];
-
-					tuples.forEach( tuple => dependentRules!.push( new DependentRule(
-						() => propName + selectorToString( tuple[0]),
-						undefined, tuple[1], this)));
+					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
+						() => propName + selectorToString( tuple[0]), undefined, tuple[1], this));
 				}
 			}
 			else if (propName.endsWith("&"))
@@ -102,60 +114,15 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				let tuples = propVal as [CssSelector, ExtendedStyleset][];
 				if (tuples.length > 0)
 				{
-					if (!dependentRules)
-						dependentRules = [];
-
-					tuples.forEach( tuple => dependentRules!.push( new DependentRule(
-						() => selectorToString( tuple[0]) + propName,
-						undefined, tuple[1], this)));
+					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
+						() => selectorToString( tuple[0]) + propName, undefined, tuple[1], this));
 				}
 			}
 			else
 			{
-				// copy the property value to our internal styleset
-				styleset[propName] = propVal;
+				// this is a regular CSS property: copy the property value to our internal styleset
+				this.styleset[propName] = propVal;
 			}
-		}
-
-		// by now we went over all properties of the input styleset. If we have parent style
-		// rules, copy styleset, important and dependent rules data from them.
-		if (parentRules && parentRules.length > 0)
-		{
-			parentRules.forEach( parent =>
-			{
-				if (parent.styleset)
-					this.styleset = mergeStylesets( this.styleset, parent.styleset);
-
-				if (parent.dependentRules && parent.dependentRules.length > 0)
-				{
-					if (!this.dependentRules)
-						this.dependentRules = [];
-
-					parent.dependentRules.forEach( dependentRule =>
-					{
-						let newDependentRule = dependentRule.clone();
-						newDependentRule.containingRule = this;
-						this.dependentRules.push( newDependentRule);
-					});
-				}
-			});
-		}
-
-		// now that we copied data from the parents (if any) we need to copy over our own
-		if (styleset && Object.keys( styleset).length > 0)
-		{
-			if (!this.styleset)
-				this.styleset = styleset;
-			else
-				mergeStylesets( this.styleset, styleset);
-		}
-
-		if (dependentRules && dependentRules.length > 0)
-		{
-			if (!this.dependentRules)
-				this.dependentRules = dependentRules;
-			else
-				dependentRules.forEach( dependentRule => this.dependentRules.push( dependentRule));
 		}
 	}
 
@@ -167,26 +134,53 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		super.process( owner, ruleName);
 
 		// if dependent rules exist, process them under the same container
-		if (this.dependentRules)
-			this.dependentRules.forEach( dependentRule => dependentRule.process( owner, null));
+		for( let propName in this.dependentRules)
+		{
+			let propVal = this.dependentRules[propName];
+			if (Array.isArray(propVal) && propVal.length > 0)
+				propVal.forEach( (depRule: DependentRule) => depRule.process( owner, null));
+			else
+				(propVal as DependentRule).process( owner, null);
+		}
 	}
 
 
 
 	// Copies internal data from another rule object.
-	public copyFrom( src: StyleRule): void
+	protected copyFrom( src: StyleRule): void
 	{
-		this.styleset = src.styleset;
+		// this method is called on a newly created object so we don't have any properties in
+		// our own styleset yet
+		this.styleset = mergeStylesets( this.styleset, src.styleset);
+		this.copyDependentRulesFrom( src);
+	}
 
-		// if dependent rules exist, clone them
-		if (src.dependentRules)
+
+
+	// Copies dependent rules from another style rule object.
+	private copyDependentRulesFrom( src: StyleRule): void
+	{
+		for( let propName in src.dependentRules)
 		{
-			this.dependentRules = [];
-			for( let srcDependentRule of src.dependentRules)
+			let propVal = src.dependentRules[propName];
+			if (Array.isArray(propVal) && propVal.length > 0)
 			{
-				let newDependentRule = srcDependentRule.clone();
-				newDependentRule.containingRule = this;
-				this.dependentRules.push( newDependentRule);
+				let arr = this.dependentRules[propName];
+				if (!arr)
+					this.dependentRules[propName] = arr = [];
+
+				propVal.forEach( (srcDepRule: DependentRule) =>
+				{
+					let newDepRule = srcDepRule.clone();
+					newDepRule.containingRule = this;
+					arr.push( newDepRule);
+				});
+			}
+			else
+			{
+				let newDepRule = (propVal as DependentRule).clone();
+				newDepRule.containingRule = this;
+				this.dependentRules[propName] = newDepRule;
 			}
 		}
 	}
@@ -199,7 +193,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.cachedSelectorString == null)
 			this.cachedSelectorString = this.getSelectorString();
 			
-		return this.styleset ? `${this.cachedSelectorString} ${stylesetToString( this.styleset)}` : "";
+		return `${this.cachedSelectorString} {${stylesetToString( this.styleset)}}`;
 	}
 
 
@@ -207,12 +201,18 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		if (this.styleset)
-			this.cssRule = Rule.addRuleToDOM( this.toCssString()!, parent) as CSSStyleRule;
+		if (Object.keys(this.styleset).length > 0)
+			this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent) as CSSStyleRule;
 
 		// if dependent rules exist, insert them under the same parent
-		if (this.dependentRules)
-			this.dependentRules.forEach( dependentRule => dependentRule.insert( parent));
+		for( let propName in this.dependentRules)
+		{
+			let propVal = this.dependentRules[propName];
+			if (Array.isArray(propVal) && propVal.length > 0)
+				propVal.forEach( (depRule: DependentRule) => depRule.insert( parent));
+			else
+				(propVal as DependentRule).insert( parent);
+		}
 	}
 
 
@@ -223,8 +223,14 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		super.clear();
 
 		// if dependent rules exist, clear them too
-		if (this.dependentRules)
-			this.dependentRules.forEach( dependentRule => dependentRule.clear());
+		for( let propName in this.dependentRules)
+		{
+			let propVal = this.dependentRules[propName];
+			if (Array.isArray(propVal) && propVal.length > 0)
+				propVal.forEach( (depRule: DependentRule) => depRule.clear());
+			else
+				(propVal as DependentRule).clear();
+		}
 	}
 
 
@@ -271,15 +277,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		// first set/remove the value in our internal styleset object
 		if (value == null)
-		{
-			if (this.styleset)
-				delete this.styleset[name];
-		}
+			delete this.styleset[name];
 		else
 		{
-			if (!this.styleset)
-				this.styleset = {};
-
 			this.styleset[name] = value;
 			this.setPropImportant( name, important);
 		}
@@ -311,7 +311,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (important)
 		{
 			if (!currImportantProps)
-				this.styleset["!"] = name;
+				this.styleset["!"] = [name as keyof IStyleset];
 			else if (currImportantProps.indexOf( name) < 0)
 				currImportantProps.push( name);
 		}
@@ -336,7 +336,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean): void
 	{
 		// first set/remove the value in our internal styleset object
-		let currCustomProps = this.styleset && this.styleset["--"] as CustomVarStyleType[];
+		let currCustomProps = this.styleset["--"] as CustomVarStyleType[];
 		if (currCustomProps || value != null)
 		{
 			if (value == null)
@@ -384,11 +384,15 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/** SOM style rule */
 	public cssRule: CSSStyleRule;
 
-	// Resultant object defining properties to be inserted into DOM.
-	private styleset: any;
+	/**
+	 * Object containing dependent rules. Property names are taken from special properties
+	 * of the ExtendedStyleset. This object allows callers to access dependent rules to change
+	 * style property values programmatically.
+	 */
+	public dependentRules: DependentRules;
 
-	// List of dependent style rules.
-	private dependentRules: DependentRule[];
+	// Resultant object defining properties to be inserted into DOM.
+	private styleset: Styleset;
 
 	// Selector string cached after it is first obtained. Needed to not invoke getSelectorString
 	// multiple times in the presence of dependent rules.

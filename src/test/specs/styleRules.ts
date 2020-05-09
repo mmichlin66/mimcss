@@ -131,7 +131,7 @@ describe("style rules:", () =>
 
 
 
-	it("should create dependent style rule for complex selector", () =>
+	it("should create dependent style rules for complex selectors", () =>
 	{
 		class A extends css.StyleDefinition
 		{
@@ -162,7 +162,7 @@ describe("style rules:", () =>
 
 
 
-	it("should copy all style properties, including pseudo and dependent, when extending another style rule", () =>
+	it("should copy all style properties, including dependent rules, when extending another style rule", () =>
 	{
 		class A extends css.StyleDefinition
 		{
