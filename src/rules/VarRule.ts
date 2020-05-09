@@ -44,9 +44,9 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 
 
 	// Converts the rule to CSS string.
-	public toCssString(): string
+	public toCssString(): string | null
 	{
-		return `${this.cssName}: ${stylePropToString( this.template, this.value, true)}`;
+		return this.value == null ? null : `${this.cssName}: ${stylePropToString( this.template, this.value, true)}`;
 	}
 
 
@@ -67,7 +67,8 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	 */
 	public setValue( value: VarValueType<K>, important?: boolean): void
 	{
-		this.container.setCustomVarValue( this.cssName, stylePropToString( this.template, value, true), important)
+		this.container.setCustomVarValue( this.cssName,
+			value == null ? null : stylePropToString( this.template, value, true), important)
 	}
 
 

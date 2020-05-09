@@ -1559,21 +1559,21 @@ export interface ICssVarTemplates extends ICssStyleset
 
 
 /**
+ * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
+ * custom CSS properties using the [[$var]] function.
+ */
+export type VarTemplateName = keyof ICssVarTemplates;
+
+
+
+/**
  * The IVarTemplates type maps all template properties defined in the [[ICssVarTemplates]]
  * interface to the "extended" versions of their types. These extended types are defined using
  * the [[Extended]] generic type, which adds basic keywords (e.g. "reset", "initial", etc.) as
  * well as [[IStringProxy]] and [[IVarProxy]] to the type that is defined in the ICssVarTemplates
  * interface.
  */
-export type IVarTemplates = { [K in keyof ICssVarTemplates]: Extended<ICssVarTemplates[K]> }
-
-
-
-/**
- * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
- * custom CSS properties using the [[$var]] function.
- */
-export type VarTemplateName = keyof IVarTemplates;
+export type IVarTemplates = { [K in VarTemplateName]: Extended<ICssVarTemplates[K]> }
 
 
 

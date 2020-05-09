@@ -168,7 +168,12 @@ class RuleContainer implements ITopLevelRuleContainer
 	public setCustomVarValue( name: string, value: string, important?: boolean): void
 	{
 		if (this.cssCustomVarStyleRule)
-			this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
+		{
+			if (value != null)
+				this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
+			else
+				this.cssCustomVarStyleRule.style.removeProperty( name);
+		}
 	}
 
 
@@ -218,7 +223,7 @@ class RuleContainer implements ITopLevelRuleContainer
 		if (this.vars.length > 0)
 		{
 			this.cssCustomVarStyleRule = Rule.addRuleToDOM( `:root {${this.vars.map( varObj =>
-				varObj.toCssString()).join(";")}}`, parent) as CSSStyleRule;
+				varObj.toCssString()).filter( v => v != null).join(";")}}`, parent) as CSSStyleRule;
 		}
 
 		// insert all other rules
@@ -465,7 +470,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
  * this function is called.
  * 
  * If the parameter is an object (an instance of the StyleDefinition class) then we check whether
- * it has already been processed. If yes we just return it back; if no, we assign new unique names
+ * it has already been processed. If yes, we just return it back; if no, we assign new unique names
  * to its rules.
  */
 export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyleDefinitionClass,

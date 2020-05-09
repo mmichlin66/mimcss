@@ -105,17 +105,19 @@ export interface IStyleRule extends IRule
 	readonly cssRule: CSSStyleRule | null;
 
 	/**
-	 * Adds/replaces the value of the given CSS property in this rule.
+	 * Adds/replaces/removes the value of the given CSS property in this rule.
 	 * @param name Name of the CSS property.
-	 * @param value New value of the CSS property.
+	 * @param value New value of the CSS property. If this value is undefined or null, the property
+	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
 	setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void;
 
 	/**
-	 * Adds/replaces the value of the given custmom cSS property in this rule.
+	 * Adds/replaces/removes the value of the given custmom cSS property in this rule.
 	 * @param customVar ICUstomVar object defining a custom CSS property.
-	 * @param value New value of the custom CSS property.
+	 * @param value New value of the custom CSS property. If this value is undefined or null, the property
+	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
 	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: VarValueType<K>, important?: boolean): void;

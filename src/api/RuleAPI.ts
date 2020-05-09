@@ -121,7 +121,7 @@ export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTyp
  * is invoked.
  */
 export function $use<T extends RuleTypes.StyleDefinition>(
-	instanceOrClass: RuleTypes.IStyleDefinitionClass<T>): T | null
+	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
 {
 	return RuleContainerFuncs.processInstanceOrClass( instanceOrClass) as T;
 }

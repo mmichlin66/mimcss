@@ -1,11 +1,11 @@
 import {IStyleRule, ExtendedStyleset, IVarRule, IAbstractRule, IClassRule, IIDRule, ISelectorRule} from "./RuleTypes";
-import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes"
+import {IStyleset, Styleset, VarTemplateName, VarValueType, CustomVarStyleType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString} from "../styles/StyleFuncs"
 import {valueToString, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
-import { pseudoEntityToString, selectorToString } from "../styles/SelectorFuncs";
+import {pseudoEntityToString, selectorToString} from "../styles/SelectorFuncs";
 
 
 
@@ -196,9 +196,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Converts the rule to CSS string representing the rule.
 	public toCssString(): string
 	{
-		return this.styleset
-			? `${this.getSelectorString()} ${stylesetToString( this.styleset)}`
-			: "";
+		if (this.cachedSelectorString == null)
+			this.cachedSelectorString = this.getSelectorString();
+			
+		return this.styleset ? `${this.cachedSelectorString} ${stylesetToString( this.styleset)}` : "";
 	}
 
 
@@ -241,28 +242,141 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 */
 	public setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void
 	{
-		if (!this.cssRule)
-			return;
-
-		this.cssRule.style.setProperty( camelToDash( name),
-			stylePropToString( name, value, true), important ? "!important" : null)
+		this.setPropInternal( name, value, important);
 	}
 
 
 
 	/**
-	 * Adds/replaces the value of the given custmom cSS property in this rule.
+	 * Adds/replaces the value of the given custom CSS property in this rule.
 	 * @param varObj IVarRule object defining a custom CSS property.
 	 * @param varValue New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, varValue: VarValueType<K>, important?: boolean): void
+	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: VarValueType<K>,
+		important?: boolean): void
 	{
-		if (!varObj || !this.cssRule || !(varObj instanceof VarRule))
+		if (!varObj || !(varObj instanceof VarRule))
 			return;
 
-		this.cssRule.style.setProperty( varObj.cssName,
-			stylePropToString( varObj.template, varValue, true), important ? "!important" : null)
+		return this.setCustomPropInternal( varObj, value, important);
+	}
+
+
+
+	/**
+	 * Adds/replaces/removes the value of the given CSS property in this rule.
+	 */
+	private setPropInternal( name: string, value: any, important?: boolean): void
+	{
+		// first set/remove the value in our internal styleset object
+		if (value == null)
+		{
+			if (this.styleset)
+				delete this.styleset[name];
+		}
+		else
+		{
+			if (!this.styleset)
+				this.styleset = {};
+
+			this.styleset[name] = value;
+			this.setPropImportant( name, important);
+		}
+
+		// second, if CSSRule alredy exists, set/remove the property value there
+		if (!this.cssRule)
+			return;
+
+		if (value == null)
+			this.cssRule.style.removeProperty( camelToDash( name));
+		else
+			this.cssRule.style.setProperty( camelToDash( name),
+				stylePropToString( name, value, true), important ? "!important" : null)
+	}
+
+
+
+	/**
+	 * Sets or clears the important flag for the given property. This method is invoked only if
+	 * the styleset is defined
+	 */
+	private setPropImportant( name: string, important?: boolean): void
+	{
+		// get the current important
+		let currImportantProps = this.styleset["!"] as string[];
+		if (!currImportantProps && !important)
+			return;
+
+		if (important)
+		{
+			if (!currImportantProps)
+				this.styleset["!"] = name;
+			else if (currImportantProps.indexOf( name) < 0)
+				currImportantProps.push( name);
+		}
+		else
+		{
+			let index = currImportantProps.indexOf( name);
+			if (index >= 0)
+			{
+				if (currImportantProps.length === 1)
+					this.styleset["!"] = undefined;
+				else
+					currImportantProps.splice( index, 1);
+			}
+		}
+	}
+
+
+
+	/**
+	 * Adds/replaces/removes the value of the given custmom cSS property in this rule.
+	 */
+	private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean): void
+	{
+		// first set/remove the value in our internal styleset object
+		let currCustomProps = this.styleset && this.styleset["--"] as CustomVarStyleType[];
+		if (currCustomProps || value != null)
+		{
+			if (value == null)
+			{
+				if (currCustomProps.length > 0)
+				{
+					let index = currCustomProps.findIndex( item => item[0] === varObj);
+					if (index >= 0)
+					{
+						if (currCustomProps.length === 1)
+							this.styleset[""] = undefined;
+						else
+							currCustomProps.splice( index, 1);
+					}
+				}
+			}
+			else
+			{
+				if (!currCustomProps)
+					this.styleset["--"] = currCustomProps = [[varObj, value]];
+				else
+				{
+					let index = currCustomProps.findIndex( item => item[0] === varObj);
+					if (index >= 0)
+						currCustomProps[index][1] = value;
+					else
+						currCustomProps.push( [varObj, value]);
+				}
+			}
+		}
+
+		// second, if CSSRule alredy exists, set/remove the property value there
+		if (!this.cssRule)
+			return;
+
+		if (value == null)
+			this.cssRule.style.removeProperty( varObj.cssName);
+		else
+			this.cssRule.style.setProperty( varObj.cssName,
+				stylePropToString( varObj.template, value, true), important ? "!important" : null)
 	}
 
 
@@ -270,11 +384,15 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/** SOM style rule */
 	public cssRule: CSSStyleRule;
 
-	// Resultant Styleset object defining properties to be inserted into DOM.
-	protected styleset: Styleset;
+	// Resultant object defining properties to be inserted into DOM.
+	private styleset: any;
 
-	// List of dependent styles.
+	// List of dependent style rules.
 	private dependentRules: DependentRule[];
+
+	// Selector string cached after it is first obtained. Needed to not invoke getSelectorString
+	// multiple times in the presence of dependent rules.
+	private cachedSelectorString: string | null = null;
 }
 
 

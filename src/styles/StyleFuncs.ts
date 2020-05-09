@@ -385,14 +385,14 @@ export function mergeStylesets( target: StyleTypes.Styleset, source: StyleTypes.
     if (sourceCustomProps)
     {
         let targetCustomProps = target["--"];
-        target["--"] = !targetCustomProps ? sourceCustomProps : targetCustomProps.concat( sourceCustomProps);
+        target["--"] = !targetCustomProps ? sourceCustomProps.slice() : targetCustomProps.concat( sourceCustomProps);
     }
 
     // merge important properties
     if (sourceImpProps)
     {
         let targetImpProps = target["!"];
-        target["!"] = !targetImpProps ? sourceImpProps : targetImpProps.concat( sourceImpProps);
+        target["!"] = !targetImpProps ? sourceImpProps.slice() : targetImpProps.concat( sourceImpProps);
     }
 
     // copy all other properties from the source
