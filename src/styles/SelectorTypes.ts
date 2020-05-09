@@ -57,7 +57,7 @@ export type NthChildExpression = "odd" | "even" | number | [number, number?] | S
  * The IParameterizedPseudoEntities interface maps names of pseudo classes and pseudo elements
  * that require parameters to the type that can be used to specify these parameters
  */
-export interface IParameterizedPseudoEntities
+export interface IParameterizedPseudoEntity
 {
 	":has": string;
 	":host": string;
@@ -73,11 +73,6 @@ export interface IParameterizedPseudoEntities
 	"::part": string;
 	"::slotted": string;
 }
-
-
-
-/** Represents possible pseudo elements */
-export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" | " &" | ">&" | "+&" | "~&";
 
 
 

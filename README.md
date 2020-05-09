@@ -7,7 +7,7 @@
 * [Features](#features)
 * [Examples](#examples)
 
-Mimcss is a TypeScript library that allows authoring CSS styles without creating CSS files. Instead, the styles are created via TypeScript programming. You code your styling rules including CSS classes, selectors, animations (keyframes), media etc., by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
+Mimcss is a TypeScript library that allows authoring CSS styles without creating CSS files. Instead, the styles are created via TypeScript programming. You code your styling rules including CSS tags, classes, animations, media etc., by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
 
 ## Quick Start
 The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. Let's assume that we need to create several styles for a couple of classes and an ID. With Mimcss, you create a TypeScript class and then, in your component's TypeScript code, you refer to the CSS classes and IDs using the TypeScript class's properties:
@@ -56,7 +56,7 @@ class MyComponent extends React.Component
 }
 ```
 
-Coding CSS styles in TypeScript brings us the following advantages:
+Coding CSS styles in TypeScript brings the following advantages:
 
 - The autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `myStyles.` the IDE will present the list of all the properties defined in our style definition class.
 - If we change the name of or remove the property in the `MyStyles` class and forget to change it in our component's `render` method, the project will not build. Thus a compile time error will prevent a much-harder-to-find run-time error.
@@ -70,6 +70,7 @@ Coding CSS styles in TypeScript brings us the following advantages:
 - Co-exists with regular CSS files - doesn't require re-writing of all existing styles at once or at all. You can gradually introduce Mimcss into you project.
 - Stylesheets are defined as TypeScript classes.
 - Stylesheets can be dynamically activated (inserted into DOM) and deactivated (removed from DOM).
+- Support for styled components where each component instance gets its individual set of CSS rules isolated from other instances.
 - Names of classes, IDs, animations and custom CSS properties are auto-generated, while developers use properties that return these names.
 - All CSS rule types are supported including style rules and at-rules.
 - Custom CSS properties are supported in a type safe manner by defining what standard CSS property type they represent.

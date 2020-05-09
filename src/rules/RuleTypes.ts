@@ -6,9 +6,13 @@
 import {IVarProxy} from "../styles/UtilTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {
-	PseudoClass, PseudoElement, CssSelector, PagePseudoClass, IParameterizedPseudoEntities,
-	SelectorCombinator
+	PseudoClass, PseudoElement, CssSelector, PagePseudoClass, IParameterizedPseudoEntity
 } from "../styles/SelectorTypes";
+
+
+/** Represents properties used in the [[ExtendedStyleset]] which are used to define dependent rules */
+export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" | " &" | ">&" | "+&" | "~&";
+
 
 
 /**
@@ -60,7 +64,7 @@ export type ExtendedStyleset = Styleset &
 	{ [K in PseudoClass | PseudoElement]?: ExtendedStyleset } &
 	{ "+"?: IStyleRule | IStyleRule[] } &
 	{ [K in SelectorCombinator]?: [CssSelector, ExtendedStyleset][] } &
-	{ [K in keyof IParameterizedPseudoEntities]?: [IParameterizedPseudoEntities[K], ExtendedStyleset] };
+	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], ExtendedStyleset] };
 	
 
 
@@ -114,7 +118,7 @@ export interface IStyleRule extends IRule
 	setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void;
 
 	/**
-	 * Adds/replaces/removes the value of the given custmom cSS property in this rule.
+	 * Adds/replaces/removes the value of the given custmom CSS property in this rule.
 	 * @param customVar ICUstomVar object defining a custom CSS property.
 	 * @param value New value of the custom CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
