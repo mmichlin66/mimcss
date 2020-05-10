@@ -1,5 +1,5 @@
 ﻿import {SelectorItem, CssSelector} from "./SelectorTypes";
-import {ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
+import {StyleRule} from "../rules/StyleRules"
 import {valueToString} from "./UtilFuncs";
 
 
@@ -19,16 +19,7 @@ function selectorItemToString( val: SelectorItem): string
 {
 	return valueToString( val, {
 		fromNull: v => "",
-		fromObject: v => {
-			if (v instanceof ClassRule)
-				return v.cssName;
-			else if (v instanceof IDRule)
-				return v.cssName;
-			else if (v instanceof SelectorRule)
-				return v.selectorText;
-			else
-				return valueToString(v);
-		}
+		fromObject: v => v instanceof StyleRule ? v.selectorText : valueToString(v)
 	})
 }
 

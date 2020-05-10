@@ -3,7 +3,7 @@
  */
 
 
-import {IVarProxy} from "../styles/UtilTypes";
+import {IVarProxy, OneOrMany} from "../styles/UtilTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {
 	PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity
@@ -119,12 +119,15 @@ export interface IStyleRule extends IRule
 	/** SOM style rule */
 	readonly cssRule: CSSStyleRule | null;
 
+	/** CSS rule selector string */
+	readonly selectorText: string;
+
 	/**
 	 * Object containing dependent rules. Property names are taken from special properties
 	 * of the ExtendedStyleset. This object allows callers to access dependent rules to change
 	 * style property values programmatically.
 	 */
-	dependentRules: DependentRules;
+	readonly dependentRules: DependentRules;
 
 	/**
 	 * Adds/replaces/removes the value of the given CSS property in this rule.
@@ -148,53 +151,58 @@ export interface IStyleRule extends IRule
 
 
 /**
- * The IAbstractRule interface represents a style rule that can only be used as a base for other
- * style rules. No CSSStyleRule objects are created for the abstract rules.
+ * The INamedStyleRule interface combines IStyleRule and INamedEntity interfaces. This is used
+ * for class and ID rules.
  */
-export interface IAbstractRule extends IStyleRule
+export interface INamedStyleRule extends IStyleRule, INamedEntity
 {
-	/** Flag, which is always true, that is needed to distinguish abstract rules from other rules */
-	readonly isAbstractRule: boolean;
 }
 
 
 
 /**
- * The IClassRule interface represents a style rule that applies to elements identified by a class.
- * Objects implementing this interface are returned from the [[$class]] function.
+ * The IClassRule interface represents a style rule where the selector is a single class name.
  */
-export interface IClassRule extends IStyleRule, INamedEntity
+export interface IClassRule extends INamedStyleRule
 {
-	/** Flag, which is always true, that is needed to distinguish class rules from other rules */
-	readonly isClassRule: boolean;
+	/** Name of the class prefixed with "." */
+	readonly cssClassName: string;
 }
 
 
 
 /**
- * The IIDRule interface representsa a style rule that applies to elements identified by an ID.
- * Objects implementing this interface are returned from the [[$id]] function.
+ * The IIDRule interface represents a style rule where the selector is a single element ID.
  */
-export interface IIDRule extends IStyleRule, INamedEntity
+export interface IIDRule extends INamedStyleRule
 {
-	/** Flag, which is always true, that is needed to distinguish ID rules from other rules */
-	readonly isIDRule: boolean;
+	/** Name of the element ID prefixed with "#" */
+	readonly cssIDName: string;
 }
 
 
 
 /**
- * The ISelectorRule interface representsa a styleset that applies to elements identifies by the
- * given selector.
- * Objects implementing this interface are returned from the [[$style]] function.
+ * The AnimationWaypoint type defines a type that can be used to define a waypoint in an
+ * animation sequence.
  */
-export interface ISelectorRule extends IStyleRule
-{
-	/** CSS rule selector string */
-	readonly selectorText: string;
-}
+export type AnimationWaypoint = OneOrMany<"from" | "to" | number>;
 
+/**
+ * The AnimationStyles type defines a object containing style proprties for an animation frame.
+ * Stylesets for keyframes allow custom properties (via "--") but do not allow the !important
+ * flag ("!"). Animation styleset can extend other style rules; however, any dependent rules
+ * will be ignored.
+ */
+export type AnimationStyleset = Omit<Styleset,"!"> & { "+"?: IStyleRule | IStyleRule[] };
 
+/**
+ * The AnimationFrame type defines a single keyframe within a @keyframes rule.
+ * The waypoint can be specified as "from" or "to" strings or as a number 0 to 100, which will be
+ * used as a percent. Styleset for a keyframe allows custom properties (via "--") but do not
+ * allow the !important flag ("!").
+ */
+export type AnimationFrame = [AnimationWaypoint, AnimationStyleset];
 
 /**
  * The IAnimationRule interface represents the @keyframes rule.
@@ -204,15 +212,22 @@ export interface IAnimationRule extends IRule, INamedEntity
 {
 	/** SOM keyframes rule */
 	readonly cssRule: CSSKeyframesRule | null;
+
+	/** List of style rules representing animation frames */
+	readonly frameRules: IAnimationFrameRule[];
 }
 
 /**
- * The AnimationFrame type defines a single keyframe within a @keyframes rule.
- * The waypoint can be specified as "from" or "to" strings or as a number 0 to 100, which will be
- * used as a percent. Styleset for a keyframe allows custom properties (via "--") but do not
- * allow the !important flag ("!").
+ * The IAnimationFrameRule interface represents a single frame in the @keyframes rule.
  */
-export type AnimationFrame = ["from" | "to" | number, Omit<ExtendedStyleset,"!">];
+export interface IAnimationFrameRule extends IStyleRule
+{
+	/** Identifier of the waypoint */
+	readonly waypoint: AnimationWaypoint;
+
+	/** SOM keyframe rule */
+	readonly cssKeyframeRule: CSSKeyframeRule;
+}
 
 
 

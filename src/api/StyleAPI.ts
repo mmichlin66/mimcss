@@ -1,17 +1,12 @@
-﻿import {Extended, CssPosition, CssTime, CssLength, CssPercent, CssAngle, CssNumber, OneOrBox, CssPoint} from "../styles/UtilTypes"
+﻿import {Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, OneOrBox, CssPoint} from "../styles/UtilTypes"
 import {CssColor} from "../styles/ColorTypes"
-import {CssImage} from "../styles/ImageTypes"
 import {FontStretch_Single } from "../styles/FontFaceTypes";
 import {SelectorItem, SelectorProxy} from "../styles/SelectorTypes";
 import {
-	VarTemplateName, VarValueType, AnimationName_Single, TimingFunction_Single,
-	AnimationIterationCount_Single, AnimationDirection_Single, AnimationFillMode_Single,
-	AnimationPlayState_Single, Animation_Single, BackgroundSize_Single, BackgroundRepeat_Single,
-	BackgroundAttachment_Single, BackgroundOrigin_Single, BackgroundClip_Single,
-	Background_Single, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy,
+	VarTemplateName, VarValueType, BoxShadow_Single, Styleset, FilterProxy, BasicShapeProxy,
 	FontStyle_StyleType, FontWeight_StyleType, Font_StyleType, TextDecorationLine_StyleType,
 	TextDecorationStyle_StyleType, TextDecorationThickness_StyleType, TextDecoration_StyleType,
-	TextShadow_Single, TransformProxy, Transition_Single, TransitionProperty_Single, BorderRadius_StyleType, FillRule_StyleType
+	TextShadow_Single, TransformProxy, BorderRadius_StyleType, FillRule_StyleType
 } from "../styles/StyleTypes"
 import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
@@ -138,109 +133,6 @@ export function stylesetToStringObject( styleset: Styleset): { [K: string]: stri
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Animations
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns an object that can be assigned to the animation property.
- * @param name Animation name. This can be either a string or a reference to the animation
- * rule definition.
- * @param duration Animation duration. Integer numbers for milliseconds, floating point
- * numbers for seconds. The default value is 1 second.
- * @param func Timing function. Default value is "ease". This can be one of the following types:
- *   - one of pre-defined timing function names.
- *   - a number of steps in the steps function. The step position will be set to jump-start.
- *   - one- or two-item array that defines a step function. The first item defines the number
- *     of steps. The optional second item is one of pre-defined step postion names.
- *   - four-item array that defines cubic-bezier function.
- * @param delay Delay before the animation starts. Integer numbers for milliseconds, floating
- * point numbers for seconds. The default value is 0.
- * @param count Number of iterations the animation shold run. The default value is 1.
- * @param direction Animation direction. The default value is "normal".
- * @param mode Animation fill mode. The default value is "none".
- * @param state Animation state. The default value is "running".
- */
-export function animation( name: Extended<AnimationName_Single>,
-		duration: Extended<CssTime> = 1000,
-		func: Extended<TimingFunction_Single> = "ease",
-		delay: Extended<CssTime> = 0,
-		count: Extended<AnimationIterationCount_Single> = 1,
-		direction: Extended<AnimationDirection_Single> = "normal",
-		mode: Extended<AnimationFillMode_Single> = "none",
-		state: Extended<AnimationPlayState_Single> = "running"
-	): Animation_Single
-{
-	return { name, duration, func, delay,count, direction, state, mode };
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Background
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns an object that can be assigned to the animation property.
- * @param color Color value.
- * @param position
- * @param size
- * @param repeat Background repeat value. The default value is "repeat".
- * @param attachment Background attachment. The default value is "scroll".
- * @param origin Background origin. The default value is "padding-box".
- * @param clip Background clip. The default value is "border-box".
- */
-export function background(
-		color?: Extended<CssColor>,
-		image?: Extended<CssImage>,
-		position?: Extended<CssPosition>,
-		size?: Extended<BackgroundSize_Single>,
-		repeat: Extended<BackgroundRepeat_Single> = "repeat",
-		attachment: Extended<BackgroundAttachment_Single> = "scroll",
-		origin: Extended<BackgroundOrigin_Single> = "padding-box",
-		clip: Extended<BackgroundClip_Single> = "border-box"
-	): Background_Single
-{
-	return { color, image, position, size, repeat, attachment, origin, clip };
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Transitions
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns an object that can be assigned to the transition property.
- * @param property Name of the property to transition. The default value is "all".
- * @param duration Transition duration. Integer numbers for milliseconds, floating point
- * numbers for seconds. The default value is 1 second.
- * @param func Timing function. Default value is "ease". This can be one of the following types:
- *   - one of pre-defined timing function names.
- *   - a number of steps in the steps function. The step position will be set to jump-start.
- *   - one- or two-item array that defines a step function. The first item defines the number
- *     of steps. The optional second item is one of pre-defined step postion names.
- *   - four-item array that defines cubic-bezier function.
- * @param delay Delay before the transition starts. Integer numbers for milliseconds, floating
- * point numbers for seconds. The default value is 0.
- */
-export function transition( property: Extended<TransitionProperty_Single> = "all",
-	duration: Extended<CssTime> = 1000,
-	func: Extended<TimingFunction_Single> = "ease",
-	delay: Extended<CssTime> = 0
-	): Transition_Single
-{
-return { property, duration, func, delay };
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
 // Shadows
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,9 +150,9 @@ export function boxShadow(
 		x: Extended<CssLength>,
 		y: Extended<CssLength>,
 		color?: Extended<CssColor>,
-		blur: Extended<CssLength> = 1,
-		spread: Extended<CssLength> = 0,
-		inset: Extended<boolean> = false
+		blur?: Extended<CssLength>,
+		spread?: Extended<CssLength>,
+		inset?: Extended<boolean>
 	): BoxShadow_Single
 {
 	return { x, y, color, blur, spread, inset };
@@ -277,7 +169,7 @@ export function textShadow(
 		x: Extended<CssLength>,
 		y: Extended<CssLength>,
 		color?: Extended<CssColor>,
-		blur: Extended<CssLength> = 1,
+		blur?: Extended<CssLength>,
 	): TextShadow_Single
 {
 	return { x, y, color, blur };
