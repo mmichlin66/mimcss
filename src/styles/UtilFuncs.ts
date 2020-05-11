@@ -272,24 +272,34 @@ function mathFunc<T extends string>( name: string, params: Extended<NumberBase<T
 
 
 /**
- * The calcFunc function returns the string representation of the calc() CSS function.
+ * The templateStringToString is a tag function helper that converts the template string with
+ * parameters to a string using the given function to convert parameters.
  */
-function calcFunc<T extends string>( parts: TemplateStringsArray, params: Extended<NumberBase<T>>[],
-    convertFunc?: ConvertNumberFuncType): string
+export function templateStringToString( parts: TemplateStringsArray, params: any[],
+    convertFunc: ( v: any) => string): string
 {
     // number of parameters is always 1 less than the number of string parts
     let paramsLen = params.length;
     if (paramsLen === 0)
         return parts[0];
 
-    let buf: string[] = [];
+    let s = "";
     for( let i = 0; i < paramsLen; i++)
-    {
-        buf.push( parts[i]);
-        buf.push( styleToString( params[i], convertFunc));
-    }
+        s += parts[i] + convertFunc( params[i]);
 
-    return `calc(${buf.join("")}${parts[paramsLen]})`;
+    // add the last part
+    return s + parts[paramsLen];
+}
+
+
+
+/**
+ * The calcFunc function returns the string representation of the calc() CSS function.
+ */
+function calcFunc<T extends string>( parts: TemplateStringsArray, params: Extended<NumberBase<T>>[],
+    convertFunc?: ConvertNumberFuncType): string
+{
+    return `calc(${templateStringToString( parts, params, (v: any) => styleToString( v, convertFunc))})`;
 }
 
 

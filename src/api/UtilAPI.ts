@@ -5,8 +5,11 @@
 } from "../styles/UtilTypes"
 import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
-	CssFrequencyMath, CssFractionMath, CssPercentMath, valueToString
+	CssFrequencyMath, CssFractionMath, CssPercentMath, valueToString, templateStringToString
 } from "../styles/UtilFuncs"
+import {IVarRule} from "../rules/RuleTypes";
+import {VarTemplateName, VarValueType} from "../styles/StyleTypes";
+import {stylePropToString} from "../styles/StyleFuncs";
 
 
 
@@ -96,19 +99,26 @@ export let Percent: ICssPercentMath = new CssPercentMath();
  */
 export function raw( parts: TemplateStringsArray, ...params: any[]): StringProxy
 {
-    // number of parameters is always 1 less than the number of string parts
-    let paramsLen = params.length;
-    if (paramsLen === 0)
-        return () => parts[0];
+    return () => templateStringToString( parts, params, (v: any) => valueToString( v));
+}
 
-    let buf: string[] = [];
-    for( let i = 0; i < paramsLen; i++)
-    {
-        buf.push( parts[i]);
-        buf.push( valueToString( params[i]));
-    }
 
-	return () => `${buf.join("")}${parts[paramsLen]}`;
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// usevar()
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a StringProxy function representing the invocation of the `var()` CSS function for
+ * the given custom CSS property with optional fallbacks.
+ */
+export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: VarValueType<K>): StringProxy
+{
+    return () => fallback
+        ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
+        : `var(--${varObj.name})`;
 }
 
 

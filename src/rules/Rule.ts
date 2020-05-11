@@ -107,7 +107,11 @@ export function createNames( owner: ITopLevelRuleContainer, ruleName: string | n
 			? nameOverride
 			: nameOverride.name;
 
-	return [name, cssPrefix ? name.startsWith( cssPrefix) ? name : cssPrefix + name : name];
+	return !cssPrefix
+		? [name,name]
+		: name.startsWith( cssPrefix)
+			? [name.substr( cssPrefix.length), name]
+			: [name, cssPrefix + name];
 }
 
 

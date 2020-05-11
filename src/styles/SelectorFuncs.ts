@@ -1,6 +1,6 @@
 ﻿import {SelectorItem, CssSelector} from "./SelectorTypes";
 import {StyleRule} from "../rules/StyleRules"
-import {valueToString} from "./UtilFuncs";
+import {valueToString, templateStringToString} from "./UtilFuncs";
 
 
 
@@ -56,24 +56,12 @@ export function selectorToString( val: CssSelector): string
 
 /**
  * Returns a string representation of a selector using the given template string with optional
- * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
- * possible types.
+ * placeholders. This function is used as tag function that accepts a template string without
+ * parentheses.
  */
 export function formatSelector( parts: TemplateStringsArray, params: SelectorItem[]): string
 {
-    // number of parameters is always 1 less than the number of string parts
-    let paramsLen = params.length;
-    if (paramsLen === 0)
-        return parts[0];
-
-    let buf: string[] = [];
-    for( let i = 0; i < paramsLen; i++)
-    {
-        buf.push( parts[i]);
-        buf.push( selectorItemToString( params[i]));
-    }
-
-	return `${buf.join("")}${parts[paramsLen]}`;
+    return templateStringToString( parts, params, selectorItemToString);
 }
 
 
