@@ -172,7 +172,7 @@ export function arrayToString( val: any[], func?: (v) => string, separator: stri
  *     it will be used to convert the property's value to the string. If a function is not present, then the
  *     property value should be converted to the string using the valueToString function.
  */
-export function objectToString( val: any,propsAndFuncs: (string | [string, (val: any) => string, string?])[],
+export function objectToString( val: any, propsAndFuncs: (string | [string, (val: any) => string, string?])[],
     separator: string = " ", usePropNames: boolean = false): string
 {
     if (val == null || propsAndFuncs.length === 0)
@@ -203,6 +203,28 @@ export function objectToString( val: any,propsAndFuncs: (string | [string, (val:
     );
 
 	return buf.join(separator);
+}
+
+
+
+/**
+ * The templateStringToString is a tag function helper that converts the template string with
+ * parameters to a string using the given function to convert parameters.
+ */
+export function templateStringToString( parts: TemplateStringsArray, params: any[],
+    convertFunc: ( v: any) => string): string
+{
+    // number of parameters is always 1 less than the number of string parts
+    let paramsLen = params.length;
+    if (paramsLen === 0)
+        return parts[0];
+
+    let s = "";
+    for( let i = 0; i < paramsLen; i++)
+        s += parts[i] + convertFunc( params[i]);
+
+    // add the last part
+    return s + parts[paramsLen];
 }
 
 
@@ -267,28 +289,6 @@ function mathFunc<T extends string>( name: string, params: Extended<NumberBase<T
     convertFunc?: ConvertNumberFuncType): string
 {
     return `${name}(${multiStyleToString( params, convertFunc, ",")})`;
-}
-
-
-
-/**
- * The templateStringToString is a tag function helper that converts the template string with
- * parameters to a string using the given function to convert parameters.
- */
-export function templateStringToString( parts: TemplateStringsArray, params: any[],
-    convertFunc: ( v: any) => string): string
-{
-    // number of parameters is always 1 less than the number of string parts
-    let paramsLen = params.length;
-    if (paramsLen === 0)
-        return parts[0];
-
-    let s = "";
-    for( let i = 0; i < paramsLen; i++)
-        s += parts[i] + convertFunc( params[i]);
-
-    // add the last part
-    return s + parts[paramsLen];
 }
 
 
@@ -456,6 +456,15 @@ export class CssPercentMath extends NumberMath<PercentType> implements ICssPerce
     constructor() { super( CssFractionMath.convertFunc) }
 }
 
+/**
+ * Converts the given number to string using the following rules:
+ * - if the number is between -1 and 1 (non inclusive), multiplies the number and appends "%"
+ * - otherwise, converts the number to string without appending any utints.
+ */
+export function unitlessOrPercentToString( n: number): string
+{
+    return n >= 1 || n <= -1 ? n.toString() : Math.round(n * 100) + "%";
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

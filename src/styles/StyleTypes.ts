@@ -1,7 +1,7 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, Many,
-    CssFrequency, CssFraction, CssResolution, CssNumberBox, CssRadius, UrlProxy, AttrProxy,
+    CssFrequency, CssFraction, CssResolution, CssRadius, UrlProxy, AttrProxy,
     HorizontalPositionKeyword, VerticalPositionKeyword
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
@@ -230,11 +230,40 @@ export type BorderColor_StyleType = OneOrBox<CssColor>;
 
 
 
+/** Type for border-image style property expressed as an object. */
+export type BorderImage_Object =
+    {
+        source: Extended<BorderImageSource_StyleType>,
+        slice?: Extended<BorderImageSlice_StyleType>,
+        width?: Extended<BorderImageWidth_StyleType>,
+        outset?: Extended<BorderImageOutset_StyleType>,
+        repeat?: Extended<BorderImageRepeat_StyleType>,
+    };
+
+/** Type for border-image style property. */
+export type BorderImage_StyleType = string | CssImage | BorderImage_Object;
+
+/** Type for border-image-outset style property */
+export type BorderImageOutset_StyleType = OneOrBox<CssNumber | string>;
+
 /** Type for border-image-repeat keywords */
 export type BorderImageRepeat_Keyword = "stretch" | "repeat" | "round" | "space";
 
 /** Type for border-image-repeat style property */
 export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeat_Keyword>;
+
+/** Type for border-image-slice style property */
+export type BorderImageSlice_StyleType = OneOrBox<CssNumber | string> |
+    [Extended<CssNumber | string>, true] |
+    [Extended<CssNumber | string>, Extended<CssNumber | string>, true] |
+    [Extended<CssNumber | string>, Extended<CssNumber | string>, Extended<CssNumber | string>, true] |
+    [Extended<CssNumber | string>, Extended<CssNumber | string>, Extended<CssNumber | string>, Extended<CssNumber | string>, true];
+
+/** Type for border-image-source style property */
+export type BorderImageSource_StyleType = OneOrBox<CssImage | string>;
+
+/** Type for border-image-width style property */
+export type BorderImageWidth_StyleType = OneOrBox<CssNumber | "auto" | string>;
 
 
 
@@ -1083,12 +1112,12 @@ export interface ICssStyleset
     borderBottomWidth?: BorderWidth__Single;
     borderCollapse?: BorderColapse_StyleType;
     borderColor?: BorderColor_StyleType;
-    borderImage?: DefaultStyleType;
-    borderImageOutset?: CssNumberBox;
+    borderImage?: BorderImage_StyleType;
+    borderImageOutset?: BorderImageOutset_StyleType;
     borderImageRepeat?: BorderImageRepeat_StyleType;
-    borderImageSlice?: DefaultStyleType;
-    borderImageSource?: CssImage | string;
-    borderImageWidth?: OneOrBox<CssNumber | "auto">;
+    borderImageSlice?: BorderImageSlice_StyleType;
+    borderImageSource?: BorderImageSource_StyleType;
+    borderImageWidth?: BorderImageWidth_StyleType;
     borderInlineEnd?: Border_StyleType;
     borderInlineEndColor?: CssColor;
     borderInlineEndStyle?: BorderStyle_Keyword;

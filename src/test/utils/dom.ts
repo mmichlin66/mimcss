@@ -1,4 +1,5 @@
 import * as css from "../../mimcssTypes"
+import { Styleset } from "../../styles/StyleTypes";
 
 
 
@@ -50,9 +51,40 @@ export function verifyMultiPropValues( rule: css.IStyleRule, expected: {[K: stri
 {
 	let style = rule.cssRule?.style!;
 	for( let propName in expected)
-	{
 		expect(style[propName]).toEqual( expected[propName]);
+}
+
+
+
+// Runs a test on a single longhand style property.
+export function testLonghandProp<K extends keyof Styleset>( propName: K, propVal: Styleset[K], expected: string)
+{
+	class A extends css.StyleDefinition
+	{
+		c = css.$class( { [propName]: propVal })
 	}
+
+	let a = css.$activate( A);
+	verifyPropValue( a!.c, propName, expected);
+
+	css.$deactivate( a!);
+}
+
+
+
+// Runs a test on a single longhand style property.
+export function testShorthandProp<K extends keyof Styleset>( propName: K, propVal: Styleset[K],
+	expected: { [K: string]: string })
+{
+	class A extends css.StyleDefinition
+	{
+		c = css.$class( { [propName]: propVal })
+	}
+
+	let a = css.$activate( A);
+	verifyMultiPropValues( a!.c, expected);
+
+	css.$deactivate( a!);
 }
 
 

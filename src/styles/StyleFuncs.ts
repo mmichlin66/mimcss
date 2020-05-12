@@ -4,7 +4,7 @@ import {Extended, MultiCssPosition, CssRadius, OneOrMany} from "./UtilTypes";
 import {
     camelToDash, valueToString, arrayToString, objectToString, IValueConvertOptions,
     positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
-    CssAngleMath, CssFrequencyMath, CssFractionMath, CssPercentMath, CssResolutionMath
+    CssAngleMath, CssFrequencyMath, CssFractionMath, CssPercentMath, CssResolutionMath, unitlessOrPercentToString
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -140,6 +140,46 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize
     return valueToString( val, {
         fromNumber: CssLengthMath.styleToString,
         fromArray: CssLengthMath.multiStyleToStringWithSpace
+    });
+}
+
+
+
+/**
+ * Converts border image style value to the CSS string.
+ */
+function borderImageToString( val: StyleTypes.BorderImage_Object): string
+{
+    // if width is specified, but slice is net we need to set slice to the default 100% value;
+    // if outset is specified but width is not. we need to set width to the default 1 value;
+    let valCopy: StyleTypes.BorderImage_Object = Object.assign( {}, val);
+    if (val.slice == null && (val.width != null || val.outset != null))
+        valCopy.slice = "100%";
+    if (val.width == null && val.outset != null)
+        valCopy.width = 1;
+
+    return objectToString( valCopy, [
+        "source",
+        ["slice", borderImageSliceToString],
+        ["width", CssNumberMath.styleToString, "/"],
+        ["outset", CssNumberMath.styleToString, "/"],
+        "repeat"
+    ]);
+}
+
+
+
+/**
+ * Converts border image slice style value to the CSS string.
+ */
+function borderImageSliceToString( val: Extended<StyleTypes.BorderImageSlice_StyleType>): string
+{
+    return valueToString( val, {
+        fromNumber: unitlessOrPercentToString,
+        arrayItemFunc: v => valueToString( v, {
+            fromBool: () => "fill",
+            fromNumber: unitlessOrPercentToString,
+        })
     });
 }
 
@@ -620,6 +660,11 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
         arrayItemFunc: colorToString,
         fromAny: colorToString
     },
+    borderImage: {
+        fromObject: borderImageToString,
+    },
+    borderImageSlice: borderImageSliceToString,
+    borderImageWidth: CssLengthMath.multiStyleToStringWithSpace,
     borderInlineEnd: borderToString,
     borderInlineEndColor: colorToString,
     borderInlineEndWidth: CssLengthMath.styleToString,
