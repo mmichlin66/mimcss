@@ -1,6 +1,7 @@
 import {StyleDefinition, IStyleDefinitionClass} from "./RuleTypes"
 import {Rule, ITopLevelRuleContainer} from "./Rule"
 import {VarRule} from "./VarRule"
+import {CounterRule} from "./CounterRules";
 import {ImportRule, NamespaceRule} from "./MiscRules"
 
 
@@ -85,6 +86,8 @@ class RuleContainer implements ITopLevelRuleContainer
 			this.processReference( propVal)
 		else if (propVal instanceof VarRule)
 			this.processVarRule( propName, propVal)
+		else if (propVal instanceof CounterRule)
+			this.processCounterRule( propName, propVal)
 		else if (propVal instanceof Rule)
 			this.processRule( propName, propVal);
 		else if (Array.isArray(propVal))
@@ -111,6 +114,19 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		varObj.process( this, this.topLevelContainer, propName);
 		this.vars.push( varObj);
+	}
+
+
+
+	// Processes counter object.
+	private processCounterRule( propName: string | null, counter: CounterRule): void
+	{
+		// if the object is already assigned to a stylesheet, we create a clone of the
+		// rule and assign it to our stylesheet.
+		if (counter.container)
+			counter = counter.clone();
+
+		counter.process( this, this.topLevelContainer, propName);
 	}
 
 

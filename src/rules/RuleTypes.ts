@@ -232,6 +232,45 @@ export interface IAnimationFrameRule extends IStyleRule
 
 
 /**
+ * The IVarRule interface represents a CSS custom property definition.
+ * Objects implementing this interface are returned from the [[$var]] function.
+ */
+export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, IVarProxy<VarValueType<K>>
+{
+	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
+	readonly template: K;
+}
+
+
+
+/**
+ * The ICounterRule interface represents a named counter definition. Use this rule to create
+ * counter objects that can be used in counter-increment, counter-reset and counter-set style
+ * properties. No CSS rule is created for counters - they are needed only to provide type-safe
+ * counter definitions.
+ * Objects implementing this interface are returned from the [[$counter]] function.
+ */
+export interface ICounterRule extends INamedEntity
+{
+	/** Name of the counter */
+	readonly counterName: string;
+}
+
+
+
+// /**
+//  * The ICounterRule interface represents the @counter-style rule.
+//  * Objects implementing this interface are returned from the [[$counterStyle]] function.
+//  */
+// export interface ICounterStyleRule extends IRule, INamedEntity
+// {
+// 	/** SOM counter-style rule */
+// 	readonly cssRule: CSSCounterStyleRule | null;
+// }
+
+
+
+/**
  * The IImportRule interface represents the CSS @import rule.
  * Objects implementing this interface are returned from the [[$import]] function.
  */
@@ -284,18 +323,6 @@ export interface IPageRule extends IStyleRule
 
 	/** SOM namespace rule */
 	readonly cssRule: CSSPageRule | null;
-}
-
-
-
-/**
- * The IVarRule interface represents a CSS custom property definition.
- * Objects implementing this interface are returned from the [[$var]] function.
- */
-export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, IVarProxy<VarValueType<K>>
-{
-	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
-	readonly template: K;
 }
 
 

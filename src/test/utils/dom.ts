@@ -46,6 +46,16 @@ export function verifyPropValue( rule: css.IStyleRule, propName: string, expecte
 
 
 
+// Verifies that the CSS rule for the given style rule and the given dependent property has the
+// given value of the given property.
+export function verifyDependentPropValue( rule: css.IStyleRule, dependentProp: string,
+	propName: string, expected: string)
+{
+	expect(rule.dependentRules[dependentProp].cssRule?.style[propName]).toEqual( expected);
+}
+
+
+
 // Verifies that the CSS rule for the given style rule has the given values of the given properties.
 export function verifyMultiPropValues( rule: css.IStyleRule, expected: {[K: string]: string})
 {

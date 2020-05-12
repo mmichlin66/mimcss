@@ -6,6 +6,7 @@ module.exports =
         [
             "./lib/test/specs/activation.js",
             "./lib/test/specs/styleRules.js",
+            "./lib/test/specs/counters.js",
             "./lib/test/specs/propsLength.js",
             "./lib/test/specs/propsBorderImage.js",
         ],

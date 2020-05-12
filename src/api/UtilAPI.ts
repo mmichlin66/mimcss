@@ -7,8 +7,8 @@ import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
 	CssFrequencyMath, CssFractionMath, CssPercentMath, valueToString, templateStringToString
 } from "../styles/UtilFuncs"
-import {IVarRule} from "../rules/RuleTypes";
-import {VarTemplateName, VarValueType} from "../styles/StyleTypes";
+import {IVarRule, ICounterRule} from "../rules/RuleTypes";
+import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "../styles/StyleTypes";
 import {stylePropToString} from "../styles/StyleFuncs";
 
 
@@ -136,6 +136,51 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 export function url( val: Extended<string>): UrlProxy
 {
 	return () => `url(${valueToString(val)})`;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Counters
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a StringProxy function representing the CSS `counter()` function with additional
+ * optional strings added after and/or before the counter.
+ */
+export function counter( counterObj: Extended<ICounterRule | string>,
+	style?: Extended<ListStyleType_StyleType>,
+	textAfter?: Extended<string>, textBefore?: Extended<string>): StringProxy
+{
+	return () =>
+	{
+		let styleString = style ? `,${valueToString( style)}` : "";
+		let before = textBefore ? `"${valueToString( textBefore)}"` : "";
+		let after = textAfter ? `"${valueToString( textAfter)}"` : "";
+		return `${before} counter(${valueToString(counterObj)}${styleString}) ${after}`;
+	}
+}
+
+
+
+/**
+ * Returns a StringProxy function representing the CSS `counter()` function with additional
+ * optional strings added after and/or before the counter.
+ */
+export function counters( counterObj: Extended<ICounterRule | string>,
+	separator: Extended<string>, style?: Extended<ListStyleType_StyleType>,
+	textAfter?: Extended<string>, textBefore?: Extended<string>): StringProxy
+{
+	return () =>
+	{
+		let sepString = separator ? `"${valueToString( separator)}"` : `"."`;
+		let styleString = style ? `,${valueToString( style)}` : "";
+		let before = textBefore ? `"${valueToString( textBefore)}"` : "";
+		let after = textAfter ? `"${valueToString( textAfter)}"` : "";
+		return `${before} counters(${valueToString(counterObj)},${sepString}${styleString}) ${after}`;
+	}
 }
 
 

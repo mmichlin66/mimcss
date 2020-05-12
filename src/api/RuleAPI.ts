@@ -8,6 +8,7 @@ import {IFontFace} from "../styles/FontFaceTypes";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
+import {CounterRule} from "../rules/CounterRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {valueToString} from "../styles/UtilFuncs";
@@ -82,6 +83,16 @@ export function $var<K extends VarTemplateName>( template: K, propVal?: VarValue
 				nameOverride?: string | RuleTypes.IVarRule<K>): RuleTypes.IVarRule<K>
 {
 	return new VarRule( template, propVal, nameOverride);
+}
+
+/**
+ * Creates new counter object. The counter name will be created when the rule is processed as
+ * part of the style definition class. The name can be also overridden by providing either an
+ * explicit name or another counter rule.
+ */
+export function $counter( nameOverride?: string | RuleTypes.ICounterRule): RuleTypes.ICounterRule
+{
+	return new CounterRule( nameOverride);
 }
 
 /**

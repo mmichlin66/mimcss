@@ -7,7 +7,7 @@
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
-import {IVarRule, IAnimationRule} from "../rules/RuleTypes";
+import {IVarRule, IAnimationRule, ICounterRule} from "../rules/RuleTypes";
 
 
 
@@ -447,7 +447,7 @@ export type Content_StyleType = string | OneOrMany<CssImage | AttrProxy | "none"
 
 
 /** Type for counter-increment, counter-reset and counter-set style properties */
-export type Counter_StyleType = OneOrMany<string | [Extended<string>, Extended<number>]>;
+export type Counter_StyleType = "none" | OneOrMany<ICounterRule | string | [ICounterRule | string, Extended<number>]>;
 
 
 
@@ -659,7 +659,7 @@ export type ListStyleImage_StyleType = "none" | UrlProxy;
 
 
 /** Type for list-style-type style property */
-export type ListStyleType_StyleType = "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
+export type ListStyleType_StyleType = "none" | "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
     "cjk-decimal" | "cjk-earthly-branch" | "cjk-heavenly-stem" | "cjk-ideographic" |
     "lower-roman" | "upper-roman" | "lower-greek" | "lower-alpha" | "lower-latin" | "upper-alpha" | "upper-latin" |
     "arabic-indic" | "armenian" | "bengali" | "cambodian" | "devanagari" | "georgian" | "gujarati" | "gurmukhi" | "hebrew" |
@@ -1215,6 +1215,7 @@ export interface ICssStyleset
     content?: Content_StyleType;
     counterIncrement?: Counter_StyleType;
     counterReset?: Counter_StyleType;
+    counterSet?: Counter_StyleType;
     cursor?: Cursor_StyleType;
 
     direction?: Direction_StyleType;
