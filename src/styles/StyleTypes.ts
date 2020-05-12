@@ -63,11 +63,21 @@ export type Animation_StyleType = OneOrMany<Animation_Single>;
 
 
 
+/** Type for animation-delay style property */
+export type AnimationDelay_StyleType = CssMultiTime;
+
+
+
 /** Type for single animation direction */
 export type AnimationDirection_Single = "normal" | "reverse" | "alternate" | "alternate-reverse";
 
 /** Type for animation-direction style property */
 export type AnimationDirection_StyleType = OneOrMany<AnimationDirection_Single>;
+
+
+
+/** Type for animation-duraton style property */
+export type AnimationDuration_StyleType = CssMultiTime;
 
 
 
@@ -120,6 +130,11 @@ export type TimingFunction_Single = TimingFunction_Simple | TimingFunction_Step 
 
 /** Type for animation-timing-function style property */
 export type AnimationTimingFunction_StyleType = OneOrMany<TimingFunction_Single>;
+
+
+
+/** Type for backdrop-filter style property */
+export type BackdropFilter_StyleType = string | FilterProxy;
 
 
 
@@ -182,6 +197,11 @@ export type BackgroundOrigin_Single = "border-box" | "padding-box" | "content-bo
 
 /** Type for background-origin style property */
 export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin_Single>;
+
+
+
+/** Type for background-position style property */
+export type BackgroundPosition_StyleType = MultiCssPosition;
 
 
 
@@ -386,6 +406,11 @@ export type ColumnFill_StyleType = "auto" | "balance" | "balance-all";
 
 
 
+/** Type for column-gap style property */
+export type ColumnGap_StyleType = "normal" | Gap_Single;
+
+
+
 /** Type for column-span style property */
 export type ColumnSpan_StyleType = "none" | "all";
 
@@ -472,6 +497,11 @@ export type EmptyCells_StyleType = "show" | "hide";
 
 /** Type for fill-rule style property */
 export type FillRule_StyleType = "nonzero" | "evenodd";
+
+
+
+/** Type for filter style property */
+export type Filter_StyleType = string | FilterProxy;
 
 
 
@@ -613,6 +643,11 @@ export type LetterSpacing_StyleType = "normal" | CssLength;
 
 
 
+/** Type for line-height style property */
+export type LineHeight_StyleType = CssNumber | string;
+
+
+
 /** Type for line-break style property */
 export type LineBreak_StyleType = "auto" | "loose" | "normal" | "strict" | "anywhere";
 
@@ -688,6 +723,11 @@ export type OverscrollBehavior_StyleType = OneOrPair<OverscrollBehavior_Single_S
 
 /** Type for the paint-order style property */
 export type PaintOrder_StyleType = "normal" | OneOrMany<"fill" | "stroke" | "markers">;
+
+
+
+/** Type for the perspective style property */
+export type Perspective_StyleType = "none" | CssLength;
 
 
 
@@ -1068,16 +1108,16 @@ export interface ICssStyleset
     alignSelf?: AlignSelfStyleType;
     alignmentBaseline?: AlignmentBaselineStyleType;
     animation?: Animation_StyleType;
-    animationDelay?: CssMultiTime;
+    animationDelay?: AnimationDelay_StyleType;
     animationDirection?: AnimationDirection_StyleType;
-    animationDuration?: CssMultiTime;
+    animationDuration?: AnimationDuration_StyleType;
     animationFillMode?: AnimationFillMode_StyleType;
     animationIterationCount?: AnimationIterationCount_StyleType;
     animationName?: AnimationName_StyleType;
     animationPlayState?: AnimationPlayState_StyleType;
     animationTimingFunction?: AnimationTimingFunction_StyleType;
 
-    backdropFilter?: string | FilterProxy;
+    backdropFilter?: BackdropFilter_StyleType;
     backfaceVisibility?: BackfaceVisibilityMode_StyleType;
     background?: Background_StyleType;
     backgroundAttachment?: BackgroundAttachment_StyleType;
@@ -1086,7 +1126,7 @@ export interface ICssStyleset
     backgroundColor?: CssColor;
     backgroundImage?: BackgroundImage_StyleType;
     backgroundOrigin?: BackgroundOrigin_StyleType;
-    backgroundPosition?: MultiCssPosition;
+    backgroundPosition?: BackgroundPosition_StyleType;
     backgroundPositionX?: DefaultStyleType;
     backgroundPositionY?: DefaultStyleType;
     backgroundRepeat?: BackgroundRepeat_StyleType;
@@ -1163,7 +1203,7 @@ export interface ICssStyleset
     colorInterpolationFilters?: ColorInterpolation_StyleType;
     columnCount?: ColumnCount_StyleType;
     columnFill?: ColumnFill_StyleType;
-    columnGap?: "normal" | Gap_Single;
+    columnGap?: ColumnGap_StyleType;
     columnRule?: Border_StyleType;
     columnRuleColor?: CssColor;
     columnRuleStyle?: BorderStyle_Keyword;
@@ -1186,7 +1226,7 @@ export interface ICssStyleset
     fill?: CssColor;
     fillOpacity?: CssPercent;
     fillRule?: FillRule_StyleType;
-    filter?: string | FilterProxy;
+    filter?: Filter_StyleType;
     flex?: Flex_StyleType;
     flexBasis?: FlexBasis_StyleType;
     flexDirection?: FlexDirection_StyleType;
@@ -1254,7 +1294,7 @@ export interface ICssStyleset
     letterSpacing?: LetterSpacing_StyleType;
     lightingColor?: CssColor;
     lineBreak?: LineBreak_StyleType;
-    lineHeight?: CssNumber | string;
+    lineHeight?: LineHeight_StyleType;
     listStyle?: ListStyle_StyleType;
     listStyleImage?: ListStyleImage_StyleType;
     listStylePosition?: ListStylePosition_StyleType;
@@ -1333,7 +1373,7 @@ export interface ICssStyleset
     pageBreakAfter?: BreakAfter_StyleType;
     pageBreakBefore?: BreakBefore_StyleType;
     pageBreakInside?: BreakInside_StyleType;
-    perspective?: "none" | CssLength;
+    perspective?: Perspective_StyleType;
     perspectiveOrigin?: PerspectiveOrigin_StyleType;
     placeContent?: PlaceContent_StyleType;
     placeItems?: PlaceItems_StyleType;
