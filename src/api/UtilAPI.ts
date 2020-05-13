@@ -1,11 +1,11 @@
 ﻿import {
 	ICssNumberMath, ICssLengthMath, ICssAngleMath, ICssTimeMath, ICssResolutionMath,
-	ICssFrequencyMath, ICssFractionMath, ICssPercentMath, Extended, StringProxy,
+	ICssFrequencyMath, ICssPercentMath, Extended, StringProxy,
 	UrlProxy, AttrTypeKeyword, AttrUnitKeyword, AttrProxy
 } from "../styles/UtilTypes"
 import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
-	CssFrequencyMath, CssFractionMath, CssPercentMath, valueToString, templateStringToString
+	CssFrequencyMath, CssPercentMath, valueToString, templateStringToString
 } from "../styles/UtilFuncs"
 import {IVarRule, ICounterRule} from "../rules/RuleTypes";
 import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "../styles/StyleTypes";
@@ -64,15 +64,6 @@ export let Resolution: ICssResolutionMath = new CssResolutionMath();
  * Integer numbers use "Hz"; floating point numbers use "kHz".
  */
 export let Frequency: ICssFrequencyMath = new CssFrequencyMath();
-
-
-
-/**
- * The Fraction object contains static methods that implement CSS mathematic functions on the
- * `<fraction>` CSS type by appending a fraction unit suffix.
- * Integer numbers use "fr"; floating point numbers use "%".
- */
-export let Fraction: ICssFractionMath = new CssFractionMath();
 
 
 

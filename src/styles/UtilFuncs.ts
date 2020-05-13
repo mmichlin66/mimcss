@@ -1,11 +1,11 @@
 ﻿import {
     Extended, NumberProxy, CssNumber, CssMultiNumber, INumberMath,
-    ICssFractionMath, CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
+    CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
     CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
-    CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency, CssFraction,
-    CssMultiFraction, CssPercent, CssMultiPercent, ICssLengthMath,
+    CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency,
+    CssPercent, CssMultiPercent, ICssLengthMath,
     ICssAngleMath, ICssPercentMath, ICssFrequencyMath, ICssResolutionMath, ICssTimeMath,
-    NumberType, LengthType, PercentType, AngleType, TimeType, ResolutionType, FrequencyType, FractionType
+    NumberType, LengthType, PercentType, AngleType, TimeType, ResolutionType, FrequencyType
 } from "./UtilTypes"
 
 
@@ -453,7 +453,7 @@ export class CssPercentMath extends NumberMath<PercentType> implements ICssPerce
     public static multiStyleToStringWithComma( val: Extended<CssMultiNumber>): string
         { return multiStyleToString( val, CssPercentMath.convertFunc, ","); }
 
-    constructor() { super( CssFractionMath.convertFunc) }
+    constructor() { super( CssPercentMath.convertFunc) }
 }
 
 /**
@@ -495,6 +495,11 @@ export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthM
 
     constructor() { super( CssLengthMath.convertFunc) }
 
+    public minmax( min: Extended<CssLength>, max: Extended<CssLength>): NumberProxy<LengthType>
+    {
+        return () => mathFunc( "minmax", [min, max], CssLengthMath.convertFunc);
+    }
+
     public Q( n: number) { return this.unit( n, "Q"); }
     public ch( n: number) { return this.unit( n, "ch"); }
     public cm( n: number) { return this.unit( n, "cm"); }
@@ -515,6 +520,7 @@ export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthM
     public rlh( n: number) { return this.unit( n, "rlh"); }
     public vmax( n: number) { return this.unit( n, "vmax"); }
     public vmin( n: number) { return this.unit( n, "vmin"); }
+    public fr( n: number) { return this.unit( n, "fr"); }
 }
 
 
@@ -662,44 +668,6 @@ export class CssFrequencyMath extends NumberMath<FrequencyType> implements ICssF
 
     public hz( n: number) { return this.unit( n, "Hz"); }
     public khz( n: number) { return this.unit( n, "kHz"); }
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Fraction
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The CssFractionMath class contains methods that implement CSS mathematic functions on the
- * <fraction> CSS types.
- */
-export class CssFractionMath extends NumberMath<FractionType> implements ICssFractionMath
-{
-    public static convertFunc( n: number): string { return numberToString( n, "fr", "fr"); }
-
-    public static styleToString( val: Extended<CssFraction>): string
-        { return styleToString( val, CssFractionMath.convertFunc); }
-
-    public static multiStyleToString( val: Extended<CssMultiFraction>, separator: string): string
-        { return multiStyleToString( val, CssFractionMath.convertFunc, separator); }
-
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiFraction>): string
-        { return multiStyleToString( val, CssFractionMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiFraction>): string
-        { return multiStyleToString( val, CssFractionMath.convertFunc, ","); }
-
-    constructor() { super( CssFractionMath.convertFunc) }
-
-    public minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): NumberProxy<FractionType>
-    {
-        return () => mathFunc( "minmax", [min, max], CssFractionMath.convertFunc);
-    }
-
-    public fr( n: number) { return this.unit( n, "fr"); }
 }
 
 

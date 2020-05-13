@@ -235,7 +235,7 @@ export interface ICssPercentMath extends INumberMath<PercentType>
 
 /** Units of length */
 export type LengthUnits = "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" | "mm" | "pc" |
-                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin";
+                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "fr";
 
 /** Unique string literal that distinguishes the Length type from other numeric types */
 export type LengthType = "Length" | PercentType;
@@ -258,6 +258,9 @@ export type LengthProxy = NumberProxy<LengthType>;
  */
 export interface ICssLengthMath extends INumberMath<LengthType>
 {
+    /** Creates property value using the CSS minmax() function. */
+    minmax( min: Extended<CssLength>, max: Extended<CssLength>): NumberProxy<LengthType>;
+
     /** Creates length value in quaters of an inch */
     Q( n: number): LengthProxy;
 
@@ -319,6 +322,9 @@ export interface ICssLengthMath extends INumberMath<LengthType>
 
     /** Creates length value in the units which are a larger value between vw and vh */
     vmin( n: number): LengthProxy;
+
+    /** Creates fraction value for flex */
+    fr( n: number): LengthProxy;
 
     /**
      * Converts the given number into percents. Values between -1.0 and 1.0 non-inclusive are
@@ -506,51 +512,6 @@ export interface ICssFrequencyMath extends INumberMath<FrequencyType>
 
     /** Creates frequency value in Kilo-Hertz */
     khz( n: number): FrequencyProxy
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Fraction
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/** Units of fractions (for flex and grid layouts) */
-export type FractionUnits = "fr";
-
-/** Unique string literal that distinguishes the Fraction type from other numeric types */
-export type FractionType = "Fraction" | PercentType;
-
-/** Type for single style property of the `<fraction>` CSS type */
-export type CssFraction = NumberBase<FractionType>;
-
-/** Type for multi-part style property of the `<fraction>` CSS type */
-export type CssMultiFraction = OneOrMany<CssFraction>;
-
-/** Type for 1-to-four-part style property of the `<fraction>` CSS type */
-export type CssFractionBox = OneOrBox<CssFraction>;
-
-/** Proxy type that represents values of the `<fraction>` CSS type */
-export type FractionProxy = NumberProxy<FractionType>;
-
-/**
- * The IFractionMath interface contains methods that implement CSS mathematic functions on the
- * `<fraction>` CSS types.
- */
-export interface ICssFractionMath extends INumberMath<FractionType>
-{
-    /** Creates property value using the CSS minmax() function. */
-    minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): NumberProxy<FractionType>;
-
-    /** Creates fraction value for flex */
-    fr( n: number): FractionProxy;
-
-    /**
-     * Converts the given number into percents. Values between -1.0 and 1.0 non-inclusive are
-     * multiplied by 100.
-     */
-    percent( n: number): FractionProxy;
 }
 
 

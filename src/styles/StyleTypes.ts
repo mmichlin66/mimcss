@@ -1,7 +1,7 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, Many,
-    CssFrequency, CssFraction, CssResolution, CssRadius, UrlProxy, AttrProxy,
+    CssFrequency, CssResolution, CssRadius, UrlProxy, AttrProxy,
     HorizontalPositionKeyword, VerticalPositionKeyword
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
@@ -1609,9 +1609,6 @@ export interface ICssVarTemplates extends ICssStyleset
 
     /** Allows having CSS variables that accept a `<frequency>` CSS value */
     "CssFrequency"?: CssFrequency;
-
-    /** Allows having CSS variables that accept a `<fraction>` CSS value */
-    "CssFraction"?: CssFraction;
 
     /** Allows having CSS variables that accept a `<percent>` CSS value */
     "CssPercent"?: CssPercent;

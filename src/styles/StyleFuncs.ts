@@ -4,7 +4,7 @@ import {Extended, MultiCssPosition, CssRadius, OneOrMany} from "./UtilTypes";
 import {
     camelToDash, valueToString, arrayToString, objectToString, IValueConvertOptions,
     positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
-    CssAngleMath, CssFrequencyMath, CssFractionMath, CssPercentMath, CssResolutionMath, unitlessOrPercentToString
+    CssAngleMath, CssFrequencyMath, CssPercentMath, CssResolutionMath, unitlessOrPercentToString
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -863,7 +863,6 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     "CssTime": CssTimeMath.styleToString,
     "CssResolution": CssResolutionMath.styleToString,
     "CssFrequency": CssFrequencyMath.styleToString,
-    "CssFraction": CssFractionMath.styleToString,
     "CssPercent": CssPercentMath.styleToString,
     "CssPosition": positionToString,
     "CssColor": colorToString,
