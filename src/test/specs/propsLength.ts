@@ -83,7 +83,8 @@ describe("style properties of type <length>:", () =>
 
 		it("calc", () =>
 		{
-			dom.testLonghandProp( "width", css.Len.calc`(90% - ${250}) / 2 + ${2.5}`, "calc((90% - 250px) / 2 + 2.5em)");
+			dom.testLonghandProp( "width", css.Len.calc`(45% + ${2.5} - ${250})`,
+				"calc(45% + 2.5em - 250px)", "calc((45% + 2.5em) - 250px)");
 		})
 	})
 })
