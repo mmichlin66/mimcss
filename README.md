@@ -38,7 +38,7 @@ class MyStyles extends css.StyleDefinition
 }
 
 /* MyComponent.tsx */
-import {myStyles} from "./MyStyles"
+import {MyStyles} from "./MyStyles"
 import * as React from "react"
 import * as css from "mimcss"
 
@@ -71,7 +71,7 @@ Coding CSS styles in TypeScript brings the following advantages:
 - Stylesheets are defined as TypeScript classes.
 - Stylesheets can be dynamically activated (inserted into DOM) and deactivated (removed from DOM).
 - Support for styled components where each component instance gets its individual set of CSS rules isolated from other instances.
-- Names of classes, IDs, animations and custom CSS properties are auto-generated, while developers use properties that return these names.
+- Names of classes, IDs, animations, custom CSS properties, counters, etc. are auto-generated, while developers use properties that return these names.
 - All CSS rule types are supported including style rules and at-rules.
 - Custom CSS properties are supported in a type safe manner by defining what standard CSS property type they represent.
 - Style rules can be nested and can extend other style rules.
@@ -98,8 +98,9 @@ class MyStyles extends css.StyleDefinition
     // element ID
     redElm = css.$id({ color: "red" })
 
-    // arbitrary complex selectors
+    // arbitrary selectors
     all = css.$style( "*", { boxSizing: "border-box" })
+    h1 = css.$style( "h1", { fontSize: 24, fontWeight: 700 })
     li = css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" })
 
     // custom CSS variables (with style-property-specific value types)
@@ -155,34 +156,10 @@ class MyStyles extends css.StyleDefinition
     unnamed =
     [
         css.$style( "*", { boxSizing: "border-box" }),
+        css.$style( "h1", { fontSize: 24, fontWeight: 700 }),
         css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" }),
-
-        css.$fontface( {
-            fontFamily: "Roboto",
-            fontWeight: 400,
-            src: [{ url: 'roboto.woff', format: 'woff' }]
-        }),
-
-        css.$import( "external.css", { width: [200, 400] }, { justifySelf: "baseline" }),
-
-        css.$page( ":first", { margin: "auto" }),
-
-        css.$namespace( css.WebNamespaces.SVG, "svg"),
-
-        css.$media( { maxWidth: 600 },
-            class extends css.StyleDefinition<MyStyles>
-            {
-                h1 = css.$style( "h1", { fontSize: 20 });
-            }
-        ),
-
-        css.$supports( {display: "grid"},
-            class extends css.StyleDefinition<MyStyles>
-            {
-                gridLayout =css.$class({ display: "grid" })
-            }
-        )
-    ]
+        ...
+]
 }
 ```
 
@@ -370,10 +347,10 @@ Values of custom CSS properties can be changed programmatically:
 ```tsx
 let myStyles = css.$activate(MyStyles);
 
-// change the top-level value; that is, the value defined under the :root` selector.
+// change the top-level value; that is, the value defined under the `:root` selector.
 myStyles.defaultColor.setValue( "navy");
 
-// change the value under the 'footer' selector.
+// change the value under the 'footer' element.
 myStyles.footer.setCustomProp( myStyles.defaultColor, "darkgreen");
 
 ```
@@ -391,7 +368,7 @@ declare module "mimcss/lib/styles/ColorTypes"
     }
 }
 
-// Provide the value for your color - it must be a number in the form OxRRGGBB(AA)
+// Provide the value for your color - it must be a number in the form OxRRGGBB
 css.Colors.myFavColor = 0x123456;
 
 // Use it just as any other named color
