@@ -1,6 +1,6 @@
 ﻿import * as StyleTypes from "./StyleTypes"
 import {IStyleset} from "./StyleTypes"
-import {Extended, MultiCssPosition, CssRadius, OneOrMany} from "./UtilTypes";
+import {Extended, CssRadius, OneOrMany, CssMultiLength, CssMultiTime} from "./UtilTypes";
 import {
     camelToDash, valueToString, arrayToString, objectToString, IValueConvertOptions,
     positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
@@ -11,9 +11,11 @@ import {VarRule} from "../rules/VarRule";
 
 
 
-// helper functions for style property conversions
-function multiPositionToStringWithComma( val: Extended<MultiCssPosition>): string { return multiPositionToString( val, ","); }
+function multiLengthToStringWithSpace( val: Extended<CssMultiLength>): string
+{ return CssLengthMath.multiStyleToString( val, " "); }
 
+function multiTimeToStringWithComma( val: Extended<CssMultiTime>): string
+{ return CssTimeMath.multiStyleToString( val, ","); }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +117,7 @@ function singleBackground_fromObject( val: StyleTypes.Background_Single): string
         ["color", colorToString],
         "image",
         ["position", positionToString],
-        ["size", CssLengthMath.multiStyleToStringWithSpace, "/"],
+        ["size", multiLengthToStringWithSpace, "/"],
         "repeat",
         "attachment",
         "origin",
@@ -139,7 +141,7 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize
 {
     return valueToString( val, {
         fromNumber: CssLengthMath.styleToString,
-        fromArray: CssLengthMath.multiStyleToStringWithSpace
+        fromArray: multiLengthToStringWithSpace
     });
 }
 
@@ -616,8 +618,8 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
         fromAny: singleAnimation_fromStyle,
         arraySeparator: ",",
     },
-    animationDelay: CssTimeMath.multiStyleToStringWithComma,
-    animationDuration: CssTimeMath.multiStyleToStringWithComma,
+    animationDelay: multiTimeToStringWithComma,
+    animationDuration: multiTimeToStringWithComma,
     animationIterationCount: commaArraySeparator,
     animationFillMode: commaArraySeparator,
     animationName: commaArraySeparator,
@@ -636,7 +638,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     backgroundClip: commaArraySeparator,
     backgroundColor: colorToString,
     backgroundOrigin: commaArraySeparator,
-    backgroundPosition: multiPositionToStringWithComma,
+    backgroundPosition: v => multiPositionToString( v, ","),
     backgroundRepeat: commaArraySeparator,
     backgroundSize: {
         fromNumber: CssLengthMath.styleToString,
@@ -664,7 +666,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
         fromObject: borderImageToString,
     },
     borderImageSlice: borderImageSliceToString,
-    borderImageWidth: CssLengthMath.multiStyleToStringWithSpace,
+    borderImageWidth: multiLengthToStringWithSpace,
     borderInlineEnd: borderToString,
     borderInlineEndColor: colorToString,
     borderInlineEndWidth: CssLengthMath.styleToString,
@@ -678,13 +680,13 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     borderRight: borderToString,
     borderRightColor: colorToString,
     borderRightWidth: CssLengthMath.styleToString,
-    borderSpacing: CssLengthMath.multiStyleToStringWithSpace,
+    borderSpacing: multiLengthToStringWithSpace,
     borderTop: borderToString,
     borderTopColor: colorToString,
     borderTopLeftRadius: singleCornerRadiusToString,
     borderTopRightRadius: singleCornerRadiusToString,
     borderTopWidth: CssLengthMath.styleToString,
-    borderWidth: CssLengthMath.multiStyleToStringWithSpace,
+    borderWidth: multiLengthToStringWithSpace,
     bottom: CssLengthMath.styleToString,
     boxShadow: {
         fromObject: singleBoxShadow_fromObject,
@@ -693,14 +695,14 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
 
     caretColor: colorToString,
     clip:  {
-        fromArray: v => `rect(${CssLengthMath.multiStyleToStringWithSpace(v)}`
+        fromArray: v => `rect(${multiLengthToStringWithSpace(v)}`
     },
     color: colorToString,
     columnGap: CssLengthMath.styleToString,
     columnRule: borderToString,
     columnRuleColor: colorToString,
     columnRuleStyle: valueToString,
-    columnRuleWidth: CssLengthMath.multiStyleToStringWithSpace,
+    columnRuleWidth: multiLengthToStringWithSpace,
     columns: columnsToString,
     columnWidth: CssLengthMath.styleToString,
     cursor: cursorToString,
@@ -716,7 +718,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     fontSize: CssLengthMath.styleToString,
     fontStyle: fontStyleToString,
 
-    gap: CssLengthMath.multiStyleToStringWithSpace,
+    gap: multiLengthToStringWithSpace,
     gridColumnGap: CssLengthMath.styleToString,
     gridRowGap: CssLengthMath.styleToString,
 
@@ -728,7 +730,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     letterSpacing: CssLengthMath.styleToString,
     lightingColor: colorToString,
 
-    margin: CssLengthMath.multiStyleToStringWithSpace,
+    margin: multiLengthToStringWithSpace,
     marginBlockEnd: CssLengthMath.styleToString,
     marginBlockStart: CssLengthMath.styleToString,
     marginBottom: CssLengthMath.styleToString,
@@ -754,7 +756,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     outlineOffset: CssLengthMath.styleToString,
     outlineStyle: valueToString,
 
-    padding: CssLengthMath.multiStyleToStringWithSpace,
+    padding: multiLengthToStringWithSpace,
     paddingBlockEnd: CssLengthMath.styleToString,
     paddingBlockStart: CssLengthMath.styleToString,
     paddingBottom: CssLengthMath.styleToString,
@@ -775,23 +777,23 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     right: CssLengthMath.styleToString,
     rowGap: CssLengthMath.styleToString,
 
-    scrollMargin: CssLengthMath.multiStyleToStringWithSpace,
-    scrollMarginBlock: CssLengthMath.multiStyleToStringWithSpace,
+    scrollMargin: multiLengthToStringWithSpace,
+    scrollMarginBlock: multiLengthToStringWithSpace,
     scrollMarginBlockEnd: CssLengthMath.styleToString,
     scrollMarginBlockStart: CssLengthMath.styleToString,
     scrollMarginBottom: CssLengthMath.styleToString,
-    scrollMarginInline: CssLengthMath.multiStyleToStringWithSpace,
+    scrollMarginInline: multiLengthToStringWithSpace,
     scrollMarginInlineEnd: CssLengthMath.styleToString,
     scrollMarginInlineStart: CssLengthMath.styleToString,
     scrollMarginLeft: CssLengthMath.styleToString,
     scrollMarginRight: CssLengthMath.styleToString,
     scrollMarginTop: CssLengthMath.styleToString,
-    scrollPadding: CssLengthMath.multiStyleToStringWithSpace,
-    scrollPaddingBlock: CssLengthMath.multiStyleToStringWithSpace,
+    scrollPadding: multiLengthToStringWithSpace,
+    scrollPaddingBlock: multiLengthToStringWithSpace,
     scrollPaddingBlockEnd: CssLengthMath.styleToString,
     scrollPaddingBlockStart: CssLengthMath.styleToString,
     scrollPaddingBottom: CssLengthMath.styleToString,
-    scrollPaddingInline: CssLengthMath.multiStyleToStringWithSpace,
+    scrollPaddingInline: multiLengthToStringWithSpace,
     scrollPaddingInlineEnd: CssLengthMath.styleToString,
     scrollPaddingInlineStart: CssLengthMath.styleToString,
     scrollPaddingLeft: CssLengthMath.styleToString,

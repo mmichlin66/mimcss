@@ -19,34 +19,34 @@ import {IVarRule, IAnimationRule, ICounterRule} from "../rules/RuleTypes";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for align-content style property */
-export type AlignContentStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignContent_StyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" |
     "space-between" | "space-around" | "space-evenly";
 
 
 
 /** Type for align-items style property */
-export type AlignItemsStyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignItems_StyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center";
 
 
 
 /** Type for align-self style property */
-export type AlignSelfStyleType = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignSelf_StyleType = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "self-start" | "self-end" | "baseline" | "first baseline" | "last baseline" |
     "safe center" | "unsafe center";
 
 
 
 /** Type for alignment-baseline style property */
-export type AlignmentBaselineStyleType = "auto" | "baseline" | "before-edge" | "text-before-edge" |
+export type AlignmentBaseline_StyleType = "auto" | "baseline" | "before-edge" | "text-before-edge" |
     "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" |
     "hanging" | "mathematical" | "top" | "center" | "bottom";
 
 
 
 /** Type for single animation */
-export type Animation_Single = string |
+export type Animation_Single =
     {
         name?: Extended<AnimationName_Single>;
         duration?: Extended<CssTime>;
@@ -59,7 +59,7 @@ export type Animation_Single = string |
     };
 
 /** Type for animation style property */
-export type Animation_StyleType = OneOrMany<Animation_Single>;
+export type Animation_StyleType = string | OneOrMany<Animation_Single>;
 
 
 
@@ -738,17 +738,17 @@ export type PerspectiveOrigin_StyleType = HorizontalPositionKeyword | VerticalPo
 
 
 /** Type for the place-content style property */
-export type PlaceContent_StyleType = AlignContentStyleType | [Extended<AlignContentStyleType>, Extended<JustifyContent_StyleType>];
+export type PlaceContent_StyleType = AlignContent_StyleType | [Extended<AlignContent_StyleType>, Extended<JustifyContent_StyleType>];
 
 
 
 /** Type for the place-items style property */
-export type PlaceItems_StyleType = AlignItemsStyleType | [Extended<AlignItemsStyleType>, Extended<JustifyItems_StyleType>];
+export type PlaceItems_StyleType = AlignItems_StyleType | [Extended<AlignItems_StyleType>, Extended<JustifyItems_StyleType>];
 
 
 
 /** Type for the place-self style property */
-export type PlaceSelf_StyleType = AlignSelfStyleType | [Extended<AlignSelfStyleType>, Extended<JustifySelf_StyleType>];
+export type PlaceSelf_StyleType = AlignSelf_StyleType | [Extended<AlignSelf_StyleType>, Extended<JustifySelf_StyleType>];
 
 
 
@@ -1103,10 +1103,10 @@ export type TransformProxy = (p?: "transform") => string;
 export interface ICssStyleset
 {
     all?: DefaultStyleType;
-    alignContent?: AlignContentStyleType;
-    alignItems?: AlignItemsStyleType;
-    alignSelf?: AlignSelfStyleType;
-    alignmentBaseline?: AlignmentBaselineStyleType;
+    alignContent?: AlignContent_StyleType;
+    alignItems?: AlignItems_StyleType;
+    alignSelf?: AlignSelf_StyleType;
+    alignmentBaseline?: AlignmentBaseline_StyleType;
     animation?: Animation_StyleType;
     animationDelay?: AnimationDelay_StyleType;
     animationDirection?: AnimationDirection_StyleType;

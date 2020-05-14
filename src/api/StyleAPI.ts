@@ -265,7 +265,7 @@ export function hueRotate( amount: Extended<CssAngle>): FilterProxy
 export function inset( offset: Extended<OneOrBox<CssLength>>, radius?: Extended<BorderRadius_StyleType>): BasicShapeProxy
 {
 	let r = radius != null ? "round " + borderRadiusToString( radius) : "";
-    return () => `inset(${CssLengthMath.multiStyleToStringWithSpace(offset)}${r})`;
+    return () => `inset(${CssLengthMath.multiStyleToString( offset, " ")}${r})`;
 }
 
 
@@ -315,9 +315,9 @@ export function polygon( pointOrRule: CssPoint | FillRule_StyleType,
 		if (typeof pointOrRule === "string")
 			s += pointOrRule + ",";
 		else
-			s += `${CssLengthMath.multiStyleToStringWithSpace( pointOrRule)},`;
+			s += `${CssLengthMath.multiStyleToString( pointOrRule, " ")},`;
 
-		s += points.map( pt => CssLengthMath.multiStyleToStringWithSpace( pt)).join(",");
+		s += points.map( pt => CssLengthMath.multiStyleToString( pt, " ")).join(",");
 
 		return s + ")";
 	};

@@ -385,10 +385,6 @@ export interface INumberMathClass<T extends string>
 
     multiStyleToString( val: Extended<MultiNumberBase<T>>, separator: string): string;
 
-    multiStyleToStringWithSpace( val: Extended<MultiNumberBase<T>>): string;
-
-    multiStyleToStringWithComma( val: Extended<MultiNumberBase<T>>): string;
-
     new(): INumberMath<T>;
 }
 
@@ -415,12 +411,6 @@ export class CssNumberMath extends NumberMath<NumberType>
     public static multiStyleToString( val: Extended<CssMultiNumber>, separator: string): string
         { return multiStyleToString( val, CssNumberMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiNumber>): string
-        { return multiStyleToString( val, CssNumberMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiNumber>): string
-        { return multiStyleToString( val, CssNumberMath.convertFunc, ","); }
-
     constructor() { super( CssNumberMath.convertFunc) }
 }
 
@@ -446,12 +436,6 @@ export class CssPercentMath extends NumberMath<PercentType> implements ICssPerce
 
     public static multiStyleToString( val: Extended<CssMultiPercent>, separator: string): string
         { return multiStyleToString( val, CssPercentMath.convertFunc, separator); }
-
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiPercent>): string
-        { return multiStyleToString( val, CssPercentMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiNumber>): string
-        { return multiStyleToString( val, CssPercentMath.convertFunc, ","); }
 
     constructor() { super( CssPercentMath.convertFunc) }
 }
@@ -486,12 +470,6 @@ export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthM
 
     public static multiStyleToString( val: Extended<CssMultiLength>, separator: string): string
         { return multiStyleToString( val, CssLengthMath.convertFunc, separator); }
-
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiLength>): string
-        { return multiStyleToString( val, CssLengthMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiLength>): string
-        { return multiStyleToString( val, CssLengthMath.convertFunc, ","); }
 
     constructor() { super( CssLengthMath.convertFunc) }
 
@@ -545,12 +523,6 @@ export class CssAngleMath extends NumberMath<AngleType> implements ICssAngleMath
     public static multiStyleToString( val: Extended<CssMultiAngle>, separator: string): string
         { return multiStyleToString( val, CssAngleMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiAngle>): string
-        { return multiStyleToString( val, CssAngleMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiAngle>): string
-        { return multiStyleToString( val, CssAngleMath.convertFunc, ","); }
-
     constructor() { super( CssAngleMath.convertFunc) }
 
     public deg( n: number) { return this.unit( n, "deg"); }
@@ -581,12 +553,6 @@ export class CssTimeMath extends NumberMath<TimeType> implements ICssTimeMath
     public static multiStyleToString( val: Extended<CssMultiTime>, separator: string): string
         { return multiStyleToString( val, CssTimeMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiTime>): string
-        { return multiStyleToString( val, CssTimeMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiTime>): string
-        { return multiStyleToString( val, CssTimeMath.convertFunc, ","); }
-
     constructor() { super( CssTimeMath.convertFunc) }
 
     public ms( n: number) { return this.unit( n, "ms"); }
@@ -614,12 +580,6 @@ export class CssResolutionMath extends NumberMath<ResolutionType> implements ICs
 
     public static multiStyleToString( val: Extended<CssMultiResolution>, separator: string): string
         { return multiStyleToString( val, CssResolutionMath.convertFunc, separator); }
-
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiResolution>): string
-        { return multiStyleToString( val, CssResolutionMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiResolution>): string
-        { return multiStyleToString( val, CssResolutionMath.convertFunc, ","); }
 
     constructor() { super( CssResolutionMath.convertFunc) }
 
@@ -658,12 +618,6 @@ export class CssFrequencyMath extends NumberMath<FrequencyType> implements ICssF
     public static multiStyleToString( val: Extended<CssMultiFrequency>, separator: string): string
         { return multiStyleToString( val, CssFrequencyMath.convertFunc, separator); }
 
-    public static multiStyleToStringWithSpace( val: Extended<CssMultiFrequency>): string
-        { return multiStyleToString( val, CssFrequencyMath.convertFunc, " "); }
-
-    public static multiStyleToStringWithComma( val: Extended<CssMultiFrequency>): string
-        { return multiStyleToString( val, CssFrequencyMath.convertFunc, ","); }
-
     constructor() { super( CssFrequencyMath.convertFunc) }
 
     public hz( n: number) { return this.unit( n, "Hz"); }
@@ -686,7 +640,7 @@ export function positionToString( val: Extended<CssPosition>): string
     return valueToString( val, {
         fromNull: v => "",
         fromNumber: CssLengthMath.styleToString,
-        fromArray: CssLengthMath.multiStyleToStringWithSpace
+        fromArray: v => CssLengthMath.multiStyleToString( v, " ")
     });
 }
 

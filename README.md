@@ -413,7 +413,7 @@ class MyStyles extends css.StyleDefinition
 > Note: in JavaScript `1.0` is not a floating point number but rather an integer.
 
 ## Conclusion
-We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html) to find more information.
+We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/guide/mimcss-guide-introduction.html) to find more information.
 
 
 
