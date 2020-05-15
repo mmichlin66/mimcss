@@ -720,6 +720,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
 
     gap: multiLengthToStringWithSpace,
     gridColumnGap: CssLengthMath.styleToString,
+    gridGap: multiLengthToStringWithSpace,
     gridRowGap: CssLengthMath.styleToString,
 
     height: CssLengthMath.styleToString,

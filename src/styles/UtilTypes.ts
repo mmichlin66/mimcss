@@ -46,18 +46,11 @@ export type StringProxy = (p?: "string") => string;
 
 
 /**
- * Style values that can be used for (almost) any CSS property.
- */
-export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | StringProxy | null | undefined;
-
-
-
-/**
- * The IVarProxy interface represents a CSS custom property object with values of the given type.
- * we need this interface because every style property can accept value in the form of var()
+ * The ICustomVar interface represents a CSS custom property object with values of the given type.
+ * This interface is needed because every style property can accept value in the form of the var()
  * CSS function.
  */
-export interface IVarProxy<T = any>
+export interface ICustomVar<T = any>
 {
 	/**
 	 * Sets new value of this custom CSS property.
@@ -71,11 +64,17 @@ export interface IVarProxy<T = any>
 
 /**
  * Type that extends the given type with the following types:
- * - basic style values that are valid for all style properties.
+ * - ICustomVar object that allows using a CSS custom property.
  * - StringProxy type that allows specifying raw string value.
- * - IVarProxy object that allows using a CSS custom property.
  */
-export type Extended<T> = T | Base_StyleType | IVarProxy<T>;
+export type Extended<T> = T | ICustomVar<T> | StringProxy | undefined;
+
+
+
+/**
+ * Style values that can be used for any CSS property.
+ */
+export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
 
 
 
@@ -94,14 +93,11 @@ export type OneOrBox<T> = T | [Extended<T>, Extended<T>, Extended<T>?, Extended<
 /** Type for a property that can have 1 or more values of the given type */
 export type OneOrMany<T> = T | Extended<T>[];
 
-/** Type for a property that can have 1 or more values of the given type */
-export type Many<T> = Extended<T>[];
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Numeric types as a baseis for handling CSS <number>. <length>, <angle>, etc.
+// Numeric types as a basis for handling CSS <number>, <length>, <angle>, etc.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -126,16 +122,7 @@ export type MultiNumberBase<T extends string> = OneOrMany<NumberBase<T>>;
  */
 export interface INumberMath<T extends string>
 {
-    /** Converts number to string appending necessary unit suffixes */
-    numberToString: ( n: number) => string;
-
-    /** Converts single numeric style value to string appending necessary unit suffixes */
-    styleToString: ( val: Extended<NumberBase<T>>) => string;
-
-    /** Converts multiple numeric style value to string appending necessary unit suffixes */
-    multiStyleToString: ( val: Extended<MultiNumberBase<T>>, separator: string) => string;
-
-    /** Creates property value of using the CSS min() function. */
+    /** Creates property value using the CSS min() function. */
     min( ...params: Extended<NumberBase<T>>[]): NumberProxy<T>;
 
     /** Creates property value using the CSS max() function. */
@@ -147,16 +134,6 @@ export interface INumberMath<T extends string>
     /**
      * Creates property value using the CSS calc() function. This method is a tag function and must
      * be invoked with a template string without parentheses.
-     * 
-     * ```typescript
-     * class MyStyles
-     * {
-     *     wallGap = $var( "width", 16);
-     *     myClass = $class({ maxWidth: css.Len.calc `100% - 2 * {this.wallGap}` })
-     * }
-     * ```
-     * @param formula 
-     * @param params 
      */
     calc( formulaParts: TemplateStringsArray, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>;
 }
@@ -172,14 +149,11 @@ export interface INumberMath<T extends string>
 /** Unique string literal that distinguishes the Number type from other numeric types */
 export type NumberType = "Number";
 
-/** Type for single style property of the `<number>` CSS type*/
+/** Type for single style property of the `<number>` CSS type - note that it exludes `string` */
 export type CssNumber = Exclude<NumberBase<NumberType>,string>;
 
-/** Type for multi-part style property of the `<number>` CSS type*/
+/** Type for multi-part style property of the `<number>` CSS type */
 export type CssMultiNumber = OneOrMany<CssNumber>;
-
-/** Type for 1-to-four-part style property of the `<number>` CSS type*/
-export type CssNumberBox = OneOrBox<CssNumber>;
 
 /**
  * The ICssNumberMath interface contains methods that implement CSS mathematic functions on the
@@ -206,9 +180,6 @@ export type CssPercent = NumberBase<PercentType>;
 
 /** Type for multi-part style property of the `<percent>` CSS type */
 export type CssMultiPercent = OneOrMany<CssPercent>;
-
-/** Type for 1-to-four-part style property of the `<percent>` CSS type */
-export type CssPercentBox = OneOrBox<CssPercent>;
 
 /** Proxy type that represents values of the `<percent>` CSS type */
 export type PercentProxy = NumberProxy<PercentType>;
@@ -323,7 +294,7 @@ export interface ICssLengthMath extends INumberMath<LengthType>
     /** Creates length value in the units which are a larger value between vw and vh */
     vmin( n: number): LengthProxy;
 
-    /** Creates fraction value for flex */
+    /** Creates length value for flex */
     fr( n: number): LengthProxy;
 
     /**
@@ -360,9 +331,6 @@ export type CssAngle = NumberBase<AngleType>;
 /** Type for multi-part style property of the `<angle>` CSS type */
 export type CssMultiAngle = OneOrMany<CssAngle>;
 
-/** Type for 1-to-four-part style property of the `<angle>` CSS type */
-export type CssAngleBox = OneOrBox<CssAngle>;
-
 /** Proxy type that represents values of the `<angle>` CSS type */
 export type AngleProxy = NumberProxy<AngleType>;
 
@@ -373,7 +341,7 @@ export type AngleProxy = NumberProxy<AngleType>;
 export interface ICssAngleMath extends INumberMath<AngleType>
 {
     /** Creates angle value in degrees */
-     deg( n: number): AngleProxy;
+    deg( n: number): AngleProxy;
 
     /** Creates angle value in radians */
     rad( n: number): AngleProxy;
@@ -411,9 +379,6 @@ export type CssTime = NumberBase<TimeType>;
 /** Type for multi-part style property of the `<time>` CSS type */
 export type CssMultiTime = OneOrMany<CssTime>;
 
-/** Type for 1-to-four-part style property of the `<time>` CSS type */
-export type CssTimeBox = OneOrBox<CssTime>;
-
 /** Proxy type that represents values of the `<time>` CSS type*/
 export type TimeProxy = NumberProxy<TimeType>;
 
@@ -423,10 +388,10 @@ export type TimeProxy = NumberProxy<TimeType>;
  */
 export interface ICssTimeMath extends INumberMath<TimeType>
 {
-    /** Creates frequency value in milliseconds */
+    /** Creates time value in milliseconds */
     ms( n: number): TimeProxy;
 
-    /** Creates frequency value in seconds */
+    /** Creates time value in seconds */
     s( n: number): TimeProxy;
 }
 
@@ -449,9 +414,6 @@ export type CssResolution = NumberBase<ResolutionType>;
 
 /** Type for multi-part style property of the `<resolution>` CSS type */
 export type CssMultiResolution = OneOrMany<CssResolution>;
-
-/** Type for 1-to-four-part style property of the `<resolution>` CSS type */
-export type CssResolutionBox = OneOrBox<CssResolution>;
 
 /** Proxy type that represents values of the `<resolution>` CSS type */
 export type ResolutionProxy = NumberProxy<ResolutionType>;
@@ -494,9 +456,6 @@ export type CssFrequency = NumberBase<FrequencyType>;
 
 /** Type for multi-part style property of the `<frequency>` CSS type */
 export type CssMultiFrequency = OneOrMany<CssFrequency>;
-
-/** Type for 1-to-four-part style property of the `<frequency>` CSS type */
-export type CssFrequencyBox = OneOrBox<CssFrequency>;
 
 /** Proxy type that represents values of the `<frequency>` CSS type */
 export type FrequencyProxy = NumberProxy<FrequencyType>;

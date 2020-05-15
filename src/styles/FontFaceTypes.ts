@@ -3,10 +3,7 @@
 
 
 /**
- * Type that extends the given type with the following types:
- * - basic style values that are valid for all style properties.
- * - StringProxy type that allows specifying raw string value.
- * - IVarProxy object that allows using a CSS custom property.
+ * Type that extends the given type with the StringProxy type that allows specifying raw string value.
  */
 export type FontFaceExtended<T> = T | StringProxy;
 
@@ -73,7 +70,7 @@ export interface ICssFontFace
 /**
  * The IFontFace type maps all @font-face properties defined in the [[ICssFontFace]] interface to
  * the "extended" versions of their types. These extended types are defined using the
- * [[FontFaceExtended]] generic type, which adds [[StringProxy]] and [[IVarProxy]] to the type
+ * [[FontFaceExtended]] generic type, which adds [[StringProxy]] and [[ICustomVar]] to the type
  * that is defined in the ICssFontFace interface.
  */
 export type IFontFace = { [K in keyof ICssFontFace]: FontFaceExtended<ICssFontFace[K]> }

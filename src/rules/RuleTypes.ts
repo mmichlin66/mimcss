@@ -1,13 +1,9 @@
-﻿/**
- * This module defines types and interfaces that represent CSS rules.
- */
-
-
-import {IVarProxy, OneOrMany} from "../styles/UtilTypes";
+﻿import {ICustomVar, OneOrMany} from "../styles/UtilTypes";
 import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {
 	PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity
 } from "../styles/SelectorTypes";
+
 
 
 /** Represents properties used in the [[ExtendedStyleset]] which are used to define dependent rules */
@@ -63,8 +59,8 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
 export type ExtendedStyleset = Styleset &
 	{ "+"?: IStyleRule | IStyleRule[] } &
 	{ [K in PseudoEntity]?: ExtendedStyleset } &
-	{ [K in SelectorCombinator]?: [CssSelector, ExtendedStyleset][] } &
-	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], ExtendedStyleset][] };
+	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], ExtendedStyleset][] } &
+	{ [K in SelectorCombinator]?: [CssSelector, ExtendedStyleset][] };
 
 
 
@@ -235,7 +231,7 @@ export interface IAnimationFrameRule extends IStyleRule
  * The IVarRule interface represents a CSS custom property definition.
  * Objects implementing this interface are returned from the [[$var]] function.
  */
-export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, IVarProxy<VarValueType<K>>
+export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, ICustomVar<VarValueType<K>>
 {
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly template: K;

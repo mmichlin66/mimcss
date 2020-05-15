@@ -1,8 +1,8 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
-    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, Many,
+    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
     CssFrequency, CssResolution, CssRadius, UrlProxy, AttrProxy,
-    HorizontalPositionKeyword, VerticalPositionKeyword
+    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, Global_StyleType
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -407,7 +407,7 @@ export type ColumnFill_StyleType = "auto" | "balance" | "balance-all";
 
 
 /** Type for column-gap style property */
-export type ColumnGap_StyleType = "normal" | Gap_Single;
+export type ColumnGap_StyleType = "normal" | CssLength;
 
 
 
@@ -436,7 +436,7 @@ export type Columns_StyleType = "auto" | CssNumber | CssLength |
 
 /** Type for contain style property */
 export type Contain_StyleType = "none" | "strict" | "content" | "size" | "layout" | "style" | "paint" |
-    Many<"size" | "layout" | "style" | "paint">;
+    Extended<"size" | "layout" | "style" | "paint">[];
 
 
 
@@ -590,11 +590,8 @@ export type FontVariantPosition_StyleType = "normal" | "sub" | "super";
 
 
 
-/** Type for a row-gap or column-gap style property */
-export type Gap_Single = "normal" | CssLength;
-
-/** Type for a row-gap or column-gap style property */
-export type Gap_StyleType = OneOrPair<Gap_Single>;
+/** Type for a gap or grid-gap style property */
+export type Gap_StyleType = RowGap_StyleType | [RowGap_StyleType, ColumnGap_StyleType];
 
 
 
@@ -764,12 +761,17 @@ export type Position_StyleType = "static" | "relative" | "absolute" | "sticky" |
 
 
 /** Type for the quotes style property */
-export type Quotes_StyleType = "none" | "auto" | Many<string>;
+export type Quotes_StyleType = "none" | "auto" | Extended<string>[];
 
 
 
 /** Type for the resize style property */
 export type Resize_StyleType = "none" | "both" | "horizontal" | "vertical" | "block" | "inline";
+
+
+
+/** Type for row-gap style property */
+export type RowGap_StyleType = CssLength;
 
 
 
@@ -1266,12 +1268,12 @@ export interface ICssStyleset
     gridAutoRows?: DefaultStyleType;
     gridColumn?: DefaultStyleType;
     gridColumnEnd?: DefaultStyleType;
-    gridColumnGap?: Gap_Single;
+    gridColumnGap?: ColumnGap_StyleType;
     gridColumnStart?: DefaultStyleType;
     gridGap?: Gap_StyleType;
     gridRow?: DefaultStyleType;
     gridRowEnd?: DefaultStyleType;
-    gridRowGap?: Gap_Single;
+    gridRowGap?: RowGap_StyleType;
     gridRowStart?: DefaultStyleType;
     gridTemplate?: DefaultStyleType;
     gridTemplateAreas?: DefaultStyleType;
@@ -1387,7 +1389,7 @@ export interface ICssStyleset
     resize?: Resize_StyleType;
     right?: CssLength;
     rotate?: DefaultStyleType;
-    rowGap?: Gap_Single;
+    rowGap?: RowGap_StyleType;
     rubyAlign?: DefaultStyleType;
     rubyOverhang?: DefaultStyleType;
     rubyPosition?: DefaultStyleType;
@@ -1567,12 +1569,11 @@ export interface ICssStyleset
 
 /**
  * The IStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
- * "extended" versions of their types. These extended types are defined using the [[Extended]]
- * generic type, which adds basic keywords (e.g. "reset", "initial", etc.) as well as
- * [[StringProxy]] and [[IVarProxy]] to the type that is defined in the ICssStyleset
- * interface.
+ * "extended" versions of their types. These extended types are defined by adding basic keywords
+ * (e.g. "reset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
+ * is defined in the ICssStyleset interface.
  */
-export type IStyleset = { [K in keyof ICssStyleset]: Extended<ICssStyleset[K]> }
+export type IStyleset = { [K in keyof ICssStyleset]: Extended<ICssStyleset[K]> | Global_StyleType }
 
 
 
@@ -1613,8 +1614,14 @@ export interface ICssVarTemplates extends ICssStyleset
     /** Allows having CSS variables that accept a `<percent>` CSS value */
     "CssPercent"?: CssPercent;
 
+    /** Allows having CSS variables that accept a Point value */
+    "CssPoint"?: CssPoint;
+
     /** Allows having CSS variables that accept a `<position>` CSS value */
     "CssPosition"?: CssPosition;
+
+    /** Allows having CSS variables that accept a `Radius` CSS value */
+    "CssRadius"?: CssRadius;
 
     /** Allows having CSS variables that accept a `<color>` CSS value */
     "CssColor"?: CssColor;
@@ -1637,7 +1644,7 @@ export type VarTemplateName = keyof ICssVarTemplates;
  * The IVarTemplates type maps all template properties defined in the [[ICssVarTemplates]]
  * interface to the "extended" versions of their types. These extended types are defined using
  * the [[Extended]] generic type, which adds basic keywords (e.g. "reset", "initial", etc.) as
- * well as [[IStringProxy]] and [[IVarProxy]] to the type that is defined in the ICssVarTemplates
+ * well as [[IStringProxy]] and [[ICustomVar]] to the type that is defined in the ICssVarTemplates
  * interface.
  */
 export type IVarTemplates = { [K in VarTemplateName]: Extended<ICssVarTemplates[K]> }
@@ -1678,7 +1685,7 @@ export type VarValueType<K extends VarTemplateName> = IVarTemplates[K];
  * Use the CustomVarStyleType type in the following manner:
  * 
  * ```typescript
- * class MyStyles
+ * class MyStyles extends StyleDefinition
  * {
  *     // define global custom CSS property and re-define its value under "brown" class.
  *     mainColor = $var( "color", "black");
