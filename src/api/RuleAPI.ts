@@ -19,7 +19,7 @@ import {valueToString} from "../styles/UtilFuncs";
  * Creates new abstract rule, which defines a styleset that can be extended by other style
  * rules. Abstract rules don't have selectors and are not inserted into DOM.
  */
-export function $abstract( style: RuleTypes.ExtendedStyleset): RuleTypes.IStyleRule
+export function $abstract( style: RuleTypes.CombinedStyleset): RuleTypes.IStyleRule
 {
 	return new AbstractRule( style);
 }
@@ -31,7 +31,7 @@ export function $abstract( style: RuleTypes.ExtendedStyleset): RuleTypes.IStyleR
  * the class. Such class can be later used either in conditional grouping rules or in derived
  * style definition classes.
  */
-export function $class( style?: RuleTypes.ExtendedStyleset,
+export function $class( style?: RuleTypes.CombinedStyleset,
 	nameOverride?: string | RuleTypes.IClassRule): RuleTypes.IClassRule
 {
 	return new ClassRule( style, nameOverride);
@@ -44,7 +44,7 @@ export function $class( style?: RuleTypes.ExtendedStyleset,
  * the ID. Such ID can be later used either in conditional grouping rules or in derived
  * style definition classes.
  */
-export function $id( style?: RuleTypes.ExtendedStyleset,
+export function $id( style?: RuleTypes.CombinedStyleset,
 	nameOverride?: string | RuleTypes.IIDRule): RuleTypes.IIDRule
 {
 	return new IDRule( style, nameOverride);
@@ -53,7 +53,7 @@ export function $id( style?: RuleTypes.ExtendedStyleset,
 /**
  * Creates new selector rule. Selector can be specified as a string or via the selector function.
  */
-export function $style( selector: CssSelector, style: RuleTypes.ExtendedStyleset): RuleTypes.IStyleRule
+export function $style( selector: CssSelector, style: RuleTypes.CombinedStyleset): RuleTypes.IStyleRule
 {
 	return new SelectorRule( selector, style);
 }

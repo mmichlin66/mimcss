@@ -1,8 +1,8 @@
-import {IStyleRule, ExtendedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "./RuleTypes";
-import {IStyleset, Styleset, VarTemplateName, VarValueType, CustomVarStyleType} from "../styles/StyleTypes"
+import {IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "./RuleTypes";
+import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVarStyleType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
-import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetSpecialProps} from "../styles/StyleFuncs"
+import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps} from "../styles/StyleFuncs"
 import {valueToString, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
 import {pseudoEntityToString, selectorToString} from "../styles/SelectorFuncs";
@@ -11,11 +11,11 @@ import {pseudoEntityToString, selectorToString} from "../styles/SelectorFuncs";
 
 /**
  * The StyleRule class is used as a base class for rules that contain a style rule. This class
- * implements the parsing of the ExtendedStyleset object.
+ * implements the parsing of the CombinedStyleset object.
  */
 export abstract class StyleRule extends Rule implements IStyleRule
 {
-	// The styleset can be an ExtendedStyleset for many rules; however, for some it is just
+	// The styleset can be an CombinedStyleset for many rules; however, for some it is just
 	// of the Styleset type.
 	public constructor( styleset?: Styleset)
 	{
@@ -25,7 +25,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		this.dependentRules = {};
 
 		if (styleset)
-			this.parseInputStyleset( styleset as ExtendedStyleset);
+			this.parseInputStyleset( styleset as CombinedStyleset);
 	}
 
 
@@ -34,7 +34,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
 	 * important properties and dependent rules.
 	 */
-	private parseInputStyleset( inputStyleset: ExtendedStyleset): void
+	private parseInputStyleset( inputStyleset: CombinedStyleset): void
 	{
 		// if we have parents, we first copy properties from them so that our own properties
 		// can override them.
@@ -59,13 +59,13 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			}
 		}
 
-		// merge custom and important properties
-		mergeStylesetSpecialProps( this.styleset, inputStyleset);
+		// merge custom  properties
+		mergeStylesetCustomProps( this.styleset, inputStyleset);
 
 		for( let propName in inputStyleset)
 		{
 			// skip over already processed parents, important and custom properties
-			if (propName === "+" || propName === "!" || propName === "--")
+			if (propName === "+" || propName === "--")
 				continue;
 
 			let propVal = inputStyleset[propName];
@@ -73,11 +73,11 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			{
 				// if the value is an array, then this is an array of tuples representing
 				// parameterised pseudo entities where the first element is the parameter value
-				// (string) and the second the ExtendedStyleset. Otherwise, the value is just an
-				// ExtendedStyleset.
+				// (string) and the second the CombinedStyleset. Otherwise, the value is just an
+				// CombinedStyleset.
 				if (Array.isArray(propVal))
 				{
-					let tuples = propVal as [any, ExtendedStyleset][];
+					let tuples = propVal as [any, CombinedStyleset][];
 					if (tuples.length > 0)
 					{
 						this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
@@ -86,12 +86,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				}
 				else
 					this.dependentRules[propName] = new DependentRule( "&" + propName, undefined,
-						propVal as ExtendedStyleset, this);
+						propVal as CombinedStyleset, this);
 			}
 			else if (propName === "&")
 			{
 				// value is an array of two-element tuples with selector and styleset
-				let tuples = propVal as [CssSelector, ExtendedStyleset][];
+				let tuples = propVal as [CssSelector, CombinedStyleset][];
 				if (tuples.length > 0)
 				{
 					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
@@ -101,7 +101,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			else if (propName.startsWith("&"))
 			{
 				// value is an array of two-element tuples with selector and styleset
-				let tuples = propVal as [CssSelector, ExtendedStyleset][];
+				let tuples = propVal as [CssSelector, CombinedStyleset][];
 				if (tuples.length > 0)
 				{
 					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
@@ -111,7 +111,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			else if (propName.endsWith("&"))
 			{
 				// value is an array of two-element tuples with selector and styleset
-				let tuples = propVal as [CssSelector, ExtendedStyleset][];
+				let tuples = propVal as [CssSelector, CombinedStyleset][];
 				if (tuples.length > 0)
 				{
 					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
@@ -271,7 +271,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param value New value of the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	public setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void
+	public setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K], important?: boolean): void
 	{
 		this.setPropInternal( name, value, important);
 	}
@@ -304,10 +304,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (value == null)
 			delete this.styleset[name];
 		else
-		{
-			this.styleset[name] = value;
-			this.setPropImportant( name, important);
-		}
+			this.styleset[name] = important ? { "!": value } : value;
 
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (!this.cssRule)
@@ -318,39 +315,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		else
 			this.cssRule.style.setProperty( camelToDash( name),
 				stylePropToString( name, value, true), important ? "!important" : null)
-	}
-
-
-
-	/**
-	 * Sets or clears the important flag for the given property. This method is invoked only if
-	 * the styleset is defined
-	 */
-	private setPropImportant( name: string, important?: boolean): void
-	{
-		// get the current important
-		let currImportantProps = this.styleset["!"] as string[];
-		if (!currImportantProps && !important)
-			return;
-
-		if (important)
-		{
-			if (!currImportantProps)
-				this.styleset["!"] = [name as keyof IStyleset];
-			else if (currImportantProps.indexOf( name) < 0)
-				currImportantProps.push( name);
-		}
-		else
-		{
-			let index = currImportantProps.indexOf( name);
-			if (index >= 0)
-			{
-				if (currImportantProps.length === 1)
-					this.styleset["!"] = undefined;
-				else
-					currImportantProps.splice( index, 1);
-			}
-		}
 	}
 
 
@@ -411,7 +375,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	/**
 	 * Object containing dependent rules. Property names are taken from special properties
-	 * of the ExtendedStyleset. This object allows callers to access dependent rules to change
+	 * of the CombinedStyleset. This object allows callers to access dependent rules to change
 	 * style property values programmatically.
 	 */
 	public dependentRules: DependentRules;
@@ -437,7 +401,7 @@ class DependentRule extends StyleRule
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, psudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
-	public constructor( selector: CssSelector, selectorParam?: any, style?: ExtendedStyleset,
+	public constructor( selector: CssSelector, selectorParam?: any, style?: CombinedStyleset,
 		containingRule?: StyleRule)
 	{
 		super( style);
@@ -500,7 +464,7 @@ class DependentRule extends StyleRule
  */
 export class AbstractRule extends StyleRule
 {
-	public constructor( style?: ExtendedStyleset)
+	public constructor( style?: CombinedStyleset)
 	{
 		super( style);
 	}
@@ -532,7 +496,7 @@ export class AbstractRule extends StyleRule
  */
 abstract class NamedStyleRule extends StyleRule implements INamedEntity
 {
-	public constructor( style?: ExtendedStyleset, nameOverride?: string | INamedEntity)
+	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
 	{
 		super( style);
 		this.nameOverride = nameOverride;
@@ -582,7 +546,7 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
  */
 export class ClassRule extends NamedStyleRule implements IClassRule
 {
-	public constructor( style?: ExtendedStyleset, nameOverride?: string | INamedEntity)
+	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
 	{
 		super( style, nameOverride);
 	}
@@ -608,7 +572,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
  */
 export class IDRule extends NamedStyleRule implements IIDRule
 {
-	public constructor( style?: ExtendedStyleset, nameOverride?: string | INamedEntity)
+	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
 	{
 		super( style, nameOverride);
 	}
@@ -634,7 +598,7 @@ export class IDRule extends NamedStyleRule implements IIDRule
  */
 export class SelectorRule extends StyleRule
 {
-	public constructor( selector: CssSelector, style?: ExtendedStyleset)
+	public constructor( selector: CssSelector, style?: CombinedStyleset)
 	{
 		super( style);
 		this.selector = selector;

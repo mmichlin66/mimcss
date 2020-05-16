@@ -1,5 +1,6 @@
 import * as css from "../../mimcssTypes"
-import { Styleset } from "../../styles/StyleTypes";
+import {Styleset} from "../../styles/StyleTypes";
+import {camelToDash} from "../../styles/UtilFuncs";
 
 
 
@@ -41,8 +42,15 @@ export function expectNoStylesInHead()
 // Verifies that the CSS rule for the given style rule has the given value of the given property.
 export function verifyPropValue( rule: css.IStyleRule, propName: string, ...expected: string[])
 {
-	// expect(rule.cssRule?.style[propName]).toEqual( expected);
-	expect(expected).toContain(rule.cssRule?.style[propName]);
+	expect(expected).toContain(rule.cssRule?.style[camelToDash( propName)]);
+}
+
+
+
+// Verifies that the CSS rule for the given style rule has the given value of the given property.
+export function verifyPropPriority( rule: css.IStyleRule, propName: string, expectedPrioriy: boolean)
+{
+	expect(rule.cssRule?.style.getPropertyPriority( camelToDash( propName))).toEqual( expectedPrioriy ? "important" : "");
 }
 
 
@@ -52,8 +60,7 @@ export function verifyPropValue( rule: css.IStyleRule, propName: string, ...expe
 export function verifyDependentPropValue( rule: css.IStyleRule, dependentProp: string,
 	propName: string, ...expected: string[])
 {
-	// expect(rule.dependentRules[dependentProp].cssRule?.style[propName]).toEqual( expected);
-	expect(expected).toContain(rule.dependentRules[dependentProp].cssRule?.style[propName]);
+	expect(expected).toContain(rule.dependentRules[dependentProp].cssRule?.style[camelToDash( propName)]);
 }
 
 
@@ -63,7 +70,7 @@ export function verifyMultiPropValues( rule: css.IStyleRule, expected: {[K: stri
 {
 	let style = rule.cssRule?.style!;
 	for( let propName in expected)
-		expect(style[propName]).toEqual( expected[propName]);
+		expect(style[camelToDash( propName)]).toEqual( expected[propName]);
 }
 
 
@@ -95,6 +102,22 @@ export function testShorthandProp<K extends keyof Styleset>( propName: K, propVa
 
 	let a = css.$activate( A);
 	verifyMultiPropValues( a!.c, expected);
+
+	css.$deactivate( a!);
+}
+
+
+
+// Runs a test on a single longhand style property.
+export function testPropPriority<K extends keyof Styleset>( propName: K, propVal: Styleset[K], expectedPriority: boolean)
+{
+	class A extends css.StyleDefinition
+	{
+		c = css.$class( { [propName]: propVal })
+	}
+
+	let a = css.$activate( A);
+	verifyPropPriority( a!.c, propName, expectedPriority);
 
 	css.$deactivate( a!);
 }

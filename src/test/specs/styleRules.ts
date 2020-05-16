@@ -193,6 +193,13 @@ describe("style rules:", () =>
 
 		css.$deactivate( a!);
 	})
+
+
+
+	it("should set !important flag", () =>
+	{
+		dom.testPropPriority( "paddingLeft", { "!": 8 }, true);
+	})
 })
 
 

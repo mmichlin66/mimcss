@@ -1,6 +1,6 @@
 {
 	"name": "mimcss",
-	"version": "0.5.5",
+	"version": "0.5.6",
 	"description": "Authoring CSS in TypeScript",
 	"homepage": "https://mmichlin66.github.io/mimcss/guide/mimcss-guide-introduction.html",
 	"repository": "github:mmichlin66/mimcss",

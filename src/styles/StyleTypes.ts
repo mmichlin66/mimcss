@@ -1568,12 +1568,12 @@ export interface ICssStyleset
 
 
 /**
- * The IStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
- * "extended" versions of their types. These extended types are defined by adding basic keywords
- * (e.g. "reset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
- * is defined in the ICssStyleset interface.
+ * The ExtendedProp extends the given generic type with the following elements:
+ * - Object with a single property "!", whcih is used to mark a property as "!important".
+ * - Global_StyleType, which allows any property to be assigned the global values such as
+ *   "initial", "inherit", "reset" and "revert".
  */
-export type IStyleset = { [K in keyof ICssStyleset]: Extended<ICssStyleset[K]> | Global_StyleType }
+export type ExtendedProp<T> = Extended<T> | { "!": Extended<T> } | Global_StyleType;
 
 
 
@@ -1581,8 +1581,8 @@ export type IStyleset = { [K in keyof ICssStyleset]: Extended<ICssStyleset[K]> |
  * The ICssVarTemplates interface maps template names to the types, whcih can be used for
  * defining custom CSS properties (a.k.a. variables). Normally, variables are defined using the
  * names of the style properties and their type is determined by the type of this property in the
- * IStyleset interface. Sometimes, however, there is a need to define variables of some other
- * types, for which ther is no suitable style property. The ICssVarTemplates interface provides
+ * ICssStyleset interface. Sometimes, however, there is a need to define variables of some other
+ * types, for which there is no suitable style property. The ICssVarTemplates interface provides
  * many basic types and it can also be extended using the TypeScript's module augmentation.
  */
 export interface ICssVarTemplates extends ICssStyleset
@@ -1647,7 +1647,7 @@ export type VarTemplateName = keyof ICssVarTemplates;
  * well as [[IStringProxy]] and [[ICustomVar]] to the type that is defined in the ICssVarTemplates
  * interface.
  */
-export type IVarTemplates = { [K in VarTemplateName]: Extended<ICssVarTemplates[K]> }
+export type IVarTemplates = { [K in VarTemplateName]: ExtendedProp<ICssVarTemplates[K]> }
 
 
 
@@ -1710,26 +1710,27 @@ export type CustomVarStyleType<K extends VarTemplateName = any> =
 
 
 /**
- * Type representing a collection of style properties and their values. In addition to the
- * properties representing the standard CSS styles, this type also includes:
- * - the "--" property, which is an array of CustomVarStyleType objects.
- * - the "!" property, which is one or more names of CSS properties to which the !important
- *   flag should be added
+ * The ExtendedStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
+ * "extended" versions of their types. These extended types are defined by adding basic keywords
+ * (e.g. "reset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
+ * is defined in the ICssStyleset interface.
  */
-export type Styleset = IStyleset &
+export type ExtendedStyleset = { [K in keyof ICssStyleset]: ExtendedProp<ICssStyleset[K]> }
+
+
+
+/**
+ * Type representing a collection of style properties and their values. In addition to the
+ * properties representing the standard CSS styles, this type also includes the "--" property,
+ * which is an array of CustomVarStyleType objects.
+ */
+export type Styleset = ExtendedStyleset &
     {
         /**
          * Special property "--" specifies an array that contains CustomVarStyleType objects each
          * representing a definition of a custom CSS property.
          */
         "--"?: CustomVarStyleType[];
-
-        /**
-         * Special property "!" specifies one or more names of styleset properties that should be
-         * considered "important". When the rule is inserted into DOM, the "!important" flag is
-         * added to the property value.
-         */
-        "!"?: (keyof IStyleset)[],
     };
 
 
@@ -1750,7 +1751,7 @@ export type Styleset = IStyleset &
  * supports the "flex" value, we cannot check whether both "flex" and "grid" values are supported.
  * To check such criteria you must specify the query as a string.
  */
-export type SingleSupportsQuery = string | IStyleset & { $negate?: boolean; };
+export type SingleSupportsQuery = string | ExtendedStyleset & { $negate?: boolean; };
 
 
 

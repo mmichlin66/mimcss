@@ -1,18 +1,18 @@
 ﻿import {ICustomVar, OneOrMany} from "../styles/UtilTypes";
-import {IStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
+import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {
 	PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity
 } from "../styles/SelectorTypes";
 
 
 
-/** Represents properties used in the [[ExtendedStyleset]] which are used to define dependent rules */
+/** Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules */
 export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" | " &" | ">&" | "+&" | "~&";
 
 
 
 /**
- * The ExtendedStyleset type extends the Styleset type with certain properties that provide
+ * The CombinedStyleset type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset and allow building nested styles:
  * - The `+` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation.
@@ -29,7 +29,7 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
  *   ampersand symbol to refer to the parent style selector. If the ampersand symbol is not used,
  *   the selector will be simply appended to the parent selector.
  * 
- * Functions that return style rules (e.g. $class) accept the ExtendedStyleset as a parameter,
+ * Functions that return style rules (e.g. $class) accept the CombinedStyleset as a parameter,
  * for example:
  * 
  * ```typescript
@@ -56,11 +56,11 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
  * .m123.m122 { backgroundColor: orange; }
  * ```
  */
-export type ExtendedStyleset = Styleset &
+export type CombinedStyleset = Styleset &
 	{ "+"?: IStyleRule | IStyleRule[] } &
-	{ [K in PseudoEntity]?: ExtendedStyleset } &
-	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], ExtendedStyleset][] } &
-	{ [K in SelectorCombinator]?: [CssSelector, ExtendedStyleset][] };
+	{ [K in PseudoEntity]?: CombinedStyleset } &
+	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset][] } &
+	{ [K in SelectorCombinator]?: [CssSelector, CombinedStyleset][] };
 
 
 
@@ -120,7 +120,7 @@ export interface IStyleRule extends IRule
 
 	/**
 	 * Object containing dependent rules. Property names are taken from special properties
-	 * of the ExtendedStyleset. This object allows callers to access dependent rules to change
+	 * of the CombinedStyleset. This object allows callers to access dependent rules to change
 	 * style property values programmatically.
 	 */
 	readonly dependentRules: DependentRules;
@@ -132,7 +132,7 @@ export interface IStyleRule extends IRule
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 */
-	setProp<K extends keyof IStyleset>( name: K, value: IStyleset[K], important?: boolean): void;
+	setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K], important?: boolean): void;
 
 	/**
 	 * Adds/replaces/removes the value of the given custmom CSS property in this rule.
@@ -186,17 +186,15 @@ export type AnimationWaypoint = OneOrMany<"from" | "to" | number>;
 
 /**
  * The AnimationStyles type defines a object containing style proprties for an animation frame.
- * Stylesets for keyframes allow custom properties (via "--") but do not allow the !important
- * flag ("!"). Animation styleset can extend other style rules; however, any dependent rules
- * will be ignored.
+ * Stylesets for keyframes allow custom properties (via "--"). Animation styleset can extend
+ * other style rules; however, any dependent rules will be ignored.
  */
-export type AnimationStyleset = Omit<Styleset,"!"> & { "+"?: IStyleRule | IStyleRule[] };
+export type AnimationStyleset = Styleset & { "+"?: IStyleRule | IStyleRule[] };
 
 /**
  * The AnimationFrame type defines a single keyframe within a @keyframes rule.
  * The waypoint can be specified as "from" or "to" strings or as a number 0 to 100, which will be
- * used as a percent. Styleset for a keyframe allows custom properties (via "--") but do not
- * allow the !important flag ("!").
+ * used as a percent.
  */
 export type AnimationFrame = [AnimationWaypoint, AnimationStyleset];
 

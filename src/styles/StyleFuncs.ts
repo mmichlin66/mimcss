@@ -1,5 +1,5 @@
 ﻿import * as StyleTypes from "./StyleTypes"
-import {IStyleset} from "./StyleTypes"
+import {ExtendedStyleset} from "./StyleTypes"
 import {Extended, CssRadius, OneOrMany, CssMultiLength, CssMultiTime} from "./UtilTypes";
 import {
     camelToDash, valueToString, arrayToString, objectToString, IValueConvertOptions,
@@ -394,7 +394,7 @@ function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>
 
 /**
  * Merges properties from the source styleset to the target styleset. All regular properties are
- * replaced. Properties "--" and "!" get special treatment because they might be arrays.
+ * replaced. The "--" property gets special treatment because it is an array.
  * @param target 
  * @param source 
  * @returns Reference to the target styleset if not null or a new styleset otherwise.
@@ -414,18 +414,16 @@ export function mergeStylesets( target: StyleTypes.Styleset | undefined | null,
         return target;
     }
 
-    // check whether custom properties and important properties are defined. If we don't have
-    // either, we can just use the Object.assign function.
+    // check whether custom properties are defined. If not, we can just use the Object.assign function.
     let sourceCustomProps = source["--"];
-    let sourceImpProps = source["!"];
-    if (!sourceCustomProps && !sourceImpProps)
+    if (!sourceCustomProps)
     {
         Object.assign( target, source);
         return target;
     }
 
     // merge custom and important properties
-    mergeStylesetSpecialProps( target, source);
+    mergeStylesetCustomProps( target, source);
 
     // copy all other properties from the source
 	for( let propName in source)
@@ -442,15 +440,14 @@ export function mergeStylesets( target: StyleTypes.Styleset | undefined | null,
 
 
 /**
- * Merges "--" and "!" properties from the source styleset to the target styleset.
+ * Merges "--" property from the source styleset to the target styleset.
  */
-export function mergeStylesetSpecialProps( target: StyleTypes.Styleset,
+export function mergeStylesetCustomProps( target: StyleTypes.Styleset,
     source: StyleTypes.Styleset): void
 {
     // check whether custom properties and important properties are defined
     let sourceCustomProps = source["--"];
-    let sourceImpProps = source["!"];
-    if (!sourceCustomProps && !sourceImpProps)
+    if (!sourceCustomProps)
         return;
 
     // merge custom properties
@@ -458,13 +455,6 @@ export function mergeStylesetSpecialProps( target: StyleTypes.Styleset,
     {
         let targetCustomProps = target["--"];
         target["--"] = !targetCustomProps ? sourceCustomProps.slice() : targetCustomProps.concat( sourceCustomProps);
-    }
-
-    // merge important properties
-    if (sourceImpProps)
-    {
-        let targetImpProps = target["!"];
-        target["!"] = !targetImpProps ? sourceImpProps.slice() : targetImpProps.concat( sourceImpProps);
     }
 }
 
@@ -476,23 +466,9 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string
     if (!styleset)
         return "";
 
-    let impProps: Set<string> | null = null;
-    if (styleset["!"])
-    {
-        // value is either a single name or an array of names of CSS properties to add the !important flag
-        impProps = new Set<string>();
-        let impPropVal = styleset["!"] as (string | string[]);
-        if (typeof impPropVal === "string")
-            impProps.add( impPropVal);
-        else
-            impPropVal.forEach( v => impProps!.add( v));
-    }
-
     let buf: string[] = [];
 	for( let propName in styleset)
 	{
-        if (propName === "!")
-            continue;
         if (propName === "--")
         {
             // special handling of the "--" property, which is an array where each item is
@@ -509,8 +485,7 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string
         else
         {
             // get the string representation of the property
-            buf.push( stylePropToString( propName as keyof IStyleset, styleset[propName]) +
-                    (impProps && impProps.has( propName) ? " !important" : ""));
+            buf.push( stylePropToString( propName, styleset[propName]));
         }
 	}
 
@@ -564,8 +539,7 @@ function customPropToString( propVal: StyleTypes.CustomVarStyleType, valueOnly?:
  * Converts the given style property to the CSS style string
  * @param style 
  */
-export function stylePropToString(
-    propName: string, propVal: any, valueOnly?: boolean): string
+export function stylePropToString( propName: string, propVal: any, valueOnly?: boolean): string
 {
     if (!propName)
         return "";
@@ -573,16 +547,28 @@ export function stylePropToString(
     // find information object for the property
     let info: any = StylePropertyInfos[propName];
 
-    let varValue = !info
-        ? valueToString( propVal)
+    // if the property value is an object with the "!" property, then the actual value is the
+    // value of this property and we also need to set the "!important" flag
+    let varValue = propVal;
+    let impFlag = false;
+    if (typeof propVal === "object" && "!" in propVal)
+    {
+        varValue = propVal["!"];
+        impFlag = true;
+    }
+    let stringValue = !info
+        ? valueToString( varValue)
         : typeof info === "object"
-            ? valueToString( propVal, info as IValueConvertOptions)
-            : (info as PropToStringFunc)( propVal);
+            ? valueToString( varValue, info as IValueConvertOptions)
+            : (info as PropToStringFunc)( varValue);
 
-    if (!varValue && !valueOnly)
-        varValue = "initial";
-        
-    return valueOnly ? varValue : `${camelToDash( propName)}:${varValue}`;
+    if (!stringValue && !valueOnly)
+        stringValue = "initial";
+
+    if (impFlag)
+        stringValue += " !important";
+
+    return valueOnly ? stringValue : `${camelToDash( propName)}:${stringValue}`;
 }
 
 
@@ -908,7 +894,7 @@ export function singleSupportsQueryToString( query: StyleTypes.SingleSupportsQue
 
     let not = query.$negate ? "not" : "";
     return  `${not} (${propNames.map( (propName) =>
-        stylePropToString( propName as keyof IStyleset, query[propName])).join( ") and (")})`;
+        stylePropToString( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
 }
 
 
