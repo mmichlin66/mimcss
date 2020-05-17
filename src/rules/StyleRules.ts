@@ -1,5 +1,5 @@
 import {IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "./RuleTypes";
-import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVarStyleType} from "../styles/StyleTypes"
+import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps} from "../styles/StyleFuncs"
@@ -325,7 +325,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean): void
 	{
 		// first set/remove the value in our internal styleset object
-		let currCustomProps = this.styleset["--"] as CustomVarStyleType[];
+		let currCustomProps = this.styleset["--"] as CustomVar_StyleType[];
 		if (currCustomProps || value != null)
 		{
 			if (value == null)

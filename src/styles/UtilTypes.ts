@@ -33,6 +33,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Style values that can be used for any CSS property.
+ */
+export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
+
+
+
+/**
  * The StringProxy type represents a function that returns a string. This function is part of type
  * definition for all CSS properties - even for those that don't have `string` as part of their
  * type.
@@ -72,9 +79,20 @@ export type Extended<T> = T | ICustomVar<T> | StringProxy | undefined;
 
 
 /**
- * Style values that can be used for any CSS property.
+ * Type that encapsulates the type of property in an object with a single "!" property. This
+ * type is used to indicate that the property value must be flagged as "!important".
  */
-export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
+export type ImportantProp<T> = { "!": Extended<T> };
+
+
+
+/**
+ * The ExtendedProp extends the given generic type with the following elements:
+ * - Object with a single property "!", whcih is used to mark a property as "!important".
+ * - Global_StyleType, which allows any property to be assigned the global values such as
+ *   "initial", "inherit", "unset" and "revert".
+ */
+export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
 
 
 

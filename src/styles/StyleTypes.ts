@@ -2,7 +2,7 @@
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
     CssFrequency, CssResolution, CssRadius, UrlProxy, AttrProxy,
-    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, Global_StyleType
+    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -48,14 +48,14 @@ export type AlignmentBaseline_StyleType = "auto" | "baseline" | "before-edge" | 
 /** Type for single animation */
 export type Animation_Single =
     {
-        name?: Extended<AnimationName_Single>;
-        duration?: Extended<CssTime>;
-        func?: Extended<TimingFunction_Single>;
-        delay?: Extended<CssTime>;
-        count?: Extended<AnimationIterationCount_Single>;
-        direction?: Extended<AnimationDirection_Single>;
-        mode?: Extended<AnimationFillMode_Single>;
-        state?: Extended<AnimationPlayState_Single>;
+        name?: ExtendedProp<AnimationName_Single>;
+        duration?: ExtendedProp<CssTime>;
+        func?: ExtendedProp<TimingFunction_Single>;
+        delay?: ExtendedProp<CssTime>;
+        count?: ExtendedProp<AnimationIterationCount_Single>;
+        direction?: ExtendedProp<AnimationDirection_Single>;
+        mode?: ExtendedProp<AnimationFillMode_Single>;
+        state?: ExtendedProp<AnimationPlayState_Single>;
     };
 
 /** Type for animation style property */
@@ -146,14 +146,14 @@ export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 /** Type for single background value */
 export type Background_Single = string | CssColor |
     {
-        color?: Extended<CssColor>,
-        image?: Extended<CssImage | string>,
-        position?: Extended<CssPosition>,
-        size?: Extended<BackgroundSize_Single>,
-        repeat?: Extended<BackgroundRepeat_Single>,
-        attachment?: Extended<BackgroundAttachment_Single>,
-        origin?: Extended<BackgroundOrigin_Single>,
-        clip?: Extended<BackgroundClip_Single>,
+        color?: ExtendedProp<CssColor>,
+        image?: ExtendedProp<CssImage | string>,
+        position?: ExtendedProp<CssPosition>,
+        size?: ExtendedProp<BackgroundSize_Single>,
+        repeat?: ExtendedProp<BackgroundRepeat_Single>,
+        attachment?: ExtendedProp<BackgroundAttachment_Single>,
+        origin?: ExtendedProp<BackgroundOrigin_Single>,
+        clip?: ExtendedProp<BackgroundClip_Single>,
     };
 
 /** Type for background style property */
@@ -253,11 +253,11 @@ export type BorderColor_StyleType = OneOrBox<CssColor>;
 /** Type for border-image style property expressed as an object. */
 export type BorderImage_Object =
     {
-        source: Extended<BorderImageSource_StyleType>,
-        slice?: Extended<BorderImageSlice_StyleType>,
-        width?: Extended<BorderImageWidth_StyleType>,
-        outset?: Extended<BorderImageOutset_StyleType>,
-        repeat?: Extended<BorderImageRepeat_StyleType>,
+        source: ExtendedProp<BorderImageSource_StyleType>,
+        slice?: ExtendedProp<BorderImageSlice_StyleType>,
+        width?: ExtendedProp<BorderImageWidth_StyleType>,
+        outset?: ExtendedProp<BorderImageOutset_StyleType>,
+        repeat?: ExtendedProp<BorderImageRepeat_StyleType>,
     };
 
 /** Type for border-image style property. */
@@ -331,7 +331,7 @@ export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
 
 /** Type for border side style property */
 export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
-    [Extended<CssLength>?, Extended<BorderStyle_Keyword>?, Extended<CssColor>?];
+    [ExtendedProp<CssLength>?, ExtendedProp<BorderStyle_Keyword>?, ExtendedProp<CssColor>?];
 
 
 
@@ -429,7 +429,7 @@ export type ColumnSpan_StyleType = "none" | "all";
 export type Columns_StyleType = "auto" | CssNumber | CssLength |
     ["auto" | Extended<CssNumber>, "auto" | Exclude<Extended<CssLength>,number>] |
     ["auto" | Exclude<Extended<CssLength>,number>, "auto" | Extended<CssNumber>];
-// Note that no special coversion function is required for this property because number type will
+// Note that no special coversion function is required for this property because the number type will
 // always be converted to a unitless number
 
 
@@ -543,13 +543,13 @@ export type Font_SystemKeyword = "caption" | "icon" | "menu" | "message-box" | "
 /** Type for font style property */
 export type Font_StyleType = string | Font_SystemKeyword |
     {
-        size: Extended<CssLength>;
-        family: string;
-        style?: Extended<FontStyle_StyleType>;
-        variant?: Extended<"normal" | "small-caps">;
-        weight?: Extended<FontWeight_StyleType>;
-        stretch?: Extended<Exclude<FontStretch_Single,number>>;
-        lineHeight?: Extended<CssNumber>
+        size: ExtendedProp<CssLength>;
+        family: ExtendedProp<string>;
+        style?: ExtendedProp<FontStyle_StyleType>;
+        variant?: ExtendedProp<"normal" | "small-caps">;
+        weight?: ExtendedProp<FontWeight_StyleType>;
+        stretch?: ExtendedProp<Exclude<FontStretch_Single,number>>;
+        lineHeight?: ExtendedProp<CssNumber>
     };
 
 
@@ -855,17 +855,17 @@ export type TextDecorationSkipInk_StyleType = "none" | "auto" | "all";
  */
 export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecorationStyle_StyleType | CssColor |
     {
-        line?: Extended<TextDecorationLine_StyleType>,
-        style?: Extended<TextDecorationStyle_StyleType>,
-        color?: Extended<CssColor>,
-        thickness?: Extended<TextDecorationThickness_StyleType>,
+        line?: ExtendedProp<TextDecorationLine_StyleType>,
+        style?: ExtendedProp<TextDecorationStyle_StyleType>,
+        color?: ExtendedProp<CssColor>,
+        thickness?: ExtendedProp<TextDecorationThickness_StyleType>,
     };
 
 
 
 // /** Type for the text-emphasis style property */
 export type TextEmphasis_StyleType = TextEmphasisStyle_StyleType | CssColor |
-    [Extended<TextEmphasisStyle_StyleType>, Extended<CssColor>];
+    [ExtendedProp<TextEmphasisStyle_StyleType>, ExtendedProp<CssColor>];
 
 /** Type for the text-emphasis-position style property */
 export type TextEmphasisPosition_StyleType = string | [Extended<"over" | "under">, Extended<"left" | "right">];
@@ -969,24 +969,20 @@ export type TransformStyle_StyleType = "flat" | "preserve-3d";
 /** Type for single transition */
 export type Transition_Single = string |
     {
-        property?: Extended<TransitionProperty_Single>;
-        duration?: Extended<CssTime>;
-        func?: Extended<TimingFunction_Single>;
-        delay?: Extended<CssTime>;
+        property?: ExtendedProp<TransitionProperty_Single>;
+        duration?: ExtendedProp<CssTime>;
+        func?: ExtendedProp<TimingFunction_Single>;
+        delay?: ExtendedProp<CssTime>;
     };
 
 /** Type for transition style property */
 export type Transition_StyleType = OneOrMany<Transition_Single>;
-
-
 
 /** Type for single transition-property */
 export type TransitionProperty_Single = "none" | "all" | keyof ICssStyleset;
 
 /** Type for transition-property style property */
 export type TransitionProperty_StyleType = OneOrMany<TransitionProperty_Single>;
-
-
 
 /** Type for transition-timing-function style property */
 export type TransitionTimingFunction_StyleType = OneOrMany<TimingFunction_Single>;
@@ -1568,17 +1564,17 @@ export interface ICssStyleset
 
 
 /**
- * The ExtendedProp extends the given generic type with the following elements:
- * - Object with a single property "!", whcih is used to mark a property as "!important".
- * - Global_StyleType, which allows any property to be assigned the global values such as
- *   "initial", "inherit", "reset" and "revert".
+ * The ExtendedStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
+ * "extended" versions of their types. These extended types are defined by adding basic keywords
+ * (e.g. "unset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
+ * is defined in the ICssStyleset interface.
  */
-export type ExtendedProp<T> = Extended<T> | { "!": Extended<T> } | Global_StyleType;
+export type ExtendedStyleset = { [K in keyof ICssStyleset]: ExtendedProp<ICssStyleset[K]> }
 
 
 
 /**
- * The ICssVarTemplates interface maps template names to the types, whcih can be used for
+ * The ICssVarTemplates interface maps template names to the types, which can be used for
  * defining custom CSS properties (a.k.a. variables). Normally, variables are defined using the
  * names of the style properties and their type is determined by the type of this property in the
  * ICssStyleset interface. Sometimes, however, there is a need to define variables of some other
@@ -1591,43 +1587,43 @@ export interface ICssVarTemplates extends ICssStyleset
     "any"?: any;
 
     /** Allows having CSS variables that accept a string value */
-    "CssString"?: string;
+    CssString?: string;
 
     /** Allows having CSS variables that accept a `<number>` CSS value */
-    "CssNumber"?: CssNumber;
+    CssNumber?: CssNumber;
 
     /** Allows having CSS variables that accept a `<length>` CSS value */
-    "CssLength"?: CssLength;
+    CssLength?: CssLength;
 
     /** Allows having CSS variables that accept an `<angle>` CSS value */
-    "CssAngle"?: CssAngle;
+    CssAngle?: CssAngle;
 
     /** Allows having CSS variables that accept a `<time>` CSS value */
-    "CssTime"?: CssTime;
+    CssTime?: CssTime;
 
     /** Allows having CSS variables that accept a `<resolution>` CSS value */
-    "CssResolution"?: CssResolution;
+    CssResolution?: CssResolution;
 
     /** Allows having CSS variables that accept a `<frequency>` CSS value */
-    "CssFrequency"?: CssFrequency;
+    CssFrequency?: CssFrequency;
 
     /** Allows having CSS variables that accept a `<percent>` CSS value */
-    "CssPercent"?: CssPercent;
+    CssPercent?: CssPercent;
 
     /** Allows having CSS variables that accept a Point value */
-    "CssPoint"?: CssPoint;
+    CssPoint?: CssPoint;
 
     /** Allows having CSS variables that accept a `<position>` CSS value */
-    "CssPosition"?: CssPosition;
+    CssPosition?: CssPosition;
 
     /** Allows having CSS variables that accept a `Radius` CSS value */
-    "CssRadius"?: CssRadius;
+    CssRadius?: CssRadius;
 
     /** Allows having CSS variables that accept a `<color>` CSS value */
-    "CssColor"?: CssColor;
+    CssColor?: CssColor;
 
     /** Allows having CSS variables that accept an `<image>` CSS value */
-    "CssImage"?: CssImage;
+    CssImage?: CssImage;
 }
 
 
@@ -1641,13 +1637,13 @@ export type VarTemplateName = keyof ICssVarTemplates;
 
 
 /**
- * The IVarTemplates type maps all template properties defined in the [[ICssVarTemplates]]
+ * The VarTemplates type maps all template properties defined in the [[ICssVarTemplates]]
  * interface to the "extended" versions of their types. These extended types are defined using
- * the [[Extended]] generic type, which adds basic keywords (e.g. "reset", "initial", etc.) as
- * well as [[IStringProxy]] and [[ICustomVar]] to the type that is defined in the ICssVarTemplates
+ * the [[Extended]] generic type, which adds basic keywords (e.g. "unset", "initial", etc.) as
+ * well as [[StringProxy]] and [[ICustomVar]] to the type that is defined in the ICssVarTemplates
  * interface.
  */
-export type IVarTemplates = { [K in VarTemplateName]: ExtendedProp<ICssVarTemplates[K]> }
+export type VarTemplates = { [K in VarTemplateName]: ExtendedProp<ICssVarTemplates[K]> }
 
 
 
@@ -1655,7 +1651,7 @@ export type IVarTemplates = { [K in VarTemplateName]: ExtendedProp<ICssVarTempla
  * The VarValueType generic type defines the type of the value that can be assigned to the custom
  * CSS property using the generic type K as its template.
  */
-export type VarValueType<K extends VarTemplateName> = IVarTemplates[K];
+export type VarValueType<K extends VarTemplateName> = VarTemplates[K];
 
 
 
@@ -1704,18 +1700,8 @@ export type VarValueType<K extends VarTemplateName> = IVarTemplates[K];
  * .blue { --different-olor: "blue"; }
  * ```
  */
-export type CustomVarStyleType<K extends VarTemplateName = any> = 
+export type CustomVar_StyleType<K extends VarTemplateName = any> = 
     [IVarRule<K>, VarValueType<K>] | [string, K, VarValueType<K>]
-
-
-
-/**
- * The ExtendedStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
- * "extended" versions of their types. These extended types are defined by adding basic keywords
- * (e.g. "reset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
- * is defined in the ICssStyleset interface.
- */
-export type ExtendedStyleset = { [K in keyof ICssStyleset]: ExtendedProp<ICssStyleset[K]> }
 
 
 
@@ -1730,7 +1716,7 @@ export type Styleset = ExtendedStyleset &
          * Special property "--" specifies an array that contains CustomVarStyleType objects each
          * representing a definition of a custom CSS property.
          */
-        "--"?: CustomVarStyleType[];
+        "--"?: CustomVar_StyleType[];
     };
 
 

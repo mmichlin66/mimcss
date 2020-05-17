@@ -473,7 +473,7 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string
         {
             // special handling of the "--" property, which is an array where each item is
             // a two-item or three-item array
-            let propVal = styleset[propName] as StyleTypes.CustomVarStyleType[];
+            let propVal = styleset[propName] as StyleTypes.CustomVar_StyleType[];
             for( let customVal of propVal)
             {
                 if (!customVal)
@@ -500,7 +500,7 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string
  * @param propVal 
  * @param valueOnly 
  */
-function customPropToString( propVal: StyleTypes.CustomVarStyleType, valueOnly?: boolean): string
+function customPropToString( propVal: StyleTypes.CustomVar_StyleType, valueOnly?: boolean): string
 {
     if (!propVal)
         return "";
