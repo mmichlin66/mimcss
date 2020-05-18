@@ -59,10 +59,10 @@ export type NthChildExpression = "odd" | "even" | number | [number, number?] | s
 
 
 /**
- * The IParameterizedPseudoEntity interface maps names of pseudo classes and pseudo elements
- * that require parameters to the type that can be used to specify these parameters
+ * The IParameterizedPseudoClass interface maps names of pseudo classes that require parameters
+ * to the type that can be used to specify these parameters.
  */
-export interface IParameterizedPseudoEntity
+export interface IParameterizedPseudoClass
 {
 	":has": string;
 	":host": string;
@@ -75,8 +75,28 @@ export interface IParameterizedPseudoEntity
 	":nth-last-child": NthChildExpression;
 	":nth-last-of-type": NthChildExpression;
 	":where": string;
+}
+
+
+
+/**
+ * The IParameterizedPseudoElement interface maps names of pseudo elements that require parameters
+ * to the type that can be used to specify these parameters.
+ */
+export interface IParameterizedPseudoElement
+{
 	"::part": string;
 	"::slotted": string;
+}
+
+
+
+/**
+ * The IParameterizedPseudoEntity interface combines IParameterizedPseudoClass and
+ * IParameterizedPseudoElement interfaces.
+ */
+export interface IParameterizedPseudoEntity extends IParameterizedPseudoClass, IParameterizedPseudoElement
+{
 }
 
 

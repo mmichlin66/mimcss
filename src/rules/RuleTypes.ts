@@ -83,7 +83,7 @@ export interface IRule
 export interface INamedEntity
 {
 	/**
-	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastructure. This name
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
@@ -185,7 +185,7 @@ export interface IIDRule extends INamedStyleRule
 export type AnimationWaypoint = OneOrMany<"from" | "to" | number>;
 
 /**
- * The AnimationStyles type defines a object containing style proprties for an animation frame.
+ * The AnimationStyles type defines a object containing style properties for an animation frame.
  * Stylesets for keyframes allow custom properties (via "--"). Animation styleset can extend
  * other style rules; however, any dependent rules will be ignored.
  */
@@ -315,7 +315,7 @@ export interface IPageRule extends IStyleRule
 	/** Optional name of the page pseudo style (e.g. "":first") */
 	readonly pseudoClass: PagePseudoClass | undefined;
 
-	/** SOM namespace rule */
+	/** SOM page rule */
 	readonly cssRule: CSSPageRule | null;
 }
 
@@ -388,8 +388,7 @@ export interface IStyleDefinitionClass<T extends StyleDefinition<O> = any, O ext
 
 
 /**
- * The ISupportRule interface represents the CSS @supports rule.
- * Objects implementing this interface are returned from the [[$supports]] function.
+ * The IGroupRule interface represents a grouping CSS rule.
  */
 export interface IGroupRule<T extends StyleDefinition = any> extends IRule
 {
@@ -403,7 +402,7 @@ export interface IGroupRule<T extends StyleDefinition = any> extends IRule
 
 
 /**
- * The ISupportRule interface represents the CSS @supports rule.
+ * The ISupportsRule interface represents the CSS @supports rule.
  * Objects implementing this interface are returned from the [[$supports]] function.
  */
 export interface ISupportsRule<T extends StyleDefinition = any> extends IGroupRule<T>

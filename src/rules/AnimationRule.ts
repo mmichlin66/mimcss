@@ -133,7 +133,6 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 			arrayItemFunc: v => valueToString( v, { fromNumber: v => v + "%" }),
 			arraySeparator: ","
 		})
-		// return typeof this.waypoint === "string" ? this.waypoint : this.waypoint + "%";
 	}
 
 	/** Identifier of the waypoint */
