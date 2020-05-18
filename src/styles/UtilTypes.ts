@@ -88,7 +88,7 @@ export type ImportantProp<T> = { "!": Extended<T> };
 
 /**
  * The ExtendedProp extends the given generic type with the following elements:
- * - Object with a single property "!", whcih is used to mark a property as "!important".
+ * - Object with a single property "!", which is used to mark a property as "!important".
  * - Global_StyleType, which allows any property to be assigned the global values such as
  *   "initial", "inherit", "unset" and "revert".
  */

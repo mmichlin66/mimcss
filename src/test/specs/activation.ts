@@ -124,6 +124,60 @@ describe("activation:", () =>
 		css.$deactivate( b!);
 		dom.expectNoStylesInHead();
 	})
+
+
+
+	it("should not create <style> elements for embedded definitions", () =>
+	{
+		class EmbeddedStyles1 extends css.StyleDefinition
+		{
+			red = css.$class({ color: "red" })
+		}
+
+		class EmbeddedStyles2 extends css.StyleDefinition
+		{
+			embedded = css.$embed( EmbeddedStyles1)
+			green = css.$class({ color: "green" })
+		}
+
+		class MyStyles extends css.StyleDefinition
+		{
+			embedded = css.$embed( EmbeddedStyles2)
+			blue = css.$class({ color: "blue" })
+		}
+
+		let myStyles1 = css.$activate( MyStyles);
+
+		let elms = dom.getAllStylesFromHead();
+		expect(elms.length).toEqual(1);
+
+		css.$deactivate( myStyles1!);
+		dom.expectNoStylesInHead();
+	})
+
+
+
+	it("should create different unique names for same-named rules for embedded definitions", () =>
+	{
+		class EmbeddedStyles extends css.StyleDefinition
+		{
+			red = css.$class({ color: "red" })
+		}
+
+		class MyStyles extends css.StyleDefinition
+		{
+			embedded = css.$embed( EmbeddedStyles)
+			red = css.$class({ color: "darkred" })
+		}
+
+		let myStyles1 = css.$activate( MyStyles);
+
+		let elms = dom.getAllStylesFromHead();
+		expect((elms[0].sheet as CSSStyleSheet).cssRules.length).toEqual(2);
+
+		css.$deactivate( myStyles1!);
+		dom.expectNoStylesInHead();
+	})
 })
 
 

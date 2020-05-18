@@ -149,11 +149,10 @@ export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTyp
 
 
 /**
- * Processes the given stylesheet definition and returns the Stylesheet object that contains
- * names of IDs, classes and keyframes and allows style manipulations. For a given stylesheet
- * definition class there is a single stylesheet object, no matter how many times this function
- * is invoked. However, if an instance, whcih has not yet been processed, is passed, then a new
- * set of rules will be created for it.
+ * Processes the given style definition class or instance and creates unique names for all named
+ * entities. For a given style definition class only a single instance is created, no matter how
+ * many times this function this function is invoked. However, if an instance, which has not yet
+ * been processed, is passed, then a new set of unique names will be created for it.
  */
 export function $use<T extends RuleTypes.StyleDefinition>(
 	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
@@ -164,11 +163,34 @@ export function $use<T extends RuleTypes.StyleDefinition>(
 
 
 /**
- * Activates the given stylesheet and inserts all its rules into DOM. If the input object is not
- * a stylesheet but a style definition class, obtain stylesheet by calling the $use function.
- * Note that each stylesheet object maintains a reference counter of how many times it was
- * activated and deactivated. The rules are inserted into DOM only when this reference counter
- * goes up to 1.
+ * Embeds the given style definition class into another style definition object. When activated,
+ * the embedded object doesn't create its own `<style>` element but uses that of its owner. This
+ * allows creating many small style definition classes instead of one huge one without incurring
+ * the overhead of many `<style>` elements.
+ * 
+ * Note that as opposed to the $use function, the $embed function always creates a new instance of
+ * the given class and doesn't associate the class with the created instance. That means that if
+ * a class is embedded into more than one "owner", two separate instances of each CSS rule will be
+ * created with different unique names.
+ */
+export function $embed<T extends RuleTypes.StyleDefinition>(
+	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
+{
+	// return definition instance without processing it. This is the indication that the defintion
+	// will be embedded into another definition.
+	return instanceOrClass instanceof RuleTypes.StyleDefinition
+		? instanceOrClass
+		: new instanceOrClass();
+}
+
+
+
+/**
+ * Activates the given style definition class or instance and inserts all its rules into DOM. If
+ * the input object is not an instance but a class, which is not yet associated with an instance,
+ * the instance is first created and processed. Note that each style definition instance maintains
+ * a reference counter of how many times it was activated and deactivated. The rules are inserted
+ * into DOM only upon first activation.
  */
 export function $activate<T extends RuleTypes.StyleDefinition>(
 	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
@@ -179,9 +201,9 @@ export function $activate<T extends RuleTypes.StyleDefinition>(
 
 
 /**
- * Deactivates the given stylesheet by removing its rules from DOM. Note that each stylesheet
- * object maintains a reference counter of how many times it was activated and deactivated. The
- * rules are removed from DOM only when this reference counter goes down to 0.
+ * Deactivates the given style definition instance by removing its rules from DOM. Note that each
+ * style definition instance maintains a reference counter of how many times it was activated and
+ * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
  */
 export function $deactivate( instance: RuleTypes.StyleDefinition): void
 {

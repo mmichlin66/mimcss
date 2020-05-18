@@ -29,10 +29,12 @@ const symRuleContainer = Symbol("ruleContainer");
  */
 class RuleContainer implements ITopLevelRuleContainer
 {
-	constructor( instance: StyleDefinition, name: string)
+	constructor( instance: StyleDefinition, name: string, embeddingContainer?: RuleContainer)
 	{
 		this.instance = instance;
 		this.name = name;
+		this.embeddingContainer = embeddingContainer;
+
 		this.definitionClass = instance.constructor as IStyleDefinitionClass;
 		this.owner = instance.owner;
 
@@ -51,7 +53,7 @@ class RuleContainer implements ITopLevelRuleContainer
 		// put reference to this container in the symbol property of the definition instance.
 		this.instance[symRuleContainer] = this;
 
-		// if the owner taken from the instance is null (that is this is a top-level definition),
+		// if the owner taken from the instance is null (that is, this is a top-level definition),
 		// change our owner property to point to the instance itself
 		if (!this.owner)
 		{
@@ -62,7 +64,7 @@ class RuleContainer implements ITopLevelRuleContainer
 			this.topLevelContainer = this.owner[symRuleContainer];
 
 		// if our container is not the top-level container, prefix our name with the upper one
-		if (!this.isTopLevel)
+		if (!this.isTopLevel && this.topLevelContainer)
 			this.name = `${this.topLevelContainer.name}_${this.name}`;
 
 		this.imports = [];
@@ -99,6 +101,10 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Processes reference to another style definition created by the $use function.
 	private processReference( ref: StyleDefinition): void
 	{
+		// if the instance has not already been processed, process it and indicate that it is
+		// embedded into our container because only definitions created with the $embed function
+		// are not processed.
+		processInstance( ref, this);
 		this.refs.push( ref);
 	}
 
@@ -223,10 +229,6 @@ class RuleContainer implements ITopLevelRuleContainer
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
 	public insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		// activate referenced style definitions
-		for( let ref of this.refs)
-			ref[symRuleContainer].activate();
-
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
 		if (parent instanceof CSSStyleSheet)
@@ -234,6 +236,10 @@ class RuleContainer implements ITopLevelRuleContainer
 			this.imports && this.imports.forEach( rule => rule.insert( parent));
 			this.namespaces && this.namespaces.forEach( rule => rule.insert( parent));
 		}
+
+		// activate referenced style definitions
+		for( let ref of this.refs)
+			ref[symRuleContainer].activate();
 
 		// isert our custom variables in a ":root" rule
 		if (this.vars.length > 0)
@@ -273,8 +279,10 @@ class RuleContainer implements ITopLevelRuleContainer
 	{
 		if (++this.activationRefCount === 1)
 		{
-			// only the top-level style defiition creates the `<style>` element
-			if (this.isTopLevel)
+			// only the top-level not-embedded style definitions create the `<style>` element
+			if (this.embeddingContainer)
+				this.domStyleElm = this.embeddingContainer.domStyleElm;
+			else if (this.isTopLevel)
 			{
 				this.domStyleElm = document.createElement( "style");
 				this.domStyleElm.id = this.name;
@@ -331,8 +339,13 @@ class RuleContainer implements ITopLevelRuleContainer
 	private owner: StyleDefinition;
 
 	// Rule container that belongs to the owner style defintion. If our container is top-level,
-	// this property points to `this`.
+	// this property points to `this`. Names for named rules are created using this container.
 	private topLevelContainer: RuleContainer;
+
+	// Container corresponding to the style definition instance that is embedding our instance
+	// (that is, the instance corresponding to our container). If defined, this container's
+	// `<style>` element is used to insert CSS rules into instead of topLevelContainer.
+	private embeddingContainer?: RuleContainer;
 
 	// List of references to other style definitions creaed via the $use function.
 	private refs: StyleDefinition[];
@@ -437,6 +450,38 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Processes the given stylesheet definition class or instance and assigns names to its rules.
+ * If the parameter is a style definition class we check whether there is an instance already
+ * created for it as a class will have only a single associated instane no matter how many times
+ * this function is called.
+ * 
+ * If the parameter is an object (an instance of the StyleDefinition class) then we check whether
+ * it has already been processed. If yes, we just return it back; if no, we assign new unique names
+ * to its rules.
+ */
+export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyleDefinitionClass,
+	owner?: StyleDefinition): StyleDefinition | null
+{
+	if (!instanceOrClass)
+		return null;
+
+	if (instanceOrClass instanceof StyleDefinition)
+	{
+		processInstance( instanceOrClass);
+		return instanceOrClass;
+	}
+	else
+	{
+		// check whether this definition class is already associated with an instance
+		return instanceOrClass.hasOwnProperty(symInstance)
+			? instanceOrClass[symInstance]
+			: processClass( instanceOrClass, owner);
+	}
+}
+
+
+
+/**
  * Processes the given style definition class by creating its instance and associating a
  * rule container object with it. The class will be associated with the instance using the
  * Symbol property. The owner parameter is a reference to the top-level style defiition
@@ -480,47 +525,30 @@ function processClass( definitionClass: IStyleDefinitionClass,
 
 
 /**
- * Processes the given stylesheet definition class or instance and assigns names to its rules.
- * If the parameter is a style definition class we check whether there is an instance already
- * created for it as a class will have only a single associated instane no matter how many times
- * this function is called.
- * 
- * If the parameter is an object (an instance of the StyleDefinition class) then we check whether
- * it has already been processed. If yes, we just return it back; if no, we assign new unique names
+ * Processes the given stylesheet definition instance and assigns names to its rules. If the
+ * instance has already been processed, we just return it back; if no, we assign new unique names
  * to its rules.
  */
-export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyleDefinitionClass,
-	owner?: StyleDefinition): StyleDefinition | null
+export function processInstance( instance: StyleDefinition, embeddingContainer?: RuleContainer): void
 {
-	if (!instanceOrClass)
-		return null;
+	// if the instance is already processed, just return it; in this case we ignore the
+	// embeddingContainer parameter.
+	let ruleContainer = instance[symRuleContainer] as RuleContainer;
+	if (ruleContainer)
+		return;
 
-	if (instanceOrClass instanceof StyleDefinition)
+	// get the name for our container
+	let name = generateUniqueName();
+	if (!useUniqueStyleNames)
 	{
-		// check whether this definition instance has already been processed
-		let ruleContainer = instanceOrClass[symRuleContainer] as RuleContainer;
-		if (!ruleContainer)
-		{
-			// get the name for our container
-			let name = generateUniqueName();
-			if (!useUniqueStyleNames)
-			{
-				let definitionClass = instanceOrClass.constructor;
-				if (definitionClass.name)
-					name += "_" + definitionClass.name;
-			}
-
-			new RuleContainer( instanceOrClass, name);
-		}
-
-		return instanceOrClass;
+		let definitionClass = instance.constructor;
+		if (definitionClass.name)
+			name += "_" + definitionClass.name;
 	}
-	else
-	{
-		return instanceOrClass.hasOwnProperty(symInstance)
-			? instanceOrClass[symInstance]
-			: processClass( instanceOrClass, owner);
-	}
+
+	// create container - this will associate the new container with the instance and process
+	// the rules.
+	new RuleContainer( instance, name, embeddingContainer);
 }
 
 

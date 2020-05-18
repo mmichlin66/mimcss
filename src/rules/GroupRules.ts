@@ -46,7 +46,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 		if (!selector)
 			return;
 
-		this.cssRule = Rule.addRuleToDOM( `${selector} {}`, parent) as CSSSupportsRule;
+		this.cssRule = Rule.addRuleToDOM( `${selector} {}`, parent) as CSSGroupingRule;
 
 		// insert sub-rules
 		if (this.cssRule)

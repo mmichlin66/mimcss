@@ -12,7 +12,7 @@ import {createNames, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
  * name, which will be used when defining and using this custom property in CSS.
  * 
  * Note that while the type parameter K is a key of the ICssStyleset interface, the value is of
- * type IStileset[K], whcih is Extended<ICssStyleset[K]>. This allows specifying values that are
+ * type IStileset[K], which is Extended<ICssStyleset[K]>. This allows specifying values that are
  * valid for the Extended roperty type.
  */
 export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
