@@ -554,11 +554,6 @@ export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" 
 
 export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnits | ResolutionUnits | FrequencyUnits;
 
-/**
- * The AttrProxy function represents an invocation of the CSS attr() functions.
- */
-export type AttrProxy = (p?: "attr") => string;
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

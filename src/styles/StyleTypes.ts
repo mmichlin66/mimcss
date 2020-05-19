@@ -1,7 +1,7 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
-    CssFrequency, CssResolution, CssRadius, UrlProxy, AttrProxy,
+    CssFrequency, CssResolution, CssRadius, UrlProxy,
     HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
@@ -441,7 +441,7 @@ export type Contain_StyleType = "none" | "strict" | "content" | "size" | "layout
 
 
 /** Type for content style property */
-export type Content_StyleType = string | OneOrMany<CssImage | AttrProxy | "none" | "normal" |
+export type Content_StyleType = string | "none" | "normal" | OneOrMany<CssImage |
     "open-quote" | "close-quote" | "no-open-quote" | "no-close-quote">;
 
 

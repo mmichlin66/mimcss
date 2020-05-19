@@ -151,8 +151,8 @@ export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTyp
 /**
  * Processes the given style definition class or instance and creates unique names for all named
  * entities. For a given style definition class only a single instance is created, no matter how
- * many times this function this function is invoked. However, if an instance, which has not yet
- * been processed, is passed, then a new set of unique names will be created for it.
+ * many times this function is invoked. However, if an instance, which has not yet been processed,
+ * is passed, then a new set of unique names will be created for it.
  */
 export function $use<T extends RuleTypes.StyleDefinition>(
 	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
@@ -219,7 +219,7 @@ export function $deactivate( instance: RuleTypes.StyleDefinition): void
  * @param enable
  * @param prefix
  */
-export function $enableShortNames( enable: boolean, prefix?: string): void
+export function enableShortNames( enable: boolean, prefix?: string): void
 {
 	return RuleContainerFuncs.enableShortNames( enable, prefix);
 }
@@ -231,7 +231,7 @@ export function $enableShortNames( enable: boolean, prefix?: string): void
  * `class` property of an HTML element.
  * @param classes
  */
-export function classes( ...classes: (RuleTypes.INamedStyleRule | Extended<string>)[]): string
+export function classes( ...classes: (RuleTypes.IClassRule | Extended<string>)[]): string
 {
 	return valueToString( classes, {
 		arrayItemFunc: v => v instanceof ClassRule ? v.name : valueToString(v)

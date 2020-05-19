@@ -1,7 +1,7 @@
 ﻿import {
 	ICssNumberMath, ICssLengthMath, ICssAngleMath, ICssTimeMath, ICssResolutionMath,
 	ICssFrequencyMath, ICssPercentMath, Extended, StringProxy,
-	UrlProxy, AttrTypeKeyword, AttrUnitKeyword, AttrProxy
+	UrlProxy, AttrTypeKeyword, AttrUnitKeyword
 } from "../styles/UtilTypes"
 import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
@@ -176,17 +176,20 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // attr()
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an AttrProxy function representing the `attr()` CSS function.
+ * Returns an AttrProxy function representing the `attr()` CSS function. It returns StringPropxy
+ * and theoretically can be used in any style property; however, its use by browsers is currently
+ * limited to the `content` property. Also no browser currently support type, units or fallback
+ * values.
  */
 export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
-	fallback?: Extended<string>): AttrProxy
+	fallback?: Extended<string>): StringProxy
 {
     return () => `attr(${attrName}${typeOrUnit ? " " + typeOrUnit : ""}${fallback ? "," + fallback : ""})`;
 }
