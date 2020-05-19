@@ -1,6 +1,6 @@
 {
 	"name": "mimcss",
-	"version": "0.5.7",
+	"version": "0.5.8",
 	"description": "Authoring CSS in TypeScript",
 	"homepage": "https://mmichlin66.github.io/mimcss/guide/mimcss-guide-introduction.html",
 	"repository": "github:mmichlin66/mimcss",
@@ -27,8 +27,8 @@
 		"@types/jasmine": "^3.5.10",
 		"ifdef-loader": "^2.1.5",
 		"source-map-loader": "^0.2.4",
-		"typescript": "^3.8.3",
-		"webpack": "^4.42.1",
+		"typescript": "^3.9.2",
+		"webpack": "^4.43.0",
 		"webpack-cli": "^3.3.8"
 	},
 	"files": [

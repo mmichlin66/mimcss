@@ -314,7 +314,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			this.cssRule.style.removeProperty( camelToDash( name));
 		else
 			this.cssRule.style.setProperty( camelToDash( name),
-				stylePropToString( name, value, true), important ? "!important" : null)
+				stylePropToString( name, value, true), important ? "!important" : undefined)
 	}
 
 
@@ -365,7 +365,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			this.cssRule.style.removeProperty( varObj.cssName);
 		else
 			this.cssRule.style.setProperty( varObj.cssName,
-				stylePropToString( varObj.template, value, true), important ? "!important" : null)
+				stylePropToString( varObj.template, value, true), important ? "!important" : undefined)
 	}
 
 

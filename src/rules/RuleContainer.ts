@@ -192,7 +192,7 @@ class RuleContainer implements ITopLevelRuleContainer
 		if (this.cssCustomVarStyleRule)
 		{
 			if (value != null)
-				this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : null);
+				this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : undefined);
 			else
 				this.cssCustomVarStyleRule.style.removeProperty( name);
 		}
