@@ -157,8 +157,8 @@ export function counter( counterObj: Extended<ICounterRule | string>,
 
 
 /**
- * Returns a StringProxy function representing the CSS `counter()` function with additional
- * optional strings added after and/or before the counter.
+ * Returns a StringProxy function representing the CSS `countesr()` function with the given
+ * separator string and additional optional strings added after and/or before the counter.
  */
 export function counters( counterObj: Extended<ICounterRule | string>,
 	separator: Extended<string>, style?: Extended<ListStyleType_StyleType>,
@@ -183,7 +183,7 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an AttrProxy function representing the `attr()` CSS function. It returns StringPropxy
+ * Returns the StringProxy function representing the `attr()` CSS function. It returns StringPropxy
  * and theoretically can be used in any style property; however, its use by browsers is currently
  * limited to the `content` property. Also no browser currently support type, units or fallback
  * values.

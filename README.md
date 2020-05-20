@@ -159,7 +159,7 @@ class MyStyles extends css.StyleDefinition
         css.$style( "h1", { fontSize: 24, fontWeight: 700 }),
         css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" }),
         ...
-]
+    ]
 }
 ```
 

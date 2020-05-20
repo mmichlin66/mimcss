@@ -4,11 +4,12 @@ module.exports =
     {
         entry:
         [
-            "./lib/test/specs/activation.js",
-            "./lib/test/specs/styleRules.js",
-            "./lib/test/specs/counters.js",
-            "./lib/test/specs/propsLength.js",
-            "./lib/test/specs/propsBorderImage.js",
+            "./lib/test/specs/testActivation.js",
+            "./lib/test/specs/testStyleRules.js",
+            "./lib/test/specs/testColors.js",
+            "./lib/test/specs/testCounters.js",
+            "./lib/test/specs/testPropsLength.js",
+            "./lib/test/specs/testPropsBorderImage.js",
         ],
 
         output:
