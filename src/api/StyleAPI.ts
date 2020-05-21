@@ -3,7 +3,7 @@ import {CssColor} from "../styles/ColorTypes"
 import {SelectorItem, SelectorProxy} from "../styles/SelectorTypes";
 import {
 	VarTemplateName, VarValueType, Styleset, FilterProxy, BasicShapeProxy,
-	TransformProxy, BorderRadius_StyleType, FillRule_StyleType
+	TransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder
 } from "../styles/StyleTypes"
 import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
 import {formatSelector} from "../styles/SelectorFuncs";
@@ -321,6 +321,97 @@ export function polygon( pointOrRule: CssPoint | FillRule_StyleType,
 
 		return s + ")";
 	};
+}
+
+
+
+/**
+ * Returns an BasicShapeProxy function representing the `polygon()` CSS function.
+ */
+export function path( fillRule?: FillRule_StyleType): IPathBuilder
+{
+	return new PathBuilder( fillRule);
+}
+
+
+
+/**
+ * The IPathBuilder interface represents the object that accumulates path commands that are then
+ * converted to a string parameter of the CSS `path()` function.
+ */
+class PathBuilder implements IPathBuilder
+{
+	private buf: string;
+
+	public constructor( fillRule?: FillRule_StyleType)
+	{
+		this.buf = "path(";
+		if (fillRule)
+			this.buf += fillRule + ",";
+
+		this.buf += "'";
+	}
+
+	// Returns the accumulated string
+	public valueToString() : string { return this.buf + "')"; }
+
+
+	
+    // Move-to command with absolute coordinates.
+	private items( command: string, ...items: (number | number[])[]): IPathBuilder
+	{
+		this.buf += " " + command;
+
+		for( let item of items)
+		{
+			if (typeof item === "number")
+				this.buf += " " + item;
+			else
+			{
+				for( let subItem of item)
+					this.buf += " " + subItem;
+			}
+		}
+
+		return this;
+	}
+
+	public M( first: [number,number], ...next: [number,number][]) { return this.items( "M", first, ...next); }
+    public m( first: [number,number], ...next: [number,number][]) { return this.items( "m", first, ...next); }
+
+	public L( first: [number,number], ...next: [number,number][]) { return this.items( "L", first, ...next); }
+    public l( first: [number,number], ...next: [number,number][]) { return this.items( "l", first, ...next); }
+
+	public H( first: number, ...next: number[]) { return this.items( "H", first, ...next); }
+    public h( first: number, ...next: number[]) { return this.items( "h", first, ...next); }
+
+	public V( first: number, ...next: number[]) { return this.items( "V", first, ...next); }
+    public v( first: number, ...next: number[]) { return this.items( "v", first, ...next); }
+
+	public C( first: [number,number,number,number,number,number],
+		...next: [number,number,number,number,number,number][]) { return this.items( "C", first, ...next); }
+	public c( first: [number,number,number,number,number,number],
+		...next: [number,number,number,number,number,number][]) { return this.items( "c", first, ...next); }
+
+	public S( first: [number,number,number,number],
+		...next: [number,number,number,number][]) { return this.items( "S", first, ...next); }
+	public s( first: [number,number,number,number],
+		...next: [number,number,number,number][]) { return this.items( "s", first, ...next); }
+
+	public Q( first: [number,number,number,number],
+		...next: [number,number,number,number][]) { return this.items( "Q", first, ...next); }
+	public q( first: [number,number,number,number],
+		...next: [number,number,number,number][]) { return this.items( "q", first, ...next); }
+
+	public T( first: [number,number], ...next: [number,number][]) { return this.items( "T", first, ...next); }
+    public t( first: [number,number], ...next: [number,number][]) { return this.items( "t", first, ...next); }
+
+	public A( first: [number,number,number,0|1,0|1,number,number],
+		...next: [number,number,number,0|1,0|1,number,number][]) { return this.items( "A", first, ...next); }
+	public a( first: [number,number,number,0|1,0|1,number,number],
+		...next: [number,number,number,0|1,0|1,number,number][]) { return this.items( "a", first, ...next); }
+
+	public z() { this.buf += " z"; return this; }
 }
 
 

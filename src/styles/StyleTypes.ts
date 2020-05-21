@@ -387,7 +387,7 @@ export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "
     "fill-box" | "stroke-box" | "view-box";
 
 /** Type for clip-path style property */
-export type ClipPath_StyleType = UrlProxy | BasicShapeProxy | GeometryBoxKeyword;
+export type ClipPath_StyleType = UrlProxy | BasicShape | GeometryBoxKeyword;
 
 
 
@@ -797,7 +797,7 @@ export type ScrollSnapType_StyleType = "none" |
 
 
 /** Type for shape-outside style property */
-export type ShapeOutside_StyleType = UrlProxy | BasicShapeProxy | GeometryBoxKeyword | CssImage;
+export type ShapeOutside_StyleType = UrlProxy | BasicShape | GeometryBoxKeyword | CssImage;
 
 
 
@@ -1078,14 +1078,91 @@ export type DefaultStyleType = string;
 export type FilterProxy = (p?: "filter") => string;
 
 /**
- * The BasicShapeProxy function represents an invocation of one the CSS `<basic-shape>` functions.
+ * The BasicShapeProxy function represents an invocation of one the CSS `<basic-shape>` functions
+ * except the `path()` function.
  */
 export type BasicShapeProxy = (p?: "basic-shape") => string;
+
+/**
+ * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions including
+ * the `path()` function.
+ */
+export type BasicShape = BasicShapeProxy | IPathBuilder;
 
 /**
  * The TransformProxy function represents an invocation of one the CSS `<basic-shape>` functions.
  */
 export type TransformProxy = (p?: "transform") => string;
+
+
+
+/**
+ * The IPathBuilder interface represents the object that accumulates path commands that are then
+ * converted to a string parameter of the CSS `path()` function.
+ */
+export interface IPathBuilder
+{
+    // Move-to command with absolute coordinates.
+    M( first: [number,number], ...next: [number,number][]): IPathBuilder;
+
+    // Move-to command with relative coordinates.
+    m( first: [number,number], ...next: [number,number][]): IPathBuilder;
+
+    // Line-to command with absolute coordinates.
+	L( first: [number,number], ...next: [number,number][]): IPathBuilder;
+
+    // Line-to command with relative coordinates.
+    l( first: [number,number], ...next: [number,number][]): IPathBuilder;
+
+    // Horizontal line-to command with absolute coordinates.
+	H( first: number, ...next: number[]): IPathBuilder;
+
+    // Horizontal line-to command with relative coordinates.
+    h( first: number, ...next: number[]): IPathBuilder;
+
+    // Vertical line-to command with absolute coordinates.
+	V( first: number, ...next: number[]): IPathBuilder;
+
+    // Vertical line-to command with relative coordinates.
+    v( first: number, ...next: number[]): IPathBuilder;
+
+    // Cubic bezier curve command with absolute coordinates.
+	C( first: [number,number,number,number,number,number],
+		...next: [number,number,number,number,number,number][]): IPathBuilder;
+
+    // Cubic bezier curve command with relative coordinates.
+	c( first: [number,number,number,number,number,number],
+		...next: [number,number,number,number,number,number][]): IPathBuilder;
+
+    // Smooth cubic bezier curve command with absolute coordinates.
+	S( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+
+    // Smooth cubic bezier curve command with relative coordinates.
+	s( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+
+    // Quadratic bezier curve command with absolute coordinates.
+	Q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+
+    // Quadratic bezier curve command with relative coordinates.
+	q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+
+    // Smooth quadratic bezier curve command with absolute coordinates.
+	T( first: [number,number], ...next: [number,number][]): IPathBuilder;
+
+    // Smooth quadratic bezier curve command with relative coordinates.
+	t( first: [number,number], ...next: [number,number][]): IPathBuilder;
+
+    // Elliptical arc curve command with absolute coordinates.
+	A( first: [number,number,number,0|1,0|1,number,number],
+		...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
+
+    // Elliptical arc curve command with relative coordinates.
+	a( first: [number,number,number,0|1,0|1,number,number],
+		...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
+
+    // Close-path command.
+    z(): IPathBuilder;
+}
 
 
 
