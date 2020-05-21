@@ -1,6 +1,5 @@
-﻿import {SelectorItem, CssSelector} from "./SelectorTypes";
-import {StyleRule} from "../rules/StyleRules"
-import {valueToString, templateStringToString} from "./UtilFuncs";
+﻿import {CssSelector} from "./SelectorTypes";
+import {valueToString} from "./UtilFuncs";
 
 
 
@@ -9,21 +8,6 @@ import {valueToString, templateStringToString} from "./UtilFuncs";
 // CSS selector.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a string representation of a selector using the given template string with optional
- * placeholders (e.g. {0}), which will be replaced by names of tags, classes and IDs and other
- * possible types.
- */
-function selectorItemToString( val: SelectorItem): string
-{
-	return valueToString( val, {
-		fromNull: v => "",
-		fromObject: v => v instanceof StyleRule ? v.selectorText : valueToString(v)
-	})
-}
-
-
 
 /**
  * Converts the given two-number tuple to a string in the form An+B.
@@ -47,21 +31,8 @@ function nthTupleToString( val: [number, number?]): string
 export function selectorToString( val: CssSelector): string
 {
 	return valueToString( val, {
-		fromAny: selectorItemToString,
 		arraySeparator: ""
 	})
-}
-
-
-
-/**
- * Returns a string representation of a selector using the given template string with optional
- * placeholders. This function is used as tag function that accepts a template string without
- * parentheses.
- */
-export function formatSelector( parts: TemplateStringsArray, params: SelectorItem[]): string
-{
-    return templateStringToString( parts, params, selectorItemToString);
 }
 
 

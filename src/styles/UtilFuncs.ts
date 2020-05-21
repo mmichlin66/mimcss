@@ -212,7 +212,7 @@ export function objectToString( val: any, propsAndFuncs: (string | [string, (val
  * parameters to a string using the given function to convert parameters.
  */
 export function templateStringToString( parts: TemplateStringsArray, params: any[],
-    convertFunc: ( v: any) => string): string
+    convertFunc?: ( v: any) => string): string
 {
     // number of parameters is always 1 less than the number of string parts
     let paramsLen = params.length;
@@ -221,7 +221,7 @@ export function templateStringToString( parts: TemplateStringsArray, params: any
 
     let s = "";
     for( let i = 0; i < paramsLen; i++)
-        s += parts[i] + convertFunc( params[i]);
+        s += parts[i] + (convertFunc ? convertFunc( params[i]) : valueToString( params[i]));
 
     // add the last part
     return s + parts[paramsLen];

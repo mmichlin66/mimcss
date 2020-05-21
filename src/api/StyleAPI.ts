@@ -6,8 +6,7 @@ import {
 	TransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder
 } from "../styles/StyleTypes"
 import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
-import {formatSelector} from "../styles/SelectorFuncs";
-import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString} from "../styles/UtilFuncs";
+import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString, templateStringToString} from "../styles/UtilFuncs";
 
 
 
@@ -17,7 +16,7 @@ import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMat
  */
 export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]): SelectorProxy
 {
-	return () => formatSelector( parts, params);
+	return () => templateStringToString( parts, params);
 }
 
 

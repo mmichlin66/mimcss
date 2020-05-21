@@ -7,7 +7,7 @@ import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
 	CssFrequencyMath, CssPercentMath, valueToString, templateStringToString
 } from "../styles/UtilFuncs"
-import {IVarRule, ICounterRule} from "../rules/RuleTypes";
+import {IVarRule, ICounterRule, IIDRule} from "../rules/RuleTypes";
 import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "../styles/StyleTypes";
 import {stylePropToString} from "../styles/StyleFuncs";
 
@@ -90,7 +90,7 @@ export let Percent: ICssPercentMath = new CssPercentMath();
  */
 export function raw( parts: TemplateStringsArray, ...params: any[]): StringProxy
 {
-    return () => templateStringToString( parts, params, (v: any) => valueToString( v));
+    return () => templateStringToString( parts, params);
 }
 
 
@@ -122,9 +122,10 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 
 /**
  * Returns a UrlProxy function representing the CSS `url()` function. The string parameter
- * will be wrapped in a "url()" invocation.
+ * will be wrapped in a "url()" invocation. The function can also accept the IIDRule object to
+ * create url(#element) invocation, whcih is often used to address SVG elements by their IDs.
  */
-export function url( val: Extended<string>): UrlProxy
+export function url( val: Extended<string | IIDRule>): UrlProxy
 {
 	return () => `url(${valueToString(val)})`;
 }

@@ -256,6 +256,18 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
+	/**
+	 * This function allows the object to particpate in "valueToString" serialization. Whenever
+	 * the StyleRule-derived object is encountered by the `UtilFunc.valueToString` function,
+	 * the rule's selector will be used.
+	 */
+	public valueToString(): string
+	{
+		return this.selectorText;
+	}
+
+
+
 	// Creates a new style rule object of the proper type, but without the styleset and dependent
 	// rules.
 	protected abstract cloneObject(): StyleRule;
