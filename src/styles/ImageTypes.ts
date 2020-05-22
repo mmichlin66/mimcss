@@ -75,11 +75,6 @@ export type GradientStopOrHint = GradientStop | GradientHint;
  */
 export type RadialGradientShape = Extended<"circle" | "ellipse">;
 
-/**
- * Type representing extent for the `radial-gradient()` CSS function.
- */
-export type RadialGradientExtent = Extended<"closest-corner" | "closest-side" | "farthest-corner" | "farthest-side">;
-
 
 
 /**

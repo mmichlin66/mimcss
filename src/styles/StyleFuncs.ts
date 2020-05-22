@@ -2,9 +2,9 @@
 import {ExtendedStyleset} from "./StyleTypes"
 import {Extended, CssRadius, OneOrMany, CssMultiLength, CssMultiTime} from "./UtilTypes";
 import {
-    camelToDash, valueToString, arrayToString, objectToString, IValueConvertOptions,
+    camelToDash, dashToCamel, valueToString, arrayToString, IValueConvertOptions,
     positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
-    CssAngleMath, CssFrequencyMath, CssPercentMath, CssResolutionMath, unitlessOrPercentToString
+    CssAngleMath, CssFrequencyMath, CssPercentMath, CssResolutionMath, unitlessOrPercentToString,
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -152,7 +152,7 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize
  */
 function borderImageToString( val: StyleTypes.BorderImage_Object): string
 {
-    // if width is specified, but slice is net we need to set slice to the default 100% value;
+    // if width is specified, but slice is not, we need to set slice to the default 100% value;
     // if outset is specified but width is not. we need to set width to the default 1 value;
     let valCopy: StyleTypes.BorderImage_Object = Object.assign( {}, val);
     if (val.slice == null && (val.width != null || val.outset != null))
@@ -162,9 +162,9 @@ function borderImageToString( val: StyleTypes.BorderImage_Object): string
 
     return objectToString( valCopy, [
         "source",
-        ["slice", borderImageSliceToString],
-        ["width", CssNumberMath.styleToString, "/"],
-        ["outset", CssNumberMath.styleToString, "/"],
+        ["slice", "borderImageSlice"],
+        ["width", null, "/"],
+        ["outset",null, "/"],
         "repeat"
     ]);
 }
@@ -337,7 +337,7 @@ function font_fromObject( val: any): string
         "weight",
         "stretch",
         ["size", CssLengthMath.styleToString],
-        ["lineHeight", v => v.toString() , "/"],
+        ["lineHeight", null, "/"],
         "family"
     ]);
 }
@@ -382,6 +382,82 @@ function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>
     return valueToString( val, {
         fromObject: singleTransition_fromObject
     });
+}
+
+
+
+function offsetToString( val: StyleTypes.Offset_StyleType): string
+{
+    return objectToString( val, [
+        ["position", "offsetPosition"],
+        ["path", "offsetPath"],
+        ["distance", "offsetDistance"],
+        ["rotate", "offsetRotate"],
+        ["anchor", "offsetAnchor", "/"],
+    ]);
+}
+
+
+
+/** Type defnition of a function that takes a value and converts it to string */
+export type ToStringFunc = (val: any) => string;
+
+
+
+
+/**
+ * Converts the given value to a CSS string using the info parameter to inform how the object's
+ * properties should be converted to strings. The info parameter is an array of either strings
+ * or two- or thre-element tuples. The only string and the first tuple element corresponds to a
+ * property expected in the value object to be converted. Each property is converted according
+ * to the following rules:
+ * - If the array item is just a string, the corresponding value's property is converted using
+ *   the valueToString function.
+ * - If the second element is null or undefined, the corresponding value's property is converted using
+ *   the valueToString function..
+ * - If the second element is a string it is treated as a name of a longhand style property. The
+ *   value's property is converted using the stylePropToString function for this longhand style
+ *   property.
+ * - If the second element is a function, it is used to convert the value's property.
+ * - If a third element exists in the tuple it is treated as a prefix to be placed before the
+ *   converted property value.
+ * 
+ * The order of the names determines in which order the properties should be added to the string.
+ */
+export function objectToString( val: any,
+    info: (string | [string, null | string | ToStringFunc, string?] )[],
+    separator: string = " "): string
+{
+    if (val == null)
+        return "";
+    else if (typeof val !== "object")
+        return val.toString();
+
+    let buf: (string)[] = [];
+    info.forEach( nameOrTuple =>
+    {
+        // get the name of the property in the value to be converted and the corresponding value;
+        // if the properties value is not defined, skip it.
+        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
+        let propVal = val[propName];
+        if (propVal == null)
+            return;
+
+        // check whether we have a prefix
+        let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
+        if (prefix)
+            buf.push( prefix);
+
+        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+        if (!convertor)
+            buf.push( valueToString( propVal));
+        else if (typeof convertor === "string")
+            buf.push( stylePropToString( convertor, propVal, true));
+        else
+            buf.push( convertor( propVal));
+    });
+
+	return buf.join(separator);
 }
 
 
@@ -536,7 +612,8 @@ function customPropToString( propVal: StyleTypes.CustomVar_StyleType, valueOnly?
 
 
 /**
- * Converts the given style property to the CSS style string
+ * Converts the given style property to the CSS style string. Property name cn be in either
+ * dash or camel form.
  * @param style 
  */
 export function stylePropToString( propName: string, propVal: any, valueOnly?: boolean): string
@@ -545,7 +622,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         return "";
 
     // find information object for the property
-    let info: any = StylePropertyInfos[propName];
+    let info: any = StylePropertyInfos[dashToCamel(propName)];
 
     // if the property value is an object with the "!" property, then the actual value is the
     // value of this property and we also need to set the "!important" flag
@@ -560,7 +637,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         ? valueToString( varValue)
         : typeof info === "object"
             ? valueToString( varValue, info as IValueConvertOptions)
-            : (info as PropToStringFunc)( varValue);
+            : (info as ToStringFunc)( varValue);
 
     if (!stringValue && !valueOnly)
         stringValue = "initial";
@@ -579,14 +656,6 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// /** Type defnition of a function that takes property value and converts it to string */
-// type PropToStringFunc<K extends StyleTypes.VarTemplateName = any> = (val: StyleTypes.VarValueType<K>) => string;
-
-/** Type defnition of a function that takes property value and converts it to string */
-type PropToStringFunc = (val: any) => string;
-
-
-
 // Helper object that is used to indicate that values in an array should be separated by comma.
 // We use it many times in the stucture below.
 let commaArraySeparator = { arraySeparator: "," };
@@ -597,7 +666,7 @@ let commaArraySeparator = { arraySeparator: "," };
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFunc | IValueConvertOptions) } =
+const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | IValueConvertOptions) } =
 {
     animation: {
         fromObject: singleAnimation_fromObject,
@@ -652,7 +721,6 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
         fromObject: borderImageToString,
     },
     borderImageSlice: borderImageSliceToString,
-    borderImageWidth: multiLengthToStringWithSpace,
     borderInlineEnd: borderToString,
     borderInlineEndColor: colorToString,
     borderInlineEndWidth: CssLengthMath.styleToString,
@@ -738,6 +806,13 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (PropToStringFun
     minZoom: CssPercentMath.styleToString,
 
     objectPosition: positionToString,
+    offset: offsetToString,
+    offsetAnchor: positionToString,
+    offsetDistance: CssLengthMath.styleToString,
+    offsetPosition: positionToString,
+    offsetRotate: {
+        fromAny: CssAngleMath.styleToString
+    },
     outline: borderToString,
     outlineColor: colorToString,
     outlineOffset: CssLengthMath.styleToString,

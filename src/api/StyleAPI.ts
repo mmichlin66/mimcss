@@ -3,7 +3,7 @@ import {CssColor} from "../styles/ColorTypes"
 import {SelectorItem, SelectorProxy} from "../styles/SelectorTypes";
 import {
 	VarTemplateName, VarValueType, Styleset, FilterProxy, BasicShapeProxy,
-	TransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder
+	TransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder, RayProxy, ExtentKeyword
 } from "../styles/StyleTypes"
 import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
 import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString, templateStringToString} from "../styles/UtilFuncs";
@@ -319,6 +319,23 @@ export function polygon( pointOrRule: CssPoint | FillRule_StyleType,
 		s += points.map( pt => CssLengthMath.multiStyleToString( pt, " ")).join(",");
 
 		return s + ")";
+	};
+}
+
+
+
+/**
+ * Returns an RayProxy function representing the `ray()` CSS function.
+ */
+export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
+	contain?: boolean): RayProxy
+{
+	return () =>
+	{
+		let angleString = CssAngleMath.styleToString( angle);
+		let sizeString = size =! null ? "," + CssLengthMath.styleToString( size) : "";
+		let containString = contain ? ",contain" : "";
+		return `ray(${angleString}${sizeString}${containString})`;
 	};
 }
 

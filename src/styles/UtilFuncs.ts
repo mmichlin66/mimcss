@@ -163,49 +163,6 @@ export function arrayToString( val: any[], func?: (v) => string, separator: stri
 
 
 
-/**
- * Converts the given object to a CSS string.
- * @param val Object to convert to string.
- * @param usePropNames Flag indicating whether the names of the object's proprties should be added to the string.
- * @param propsAndFuncs Array of property names and optionally functions. The order of the names determines in
- *     which order the properties should be added to the string. If a function is present for the property,
- *     it will be used to convert the property's value to the string. If a function is not present, then the
- *     property value should be converted to the string using the valueToString function.
- */
-export function objectToString( val: any, propsAndFuncs: (string | [string, (val: any) => string, string?])[],
-    separator: string = " ", usePropNames: boolean = false): string
-{
-    if (val == null || propsAndFuncs.length === 0)
-        return "";
-
-    let buf: (string)[] = [];
-    propsAndFuncs.forEach( propAndFunc =>
-        {
-            let propName = typeof propAndFunc === "string" ? propAndFunc : propAndFunc[0];
-
-            let propVal = val[propName];
-            if (propVal == null)
-                return;
-
-            if (usePropNames)
-                buf.push( propName);
-
-            let prefix = typeof propAndFunc === "string" ? undefined : propAndFunc[2];
-            if (prefix)
-                buf.push( prefix);
-
-            let func = typeof propAndFunc === "string" ? undefined : propAndFunc[1];
-            if (func)
-                buf.push( func( propVal));
-            else if (propVal != null)
-                buf.push( valueToString( propVal));
-        }
-    );
-
-	return buf.join(separator);
-}
-
-
 
 /**
  * The templateStringToString is a tag function helper that converts the template string with

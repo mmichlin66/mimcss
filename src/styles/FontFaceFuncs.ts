@@ -1,5 +1,6 @@
 ﻿import * as FontFaceTypes from "./FontFaceTypes"
 import * as UtilFuncs from "./UtilFuncs"
+import {objectToString} from "./StyleFuncs";
 
 
 
@@ -77,7 +78,7 @@ function fontSrcToString( val: FontFaceTypes.FontSrc_FontFaceType): string
 
 function fontSingleSrcToString( val: FontFaceTypes.FontSrc_Single): string
 {
-    return UtilFuncs.objectToString( val, [
+    return objectToString( val, [
         ["local", v => `local(${v})`],
         ["url", v => `url(${v})`],
         ["format", v => `format(${fontFormatToString(v)})`]

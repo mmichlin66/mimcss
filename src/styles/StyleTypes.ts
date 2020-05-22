@@ -263,7 +263,10 @@ export type BorderImage_Object =
 /** Type for border-image style property. */
 export type BorderImage_StyleType = string | CssImage | BorderImage_Object;
 
-/** Type for border-image-outset style property */
+/**
+ * Type for border-image-outset style property. It is CssNumber and not CssLength because
+ * border-image-outset can be specified as a unitless number.
+ */
 export type BorderImageOutset_StyleType = OneOrBox<CssNumber | string>;
 
 /** Type for border-image-repeat keywords */
@@ -282,7 +285,10 @@ export type BorderImageSlice_StyleType = OneOrBox<CssNumber | string> |
 /** Type for border-image-source style property */
 export type BorderImageSource_StyleType = OneOrBox<CssImage | string>;
 
-/** Type for border-image-width style property */
+/**
+ * Type for border-image-width style property. It is CssNumber and not CssLength because
+ * border-image-width can be specified as a unitless number.
+ */
 export type BorderImageWidth_StyleType = OneOrBox<CssNumber | "auto" | string>;
 
 
@@ -386,8 +392,18 @@ export type Clip_StyleType = "auto" | CssLengthBox;
 export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
     "fill-box" | "stroke-box" | "view-box";
 
+
+
+/**
+ * Type representing extent for the `radial-gradient()` or `ray()` CSS function.
+ */
+export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
+
+
+
 /** Type for clip-path style property */
-export type ClipPath_StyleType = UrlProxy | BasicShape | GeometryBoxKeyword;
+export type ClipPath_StyleType = "none" | UrlProxy | BasicShape | GeometryBoxKeyword |
+    [GeometryBoxKeyword, BasicShape];
 
 
 
@@ -684,6 +700,34 @@ export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_St
 
 /** Type for the object-fit style property */
 export type ObjectFit_StyleType = "fill" | "contain" | "cover" | "none" | "scale-down";
+
+
+
+/** Type for the offset style property */
+export type Offset_StyleType = string | OffsetPath_StyleType |
+{
+    anchor?: OffsetAnchor_StyleType,
+    distance?: CssLength,
+    path?: OffsetPath_StyleType,
+    position?: CssPosition,
+    rotate?: OffsetRotate_StyleType,
+}
+
+
+
+/** Type for the offset-anchor style property */
+export type OffsetAnchor_StyleType = "auto" | CssPosition;
+
+
+
+/** Type for offset-path style property */
+export type OffsetPath_StyleType = "none" | RayProxy | UrlProxy | BasicShape | GeometryBoxKeyword |
+    [GeometryBoxKeyword, BasicShape];
+
+
+
+/** Type for the offset-rotate style property */
+export type OffsetRotate_StyleType = "auto" | "reverse" | CssAngle | ["auto", CssAngle];
 
 
 
@@ -1090,6 +1134,11 @@ export type BasicShapeProxy = (p?: "basic-shape") => string;
 export type BasicShape = BasicShapeProxy | IPathBuilder;
 
 /**
+ * The RayProxy function represents an invocation of one the CSS `ray()` functions.
+ */
+export type RayProxy = (p?: "ray") => string;
+
+/**
  * The TransformProxy function represents an invocation of one the CSS `<basic-shape>` functions.
  */
 export type TransformProxy = (p?: "transform") => string;
@@ -1409,10 +1458,12 @@ export interface ICssStyleset
 
     objectFit?: ObjectFit_StyleType;
     objectPosition?: CssPosition;
-    offset?: DefaultStyleType;
-    offsetDistance?: DefaultStyleType;
-    offsetPath?: DefaultStyleType;
-    offsetRotate?: DefaultStyleType;
+    offset?: Offset_StyleType;
+    offsetAnchor?: OffsetAnchor_StyleType
+    offsetDistance?: CssLength;
+    offsetPath?: OffsetPath_StyleType;
+    offsetPosition?: CssPosition;
+    offsetRotate?: OffsetRotate_StyleType;
     opacity?: CssPercent;
     order?: CssNumber;
     orientation?: Orientation_StyleType;
