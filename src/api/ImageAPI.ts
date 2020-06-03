@@ -1,68 +1,37 @@
-﻿import {Extended, CssPosition, SimpleCssPosition, CssAngle} from "../styles/UtilTypes"
-import {ExtentKeyword} from "../styles/StyleTypes";
+﻿import {Extended, CssPosition, SimpleCssPosition, CssAngle, CssLength} from "../styles/UtilTypes"
 import {
-    GradientStopOrHint, GradientColorAndLength, LinearGradAngle, RadialGradientShape,
-    CrossFadeParam, ImageProxy
+    GradientStopOrHint, GradientColorAndLength, LinearGradAngle,
+    CrossFadeParam, ImageProxy, RadialGradientShape, RadialGradientSize, 
+    IGradient, ILinearGradient, IRadialGradient, IConicGradient
 } from "../styles/ImageTypes"
 import {colorToString} from "../styles/ColorFuncs";
-import {valueToString, INumberMathClass, CssAngleMath, positionToString, CssPercentMath} from "../styles/UtilFuncs";
+import {valueToString, INumberMathClass, CssAngleMath, positionToString, CssPercentMath, CssLengthMath} from "../styles/UtilFuncs";
+import { ExtentKeyword } from "../styles/StyleTypes";
 
 
 
 /**
- * Returns an ImageProxy function representing the `linear-gradient()` CSS function.
+ * The Gradient class implements the IGradient interface using property get accessor, whcih allows
+ * createing a new instance of the approprient gradient interface. We need new instances, because
+ * the functions implementing these callable interfaces keep optional parameters as properties of
+ * the fucntion objects themselves.
  */
-export function linearGradient( angle?: LinearGradAngle,
-    ...stopsOrHints: GradientStopOrHint[]): ImageProxy
+class Gradient implements IGradient
 {
-    return () => linearGradientToString( "linear-gradient", angle, stopsOrHints);
+    public get linear(): ILinearGradient { return linearGradientFunc( "linear-gradient"); }
+    public get repeatingLinear(): ILinearGradient { return linearGradientFunc( "repeating-linear-gradient"); }
+    public get radial(): IRadialGradient { return radialGradientFunc( "radial-gradient"); }
+    public get repeatingRadial(): IRadialGradient { return radialGradientFunc( "repeating-radial-gradient"); }
+    public get conic(): IConicGradient { return conicGradientFunc( "conic-gradient"); }
+    public get repeatingConic(): IConicGradient { return conicGradientFunc( "repeating-conic-gradient"); }
 }
 
 
 
 /**
- * Returns an ImageProxy function representing the `repeating-linear-gradient()` CSS function.
+ * The gradient variable provides access to functions implementing the `<gradient>` CSS functions.
  */
-export function repeatingLinearGradient( angle?: LinearGradAngle,
-    ...stopsOrHints: GradientStopOrHint[]): ImageProxy
-{
-    return () => linearGradientToString( "repeating-linear-gradient", angle, stopsOrHints);
-}
-
-
-
-/**
- * Returns an ImageProxy function representing the `radial-gradient()` CSS function.
- */
-export function radialGradient( shape?: RadialGradientShape,
-    extent?: ExtentKeyword, pos?: CssPosition,
-    ...stopsOrHints: GradientStopOrHint[]): ImageProxy
-{
-    return () => radialGradientToString( "radial-gradient", shape, extent, pos, stopsOrHints);
-}
-
-
-
-/**
- * Returns an ImageProxy function representing the `repeating-radial-gradient()` CSS function.
- */
-export function repeatingRadialGradient( shape?: RadialGradientShape,
-    extent?: ExtentKeyword, pos?: CssPosition,
-    ...stopsOrHints: GradientStopOrHint[]): ImageProxy
-{
-    return () => radialGradientToString( "repeating-radial-gradient", shape, extent, pos, stopsOrHints);
-}
-
-
-
-/**
- * Returns an ImageProxy function representing the`conic-gradient()`  CSS function.
- */
-export function conicGradient( angle?: Extended<CssAngle>, pos?: SimpleCssPosition,
-    ...stopsOrHints: GradientStopOrHint[]): (img?:"image") => string
-{
-    return () => conicGradientToString( angle, pos, stopsOrHints);
-}
+export let gradient: IGradient = new Gradient();
 
 
 
@@ -72,6 +41,145 @@ export function conicGradient( angle?: Extended<CssAngle>, pos?: SimpleCssPositi
 export function crossFade( ...args: CrossFadeParam[]): ImageProxy
 {
     return () => crossFadeToString( args);
+}
+
+
+
+/**
+ * Function returning the ILinearGradient interface for either `liner-gradient` or
+ * `repeating-liner-gradient` CSS functions.
+ */
+function linearGradientFunc( name: string): ILinearGradient
+{
+    let f: any = (...stopsOrHints: GradientStopOrHint[]): ImageProxy =>
+        () => linearGradientToString( name, stopsOrHints, f.angleParam);
+
+	f.to = (angle: LinearGradAngle) => {
+        f.angleParam = angle;
+        return f;
+    }
+    
+	return f;
+}
+
+
+
+/**
+ * Function returning the IRadialGradient interface for either `radial-gradient` or
+ * `repeating-radial-gradient` CSS functions.
+ */
+function radialGradientFunc( name: string): IRadialGradient
+{
+    let f: any = (...stopsOrHints: GradientStopOrHint[]): ImageProxy =>
+        () => radialGradientToString( name, stopsOrHints, f.shapeParam, f.sizeParam, f.posParam);
+
+    f.circle = (sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>) => {
+        f.shapeParam = "circle";
+        f.sizeParam = sizeOrExtent;
+        return f;
+    }
+
+	f.ellipse = (sizeOrExtent?: [Extended<CssLength>, Extended<CssLength>] | Extended<ExtentKeyword>) => {
+        f.shapeParam = "ellipse";
+        f.sizeParam = sizeOrExtent;
+        return f;
+    }
+
+	f.extent = (extent: Extended<ExtentKeyword>) => {
+        f.sizeParam = extent;
+        return f;
+    }
+
+	f.at = (pos: Extended<CssPosition>) => {
+        f.posParam = pos; return f;
+    }
+
+	return f;
+}
+
+
+
+/**
+ * Function returning the IConicGradient interface for either `conic-gradient` or
+ * `repeating-conic-gradient` CSS functions.
+ */
+function conicGradientFunc( name: string): IConicGradient
+{
+    let f: any = (...stopsOrHints: GradientStopOrHint[]): ImageProxy =>
+        () => conicGradientToString( name, stopsOrHints, f.angleParam, f.posParam);
+
+	f.from = (angle: LinearGradAngle) => {
+        f.angleParam = angle;
+        return f;
+    }
+
+	f.at = (pos: Extended<SimpleCssPosition>) => {
+        f.posParam = pos;
+        return f;
+    }
+
+	return f;
+}
+
+
+
+function linearGradientToString( name: string, stopsOrHints: GradientStopOrHint[],
+    angle?: LinearGradAngle): string
+{
+    let angleString = "";
+    if (angle)
+    {
+        angleString = valueToString( angle, {
+            fromNumber: CssAngleMath.convertFunc,
+            fromString: v => /\d+.*/.test(v) ? v : "to " + v
+        }) + ",";
+    }
+
+    return `${name}(${angleString}${gradientStopsOrHintsToString( stopsOrHints, CssPercentMath)})`;
+}
+
+
+
+function radialGradientToString( name: string, stopsOrHints: GradientStopOrHint[],
+    shape: RadialGradientShape, sizeOrExtent: RadialGradientSize | Extended<ExtentKeyword>,
+    pos: CssPosition): string
+{
+    let shapeString = shape ? shape : "";
+    let sizeOrExtentString = sizeOrExtent ? CssLengthMath.multiStyleToString( sizeOrExtent, " ") : "";
+    let posString = pos ? `at ${positionToString( pos)}` : "";
+    let whatAndWhere = shape || sizeOrExtentString || pos ? `${shapeString} ${sizeOrExtentString} ${posString},` : "";
+    return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, CssPercentMath)})`;
+}
+
+
+
+function conicGradientToString( name: string, stopsOrHints: GradientStopOrHint[],
+    angle?: Extended<CssAngle>, pos?: Extended<SimpleCssPosition>): string
+{
+    let angleString = angle ? `from ${CssAngleMath.styleToString( angle)}` : "";
+    let posString = pos ? `at ${positionToString( pos)}` : "";
+    let whatAndWhere = angle || pos ? `${angleString} ${posString},` : "";
+    return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, CssAngleMath)})`;
+}
+
+
+
+function crossFadeToString( args: CrossFadeParam[]): string
+{
+    let paramsString = valueToString( args, {
+        arrayItemFunc: crossFadeParamToString,
+        arraySeparator: ","
+    })
+
+    return `cross-fade(${paramsString})`;
+}
+
+
+
+function gradientStopsOrHintsToString<T extends string>( val: GradientStopOrHint[],
+    mathClass: INumberMathClass<T>): string
+{
+    return val.map( v => gradientStopOrHintToString( v, mathClass)).join(",");
 }
 
 
@@ -97,59 +205,11 @@ function gradientColorAndLengthToString<T extends string>( val: GradientColorAnd
 
 
 
-function linearGradientToString( name: string, angle: LinearGradAngle,
-    stopsOrHints: GradientStopOrHint[]): string
-{
-    let angleString = angle ? CssAngleMath.styleToString( angle) + "," : "";
-    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, CssPercentMath));
-    return `${name}(${angleString}${buf.join(",")})`;
-}
-
-
-
-function radialGradientToString( name: string, shape: RadialGradientShape,
-    extent: Extended<ExtentKeyword>, pos: CssPosition,
-    stopsOrHints: GradientStopOrHint[]): string
-{
-    let shapeString = shape ? shape : "";
-    let extentString = extent ? extent : "";
-    let posString = pos ? `at ${positionToString( pos)}` : "";
-    let whatAndWhere = shape || extentString || pos ? `${shapeString} ${extentString} ${posString},` : "";
-    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, CssPercentMath));
-    return `${name}(${whatAndWhere}${buf.join(",")})`;
-}
-
-
-
-function conicGradientToString( angle: Extended<CssAngle>, pos: SimpleCssPosition,
-    stopsOrHints: GradientStopOrHint[]): string
-{
-    let angleString = angle ? `from ${CssAngleMath.styleToString( angle)}` : "";
-    let posString = pos ? `at ${positionToString( pos)}` : "";
-    let whatAndWhere = angle || pos ? `${angleString} ${posString},` : "";
-    let buf = stopsOrHints.map( stopOrHint => gradientStopOrHintToString( stopOrHint, CssAngleMath));
-    return `conic-gradient(${whatAndWhere}${buf.join(",")})`;
-}
-
-
-
 function crossFadeParamToString( val: CrossFadeParam): string
 {
     return valueToString( val, {
         fromArray: v => `${valueToString(v[0])},${CssPercentMath.styleToString(v[1])}`
     });
-}
-
-
-
-function crossFadeToString( args: CrossFadeParam[]): string
-{
-    let paramsString = valueToString( args, {
-        arrayItemFunc: crossFadeParamToString,
-        arraySeparator: ","
-    })
-
-    return `cross-fade(${paramsString})`;
 }
 
 
