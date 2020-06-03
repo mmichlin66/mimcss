@@ -1,4 +1,4 @@
-﻿import {Extended, CssPosition, SimpleCssPosition, CssAngle, CssLength} from "../styles/UtilTypes"
+﻿import {Extended, CssPosition, CssAngle, CssLength} from "../styles/UtilTypes"
 import {
     GradientStopOrHint, GradientColorAndLength, LinearGradAngle,
     CrossFadeParam, ImageProxy, RadialGradientShape, RadialGradientSize, 
@@ -113,7 +113,7 @@ function conicGradientFunc( name: string): IConicGradient
         return f;
     }
 
-	f.at = (pos: Extended<SimpleCssPosition>) => {
+	f.at = (pos: Extended<CssPosition>) => {
         f.posParam = pos;
         return f;
     }
@@ -154,7 +154,7 @@ function radialGradientToString( name: string, stopsOrHints: GradientStopOrHint[
 
 
 function conicGradientToString( name: string, stopsOrHints: GradientStopOrHint[],
-    angle?: Extended<CssAngle>, pos?: Extended<SimpleCssPosition>): string
+    angle?: Extended<CssAngle>, pos?: Extended<CssPosition>): string
 {
     let angleString = angle ? `from ${CssAngleMath.styleToString( angle)}` : "";
     let posString = pos ? `at ${positionToString( pos)}` : "";

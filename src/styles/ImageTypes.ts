@@ -2,7 +2,7 @@
  * This module contains types used to define CSS `<image>` type and related functions.
  */
 
-import {UrlProxy, Extended, CssNumber, CssAngle, NumberBase, CssLength, SimpleCssPosition, CssPosition} from "./UtilTypes"
+import {UrlProxy, Extended, CssNumber, CssAngle, NumberBase, CssLength, CssPosition} from "./UtilTypes"
 import {CssColor} from "./ColorTypes";
 import { ExtentKeyword } from "./StyleTypes";
 
@@ -144,7 +144,7 @@ export interface IConicGradient
 {
     (...stopsOrHints: GradientStopOrHint[]): ImageProxy;
 	from( angle: Extended<CssAngle>): IConicGradient;
-	at( pos: Extended<SimpleCssPosition>): IConicGradient;
+	at( pos: Extended<CssPosition>): IConicGradient;
 }
 
 
