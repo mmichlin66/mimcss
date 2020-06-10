@@ -1692,12 +1692,20 @@ export interface ICssStyleset
 
 
 /**
+ * The StringStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
+ * string values.
+ */
+export type StringStyleset = { [K in keyof ICssStyleset]?: string }
+
+
+
+/**
  * The ExtendedStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
  * "extended" versions of their types. These extended types are defined by adding basic keywords
  * (e.g. "unset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
  * is defined in the ICssStyleset interface.
  */
-export type ExtendedStyleset = { [K in keyof ICssStyleset]: ExtendedProp<ICssStyleset[K]> }
+export type ExtendedStyleset = { [K in keyof ICssStyleset]?: ExtendedProp<ICssStyleset[K]> }
 
 
 

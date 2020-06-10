@@ -542,71 +542,54 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string
     if (!styleset)
         return "";
 
-    let buf: string[] = [];
-	for( let propName in styleset)
-	{
-        if (propName === "--")
-        {
-            // special handling of the "--" property, which is an array where each item is
-            // a two-item or three-item array
-            let propVal = styleset[propName] as StyleTypes.CustomVar_StyleType[];
-            for( let customVal of propVal)
-            {
-                if (!customVal)
-                    continue;
+    let s = "";
 
-                buf.push( customPropToString( customVal, false));
-            }
-        }
+	forAllPropsInStylset( styleset, (name: string, value: string, isCustom: boolean): void => {
+        if (isCustom)
+            s += `${name}:${value};`;
         else
-        {
-            // get the string representation of the property
-            buf.push( stylePropToString( propName, styleset[propName]));
-        }
-	}
+            s += `${camelToDash(name)}:${value};`;
+    });
 
-    // join all elements in the array except nulls, undefined and empty strings
-    return buf.filter( item => item != null).join(";");
+    return s;
 }
 
 
 
 /**
- * Converts the given custom CSS property definition to string.
- * @param propVal 
- * @param valueOnly 
+ * Extracts name and string values from the given custom CSS property definition.
+ * @param customVal 
  */
-function customPropToString( propVal: StyleTypes.CustomVar_StyleType, valueOnly?: boolean): string
+export function getCustomPropNameAndValue( customVal: StyleTypes.CustomVar_StyleType): [string?,string?]
 {
-    if (!propVal)
-        return "";
+    if (!customVal)
+        return [];
 
     let varName: string;
     let template: string;
     let value: any;
-    if (propVal.length === 2)
+    if (customVal.length === 2)
     {
-        varName = (propVal[0] as VarRule).cssName;
-        template = propVal[0].template;
-        value = propVal[1]
+        varName = (customVal[0] as VarRule).cssName;
+        template = customVal[0].template;
+        value = customVal[1]
     }
     else
     {
-        varName = propVal[0];
+        varName = customVal[0];
         if (!varName)
-            return "";
+            return [];
         else if (!varName.startsWith("--"))
             varName = "--" + varName;
 
-        template = propVal[1];
+        template = customVal[1];
         if (!varName || !template)
-            return "";
+            return [];
 
-        value = propVal[2];
+        value = customVal[2];
     }
 
-    let varValue = stylePropToString( template, value, true);
-    return valueOnly ? varValue : `${varName}:${varValue}`;
+    return [varName, stylePropToString( template, value, true)];
 }
 
 
@@ -646,6 +629,47 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         stringValue += " !important";
 
     return valueOnly ? stringValue : `${camelToDash( propName)}:${stringValue}`;
+}
+
+
+
+/**
+ * For each property - regular and custom - in the given styleset invokes the appropriate
+ * function that gets the property name and the value converted to string.
+ * @param styleset 
+ * @param forProp 
+ * @param forCustomProp 
+ */
+export function forAllPropsInStylset( styleset: StyleTypes.Styleset,
+    forProp: (name: string, val: any, isCustom: boolean) => void)
+{
+	for( let propName in styleset)
+	{
+		if (propName === "--")
+		{
+			// special handling of the "--" property, which is an array where each item is
+			// a two-item or three-item array
+			let propVal = styleset[propName] as StyleTypes.CustomVar_StyleType[];
+			for( let customVal of propVal)
+			{
+				if (!customVal)
+					continue;
+
+				let [varName, varValue] = getCustomPropNameAndValue( customVal);
+				if (!varName)
+					continue;
+				if (varValue == null)
+					varValue = "";
+
+				forProp( varName, varValue, true);
+			}
+		}
+		else
+		{
+			// get the string representation of the property
+            forProp( propName, stylePropToString( propName, styleset[propName], true), false);
+		}
+	}
 }
 
 

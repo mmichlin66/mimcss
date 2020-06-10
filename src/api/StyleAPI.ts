@@ -2,11 +2,17 @@
 import {CssColor} from "../styles/ColorTypes"
 import {SelectorItem, SelectorProxy} from "../styles/SelectorTypes";
 import {
-	VarTemplateName, VarValueType, Styleset, FilterProxy, BasicShapeProxy,
-	TransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder, RayProxy, ExtentKeyword
+	Styleset, FilterProxy, BasicShapeProxy,
+	TransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder, RayProxy,
+	ExtentKeyword, ExtendedStyleset, StringStyleset
 } from "../styles/StyleTypes"
-import {stylePropToString, singleBoxShadow_fromObject, borderRadiusToString} from "../styles/StyleFuncs"
-import {CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString, templateStringToString} from "../styles/UtilFuncs";
+import {
+	stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset
+} from "../styles/StyleFuncs"
+import {
+	CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString,
+	 templateStringToString
+} from "../styles/UtilFuncs";
 
 
 
@@ -33,8 +39,8 @@ export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]
  * to a CSS compliant string.
  * @param stylePropValue Value to convert.
  */
-export function getStylePropValue<K extends VarTemplateName>( stylePropName: K,
-	stylePropValue: VarValueType<K>): string | null
+export function getStylePropValue<K extends keyof ExtendedStyleset>( stylePropName: K,
+	stylePropValue: ExtendedStyleset[K]): string | null
 {
 	return stylePropToString( stylePropName, stylePropValue, true);
 }
@@ -47,17 +53,34 @@ export function getStylePropValue<K extends VarTemplateName>( stylePropName: K,
  * @param elm HTML element whose styles will be set.
  * @param styleset Styleset object which provides values for style properties.
  */
-export function setElementStyle( elm: HTMLElement, styleset: Styleset): void
+export function setElementStyle( elm: HTMLElement, styleset: Styleset | null | undefined): void
 {
-	if (styleset == undefined)
+	if (!styleset)
 		elm.removeAttribute( "style");
 	else
 	{
 		let elmStyle = elm.style;
-		Object.keys(styleset).forEach( key => elmStyle[key] = stylePropToString( key, styleset[key], true));
+		forAllPropsInStylset( styleset,
+			(name: string, value: string): void => { elmStyle.setProperty( name, value) });
 	}
 }
 
+
+
+/**
+ * Converts the given [[Styleset]] object into an object, where each Styleset's property is
+ * converted to its string value.
+ * @param styleset 
+ */
+export function stylesetToStringStyleset( styleset: Styleset): StringStyleset
+{
+	let res: StringStyleset = {};
+
+	forAllPropsInStylset( styleset,
+		(name: string, value: string): void => { res[name] = value });
+
+	return res;
+}
 
 
 
@@ -68,29 +91,42 @@ export function setElementStyle( elm: HTMLElement, styleset: Styleset): void
  * in the new one.
  * @param oldStyleset 
  * @param newStyleset 
+ * @returns StringStyleset object with properties that have different values in the old and new
+ * stylesets. Properties that existed in the old but don't exist in the new styleset, will have
+ * their values set to undefined. If there is no differences between the two stylesets nul is
+ * returned.
  */
-export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): { [K: string]: string | undefined } | null
+export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): StringStyleset | null
 {
-	const updateVal: { [K: string]: string | undefined } = {};
-	let changesExist = false;
+	if (!oldStyleset && !newStyleset)
+		return null;
+	else if (!oldStyleset)
+		return stylesetToStringStyleset( newStyleset);
+	else if (!newStyleset)
+		return stylesetToStringStyleset( oldStyleset);
+
+	// first convert both stylesets to their string versions
+	let oldStringStyleset =	stylesetToStringStyleset( oldStyleset);
+	let newStringStyleset =	stylesetToStringStyleset( newStyleset);
+
+	let updateVal: StringStyleset | null = null;
 
 	// loop over keys in the old style object and find those that are not in the new one. These
 	// will be removed.
-	for( let key in oldStyleset)
+	for( let key in oldStringStyleset)
 	{
-		let newVal = newStyleset[key];
-		if (newVal == null)
+		let newStringVal = newStringStyleset[key];
+		if (newStringVal == null)
 		{
-			changesExist = true;
+			updateVal = updateVal || {};
 			updateVal[key] = undefined;
 		}
 		else
 		{
-			let oldStringVal = stylePropToString( key, oldStyleset[key], true);
-			let newStringVal = stylePropToString( key, newVal, true);
+			let oldStringVal = oldStringStyleset[key];
 			if (oldStringVal !== newStringVal)
 			{
-				changesExist = true;
+				updateVal = updateVal || {};
 				updateVal[key] = newStringVal;
 			}
 		}
@@ -98,31 +134,17 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): { 
 
 	// loop over keys in the new style object and find those that are not in the old one. These
 	// will be added.
-	for( let key in newStyleset)
+	for( let key in newStringStyleset)
 	{
-		let oldVal = oldStyleset[key];
-		if (oldVal == null)
+		let oldStringVal = oldStringStyleset[key];
+		if (oldStringVal == null)
 		{
-			changesExist = true;
-			updateVal[key] = stylePropToString( key, newStyleset[key], true);
+			updateVal = updateVal || {};
+			updateVal[key] = newStringStyleset[key];
 		}
 	}
 
-	return changesExist ? updateVal : null;
-}
-
-
-
-/**
- * Converts the given [[Styleset]] object into an object, where each Styleset's property is
- * converted to its string value.
- * @param styleset 
- */
-export function stylesetToStringObject( styleset: Styleset): { [K: string]: string }
-{
-	let res = {};
-	Object.keys( styleset).forEach( key => res[key] = stylePropToString( key, styleset[key], true));
-	return res;
+	return updateVal;
 }
 
 
@@ -234,10 +256,10 @@ export function dropShadow(
     x: Extended<CssLength>,
     y: Extended<CssLength>,
     color?: Extended<CssColor>,
-    blur: Extended<CssLength> = 1,
-    spread: Extended<CssLength> = 0): FilterProxy
+    blur?: Extended<CssLength>,
+    spread?: Extended<CssLength>): FilterProxy
 {
-	return () => singleBoxShadow_fromObject( { x, y, color, blur, spread});
+	return () => `drop-shadow(${singleBoxShadow_fromObject( { x, y, color, blur, spread})})`;
 }
 
 
