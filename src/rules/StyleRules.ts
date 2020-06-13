@@ -528,6 +528,12 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 		return this.cssName;
 	}
 
+	// Implementation of the toString method returns the name of the rule (without the CSS prefix).
+	public toString(): string
+	{
+		return this.name;
+	}
+
 	// Returns prefix that is put before the entity name to create a CSS name used in style rule
 	// selectors.
 	protected abstract get cssPrefix(): string;

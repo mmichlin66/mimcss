@@ -11,7 +11,8 @@ import {
 } from "../styles/StyleFuncs"
 import {
 	CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString,
-	 templateStringToString
+	 templateStringToString,
+	 camelToDash
 } from "../styles/UtilFuncs";
 
 
@@ -61,7 +62,27 @@ export function setElementStyle( elm: HTMLElement, styleset: Styleset | null | u
 	{
 		let elmStyle = elm.style;
 		forAllPropsInStylset( styleset,
-			(name: string, value: string): void => { elmStyle.setProperty( name, value) });
+			(name: string, value: string): void => { elmStyle.setProperty( camelToDash( name), value) });
+	}
+}
+
+
+
+/**
+ * Sets values of the style properties from the given StringStyleset object to the `style` attribute
+ * of the given HTML element.
+ * @param elm HTML element whose styles will be set.
+ * @param styleset StringStyleset object which provides values for style properties.
+ */
+export function setElementStringStyle( elm: HTMLElement, styleset: StringStyleset | null | undefined): void
+{
+	if (!styleset)
+		elm.removeAttribute( "style");
+	else
+	{
+		let style = (elm as HTMLElement).style;
+		for( let propName in styleset)
+			style[propName] = styleset[propName];
 	}
 }
 
@@ -93,7 +114,7 @@ export function stylesetToStringStyleset( styleset: Styleset): StringStyleset
  * @param newStyleset 
  * @returns StringStyleset object with properties that have different values in the old and new
  * stylesets. Properties that existed in the old but don't exist in the new styleset, will have
- * their values set to undefined. If there is no differences between the two stylesets nul is
+ * their values set to undefined. If there is no differences between the two stylesets null is
  * returned.
  */
 export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): StringStyleset | null
