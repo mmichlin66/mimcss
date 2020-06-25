@@ -133,11 +133,6 @@ export type AnimationTimingFunction_StyleType = OneOrMany<TimingFunction_Single>
 
 
 
-/** Type for backdrop-filter style property */
-export type BackdropFilter_StyleType = string | FilterProxy;
-
-
-
 /** Type for backface-visibility style property */
 export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 
@@ -174,7 +169,7 @@ export type BackgroundBlendMode_Single = "normal" | "multiply" | "screen" | "ove
     "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" |
     "exclusion" | "hue" | "saturation" | "color" | "luminosity";
 
-/** Type for commaArraySeparator style property */
+/** Type for background-blend-mode style property */
 export type BackgroundBlendMode_StyleType = OneOrMany<BackgroundBlendMode_Single>;
 
 
@@ -298,6 +293,36 @@ export type BorderRadius_StyleType = OneOrPair<CssLengthBox>;
 
 
 
+/** Type for border-spacing style property */
+export type BorderSpacing_StyleType = OneOrPair<CssLength>;
+
+
+
+/** Type for single border side style property */
+export type BorderStyle_Keyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
+    "groove" | "ridge" | "inset" | "outset";
+
+
+
+/** Type for border-style style property */
+export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
+
+
+
+/** Type for border style property */
+export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
+    [ExtendedProp<CssLength>?, ExtendedProp<BorderStyle_Keyword>?, ExtendedProp<CssColor>?];
+
+
+
+/** Type for border side width style property */
+export type BorderWidth_Single = "thin" | "medium" | "thick" | CssLength;
+
+/** Type for border-width style property */
+export type BorderWidth_StyleType = OneOrBox<BorderWidth_Single>;
+
+
+
 /** Type for single box shadow. */
 export type BoxShadow_Single = "none" | string |
     {
@@ -316,36 +341,6 @@ export type BoxShadow_StyleType = OneOrMany<BoxShadow_Single>;
 
 /** Type for box-sizing style property */
 export type BoxSizing_StyleType = "content-box" | "border-box";
-
-
-
-/** Type for border-spacing style property */
-export type BorderSpacing_StyleType = OneOrPair<CssLength>;
-
-
-
-/** Type for single border side style property */
-export type BorderStyle_Keyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
-    "groove" | "ridge" | "inset" | "outset";
-
-
-
-/** Type for border-style style property */
-export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
-
-
-
-/** Type for border side style property */
-export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
-    [ExtendedProp<CssLength>?, ExtendedProp<BorderStyle_Keyword>?, ExtendedProp<CssColor>?];
-
-
-
-/** Type for border side width style property */
-export type BorderWidth__Single = "thin" | "medium" | "thick" | CssLength;
-
-/** Type for border-width style property */
-export type BorderWidth_StyleType = OneOrBox<BorderWidth__Single>;
 
 
 
@@ -516,8 +511,11 @@ export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 
-/** Type for filter style property */
-export type Filter_StyleType = string | FilterProxy;
+/** Type for filter and backdrop-filter style single value */
+export type Filter_Single = string | UrlProxy | FilterProxy;
+
+/** Type for filter and backdrop-filter style property */
+export type Filter_StyleType = OneOrMany<Filter_Single>;
 
 
 
@@ -1241,7 +1239,7 @@ export interface ICssStyleset
     animationPlayState?: AnimationPlayState_StyleType;
     animationTimingFunction?: AnimationTimingFunction_StyleType;
 
-    backdropFilter?: BackdropFilter_StyleType;
+    backdropFilter?: Filter_StyleType;
     backfaceVisibility?: BackfaceVisibilityMode_StyleType;
     background?: Background_StyleType;
     backgroundAttachment?: BackgroundAttachment_StyleType;
@@ -1263,17 +1261,17 @@ export interface ICssStyleset
     borderBlockEnd?: Border_StyleType;
     borderBlockEndColor?: CssColor;
     borderBlockEndStyle?: BorderStyle_Keyword;
-    borderBlockEndWidth?: BorderWidth__Single;
+    borderBlockEndWidth?: BorderWidth_Single;
     borderBlockStart?: Border_StyleType;
     borderBlockStartColor?: CssColor;
     borderBlockStartStyle?: BorderStyle_Keyword;
-    borderBlockStartWidth?: BorderWidth__Single;
+    borderBlockStartWidth?: BorderWidth_Single;
     borderBottom?: Border_StyleType;
     borderBottomColor?: CssColor;
     borderBottomLeftRadius?: CssRadius;
     borderBottomRightRadius?: CssRadius;
     borderBottomStyle?: BorderStyle_Keyword;
-    borderBottomWidth?: BorderWidth__Single;
+    borderBottomWidth?: BorderWidth_Single;
     borderCollapse?: BorderColapse_StyleType;
     borderColor?: BorderColor_StyleType;
     borderImage?: BorderImage_StyleType;
@@ -1285,20 +1283,20 @@ export interface ICssStyleset
     borderInlineEnd?: Border_StyleType;
     borderInlineEndColor?: CssColor;
     borderInlineEndStyle?: BorderStyle_Keyword;
-    borderInlineEndWidth?: BorderWidth__Single;
+    borderInlineEndWidth?: BorderWidth_Single;
     borderInlineStart?: Border_StyleType;
     borderInlineStartColor?: CssColor;
     borderInlineStartStyle?: BorderStyle_Keyword;
-    borderInlineStartWidth?: BorderWidth__Single;
+    borderInlineStartWidth?: BorderWidth_Single;
     borderLeft?: Border_StyleType;
     borderLeftColor?: CssColor;
     borderLeftStyle?: BorderStyle_Keyword;
-    borderLeftWidth?: BorderWidth__Single;
+    borderLeftWidth?: BorderWidth_Single;
     borderRadius?: BorderRadius_StyleType;
     borderRight?: Border_StyleType;
     borderRightColor?: CssColor;
     borderRightStyle?: BorderStyle_Keyword;
-    borderRightWidth?: BorderWidth__Single;
+    borderRightWidth?: BorderWidth_Single;
     borderSpacing?: BorderSpacing_StyleType;
     borderStyle?: BorderStyle_StyleType;
     borderTop?: Border_StyleType;
@@ -1306,7 +1304,7 @@ export interface ICssStyleset
     borderTopLeftRadius?: CssRadius;
     borderTopRightRadius?: CssRadius;
     borderTopStyle?: BorderStyle_Keyword;
-    borderTopWidth?: BorderWidth__Single;
+    borderTopWidth?: BorderWidth_Single;
     borderWidth?: BorderWidth_StyleType;
     bottom?: CssLength;
     boxShadow?: BoxShadow_StyleType;
@@ -1331,7 +1329,7 @@ export interface ICssStyleset
     columnRule?: Border_StyleType;
     columnRuleColor?: CssColor;
     columnRuleStyle?: BorderStyle_Keyword;
-    columnRuleWidth?: BorderWidth__Single;
+    columnRuleWidth?: BorderWidth_Single;
     columnSpan?: ColumnSpan_StyleType;
     columnWidth?: CssLength;
     columns?: Columns_StyleType;
@@ -1472,7 +1470,7 @@ export interface ICssStyleset
     outlineColor?: CssColor;
     outlineOffset?: CssLength;
     outlineStyle?: BorderStyle_StyleType;
-    outlineWidth?: BorderWidth__Single;
+    outlineWidth?: BorderWidth_Single;
     overflow?: Overflow_StyleType;
     overflowAnchor?: OverflowAnchor_StyleType;
     overflowWrap?: OverflowWrap_StyleType;

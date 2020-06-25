@@ -84,7 +84,7 @@ Coding CSS styles in TypeScript brings the following advantages:
 - Access to CSSRule-derived objects for direct style manipulation.
 
 ## Examples
-The following short sections provide examples of Mimcss capabilities. This is really just scratching the surface - for more information please see [Mimcss Guide](https://mmichlin66.github.io/mimcss/mimcss-guide-introduction.html).
+The following short sections provide examples of Mimcss capabilities. This is really just scratching the surface - for more information please see [Mimcss Guide](https://mmichlin66.github.io/mimcss/guide/mimcss-guide-introduction.html).
 
 ### Supported CSS Rules
 Mimcss supports all types of CSS rules (except @charset):

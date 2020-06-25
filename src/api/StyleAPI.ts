@@ -41,7 +41,7 @@ export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]
  * @param stylePropValue Value to convert.
  */
 export function getStylePropValue<K extends keyof ExtendedStyleset>( stylePropName: K,
-	stylePropValue: ExtendedStyleset[K]): string | null
+	stylePropValue: ExtendedStyleset[K]): string
 {
 	return stylePropToString( stylePropName, stylePropValue, true);
 }
