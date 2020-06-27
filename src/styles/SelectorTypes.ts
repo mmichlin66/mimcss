@@ -1,18 +1,18 @@
-﻿import {StringProxy} from "./UtilTypes";
+﻿import {IStringProxy, IGenericProxy} from "./UtilTypes";
 import {IStyleRule} from "../rules/RuleTypes";
 
 
 
 /**
- * The SelectorProxy function returns a CSS selector string. This type is returned from the
+ * The ISelectorProxy function returns a CSS selector string. This type is returned from the
  * [[selector]] function.
  */
-export type SelectorProxy = (p?: "selector") => string;
+export interface ISelectorProxy extends IGenericProxy<"selector"> {};
 
 
 
 /** Type for a single selector token that can be used as an argument to the [[selector]] function */
-export type SelectorItem = string | IStyleRule | StringProxy | SelectorProxy;
+export type SelectorItem = string | IStyleRule | IStringProxy | ISelectorProxy;
 
 
 
@@ -54,7 +54,7 @@ export type PseudoEntity = PseudoClass | PseudoElement;
  * the 'n' in An+B will not be used - as in `nth-child(2)`. If it is a tuple, the 'n' will be used
  * even if the second tuple's element is not provided.
  */
-export type NthChildExpression = "odd" | "even" | number | [number, number?] | string | StringProxy;
+export type NthChildExpression = "odd" | "even" | number | [number, number?] | string | IStringProxy;
 
 
 

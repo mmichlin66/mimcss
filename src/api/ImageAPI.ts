@@ -1,7 +1,7 @@
 ﻿import {Extended, CssPosition, CssAngle, CssLength} from "../styles/UtilTypes"
 import {
     GradientStopOrHint, GradientColorAndLength, LinearGradAngle,
-    CrossFadeParam, ImageProxy, RadialGradientShape, RadialGradientSize, 
+    CrossFadeParam, IImageProxy, RadialGradientShape, RadialGradientSize, 
     IGradient, ILinearGradient, IRadialGradient, IConicGradient
 } from "../styles/ImageTypes"
 import {colorToString} from "../styles/ColorFuncs";
@@ -38,7 +38,7 @@ export let gradient: IGradient = new Gradient();
 /**
  * Returns an ImageProxy function representing the `cross-fade()` CSS function.
  */
-export function crossFade( ...args: CrossFadeParam[]): ImageProxy
+export function crossFade( ...args: CrossFadeParam[]): IImageProxy
 {
     return () => crossFadeToString( args);
 }
@@ -51,7 +51,7 @@ export function crossFade( ...args: CrossFadeParam[]): ImageProxy
  */
 function linearGradientFunc( name: string): ILinearGradient
 {
-    let f: any = (...stopsOrHints: GradientStopOrHint[]): ImageProxy =>
+    let f: any = (...stopsOrHints: GradientStopOrHint[]): IImageProxy =>
         () => linearGradientToString( name, stopsOrHints, f.angleParam);
 
 	f.to = (angle: LinearGradAngle) => {
@@ -70,7 +70,7 @@ function linearGradientFunc( name: string): ILinearGradient
  */
 function radialGradientFunc( name: string): IRadialGradient
 {
-    let f: any = (...stopsOrHints: GradientStopOrHint[]): ImageProxy =>
+    let f: any = (...stopsOrHints: GradientStopOrHint[]): IImageProxy =>
         () => radialGradientToString( name, stopsOrHints, f.shapeParam, f.sizeParam, f.posParam);
 
     f.circle = (sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>) => {
@@ -105,7 +105,7 @@ function radialGradientFunc( name: string): IRadialGradient
  */
 function conicGradientFunc( name: string): IConicGradient
 {
-    let f: any = (...stopsOrHints: GradientStopOrHint[]): ImageProxy =>
+    let f: any = (...stopsOrHints: GradientStopOrHint[]): IImageProxy =>
         () => conicGradientToString( name, stopsOrHints, f.angleParam, f.posParam);
 
 	f.from = (angle: LinearGradAngle) => {

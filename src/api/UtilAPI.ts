@@ -1,7 +1,7 @@
 ﻿import {
 	ICssNumberMath, ICssLengthMath, ICssAngleMath, ICssTimeMath, ICssResolutionMath,
-	ICssFrequencyMath, ICssPercentMath, Extended, StringProxy,
-	UrlProxy, AttrTypeKeyword, AttrUnitKeyword
+	ICssFrequencyMath, ICssPercentMath, Extended, IStringProxy,
+	IUrlProxy, AttrTypeKeyword, AttrUnitKeyword
 } from "../styles/UtilTypes"
 import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
@@ -82,13 +82,13 @@ export let Percent: ICssPercentMath = new CssPercentMath();
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns a StringProxy function encapsulating the given string-like parameter. This function
+ * Returns a function encapsulating the given string-like parameter. This function
  * allows specifying arbitrary text for properties whose type normally doesn't allow strings.
  * This is used as an "escape hatch" when a string value already exists and there is no sense
  * to convert it to a proper type. This function is a tag function and must be invoked with
  * the template string without parentheses.
  */
-export function raw( parts: TemplateStringsArray, ...params: any[]): StringProxy
+export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProxy
 {
     return () => templateStringToString( parts, params);
 }
@@ -102,10 +102,10 @@ export function raw( parts: TemplateStringsArray, ...params: any[]): StringProxy
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns a StringProxy function representing the invocation of the `var()` CSS function for
+ * Returns a function representing the invocation of the `var()` CSS function for
  * the given custom CSS property with optional fallbacks.
  */
-export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: VarValueType<K>): StringProxy
+export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: VarValueType<K>): IStringProxy
 {
     return () => fallback
         ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
@@ -121,11 +121,11 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns a UrlProxy function representing the CSS `url()` function. The string parameter
+ * Returns a function representing the CSS `url()` function. The string parameter
  * will be wrapped in a "url()" invocation. The function can also accept the IIDRule object to
  * create url(#element) invocation, whcih is often used to address SVG elements by their IDs.
  */
-export function url( val: Extended<string | IIDRule>): UrlProxy
+export function url( val: Extended<string | IIDRule>): IUrlProxy
 {
 	return () => `url(${valueToString(val)})`;
 }
@@ -139,12 +139,12 @@ export function url( val: Extended<string | IIDRule>): UrlProxy
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns a StringProxy function representing the CSS `counter()` function with additional
+ * Returns a function representing the CSS `counter()` function with additional
  * optional strings added after and/or before the counter.
  */
 export function counter( counterObj: Extended<ICounterRule | string>,
 	style?: Extended<ListStyleType_StyleType>,
-	textAfter?: Extended<string>, textBefore?: Extended<string>): StringProxy
+	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
 {
 	return () =>
 	{
@@ -158,12 +158,12 @@ export function counter( counterObj: Extended<ICounterRule | string>,
 
 
 /**
- * Returns a StringProxy function representing the CSS `countesr()` function with the given
+ * Returns a function representing the CSS `countesr()` function with the given
  * separator string and additional optional strings added after and/or before the counter.
  */
 export function counters( counterObj: Extended<ICounterRule | string>,
 	separator: Extended<string>, style?: Extended<ListStyleType_StyleType>,
-	textAfter?: Extended<string>, textBefore?: Extended<string>): StringProxy
+	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
 {
 	return () =>
 	{
@@ -184,13 +184,13 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns the StringProxy function representing the `attr()` CSS function. It returns StringPropxy
+ * Returns a function representing the `attr()` CSS function. It returns StringPropxy
  * and theoretically can be used in any style property; however, its use by browsers is currently
  * limited to the `content` property. Also no browser currently support type, units or fallback
  * values.
  */
 export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
-	fallback?: Extended<string>): StringProxy
+	fallback?: Extended<string>): IStringProxy
 {
     return () => `attr(${attrName}${typeOrUnit ? " " + typeOrUnit : ""}${fallback ? "," + fallback : ""})`;
 }

@@ -24,7 +24,7 @@ import * as ColorFuncs from "../styles/ColorFuncs"
  * @param b Blue separation value.
  * @param a Optional alpha mask as a percentage value.
  */
-export function rgb( r: number, g: number, b: number, a?: number): ColorTypes.ColorProxy
+export function rgb( r: number, g: number, b: number, a?: number): ColorTypes.IColorProxy
 {
     return () => ColorFuncs.rgbToString( r, g, b, a);
 }
@@ -53,7 +53,7 @@ export function rgb( r: number, g: number, b: number, a?: number): ColorTypes.Co
  * @param l Lightness component as a percentage value.
  * @param a Optional alpha mask as a percentage value.
  */
-export function hsl( h: number | string, s: number, l: number, a?: number): ColorTypes.ColorProxy
+export function hsl( h: number | string, s: number, l: number, a?: number): ColorTypes.IColorProxy
 {
     return () => ColorFuncs.hslToString( h, s, l, a);
 }
@@ -73,7 +73,7 @@ export function hsl( h: number | string, s: number, l: number, a?: number): Colo
  * @param c Color value as either a number or a named color
  * @param a Alpha channel value
  */
-export function alpha( c: number | keyof ColorTypes.INamedColors, a: number): ColorTypes.ColorProxy
+export function alpha( c: number | keyof ColorTypes.INamedColors, a: number): ColorTypes.IColorProxy
 {
     return () => ColorFuncs.colorWithAlphaToString( c, a);
 }

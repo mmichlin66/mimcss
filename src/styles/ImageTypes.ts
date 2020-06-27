@@ -2,24 +2,24 @@
  * This module contains types used to define CSS `<image>` type and related functions.
  */
 
-import {UrlProxy, Extended, CssNumber, CssAngle, NumberBase, CssLength, CssPosition} from "./UtilTypes"
+import {IUrlProxy, Extended, CssNumber, CssAngle, NumberBase, CssLength, CssPosition, IGenericProxy} from "./UtilTypes"
 import {CssColor} from "./ColorTypes";
 import { ExtentKeyword } from "./StyleTypes";
 
 
 /**
- * The ImageProxy type represents an invocation of one of CSS functions that are used for
+ * The ImageProxy interface represents an invocation of one of CSS functions that are used for
  * secifying images. This interface is returned from functions like: linearGradient(), paint(),
  * element(), etc.
  */
-export type ImageProxy = (img?:"image") => string;
+export interface IImageProxy extends IGenericProxy<"image"> {};
 
 
 
 /**
  * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
  */
-export type CssImage = UrlProxy | ImageProxy;
+export type CssImage = IUrlProxy | IImageProxy;
 
 
 
@@ -113,7 +113,7 @@ export interface IGradient
  */
 export interface ILinearGradient
 {
-    (...stopsOrHints: GradientStopOrHint[]): ImageProxy;
+    (...stopsOrHints: GradientStopOrHint[]): IImageProxy;
 	to( angle: LinearGradAngle): ILinearGradient;
 }
 
@@ -126,7 +126,7 @@ export interface ILinearGradient
  */
 export interface IRadialGradient
 {
-    (...stopsOrHints: GradientStopOrHint[]): ImageProxy;
+    (...stopsOrHints: GradientStopOrHint[]): IImageProxy;
 	circle( sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>): IRadialGradient;
 	ellipse( sizeOrExtent?: [Extended<CssLength>, Extended<CssLength>] | Extended<ExtentKeyword>): IRadialGradient;
 	extent( extent: Extended<ExtentKeyword>): IRadialGradient;
@@ -142,7 +142,7 @@ export interface IRadialGradient
  */
 export interface IConicGradient
 {
-    (...stopsOrHints: GradientStopOrHint[]): ImageProxy;
+    (...stopsOrHints: GradientStopOrHint[]): IImageProxy;
 	from( angle: Extended<CssAngle>): IConicGradient;
 	at( pos: Extended<CssPosition>): IConicGradient;
 }

@@ -1,5 +1,5 @@
 ﻿import {
-    Extended, NumberProxy, CssNumber, CssMultiNumber, INumberMath,
+    Extended, IGenericProxy, CssNumber, CssMultiNumber, INumberMath,
     CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
     CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
     CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency,
@@ -262,16 +262,6 @@ function calcFunc<T extends string>( parts: TemplateStringsArray, params: Extend
 
 
 /**
- * The unitFunc function returns string representation of the given number with the given units.
- */
-function unitFunc<T extends string>( n: number, unit: string): string
-{
-    return n + unit;
-}
-
-
-
-/**
  * The NummberMath class contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
@@ -297,34 +287,34 @@ class NumberMath<T extends string> implements INumberMath<T>
         return multiStyleToString( val, this.convertFunc, separator);
     }
 
-    public min( ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
+    public min( ...params: Extended<NumberBase<T>>[]): IGenericProxy<T>
     {
         return () => mathFunc( "min", params, this.convertFunc);
     }
 
-    public max( ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
+    public max( ...params: Extended<NumberBase<T>>[]): IGenericProxy<T>
     {
         return () => mathFunc( "max", params, this.convertFunc);
     }
 
-    public clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): NumberProxy<T>
+    public clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): IGenericProxy<T>
     {
         return () => mathFunc( "clamp", [min, pref, max], this.convertFunc);
     }
 
-    public calc( formulaParts: TemplateStringsArray, ...params: Extended<NumberBase<T>>[]): NumberProxy<T>
+    public calc( formulaParts: TemplateStringsArray, ...params: Extended<NumberBase<T>>[]): IGenericProxy<T>
     {
         return () => calcFunc( formulaParts, params, this.convertFunc);
     }
 
-    public percent( n: number)
+    public percent( n: number): IGenericProxy<T>
     {
         return () => CssPercentMath.convertFunc(n);
     }
 
-    public unit( n: number, unit: string): NumberProxy<T>
+    public unit( n: number, unit: string): IGenericProxy<T>
     {
-        return () => unitFunc<T>( n, unit);
+        return () => n + unit;
     }
 }
 
@@ -430,7 +420,7 @@ export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthM
 
     constructor() { super( CssLengthMath.convertFunc) }
 
-    public minmax( min: Extended<CssLength>, max: Extended<CssLength>): NumberProxy<LengthType>
+    public minmax( min: Extended<CssLength>, max: Extended<CssLength>): IGenericProxy<LengthType>
     {
         return () => mathFunc( "minmax", [min, max], CssLengthMath.convertFunc);
     }

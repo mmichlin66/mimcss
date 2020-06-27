@@ -1,11 +1,11 @@
-﻿import {StringProxy} from "./UtilTypes";
+﻿import {IStringProxy} from "./UtilTypes";
 
 
 
 /**
- * Type that extends the given type with the StringProxy type that allows specifying raw string value.
+ * Type that extends the given type with the IStringProxy interface that allows specifying raw string value.
  */
-export type FontFaceExtended<T> = T | StringProxy;
+export type FontFaceExtended<T> = T | IStringProxy;
 
 
 

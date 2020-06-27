@@ -1,8 +1,8 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
-    CssFrequency, CssResolution, CssRadius, UrlProxy,
-    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp
+    CssFrequency, CssResolution, CssRadius, IUrlProxy,
+    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -397,7 +397,7 @@ export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner
 
 
 /** Type for clip-path style property */
-export type ClipPath_StyleType = "none" | UrlProxy | BasicShape | GeometryBoxKeyword |
+export type ClipPath_StyleType = "none" | IUrlProxy | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -471,7 +471,7 @@ export type Cursor_Keyword = "auto" | "default" | "none" | "context-menu" | "hel
     "zoom-out" | "grab" | "grabbing";
 
 /** Type for cursor style property single value */
-export type Cursor_Single = Cursor_Keyword | UrlProxy | [UrlProxy, Extended<CssNumber>, Extended<CssNumber>];
+export type Cursor_Single = Cursor_Keyword | IUrlProxy | [IUrlProxy, Extended<CssNumber>, Extended<CssNumber>];
 
 /** Type for cursor style property */
 export type Cursor_StyleType = OneOrMany<Cursor_Single>;
@@ -512,7 +512,7 @@ export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 /** Type for filter and backdrop-filter style single value */
-export type Filter_Single = string | UrlProxy | FilterProxy;
+export type Filter_Single = string | IUrlProxy | IFilterProxy;
 
 /** Type for filter and backdrop-filter style property */
 export type Filter_StyleType = OneOrMany<Filter_Single>;
@@ -665,7 +665,7 @@ export type LineBreak_StyleType = "auto" | "loose" | "normal" | "strict" | "anyw
 
 
 /** Type for line-style-image style property */
-export type ListStyleImage_StyleType = "none" | UrlProxy;
+export type ListStyleImage_StyleType = "none" | IUrlProxy;
 
 
 
@@ -719,7 +719,7 @@ export type OffsetAnchor_StyleType = "auto" | CssPosition;
 
 
 /** Type for offset-path style property */
-export type OffsetPath_StyleType = "none" | RayProxy | UrlProxy | BasicShape | GeometryBoxKeyword |
+export type OffsetPath_StyleType = "none" | IRayProxy | IUrlProxy | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -839,7 +839,7 @@ export type ScrollSnapType_StyleType = "none" |
 
 
 /** Type for shape-outside style property */
-export type ShapeOutside_StyleType = UrlProxy | BasicShape | GeometryBoxKeyword | CssImage;
+export type ShapeOutside_StyleType = IUrlProxy | BasicShape | GeometryBoxKeyword | CssImage;
 
 
 
@@ -988,7 +988,7 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
 
 
 /** Type for transform style property */
-export type Transform_StyleType = "none" | string | OneOrMany<TransformProxy>;
+export type Transform_StyleType = "none" | string | OneOrMany<ITransformProxy>;
 
 
 
@@ -1115,31 +1115,31 @@ export type DefaultStyleType = string;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The FilterProxy function represents an invocation of one the CSS `<filter>` functions.
+ * The IFilterProxy function represents an invocation of one the CSS `<filter>` functions.
  */
-export type FilterProxy = (p?: "filter") => string;
+export interface IFilterProxy extends IGenericProxy<"filter"> {};
 
 /**
- * The BasicShapeProxy function represents an invocation of one the CSS `<basic-shape>` functions
+ * The IBasicShapeProxy function represents an invocation of one the CSS `<basic-shape>` functions
  * except the `path()` function.
  */
-export type BasicShapeProxy = (p?: "basic-shape") => string;
+export interface IBasicShapeProxy extends IGenericProxy<"basic-shape"> {};
 
 /**
  * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions including
  * the `path()` function.
  */
-export type BasicShape = BasicShapeProxy | IPathBuilder;
+export type BasicShape = IBasicShapeProxy | IPathBuilder;
 
 /**
- * The RayProxy function represents an invocation of one the CSS `ray()` functions.
+ * The IRayProxy function represents an invocation of one the CSS `ray()` functions.
  */
-export type RayProxy = (p?: "ray") => string;
+export interface IRayProxy extends IGenericProxy<"ray"> {};
 
 /**
- * The TransformProxy function represents an invocation of one the CSS `<basic-shape>` functions.
+ * The ITransformProxy function represents an invocation of one the CSS `<basic-shape>` functions.
  */
-export type TransformProxy = (p?: "transform") => string;
+export interface ITransformProxy extends IGenericProxy<"transform"> {};
 
 
 

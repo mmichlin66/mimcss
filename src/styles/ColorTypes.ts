@@ -2,6 +2,8 @@
  * This module contains types for working with CSS colors.
  */
 
+import { IGenericProxy } from "./UtilTypes";
+
 
 
 /**
@@ -163,10 +165,10 @@ export interface INamedColors
 
 
 /**
- * The ColorProxy type represents an invocation of one of CSS functions that are used for
+ * The IColorProxy interface represents an invocation of one of CSS functions that are used for
  * specifying colors. This interface is returned from functions like: rgb(), alpha(), etc.
  */
-export type ColorProxy = (p?: "color") => string;
+export interface IColorProxy extends IGenericProxy<"color"> {};
 
 
 
@@ -188,9 +190,9 @@ export type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas"
  *     ignored.
  *   - floating point part of the number is treated as percents of alpha channel. If there is no
  *     floating part, alpha is 1.
- * - functions: rgb(), hsl(), alpha() as well as any function that returns the ColorProxy type.
+ * - functions: rgb(), hsl(), alpha() as well as any function that returns the IColorProxy type.
  */
-export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | ColorProxy | SystemColors;
+export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | IColorProxy | SystemColors;
 
 
 
