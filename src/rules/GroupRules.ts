@@ -1,5 +1,5 @@
 import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "./RuleTypes"
-import {getContainerFromDefinition, processInstanceOrClass} from "./RuleContainer"
+import {getContainerFromInstance, processInstanceOrClass} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule} from "./Rule"
 import {supportsQueryToString} from "../styles/StyleFuncs";
 import {SupportsQuery} from "../styles/StyleTypes";
@@ -31,7 +31,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 			return;
 
 		this.instance = instance;
-		this.ruleContainer = getContainerFromDefinition( instance);
+		this.ruleContainer = getContainerFromInstance( instance);
 	}
 
 

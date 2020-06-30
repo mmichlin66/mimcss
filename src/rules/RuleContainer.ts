@@ -380,16 +380,31 @@ class RuleContainer implements ITopLevelRuleContainer
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
+ * will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix "n" will be used.
+ * @param enable
+ * @param prefix
+ */
+export function enableShortNames( enable: boolean, prefix?: string): void
+{
+	s_useUniqueStyleNames = enable;
+	s_uniqueStyleNamesPrefix = prefix ? prefix : "n";
+}
+
+
+
 // Flag indicating whether to use optimaized names for style elements (class names, animation
 // names, etc.)
-let useUniqueStyleNames: boolean = false;
+let s_useUniqueStyleNames: boolean = false;
 
 // Prefix to use when generating unique style names. If undefined, a standard prefix "n" will
 // be used.
-let uniqueStyleNamesPrefix: string = "n";
+let s_uniqueStyleNamesPrefix: string = "n";
 
 // Next number to use when generating unique identifiers.
-let nextUniqueID: number = 1;
+let s_nextUniqueID: number = 1;
 
 
 
@@ -398,8 +413,8 @@ let nextUniqueID: number = 1;
  */
 function generateName( sheetName: string, ruleName: string): string
 {
-	return useUniqueStyleNames
-		? generateUniqueName( uniqueStyleNamesPrefix)
+	return s_useUniqueStyleNames
+		? generateUniqueName( s_uniqueStyleNamesPrefix)
 		: `${sheetName}_${ruleName}`;
 }
 
@@ -411,7 +426,7 @@ function generateName( sheetName: string, ruleName: string): string
  */
 function generateUniqueName( prefix?: string): string
 {
-	return (prefix ? prefix : uniqueStyleNamesPrefix) + nextUniqueID++;
+	return (prefix ? prefix : s_uniqueStyleNamesPrefix) + s_nextUniqueID++;
 }
 
 
@@ -507,7 +522,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
 		let instance = new definitionClass( owner);
 
 		// get the name for our container
-		let name = useUniqueStyleNames || !definitionClass.name
+		let name = s_useUniqueStyleNames || !definitionClass.name
 			? generateUniqueName()
 			: definitionClass.name;
 
@@ -529,7 +544,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
  * instance has already been processed, we just return it back; if no, we assign new unique names
  * to its rules.
  */
-export function processInstance( instance: StyleDefinition, embeddingContainer?: RuleContainer): void
+function processInstance( instance: StyleDefinition, embeddingContainer?: RuleContainer): void
 {
 	// if the instance is already processed, just return it; in this case we ignore the
 	// embeddingContainer parameter.
@@ -539,7 +554,7 @@ export function processInstance( instance: StyleDefinition, embeddingContainer?:
 
 	// get the name for our container
 	let name = generateUniqueName();
-	if (!useUniqueStyleNames)
+	if (!s_useUniqueStyleNames)
 	{
 		let definitionClass = instance.constructor;
 		if (definitionClass.name)
@@ -556,9 +571,9 @@ export function processInstance( instance: StyleDefinition, embeddingContainer?:
 /**
  * Returns rule container object associated with the given style definition object.
  */
-export function getContainerFromDefinition( definition: StyleDefinition): RuleContainer
+export function getContainerFromInstance( instance: StyleDefinition): RuleContainer
 {
-	return definition ? definition[symRuleContainer] : null;
+	return instance ? instance[symRuleContainer] : null;
 }
 
 
@@ -570,15 +585,14 @@ export function getContainerFromDefinition( definition: StyleDefinition): RuleCo
  * it was activated and deactivated. The rules are inserted to DOM only when this reference counter
  * goes up to 1.
  */
-export function activate<T extends StyleDefinition>( instanceOrClass: T | IStyleDefinitionClass<T>): T | null
+export function activateInstance( instance: StyleDefinition, count: number): void
 {
-	let instance = processInstanceOrClass( instanceOrClass) as T;
-	if (!instance)
-		return null;
-
-	let ruleContainer = instance[symRuleContainer] as RuleContainer;
-	ruleContainer.activate();
-	return instance;
+	let ruleContainer = getContainerFromInstance( instance);
+	if (ruleContainer)
+	{
+		for( let i = 0; i < count; i++)
+			ruleContainer.activate();
+	}
 }
 
 
@@ -588,29 +602,14 @@ export function activate<T extends StyleDefinition>( instanceOrClass: T | IStyle
  * definition object maintains a reference counter of how many times it was activated and
  * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function deactivate( definition: StyleDefinition): void
+export function deactivateInstance( instance: StyleDefinition, count: number): void
 {
-	if (!definition)
-		return;
-
-	let ruleContainer = definition[symRuleContainer] as RuleContainer;
+	let ruleContainer = getContainerFromInstance( instance);
 	if (ruleContainer)
-		ruleContainer.deactivate();
-}
-
-
-
-/**
- * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
- * will be created by appending a unique number to the given prefix. If the prefix is not
- * specified, the standard prefix "n" will be used.
- * @param enable
- * @param prefix
- */
-export function enableShortNames( enable: boolean, prefix?: string): void
-{
-	useUniqueStyleNames = enable;
-	uniqueStyleNamesPrefix = prefix ? prefix : "n";
+	{
+		for( let i = 0; i < count; i++)
+			ruleContainer.deactivate();
+	}
 }
 
 

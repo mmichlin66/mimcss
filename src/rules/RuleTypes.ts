@@ -425,3 +425,63 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 
 
 
+/**
+ * The ActivatorType enumeration provides values used to define how the calls to the
+ * $activate and $deactivate functions schedule the writing of style changes to the DOM.
+ */
+export const enum ActivatorType
+{
+	/**
+	 * Synchronous activation - style definitions are written to the DOM upon the $activate
+	 * and $deactivate calls.
+	 */
+	Sync = 0,
+
+	/**
+	 * Calls to $activate and $deactivate functions are accumulated until the next animation
+	 * frame and then executed alltogether.
+	 */
+	AnimationFrame,
+
+	/**
+	 * Calls to $activate and $deactivate functions are accumulated until the call to the
+	 * $forceActivation function and then executed alltogether.
+	 */
+	Manual,
+}
+
+
+
+/**
+ * The IActivator interface represents an object responsible for a certain type of activation
+ * mechanism.
+ */
+export interface IActivator
+{
+	/**
+	 * Instructs to activate the given style definition instance.
+	 * @param definition
+	 */
+	activate( definition: StyleDefinition): void;
+
+	/**
+	 * Instructs to deactivate the given style definition instance.
+	 * @param definition
+	 */
+	deactivate( definition: StyleDefinition): void;
+
+	/**
+	 * Performs activation/deactivation for all style definitions accumulated since the last
+	 * activation/deactivation.
+	 */
+	forceActivation(): void;
+
+	/**
+	 * Cancel activation/deactivation for all style definitions accumulated since the last
+	 * activation/deactivation.
+	 */
+	cancelActivation(): void;
+}
+
+
+
