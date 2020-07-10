@@ -13,3 +13,4 @@ export * from "./api/ColorAPI";
 export * from "./api/ImageAPI";
 export * from "./api/StyleAPI";
 export * from "./api/RuleAPI";
+export * from "./api/SchedulingAPI";

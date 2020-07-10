@@ -12,7 +12,6 @@ import {CounterRule} from "../rules/CounterRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {valueToString} from "../styles/UtilFuncs";
-import {SynchronousActivator, AnimationFrameActivator, ManualActivator} from "../rules/Scheduling";
 
 
 
@@ -187,131 +186,6 @@ export function $embed<T extends RuleTypes.StyleDefinition>(
 
 
 /**
- * Activates the given style definition class or instance and inserts all its rules into DOM. If
- * the input object is not an instance but a class, which is not yet associated with an instance,
- * the instance is first created and processed. Note that each style definition instance maintains
- * a reference counter of how many times it was activated and deactivated. The rules are inserted
- * into DOM only upon first activation.
- */
-export function $activate<T extends RuleTypes.StyleDefinition>(
-	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>,
-	schedulingType?: number): T | null
-{
-	if (schedulingType == null)
-		schedulingType = s_defaultActivatorType;
-
-	let instance = RuleContainerFuncs.processInstanceOrClass( instanceOrClass) as T;
-	if (instance)
-	{
-		let activator = s_registeredActivators.get( schedulingType);
-		if (activator)
-			activator.activate( instance);
-	}
-
-	return instance;
-}
-
-
-
-/**
- * Deactivates the given style definition instance by removing its rules from DOM. Note that each
- * style definition instance maintains a reference counter of how many times it was activated and
- * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
- */
-export function $deactivate( instance: RuleTypes.StyleDefinition,
-	schedulingType?: RuleTypes.ActivatorType): void
-{
-	if (schedulingType == null)
-		schedulingType = s_defaultActivatorType;
-
-	let activator = s_registeredActivators.get( schedulingType);
-	if (activator)
-		activator.deactivate( instance);
-}
-
-
-
-/**
- * Writes to DOM all style changes caused by the calls to the $activate and $deactivate functions
- * accumulated since the last activation of the given scheduling type.
- */
-export function $forceActivation( schedulingType?: number): void
-{
-	if (schedulingType == null)
-		schedulingType = s_defaultActivatorType;
-
-	let activator = s_registeredActivators.get( schedulingType);
-	if (activator)
-		activator.forceActivation();
-}
-
-
-
-/**
- * Removes all scheduled activations caused by the calls to the $activate and $deactivate functions
- * accumulated since the last activation of the given scheduling type.
- */
-export function $cancelActivation( schedulingType?: number): void
-{
-	if (schedulingType == null)
-		schedulingType = s_defaultActivatorType;
-
-	let activator = s_registeredActivators.get( schedulingType);
-	if (activator)
-		activator.cancelActivation();
-}
-
-
-
-/**
- * Sets the default scheduling type that is used by $activate and $deactivate functions that are
- * called without explicitly providing value to the scheduling parameter.
- */
-export function setDefaultActivatorType( schedulingType: number): boolean
-{
-	// check that the given number is in our map of registered activators
-	if (!s_registeredActivators.has(schedulingType))
-		return false;
-
-	s_defaultActivatorType = schedulingType;
-	return true;
-}
-
-
-
-/**
- * Registers the given activator object and returns the identifier, which should be used when
- * calling $activate and $deactivate functions.
- */
-export function registerActivator( activator: RuleTypes.IActivator): number
-{
-	// get the registration ID for this activator
-	let id = s_nextCustomActivatorType++;
-	s_registeredActivators.set( id, activator);
-	return id;
-}
-
-
-
-/**
- * Registers the given activator object and returns the identifier, which should be used when
- * calling $activate and $deactivate functions.
- */
-export function unregisterActivator( id: number): void
-{
-	if (id >= s_firstCustomActivatorType)
-	{
-		s_registeredActivators.delete( id);
-
-		// if the deleted activator was our default one, we set the default to SYNC
-		if (s_defaultActivatorType === id)
-			s_defaultActivatorType = RuleTypes.ActivatorType.Sync;
-	}
-}
-
-
-
-/**
  * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
  * will be created by appending a unique number to the given prefix. If the prefix is not
  * specified, the standard prefix "n" will be used.
@@ -336,36 +210,6 @@ export function classes( ...classes: (RuleTypes.IClassRule | Extended<string>)[]
 		arrayItemFunc: v => v instanceof ClassRule ? v.name : valueToString(v)
 	});
 }
-
-
-
-/**
- * Map of registered built-in and custom activators.
- */
-let s_registeredActivators = new Map<number,RuleTypes.IActivator>();
-s_registeredActivators.set( RuleTypes.ActivatorType.Sync, new SynchronousActivator());
-s_registeredActivators.set( RuleTypes.ActivatorType.AnimationFrame, new AnimationFrameActivator());
-s_registeredActivators.set( RuleTypes.ActivatorType.Manual, new ManualActivator());
-
-
-
-/**
- * Current default activator
- */
-let s_defaultActivatorType: number = RuleTypes.ActivatorType.Sync;
-
-
-
-/**
- * Activator type identifier to be assigned to the first custom activator to be registered.
- * All custom activator identifiers are greater or equal to this number.
- */
-const s_firstCustomActivatorType: number = 1001;
-
-/**
- * Activator type identifier to be assigned to the next custom activator to be registered.
- */
-let s_nextCustomActivatorType: number = s_firstCustomActivatorType;
 
 
 

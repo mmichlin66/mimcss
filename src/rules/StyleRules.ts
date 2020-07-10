@@ -6,6 +6,7 @@ import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustom
 import {valueToString, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
 import {pseudoEntityToString, selectorToString} from "../styles/SelectorFuncs";
+import {s_scheduleStylePropertyUpdate} from "./Scheduling";
 
 
 
@@ -310,7 +311,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/**
 	 * Adds/replaces/removes the value of the given CSS property in this rule.
 	 */
-	private setPropInternal( name: string, value: any, important?: boolean): void
+	private setPropInternal( name: string, value: any, important?: boolean, schedulingType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
 		if (value == null)
@@ -322,11 +323,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (!this.cssRule)
 			return;
 
-		if (value == null)
-			this.cssRule.style.removeProperty( camelToDash( name));
-		else
-			this.cssRule.style.setProperty( camelToDash( name),
-				stylePropToString( name, value, true), important ? "!important" : undefined)
+		s_scheduleStylePropertyUpdate( this.cssRule, camelToDash( name),
+			value == null ? null : stylePropToString( name, value, true), important);
 	}
 
 
@@ -334,7 +332,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/**
 	 * Adds/replaces/removes the value of the given custmom cSS property in this rule.
 	 */
-	private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean): void
+	private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean, schedulingType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
 		let currCustomProps = this.styleset["--"] as CustomVar_StyleType[];
@@ -373,11 +371,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (!this.cssRule)
 			return;
 
-		if (value == null)
-			this.cssRule.style.removeProperty( varObj.cssName);
-		else
-			this.cssRule.style.setProperty( varObj.cssName,
-				stylePropToString( varObj.template, value, true), important ? "!important" : undefined)
+		s_scheduleStylePropertyUpdate( this.cssRule, varObj.cssName,
+				value == null ? null : stylePropToString( varObj.template, value, true), important);
 	}
 
 

@@ -131,8 +131,11 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulingType ID of a registered activator type that is used to write the property
+	 * value to the DOM. If undefined, the current default activator will be used.
 	 */
-	setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K], important?: boolean): void;
+	setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K],
+		important?: boolean, schedulingType?: number): void;
 
 	/**
 	 * Adds/replaces/removes the value of the given custmom CSS property in this rule.
@@ -140,8 +143,11 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the custom CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulingType ID of a registered activator type that is used to write the property
+	 * value to the DOM. If undefined, the current default activator will be used.
 	 */
-	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: VarValueType<K>, important?: boolean): void;
+	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: VarValueType<K>,
+		important?: boolean, schedulingType?: number): void;
 }
 
 
@@ -435,7 +441,7 @@ export const enum ActivatorType
 	 * Synchronous activation - style definitions are written to the DOM upon the $activate
 	 * and $deactivate calls.
 	 */
-	Sync = 0,
+	Sync = 1,
 
 	/**
 	 * Calls to $activate and $deactivate functions are accumulated until the next animation
@@ -448,39 +454,6 @@ export const enum ActivatorType
 	 * $forceActivation function and then executed alltogether.
 	 */
 	Manual,
-}
-
-
-
-/**
- * The IActivator interface represents an object responsible for a certain type of activation
- * mechanism.
- */
-export interface IActivator
-{
-	/**
-	 * Instructs to activate the given style definition instance.
-	 * @param definition
-	 */
-	activate( definition: StyleDefinition): void;
-
-	/**
-	 * Instructs to deactivate the given style definition instance.
-	 * @param definition
-	 */
-	deactivate( definition: StyleDefinition): void;
-
-	/**
-	 * Performs activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation.
-	 */
-	forceActivation(): void;
-
-	/**
-	 * Cancel activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation.
-	 */
-	cancelActivation(): void;
 }
 
 

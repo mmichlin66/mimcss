@@ -1,244 +1,122 @@
-import {StyleDefinition, IActivator} from "./RuleTypes";
-import {activateInstance, deactivateInstance} from "./RuleContainer";
+import {ActivatorType, StyleDefinition} from "./RuleTypes";
 
 
 
 /**
- * The SynchronousActivator class represents the synchronous activation mechanism, which writes
- * style changes to the DOM when the $activate and $deactivate functions are called.
+ * The IActivator interface represents an object responsible for a certain type of activation
+ * mechanism.
  */
-export class SynchronousActivator implements IActivator
+export interface IActivator
 {
 	/**
-	 * Instructs to activate the given style definition instance.
-	 * @param definition
+	 * Instructs to activate the given style definition instance. This method is called when the
+	 * $activate function is called for this activation mechanism.
 	 */
-	public activate( definition: StyleDefinition): void
-	{
-		activateInstance( definition, 1);
-	}
+	activate( definition: StyleDefinition): void;
 
 	/**
-	 * Instructs to deactivate the given style definition instance.
-	 * @param definition
+	 * Instructs to deactivate the given style definition instance. This method is called when the
+	 * $deactivate function is called for this activation mechanism.
 	 */
-	public deactivate( definition: StyleDefinition): void
-	{
-		deactivateInstance( definition, 1);
-	}
+	deactivate( definition: StyleDefinition): void;
+
+	/**
+	 * Instructs to set the value of the property in the given CSS style rule.
+	 */
+	setStyleProperty( rule: CSSStyleRule, name: string, value?: string | null, important?: boolean): void;
 
 	/**
 	 * Performs activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation.
+	 * activation/deactivation. This method is called when the $forceActivation function is called
+	 * for this activation mechanism.
 	 */
-	public forceActivation(): void {}
+	forceActivation(): void;
 
 	/**
 	 * Cancel activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation.
+	 * activation/deactivation. This method is called when the $cancelActivation function is called
+	 * for this activation mechanism.
 	 */
-	public cancelActivation(): void {}
+	cancelActivation(): void;
 }
 
 
 
 /**
- * The SchedulingActivator class keeps a map of StyleDefinition instances that are scheduled for
- * activation or deactivation. Each instance is mapped to a refernce count, which is incremented
- * upon the $activate calls and decremented upon the $deactivate calls. When the doActivation
- * method is called The style definition will be either activated or deactivated based on whether
- * the reference count is positive or negative.
+ * Represents objects that are used in the IActivator interface for setting property values.
  */
-abstract class SchedulingActivator implements IActivator
+export interface ScheduledStylePropValue
 {
-	private definitions = new Map<StyleDefinition,number>();
+	/** Style rule in which to set the property value */
+	rule: CSSStyleRule;
 
+	/** Dashe-cased property name */
+	name: string;
 
+	/** Property value. If the value is null or undefined, it is removed. */
+	value?: string | null;
 
-	/**
-	 * Instructs to activate the given style definition instance.
-	 * @param definition
-	 */
-	public activate( definition: StyleDefinition): void
-	{
-		let refCount = this.definitions.get( definition) || 0;
-		if (refCount === -1)
-		{
-			this.definitions.delete( definition);
-			if (this.definitions.size === 0)
-				this.onLastUnscheduled();
-		}
-		else
-		{
-			if (this.definitions.size === 0)
-				this.onFirstScheduled();
-				
-			this.definitions.set( definition, ++refCount);
-		}
-	}
-
-
-
-	/**
-	 * Instructs to deactivate the given style definition instance.
-	 * @param definition
-	 */
-	public deactivate( definition: StyleDefinition): void
-	{
-		let refCount = this.definitions.get( definition) || 0;
-		if (refCount === 1)
-		{
-			this.definitions.delete( definition);
-			if (this.definitions.size === 0)
-				this.onLastUnscheduled();
-		}
-		else
-		{
-			if (this.definitions.size === 0)
-				this.onFirstScheduled();
-				
-			this.definitions.set( definition, --refCount);
-		}
-	}
-
-
-
-	/**
-	 * Performs activation/deactivation for all style definitions in our internal map.
-	 */
-	public forceActivation(): void
-	{
-		if (this.definitions.size > 0)
-		{
-			this.onSchedulingCleared();
-			this.doActivation();
-		}
-	}
-
-
-
-	/**
-	 * Cancel activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation.
-	 */
-	public cancelActivation(): void
-	{
-		if (this.definitions.size > 0)
-		{
-			this.definitions.clear();
-			this.onSchedulingCleared();
-		}
-	}
-
-
-
-	/**
-	 * Performs activation/deactivation for all style definitions in our internal map. This method
-	 * should be used by the derived classes when scheduled activations should be performed.
-	 */
-	protected doActivation(): void
-	{
-		this.definitions.forEach( (refCount: number, definition: StyleDefinition) =>
-		{
-			if (refCount > 0)
-				activateInstance( definition, refCount);
-			else
-				deactivateInstance( definition, -refCount);
-		})
-
-		this.definitions.clear();
-	}
-
-
-
-	/**
-	 * Is invoked when the first item is added to the map. Allows derived classes to schedule an
-	 * action (e.g. to call requestAnimationFrame).
-	 */
-	protected onFirstScheduled(): void {}
-
-	/**
-	 * Is invoked when the last item is removed from the map. Allows derived classes to unschedule
-	 * an action (e.g. to call cancelAnimationFrame).
-	 */
-	protected onLastUnscheduled(): void {}
-
-	/**
-	 * Is invoked when activation was either forced externally via the forceActivation call or was
-	 * canceled via the cancelActivation call. Allows derived classes to unschedule an action (e.g.
-	 * to call cancelAnimationFrame).
-	 */
-	protected onSchedulingCleared(): void {}
+	/** Flag indicating whether the property should be marked "!important" */
+	important?: boolean;
 }
 
 
 
 /**
- * The AnimationFrameActivator implements scheduling using animation frames.
+ * Map of registered built-in and custom activators.
  */
-export class AnimationFrameActivator extends SchedulingActivator
+export let s_registeredActivators = new Map<number,IActivator>();
+
+
+
+/**
+ * Schedules the update of the value of the given CSS property in the given rule.
+ */
+export function s_scheduleStylePropertyUpdate( rule: CSSStyleRule, name: string,
+	value?: string | null, important?: boolean, activatorType?: number): void
 {
-	private requestHandle = 0;
-
-
-
-	/**
-	 * Is invoked when the first item is added to the map. Allows derived classes to schedule an
-	 * action (e.g. to call requestAnimationFrame).
-	 */
-	protected onFirstScheduled(): void
-	{
-		this.requestHandle = requestAnimationFrame( this.onAnimationFrame)
-	}
-
-
-
-	/**
-	 * Is invoked when the last item is removed from the map. Allows derived classes to unschedule
-	 * an action (e.g. to call cancelAnimationFrame).
-	 */
-	protected onLastUnscheduled(): void
-	{
-		cancelAnimationFrame( this.requestHandle);
-		this.requestHandle = 0;
-	}
-
-
-
-	/**
-	 * Is invoked when activation was either forced externally via the forceActivation call or was
-	 * canceled via the cancelActivation call. Allows derived classes to unschedule an action (e.g.
-	 * to call cancelAnimationFrame).
-	 */
-	protected onSchedulingCleared(): void
-	{
-		if (this.requestHandle > 0)
-		{
-			cancelAnimationFrame( this.requestHandle);
-			this.requestHandle = 0;
-		}
-	}
-
-
-
-	/**
-	 * Is invoked when animation frame should be executed.
-	 */
-	private onAnimationFrame = (): void =>
-	{
-		this.doActivation();
-	}
+	s_scheduleCall( (activator: IActivator) =>
+		activator.setStyleProperty( rule, name, value, important), activatorType);
 }
 
 
 
 /**
- * The ManualActivator class accumulates calls to $activate and $deactivate functions until the
- * $forceActivation or $cancelActivation funtions are called.
+ * Schedules calling of the iven function using the given activator type.
  */
-export class ManualActivator extends SchedulingActivator
+export function s_scheduleCall( func: (activator: IActivator) => void, activatorType?: number): void
 {
+	if (activatorType == null)
+		activatorType = s_currentDefaultActivatorType;
+
+	let activator = s_registeredActivators.get( activatorType);
+	if (activator)
+		func( activator);
 }
+
+
+
+/**
+ * Returns the current default activator type.
+ */
+export function s_getCurrentDefaultActivatorType(): number
+{
+	return s_currentDefaultActivatorType;
+}
+
+/**
+ * Sets the current default activator type.
+ */
+export function s_setCurrentDefaultActivatorType( activatorType: number): void
+{
+	s_currentDefaultActivatorType = activatorType;
+}
+
+/**
+ * Current default activator. This activator will be used if activator type is not explicitly
+ * specified in calls such as $activate or IStyleRule.setProp.
+ */
+let s_currentDefaultActivatorType: number = ActivatorType.Sync;
 
 
 
