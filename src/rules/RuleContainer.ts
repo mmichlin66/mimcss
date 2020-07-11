@@ -3,6 +3,7 @@ import {Rule, ITopLevelRuleContainer} from "./Rule"
 import {VarRule} from "./VarRule"
 import {CounterRule} from "./CounterRules";
 import {ImportRule, NamespaceRule} from "./MiscRules"
+import { s_scheduleStylePropertyUpdate } from "./Scheduling";
 
 
 
@@ -187,15 +188,10 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Sets the given value for the custom CSS roperty with the given name.
-	public setCustomVarValue( name: string, value: string, important?: boolean): void
+	public setCustomVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
 		if (this.cssCustomVarStyleRule)
-		{
-			if (value != null)
-				this.cssCustomVarStyleRule.style.setProperty( name, value, important ? "!important" : undefined);
-			else
-				this.cssCustomVarStyleRule.style.removeProperty( name);
-		}
+            s_scheduleStylePropertyUpdate( this.cssCustomVarStyleRule, name, value, important, schedulerType);
 	}
 
 

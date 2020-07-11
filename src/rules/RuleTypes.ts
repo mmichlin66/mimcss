@@ -131,11 +131,11 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
-	 * @param schedulingType ID of a registered activator type that is used to write the property
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default activator will be used.
 	 */
 	setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K],
-		important?: boolean, schedulingType?: number): void;
+		important?: boolean, schedulerType?: number): void;
 
 	/**
 	 * Adds/replaces/removes the value of the given custmom CSS property in this rule.
@@ -143,11 +143,11 @@ export interface IStyleRule extends IRule
 	 * @param value New value of the custom CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
-	 * @param schedulingType ID of a registered activator type that is used to write the property
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default activator will be used.
 	 */
 	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: VarValueType<K>,
-		important?: boolean, schedulingType?: number): void;
+		important?: boolean, schedulerType?: number): void;
 }
 
 
@@ -432,10 +432,10 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 
 
 /**
- * The ActivatorType enumeration provides values used to define how the calls to the
+ * The SchedulerType enumeration provides values used to define how the calls to the
  * $activate and $deactivate functions schedule the writing of style changes to the DOM.
  */
-export const enum ActivatorType
+export const enum SchedulerType
 {
 	/**
 	 * Synchronous activation - style definitions are written to the DOM upon the $activate
@@ -458,3 +458,25 @@ export const enum ActivatorType
 
 
 
+/**
+ * The IScheduler interface should be implemented by custom schedulers. Its methods are invoked
+ * by the activation infrastructure.
+ */
+export interface IScheduler
+{
+    /**
+     * Initializes the scheduler object and provides the callback that should be invoked when the
+     * scheduler decides to make changes to the DOM.
+     */
+    init( doActivation: () => void);
+
+	/**
+	 * Is invoked when the scheduler needs to schedule its callback or event.
+	 */
+	scheduleActivation(): void;
+
+	/**
+	 * Is invoked when the scheduler needs to cancels its scheduled callback or event.
+	 */
+	unscheduleActivation(): void;
+}

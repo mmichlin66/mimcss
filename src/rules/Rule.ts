@@ -18,7 +18,7 @@ export interface IRuleContainer
 	clearRules(): void;
 
 	/** Sets the given value for the custom CSS roperty with the given name. */
-	setCustomVarValue( name: string, value: string | null, important?: boolean): void;
+	setCustomVarValue( name: string, value: string | null, important?: boolean, schedulerType?: number): void;
 }
 
 

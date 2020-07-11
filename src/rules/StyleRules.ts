@@ -283,10 +283,13 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param name Name of the CSS property.
 	 * @param value New value of the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
+	 * value to the DOM. If undefined, the current default activator will be used.
 	 */
-	public setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K], important?: boolean): void
+    public setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K],
+        important?: boolean, schedulerType?: number): void
 	{
-		this.setPropInternal( name, value, important);
+		this.setPropInternal( name, value, important, schedulerType);
 	}
 
 
@@ -296,14 +299,16 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param varObj IVarRule object defining a custom CSS property.
 	 * @param varValue New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
+	 * value to the DOM. If undefined, the current default activator will be used.
 	 */
 	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: VarValueType<K>,
-		important?: boolean): void
+		important?: boolean, schedulerType?: number): void
 	{
 		if (!varObj || !(varObj instanceof VarRule))
 			return;
 
-		return this.setCustomPropInternal( varObj, value, important);
+		return this.setCustomPropInternal( varObj, value, important, schedulerType);
 	}
 
 
@@ -311,7 +316,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/**
 	 * Adds/replaces/removes the value of the given CSS property in this rule.
 	 */
-	private setPropInternal( name: string, value: any, important?: boolean, schedulingType?: number): void
+	private setPropInternal( name: string, value: any, important?: boolean, schedulerType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
 		if (value == null)
@@ -324,7 +329,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			return;
 
 		s_scheduleStylePropertyUpdate( this.cssRule, camelToDash( name),
-			value == null ? null : stylePropToString( name, value, true), important);
+			value == null ? null : stylePropToString( name, value, true), important, schedulerType);
 	}
 
 
@@ -332,7 +337,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/**
 	 * Adds/replaces/removes the value of the given custmom cSS property in this rule.
 	 */
-	private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean, schedulingType?: number): void
+    private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean,
+        schedulerType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
 		let currCustomProps = this.styleset["--"] as CustomVar_StyleType[];
@@ -372,7 +378,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			return;
 
 		s_scheduleStylePropertyUpdate( this.cssRule, varObj.cssName,
-				value == null ? null : stylePropToString( varObj.template, value, true), important);
+                value == null ? null : stylePropToString( varObj.template, value, true),
+                important, schedulerType);
 	}
 
 

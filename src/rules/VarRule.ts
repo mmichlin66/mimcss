@@ -64,11 +64,14 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	 * Sets new value of this custom CSS property.
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
+	 * value to the DOM. If undefined, the current default activator will be used.
 	 */
-	public setValue( value: VarValueType<K>, important?: boolean): void
+	public setValue( value: VarValueType<K>, important?: boolean, schedulerType?: number): void
 	{
 		this.container.setCustomVarValue( this.cssName,
-			value == null ? null : stylePropToString( this.template, value, true), important)
+            value == null ? null : stylePropToString( this.template, value, true),
+            important, schedulerType)
 	}
 
 
