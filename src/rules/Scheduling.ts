@@ -345,15 +345,12 @@ export function s_scheduleStylePropertyUpdate( rule: CSSStyleRule, name: string,
 
 
 /**
- * Schedules calling of the iven function using the given scheduler type.
+ * Schedules calling of the given function using the given scheduler type.
  */
 export function s_scheduleCall( func: (activator: IActivator) => void, schedulerType?: number): void
 {
-	if (schedulerType == null)
-		schedulerType = s_defaultSchedulerType;
-
-	let activator = s_registeredActivators.get( schedulerType);
-	if (activator)
+	let activator = schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType);
+    if (activator)
 		func( activator);
 }
 
@@ -377,12 +374,14 @@ export function s_getDefaultSchedulerType(): number
  */
 export function s_setDefaultSchedulerType( schedulerType: number): number
 {
-	// check that the given number is in our map of registered activators
-	if (!s_registeredActivators.has(schedulerType))
+    // check that the given number is in our map of registered activators
+    let activator = s_registeredActivators.get( schedulerType);
+	if (!activator)
 		return 0;
 
 	let prevSchedulerType = s_defaultSchedulerType;
-	s_defaultSchedulerType = schedulerType;
+    s_defaultSchedulerType = schedulerType;
+    s_defaultActivator = activator;
 	return prevSchedulerType;
 }
 
@@ -412,8 +411,11 @@ export function s_unregisterScheduler( id: number): void
 		s_registeredActivators.delete( id);
 
 		// if the deleted activator was our default one, we set the default to SYNC
-		if (s_defaultSchedulerType === id)
+        if (s_defaultSchedulerType === id)
+        {
             s_defaultSchedulerType = SchedulerType.Sync;
+            s_defaultActivator = s_synchronousActivator;
+        }
 	}
 }
 
@@ -424,6 +426,17 @@ export function s_unregisterScheduler( id: number): void
  * specified in calls such as $activate or IStyleRule.setProp.
  */
 let s_defaultSchedulerType: number = SchedulerType.Sync;
+
+/**
+ * Synchronous activator instance.
+ */
+let s_synchronousActivator = new SynchronousActivator();
+
+/**
+ * Current default activator. This activator will be used if scheduler type is not explicitly
+ * specified in calls such as $activate or IStyleRule.setProp.
+ */
+let s_defaultActivator: IActivator = s_synchronousActivator;
 
 /**
  * Scheduler type identifier to be assigned to the first custom activator to be registered.
@@ -446,7 +459,7 @@ let s_registeredActivators = new Map<number,IActivator>();
 /**
  * Register built-in and custom activators.
  */
-s_registeredActivators.set( SchedulerType.Sync, new SynchronousActivator());
+s_registeredActivators.set( SchedulerType.Sync, s_synchronousActivator);
 s_registeredActivators.set( SchedulerType.AnimationFrame, new SchedulingActivator( new AnimationFrameScheduler()));
 s_registeredActivators.set( SchedulerType.Manual, new SchedulingActivator());
 
