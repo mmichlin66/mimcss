@@ -184,7 +184,7 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns a function representing the `attr()` CSS function. It returns StringPropxy
+ * Returns a function representing the `attr()` CSS function. It returns IStringProxy
  * and theoretically can be used in any style property; however, its use by browsers is currently
  * limited to the `content` property. Also no browser currently support type, units or fallback
  * values.

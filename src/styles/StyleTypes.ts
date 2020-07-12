@@ -402,7 +402,12 @@ export type ClipPath_StyleType = "none" | IUrlProxy | BasicShape | GeometryBoxKe
 
 
 
-/** Type for color-interpolation-filters style property */
+/** Type for clip-rule style property */
+export type ClipRule_StyleType = "nonzero" | "evenodd";
+
+
+
+/** Type for color-interpolation and color-interpolation-filters style properties */
 export type ColorInterpolation_StyleType = "auto" | "sRGB" | "linearRGB";
 
 
@@ -1319,7 +1324,7 @@ export interface ICssStyleset
     clear?: Clear_StyleType;
     clip?: Clip_StyleType;
     clipPath?: ClipPath_StyleType;
-    clipRule?: DefaultStyleType;
+    clipRule?: ClipRule_StyleType;
     color?: CssColor;
     colorInterpolation?: ColorInterpolation_StyleType;
     colorInterpolationFilters?: ColorInterpolation_StyleType;
