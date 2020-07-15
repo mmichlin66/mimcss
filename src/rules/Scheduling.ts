@@ -393,7 +393,7 @@ export function s_setDefaultSchedulerType( schedulerType: number): number
  */
 export function s_registerScheduler( scheduler: IScheduler): number
 {
-	// get the registration ID for this activator
+	// get the registration ID for this scheduler
 	let id = s_nextCustomSchedulerType++;
 	s_registeredActivators.set( id, new SchedulingActivator( scheduler));
 	return id;
@@ -410,7 +410,7 @@ export function s_unregisterScheduler( id: number): void
 	{
 		s_registeredActivators.delete( id);
 
-		// if the deleted activator was our default one, we set the default to SYNC
+		// if the deleted scheduler was our default one, we set the default to SYNC
         if (s_defaultSchedulerType === id)
         {
             s_defaultSchedulerType = SchedulerType.Sync;
@@ -422,7 +422,7 @@ export function s_unregisterScheduler( id: number): void
 
 
 /**
- * Current default activator. This activator will be used if scheduler type is not explicitly
+ * Current default scheduler. This scheduler will be used if scheduler type is not explicitly
  * specified in calls such as $activate or IStyleRule.setProp.
  */
 let s_defaultSchedulerType: number = SchedulerType.Sync;
@@ -439,13 +439,13 @@ let s_synchronousActivator = new SynchronousActivator();
 let s_defaultActivator: IActivator = s_synchronousActivator;
 
 /**
- * Scheduler type identifier to be assigned to the first custom activator to be registered.
- * All custom activator identifiers are greater or equal to this number.
+ * Scheduler type identifier to be assigned to the first custom scheduler to be registered.
+ * All custom scheduler identifiers are greater or equal to this number.
  */
 const s_firstCustomSchedulerType: number = 1001;
 
 /**
- * Scheduler type identifier to be assigned to the next custom activator to be registered.
+ * Scheduler type identifier to be assigned to the next custom scheduler to be registered.
  */
 let s_nextCustomSchedulerType: number = s_firstCustomSchedulerType;
 

@@ -132,7 +132,7 @@ export interface IStyleRule extends IRule
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
-	 * value to the DOM. If undefined, the current default activator will be used.
+	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
 	setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K],
 		important?: boolean, schedulerType?: number): void;
@@ -144,7 +144,7 @@ export interface IStyleRule extends IRule
 	 * is removed from the rule's styleset.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
-	 * value to the DOM. If undefined, the current default activator will be used.
+	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
 	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: VarValueType<K>,
 		important?: boolean, schedulerType?: number): void;

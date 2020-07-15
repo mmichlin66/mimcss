@@ -79,7 +79,7 @@ export interface ICustomVar<T = any>
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
-	 * value to the DOM. If undefined, the current default activator will be used.
+	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
 	setValue( value: T, important?: boolean, schedulerType?: number): void;
 }

@@ -284,7 +284,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param value New value of the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
-	 * value to the DOM. If undefined, the current default activator will be used.
+	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
     public setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K],
         important?: boolean, schedulerType?: number): void
@@ -300,7 +300,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param varValue New value of the custom CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
-	 * value to the DOM. If undefined, the current default activator will be used.
+	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
 	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: VarValueType<K>,
 		important?: boolean, schedulerType?: number): void

@@ -8,6 +8,7 @@ import {
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
+import { IIDRule } from "../rules/RuleTypes";
 
 
 
@@ -352,6 +353,27 @@ function fontStyleToString( val: Extended<StyleTypes.Font_StyleType>): string
 }
 
 
+
+function markerStyleToString( val: Extended<StyleTypes.Marker_StyleType>): string
+{
+    return valueToString( val, {
+        fromObject: v => `url(#${(val as IIDRule).name})`
+    });
+}
+
+
+
+function rotateToString( val:StyleTypes.Rotate_StyleType): string
+{
+    return valueToString( val, {
+        fromArray: v => {
+            if (v.length === 2)
+                return `${v[0]} ${CssAngleMath.styleToString(v[1])}`;
+            else
+                return `${v[0]} ${v[1]} ${v[2]} ${CssAngleMath.styleToString(v[3])}`;
+        }
+    });
+}
 
 function textDecoration_fromObject( val: Extended<StyleTypes.TextDecoration_StyleType>): string
 {
@@ -818,16 +840,17 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | 
     marginLeft: CssLengthMath.styleToString,
     marginRight: CssLengthMath.styleToString,
     marginTop: CssLengthMath.styleToString,
+    markerEnd: markerStyleToString,
+    markerMid: markerStyleToString,
+    markerStart: markerStyleToString,
     maxBlockSize: CssLengthMath.styleToString,
     maxHeight: CssLengthMath.styleToString,
     maxInlineSize: CssLengthMath.styleToString,
     maxWidth: CssLengthMath.styleToString,
-    maxZoom: CssPercentMath.styleToString,
     minBlockSize: CssLengthMath.styleToString,
     minHeight: CssLengthMath.styleToString,
     minInlineSize: CssLengthMath.styleToString,
 	minWidth: CssLengthMath.styleToString,
-    minZoom: CssPercentMath.styleToString,
 
     objectPosition: positionToString,
     offset: offsetToString,
@@ -840,7 +863,6 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | 
     outline: borderToString,
     outlineColor: colorToString,
     outlineOffset: CssLengthMath.styleToString,
-    outlineStyle: valueToString,
 
     padding: multiLengthToStringWithSpace,
     paddingBlockEnd: CssLengthMath.styleToString,
@@ -861,6 +883,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | 
     },
 
     right: CssLengthMath.styleToString,
+    rotate: rotateToString,
     rowGap: CssLengthMath.styleToString,
 
     scrollMargin: multiLengthToStringWithSpace,

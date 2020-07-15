@@ -7,7 +7,7 @@
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
-import {IVarRule, IAnimationRule, ICounterRule} from "../rules/RuleTypes";
+import {IVarRule, IAnimationRule, ICounterRule, IIDRule} from "../rules/RuleTypes";
 
 
 
@@ -524,14 +524,14 @@ export type Filter_StyleType = OneOrMany<Filter_Single>;
 
 
 
-/** Type for flex-basis style property */
-export type FlexBasis_StyleType = "auto" | "content" | CssLength;
-
-
-
 /** Type for flex style property */
 export type Flex_StyleType = FlexBasis_StyleType | [Extended<number>, Extended<number>] |
     [Extended<number>, Extended<number>, Extended<FlexBasis_StyleType>];
+
+
+
+/** Type for flex-basis style property */
+export type FlexBasis_StyleType = "auto" | "content" | CssLength;
 
 
 
@@ -551,12 +551,12 @@ export type FlexWrap_StyleType = "nowrap" | "wrap" | "wrap-reverse";
 
 
 
-/** Type for float (cssFloat) style property */
+/** Type for float style property */
 export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inline-end";
 
 
 
-/** Type for font style property */
+/** Keywords for font style property */
 export type Font_SystemKeyword = "caption" | "icon" | "menu" | "message-box" | "small-caption" | "status-bar";
 
 /** Type for font style property */
@@ -565,7 +565,7 @@ export type Font_StyleType = string | Font_SystemKeyword |
         size: ExtendedProp<CssLength>;
         family: ExtendedProp<string>;
         style?: ExtendedProp<FontStyle_StyleType>;
-        variant?: ExtendedProp<"normal" | "small-caps">;
+        variant?: ExtendedProp<string>;
         weight?: ExtendedProp<FontWeight_StyleType>;
         stretch?: ExtendedProp<Exclude<FontStretch_Single,number>>;
         lineHeight?: ExtendedProp<CssNumber>
@@ -583,6 +583,11 @@ export type FontOpticalSizing_StyleType = "auto" | "none";
 
 
 
+/** Type for font-stretch style property */
+export type FontStretch_StyleType = FontStretch_Single;
+
+
+
 /** Type for font-style style property */
 export type FontStyle_StyleType = "normal" | "italic" | "oblique" | CssAngle;
 
@@ -590,11 +595,6 @@ export type FontStyle_StyleType = "normal" | "italic" | "oblique" | CssAngle;
 
 /** Type for font-synthesis style property */
 export type FontSynthesis_StyleType = "none" | "weight" | "style" | "weight style";
-
-
-
-/** Type for font-weight style property */
-export type FontWeight_StyleType = "normal" | "bold" | "bolder" | "lighter" | number;
 
 
 
@@ -606,6 +606,11 @@ export type FontVariantCaps_StyleType = "normal" | "small-caps" | "all-small-cap
 
 /** Type for font-variant-position style property */
 export type FontVariantPosition_StyleType = "normal" | "sub" | "super";
+
+
+
+/** Type for font-weight style property */
+export type FontWeight_StyleType = "normal" | "bold" | "bolder" | "lighter" | number;
 
 
 
@@ -659,18 +664,32 @@ export type LetterSpacing_StyleType = "normal" | CssLength;
 
 
 
-/** Type for line-height style property */
-export type LineHeight_StyleType = CssNumber | string;
-
-
-
 /** Type for line-break style property */
 export type LineBreak_StyleType = "auto" | "loose" | "normal" | "strict" | "anywhere";
 
 
 
+/** Type for line-height style property */
+export type LineHeight_StyleType = CssNumber | string;
+
+
+
+/** Type for list-style style property */
+export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_StyleType | ListStyleImage_StyleType |
+    [Extended<ListStyleImage_StyleType>, Extended<ListStylePosition_StyleType>] |
+    [Extended<ListStyleImage_StyleType>, Extended<ListStyleType_StyleType>?] |
+    [Extended<ListStyleType_StyleType>, Extended<ListStylePosition_StyleType>] |
+    [Extended<ListStyleImage_StyleType>, Extended<ListStylePosition_StyleType>, Extended<ListStyleType_StyleType>?];
+
+
+
 /** Type for line-style-image style property */
 export type ListStyleImage_StyleType = "none" | IUrlProxy;
+
+
+
+/** Type for list-style-position style property */
+export type ListStylePosition_StyleType = "inside" | "outside";
 
 
 
@@ -687,17 +706,8 @@ export type ListStyleType_StyleType = "none" | "disc" | "circle" | "square" | "d
 
 
 
-/** Type for list-style-position style property */
-export type ListStylePosition_StyleType = "inside" | "outside";
-
-
-
-/** Type for list-style style property */
-export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_StyleType | ListStyleImage_StyleType |
-    [Extended<ListStyleImage_StyleType>, Extended<ListStylePosition_StyleType>] |
-    [Extended<ListStyleImage_StyleType>, Extended<ListStyleType_StyleType>?] |
-    [Extended<ListStyleType_StyleType>, Extended<ListStylePosition_StyleType>] |
-    [Extended<ListStyleImage_StyleType>, Extended<ListStylePosition_StyleType>, Extended<ListStyleType_StyleType>?];
+/** Type for the marker-start, marker-mid and marker-end style properties */
+export type Marker_StyleType = "none" | IIDRule;
 
 
 
@@ -730,12 +740,7 @@ export type OffsetPath_StyleType = "none" | IRayProxy | IUrlProxy | BasicShape |
 
 
 /** Type for the offset-rotate style property */
-export type OffsetRotate_StyleType = "auto" | "reverse" | CssAngle | ["auto", CssAngle];
-
-
-
-/** Type for the orientation style property */
-export type Orientation_StyleType = "landscape" | "portrait";
+export type OffsetRotate_StyleType = "auto" | "reverse" | CssAngle | ["auto" | "reverse", CssAngle];
 
 
 
@@ -760,13 +765,17 @@ export type OverflowWrap_StyleType = "normal" | "break-word" | "anywhere";
 /** Type for the overscroll-behavior-x/y style property */
 export type OverscrollBehavior_Single_StyleType = "contain" | "none" | "auto";
 
-/** Type for the overflow-behavior style property */
+/** Type for the overscroll-behavior style property */
 export type OverscrollBehavior_StyleType = OneOrPair<OverscrollBehavior_Single_StyleType>;
 
 
 
 /** Type for the paint-order style property */
-export type PaintOrder_StyleType = "normal" | OneOrMany<"fill" | "stroke" | "markers">;
+export type PaintOrder_Keyword = "fill" | "stroke" | "markers";
+
+/** Type for the paint-order style property */
+export type PaintOrder_StyleType = "normal" | PaintOrder_Keyword |
+    [PaintOrder_Keyword, PaintOrder_Keyword?, PaintOrder_Keyword?];
 
 
 
@@ -817,8 +826,20 @@ export type Resize_StyleType = "none" | "both" | "horizontal" | "vertical" | "bl
 
 
 
+/** Type for rotate style property */
+export type Rotate_StyleType = "none" | ["x" | "y" | "z", Extended<CssAngle>] |
+    [Extended<CssNumber>, Extended<CssNumber>, Extended<CssNumber>, Extended<CssAngle>];
+
+
+
 /** Type for row-gap style property */
 export type RowGap_StyleType = CssLength;
+
+
+
+/** Type for the scale style property */
+export type Scale_StyleType = "none" | CssNumber |
+    [Extended<CssNumber>, Extended<CssNumber>?, Extended<CssNumber>?];
 
 
 
@@ -1366,14 +1387,13 @@ export interface ICssStyleset
     floodColor?: CssColor;
     floodOpacity?: CssPercent;
     font?: Font_StyleType;
-    fontDisplay?: DefaultStyleType;
     fontFamily?: DefaultStyleType;
     fontFeatureSettings?: DefaultStyleType;
     fontKerning?: FontKerning_StyleType;
     fontOpticalSizing?: FontOpticalSizing_StyleType;
     fontSize?: CssLength;
     fontSizeAdjust?: number;
-    fontStretch?: FontStretch_Single;
+    fontStretch?: FontStretch_StyleType;
     fontStyle?: FontStyle_StyleType;
     fontSynthesis?: FontSynthesis_StyleType;
     fontVariant?: DefaultStyleType;
@@ -1416,8 +1436,6 @@ export interface ICssStyleset
     justifyItems?: JustifyItems_StyleType;
     justifySelf?: JustifySelf_StyleType;
 
-    kerning?: FontKerning_StyleType;
-
     left?: CssLength;
     letterSpacing?: LetterSpacing_StyleType;
     lightingColor?: CssColor;
@@ -1438,7 +1456,7 @@ export interface ICssStyleset
     marginRight?: CssLength;
     marginTop?: CssLength;
     marker?: DefaultStyleType;
-    markerEnd?: DefaultStyleType;
+    markerEnd?: Marker_StyleType;
     markerMid?: DefaultStyleType;
     markerStart?: DefaultStyleType;
     mask?: DefaultStyleType;
@@ -1452,12 +1470,10 @@ export interface ICssStyleset
     maxHeight?: CssLength;
     maxInlineSize?: CssLength;
     maxWidth?: CssLength;
-    maxZoom?: CssLength;
     minBlockSize?: CssLength;
     minHeight?: CssLength;
     minInlineSize?: CssLength;
     minWidth?: CssLength;
-    minZoom?: CssPercent;
 
     objectFit?: ObjectFit_StyleType;
     objectPosition?: CssPosition;
@@ -1469,7 +1485,6 @@ export interface ICssStyleset
     offsetRotate?: OffsetRotate_StyleType;
     opacity?: CssPercent;
     order?: CssNumber;
-    orientation?: Orientation_StyleType;
     orphans?: CssNumber;
     outline?: Border_StyleType;
     outlineColor?: CssColor;
@@ -1478,11 +1493,11 @@ export interface ICssStyleset
     outlineWidth?: BorderWidth_Single;
     overflow?: Overflow_StyleType;
     overflowAnchor?: OverflowAnchor_StyleType;
+    overflowBlock?: Overflow_Single_StyleType;
+    overflowInline?: Overflow_Single_StyleType;
     overflowWrap?: OverflowWrap_StyleType;
     overflowX?: Overflow_Single_StyleType;
     overflowY?: Overflow_Single_StyleType;
-    overflowInline?: Overflow_Single_StyleType;
-    overflowBlock?: Overflow_Single_StyleType;
     overscrollBehavior?: OverscrollBehavior_StyleType;
     overscrollBehaviorBlock?: OverscrollBehavior_Single_StyleType;
     overscrollBehaviorInline?: OverscrollBehavior_Single_StyleType;
@@ -1498,7 +1513,6 @@ export interface ICssStyleset
     paddingLeft?: CssLength;
     paddingRight?: CssLength;
     paddingTop?: CssLength;
-    page?: DefaultStyleType;
     paintOrder?: PaintOrder_StyleType;
     pageBreakAfter?: BreakAfter_StyleType;
     pageBreakBefore?: BreakBefore_StyleType;
@@ -1515,7 +1529,7 @@ export interface ICssStyleset
 
     resize?: Resize_StyleType;
     right?: CssLength;
-    rotate?: DefaultStyleType;
+    rotate?: Rotate_StyleType;
     rowGap?: RowGap_StyleType;
     rubyAlign?: DefaultStyleType;
     rubyOverhang?: DefaultStyleType;

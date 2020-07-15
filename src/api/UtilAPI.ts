@@ -123,7 +123,7 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 /**
  * Returns a function representing the CSS `url()` function. The string parameter
  * will be wrapped in a "url()" invocation. The function can also accept the IIDRule object to
- * create url(#element) invocation, whcih is often used to address SVG elements by their IDs.
+ * create url(#element) invocation, which is often used to address SVG elements by their IDs.
  */
 export function url( val: Extended<string | IIDRule>): IUrlProxy
 {

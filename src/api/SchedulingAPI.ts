@@ -64,7 +64,7 @@ export function $cancelActivation( schedulerType?: number): void
 /**
  * Sets the default scheduler type that is used by $activate and $deactivate functions that are
  * called without explicitly providing value to the scheduler type parameter. Returns the type of
- * the previous default activator or 0 if an error occurs (e.g. the given scheduler type ID is not
+ * the previous default scheduler or 0 if an error occurs (e.g. the given scheduler type ID is not
  * registered).
  */
 export function setDefaultSchedulerType( schedulerType: number): number
