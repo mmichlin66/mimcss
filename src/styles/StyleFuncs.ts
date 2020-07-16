@@ -910,6 +910,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | 
     scrollPaddingTop: CssLengthMath.styleToString,
     shapeMargin: CssLengthMath.styleToString,
     stopColor: colorToString,
+    stroke: colorToString,
 
     tabSize: CssLengthMath.styleToString,
     textCombineUpright: {

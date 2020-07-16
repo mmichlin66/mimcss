@@ -2,7 +2,7 @@
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
     CssFrequency, CssResolution, CssRadius, IUrlProxy,
-    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy
+    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy, CssLengthPair
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -48,14 +48,14 @@ export type AlignmentBaseline_StyleType = "auto" | "baseline" | "before-edge" | 
 /** Type for single animation */
 export type Animation_Single =
     {
-        name?: ExtendedProp<AnimationName_Single>;
-        duration?: ExtendedProp<CssTime>;
-        func?: ExtendedProp<TimingFunction_Single>;
-        delay?: ExtendedProp<CssTime>;
-        count?: ExtendedProp<AnimationIterationCount_Single>;
-        direction?: ExtendedProp<AnimationDirection_Single>;
-        mode?: ExtendedProp<AnimationFillMode_Single>;
-        state?: ExtendedProp<AnimationPlayState_Single>;
+        name?: Extended<AnimationName_Single>;
+        duration?: Extended<CssTime>;
+        func?: Extended<TimingFunction_Single>;
+        delay?: Extended<CssTime>;
+        count?: Extended<AnimationIterationCount_Single>;
+        direction?: Extended<AnimationDirection_Single>;
+        mode?: Extended<AnimationFillMode_Single>;
+        state?: Extended<AnimationPlayState_Single>;
     };
 
 /** Type for animation style property */
@@ -141,14 +141,14 @@ export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 /** Type for single background value */
 export type Background_Single = string | CssColor |
     {
-        color?: ExtendedProp<CssColor>,
-        image?: ExtendedProp<CssImage | string>,
-        position?: ExtendedProp<CssPosition>,
-        size?: ExtendedProp<BackgroundSize_Single>,
-        repeat?: ExtendedProp<BackgroundRepeat_Single>,
-        attachment?: ExtendedProp<BackgroundAttachment_Single>,
-        origin?: ExtendedProp<BackgroundOrigin_Single>,
-        clip?: ExtendedProp<BackgroundClip_Single>,
+        color?: Extended<CssColor>,
+        image?: Extended<CssImage | string>,
+        position?: Extended<CssPosition>,
+        size?: Extended<BackgroundSize_Single>,
+        repeat?: Extended<BackgroundRepeat_Single>,
+        attachment?: Extended<BackgroundAttachment_Single>,
+        origin?: Extended<BackgroundOrigin_Single>,
+        clip?: Extended<BackgroundClip_Single>,
     };
 
 /** Type for background style property */
@@ -248,11 +248,11 @@ export type BorderColor_StyleType = OneOrBox<CssColor>;
 /** Type for border-image style property expressed as an object. */
 export type BorderImage_Object =
     {
-        source: ExtendedProp<BorderImageSource_StyleType>,
-        slice?: ExtendedProp<BorderImageSlice_StyleType>,
-        width?: ExtendedProp<BorderImageWidth_StyleType>,
-        outset?: ExtendedProp<BorderImageOutset_StyleType>,
-        repeat?: ExtendedProp<BorderImageRepeat_StyleType>,
+        source: Extended<BorderImageSource_StyleType>,
+        slice?: Extended<BorderImageSlice_StyleType>,
+        width?: Extended<BorderImageWidth_StyleType>,
+        outset?: Extended<BorderImageOutset_StyleType>,
+        repeat?: Extended<BorderImageRepeat_StyleType>,
     };
 
 /** Type for border-image style property. */
@@ -311,7 +311,7 @@ export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
 
 /** Type for border style property */
 export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
-    [ExtendedProp<CssLength>?, ExtendedProp<BorderStyle_Keyword>?, ExtendedProp<CssColor>?];
+    [Extended<CssLength>?, Extended<BorderStyle_Keyword>?, Extended<CssColor>?];
 
 
 
@@ -562,13 +562,13 @@ export type Font_SystemKeyword = "caption" | "icon" | "menu" | "message-box" | "
 /** Type for font style property */
 export type Font_StyleType = string | Font_SystemKeyword |
     {
-        size: ExtendedProp<CssLength>;
-        family: ExtendedProp<string>;
-        style?: ExtendedProp<FontStyle_StyleType>;
-        variant?: ExtendedProp<string>;
-        weight?: ExtendedProp<FontWeight_StyleType>;
-        stretch?: ExtendedProp<Exclude<FontStretch_Single,number>>;
-        lineHeight?: ExtendedProp<CssNumber>
+        size: Extended<CssLength>;
+        family: Extended<string>;
+        style?: Extended<FontStyle_StyleType>;
+        variant?: Extended<string>;
+        weight?: Extended<FontWeight_StyleType>;
+        stretch?: Extended<Exclude<FontStretch_Single,number>>;
+        lineHeight?: Extended<CssNumber>
     };
 
 
@@ -874,11 +874,6 @@ export type ShapeRendering_StyleType = "auto" | "optimizeSpeed" | "crispEdges" |
 
 
 
-/** Type for the stop-opacity style property */
-export type StopOpacity_StyleType = number;
-
-
-
 /** Type for the table-layout style property */
 export type TableLayout_StyleType = "auto" | "fixed";
 
@@ -904,42 +899,55 @@ export type TextCombineUpright_StyleType = "none" | "all" | "digits" | number;
 
 
 
+/**
+ * Type for the text-decoration style property. If a number is specified, it will be interpreted
+ * as color - not as thickness.
+ */
+export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecorationStyle_StyleType |
+    CssColor | TextDecorationThickness_StyleType |
+    {
+        line?: Extended<TextDecorationLine_StyleType>,
+        style?: Extended<TextDecorationStyle_StyleType>,
+        color?: Extended<CssColor>,
+        thickness?: Extended<TextDecorationThickness_StyleType>,
+    };
+
+
+
 /** Type for the text-decoration-line style property */
 export type TextDecorationLine_StyleType = "none" | "spelling-error" | "grammar-error" |
     OneOrMany<"underline" | "overline" | "line-through">; 
 
+
+
 /** Type for the text-decoration-style style property */
 export type TextDecorationStyle_StyleType = "solid" | "double" | "dotted" | "dashed" | "wavy";
 
-/** Type for the text-decoration-thickness style property */
-export type TextDecorationThickness_StyleType = "auto" | "from-font" | CssLength;
+
 
 /** Type for the text-decoration-skip-ink style property */
 export type TextDecorationSkipInk_StyleType = "none" | "auto" | "all";
 
-/**
- * Type for the text-decoration-line style property. If a number is specified, it will be interpreted
- * as color - not as thickness.
- */
-export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecorationStyle_StyleType | CssColor |
-    {
-        line?: ExtendedProp<TextDecorationLine_StyleType>,
-        style?: ExtendedProp<TextDecorationStyle_StyleType>,
-        color?: ExtendedProp<CssColor>,
-        thickness?: ExtendedProp<TextDecorationThickness_StyleType>,
-    };
+
+
+/** Type for the text-decoration-thickness style property */
+export type TextDecorationThickness_StyleType = "auto" | "from-font" | CssLength;
 
 
 
 // /** Type for the text-emphasis style property */
 export type TextEmphasis_StyleType = TextEmphasisStyle_StyleType | CssColor |
-    [ExtendedProp<TextEmphasisStyle_StyleType>, ExtendedProp<CssColor>];
+    [Extended<TextEmphasisStyle_StyleType>, Extended<CssColor>];
+
+
 
 /** Type for the text-emphasis-position style property */
-export type TextEmphasisPosition_StyleType = string | [Extended<"over" | "under">, Extended<"left" | "right">];
+export type TextEmphasisPosition_StyleType = "over left" | "over right" | "under left" | "under right";
+
+
 
 /** Shape for the text-emphasis-style style property */
-export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame";
+export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame" | string;
 
 /** Fill option for the text-emphasis-style style property */
 export type TextEmphasisFill = "filled" | "open";
@@ -995,7 +1003,7 @@ export type TextTransform_StyleType = "none" | "capitalize" | "uppercase" | "low
 
 
 
-/** Type for the text-underlinePosition style property */
+/** Type for the text-underline-position style property */
 export type TextUnderlinePosition_StyleType = "auto" | "under" | "left" | "right" | "auto-pos" | "above" | "below";
 
 
@@ -1037,20 +1045,24 @@ export type TransformStyle_StyleType = "flat" | "preserve-3d";
 /** Type for single transition */
 export type Transition_Single = string |
     {
-        property?: ExtendedProp<TransitionProperty_Single>;
-        duration?: ExtendedProp<CssTime>;
-        func?: ExtendedProp<TimingFunction_Single>;
-        delay?: ExtendedProp<CssTime>;
+        property?: Extended<TransitionProperty_Single>;
+        duration?: Extended<CssTime>;
+        func?: Extended<TimingFunction_Single>;
+        delay?: Extended<CssTime>;
     };
 
 /** Type for transition style property */
 export type Transition_StyleType = OneOrMany<Transition_Single>;
+
+
 
 /** Type for single transition-property */
 export type TransitionProperty_Single = "none" | "all" | keyof ICssStyleset;
 
 /** Type for transition-property style property */
 export type TransitionProperty_StyleType = OneOrMany<TransitionProperty_Single>;
+
+
 
 /** Type for transition-timing-function style property */
 export type TransitionTimingFunction_StyleType = OneOrMany<TimingFunction_Single>;
@@ -1538,22 +1550,22 @@ export interface ICssStyleset
     scale?: DefaultStyleType;
     scrollBehavior?: ScrollBehavior_StyleType;
     scrollMargin?: CssLengthBox;
-    scrollMarginBlock?: CssLengthBox;
+    scrollMarginBlock?: CssLengthPair;
     scrollMarginBlockEnd?: CssLength;
     scrollMarginBlockStart?: CssLength;
     scrollMarginBottom?: CssLength;
-    scrollMarginInline?: CssLengthBox;
+    scrollMarginInline?: CssLengthPair;
     scrollMarginInlineEnd?: CssLength;
     scrollMarginInlineStart?: CssLength;
     scrollMarginLeft?: CssLength;
     scrollMarginRight?: CssLength;
     scrollMarginTop?: CssLength;
     scrollPadding?: CssLengthBox;
-    scrollPaddingBlock?: CssLengthBox;
+    scrollPaddingBlock?: CssLengthPair;
     scrollPaddingBlockEnd?: CssLength;
     scrollPaddingBlockStart?: CssLength;
     scrollPaddingBottom?: CssLength;
-    scrollPaddingInline?: CssLengthBox;
+    scrollPaddingInline?: CssLengthPair;
     scrollPaddingInlineEnd?: CssLength;
     scrollPaddingInlineStart?: CssLength;
     scrollPaddingLeft?: CssLength;
@@ -1567,8 +1579,8 @@ export interface ICssStyleset
     shapeOutside?: ShapeOutside_StyleType;
     shapeRendering?: ShapeRendering_StyleType;
     stopColor?: CssColor;
-    stopOpacity?: StopOpacity_StyleType;
-    stroke?: DefaultStyleType;
+    stopOpacity?: CssNumber;
+    stroke?: CssColor;
     strokeDasharray?: DefaultStyleType;
     strokeDashoffset?: DefaultStyleType;
     strokeLinecap?: DefaultStyleType;
@@ -1589,7 +1601,7 @@ export interface ICssStyleset
     textDecorationSkipInk?: TextDecorationSkipInk_StyleType;
     textDecorationStyle?: TextDecorationStyle_StyleType;
     textDecorationThickness?: TextDecorationThickness_StyleType;
-    textEmphasis?: TextEmphasisFill;
+    textEmphasis?: TextEmphasis_StyleType;
     textEmphasisColor?: CssColor;
     textEmphasisPosition?: TextEmphasisPosition_StyleType;
     textEmphasisStyle?: TextEmphasisStyle_StyleType;

@@ -1,5 +1,5 @@
 ﻿import {
-    Extended, IGenericProxy, CssNumber, CssMultiNumber, INumberMath,
+    Extended, IGenericProxy, CssNumber, CssMultiNumber, INumberBaseMath,
     CssPosition, MultiCssPosition, NumberBase, MultiNumberBase,
     CssLength, CssMultiLength, CssAngle, CssMultiAngle, CssTime, CssMultiTime,
     CssResolution, CssMultiResolution, CssFrequency, CssMultiFrequency,
@@ -262,11 +262,11 @@ function calcFunc<T extends string>( parts: TemplateStringsArray, params: Extend
 
 
 /**
- * The NummberMath class contains methods that implement CSS mathematic functions on the
+ * The NummberBaseMath class contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
  */
-class NumberMath<T extends string> implements INumberMath<T>
+class NumberBaseMath<T extends string> implements INumberBaseMath<T>
 {
     constructor( protected convertFunc: ConvertNumberFuncType)
     {
@@ -324,7 +324,7 @@ class NumberMath<T extends string> implements INumberMath<T>
  * The INumberMathClass interface represents a "static" side of classes derived from the
  * NumberMath class.
  */
-export interface INumberMathClass<T extends string>
+export interface INumberBaseMathClass<T extends string>
 {
     convertFunc( n: number): string;
 
@@ -332,7 +332,7 @@ export interface INumberMathClass<T extends string>
 
     multiStyleToString( val: Extended<MultiNumberBase<T>>, separator: string): string;
 
-    new(): INumberMath<T>;
+    new(): INumberBaseMath<T>;
 }
 
 
@@ -348,7 +348,7 @@ export interface INumberMathClass<T extends string>
  * The CssNumberMath class contains methods that implement CSS mathematic functions on the
  * <number> CSS types.
  */
-export class CssNumberMath extends NumberMath<NumberType>
+export class CssNumberMath extends NumberBaseMath<NumberType>
 {
     public static convertFunc( n: number): string { return n.toString(); }
 
@@ -373,7 +373,7 @@ export class CssNumberMath extends NumberMath<NumberType>
  * The CssPercentMath class contains methods that implement CSS mathematic functions on the
  * <percent> CSS types.
  */
-export class CssPercentMath extends NumberMath<PercentType> implements ICssPercentMath
+export class CssPercentMath extends NumberBaseMath<PercentType> implements ICssPercentMath
 {
     public static convertFunc( n: number): string
         { return (Number.isInteger(n) ? n : Math.round(n * 100)) + "%"; }
@@ -408,7 +408,7 @@ export function unitlessOrPercentToString( n: number): string
  * The CssLengthMath class contains methods that implement CSS mathematic functions on the
  * <length> CSS types.
  */
-export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthMath
+export class CssLengthMath extends NumberBaseMath<LengthType> implements ICssLengthMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "px", "em"); }
 
@@ -460,7 +460,7 @@ export class CssLengthMath extends NumberMath<LengthType> implements ICssLengthM
  * The CssAngleMath class contains methods that implement CSS mathematic functions on the
  * <angle> CSS types.
  */
-export class CssAngleMath extends NumberMath<AngleType> implements ICssAngleMath
+export class CssAngleMath extends NumberBaseMath<AngleType> implements ICssAngleMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "deg", "turn"); }
 
@@ -490,7 +490,7 @@ export class CssAngleMath extends NumberMath<AngleType> implements ICssAngleMath
  * The CssTimeMath class contains methods that implement CSS mathematic functions on the
  * <time> CSS types.
  */
-export class CssTimeMath extends NumberMath<TimeType> implements ICssTimeMath
+export class CssTimeMath extends NumberBaseMath<TimeType> implements ICssTimeMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "ms", "s"); }
 
@@ -518,7 +518,7 @@ export class CssTimeMath extends NumberMath<TimeType> implements ICssTimeMath
  * The CssResolutionMath class contains methods that implement CSS mathematic functions on the
  * <resolution> CSS types.
  */
-export class CssResolutionMath extends NumberMath<ResolutionType> implements ICssResolutionMath
+export class CssResolutionMath extends NumberBaseMath<ResolutionType> implements ICssResolutionMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "dpi", "x"); }
 
@@ -555,7 +555,7 @@ export class CssResolutionMath extends NumberMath<ResolutionType> implements ICs
  * The CssFrequencyMath class contains methods that implement CSS mathematic functions on the
  * <frequence> CSS types.
  */
-export class CssFrequencyMath extends NumberMath<FrequencyType> implements ICssFrequencyMath
+export class CssFrequencyMath extends NumberBaseMath<FrequencyType> implements ICssFrequencyMath
 {
     public static convertFunc( n: number): string { return numberToString( n, "Hz", "kHz"); }
 

@@ -5,7 +5,7 @@ import {
     IGradient, ILinearGradient, IRadialGradient, IConicGradient
 } from "../styles/ImageTypes"
 import {colorToString} from "../styles/ColorFuncs";
-import {valueToString, INumberMathClass, CssAngleMath, positionToString, CssPercentMath, CssLengthMath} from "../styles/UtilFuncs";
+import {valueToString, INumberBaseMathClass, CssAngleMath, positionToString, CssPercentMath, CssLengthMath} from "../styles/UtilFuncs";
 import { ExtentKeyword } from "../styles/StyleTypes";
 
 
@@ -177,7 +177,7 @@ function crossFadeToString( args: CrossFadeParam[]): string
 
 
 function gradientStopsOrHintsToString<T extends string>( val: GradientStopOrHint[],
-    mathClass: INumberMathClass<T>): string
+    mathClass: INumberBaseMathClass<T>): string
 {
     return val.map( v => gradientStopOrHintToString( v, mathClass)).join(",");
 }
@@ -185,7 +185,7 @@ function gradientStopsOrHintsToString<T extends string>( val: GradientStopOrHint
 
 
 function gradientStopOrHintToString<T extends string>( val: GradientStopOrHint,
-    mathClass: INumberMathClass<T>): string
+    mathClass: INumberBaseMathClass<T>): string
 {
     return valueToString( val, {
         fromNumber: colorToString,
@@ -197,7 +197,7 @@ function gradientStopOrHintToString<T extends string>( val: GradientStopOrHint,
 
 
 function gradientColorAndLengthToString<T extends string>( val: GradientColorAndLength,
-    mathClass: INumberMathClass<T>): string
+    mathClass: INumberBaseMathClass<T>): string
 {
     let secondStop = val.length > 2 ? mathClass.styleToString( val[2]) : "";
     return `${colorToString(val[0])} ${mathClass.styleToString( val[1])} ${secondStop}`;

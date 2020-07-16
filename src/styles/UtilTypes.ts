@@ -44,7 +44,7 @@ export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
  * accept an optional parameter of a generic type and return a string. This interface is used as a
  * base for proxy interfaces defining types acceptable by certain style properties. The type
  * parameter helps differentiate these interfaces so that functions that can be assigned to one
- * type of style proprties (e.g. "transform") cannot be asigned to an incompatible style property
+ * type of style properties (e.g. "transform") cannot be assigned to an incompatible style property
  * (e.g. clip-path).
  */
 export interface IGenericProxy<T extends string>
@@ -145,11 +145,11 @@ export type MultiNumberBase<T extends string> = OneOrMany<NumberBase<T>>;
 
 
 /**
- * The INumberMath interface contains methods that implement CSS mathematic functions on the
+ * The INumberBaseMath interface contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number type, they are converted
  * to strings using the `numberToString` method.
  */
-export interface INumberMath<T extends string>
+export interface INumberBaseMath<T extends string>
 {
     /** Creates property value using the CSS min() function. */
     min( ...params: Extended<NumberBase<T>>[]): IGenericProxy<T>;
@@ -184,11 +184,14 @@ export type CssNumber = Exclude<NumberBase<NumberType>,string>;
 /** Type for multi-part style property of the `<number>` CSS type */
 export type CssMultiNumber = OneOrMany<CssNumber>;
 
+/** Proxy interface that represents values of the `<percent>` CSS type */
+export interface INumberProxy extends IGenericProxy<NumberType> {};
+
 /**
  * The ICssNumberMath interface contains methods that implement CSS mathematic functions on the
  * `<number>` CSS types.
  */
-export interface ICssNumberMath extends INumberMath<NumberType> {}
+export interface ICssNumberMath extends INumberBaseMath<NumberType> {}
 
 
 
@@ -214,10 +217,10 @@ export type CssMultiPercent = OneOrMany<CssPercent>;
 export interface IPercentProxy extends IGenericProxy<PercentType> {};
 
 /**
- * The IFractionMath interface contains methods that implement CSS mathematic functions on the
+ * The ICssPercentMath interface contains methods that implement CSS mathematic functions on the
  * `<percent>` CSS types.
  */
-export interface ICssPercentMath extends INumberMath<PercentType>
+export interface ICssPercentMath extends INumberBaseMath<PercentType>
 {
     /**
      * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
@@ -246,7 +249,10 @@ export type CssLength = NumberBase<LengthType>;
 /** Type for multi-part style property of the `<length>` CSS type */
 export type CssMultiLength = OneOrMany<CssLength>;
 
-/** Type for 1-to-four-part style property of the `<length>` CSS type */
+/** Type for 1-to-2-part style property of the `<length>` CSS type */
+export type CssLengthPair = OneOrPair<CssLength>;
+
+/** Type for 1-to-4-part style property of the `<length>` CSS type */
 export type CssLengthBox = OneOrBox<CssLength>;
 
 /** Proxy interface that represents values of the `<length>` CSS type */
@@ -256,7 +262,7 @@ export interface ILengthProxy extends IGenericProxy<LengthType> {};
  * The ICssLengthMath interface contains methods that implement CSS mathematic functions on the
  * `<length>` CSS types.
  */
-export interface ICssLengthMath extends INumberMath<LengthType>
+export interface ICssLengthMath extends INumberBaseMath<LengthType>
 {
     /** Creates property value using the CSS minmax() function. */
     minmax( min: Extended<CssLength>, max: Extended<CssLength>): ILengthProxy;
@@ -367,7 +373,7 @@ export interface IAngleProxy extends IGenericProxy<AngleType> {};
  * The ICssAngleMath interface contains methods that implement CSS mathematic functions on the
  * `<angle>` CSS types.
  */
-export interface ICssAngleMath extends INumberMath<AngleType>
+export interface ICssAngleMath extends INumberBaseMath<AngleType>
 {
     /** Creates angle value in degrees */
     deg( n: number): IAngleProxy;
@@ -415,7 +421,7 @@ export interface ITimeProxy extends IGenericProxy<TimeType> {};
  * The ICssTimeMath interface contains methods that implement CSS mathematic functions on the
  * `<time>` CSS types.
  */
-export interface ICssTimeMath extends INumberMath<TimeType>
+export interface ICssTimeMath extends INumberBaseMath<TimeType>
 {
     /** Creates time value in milliseconds */
     ms( n: number): ITimeProxy;
@@ -451,7 +457,7 @@ export interface IResolutionProxy extends IGenericProxy<ResolutionType> {};
  * The ICssResolutionMath interface contains methods that implement CSS mathematic functions on the
  * `<resolution>` CSS types.
  */
-export interface ICssResolutionMath extends INumberMath<ResolutionType>
+export interface ICssResolutionMath extends INumberBaseMath<ResolutionType>
 {
     /** Creates resolution value in DPI */
     dpi( n: number): IResolutionProxy;
@@ -493,7 +499,7 @@ export interface IFrequencyProxy extends IGenericProxy<FrequencyType> {};
  * The ICssFrequencyMath interface contains methods that implement CSS mathematic functions on the
  * `<frequency>` CSS types.
  */
-export interface ICssFrequencyMath extends INumberMath<FrequencyType>
+export interface ICssFrequencyMath extends INumberBaseMath<FrequencyType>
 {
     /** Creates frequency value in Hertz */
     hz( n: number): IFrequencyProxy
