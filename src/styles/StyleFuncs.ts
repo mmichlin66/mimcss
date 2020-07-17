@@ -886,6 +886,9 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | 
     rotate: rotateToString,
     rowGap: CssLengthMath.styleToString,
 
+    scrollbarColor: {
+        arrayItemFunc: colorToString
+    },
     scrollMargin: multiLengthToStringWithSpace,
     scrollMarginBlock: multiLengthToStringWithSpace,
     scrollMarginBlockEnd: CssLengthMath.styleToString,

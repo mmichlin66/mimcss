@@ -850,6 +850,17 @@ export type Scale_StyleType = "none" | CssNumber |
 
 
 
+/** Type for the scrollbar-color style property */
+export type ScrollbarColor_StyleType = "auto" | "dark" | "light" |
+    [Extended<CssColor>, Extended<CssColor>];
+
+
+
+/** Type for the scrollbar-width style property */
+export type ScrollbarWidth_StyleType = "auto" | "thin" | "none";
+
+
+
 /** Type for the scroll-behavior style property */
 export type ScrollBehavior_StyleType = "auto" | "smooth";
 
@@ -1550,6 +1561,8 @@ export interface ICssStyleset
     rubyPosition?: DefaultStyleType;
 
     scale?: DefaultStyleType;
+    scrollbarColor?: ScrollbarColor_StyleType;
+    scrollbarWidth?: ScrollbarWidth_StyleType;
     scrollBehavior?: ScrollBehavior_StyleType;
     scrollMargin?: CssLengthBox;
     scrollMarginBlock?: CssLengthPair;
