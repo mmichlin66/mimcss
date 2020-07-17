@@ -306,16 +306,6 @@ class NumberBaseMath<T extends string> implements INumberBaseMath<T>
     {
         return () => calcFunc( formulaParts, params, this.convertFunc);
     }
-
-    public percent( n: number): IGenericProxy<T>
-    {
-        return () => CssPercentMath.convertFunc(n);
-    }
-
-    public unit( n: number, unit: string): IGenericProxy<T>
-    {
-        return () => n + unit;
-    }
 }
 
 
@@ -424,28 +414,6 @@ export class CssLengthMath extends NumberBaseMath<LengthType> implements ICssLen
     {
         return () => mathFunc( "minmax", [min, max], CssLengthMath.convertFunc);
     }
-
-    public Q( n: number) { return this.unit( n, "Q"); }
-    public ch( n: number) { return this.unit( n, "ch"); }
-    public cm( n: number) { return this.unit( n, "cm"); }
-    public em( n: number) { return this.unit( n, "em"); }
-    public ex( n: number) { return this.unit( n, "ex"); }
-    public ic( n: number) { return this.unit( n, "ic"); }
-    public in( n: number) { return this.unit( n, "in"); }
-    public lh( n: number) { return this.unit( n, "lh"); }
-    public mm( n: number) { return this.unit( n, "mm"); }
-    public pc( n: number) { return this.unit( n, "pc"); }
-    public pt( n: number) { return this.unit( n, "pt"); }
-    public px( n: number) { return this.unit( n, "px"); }
-    public vb( n: number) { return this.unit( n, "vb"); }
-    public vh( n: number) { return this.unit( n, "vh"); }
-    public vi( n: number) { return this.unit( n, "vi"); }
-    public vw( n: number) { return this.unit( n, "vw"); }
-    public rem( n: number) { return this.unit( n, "rem"); }
-    public rlh( n: number) { return this.unit( n, "rlh"); }
-    public vmax( n: number) { return this.unit( n, "vmax"); }
-    public vmin( n: number) { return this.unit( n, "vmin"); }
-    public fr( n: number) { return this.unit( n, "fr"); }
 }
 
 
@@ -471,11 +439,6 @@ export class CssAngleMath extends NumberBaseMath<AngleType> implements ICssAngle
         { return multiStyleToString( val, CssAngleMath.convertFunc, separator); }
 
     constructor() { super( CssAngleMath.convertFunc) }
-
-    public deg( n: number) { return this.unit( n, "deg"); }
-    public rad( n: number) { return this.unit( n, "rad"); }
-    public grad( n: number) { return this.unit( n, "grad"); }
-    public turn( n: number) { return this.unit( n, "turn"); }
 }
 
 
@@ -501,9 +464,6 @@ export class CssTimeMath extends NumberBaseMath<TimeType> implements ICssTimeMat
         { return multiStyleToString( val, CssTimeMath.convertFunc, separator); }
 
     constructor() { super( CssTimeMath.convertFunc) }
-
-    public ms( n: number) { return this.unit( n, "ms"); }
-    public s( n: number) { return this.unit( n, "s"); }
 }
 
 
@@ -529,18 +489,6 @@ export class CssResolutionMath extends NumberBaseMath<ResolutionType> implements
         { return multiStyleToString( val, CssResolutionMath.convertFunc, separator); }
 
     constructor() { super( CssResolutionMath.convertFunc) }
-
-    /** Creates resolution value in DPI */
-    public dpi( n: number) { return this.unit( n, "dpi"); }
-
-    /** Creates resolution value in DPCM */
-    public dpcm( n: number) { return this.unit( n, "dpcm"); }
-
-    /** Creates resolution value in DPPX */
-    public dppx( n: number) { return this.unit( n, "dppx"); }
-
-    /** Creates resolution value in DPPX */
-    public x( n: number) { return this.unit( n, "x"); }
 }
 
 
@@ -566,9 +514,6 @@ export class CssFrequencyMath extends NumberBaseMath<FrequencyType> implements I
         { return multiStyleToString( val, CssFrequencyMath.convertFunc, separator); }
 
     constructor() { super( CssFrequencyMath.convertFunc) }
-
-    public hz( n: number) { return this.unit( n, "Hz"); }
-    public khz( n: number) { return this.unit( n, "kHz"); }
 }
 
 
