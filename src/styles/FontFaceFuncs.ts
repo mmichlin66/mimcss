@@ -1,6 +1,6 @@
 ﻿import * as FontFaceTypes from "./FontFaceTypes"
-import * as UtilFuncs from "./UtilFuncs"
-import {objectToString} from "./StyleFuncs";
+import {obj2str} from "./StyleFuncs";
+import {camelToDash, val2str, CssPercentMath, CssAngleMath, arr2str, CssNumberMath} from "./UtilFuncs";
 
 
 
@@ -16,7 +16,7 @@ export function fontFaceToString( fontface: FontFaceTypes.IFontFace): string | n
 
     for( let propName in fontface)
     {
-        s += `${UtilFuncs.camelToDash( propName)}:`;
+        s += `${camelToDash( propName)}:`;
         let propVal = fontface[propName];
         if (propName === "fontStretch")
             s += fontStretchToString( propVal);
@@ -39,9 +39,9 @@ export function fontFaceToString( fontface: FontFaceTypes.IFontFace): string | n
 
 function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): string
 {
-    return UtilFuncs.valueToString( val, {
-        fromNumber: UtilFuncs.CssPercentMath.styleToString,
-        arrayItemFunc: UtilFuncs.CssPercentMath.styleToString
+    return val2str( val, {
+        fromNumber: CssPercentMath.styleToString,
+        arrFunc: CssPercentMath.styleToString
     });
 }
 
@@ -49,9 +49,9 @@ function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): stri
 
 function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 {
-    return UtilFuncs.valueToString( val, {
-        fromNumber: v => `oblique ${UtilFuncs.CssAngleMath.styleToString(v)}`,
-        fromArray: v => `oblique ${UtilFuncs.arrayToString( v, UtilFuncs.CssAngleMath.styleToString)}`
+    return val2str( val, {
+        fromNumber: v => `oblique ${CssAngleMath.styleToString(v)}`,
+        fromArray: v => `oblique ${arr2str( v, CssAngleMath.styleToString)}`
     });
 }
 
@@ -59,8 +59,8 @@ function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 
 function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
 {
-    return UtilFuncs.valueToString( val, {
-        fromAny: UtilFuncs.CssNumberMath.styleToString
+    return val2str( val, {
+        fromAny: CssNumberMath.styleToString
     });
 }
 
@@ -68,9 +68,9 @@ function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
 
 function fontSrcToString( val: FontFaceTypes.FontSrc_FontFaceType): string
 {
-    return UtilFuncs.valueToString( val, {
+    return val2str( val, {
         fromAny: fontSingleSrcToString,
-        arraySeparator: ","
+        arrSep: ","
     });
 }
 
@@ -78,7 +78,7 @@ function fontSrcToString( val: FontFaceTypes.FontSrc_FontFaceType): string
 
 function fontSingleSrcToString( val: FontFaceTypes.FontSrc_Single): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         ["local", v => `local(${v})`],
         ["url", v => `url(${v})`],
         ["format", v => `format(${fontFormatToString(v)})`]
@@ -89,9 +89,9 @@ function fontSingleSrcToString( val: FontFaceTypes.FontSrc_Single): string
 
 function fontFormatToString( val: FontFaceTypes.FontSrc_Single): string
 {
-    return UtilFuncs.valueToString( val, {
+    return val2str( val, {
         fromString: v => `\"${v}\"`,
-        arraySeparator: ","
+        arrSep: ","
     });
 }
 

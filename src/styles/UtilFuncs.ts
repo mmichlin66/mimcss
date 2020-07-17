@@ -63,16 +63,16 @@ export interface IValueConvertOptions
     fromArray?: (val: any[]) => string;
 
     // Called if value is an object
-    fromObject?: (val: any) => string;
+    fromObj?: (val: any) => string;
 
     // Called if type-specific function is not defined
     fromAny?: (val: any) => string;
 
     // Called to convert array items if fromArray is not defined
-    arrayItemFunc?: (v: any) => string;
+    arrFunc?: (v: any) => string;
 
     // Separator for array items - used only if fromArray is not defined
-    arraySeparator?: string;
+    arrSep?: string;
 
     // If value is a function, these are arguments to pass when invoking it
     funcArgs?: any[];
@@ -84,7 +84,7 @@ export interface IValueConvertOptions
  * Converts a value of an arbitrary type to a single string. The optional options parameter
  * can define how specific types are converted.
  */
-export function valueToString( val: any, options?: IValueConvertOptions): string
+export function val2str( val: any, options?: IValueConvertOptions): string
 {
    if (!options)
     {
@@ -98,7 +98,7 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         else if (typeof val === "string")
             return val;
         else if (Array.isArray(val))
-            return arrayToString( val);
+            return arr2str( val);
         else if (typeof val === "function")
             return val();
         else if (typeof val.valueToString === "function")
@@ -117,23 +117,23 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
         else if (typeof val === "number")
             return options.fromNumber ? options.fromNumber( val) : options.fromAny ? options.fromAny( val) : val.toString();
         else if (typeof val === "function")
-            return valueToString( options.funcArgs ? val( ...options.funcArgs) : val());
+            return val2str( options.funcArgs ? val( ...options.funcArgs) : val());
         else if (Array.isArray(val))
         {
             if (options.fromArray)
                 return options.fromArray( val);
             else
             {
-                let separator = options.arraySeparator != null ? options.arraySeparator : " ";
-                return arrayToString( val, options.arrayItemFunc || options.fromAny || undefined, separator);
+                let separator = options.arrSep != null ? options.arrSep : " ";
+                return arr2str( val, options.arrFunc || options.fromAny || undefined, separator);
             }
         }
         else if (typeof val === "object")
         {
             if (typeof val.valueToString === "function")
                 return val.valueToString();
-            else if (options.fromObject)
-                return options.fromObject( val);
+            else if (options.fromObj)
+                return options.fromObj( val);
             else if (options.fromAny)
                 return options.fromAny( val);
             else
@@ -154,11 +154,11 @@ export function valueToString( val: any, options?: IValueConvertOptions): string
  * Converts an array of the given typeto a single string using the given separator.
  * Elements of the array are converted to strings using the given function.
  */
-export function arrayToString( val: any[], func?: (v) => string, separator: string = " "): string
+export function arr2str( val: any[], func?: (v) => string, separator: string = " "): string
 {
     return !val || val.length === 0
         ? ""
-        : val.filter( x => x != null).map( y => func ? func(y) : valueToString( y)).join( separator);
+        : val.filter( x => x != null).map( y => func ? func(y) : val2str( y)).join( separator);
 }
 
 
@@ -178,7 +178,7 @@ export function templateStringToString( parts: TemplateStringsArray, params: any
 
     let s = "";
     for( let i = 0; i < paramsLen; i++)
-        s += parts[i] + (convertFunc ? convertFunc( params[i]) : valueToString( params[i]));
+        s += parts[i] + (convertFunc ? convertFunc( params[i]) : val2str( params[i]));
 
     // add the last part
     return s + parts[paramsLen];
@@ -214,10 +214,10 @@ function numberToString( n: number, intUnit: string = "", floatUint: string = ""
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function styleToString<T extends string>( val: Extended<NumberBase<T>>,
+function numberBaseToString<T extends string>( val: Extended<NumberBase<T>>,
     convertFunc?: ConvertNumberFuncType): string
 {
-    return valueToString( val, { fromNumber: convertFunc});
+    return val2str( val, { fromNumber: convertFunc});
 }
 
 /**
@@ -229,10 +229,10 @@ function styleToString<T extends string>( val: Extended<NumberBase<T>>,
 function multiStyleToString<T extends string>( val: Extended<MultiNumberBase<T>>,
                 convertFunc?: ConvertNumberFuncType, separator: string = " "): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: convertFunc,
-        arrayItemFunc: v => styleToString( v, convertFunc),
-        arraySeparator: separator
+        arrFunc: v => numberBaseToString( v, convertFunc),
+        arrSep: separator
     });
 }
 
@@ -256,7 +256,7 @@ function mathFunc<T extends string>( name: string, params: Extended<NumberBase<T
 function calcFunc<T extends string>( parts: TemplateStringsArray, params: Extended<NumberBase<T>>[],
     convertFunc?: ConvertNumberFuncType): string
 {
-    return `calc(${templateStringToString( parts, params, (v: any) => styleToString( v, convertFunc))})`;
+    return `calc(${templateStringToString( parts, params, (v: any) => numberBaseToString( v, convertFunc))})`;
 }
 
 
@@ -279,7 +279,7 @@ class NumberBaseMath<T extends string> implements INumberBaseMath<T>
 
     public styleToString = (val: Extended<NumberBase<T>>): string =>
     {
-        return styleToString( val, this.convertFunc);
+        return numberBaseToString( val, this.convertFunc);
     }
 
     public multiStyleToString = (val: Extended<MultiNumberBase<T>>, separator: string = " "): string =>
@@ -353,7 +353,7 @@ export class CssNumberMath extends NumberBaseMath<NumberType>
     public static convertFunc( n: number): string { return n.toString(); }
 
     public static styleToString( val: Extended<CssNumber>): string
-        { return styleToString( val, CssNumberMath.convertFunc); }
+        { return numberBaseToString( val, CssNumberMath.convertFunc); }
 
     public static multiStyleToString( val: Extended<CssMultiNumber>, separator: string): string
         { return multiStyleToString( val, CssNumberMath.convertFunc, separator); }
@@ -379,7 +379,7 @@ export class CssPercentMath extends NumberBaseMath<PercentType> implements ICssP
         { return (Number.isInteger(n) ? n : Math.round(n * 100)) + "%"; }
 
     public static styleToString( val: Extended<CssPercent>): string
-        { return styleToString( val, CssPercentMath.convertFunc); }
+        { return numberBaseToString( val, CssPercentMath.convertFunc); }
 
     public static multiStyleToString( val: Extended<CssMultiPercent>, separator: string): string
         { return multiStyleToString( val, CssPercentMath.convertFunc, separator); }
@@ -413,7 +413,7 @@ export class CssLengthMath extends NumberBaseMath<LengthType> implements ICssLen
     public static convertFunc( n: number): string { return numberToString( n, "px", "em"); }
 
     public static styleToString( val: Extended<CssLength>): string
-        { return styleToString( val, CssLengthMath.convertFunc); }
+        { return numberBaseToString( val, CssLengthMath.convertFunc); }
 
     public static multiStyleToString( val: Extended<CssMultiLength>, separator: string): string
         { return multiStyleToString( val, CssLengthMath.convertFunc, separator); }
@@ -465,7 +465,7 @@ export class CssAngleMath extends NumberBaseMath<AngleType> implements ICssAngle
     public static convertFunc( n: number): string { return numberToString( n, "deg", "turn"); }
 
     public static styleToString( val: Extended<CssAngle>): string
-        { return styleToString( val, CssAngleMath.convertFunc); }
+        { return numberBaseToString( val, CssAngleMath.convertFunc); }
 
     public static multiStyleToString( val: Extended<CssMultiAngle>, separator: string): string
         { return multiStyleToString( val, CssAngleMath.convertFunc, separator); }
@@ -495,7 +495,7 @@ export class CssTimeMath extends NumberBaseMath<TimeType> implements ICssTimeMat
     public static convertFunc( n: number): string { return numberToString( n, "ms", "s"); }
 
     public static styleToString( val: Extended<CssTime>): string
-        { return styleToString( val, CssTimeMath.convertFunc); }
+        { return numberBaseToString( val, CssTimeMath.convertFunc); }
 
     public static multiStyleToString( val: Extended<CssMultiTime>, separator: string): string
         { return multiStyleToString( val, CssTimeMath.convertFunc, separator); }
@@ -523,7 +523,7 @@ export class CssResolutionMath extends NumberBaseMath<ResolutionType> implements
     public static convertFunc( n: number): string { return numberToString( n, "dpi", "x"); }
 
     public static styleToString( val: Extended<CssResolution>): string
-        { return styleToString( val, CssResolutionMath.convertFunc); }
+        { return numberBaseToString( val, CssResolutionMath.convertFunc); }
 
     public static multiStyleToString( val: Extended<CssMultiResolution>, separator: string): string
         { return multiStyleToString( val, CssResolutionMath.convertFunc, separator); }
@@ -560,7 +560,7 @@ export class CssFrequencyMath extends NumberBaseMath<FrequencyType> implements I
     public static convertFunc( n: number): string { return numberToString( n, "Hz", "kHz"); }
 
     public static styleToString( val: Extended<CssFrequency>): string
-        { return styleToString( val, CssFrequencyMath.convertFunc); }
+        { return numberBaseToString( val, CssFrequencyMath.convertFunc); }
 
     public static multiStyleToString( val: Extended<CssMultiFrequency>, separator: string): string
         { return multiStyleToString( val, CssFrequencyMath.convertFunc, separator); }
@@ -582,9 +582,9 @@ export class CssFrequencyMath extends NumberBaseMath<FrequencyType> implements I
 /**
  * Converts single position style value to the CSS string.
  */
-export function positionToString( val: Extended<CssPosition>): string
+export function pos2str( val: Extended<CssPosition>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNull: v => "",
         fromNumber: CssLengthMath.styleToString,
         fromArray: v => CssLengthMath.multiStyleToString( v, " ")
@@ -594,11 +594,11 @@ export function positionToString( val: Extended<CssPosition>): string
 /**
  * Converts multi-position style value to the CSS string.
  */
-export function multiPositionToString( val: Extended<MultiCssPosition>, separator: string): string
+export function multiPos2str( val: Extended<MultiCssPosition>, separator: string): string
 {
-    return valueToString( val, {
-        arrayItemFunc: positionToString,
-        arraySeparator: separator
+    return val2str( val, {
+        arrFunc: pos2str,
+        arrSep: separator
     });
 }
 

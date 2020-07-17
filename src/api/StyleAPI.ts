@@ -10,7 +10,7 @@ import {
 	stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset
 } from "../styles/StyleFuncs"
 import {
-	CssPercentMath, CssLengthMath, arrayToString, CssAngleMath, CssNumberMath, positionToString,
+	CssPercentMath, CssLengthMath, arr2str, CssAngleMath, CssNumberMath, pos2str,
 	 templateStringToString,
 	 camelToDash
 } from "../styles/UtilFuncs";
@@ -325,7 +325,7 @@ export type ShapeRadius = Extended<CssLength | "closest-side" | "farthest-side">
 export function circle( center?: ShapeRadius, position?: Extended<CssPosition>): IBasicShapeProxy
 {
     let c =  center != null ? CssLengthMath.styleToString(center) : "";
-	let pos = position != null ? " at " + positionToString( position) : "";
+	let pos = position != null ? " at " + pos2str( position) : "";
     return () => `circle(${c}${pos})`;
 }
 
@@ -339,7 +339,7 @@ export function ellipse( rx?: ShapeRadius, ry?: ShapeRadius,
 {
     let rxs =  rx != null ? CssLengthMath.styleToString(rx) : "";
     let rys =  ry != null ? " " + CssLengthMath.styleToString(ry) : "";
-	let pos = position != null ? " at " + positionToString( position) : "";
+	let pos = position != null ? " at " + pos2str( position) : "";
     return () => `ellipse(${rxs}${rys}${pos})`;
 }
 
@@ -487,7 +487,7 @@ class PathBuilder implements IPathBuilder
 export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
 	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): ITransformProxy
 {
-    return () => `matrix(${arrayToString( [a, b, c, d, tx, ty], undefined, ",")})`;
+    return () => `matrix(${arr2str( [a, b, c, d, tx, ty], undefined, ",")})`;
 }
 
 
@@ -502,7 +502,7 @@ export function matrix3d(
 		a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>,
 	): ITransformProxy
 {
-    return () => `matrix(${arrayToString( [a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4], undefined, ",")})`;
+    return () => `matrix(${arr2str( [a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4], undefined, ",")})`;
 }
 
 

@@ -5,7 +5,7 @@
 } from "../styles/UtilTypes"
 import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
-	CssFrequencyMath, CssPercentMath, valueToString, templateStringToString
+	CssFrequencyMath, CssPercentMath, val2str, templateStringToString
 } from "../styles/UtilFuncs"
 import {IVarRule, ICounterRule, IIDRule} from "../rules/RuleTypes";
 import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "../styles/StyleTypes";
@@ -127,7 +127,7 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
  */
 export function url( val: Extended<string | IIDRule>): IUrlProxy
 {
-	return () => `url(${valueToString(val)})`;
+	return () => `url(${val2str(val)})`;
 }
 
 
@@ -148,10 +148,10 @@ export function counter( counterObj: Extended<ICounterRule | string>,
 {
 	return () =>
 	{
-		let styleString = style ? `,${valueToString( style)}` : "";
-		let before = textBefore ? `"${valueToString( textBefore)}"` : "";
-		let after = textAfter ? `"${valueToString( textAfter)}"` : "";
-		return `${before} counter(${valueToString(counterObj)}${styleString}) ${after}`;
+		let styleString = style ? `,${val2str( style)}` : "";
+		let before = textBefore ? `"${val2str( textBefore)}"` : "";
+		let after = textAfter ? `"${val2str( textAfter)}"` : "";
+		return `${before} counter(${val2str(counterObj)}${styleString}) ${after}`;
 	}
 }
 
@@ -167,11 +167,11 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 {
 	return () =>
 	{
-		let sepString = separator ? `"${valueToString( separator)}"` : `"."`;
-		let styleString = style ? `,${valueToString( style)}` : "";
-		let before = textBefore ? `"${valueToString( textBefore)}"` : "";
-		let after = textAfter ? `"${valueToString( textAfter)}"` : "";
-		return `${before} counters(${valueToString(counterObj)},${sepString}${styleString}) ${after}`;
+		let sepString = separator ? `"${val2str( separator)}"` : `"."`;
+		let styleString = style ? `,${val2str( style)}` : "";
+		let before = textBefore ? `"${val2str( textBefore)}"` : "";
+		let after = textAfter ? `"${val2str( textAfter)}"` : "";
+		return `${before} counters(${val2str(counterObj)},${sepString}${styleString}) ${after}`;
 	}
 }
 

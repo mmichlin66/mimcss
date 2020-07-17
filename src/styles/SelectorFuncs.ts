@@ -1,5 +1,5 @@
 ﻿import {CssSelector} from "./SelectorTypes";
-import {valueToString} from "./UtilFuncs";
+import {val2str} from "./UtilFuncs";
 
 
 
@@ -14,11 +14,11 @@ import {valueToString} from "./UtilFuncs";
  */
 function nthTupleToString( val: [number, number?]): string
 {
-	let v0 = valueToString( val[0]);
+	let v0 = val2str( val[0]);
 	let v1n = val[1];
 
 	// the '!v1n' expression covers null, undefined and 0.
-	let v1 = !v1n ? "" : v1n > 0 ? "+" + valueToString( v1n) : "-" + valueToString( -v1n);
+	let v1 = !v1n ? "" : v1n > 0 ? "+" + val2str( v1n) : "-" + val2str( -v1n);
 
 	return `${v0}n${v1}`;
 }
@@ -30,8 +30,8 @@ function nthTupleToString( val: [number, number?]): string
  */
 export function selectorToString( val: CssSelector): string
 {
-	return valueToString( val, {
-		arraySeparator: ""
+	return val2str( val, {
+		arrSep: ""
 	})
 }
 
@@ -46,9 +46,9 @@ export function pseudoEntityToString( entityName: string, val: any): string
 		return "";
 
 	if (entityName.startsWith( ":nth"))
-		return valueToString( val, { fromArray: nthTupleToString });
+		return val2str( val, { fromArray: nthTupleToString });
 	else
-		return valueToString(val);
+		return val2str(val);
 }
 
 

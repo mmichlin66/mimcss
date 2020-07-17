@@ -3,7 +3,7 @@ import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_Sty
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps} from "../styles/StyleFuncs"
-import {valueToString, camelToDash} from "../styles/UtilFuncs";
+import {val2str, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
 import {pseudoEntityToString, selectorToString} from "../styles/SelectorFuncs";
 import {s_scheduleStylePropertyUpdate} from "./Scheduling";
@@ -633,7 +633,7 @@ export class SelectorRule extends StyleRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return valueToString( this.selector);
+		return val2str( this.selector);
 	}
 
 	// selector object for this rule.

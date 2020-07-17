@@ -1,7 +1,7 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "./RuleTypes"
 import {Rule, ITopLevelRuleContainer, createNames} from "./Rule"
 import {StyleRule} from "./StyleRules";
-import { valueToString } from "../styles/UtilFuncs";
+import { val2str } from "../styles/UtilFuncs";
 
 
 
@@ -128,10 +128,10 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return valueToString( this.waypoint, {
+		return val2str( this.waypoint, {
 			fromNumber: v => v + "%",
-			arrayItemFunc: v => valueToString( v, { fromNumber: v => v + "%" }),
-			arraySeparator: ","
+			arrFunc: v => val2str( v, { fromNumber: v => v + "%" }),
+			arrSep: ","
 		})
 	}
 

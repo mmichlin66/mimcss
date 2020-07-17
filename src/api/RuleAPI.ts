@@ -11,7 +11,7 @@ import {VarRule} from "../rules/VarRule"
 import {CounterRule} from "../rules/CounterRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
-import {valueToString} from "../styles/UtilFuncs";
+import {val2str} from "../styles/UtilFuncs";
 
 
 
@@ -206,8 +206,8 @@ export function enableShortNames( enable: boolean, prefix?: string): void
  */
 export function classes( ...classes: (RuleTypes.IClassRule | Extended<string>)[]): string
 {
-	return valueToString( classes, {
-		arrayItemFunc: v => v instanceof ClassRule ? v.name : valueToString(v)
+	return val2str( classes, {
+		arrFunc: v => v instanceof ClassRule ? v.name : val2str(v)
 	});
 }
 

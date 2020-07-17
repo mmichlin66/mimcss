@@ -1,5 +1,5 @@
 ﻿import {INamedColors, CssColor, Colors} from "./ColorTypes"
-import {CssAngleMath, valueToString} from "./UtilFuncs"
+import {CssAngleMath, val2str} from "./UtilFuncs"
 import {Extended} from "./UtilTypes";
 
 
@@ -246,7 +246,7 @@ export function colorWithAlphaToString( c: number | keyof INamedColors, a: numbe
  */
 export function colorToString( val: Extended<CssColor>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromString: v => Colors[v] ? colorNumberToString( Colors[v]) : v,
         fromNumber: colorNumberToString
     });

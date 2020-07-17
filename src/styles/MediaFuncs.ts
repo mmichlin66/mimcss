@@ -142,7 +142,7 @@ function mediaFeatureSingleValueToString( propVal: any, convert?: convertFuncTyp
     else if (typeof propVal === "string")
         return propVal;
     else if (Array.isArray( propVal))
-        return UtilFuncs.arrayToString( propVal);
+        return UtilFuncs.arr2str( propVal);
     else
         return propVal.toString();
 }

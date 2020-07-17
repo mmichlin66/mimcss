@@ -2,8 +2,8 @@
 import {ExtendedStyleset} from "./StyleTypes"
 import {Extended, CssRadius, OneOrMany, CssMultiLength, CssMultiTime} from "./UtilTypes";
 import {
-    camelToDash, dashToCamel, valueToString, arrayToString, IValueConvertOptions,
-    positionToString, multiPositionToString, CssLengthMath, CssTimeMath, CssNumberMath,
+    camelToDash, dashToCamel, val2str, arr2str, IValueConvertOptions,
+    pos2str, multiPos2str, CssLengthMath, CssTimeMath, CssNumberMath,
     CssAngleMath, CssFrequencyMath, CssPercentMath, CssResolutionMath, unitlessOrPercentToString,
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
@@ -27,7 +27,7 @@ function multiTimeToStringWithComma( val: Extended<CssMultiTime>): string
 
 function singleAnimation_fromObject( val: StyleTypes.Animation_Single): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         ["duration", CssTimeMath.styleToString],
         ["func", singleTimingFunction_fromStyle],
         ["delay", CssTimeMath.styleToString],
@@ -43,8 +43,8 @@ function singleAnimation_fromObject( val: StyleTypes.Animation_Single): string
 
 function singleAnimation_fromStyle( val: Extended<StyleTypes.Animation_Single>): string
 {
-    return valueToString( val, {
-        fromObject: singleAnimation_fromObject
+    return val2str( val, {
+        fromObj: singleAnimation_fromObject
     });
 }
 
@@ -52,7 +52,7 @@ function singleAnimation_fromStyle( val: Extended<StyleTypes.Animation_Single>):
 
 function timingFunctionToString( val: Extended<OneOrMany<StyleTypes.TimingFunction_Single>>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: timingFunction_fromNumber,
         fromArray: timingFunction_fromArray
     });
@@ -71,14 +71,14 @@ function timingFunction_fromArray( val: any[]): string
 {
     return typeof val[0] === "number"
         ? singleTimingFunction_fromStyle( val as StyleTypes.TimingFunction_Single)
-        : arrayToString( val, singleTimingFunction_fromStyle, ",");
+        : arr2str( val, singleTimingFunction_fromStyle, ",");
 }
 
 
 
 function singleTimingFunction_fromStyle( val: Extended<StyleTypes.TimingFunction_Single>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: timingFunction_fromNumber,
         fromArray: v =>
         {
@@ -114,10 +114,10 @@ function singleTimingFunction_fromStyle( val: Extended<StyleTypes.TimingFunction
 
 function singleBackground_fromObject( val: StyleTypes.Background_Single): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         ["color", colorToString],
         "image",
-        ["position", positionToString],
+        ["position", pos2str],
         ["size", multiLengthToStringWithSpace, "/"],
         "repeat",
         "attachment",
@@ -130,9 +130,9 @@ function singleBackground_fromObject( val: StyleTypes.Background_Single): string
 
 function singleBackground_fromStyle( val: Extended<StyleTypes.Background_Single>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: colorToString,
-        fromObject: singleBackground_fromObject
+        fromObj: singleBackground_fromObject
     });
 }
 
@@ -140,7 +140,7 @@ function singleBackground_fromStyle( val: Extended<StyleTypes.Background_Single>
 
 function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize_Single>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: CssLengthMath.styleToString,
         fromArray: multiLengthToStringWithSpace
     });
@@ -161,7 +161,7 @@ function borderImageToString( val: StyleTypes.BorderImage_Object): string
     if (val.width == null && val.outset != null)
         valCopy.width = 1;
 
-    return objectToString( valCopy, [
+    return obj2str( valCopy, [
         "source",
         ["slice", "borderImageSlice"],
         ["width", null, "/"],
@@ -177,9 +177,9 @@ function borderImageToString( val: StyleTypes.BorderImage_Object): string
  */
 function borderImageSliceToString( val: Extended<StyleTypes.BorderImageSlice_StyleType>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: unitlessOrPercentToString,
-        arrayItemFunc: v => valueToString( v, {
+        arrFunc: v => val2str( v, {
             fromBool: () => "fill",
             fromNumber: unitlessOrPercentToString,
         })
@@ -190,7 +190,7 @@ function borderImageSliceToString( val: Extended<StyleTypes.BorderImageSlice_Sty
 
 export function singleBoxShadow_fromObject( val: StyleTypes.BoxShadow_Single): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         ["inset", v => v ? "inset" : ""],
         ["x", CssLengthMath.styleToString],
         ["y", CssLengthMath.styleToString],
@@ -207,8 +207,8 @@ export function singleBoxShadow_fromObject( val: StyleTypes.BoxShadow_Single): s
  */
 function singleCornerRadiusToString( val: Extended<CssRadius>): string
 {
-    return valueToString( val, {
-        arrayItemFunc: CssLengthMath.styleToString,
+    return val2str( val, {
+        arrFunc: CssLengthMath.styleToString,
         fromAny: CssLengthMath.styleToString
     });
 }
@@ -220,20 +220,20 @@ function singleCornerRadiusToString( val: Extended<CssRadius>): string
  */
 export function borderRadiusToString( val: Extended<StyleTypes.BorderRadius_StyleType>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromArray: v =>
         {
             if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = arrayToString( v[0], CssLengthMath.styleToString, " ");
+                let s = arr2str( v[0], CssLengthMath.styleToString, " ");
                 s += " / ";
-                return s + arrayToString( v[1], CssLengthMath.styleToString, " ");
+                return s + arr2str( v[1], CssLengthMath.styleToString, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return arrayToString( v, CssLengthMath.styleToString, " ");
+                return arr2str( v, CssLengthMath.styleToString, " ");
             }
         },
         fromAny: CssLengthMath.styleToString
@@ -247,7 +247,7 @@ export function borderRadiusToString( val: Extended<StyleTypes.BorderRadius_Styl
  */
 function borderToString( val: Extended<StyleTypes.Border_StyleType>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: CssLengthMath.styleToString,
         fromArray: v =>
         {
@@ -256,7 +256,7 @@ function borderToString( val: Extended<StyleTypes.Border_StyleType>): string
                 buf.push( CssLengthMath.styleToString( v[0]))
 
             if (v[1] != null)
-                buf.push( valueToString(v[1]));
+                buf.push( val2str(v[1]));
 
             if (v[2] != null)
                 buf.push( colorToString(v[2]));
@@ -274,7 +274,7 @@ function borderToString( val: Extended<StyleTypes.Border_StyleType>): string
  */
 function columnsToString( val: Extended<StyleTypes.Columns_StyleType>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromArray: v => v[0] + " " + CssLengthMath.styleToString( v[1])
     });
 }
@@ -290,19 +290,19 @@ function cursorToString( val: Extended<StyleTypes.Cursor_StyleType>): string
     // if the first element is a function, then we need to use space as a separator (because
     // this is a URL with optional numbers for the hot spot); otherwise, we use comma as a
     // separator - because these are multiple cursor definitions.
-    return valueToString( val, {
+    return val2str( val, {
         fromArray: v => {
             if (v.length === 0)
                 return "";
             else if (v.length === 1)
-                return valueToString(v);
+                return val2str(v);
             else if (typeof v[1] === "number")
-                return valueToString( v, { arraySeparator: " "})
+                return val2str( v, { arrSep: " "})
             else
             {
-                return valueToString( v, {
-                    arrayItemFunc: cursorToString,
-                    arraySeparator: ","
+                return val2str( v, {
+                    arrFunc: cursorToString,
+                    arrSep: ","
                 })
             }
         }
@@ -316,7 +316,7 @@ function cursorToString( val: Extended<StyleTypes.Cursor_StyleType>): string
  */
 function flexToString( val: Extended<StyleTypes.Flex_StyleType>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromArray: v =>
         {
             if (v.length === 2)
@@ -332,7 +332,7 @@ function flexToString( val: Extended<StyleTypes.Flex_StyleType>): string
 
 function font_fromObject( val: any): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         ["style", fontStyleToString],
         "variant",
         "weight",
@@ -347,7 +347,7 @@ function font_fromObject( val: any): string
 
 function fontStyleToString( val: Extended<StyleTypes.Font_StyleType>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: v => "oblique " + CssAngleMath.styleToString( v)
     });
 }
@@ -356,8 +356,8 @@ function fontStyleToString( val: Extended<StyleTypes.Font_StyleType>): string
 
 function markerStyleToString( val: Extended<StyleTypes.Marker_StyleType>): string
 {
-    return valueToString( val, {
-        fromObject: v => `url(#${(val as IIDRule).name})`
+    return val2str( val, {
+        fromObj: v => `url(#${(val as IIDRule).name})`
     });
 }
 
@@ -365,7 +365,7 @@ function markerStyleToString( val: Extended<StyleTypes.Marker_StyleType>): strin
 
 function rotateToString( val:StyleTypes.Rotate_StyleType): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromArray: v => {
             if (v.length === 2)
                 return `${v[0]} ${CssAngleMath.styleToString(v[1])}`;
@@ -377,7 +377,7 @@ function rotateToString( val:StyleTypes.Rotate_StyleType): string
 
 function textDecoration_fromObject( val: Extended<StyleTypes.TextDecoration_StyleType>): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         "line",
         "style",
         ["color", colorToString],
@@ -389,7 +389,7 @@ function textDecoration_fromObject( val: Extended<StyleTypes.TextDecoration_Styl
 
 function singleTransition_fromObject( val: Extended<StyleTypes.Transition_Single>): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         ["property", camelToDash],
         ["duration", CssTimeMath.styleToString],
         ["func", singleTimingFunction_fromStyle],
@@ -401,8 +401,8 @@ function singleTransition_fromObject( val: Extended<StyleTypes.Transition_Single
 
 function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>): string
 {
-    return valueToString( val, {
-        fromObject: singleTransition_fromObject
+    return val2str( val, {
+        fromObj: singleTransition_fromObject
     });
 }
 
@@ -410,7 +410,7 @@ function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>
 
 function offsetToString( val: StyleTypes.Offset_StyleType): string
 {
-    return objectToString( val, [
+    return obj2str( val, [
         ["position", "offsetPosition"],
         ["path", "offsetPath"],
         ["distance", "offsetDistance"],
@@ -446,7 +446,7 @@ export type ToStringFunc = (val: any) => string;
  * 
  * The order of the names determines in which order the properties should be added to the string.
  */
-export function objectToString( val: any,
+export function obj2str( val: any,
     info: (string | [string, null | string | ToStringFunc, string?] )[],
     separator: string = " "): string
 {
@@ -472,7 +472,7 @@ export function objectToString( val: any,
 
         let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
         if (!convertor)
-            buf.push( valueToString( propVal));
+            buf.push( val2str( propVal));
         else if (typeof convertor === "string")
             buf.push( stylePropToString( convertor, propVal, true));
         else
@@ -617,9 +617,8 @@ export function getCustomPropNameAndValue( customVal: StyleTypes.CustomVar_Style
 
 
 /**
- * Converts the given style property to the CSS style string. Property name cn be in either
+ * Converts the given style property to the CSS style string. Property name can be in either
  * dash or camel form.
- * @param style 
  */
 export function stylePropToString( propName: string, propVal: any, valueOnly?: boolean): string
 {
@@ -638,11 +637,14 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         varValue = propVal["!"];
         impFlag = true;
     }
+
     let stringValue = !info
-        ? valueToString( varValue)
+        ? val2str( varValue)
         : typeof info === "object"
-            ? valueToString( varValue, info as IValueConvertOptions)
-            : (info as ToStringFunc)( varValue);
+            ? val2str( varValue, info as IValueConvertOptions)
+            : typeof info === "number"
+                ? valueToStringByWellKnownFunc( varValue, info)
+                : (info as ToStringFunc)( varValue);
 
     if (!stringValue && !valueOnly)
         stringValue = "initial";
@@ -696,6 +698,49 @@ export function forAllPropsInStylset( styleset: StyleTypes.Styleset,
 
 
 
+/**
+ * Numeric identifiers corresponding to well known functions used to convert style property values
+ * to strings. This is used to reduce the size of the object used for mapping style properties to
+ * conversion functions.
+ * 
+ * Note!!!: the order in the enumeration cannot be changed - otherwise, it will not be backwards
+ * compatible. All new values must be appended at the end.
+ */
+const enum WellKnownFunc
+{
+    Length = 1,
+    MultiLengthWithSpace,
+    Color,
+    Border,
+    Position,
+    CornerRadius,
+}
+
+
+
+/**
+ * Converts the given value to string using a well-known function indicated by the given
+ * enumeration value.
+ * @param val 
+ * @param funcType 
+ */
+function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): string
+{
+    switch( funcType)
+    {
+        case WellKnownFunc.Length: return CssLengthMath.styleToString( val);
+        case WellKnownFunc.MultiLengthWithSpace: return multiLengthToStringWithSpace( val);
+        case WellKnownFunc.Color: return colorToString( val);
+        case WellKnownFunc.Border: return borderToString( val);
+        case WellKnownFunc.Position: return pos2str( val);
+        case WellKnownFunc.CornerRadius: return singleCornerRadiusToString( val);
+
+        default: return "";
+    }
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Registry of CSS properties that specifies how their values should be converted to strings.
@@ -704,7 +749,7 @@ export function forAllPropsInStylset( styleset: StyleTypes.Styleset,
 
 // Helper object that is used to indicate that values in an array should be separated by comma.
 // We use it many times in the stucture below.
-let commaArraySeparator = { arraySeparator: "," };
+let commaArraySeparator = { arrSep: "," };
 
 
 
@@ -712,12 +757,12 @@ let commaArraySeparator = { arraySeparator: "," };
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | IValueConvertOptions) } =
+const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (WellKnownFunc | ToStringFunc | IValueConvertOptions) } =
 {
     animation: {
-        fromObject: singleAnimation_fromObject,
+        fromObj: singleAnimation_fromObject,
         fromAny: singleAnimation_fromStyle,
-        arraySeparator: ",",
+        arrSep: ",",
     },
     animationDelay: multiTimeToStringWithComma,
     animationDuration: multiTimeToStringWithComma,
@@ -729,231 +774,230 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | 
 
     background: {
         fromNumber: colorToString,
-        fromObject: singleBackground_fromObject,
+        fromObj: singleBackground_fromObject,
         fromAny: singleBackground_fromStyle,
-        arrayItemFunc: singleBackground_fromStyle,
-        arraySeparator: ",",
+        arrFunc: singleBackground_fromStyle,
+        arrSep: ",",
     },
     backgroundAttachment: commaArraySeparator,
     backgroundBlendMode: commaArraySeparator,
     backgroundClip: commaArraySeparator,
-    backgroundColor: colorToString,
+    backgroundColor: WellKnownFunc.Color,
     backgroundOrigin: commaArraySeparator,
-    backgroundPosition: v => multiPositionToString( v, ","),
+    backgroundPosition: v => multiPos2str( v, ","),
     backgroundRepeat: commaArraySeparator,
     backgroundSize: {
         fromNumber: CssLengthMath.styleToString,
-        arrayItemFunc: singleBackgroundSize_fromStyle,
-        arraySeparator: ","
+        arrFunc: singleBackgroundSize_fromStyle,
+        arrSep: ","
     },
-    baselineShift: CssLengthMath.styleToString,
-    border: borderToString,
-    borderBlockEnd: borderToString,
-    borderBlockEndColor: colorToString,
-    borderBlockEndWidth: CssLengthMath.styleToString,
-    borderBlockStart: borderToString,
-    borderBlockStartColor: colorToString,
-    borderBlockStartWidth: CssLengthMath.styleToString,
-    borderBottom: borderToString,
-    borderBottomColor: colorToString,
-    borderBottomLeftRadius: singleCornerRadiusToString,
-    borderBottomRightRadius: singleCornerRadiusToString,
-    borderBottomWidth: CssLengthMath.styleToString,
+    baselineShift: WellKnownFunc.Length,
+    border: WellKnownFunc.Border,
+    borderBlockEnd: WellKnownFunc.Border,
+    borderBlockEndColor: WellKnownFunc.Color,
+    borderBlockEndWidth: WellKnownFunc.Length,
+    borderBlockStart: WellKnownFunc.Border,
+    borderBlockStartColor: WellKnownFunc.Color,
+    borderBlockStartWidth: WellKnownFunc.Length,
+    borderBottom: WellKnownFunc.Border,
+    borderBottomColor: WellKnownFunc.Color,
+    borderBottomLeftRadius: WellKnownFunc.CornerRadius,
+    borderBottomRightRadius: WellKnownFunc.CornerRadius,
+    borderBottomWidth: WellKnownFunc.Length,
     borderColor: {
-        arrayItemFunc: colorToString,
+        arrFunc: colorToString,
         fromAny: colorToString
     },
     borderImage: {
-        fromObject: borderImageToString,
+        fromObj: borderImageToString,
     },
     borderImageSlice: borderImageSliceToString,
-    borderInlineEnd: borderToString,
-    borderInlineEndColor: colorToString,
-    borderInlineEndWidth: CssLengthMath.styleToString,
-    borderInlineStart: borderToString,
-    borderInlineStartColor: colorToString,
-    borderInlineStartWidth: CssLengthMath.styleToString,
-    borderLeft: borderToString,
-    borderLeftColor: colorToString,
-    borderLeftWidth: CssLengthMath.styleToString,
+    borderInlineEnd: WellKnownFunc.Border,
+    borderInlineEndColor: WellKnownFunc.Color,
+    borderInlineEndWidth: WellKnownFunc.Length,
+    borderInlineStart: WellKnownFunc.Border,
+    borderInlineStartColor: WellKnownFunc.Color,
+    borderInlineStartWidth: WellKnownFunc.Length,
+    borderLeft: WellKnownFunc.Border,
+    borderLeftColor: WellKnownFunc.Color,
+    borderLeftWidth: WellKnownFunc.Length,
     borderRadius: borderRadiusToString,
-    borderRight: borderToString,
-    borderRightColor: colorToString,
-    borderRightWidth: CssLengthMath.styleToString,
-    borderSpacing: multiLengthToStringWithSpace,
-    borderTop: borderToString,
-    borderTopColor: colorToString,
-    borderTopLeftRadius: singleCornerRadiusToString,
-    borderTopRightRadius: singleCornerRadiusToString,
-    borderTopWidth: CssLengthMath.styleToString,
-    borderWidth: multiLengthToStringWithSpace,
-    bottom: CssLengthMath.styleToString,
+    borderRight: WellKnownFunc.Border,
+    borderRightColor: WellKnownFunc.Color,
+    borderRightWidth: WellKnownFunc.Length,
+    borderSpacing: WellKnownFunc.MultiLengthWithSpace,
+    borderTop: WellKnownFunc.Border,
+    borderTopColor: WellKnownFunc.Color,
+    borderTopLeftRadius: WellKnownFunc.CornerRadius,
+    borderTopRightRadius: WellKnownFunc.CornerRadius,
+    borderTopWidth: WellKnownFunc.Length,
+    borderWidth: WellKnownFunc.MultiLengthWithSpace,
+    bottom: WellKnownFunc.Length,
     boxShadow: {
-        fromObject: singleBoxShadow_fromObject,
-        arraySeparator: ",",
+        fromObj: singleBoxShadow_fromObject,
+        arrSep: ",",
     },
 
-    caretColor: colorToString,
+    caretColor: WellKnownFunc.Color,
     clip:  {
         fromArray: v => `rect(${multiLengthToStringWithSpace(v)}`
     },
-    color: colorToString,
-    columnGap: CssLengthMath.styleToString,
-    columnRule: borderToString,
-    columnRuleColor: colorToString,
-    columnRuleStyle: valueToString,
-    columnRuleWidth: multiLengthToStringWithSpace,
+    color: WellKnownFunc.Color,
+    columnGap: WellKnownFunc.Length,
+    columnRule: WellKnownFunc.Border,
+    columnRuleColor: WellKnownFunc.Color,
+    columnRuleWidth: WellKnownFunc.MultiLengthWithSpace,
     columns: columnsToString,
-    columnWidth: CssLengthMath.styleToString,
+    columnWidth: WellKnownFunc.Length,
     cursor: cursorToString,
 
-    fill: colorToString,
+    fill: WellKnownFunc.Color,
     fillOpacity: CssPercentMath.styleToString,
     flex: flexToString,
-    flexBasis: CssLengthMath.styleToString,
-    floodColor: colorToString,
+    flexBasis: WellKnownFunc.Length,
+    floodColor: WellKnownFunc.Color,
     font: {
-        fromObject: font_fromObject
+        fromObj: font_fromObject
     },
-    fontSize: CssLengthMath.styleToString,
+    fontSize: WellKnownFunc.Length,
     fontStyle: fontStyleToString,
 
-    gap: multiLengthToStringWithSpace,
-    gridColumnGap: CssLengthMath.styleToString,
-    gridGap: multiLengthToStringWithSpace,
-    gridRowGap: CssLengthMath.styleToString,
+    gap: WellKnownFunc.MultiLengthWithSpace,
+    gridColumnGap: WellKnownFunc.Length,
+    gridGap: WellKnownFunc.MultiLengthWithSpace,
+    gridRowGap: WellKnownFunc.Length,
 
-    height: CssLengthMath.styleToString,
+    height: WellKnownFunc.Length,
 
-    inlineSize: CssLengthMath.styleToString,
+    inlineSize: WellKnownFunc.Length,
 
-    left: CssLengthMath.styleToString,
-    letterSpacing: CssLengthMath.styleToString,
-    lightingColor: colorToString,
+    left: WellKnownFunc.Length,
+    letterSpacing: WellKnownFunc.Length,
+    lightingColor: WellKnownFunc.Color,
 
-    margin: multiLengthToStringWithSpace,
-    marginBlockEnd: CssLengthMath.styleToString,
-    marginBlockStart: CssLengthMath.styleToString,
-    marginBottom: CssLengthMath.styleToString,
-    marginInlineEnd: CssLengthMath.styleToString,
-    marginInlineStart: CssLengthMath.styleToString,
-    marginLeft: CssLengthMath.styleToString,
-    marginRight: CssLengthMath.styleToString,
-    marginTop: CssLengthMath.styleToString,
+    margin: WellKnownFunc.MultiLengthWithSpace,
+    marginBlockEnd: WellKnownFunc.Length,
+    marginBlockStart: WellKnownFunc.Length,
+    marginBottom: WellKnownFunc.Length,
+    marginInlineEnd: WellKnownFunc.Length,
+    marginInlineStart: WellKnownFunc.Length,
+    marginLeft: WellKnownFunc.Length,
+    marginRight: WellKnownFunc.Length,
+    marginTop: WellKnownFunc.Length,
     markerEnd: markerStyleToString,
     markerMid: markerStyleToString,
     markerStart: markerStyleToString,
-    maxBlockSize: CssLengthMath.styleToString,
-    maxHeight: CssLengthMath.styleToString,
-    maxInlineSize: CssLengthMath.styleToString,
-    maxWidth: CssLengthMath.styleToString,
-    minBlockSize: CssLengthMath.styleToString,
-    minHeight: CssLengthMath.styleToString,
-    minInlineSize: CssLengthMath.styleToString,
-	minWidth: CssLengthMath.styleToString,
+    maxBlockSize: WellKnownFunc.Length,
+    maxHeight: WellKnownFunc.Length,
+    maxInlineSize: WellKnownFunc.Length,
+    maxWidth: WellKnownFunc.Length,
+    minBlockSize: WellKnownFunc.Length,
+    minHeight: WellKnownFunc.Length,
+    minInlineSize: WellKnownFunc.Length,
+	minWidth: WellKnownFunc.Length,
 
-    objectPosition: positionToString,
+    objectPosition: WellKnownFunc.Position,
     offset: offsetToString,
-    offsetAnchor: positionToString,
-    offsetDistance: CssLengthMath.styleToString,
-    offsetPosition: positionToString,
+    offsetAnchor: WellKnownFunc.Position,
+    offsetDistance: WellKnownFunc.Length,
+    offsetPosition: WellKnownFunc.Position,
     offsetRotate: {
         fromAny: CssAngleMath.styleToString
     },
-    outline: borderToString,
-    outlineColor: colorToString,
-    outlineOffset: CssLengthMath.styleToString,
+    outline: WellKnownFunc.Border,
+    outlineColor: WellKnownFunc.Color,
+    outlineOffset: WellKnownFunc.Length,
 
-    padding: multiLengthToStringWithSpace,
-    paddingBlockEnd: CssLengthMath.styleToString,
-    paddingBlockStart: CssLengthMath.styleToString,
-    paddingBottom: CssLengthMath.styleToString,
-    paddingInlineEnd: CssLengthMath.styleToString,
-    paddingInlineStart: CssLengthMath.styleToString,
-    paddingLeft: CssLengthMath.styleToString,
-    paddingRight: CssLengthMath.styleToString,
-    paddingTop: CssLengthMath.styleToString,
-    perspective: CssLengthMath.styleToString,
+    padding: WellKnownFunc.MultiLengthWithSpace,
+    paddingBlockEnd: WellKnownFunc.Length,
+    paddingBlockStart: WellKnownFunc.Length,
+    paddingBottom: WellKnownFunc.Length,
+    paddingInlineEnd: WellKnownFunc.Length,
+    paddingInlineStart: WellKnownFunc.Length,
+    paddingLeft: WellKnownFunc.Length,
+    paddingRight: WellKnownFunc.Length,
+    paddingTop: WellKnownFunc.Length,
+    perspective: WellKnownFunc.Length,
     perspectiveOrigin: {
         fromAny: CssLengthMath.styleToString
     },
 
     quotes: {
-        arrayItemFunc: v => `"${v}"`
+        arrFunc: v => `"${v}"`
     },
 
-    right: CssLengthMath.styleToString,
+    right: WellKnownFunc.Length,
     rotate: rotateToString,
-    rowGap: CssLengthMath.styleToString,
+    rowGap: WellKnownFunc.Length,
 
     scrollbarColor: {
-        arrayItemFunc: colorToString
+        arrFunc: colorToString
     },
-    scrollMargin: multiLengthToStringWithSpace,
-    scrollMarginBlock: multiLengthToStringWithSpace,
-    scrollMarginBlockEnd: CssLengthMath.styleToString,
-    scrollMarginBlockStart: CssLengthMath.styleToString,
-    scrollMarginBottom: CssLengthMath.styleToString,
-    scrollMarginInline: multiLengthToStringWithSpace,
-    scrollMarginInlineEnd: CssLengthMath.styleToString,
-    scrollMarginInlineStart: CssLengthMath.styleToString,
-    scrollMarginLeft: CssLengthMath.styleToString,
-    scrollMarginRight: CssLengthMath.styleToString,
-    scrollMarginTop: CssLengthMath.styleToString,
-    scrollPadding: multiLengthToStringWithSpace,
-    scrollPaddingBlock: multiLengthToStringWithSpace,
-    scrollPaddingBlockEnd: CssLengthMath.styleToString,
-    scrollPaddingBlockStart: CssLengthMath.styleToString,
-    scrollPaddingBottom: CssLengthMath.styleToString,
-    scrollPaddingInline: multiLengthToStringWithSpace,
-    scrollPaddingInlineEnd: CssLengthMath.styleToString,
-    scrollPaddingInlineStart: CssLengthMath.styleToString,
-    scrollPaddingLeft: CssLengthMath.styleToString,
-    scrollPaddingRight: CssLengthMath.styleToString,
-    scrollPaddingTop: CssLengthMath.styleToString,
-    shapeMargin: CssLengthMath.styleToString,
-    stopColor: colorToString,
-    stroke: colorToString,
+    scrollMargin: WellKnownFunc.MultiLengthWithSpace,
+    scrollMarginBlock: WellKnownFunc.MultiLengthWithSpace,
+    scrollMarginBlockEnd: WellKnownFunc.Length,
+    scrollMarginBlockStart: WellKnownFunc.Length,
+    scrollMarginBottom: WellKnownFunc.Length,
+    scrollMarginInline: WellKnownFunc.MultiLengthWithSpace,
+    scrollMarginInlineEnd: WellKnownFunc.Length,
+    scrollMarginInlineStart: WellKnownFunc.Length,
+    scrollMarginLeft: WellKnownFunc.Length,
+    scrollMarginRight: WellKnownFunc.Length,
+    scrollMarginTop: WellKnownFunc.Length,
+    scrollPadding: WellKnownFunc.MultiLengthWithSpace,
+    scrollPaddingBlock: WellKnownFunc.MultiLengthWithSpace,
+    scrollPaddingBlockEnd: WellKnownFunc.Length,
+    scrollPaddingBlockStart: WellKnownFunc.Length,
+    scrollPaddingBottom: WellKnownFunc.Length,
+    scrollPaddingInline: WellKnownFunc.MultiLengthWithSpace,
+    scrollPaddingInlineEnd: WellKnownFunc.Length,
+    scrollPaddingInlineStart: WellKnownFunc.Length,
+    scrollPaddingLeft: WellKnownFunc.Length,
+    scrollPaddingRight: WellKnownFunc.Length,
+    scrollPaddingTop: WellKnownFunc.Length,
+    shapeMargin: WellKnownFunc.Length,
+    stopColor: WellKnownFunc.Color,
+    stroke: WellKnownFunc.Color,
 
-    tabSize: CssLengthMath.styleToString,
+    tabSize: WellKnownFunc.Length,
     textCombineUpright: {
         fromNumber: v => `digits ${v}`
     },
     textDecoration: {
         fromNumber: colorToString,
-        fromObject: textDecoration_fromObject
+        fromObj: textDecoration_fromObject
     },
-    textDecorationColor: colorToString,
-    textDecorationThickness: CssLengthMath.styleToString,
+    textDecorationColor: WellKnownFunc.Color,
+    textDecorationThickness: WellKnownFunc.Length,
     textEmphasis: {
-        arrayItemFunc: colorToString
+        arrFunc: colorToString
     },
-    textEmphasisColor: colorToString,
+    textEmphasisColor: WellKnownFunc.Color,
     textIndent: {
         fromNumber: CssLengthMath.styleToString,
-        arrayItemFunc: CssLengthMath.styleToString
+        arrFunc: CssLengthMath.styleToString
     },
     textShadow: {
-        fromObject: singleBoxShadow_fromObject,
-        arraySeparator: ",",
+        fromObj: singleBoxShadow_fromObject,
+        arrSep: ",",
     },
     textSizeAdjust: CssPercentMath.styleToString,
-    top: CssLengthMath.styleToString,
+    top: WellKnownFunc.Length,
     transformOrigin: {
         fromAny: CssLengthMath.styleToString
     },
     transition: {
-        fromObject: singleTransition_fromObject,
+        fromObj: singleTransition_fromObject,
         fromAny: singleTransition_fromStyle,
-        arraySeparator: ",",
+        arrSep: ",",
     },
     transitionDelay: {
         fromAny: CssTimeMath.styleToString,
-        arraySeparator: ","
+        arrSep: ","
     },
     transitionDuration: {
         fromAny: CssTimeMath.styleToString,
-        arraySeparator: ","
+        arrSep: ","
     },
     transitionTimingFunction: timingFunctionToString,
     translate: {
@@ -964,23 +1008,23 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (ToStringFunc | 
         fromNumber: CssLengthMath.styleToString
     },
 
-    width: CssLengthMath.styleToString,
+    width: WellKnownFunc.Length,
     willChange: {
         fromString: camelToDash
     },
-    wordSpacing: CssLengthMath.styleToString,
+    wordSpacing: WellKnownFunc.Length,
 
     zoom: CssPercentMath.styleToString,
 
     // special properties for IVarRule types
-    "CssLength": CssLengthMath.styleToString,
+    "CssLength": WellKnownFunc.Length,
     "CssAngle": CssAngleMath.styleToString,
     "CssTime": CssTimeMath.styleToString,
     "CssResolution": CssResolutionMath.styleToString,
     "CssFrequency": CssFrequencyMath.styleToString,
     "CssPercent": CssPercentMath.styleToString,
-    "CssPosition": positionToString,
-    "CssColor": colorToString,
+    "CssPosition": WellKnownFunc.Position,
+    "CssColor": WellKnownFunc.Color,
 };
 
 

@@ -5,7 +5,7 @@ import {
     IGradient, ILinearGradient, IRadialGradient, IConicGradient
 } from "../styles/ImageTypes"
 import {colorToString} from "../styles/ColorFuncs";
-import {valueToString, INumberBaseMathClass, CssAngleMath, positionToString, CssPercentMath, CssLengthMath} from "../styles/UtilFuncs";
+import {val2str, INumberBaseMathClass, CssAngleMath, pos2str, CssPercentMath, CssLengthMath} from "../styles/UtilFuncs";
 import { ExtentKeyword } from "../styles/StyleTypes";
 
 
@@ -129,7 +129,7 @@ function linearGradientToString( name: string, stopsOrHints: GradientStopOrHint[
     let angleString = "";
     if (angle)
     {
-        angleString = valueToString( angle, {
+        angleString = val2str( angle, {
             fromNumber: CssAngleMath.convertFunc,
             fromString: v => /\d+.*/.test(v) ? v : "to " + v
         }) + ",";
@@ -146,7 +146,7 @@ function radialGradientToString( name: string, stopsOrHints: GradientStopOrHint[
 {
     let shapeString = shape ? shape : "";
     let sizeOrExtentString = sizeOrExtent ? CssLengthMath.multiStyleToString( sizeOrExtent, " ") : "";
-    let posString = pos ? `at ${positionToString( pos)}` : "";
+    let posString = pos ? `at ${pos2str( pos)}` : "";
     let whatAndWhere = shape || sizeOrExtentString || pos ? `${shapeString} ${sizeOrExtentString} ${posString},` : "";
     return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, CssPercentMath)})`;
 }
@@ -157,7 +157,7 @@ function conicGradientToString( name: string, stopsOrHints: GradientStopOrHint[]
     angle?: Extended<CssAngle>, pos?: Extended<CssPosition>): string
 {
     let angleString = angle ? `from ${CssAngleMath.styleToString( angle)}` : "";
-    let posString = pos ? `at ${positionToString( pos)}` : "";
+    let posString = pos ? `at ${pos2str( pos)}` : "";
     let whatAndWhere = angle || pos ? `${angleString} ${posString},` : "";
     return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, CssAngleMath)})`;
 }
@@ -166,9 +166,9 @@ function conicGradientToString( name: string, stopsOrHints: GradientStopOrHint[]
 
 function crossFadeToString( args: CrossFadeParam[]): string
 {
-    let paramsString = valueToString( args, {
-        arrayItemFunc: crossFadeParamToString,
-        arraySeparator: ","
+    let paramsString = val2str( args, {
+        arrFunc: crossFadeParamToString,
+        arrSep: ","
     })
 
     return `cross-fade(${paramsString})`;
@@ -187,7 +187,7 @@ function gradientStopsOrHintsToString<T extends string>( val: GradientStopOrHint
 function gradientStopOrHintToString<T extends string>( val: GradientStopOrHint,
     mathClass: INumberBaseMathClass<T>): string
 {
-    return valueToString( val, {
+    return val2str( val, {
         fromNumber: colorToString,
         fromArray: v => v.length === 0 ? "" : v.length === 1 ? mathClass.styleToString( v[0]) :
                         gradientColorAndLengthToString( v as GradientColorAndLength, mathClass)
@@ -207,8 +207,8 @@ function gradientColorAndLengthToString<T extends string>( val: GradientColorAnd
 
 function crossFadeParamToString( val: CrossFadeParam): string
 {
-    return valueToString( val, {
-        fromArray: v => `${valueToString(v[0])},${CssPercentMath.styleToString(v[1])}`
+    return val2str( val, {
+        fromArray: v => `${val2str(v[0])},${CssPercentMath.styleToString(v[1])}`
     });
 }
 
