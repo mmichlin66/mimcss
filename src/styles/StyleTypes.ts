@@ -583,8 +583,15 @@ export type FontOpticalSizing_StyleType = "auto" | "none";
 
 
 
+/** Type for font-size style property */
+export type FontSize_StyleType = "xx-small" | "x-small" | "small" | "medium" | "large" |
+    "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller" | CssLength;
+
+
+
 /** Type for font-stretch style property */
-export type FontStretch_StyleType = FontStretch_Single;
+export type FontStretch_StyleType = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
+"semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded" | CssNumber;
 
 
 
@@ -610,7 +617,7 @@ export type FontVariantPosition_StyleType = "normal" | "sub" | "super";
 
 
 /** Type for font-weight style property */
-export type FontWeight_StyleType = "normal" | "bold" | "bolder" | "lighter" | number;
+export type FontWeight_StyleType = "normal" | "bold" | "bolder" | "lighter" | CssNumber;
 
 
 
@@ -1106,11 +1113,6 @@ export type WhiteSpace_StyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "p
 
 
 
-/** Type for widows style property */
-export type Widows_StyleType = CssNumber;
-
-
-
 /** Type for will-change style property */
 export type WillChange_StyleType = "auto" | OneOrMany<"scroll-position" | "contents" | Exclude<keyof ICssStyleset,"willChange">>;
 
@@ -1403,8 +1405,8 @@ export interface ICssStyleset
     fontFeatureSettings?: DefaultStyleType;
     fontKerning?: FontKerning_StyleType;
     fontOpticalSizing?: FontOpticalSizing_StyleType;
-    fontSize?: CssLength;
-    fontSizeAdjust?: number;
+    fontSize?: FontSize_StyleType;
+    fontSizeAdjust?: CssNumber;
     fontStretch?: FontStretch_StyleType;
     fontStyle?: FontStyle_StyleType;
     fontSynthesis?: FontSynthesis_StyleType;
@@ -1630,19 +1632,17 @@ export interface ICssStyleset
 
     unicodeBidi?: UnicodeBidi_StyleType;
     userSelect?: UserSelect_StyleType;
-    userZoom?: DefaultStyleType;
 
     verticalAlign?: VerticalAlign_StyleType;
     visibility?: Visibility_StyleType;
     vectorEffect?: VectorEffect_StyleType;
 
     whiteSpace?: WhiteSpace_StyleType;
-    widows?: Widows_StyleType;
+    widows?: CssNumber;
     width?: CssLength;
     willChange?: WillChange_StyleType;
     wordBreak?: WordBreak_StyleType;
     wordSpacing?: WordSpacing_StyleType;
-    wordWrap?: DefaultStyleType;
     writingMode?: WritingMode_StyleType;
 
     zIndex?: ZIndex_StyleType;
