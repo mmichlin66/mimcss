@@ -329,39 +329,39 @@ export interface IPageRule extends IStyleRule
 
 /**
  * The IGridLineRule interface represents a definition of a named grid line.
- * Objects implementing this interface are returned from the [[$gridLine]] function or created
- * when a grid area is defined using the [[$gridArea]] function.
+ * Objects implementing this interface are returned from the [[$gridline]] function or created
+ * when a grid area is defined using the [[$gridarea]] function.
  */
 export interface IGridLineRule extends INamedEntity
 {
-	/**
+    /**
      * Flag indicating whether the line is a start or end line of a grid area. The value is true
      * if this is the start line; false if this is the end line; and undefined if the line is
      * not related to any area.
      */
-	readonly isStartEndOrNone?: boolean;
+    readonly isStartEndOrNone?: boolean;
 
     /**
      * Name of the grid area of which the line is either a start or an end line. It is defined
      * only if the line name ends with "-start" or "-end".
      */
-	readonly areaName: string;
+    readonly areaName: string;
 }
 
 
 
 /**
  * The IGridAreaRule interface represents a definition of a named grid are. Grid area rule
- * defines two line rules: for its start and end lines
- * Objects implementing this interface are returned from the [[$gridArea]] function.
+ * defines two line rules: for its start and end lines.
+ * Objects implementing this interface are returned from the [[$gridarea]] function.
  */
 export interface IGridAreaRule extends INamedEntity
 {
-	/** Start line of the area. */
-	readonly startLine: IGridLineRule;
+    /** Start line of the area. */
+    readonly startLine: IGridLineRule;
 
-    /** End line of the area area. */
-	readonly endLine: IGridLineRule;
+    /** End line of the area. */
+    readonly endLine: IGridLineRule;
 }
 
 

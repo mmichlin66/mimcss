@@ -105,7 +105,7 @@ export function $counter( nameOverride?: string | ICounterRule): ICounterRule
  * part of the style definition class. The name can be also overridden by providing either an
  * explicit name or another grid line rule.
  */
-export function $gridLine( nameOverride?: string | IGridLineRule,
+export function $gridline( nameOverride?: string | IGridLineRule,
     isStartEndOrNone?: boolean): IGridLineRule
 {
 	return new GridLineRule( nameOverride, isStartEndOrNone);
@@ -116,7 +116,7 @@ export function $gridLine( nameOverride?: string | IGridLineRule,
  * part of the style definition class. The name can be also overridden by providing either an
  * explicit name or another grid area rule.
  */
-export function $gridArea( nameOverride?: string | IGridAreaRule): IGridAreaRule
+export function $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
 {
 	return new GridAreaRule( nameOverride);
 }
