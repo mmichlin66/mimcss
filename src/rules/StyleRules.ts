@@ -1,7 +1,7 @@
 import {IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "./RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
-import {Rule, ITopLevelRuleContainer, createNames} from "./Rule";
+import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps} from "../styles/StyleFuncs"
 import {val2str, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
@@ -130,18 +130,18 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( owner: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
 		// if dependent rules exist, process them under the same container
 		for( let propName in this.dependentRules)
 		{
 			let propVal = this.dependentRules[propName];
 			if (Array.isArray(propVal) && propVal.length > 0)
-				propVal.forEach( (depRule: DependentRule) => depRule.process( owner, null));
+				propVal.forEach( (depRule: DependentRule) => depRule.process( container, owner, null));
 			else
-				(propVal as DependentRule).process( owner, null);
+				(propVal as DependentRule).process( container, owner, null);
 		}
 	}
 
@@ -517,9 +517,9 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 	}
 
 	// Processes the given rule.
-	public process( owner: ITopLevelRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string): void
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, this.cssPrefix);
 	}

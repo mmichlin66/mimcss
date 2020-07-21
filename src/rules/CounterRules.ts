@@ -1,5 +1,5 @@
 import {ICounterRule} from "./RuleTypes"
-import {createNames, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
+import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
 
@@ -9,10 +9,11 @@ import {createNames, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
  * properties. No CSS rule is created for counters - they are needed only to provide type-safe
  * counter definitions.
  */
-export class CounterRule implements ICounterRule
+export class CounterRule extends RuleLike implements ICounterRule
 {
 	public constructor( nameOverride?: string | ICounterRule)
 	{
+        super();
 		this.nameOverride = nameOverride;
 	}
 
@@ -21,7 +22,7 @@ export class CounterRule implements ICounterRule
 	// Processes the given rule.
 	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		this.container = container;
+        super.process( container, owner, ruleName);
 		[this.name] = createNames( owner, ruleName, this.nameOverride);
 	}
 
@@ -57,10 +58,6 @@ export class CounterRule implements ICounterRule
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | ICounterRule;
-
-	// Rule container to which this rule belongs and which hase the CSSStyleRule through which
-	// the value of this custom variable can be changed.
-	public container: IRuleContainer;
 }
 
 

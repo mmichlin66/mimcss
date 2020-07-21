@@ -1,5 +1,5 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "./RuleTypes"
-import {Rule, ITopLevelRuleContainer, createNames} from "./Rule"
+import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer} from "./Rule"
 import {StyleRule} from "./StyleRules";
 import { val2str } from "../styles/UtilFuncs";
 
@@ -23,14 +23,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process(  owner: ITopLevelRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string)
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride);
 
 		for( let keyframeRule of this.frameRules)
-			keyframeRule.process( owner, ruleName);
+			keyframeRule.process( container, owner, ruleName);
 	}
 
 

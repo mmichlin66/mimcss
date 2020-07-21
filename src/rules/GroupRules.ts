@@ -22,9 +22,9 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 
 	// Processes the given rule.
-	public process( owner: ITopLevelRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string)
 	{
-		super.process( owner, ruleName);
+		super.process( container, owner, ruleName);
 
 		let instance = processInstanceOrClass( this.instanceOrClass, owner.getDefinitionInstance());
 		if (!instance)

@@ -1,5 +1,9 @@
-﻿import * as RuleTypes from "../rules/RuleTypes";
-import * as RuleContainerFuncs from "../rules/RuleContainer"
+﻿import {
+    CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
+    ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
+    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule
+} from "../rules/RuleTypes";
+import {processInstanceOrClass} from "../rules/RuleContainer";
 import {Extended} from "../styles/UtilTypes";
 import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
@@ -9,6 +13,7 @@ import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
 import {CounterRule} from "../rules/CounterRules";
+import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {val2str} from "../styles/UtilFuncs";
@@ -19,7 +24,7 @@ import {val2str} from "../styles/UtilFuncs";
  * Creates new abstract rule, which defines a styleset that can be extended by other style
  * rules. Abstract rules don't have selectors and are not inserted into DOM.
  */
-export function $abstract( style: RuleTypes.CombinedStyleset): RuleTypes.IStyleRule
+export function $abstract( style: CombinedStyleset): IStyleRule
 {
 	return new AbstractRule( style);
 }
@@ -31,8 +36,8 @@ export function $abstract( style: RuleTypes.CombinedStyleset): RuleTypes.IStyleR
  * the class. Such class can be later used either in conditional grouping rules or in derived
  * style definition classes.
  */
-export function $class( style?: RuleTypes.CombinedStyleset,
-	nameOverride?: string | RuleTypes.IClassRule): RuleTypes.IClassRule
+export function $class( style?: CombinedStyleset,
+	nameOverride?: string | IClassRule): IClassRule
 {
 	return new ClassRule( style, nameOverride);
 }
@@ -44,8 +49,8 @@ export function $class( style?: RuleTypes.CombinedStyleset,
  * the ID. Such ID can be later used either in conditional grouping rules or in derived
  * style definition classes.
  */
-export function $id( style?: RuleTypes.CombinedStyleset,
-	nameOverride?: string | RuleTypes.IIDRule): RuleTypes.IIDRule
+export function $id( style?: CombinedStyleset,
+	nameOverride?: string | IIDRule): IIDRule
 {
 	return new IDRule( style, nameOverride);
 }
@@ -53,7 +58,7 @@ export function $id( style?: RuleTypes.CombinedStyleset,
 /**
  * Creates new selector rule. Selector can be specified as a string or via the selector function.
  */
-export function $style( selector: CssSelector, style: RuleTypes.CombinedStyleset): RuleTypes.IStyleRule
+export function $style( selector: CssSelector, style: CombinedStyleset): IStyleRule
 {
 	return new SelectorRule( selector, style);
 }
@@ -65,8 +70,8 @@ export function $style( selector: CssSelector, style: RuleTypes.CombinedStyleset
  * "declare" the animation. Such animation can be later used either in conditional grouping rules
  * or in derived style definition classes.
  */
-export function $keyframes( frames?: RuleTypes.AnimationFrame[],
-	nameOverride?: string | RuleTypes.IAnimationRule): RuleTypes.IAnimationRule
+export function $keyframes( frames?: AnimationFrame[],
+	nameOverride?: string | IAnimationRule): IAnimationRule
 {
 	return new AnimationRule( frames, nameOverride);
 }
@@ -80,7 +85,7 @@ export function $keyframes( frames?: RuleTypes.AnimationFrame[],
  * classes.
  */
 export function $var<K extends VarTemplateName>( template: K, propVal?: VarValueType<K>,
-				nameOverride?: string | RuleTypes.IVarRule<K>): RuleTypes.IVarRule<K>
+				nameOverride?: string | IVarRule<K>): IVarRule<K>
 {
 	return new VarRule( template, propVal, nameOverride);
 }
@@ -90,16 +95,37 @@ export function $var<K extends VarTemplateName>( template: K, propVal?: VarValue
  * part of the style definition class. The name can be also overridden by providing either an
  * explicit name or another counter rule.
  */
-export function $counter( nameOverride?: string | RuleTypes.ICounterRule): RuleTypes.ICounterRule
+export function $counter( nameOverride?: string | ICounterRule): ICounterRule
 {
 	return new CounterRule( nameOverride);
+}
+
+/**
+ * Creates new grid line object. The line name will be created when the rule is processed as
+ * part of the style definition class. The name can be also overridden by providing either an
+ * explicit name or another grid line rule.
+ */
+export function $gridLine( nameOverride?: string | IGridLineRule,
+    isStartEndOrNone?: boolean): IGridLineRule
+{
+	return new GridLineRule( nameOverride, isStartEndOrNone);
+}
+
+/**
+ * Creates new grid area object. The area name will be created when the rule is processed as
+ * part of the style definition class. The name can be also overridden by providing either an
+ * explicit name or another grid area rule.
+ */
+export function $gridArea( nameOverride?: string | IGridAreaRule): IGridAreaRule
+{
+	return new GridAreaRule( nameOverride);
 }
 
 /**
  * Creates new import rule.
  */
 export function $import( url: string, mediaQuery?: string | MediaQuery,
-	supportsQuery?: string | SupportsQuery): RuleTypes.IImportRule
+	supportsQuery?: string | SupportsQuery): IImportRule
 {
 	return new ImportRule( url, mediaQuery, supportsQuery);
 }
@@ -107,7 +133,7 @@ export function $import( url: string, mediaQuery?: string | MediaQuery,
 /**
  * Creates new font-face rule.
  */
-export function $fontface( fontface: IFontFace): RuleTypes.IFontFaceRule
+export function $fontface( fontface: IFontFace): IFontFaceRule
 {
 	return new FontFaceRule( fontface);
 }
@@ -115,7 +141,7 @@ export function $fontface( fontface: IFontFace): RuleTypes.IFontFaceRule
 /**
  * Creates new namespace rule.
  */
-export function $namespace( namespace: string, prefix?: string): RuleTypes.INamespaceRule
+export function $namespace( namespace: string, prefix?: string): INamespaceRule
 {
 	return new NamespaceRule( namespace, prefix);
 }
@@ -123,7 +149,7 @@ export function $namespace( namespace: string, prefix?: string): RuleTypes.IName
 /**
  * Creates new page rule.
  */
-export function $page( pseudoClass?: PagePseudoClass, style?: Styleset): RuleTypes.IPageRule
+export function $page( pseudoClass?: PagePseudoClass, style?: Styleset): IPageRule
 {
 	return new PageRule( pseudoClass, style);
 }
@@ -131,8 +157,8 @@ export function $page( pseudoClass?: PagePseudoClass, style?: Styleset): RuleTyp
 /**
  * Creates new supports rule.
  */
-export function $supports<T extends RuleTypes.StyleDefinition<O>, O extends RuleTypes.StyleDefinition>(
-	query: SupportsQuery, instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T,O>): RuleTypes.ISupportsRule<T>
+export function $supports<T extends StyleDefinition<O>, O extends StyleDefinition>(
+	query: SupportsQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>): ISupportsRule<T>
 {
 	return new SupportsRule( query, instanceOrClass);
 }
@@ -140,8 +166,8 @@ export function $supports<T extends RuleTypes.StyleDefinition<O>, O extends Rule
 /**
  * Creates new media rule.
  */
-export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTypes.StyleDefinition>(
-	query: string | MediaQuery, instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T,O>): RuleTypes.IMediaRule<T>
+export function $media<T extends StyleDefinition<O>, O extends StyleDefinition>(
+	query: string | MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>): IMediaRule<T>
 {
 	return new MediaRule( query, instanceOrClass);
 }
@@ -154,10 +180,10 @@ export function $media<T extends RuleTypes.StyleDefinition<O>, O extends RuleTyp
  * many times this function is invoked. However, if an instance, which has not yet been processed,
  * is passed, then a new set of unique names will be created for it.
  */
-export function $use<T extends RuleTypes.StyleDefinition>(
-	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
+export function $use<T extends StyleDefinition>(
+	instanceOrClass: T | IStyleDefinitionClass<T>): T | null
 {
-	return RuleContainerFuncs.processInstanceOrClass( instanceOrClass) as T;
+	return processInstanceOrClass( instanceOrClass) as T;
 }
 
 
@@ -173,12 +199,12 @@ export function $use<T extends RuleTypes.StyleDefinition>(
  * a class is embedded into more than one "owner", two separate instances of each CSS rule will be
  * created with different unique names.
  */
-export function $embed<T extends RuleTypes.StyleDefinition>(
-	instanceOrClass: T | RuleTypes.IStyleDefinitionClass<T>): T | null
+export function $embed<T extends StyleDefinition>(
+	instanceOrClass: T | IStyleDefinitionClass<T>): T | null
 {
 	// return definition instance without processing it. This is the indication that the defintion
 	// will be embedded into another definition.
-	return instanceOrClass instanceof RuleTypes.StyleDefinition
+	return instanceOrClass instanceof StyleDefinition
 		? instanceOrClass
 		: new instanceOrClass();
 }
@@ -194,7 +220,7 @@ export function $embed<T extends RuleTypes.StyleDefinition>(
  */
 export function enableShortNames( enable: boolean, prefix?: string): void
 {
-	return RuleContainerFuncs.enableShortNames( enable, prefix);
+	return enableShortNames( enable, prefix);
 }
 
 
@@ -204,7 +230,7 @@ export function enableShortNames( enable: boolean, prefix?: string): void
  * `class` property of an HTML element.
  * @param classes
  */
-export function classes( ...classes: (RuleTypes.IClassRule | Extended<string>)[]): string
+export function classes( ...classes: (IClassRule | Extended<string>)[]): string
 {
 	return val2str( classes, {
 		arrFunc: v => v instanceof ClassRule ? v.name : val2str(v)

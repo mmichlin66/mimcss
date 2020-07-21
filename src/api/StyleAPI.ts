@@ -2,9 +2,9 @@
 import {CssColor} from "../styles/ColorTypes"
 import {SelectorItem, ISelectorProxy} from "../styles/SelectorTypes";
 import {
-	Styleset, IFilterProxy, IBasicShapeProxy,
+	Styleset, ExtendedStyleset, StringStyleset, ExtentKeyword, IFilterProxy, IBasicShapeProxy,
 	ITransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder, IRayProxy,
-	ExtentKeyword, ExtendedStyleset, StringStyleset
+	IFitContentProxy, IRepeatProxy, IMinMaxProxy, GridTrackSize, GridTrackList
 } from "../styles/StyleTypes"
 import {
 	stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset
@@ -12,7 +12,8 @@ import {
 import {
 	CssPercentMath, CssLengthMath, arr2str, CssAngleMath, CssNumberMath, pos2str,
 	 templateStringToString,
-	 camelToDash
+	 camelToDash,
+     val2str
 } from "../styles/UtilFuncs";
 
 
@@ -733,6 +734,43 @@ export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
 	let v = [CssLengthMath.styleToString(x), CssLengthMath.styleToString(y),
 		CssLengthMath.styleToString(z)].join(",");
     return () => `translate3d(${v})`;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Grid functions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns an IFitContentProxy function representing the `fit-content()` CSS function.
+ */
+export function fitContent( size: Extended<CssLength>): IFitContentProxy
+{
+    return () => `fit-content(${CssLengthMath.styleToString(size)})`;
+}
+
+
+
+/**
+ * Returns an IMinMaxProxy function representing the `minmax()` CSS function.
+ */
+export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
+{
+    let options = { fromNumber: CssLengthMath.convertFunc };
+    return () => `minmax(${val2str( min, options)},${val2str( max, options)})`;
+}
+
+
+
+/**
+ * Returns an IRepeatProxy function representing the `repeat()` CSS function.
+ */
+export function repeat( qty: CssNumber | "auto-fill" | "auto-fill", tracks: GridTrackList): IRepeatProxy
+{
+    return () => `repeat(${val2str(qty)},${stylePropToString( "gridTemplateRows", tracks, true)})`;
 }
 
 

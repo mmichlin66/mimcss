@@ -37,19 +37,44 @@ export interface ITopLevelRuleContainer extends IRuleContainer
 
 
 /**
- * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
- * class is also an ancestor for Stylesheet; however, most of its the fields are undefined in
- * te Stylesheet instances.
+ * The RuleLike abstract class is a base for all "rules" defined in the style definition classes -
+ * whether they correspond to real CssRules (and thus derive from the Rule class) or not (such as
+ * counters, grid lines and grid areas).
  */
-export abstract class Rule implements IRule
+export abstract class RuleLike
 {
 	// Processes the rule.
-	public process( owner: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
 	{
+        this.container = container;
 		this.owner = owner;
 		this.ruleName = ruleName;
 	}
 
+	// Creates a copy of the rule.
+	public abstract clone(): RuleLike;
+
+	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
+	public owner: ITopLevelRuleContainer;
+
+	// Name of the property of the stylesheet definition to which this rule was assigned. This is
+	// null for Stylesheet.
+	public ruleName: string | null;
+
+	// Rule container to which this rule belongs and which hase the CSSStyleRule through which
+	// the value of this custom variable can be changed.
+	public container: IRuleContainer;
+}
+
+
+
+/**
+ * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
+ * class is also an ancestor for Stylesheet; however, most of its the fields are undefined in
+ * te Stylesheet instances.
+ */
+export abstract class Rule extends RuleLike implements IRule
+{
 	// Creates a copy of the rule.
 	public abstract clone(): Rule;
 
@@ -79,13 +104,6 @@ export abstract class Rule implements IRule
 	}
 
 
-
-	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
-	public owner: ITopLevelRuleContainer;
-
-	// Name of the property of the stylesheet definition to which this rule was assigned. This is
-	// null for Stylesheet.
-	public ruleName: string | null;
 
 	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
 	// the styles sheet or the parent rule. This is undefined for Stylesheet objects.

@@ -1,7 +1,7 @@
 import {IVarRule} from "./RuleTypes"
 import {VarValueType, VarTemplateName} from "../styles/StyleTypes"
 import {stylePropToString} from "../styles/StyleFuncs"
-import {createNames, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
+import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
 
@@ -15,10 +15,11 @@ import {createNames, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
  * type IStileset[K], which is Extended<ICssStyleset[K]>. This allows specifying values that are
  * valid for the Extended roperty type.
  */
-export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
+export class VarRule<K extends VarTemplateName = any> extends RuleLike implements IVarRule<K>
 {
 	public constructor( template: K, value?: VarValueType<K>, nameOverride?: string | IVarRule<K>)
 	{
+        super();
 		this.template = template;
 		this.value = value;
 		this.nameOverride = nameOverride;
@@ -29,7 +30,7 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	// Processes the given rule.
 	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		this.container = container;
+		super.process( container, owner, ruleName);
 		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");
 	}
 
@@ -103,10 +104,6 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | IVarRule<K>;
-
-	// Rule container to which this rule belongs and which hase the CSSStyleRule through which
-	// the value of this custom variable can be changed.
-	public container: IRuleContainer;
 }
 
 

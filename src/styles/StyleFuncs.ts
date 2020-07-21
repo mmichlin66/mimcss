@@ -354,6 +354,18 @@ function fontStyleToString( val: Extended<StyleTypes.Font_StyleType>): string
 
 
 
+function gridTemplateToString( val: Extended<StyleTypes.GridTemplateAxis_StyleType>): string
+{
+    return val2str( val, {
+        arrFunc: v => val2str( v, {
+            fromNumber: v => CssLengthMath.styleToString( v),
+            fromArray: v => `[${arr2str(v)}]`
+        })
+    });
+}
+
+
+
 function markerStyleToString( val: Extended<StyleTypes.Marker_StyleType>): string
 {
     return val2str( val, {
@@ -866,6 +878,8 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (WellKnownFunc |
     gridColumnGap: WellKnownFunc.Length,
     gridGap: WellKnownFunc.MultiLengthWithSpace,
     gridRowGap: WellKnownFunc.Length,
+    gridTemplateColumns: gridTemplateToString,
+    gridTemplateRows: gridTemplateToString,
 
     height: WellKnownFunc.Length,
 

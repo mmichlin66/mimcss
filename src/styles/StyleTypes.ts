@@ -2,12 +2,12 @@
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
     CssFrequency, CssResolution, CssRadius, IUrlProxy,
-    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy, CssLengthPair
+    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy, CssLengthPair, IStringProxy
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
-import {IVarRule, IAnimationRule, ICounterRule, IIDRule} from "../rules/RuleTypes";
+import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule} from "../rules/RuleTypes";
 
 
 
@@ -438,7 +438,7 @@ export type ColumnSpan_StyleType = "none" | "all";
  * 
  * - string: will be treated as is.
  * - number: will be converted to a unitless number - count of columns.
- * - LengthProxy (e.g. Len.px(8)): converted to anumber with the proper length units.
+ * - ILengthProxy (e.g. px(8)): converted to a number with the proper length units.
  * - two variants of two element arrays: one of the elements will be treated as a number of columns
  *   while another as the column width.
  */
@@ -621,8 +621,29 @@ export type FontWeight_StyleType = "normal" | "bold" | "bolder" | "lighter" | Cs
 
 
 
-/** Type for a gap or grid-gap style property */
+/** Type for gap or grid-gap style property */
 export type Gap_StyleType = RowGap_StyleType | [RowGap_StyleType, ColumnGap_StyleType];
+
+
+
+/** Type for naming a grid line */
+export type GridLineNames = OneOrMany<string>;
+
+/**
+ * Type for a single template element defining name or names for a grid line in grid template.
+ * This is always an array - even if a single name is given.
+ */
+export type GridTrackLine = (string | IStringProxy | IGridLineRule)[];
+
+/** Type for a single template element defining track size in grid template */
+export type GridTrackSize = CssLength | "min-content" | "max-content" | "auto" |
+    IMinMaxProxy | IFitContentProxy | IRepeatProxy;
+
+/** Type for a list of grid template sizes */
+export type GridTrackList = OneOrMany<GridTrackSize | GridTrackLine>;
+
+/** Type for grid-template-columns and grid-template-rows style properties */
+export type GridTemplateAxis_StyleType = "none" | GridTrackList | "subgrid";
 
 
 
@@ -1192,6 +1213,21 @@ export interface IRayProxy extends IGenericProxy<"ray"> {};
  */
 export interface ITransformProxy extends IGenericProxy<"transform"> {};
 
+/**
+ * The IMinMaxProxy function represents an invocation of the minmax() function
+ */
+export interface IMinMaxProxy extends IGenericProxy<"minmax"> {}
+
+/**
+ * The IFitContentProxy function represents an invocation of the fit-content() function
+ */
+export interface IFitContentProxy extends IGenericProxy<"fit-content"> {}
+
+/**
+ * The IRepeatProxy function represents an invocation of the repeat() function
+ */
+export interface IRepeatProxy extends IGenericProxy<"repeat"> {}
+
 
 
 /**
@@ -1447,8 +1483,8 @@ export interface ICssStyleset
     gridRowStart?: DefaultStyleType;
     gridTemplate?: DefaultStyleType;
     gridTemplateAreas?: DefaultStyleType;
-    gridTemplateColumns?: DefaultStyleType;
-    gridTemplateRows?: DefaultStyleType;
+    gridTemplateColumns?: GridTemplateAxis_StyleType;
+    gridTemplateRows?: GridTemplateAxis_StyleType;
 
     height?: CssLength;
     hyphens?: Hyphens_StyleType;

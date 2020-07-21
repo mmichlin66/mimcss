@@ -1,9 +1,8 @@
 import {StyleDefinition, IStyleDefinitionClass} from "./RuleTypes"
-import {Rule, ITopLevelRuleContainer} from "./Rule"
+import {Rule, ITopLevelRuleContainer, RuleLike} from "./Rule"
 import {VarRule} from "./VarRule"
-import {CounterRule} from "./CounterRules";
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import { s_scheduleStylePropertyUpdate } from "./Scheduling";
+import {s_scheduleStylePropertyUpdate} from "./Scheduling";
 
 
 
@@ -89,10 +88,10 @@ class RuleContainer implements ITopLevelRuleContainer
 			this.processReference( propVal)
 		else if (propVal instanceof VarRule)
 			this.processVarRule( propName, propVal)
-		else if (propVal instanceof CounterRule)
-			this.processCounterRule( propName, propVal)
 		else if (propVal instanceof Rule)
 			this.processRule( propName, propVal);
+		else if (propVal instanceof RuleLike)
+			this.processRuleLike( propName, propVal)
 		else if (Array.isArray(propVal))
 			this.processArray( propVal)
 	}
@@ -126,14 +125,14 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Processes counter object.
-	private processCounterRule( propName: string | null, counter: CounterRule): void
+	private processRuleLike( propName: string | null, ruleLike: RuleLike): void
 	{
 		// if the object is already assigned to a stylesheet, we create a clone of the
 		// rule and assign it to our stylesheet.
-		if (counter.container)
-			counter = counter.clone();
+		if (ruleLike.container)
+            ruleLike = ruleLike.clone();
 
-		counter.process( this, this.topLevelContainer, propName);
+        ruleLike.process( this, this.topLevelContainer, propName);
 	}
 
 
@@ -154,7 +153,7 @@ class RuleContainer implements ITopLevelRuleContainer
 			}
 		}
 
-		rule.process( this.topLevelContainer, propName);
+		rule.process( this, this.topLevelContainer, propName);
 
 		if (rule instanceof ImportRule)
 			this.imports.push( rule);
