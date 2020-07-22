@@ -1,8 +1,8 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
-    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
-    CssFrequency, CssResolution, CssRadius, IUrlProxy,
-    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy, CssLengthPair, IStringProxy, IQuotedProxy
+    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, CssFrequency,
+    CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword, VerticalPositionKeyword,
+    CssPoint, ExtendedProp, IGenericProxy, CssLengthPair, IQuotedProxy
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
@@ -664,7 +664,7 @@ export type GridArea_StyleType = OneOrBox<GridAxisSide_StyleType>;
  * Type for defining a single grid area position. The numbers are 1-based indices of the lines in
  * the following sequence: block start, inline start, block end, inline end.
  */
-export type GridTemplateArea_Definition = [Extended<string> | IGridAreaRule,
+export type GridTemplateArea_Definition = [IGridAreaRule | Extended<string>,
     number, number, number, number];
 
 /** Type for grid-template-areas style property */
@@ -677,16 +677,13 @@ export type GridTemplateAreas_StyleType = "none" | OneOrMany<IQuotedProxy> |
  * Type for a single template element defining name or names for a grid line in grid template.
  * This is always an array - even if a single name is given.
  */
-export type GridTrackLine = (string | IStringProxy | IGridLineRule)[];
+export type GridTrackLine = (IGridLineRule | Extended<string>)[];
 
 /** Type for a single track element of grid template axis */
 export type GridTrack = GridTrackSize | GridTrackLine;
 
-/** Type for a list of grid template tracks */
-export type GridTrackList = OneOrMany<GridTrack>;
-
 /** Type for grid-template-columns and grid-template-rows style properties */
-export type GridTemplateAxis_StyleType = "none" | GridTrackList | "subgrid";
+export type GridTemplateAxis_StyleType = "none" | OneOrMany<GridTrack> | "subgrid";
 
 
 

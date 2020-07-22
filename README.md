@@ -445,17 +445,17 @@ class MyStyles extends css.StyleDefinition
 
     // initial angle for the conic gradient will be 45deg.
     cls3 = css.$class({
-        backgroundImage: css.conicGradient( 45, "center", "red", "blue")
+        backgroundImage: css.gradient.conic( 45, "center", "red", "blue")
     })
 
     // initial angle for the conic gradient will be 0.25turn.
     cls4 = css.$class({
-        backgroundImage: css.conicGradient( 0.25, "center", "red", "blue")
+        backgroundImage: css.gradient.conic( 0.25, "center", "red", "blue")
     })
 }
 ```
 
-> Note: in JavaScript `1.0` is not a floating point number but rather an integer.
+> Note: in JavaScript, the literal `1.0` is not a floating point number but rather an integer.
 
 **See Also:** [Mimcss Reference: Numeric Types](https://mmichlin66.github.io/mimcss/ref/mimcss-reference-numeric-types.html)
 
