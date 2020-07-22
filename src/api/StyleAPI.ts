@@ -4,10 +4,10 @@ import {SelectorItem, ISelectorProxy} from "../styles/SelectorTypes";
 import {
 	Styleset, ExtendedStyleset, StringStyleset, ExtentKeyword, IFilterProxy, IBasicShapeProxy,
 	ITransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder, IRayProxy,
-	IFitContentProxy, IRepeatProxy, IMinMaxProxy, GridTrackSize, GridTrackList
+	IFitContentProxy, IRepeatProxy, IMinMaxProxy, GridTrackSize, GridTrack, ISpanProxy, GridLineCountOrName
 } from "../styles/StyleTypes"
 import {
-	stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset
+	stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset, gridTrackToString
 } from "../styles/StyleFuncs"
 import {
 	CssPercentMath, CssLengthMath, arr2str, CssAngleMath, CssNumberMath, pos2str,
@@ -768,9 +768,26 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 /**
  * Returns an IRepeatProxy function representing the `repeat()` CSS function.
  */
-export function repeat( qty: CssNumber | "auto-fill" | "auto-fill", tracks: GridTrackList): IRepeatProxy
+export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fill",
+    ...tracks: GridTrack[]): IRepeatProxy
 {
-    return () => `repeat(${val2str(qty)},${stylePropToString( "gridTemplateRows", tracks, true)})`;
+    // return () => `repeat(${val2str(count)},${stylePropToString( "gridTemplateRows", tracks, true)})`;
+    return () => `repeat(${val2str(count)},${val2str( tracks, { arrFunc: gridTrackToString })})`;
+}
+
+
+
+/**
+ * Returns an ISpanProxy function representing the span expression for grid layouts. If the first
+ * parameter is a number, the second parameter (if defined) must be a name; if the first parameter
+ * is a name, the second parameter (if defined) must be a number.
+ */
+export function span( countOrName: Extended<GridLineCountOrName>,
+    nameOrCount?: Extended<GridLineCountOrName>): ISpanProxy
+{
+    let firstElm = val2str(countOrName);
+    let secondElm = nameOrCount ? val2str( nameOrCount) : "";
+    return () => `span ${firstElm} ${secondElm}`;
 }
 
 

@@ -2,12 +2,12 @@
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime,
     CssFrequency, CssResolution, CssRadius, IUrlProxy,
-    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy, CssLengthPair, IStringProxy
+    HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, ExtendedProp, IGenericProxy, CssLengthPair, IStringProxy, IQuotedProxy
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
 import {CssImage} from "./ImageTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
-import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule} from "../rules/RuleTypes";
+import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "../rules/RuleTypes";
 
 
 
@@ -626,8 +626,52 @@ export type Gap_StyleType = RowGap_StyleType | [RowGap_StyleType, ColumnGap_Styl
 
 
 
-/** Type for naming a grid line */
-export type GridLineNames = OneOrMany<string>;
+/** Type for a single template element defining track size in grid template */
+export type GridTrackSize = CssLength | "min-content" | "max-content" | "auto" |
+    IMinMaxProxy | IFitContentProxy | IRepeatProxy;
+
+
+
+/** Type for grid-auto-columns and grid-auto-rows style properties */
+export type GridAutoAxis_StyleType = OneOrMany<GridTrackSize>;
+
+
+
+/** Type for grid-auto-flow style property */
+export type GridAutoFlow_StyleType = "row" | "column" | "dense" | "row dense" | "column dense";
+
+
+
+/** Type for specifying either number of grid lines or name of grid line or area */
+export type GridLineCountOrName = CssNumber | IGridAreaRule | IGridLineRule | string;
+
+/** Type for grid-column-start/end and grid-row-start/end style properties */
+export type GridAxisSide_StyleType = "auto" | GridLineCountOrName | ISpanProxy;
+
+
+
+/** Type for grid-column and grid-row style properties */
+export type GridAxis_StyleType = OneOrPair<GridAxisSide_StyleType>;
+
+
+
+/** Type for grid-area style property */
+export type GridArea_StyleType = OneOrBox<GridAxisSide_StyleType>;
+
+
+
+/**
+ * Type for defining a single grid area position. The numbers are 1-based indices of the lines in
+ * the following sequence: block start, inline start, block end, inline end.
+ */
+export type GridTemplateArea_Definition = [Extended<string> | IGridAreaRule,
+    number, number, number, number];
+
+/** Type for grid-template-areas style property */
+export type GridTemplateAreas_StyleType = "none" | OneOrMany<IQuotedProxy> |
+    GridTemplateArea_Definition[];
+
+
 
 /**
  * Type for a single template element defining name or names for a grid line in grid template.
@@ -635,12 +679,11 @@ export type GridLineNames = OneOrMany<string>;
  */
 export type GridTrackLine = (string | IStringProxy | IGridLineRule)[];
 
-/** Type for a single template element defining track size in grid template */
-export type GridTrackSize = CssLength | "min-content" | "max-content" | "auto" |
-    IMinMaxProxy | IFitContentProxy | IRepeatProxy;
+/** Type for a single track element of grid template axis */
+export type GridTrack = GridTrackSize | GridTrackLine;
 
-/** Type for a list of grid template sizes */
-export type GridTrackList = OneOrMany<GridTrackSize | GridTrackLine>;
+/** Type for a list of grid template tracks */
+export type GridTrackList = OneOrMany<GridTrack>;
 
 /** Type for grid-template-columns and grid-template-rows style properties */
 export type GridTemplateAxis_StyleType = "none" | GridTrackList | "subgrid";
@@ -1228,6 +1271,11 @@ export interface IFitContentProxy extends IGenericProxy<"fit-content"> {}
  */
 export interface IRepeatProxy extends IGenericProxy<"repeat"> {}
 
+/**
+ * The ISpanProxy function produces the span expression for grid layouts
+ */
+export interface ISpanProxy extends IGenericProxy<"span"> {}
+
 
 
 /**
@@ -1468,21 +1516,21 @@ export interface ICssStyleset
 
     gap?: Gap_StyleType;
     grid?: DefaultStyleType;
-    gridArea?: DefaultStyleType;
-    gridAutoColumns?: DefaultStyleType;
-    gridAutoFlow?: DefaultStyleType;
-    gridAutoRows?: DefaultStyleType;
-    gridColumn?: DefaultStyleType;
-    gridColumnEnd?: DefaultStyleType;
+    gridArea?: GridArea_StyleType;
+    gridAutoColumns?: GridAutoAxis_StyleType;
+    gridAutoFlow?: GridAutoFlow_StyleType;
+    gridAutoRows?: GridAutoAxis_StyleType;
+    gridColumn?: GridAxis_StyleType;
+    gridColumnEnd?: GridAxisSide_StyleType;
     gridColumnGap?: ColumnGap_StyleType;
-    gridColumnStart?: DefaultStyleType;
+    gridColumnStart?: GridAxisSide_StyleType;
     gridGap?: Gap_StyleType;
-    gridRow?: DefaultStyleType;
-    gridRowEnd?: DefaultStyleType;
+    gridRow?: GridAxis_StyleType;
+    gridRowEnd?: GridAxisSide_StyleType;
     gridRowGap?: RowGap_StyleType;
-    gridRowStart?: DefaultStyleType;
+    gridRowStart?: GridAxisSide_StyleType;
     gridTemplate?: DefaultStyleType;
-    gridTemplateAreas?: DefaultStyleType;
+    gridTemplateAreas?: GridTemplateAreas_StyleType;
     gridTemplateColumns?: GridTemplateAxis_StyleType;
     gridTemplateRows?: GridTemplateAxis_StyleType;
 

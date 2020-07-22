@@ -3,7 +3,7 @@
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule
 } from "../rules/RuleTypes";
-import {processInstanceOrClass} from "../rules/RuleContainer";
+import {processInstanceOrClass, s_enableShortNames} from "../rules/RuleContainer";
 import {Extended} from "../styles/UtilTypes";
 import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
@@ -158,18 +158,18 @@ export function $page( pseudoClass?: PagePseudoClass, style?: Styleset): IPageRu
  * Creates new supports rule.
  */
 export function $supports<T extends StyleDefinition<O>, O extends StyleDefinition>(
-	query: SupportsQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>): ISupportsRule<T>
+	query: SupportsQuery, instOrClass: T | IStyleDefinitionClass<T,O>): ISupportsRule<T>
 {
-	return new SupportsRule( query, instanceOrClass);
+	return new SupportsRule( query, instOrClass);
 }
 
 /**
  * Creates new media rule.
  */
 export function $media<T extends StyleDefinition<O>, O extends StyleDefinition>(
-	query: string | MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>): IMediaRule<T>
+	query: string | MediaQuery, instOrClass: T | IStyleDefinitionClass<T,O>): IMediaRule<T>
 {
-	return new MediaRule( query, instanceOrClass);
+	return new MediaRule( query, instOrClass);
 }
 
 
@@ -180,10 +180,9 @@ export function $media<T extends StyleDefinition<O>, O extends StyleDefinition>(
  * many times this function is invoked. However, if an instance, which has not yet been processed,
  * is passed, then a new set of unique names will be created for it.
  */
-export function $use<T extends StyleDefinition>(
-	instanceOrClass: T | IStyleDefinitionClass<T>): T | null
+export function $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T | null
 {
-	return processInstanceOrClass( instanceOrClass) as T;
+	return processInstanceOrClass( instOrClass) as T;
 }
 
 
@@ -199,14 +198,11 @@ export function $use<T extends StyleDefinition>(
  * a class is embedded into more than one "owner", two separate instances of each CSS rule will be
  * created with different unique names.
  */
-export function $embed<T extends StyleDefinition>(
-	instanceOrClass: T | IStyleDefinitionClass<T>): T | null
+export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T | null
 {
 	// return definition instance without processing it. This is the indication that the defintion
 	// will be embedded into another definition.
-	return instanceOrClass instanceof StyleDefinition
-		? instanceOrClass
-		: new instanceOrClass();
+	return instOrClass instanceof StyleDefinition ? instOrClass : new instOrClass();
 }
 
 
@@ -220,7 +216,7 @@ export function $embed<T extends StyleDefinition>(
  */
 export function enableShortNames( enable: boolean, prefix?: string): void
 {
-	return enableShortNames( enable, prefix);
+	return s_enableShortNames( enable, prefix);
 }
 
 

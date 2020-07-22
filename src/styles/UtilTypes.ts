@@ -128,6 +128,11 @@ export type OneOrBox<T> = T | [Extended<T>, Extended<T>, Extended<T>?, Extended<
 /** Type for a property that can have 1 or more values of the given type */
 export type OneOrMany<T> = T | Extended<T>[];
 
+/**
+ * The IQuotedProxy function represents a string in quotation marks
+ */
+export interface IQuotedProxy extends IGenericProxy<"quoted"> {}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

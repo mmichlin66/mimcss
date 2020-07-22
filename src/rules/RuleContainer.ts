@@ -382,7 +382,7 @@ class RuleContainer implements ITopLevelRuleContainer
  * @param enable
  * @param prefix
  */
-export function enableShortNames( enable: boolean, prefix?: string): void
+export function s_enableShortNames( enable: boolean, prefix?: string): void
 {
 	s_useUniqueStyleNames = enable;
 	s_uniqueStyleNamesPrefix = prefix ? prefix : "n";
@@ -390,16 +390,23 @@ export function enableShortNames( enable: boolean, prefix?: string): void
 
 
 
-// Flag indicating whether to use optimaized names for style elements (class names, animation
-// names, etc.)
-let s_useUniqueStyleNames: boolean = false;
+/**
+ * Flag indicating whether to use optimized names for style elements (classes,  animations, etc.)
+ * By default this flag is true in the Release build of the library and false in the Debug build.
+ */
+let s_useUniqueStyleNames: boolean = true;
 
-// Prefix to use when generating unique style names. If undefined, a standard prefix "n" will
-// be used.
-let s_uniqueStyleNamesPrefix: string = "n";
+/// #if DEBUG
+s_useUniqueStyleNames = false;
+/// #endif
 
-// Next number to use when generating unique identifiers.
-let s_nextUniqueID: number = 1;
+/**
+ * Prefix to use when generating unique style names. If undefined, a standard prefix "n" will be used.
+ */
+let s_uniqueStyleNamesPrefix = "n";
+
+/** Next number to use when generating unique identifiers. */
+let s_nextUniqueID = 1;
 
 
 
@@ -469,23 +476,23 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
  * it has already been processed. If yes, we just return it back; if no, we assign new unique names
  * to its rules.
  */
-export function processInstanceOrClass( instanceOrClass: StyleDefinition | IStyleDefinitionClass,
+export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDefinitionClass,
 	owner?: StyleDefinition): StyleDefinition | null
 {
-	if (!instanceOrClass)
+	if (!instOrClass)
 		return null;
 
-	if (instanceOrClass instanceof StyleDefinition)
+	if (instOrClass instanceof StyleDefinition)
 	{
-		processInstance( instanceOrClass);
-		return instanceOrClass;
+		processInstance( instOrClass);
+		return instOrClass;
 	}
 	else
 	{
 		// check whether this definition class is already associated with an instance
-		return instanceOrClass.hasOwnProperty(symInstance)
-			? instanceOrClass[symInstance]
-			: processClass( instanceOrClass, owner);
+		return instOrClass.hasOwnProperty(symInstance)
+			? instOrClass[symInstance]
+			: processClass( instOrClass, owner);
 	}
 }
 

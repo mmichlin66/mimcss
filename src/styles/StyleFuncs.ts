@@ -1,5 +1,11 @@
-﻿import * as StyleTypes from "./StyleTypes"
-import {ExtendedStyleset} from "./StyleTypes"
+﻿import {
+    ExtendedStyleset, Animation_Single, TimingFunction_Single, Background_Single, BackgroundSize_Single,
+    BorderImage_Object, BorderImageSlice_StyleType, BoxShadow_Single, BorderRadius_StyleType,
+    Border_StyleType, Columns_StyleType, Cursor_StyleType, Flex_StyleType, Font_StyleType,
+    GridTemplateAreas_StyleType, GridTemplateAxis_StyleType, Marker_StyleType, Rotate_StyleType,
+    TextDecoration_StyleType, Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType,
+    VarTemplateName, SupportsQuery, SingleSupportsQuery, GridTemplateArea_Definition, GridTrack
+} from "./StyleTypes"
 import {Extended, CssRadius, OneOrMany, CssMultiLength, CssMultiTime} from "./UtilTypes";
 import {
     camelToDash, dashToCamel, val2str, arr2str, IValueConvertOptions,
@@ -8,7 +14,7 @@ import {
 } from "./UtilFuncs"
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
-import { IIDRule } from "../rules/RuleTypes";
+import {IIDRule} from "../rules/RuleTypes";
 
 
 
@@ -25,7 +31,7 @@ function multiTimeToStringWithComma( val: Extended<CssMultiTime>): string
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-function singleAnimation_fromObject( val: StyleTypes.Animation_Single): string
+function singleAnimation_fromObject( val: Animation_Single): string
 {
     return obj2str( val, [
         ["duration", CssTimeMath.styleToString],
@@ -41,7 +47,7 @@ function singleAnimation_fromObject( val: StyleTypes.Animation_Single): string
 
 
 
-function singleAnimation_fromStyle( val: Extended<StyleTypes.Animation_Single>): string
+function singleAnimation_fromStyle( val: Extended<Animation_Single>): string
 {
     return val2str( val, {
         fromObj: singleAnimation_fromObject
@@ -50,7 +56,7 @@ function singleAnimation_fromStyle( val: Extended<StyleTypes.Animation_Single>):
 
 
 
-function timingFunctionToString( val: Extended<OneOrMany<StyleTypes.TimingFunction_Single>>): string
+function timingFunctionToString( val: Extended<OneOrMany<TimingFunction_Single>>): string
 {
     return val2str( val, {
         fromNumber: timingFunction_fromNumber,
@@ -70,13 +76,13 @@ function timingFunction_fromNumber( val: number): string
 function timingFunction_fromArray( val: any[]): string
 {
     return typeof val[0] === "number"
-        ? singleTimingFunction_fromStyle( val as StyleTypes.TimingFunction_Single)
+        ? singleTimingFunction_fromStyle( val as TimingFunction_Single)
         : arr2str( val, singleTimingFunction_fromStyle, ",");
 }
 
 
 
-function singleTimingFunction_fromStyle( val: Extended<StyleTypes.TimingFunction_Single>): string
+function singleTimingFunction_fromStyle( val: Extended<TimingFunction_Single>): string
 {
     return val2str( val, {
         fromNumber: timingFunction_fromNumber,
@@ -112,7 +118,7 @@ function singleTimingFunction_fromStyle( val: Extended<StyleTypes.TimingFunction
 
 
 
-function singleBackground_fromObject( val: StyleTypes.Background_Single): string
+function singleBackground_fromObject( val: Background_Single): string
 {
     return obj2str( val, [
         ["color", colorToString],
@@ -128,7 +134,7 @@ function singleBackground_fromObject( val: StyleTypes.Background_Single): string
 
 
 
-function singleBackground_fromStyle( val: Extended<StyleTypes.Background_Single>): string
+function singleBackground_fromStyle( val: Extended<Background_Single>): string
 {
     return val2str( val, {
         fromNumber: colorToString,
@@ -138,7 +144,7 @@ function singleBackground_fromStyle( val: Extended<StyleTypes.Background_Single>
 
 
 
-function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize_Single>): string
+function singleBackgroundSize_fromStyle( val: Extended<BackgroundSize_Single>): string
 {
     return val2str( val, {
         fromNumber: CssLengthMath.styleToString,
@@ -151,11 +157,11 @@ function singleBackgroundSize_fromStyle( val: Extended<StyleTypes.BackgroundSize
 /**
  * Converts border image style value to the CSS string.
  */
-function borderImageToString( val: StyleTypes.BorderImage_Object): string
+function borderImageToString( val: BorderImage_Object): string
 {
     // if width is specified, but slice is not, we need to set slice to the default 100% value;
     // if outset is specified but width is not. we need to set width to the default 1 value;
-    let valCopy: StyleTypes.BorderImage_Object = Object.assign( {}, val);
+    let valCopy: BorderImage_Object = Object.assign( {}, val);
     if (val.slice == null && (val.width != null || val.outset != null))
         valCopy.slice = "100%";
     if (val.width == null && val.outset != null)
@@ -175,7 +181,7 @@ function borderImageToString( val: StyleTypes.BorderImage_Object): string
 /**
  * Converts border image slice style value to the CSS string.
  */
-function borderImageSliceToString( val: Extended<StyleTypes.BorderImageSlice_StyleType>): string
+function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): string
 {
     return val2str( val, {
         fromNumber: unitlessOrPercentToString,
@@ -188,7 +194,7 @@ function borderImageSliceToString( val: Extended<StyleTypes.BorderImageSlice_Sty
 
 
 
-export function singleBoxShadow_fromObject( val: StyleTypes.BoxShadow_Single): string
+export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
 {
     return obj2str( val, [
         ["inset", v => v ? "inset" : ""],
@@ -218,7 +224,7 @@ function singleCornerRadiusToString( val: Extended<CssRadius>): string
 /**
  * Converts border radius style value to the CSS string.
  */
-export function borderRadiusToString( val: Extended<StyleTypes.BorderRadius_StyleType>): string
+export function borderRadiusToString( val: Extended<BorderRadius_StyleType>): string
 {
     return val2str( val, {
         fromArray: v =>
@@ -245,7 +251,7 @@ export function borderRadiusToString( val: Extended<StyleTypes.BorderRadius_Styl
 /**
  * Converts border side style value to the CSS string.
  */
-function borderToString( val: Extended<StyleTypes.Border_StyleType>): string
+function borderToString( val: Extended<Border_StyleType>): string
 {
     return val2str( val, {
         fromNumber: CssLengthMath.styleToString,
@@ -272,7 +278,7 @@ function borderToString( val: Extended<StyleTypes.Border_StyleType>): string
 /**
  * Converts columns style to its CSS string value.
  */
-function columnsToString( val: Extended<StyleTypes.Columns_StyleType>): string
+function columnsToString( val: Extended<Columns_StyleType>): string
 {
     return val2str( val, {
         fromArray: v => v[0] + " " + CssLengthMath.styleToString( v[1])
@@ -284,7 +290,7 @@ function columnsToString( val: Extended<StyleTypes.Columns_StyleType>): string
 /**
  * Converts cursor style to its CSS string value.
  */
-function cursorToString( val: Extended<StyleTypes.Cursor_StyleType>): string
+function cursorToString( val: Extended<Cursor_StyleType>): string
 {
     // the value can be either a string or a function or an array. If it is an array,
     // if the first element is a function, then we need to use space as a separator (because
@@ -314,7 +320,7 @@ function cursorToString( val: Extended<StyleTypes.Cursor_StyleType>): string
 /**
  * Converts flex style value to the CSS string.
  */
-function flexToString( val: Extended<StyleTypes.Flex_StyleType>): string
+function flexToString( val: Extended<Flex_StyleType>): string
 {
     return val2str( val, {
         fromArray: v =>
@@ -345,7 +351,7 @@ function font_fromObject( val: any): string
 
 
 
-function fontStyleToString( val: Extended<StyleTypes.Font_StyleType>): string
+function fontStyleToString( val: Extended<Font_StyleType>): string
 {
     return val2str( val, {
         fromNumber: v => "oblique " + CssAngleMath.styleToString( v)
@@ -354,19 +360,97 @@ function fontStyleToString( val: Extended<StyleTypes.Font_StyleType>): string
 
 
 
-function gridTemplateToString( val: Extended<StyleTypes.GridTemplateAxis_StyleType>): string
+function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>): string
 {
+    // val can be array of functions (IQuotedProxy[]) or arrays (GridTemplateArea_Definition[])
     return val2str( val, {
-        arrFunc: v => val2str( v, {
-            fromNumber: v => CssLengthMath.styleToString( v),
-            fromArray: v => `[${arr2str(v)}]`
-        })
+        fromArray: v => {
+            if (v.length === 0)
+                return "";
+            else if (typeof v[0] === "function")
+                return arr2str( v);
+            else
+                return createGridTemplateAreasFromDefinitions(v);
+        }
     });
 }
 
 
 
-function markerStyleToString( val: Extended<StyleTypes.Marker_StyleType>): string
+/**
+ * Converts the array of GridTemplateArea_Definition objects to a string that is suitable for
+ * the grid-template-areas format.
+ */
+function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definition[]): string
+{
+    // calculate total size of the matrix from the areas' sizes
+    let rowCount = 0, colCount = 0;
+    for( let def of defs)
+    {
+        rowCount = Math.max( rowCount, def[3]);
+        colCount = Math.max( colCount, def[4]);
+    }
+
+    if (rowCount === 0 || colCount === 0)
+        return "";
+
+    // create array of rows where every element is an array of cells
+    let matrix = new Array<string[]>(rowCount);
+    for( let i = 0; i < rowCount; i++)
+        matrix[i] = new Array<string>(colCount);
+
+    // go over definitions and fill the appropriate places in the cells with area names
+    for( let def of defs)
+    {
+        let name = val2str( def[0]);
+        for( let i = def[1]; i <= def[3]; i++)
+        {
+            for( let j = def[2]; j <= def[4]; j++)
+                matrix[i-1][j-1] = name;
+        }
+    }
+
+    // go over our matrix and for every row create a quoted string. Since our cell arrays may be
+    // sparse, use dot for the undefined cells
+    let s = "";
+    for( let i = 0; i < rowCount; i++)
+    {
+        let rowNames: string[] = [];
+        for( let j = 0; j < rowCount; j++)
+        {
+            let name = matrix[i][j];
+            rowNames.push( name ? name : ".")
+        }
+
+        s += `"${rowNames.join(" ")}"\n`;
+    }
+
+    return s;
+}
+
+
+
+export function gridTrackToString( val: GridTrack): string
+{
+    return val2str( val, {
+        fromNumber: v => CssLengthMath.styleToString( v),
+        fromArray: v => `[${arr2str(v)}]`
+    });
+}
+
+
+
+function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
+{
+    return val2str( val, {
+        fromNumber: v => CssLengthMath.styleToString( v),
+        arrFunc: gridTrackToString
+    });
+}
+
+
+
+function markerStyleToString( val: Extended<Marker_StyleType>): string
 {
     return val2str( val, {
         fromObj: v => `url(#${(val as IIDRule).name})`
@@ -375,7 +459,7 @@ function markerStyleToString( val: Extended<StyleTypes.Marker_StyleType>): strin
 
 
 
-function rotateToString( val:StyleTypes.Rotate_StyleType): string
+function rotateToString( val:Rotate_StyleType): string
 {
     return val2str( val, {
         fromArray: v => {
@@ -387,7 +471,7 @@ function rotateToString( val:StyleTypes.Rotate_StyleType): string
     });
 }
 
-function textDecoration_fromObject( val: Extended<StyleTypes.TextDecoration_StyleType>): string
+function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): string
 {
     return obj2str( val, [
         "line",
@@ -399,7 +483,7 @@ function textDecoration_fromObject( val: Extended<StyleTypes.TextDecoration_Styl
 
 
 
-function singleTransition_fromObject( val: Extended<StyleTypes.Transition_Single>): string
+function singleTransition_fromObject( val: Extended<Transition_Single>): string
 {
     return obj2str( val, [
         ["property", camelToDash],
@@ -411,7 +495,7 @@ function singleTransition_fromObject( val: Extended<StyleTypes.Transition_Single
 
 
 
-function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>): string
+function singleTransition_fromStyle( val: Extended<Transition_Single>): string
 {
     return val2str( val, {
         fromObj: singleTransition_fromObject
@@ -420,7 +504,7 @@ function singleTransition_fromStyle( val: Extended<StyleTypes.Transition_Single>
 
 
 
-function offsetToString( val: StyleTypes.Offset_StyleType): string
+function offsetToString( val: Offset_StyleType): string
 {
     return obj2str( val, [
         ["position", "offsetPosition"],
@@ -509,8 +593,8 @@ export function obj2str( val: any,
  * @param source 
  * @returns Reference to the target styleset if not null or a new styleset otherwise.
  */
-export function mergeStylesets( target: StyleTypes.Styleset | undefined | null,
-    source: StyleTypes.Styleset): StyleTypes.Styleset
+export function mergeStylesets( target: Styleset | undefined | null,
+    source: Styleset): Styleset
 {
     if (!source)
         return target ? target : {};
@@ -552,8 +636,8 @@ export function mergeStylesets( target: StyleTypes.Styleset | undefined | null,
 /**
  * Merges "--" property from the source styleset to the target styleset.
  */
-export function mergeStylesetCustomProps( target: StyleTypes.Styleset,
-    source: StyleTypes.Styleset): void
+export function mergeStylesetCustomProps( target: Styleset,
+    source: Styleset): void
 {
     // check whether custom properties and important properties are defined
     let sourceCustomProps = source["--"];
@@ -571,7 +655,7 @@ export function mergeStylesetCustomProps( target: StyleTypes.Styleset,
 
 
 /** Converts the given styleset to its string representation */
-export function stylesetToString( styleset: StyleTypes.Styleset): string
+export function stylesetToString( styleset: Styleset): string
 {
     if (!styleset)
         return "";
@@ -594,7 +678,7 @@ export function stylesetToString( styleset: StyleTypes.Styleset): string
  * Extracts name and string values from the given custom CSS property definition.
  * @param customVal 
  */
-export function getCustomPropNameAndValue( customVal: StyleTypes.CustomVar_StyleType): [string?,string?]
+export function getCustomPropNameAndValue( customVal: CustomVar_StyleType): [string?,string?]
 {
     if (!customVal)
         return [];
@@ -676,7 +760,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
  * @param forProp 
  * @param forCustomProp 
  */
-export function forAllPropsInStylset( styleset: StyleTypes.Styleset,
+export function forAllPropsInStylset( styleset: Styleset,
     forProp: (name: string, val: any, isCustom: boolean) => void)
 {
 	for( let propName in styleset)
@@ -685,7 +769,7 @@ export function forAllPropsInStylset( styleset: StyleTypes.Styleset,
 		{
 			// special handling of the "--" property, which is an array where each item is
 			// a two-item or three-item array
-			let propVal = styleset[propName] as StyleTypes.CustomVar_StyleType[];
+			let propVal = styleset[propName] as CustomVar_StyleType[];
 			for( let customVal of propVal)
 			{
 				if (!customVal)
@@ -759,9 +843,13 @@ function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): strin
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Helper object that is used to indicate that values in an array should be separated by comma.
+// Helper object that is used to indicate that values in an array should be separated by a comma.
 // We use it many times in the stucture below.
 let commaArraySeparator = { arrSep: "," };
+
+// Helper object that is used to indicate that values in an array should be separated by a slash.
+// We use it many times in the stucture below.
+let slashArraySeparator = { arrSep: "/" };
 
 
 
@@ -769,7 +857,7 @@ let commaArraySeparator = { arrSep: "," };
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (WellKnownFunc | ToStringFunc | IValueConvertOptions) } =
+const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFunc | IValueConvertOptions) } =
 {
     animation: {
         fromObj: singleAnimation_fromObject,
@@ -878,8 +966,14 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (WellKnownFunc |
     gridColumnGap: WellKnownFunc.Length,
     gridGap: WellKnownFunc.MultiLengthWithSpace,
     gridRowGap: WellKnownFunc.Length,
-    gridTemplateColumns: gridTemplateToString,
-    gridTemplateRows: gridTemplateToString,
+    gridArea: slashArraySeparator,
+    gridAutoColumns: gridAxisToString,
+    gridAutoRows: gridAxisToString,
+    gridColumn: slashArraySeparator,
+    gridRow: slashArraySeparator,
+    gridTemplateAreas: gridTemplateAreasToString,
+    gridTemplateColumns: gridAxisToString,
+    gridTemplateRows: gridAxisToString,
 
     height: WellKnownFunc.Length,
 
@@ -1050,7 +1144,7 @@ const StylePropertyInfos: { [K in StyleTypes.VarTemplateName]?: (WellKnownFunc |
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Converts the given supports query to its string representation */
-export function supportsQueryToString( query: StyleTypes.SupportsQuery): string
+export function supportsQueryToString( query: SupportsQuery): string
 {
     if (!query)
         return "";
@@ -1065,7 +1159,7 @@ export function supportsQueryToString( query: StyleTypes.SupportsQuery): string
 
 
 /** Converts the given supports query to its string representation */
-export function singleSupportsQueryToString( query: StyleTypes.SingleSupportsQuery): string
+export function singleSupportsQueryToString( query: SingleSupportsQuery): string
 {
     if (!query)
         return "";

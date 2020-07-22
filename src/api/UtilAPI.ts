@@ -2,7 +2,7 @@
 	ICssNumberMath, ICssLengthMath, ICssAngleMath, ICssTimeMath, ICssResolutionMath,
     ICssFrequencyMath, ICssPercentMath, Extended, IStringProxy, IUrlProxy,
     AttrTypeKeyword, AttrUnitKeyword, ILengthProxy, IPercentProxy, IAngleProxy,
-    ITimeProxy, IResolutionProxy, IFrequencyProxy
+    ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy
 } from "../styles/UtilTypes"
 import {
 	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
@@ -192,7 +192,7 @@ export function khz( n: number): IFrequencyProxy { return () => n + "khz"; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// raw()
+// utility functions
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -210,12 +210,6 @@ export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProx
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// usevar()
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * Returns a function representing the invocation of the `var()` CSS function for
  * the given custom CSS property with optional fallbacks.
@@ -229,12 +223,6 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// url()
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * Returns a function representing the CSS `url()` function. The string parameter
  * will be wrapped in a "url()" invocation. The function can also accept the IIDRule object to
@@ -243,6 +231,30 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 export function url( val: Extended<string | IIDRule>): IUrlProxy
 {
 	return () => `url(${val2str(val)})`;
+}
+
+
+
+/**
+ * Returns a function representing the `attr()` CSS function. It returns IStringProxy
+ * and theoretically can be used in any style property; however, its use by browsers is currently
+ * limited to the `content` property. Also no browser currently support type, units or fallback
+ * values.
+ */
+export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
+	fallback?: Extended<string>): IStringProxy
+{
+    return () => `attr(${attrName}${typeOrUnit ? " " + typeOrUnit : ""}${fallback ? "," + fallback : ""})`;
+}
+
+
+
+/**
+ * Returns a function representing a string in quotation marks.
+ */
+export function quoted( val: any): IQuotedProxy
+{
+    return () => `"${val2str(val)}"`;
 }
 
 
@@ -288,26 +300,6 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 		let after = textAfter ? `"${val2str( textAfter)}"` : "";
 		return `${before} counters(${val2str(counterObj)},${sepString}${styleString}) ${after}`;
 	}
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// attr()
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a function representing the `attr()` CSS function. It returns IStringProxy
- * and theoretically can be used in any style property; however, its use by browsers is currently
- * limited to the `content` property. Also no browser currently support type, units or fallback
- * values.
- */
-export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
-	fallback?: Extended<string>): IStringProxy
-{
-    return () => `attr(${attrName}${typeOrUnit ? " " + typeOrUnit : ""}${fallback ? "," + fallback : ""})`;
 }
 
 
