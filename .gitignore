@@ -24,6 +24,7 @@ bld/
 [Dd]ist/
 [Ll]ib/
 [Rr]eference/
+*.tsbuildinfo
 
 # Visual Studio 2015 cache/options directory
 .vs/

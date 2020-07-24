@@ -9,18 +9,18 @@
  * Intellisense and it doesn't prompt developers for the possible values. The IValueProxy
  * can be used instead of string and this solves the Intellisense issue.
  * 
- * Another benefit of using objects implementing the IValueProxy interface is that they are
- * constructed at one point but the string generation occurs at another time. This allows
+ * Another benefit of using functions is that they are
+ * constructed at one time but the string generation occurs at another time. This allows
  * using these objects in the style definition classes. They can reference objects like
  * IVarRule that are not fully initialized yet. However, when the styles should be inserted
- * into DOM the initialization will have already occurred and the valueToString method will
+ * into DOM the initialization will have already occurred and the function will
  * return a correct string.
  * 
- * Note that the IXxxProxy interfaces have a property or method that distinguishes them from
- * other proxy interface. This is because we want to distinguish between different CSS types,
+ * Note that the proxy functions have a parameter that distinguishes them from
+ * other proxy functions. This is because we want to distinguish between different CSS types,
  * so that a function used for one CSS type cannot be used for a different CSS type. For
- * example, the `calc()` function returns the INumberProxy interface, while the
- * `linearIngradient()` function returns the IImageProxy interface. Thus you cannot use the
+ * example, the `calc()` function returns the NumberProxy function, while the
+ * `linearIngradient()` function returns the ImageProxy function. Thus you cannot use the
  * 'calc()` function for image-based CSS properties and vice versa.
  */
 
@@ -33,48 +33,83 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IStringProxy interface represents an object that can be assigned to any CSS property. This
- * This interface is part of type definition for all CSS properties - even for those that don't
- * have `string` as part of their type. 
- * 
- * This interface is returned from the `raw()` function, which allows by-passing the property
- * typing rules and specifying a string directly. This might be useful, when a string value is
- * obtained from some external calculations.
+ * Style values that can be used for any CSS property.
  */
-export interface IStringProxy
+export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
+
+
+
+/**
+ * The IGenericProxy interface represents a callable interface implemented using functions that
+ * accept an optional parameter of a generic type and return a string. This interface is used as a
+ * base for proxy interfaces defining types acceptable by certain style properties. The type
+ * parameter helps differentiate these interfaces so that functions that can be assigned to one
+ * type of style properties (e.g. "transform") cannot be assigned to an incompatible style property
+ * (e.g. clip-path).
+ */
+export interface IGenericProxy<T extends string>
 {
-    /** Flag indicating that this object implements the IStringProxy interface */
-    readonly isStringProxy: boolean;
+    (p?: T): string;
 }
 
 
 
 /**
- * Style values that can be used for (almost) any CSS property.
+ * The IStringProxy interface represents a function that returns a string. This function is part
+ * of type definition for all CSS properties - even for those that don't have `string` as part of
+ * their type.
+ * 
+ * This function is returned from the `raw()` function, which allows by-passing the property
+ * typing rules and specifying a string directly. This might be useful, when a string value is
+ * obtained from some external calculations.
  */
-export type Base_StyleType = "inherit" | "initial" | "unset" | "revert" | IStringProxy | null | undefined;
+export interface IStringProxy extends IGenericProxy<"string"> {}
 
 
 
 /**
- * The IVarProxy interface represents a CSS custom property object with values of the given type.
- * we need this interface because every style property can accept value in the form of var()
+ * The ICustomVar interface represents a CSS custom property object with values of the given type.
+ * This interface is needed because every style property can accept value in the form of the var()
  * CSS function.
  */
-export interface IVarProxy<T = any>
+export interface ICustomVar<T = any>
 {
-	setValue( value: T, important?: boolean): void;
+	/**
+	 * Sets new value of this custom CSS property.
+	 * @param value New value for the CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
+	 * value to the DOM. If undefined, the current default scheduler will be used.
+	 */
+	setValue( value: T, important?: boolean, schedulerType?: number): void;
 }
 
 
 
 /**
  * Type that extends the given type with the following types:
- * - basic style values that are valid for all style properties.
- * - IStringProxy type that allows specifying raw string value.
- * - IVarProxy object that allows using a CSS custom property.
+ * - ICustomVar interface that allows using a CSS custom property.
+ * - IStringProxy interface that allows specifying raw string value.
  */
-export type Extended<T> = T | Base_StyleType | IVarProxy<T>;
+export type Extended<T> = T | ICustomVar<T> | IStringProxy | undefined;
+
+
+
+/**
+ * Type that encapsulates the type of property in an object with a single "!" property. This
+ * type is used to indicate that the property value must be flagged as "!important".
+ */
+export type ImportantProp<T> = { "!": Extended<T> };
+
+
+
+/**
+ * The ExtendedProp extends the given generic type with the following elements:
+ * - Object with a single property "!", which is used to mark a property as "!important".
+ * - Global_StyleType, which allows any property to be assigned the global values such as
+ *   "initial", "inherit", "unset" and "revert".
+ */
+export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
 
 
 
@@ -93,89 +128,48 @@ export type OneOrBox<T> = T | [Extended<T>, Extended<T>, Extended<T>?, Extended<
 /** Type for a property that can have 1 or more values of the given type */
 export type OneOrMany<T> = T | Extended<T>[];
 
-/** Type for a property that can have 1 or more values of the given type */
-export type Many<T> = Extended<T>[];
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Numeric types as a baseis for handling CSS <number>. <length>, <angle>, etc.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
- * The INumberProxy interface represents a string proxy object whose string value can be assigned
- * to properties of the CSS numeric types. This interface is returned from functions like min(),
- * max() and calc().
+ * The IQuotedProxy function represents a string in quotation marks
  */
-export interface INumberProxy<T extends string = null>
-{
-    /**
-     * Returns true - needed only to indicate that this object implements the INumerProxy interface
-     * for a given type
-     */
-    isNumberProxy( o: T): boolean;
-}
+export interface IQuotedProxy extends IGenericProxy<"quoted"> {}
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Numeric types as a basis for handling CSS <number>, <length>, <angle>, etc.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for single numeric style property */
-export type NumberBase<T extends string = null> = number | string | INumberProxy<T>;
+export type NumberBase<T extends string> = number | string | IGenericProxy<T>;
 
 /** Type for multi-part numeric style property */
-export type MultiNumberBase<T extends string = null> = OneOrMany<NumberBase<T>>;
+export type MultiNumberBase<T extends string> = OneOrMany<NumberBase<T>>;
 
 
 
 /**
- * The INummberMath interface contains methods that implement CSS mathematic functions on the
+ * The INumberBaseMath interface contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number type, they are converted
- * to strings by calling a function specified in the constructor.
+ * to strings using the `numberToString` method.
  */
-export interface INumberMath<T extends string = null>
+export interface INumberBaseMath<T extends string>
 {
-    /** Converts number to string appending necessary unit suffixes */
-    numberToString: ( n: number) => string;
-
-    /** Converts single numeric style value to string appending necessary unit suffixes */
-    styleToString: ( val: Extended<NumberBase<T>>) => string;
-
-    /** Converts multiple numeric style value to string appending necessary unit suffixes */
-    multiStyleToString: ( val: Extended<MultiNumberBase<T>>, separator: string) => string;
-
-    /** Creates property value of using the CSS min() function. */
-    min( ...params: Extended<NumberBase<T>>[]): INumberProxy<T>;
+    /** Creates property value using the CSS min() function. */
+    min( ...params: Extended<NumberBase<T>>[]): IGenericProxy<T>;
 
     /** Creates property value using the CSS max() function. */
-    max( ...params: Extended<NumberBase<T>>[]): INumberProxy<T>;
+    max( ...params: Extended<NumberBase<T>>[]): IGenericProxy<T>;
 
     /** Creates property value using the CSS clamp() function. */
-    clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): INumberProxy<T>;
+    clamp( min: Extended<NumberBase<T>>, pref: Extended<NumberBase<T>>, max: Extended<NumberBase<T>>): IGenericProxy<T>;
 
     /**
-     * Creates property value using the CSS calc() function. This function accepts a formular
-     * string and an arbitrary number of parameters. The formular string can contain placeholders
-     * that will be replaced by the parameters. Placeholders have the following format:
-     * 
-     * ```
-     * {<index> [| <unit>]}
-     * ```
-     * The `<index>` token is a zero-based index in the parameter array. The optional `<unit>` token is
-     * a measurement unit (length, percent, angle, etc.) and is used if the corresponding parameter
-     * is a number.
-     * 
-     * ```typescript
-     * class MyStyles
-     * {
-     *     wallGap = $var( "width", 16);
-     *     myClass = $class({ maxWidth: Len.calc("100% - 2*{0}", this.wallGap)})
-     * }
-     * ```
-     * @param formula 
-     * @param params 
+     * Creates property value using the CSS calc() function. This method is a tag function and must
+     * be invoked with a template string without parentheses.
      */
-    calc( formula: string, ...params: Extended<NumberBase<T>>[]): INumberProxy<T>;
+    calc( formulaParts: TemplateStringsArray, ...params: Extended<NumberBase<T>>[]): IGenericProxy<T>;
 }
 
 
@@ -186,20 +180,54 @@ export interface INumberMath<T extends string = null>
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Type for single style property of the `<number>` CSS type*/
-export type CssNumber = NumberBase<"Number">;
+/** Unique string literal that distinguishes the Number type from other numeric types */
+export type NumberType = "Number";
 
-/** Type for multi-part style property of the `<number>` CSS type*/
+/** Type for single style property of the `<number>` CSS type - note that it exludes `string` */
+export type CssNumber = Exclude<NumberBase<NumberType>,string>;
+
+/** Type for multi-part style property of the `<number>` CSS type */
 export type CssMultiNumber = OneOrMany<CssNumber>;
 
-/** Type for 1-to-four-part style property of the `<number>` CSS type*/
-export type CssNumberBox = OneOrBox<CssNumber>;
+/** Proxy interface that represents values of the `<percent>` CSS type */
+export interface INumberProxy extends IGenericProxy<NumberType> {};
 
 /**
  * The ICssNumberMath interface contains methods that implement CSS mathematic functions on the
  * `<number>` CSS types.
  */
-export interface ICssNumberMath extends INumberMath<"Number"> {}
+export interface ICssNumberMath extends INumberBaseMath<NumberType> {}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Percent
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Units of percent */
+export type PercentUnits = "%";
+
+/** Unique string literal that distinguishes the Percent type from other numeric types */
+export type PercentType = "Percent";
+
+/** Type for single style property of the `<percent>` CSS type */
+export type CssPercent = NumberBase<PercentType>;
+
+/** Type for multi-part style property of the `<percent>` CSS type */
+export type CssMultiPercent = OneOrMany<CssPercent>;
+
+/** Proxy interface that represents values of the `<percent>` CSS type */
+export interface IPercentProxy extends IGenericProxy<PercentType> {};
+
+/**
+ * The ICssPercentMath interface contains methods that implement CSS mathematic functions on the
+ * `<percent>` CSS types.
+ */
+export interface ICssPercentMath extends INumberBaseMath<PercentType>
+{
+}
 
 
 
@@ -211,91 +239,38 @@ export interface ICssNumberMath extends INumberMath<"Number"> {}
 
 /** Units of length */
 export type LengthUnits = "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" | "mm" | "pc" |
-                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin";
+                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "fr";
 
-/** Type for single style property of the `<length>` CSS type*/
-export type CssLength = NumberBase<"Length" | "Percent">;
+/** Unique string literal that distinguishes the Length type from other numeric types */
+export type LengthType = "Length" | PercentType;
 
-/** Type for multi-part style property of the `<length>` CSS type*/
+/** Type for single style property of the `<length>` CSS type */
+export type CssLength = NumberBase<LengthType>;
+
+/** Type for multi-part style property of the `<length>` CSS type */
 export type CssMultiLength = OneOrMany<CssLength>;
 
-/** Type for 1-to-four-part style property of the `<length>` CSS type*/
+/** Type for 1-to-2-part style property of the `<length>` CSS type */
+export type CssLengthPair = OneOrPair<CssLength>;
+
+/** Type for 1-to-4-part style property of the `<length>` CSS type */
 export type CssLengthBox = OneOrBox<CssLength>;
 
-/** Proxy type that represents values of the `<length>` CSS type*/
-export interface ILengthProxy extends INumberProxy<"Length" | "Percent"> {}
+/** Proxy interface that represents values of the `<length>` CSS type */
+export interface ILengthProxy extends IGenericProxy<LengthType> {};
 
 /**
  * The ICssLengthMath interface contains methods that implement CSS mathematic functions on the
  * `<length>` CSS types.
  */
-export interface ICssLengthMath extends INumberMath<"Length" | "Percent">
+export interface ICssLengthMath extends INumberBaseMath<LengthType>
 {
-    /** Creates length value in quaters of an inch */
-    Q( n: number): ILengthProxy;
-
-    /** Creates length value in ch units */
-    ch( n: number): ILengthProxy;
-
-    /** Creates length value in cantimeters */
-    cm( n: number): ILengthProxy;
-
-    /** Creates length value in calculated font-sizes of the element */
-    em( n: number): ILengthProxy;
-
-    /** Creates length value in heights of lowercase letter 'x' in the font */
-    ex( n: number): ILengthProxy;
-
-    /** Creates length value in ic units */
-    ic( n: number): ILengthProxy;
-
-    /** Creates length value in inches */
-    in( n: number): ILengthProxy;
-
-    /** Creates length value in line-heights of the element */
-    lh( n: number): ILengthProxy;
-
-    /** Creates length value in millimeters */
-    mm( n: number): ILengthProxy;
-
-    /** Creates length value in picas */
-    pc( n: number): ILengthProxy;
-
-    /** Creates length value in points */
-    pt( n: number): ILengthProxy;
-
-    /** Creates length value in pixels */
-    px( n: number): ILengthProxy;
-
-    /** Creates length value in 1% of the size of the initial containing block, in the direction
-     * of the root element’s block axis */
-    vb( n: number): ILengthProxy;
-
-    /** Creates length value in 1% of the height of the viewport's initial containing block */
-    vh( n: number): ILengthProxy;
-
-    /** Creates length value in 1% of the size of the initial containing block, in the direction
-     * of the root element’s inline axis */
-    vi( n: number): ILengthProxy;
-
-    /** Creates length value in 1% of the width of the viewport's initial containing block */
-    vw( n: number): ILengthProxy;
-
-    /** Creates length value in fontsizes of the root element (<html>) */
-    rem( n: number): ILengthProxy;
-
-    /** Creates length value in line-heights of the root element (<html>) */
-    rlh( n: number): ILengthProxy;
-
-    /** Creates length value in the units which are a smaller value between vw and vh */
-    vmax( n: number): ILengthProxy;
-
-    /** Creates length value in the units which are a larger value between vw and vh */
-    vmin( n: number): ILengthProxy;
+    /** Creates property value using the CSS minmax() function. */
+    minmax( min: Extended<CssLength>, max: Extended<CssLength>): ILengthProxy;
 }
 
 
-                
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // CSS `<angle>` type.
@@ -305,35 +280,24 @@ export interface ICssLengthMath extends INumberMath<"Length" | "Percent">
 /** Units of angle */
 export type AngleUnits = "deg" | "rad" | "grad" | "turn";
 
-/** Type for single style property of the `<angle>` CSS type*/
-export type CssAngle = NumberBase<"Angle" | "Percent">;
+/** Unique string literal that distinguishes the Angle type from other numeric types */
+export type AngleType = "Angle" | PercentType;
 
-/** Type for multi-part style property of the `<angle>` CSS type*/
+/** Type for single style property of the `<angle>` CSS type */
+export type CssAngle = NumberBase<AngleType>;
+
+/** Type for multi-part style property of the `<angle>` CSS type */
 export type CssMultiAngle = OneOrMany<CssAngle>;
 
-/** Type for 1-to-four-part style property of the `<angle>` CSS type*/
-export type CssAngleBox = OneOrBox<CssAngle>;
-
-/** Proxy type that represents values of the `<angle>` CSS type*/
-export interface IAngleProxy extends INumberProxy<"Angle" | "Percent"> {}
+/** Proxy interface that represents values of the `<angle>` CSS type */
+export interface IAngleProxy extends IGenericProxy<AngleType> {};
 
 /**
  * The ICssAngleMath interface contains methods that implement CSS mathematic functions on the
  * `<angle>` CSS types.
  */
-export interface ICssAngleMath extends INumberMath<"Angle" | "Percent">
+export interface ICssAngleMath extends INumberBaseMath<AngleType>
 {
-    /** Creates angle value in degrees */
-     deg( n: number): IAngleProxy;
-
-    /** Creates angle value in radians */
-    rad( n: number): IAngleProxy;
-
-    /** Creates angle value in gradians */
-    grad( n: number): IAngleProxy;
-
-    /** Creates angle value in turns */
-    turn( n: number): IAngleProxy;
 }
 
 
@@ -347,29 +311,24 @@ export interface ICssAngleMath extends INumberMath<"Angle" | "Percent">
 /** Units of time */
 export type TimeUnits = "s" | "ms";
 
-/** Type for single style property of the `<time>` CSS type*/
-export type CssTime = NumberBase<"Time" | "Percent">;
+/** Unique string literal that distinguishes the Time type from other numeric types */
+export type TimeType = "Time";
 
-/** Type for multi-part style property of the `<time>` CSS type*/
+/** Type for single style property of the `<time>` CSS type */
+export type CssTime = NumberBase<TimeType>;
+
+/** Type for multi-part style property of the `<time>` CSS type */
 export type CssMultiTime = OneOrMany<CssTime>;
 
-/** Type for 1-to-four-part style property of the `<time>` CSS type*/
-export type CssTimeBox = OneOrBox<CssTime>;
-
-/** Proxy type that represents values of the `<time>` CSS type*/
-export interface ITimeProxy extends INumberProxy<"Time" | "Percent"> {}
+/** Proxy interface that represents values of the `<time>` CSS type*/
+export interface ITimeProxy extends IGenericProxy<TimeType> {};
 
 /**
  * The ICssTimeMath interface contains methods that implement CSS mathematic functions on the
  * `<time>` CSS types.
  */
-export interface ICssTimeMath extends INumberMath<"Time" | "Percent">
+export interface ICssTimeMath extends INumberBaseMath<TimeType>
 {
-    /** Creates frequency value in milliseconds */
-    ms( n: number): ITimeProxy;
-
-    /** Creates frequency value in seconds */
-    s( n: number): ITimeProxy;
 }
 
 
@@ -383,35 +342,24 @@ export interface ICssTimeMath extends INumberMath<"Time" | "Percent">
 /** Units of resolution */
 export type ResolutionUnits = "dpi" | "dpcm" | "dppx" | "x";
 
-/** Type for single style property of the `<resolution>` CSS type*/
-export type CssResolution = NumberBase<"Resolution" | "Percent">;
+/** Unique string literal that distinguishes the Resolution type from other numeric types */
+export type ResolutionType = "Resolution";
 
-/** Type for multi-part style property of the `<resolution>` CSS type*/
+/** Type for single style property of the `<resolution>` CSS type */
+export type CssResolution = NumberBase<ResolutionType>;
+
+/** Type for multi-part style property of the `<resolution>` CSS type */
 export type CssMultiResolution = OneOrMany<CssResolution>;
 
-/** Type for 1-to-four-part style property of the `<resolution>` CSS type*/
-export type CssResolutionBox = OneOrBox<CssResolution>;
-
-/** Proxy type that represents values of the `<resolution>` CSS type*/
-export interface IResolutionProxy extends INumberProxy<"Resolution" | "Percent"> {}
+/** Proxy interface that represents values of the `<resolution>` CSS type */
+export interface IResolutionProxy extends IGenericProxy<ResolutionType> {};
 
 /**
  * The ICssResolutionMath interface contains methods that implement CSS mathematic functions on the
  * `<resolution>` CSS types.
  */
-export interface ICssResolutionMath extends INumberMath<"Resolution" | "Percent">
+export interface ICssResolutionMath extends INumberBaseMath<ResolutionType>
 {
-    /** Creates resolution value in DPI */
-    dpi( n: number): IResolutionProxy;
-
-    /** Creates resolution value in DPCM */
-    dpcm( n: number): IResolutionProxy;
-
-    /** Creates resolution value in DPPX */
-    dppx( n: number): IResolutionProxy;
-
-    /** Creates resolution value in X */
-    x( n: number): IResolutionProxy;
 }
 
 
@@ -425,101 +373,32 @@ export interface ICssResolutionMath extends INumberMath<"Resolution" | "Percent"
 /** Units of frequency */
 export type FrequencyUnits = "Hz" | "kHz";
 
-/** Type for single style property of the `<frequency>` CSS type*/
-export type CssFrequency = NumberBase<"Frequency" | "Percent">;
+/** Unique string literal that distinguishes the Frequency type from other numeric types */
+export type FrequencyType = "Frequency";
 
-/** Type for multi-part style property of the `<frequency>` CSS type*/
+/** Type for single style property of the `<frequency>` CSS type */
+export type CssFrequency = NumberBase<FrequencyType>;
+
+/** Type for multi-part style property of the `<frequency>` CSS type */
 export type CssMultiFrequency = OneOrMany<CssFrequency>;
 
-/** Type for 1-to-four-part style property of the `<frequency>` CSS type*/
-export type CssFrequencyBox = OneOrBox<CssFrequency>;
-
-/** Proxy type that represents values of the `<frequency>` CSS type*/
-export interface IFrequencyProxy extends INumberProxy<"Frequency" | "Percent"> {}
+/** Proxy interface that represents values of the `<frequency>` CSS type */
+export interface IFrequencyProxy extends IGenericProxy<FrequencyType> {};
 
 /**
  * The ICssFrequencyMath interface contains methods that implement CSS mathematic functions on the
  * `<frequency>` CSS types.
  */
-export interface ICssFrequencyMath extends INumberMath<"Frequency" | "Percent">
+export interface ICssFrequencyMath extends INumberBaseMath<FrequencyType>
 {
-    /** Creates frequency value in Hertz */
-    hz( n: number): IFrequencyProxy
-
-    /** Creates frequency value in Kilo-Hertz */
-    khz( n: number): IFrequencyProxy
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Fraction
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/** Units of fractions (for flex and grid layouts) */
-export type FractionUnits = "fr";
-
-/** Type for single style property of the `<fraction>` CSS type*/
-export type CssFraction = NumberBase<"Fraction" | "Percent">;
-
-/** Type for multi-part style property of the `<fraction>` CSS type*/
-export type CssMultiFraction = OneOrMany<CssFraction>;
-
-/** Type for 1-to-four-part style property of the `<fraction>` CSS type*/
-export type CssFractionBox = OneOrBox<CssFraction>;
-
-/** Proxy type that represents values of the `<fraction>` CSS type*/
-export interface IFractionProxy extends INumberProxy<"Fraction" | "Percent"> {}
 
 /**
- * The IFractionMath interface contains methods that implement CSS mathematic functions on the
- * `<fraction>` CSS types.
+ * Type representing a point using x and y coordinates.
  */
-export interface ICssFractionMath extends INumberMath<"Fraction" | "Percent">
-{
-    /** Creates property value using the CSS minmax() function. */
-    minmax( min: Extended<CssFraction>, max: Extended<CssFraction>): INumberProxy<"Fraction" | "Percent">;
-
-    /** Creates fraction value for flex */
-    fr( n: number): IFractionProxy;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Percent
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/** Units of percent */
-export type PercentUnits = "%";
-
-/** Type for single style property of the `<percent>` CSS type*/
-export type CssPercent = NumberBase<"Percent">;
-
-/** Type for multi-part style property of the `<percent>` CSS type*/
-export type CssMultiPercent = OneOrMany<CssPercent>;
-
-/** Type for 1-to-four-part style property of the `<percent>` CSS type*/
-export type CssPercentBox = OneOrBox<CssPercent>;
-
-/** Proxy type that represents values of the `<percent>` CSS type*/
-export interface IPercentProxy extends INumberProxy<"Percent"> {}
-
-/**
- * The IFractionMath interface contains methods that implement CSS mathematic functions on the
- * `<percent>` CSS types.
- */
-export interface ICssPercentMath extends INumberMath<"Percent">
-{
-    /**
-     * Converts the given number to a percent string. Numbers between -1 and 1 are multiplyed by 100.
-     */
-    percent( n: number): IPercentProxy;
-}
+export type CssPoint = [Extended<CssLength>, Extended<CssLength>];
 
 
 
@@ -536,14 +415,14 @@ export type HorizontalPositionKeyword = "left" | "center" | "right";
 export type VerticalPositionKeyword = "top" | "center" | "bottom";
 
 /** Type describing a simple 1 or two values `<position>` CSS type */
-export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyword | Extended<CssNumber> |
-    [HorizontalPositionKeyword | Extended<CssNumber>, VerticalPositionKeyword | Extended<CssNumber>];
+export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyword | Extended<CssLength> |
+    [HorizontalPositionKeyword | Extended<CssLength>, VerticalPositionKeyword | Extended<CssLength>];
 
 /** Type describing the full up to 4 values `<position>` CSS type */
 export type CssPosition = SimpleCssPosition | 
-    [HorizontalPositionKeyword, Extended<CssNumber>, VerticalPositionKeyword] |
-    [HorizontalPositionKeyword, VerticalPositionKeyword, Extended<CssNumber>] |
-    [HorizontalPositionKeyword, Extended<CssNumber>, VerticalPositionKeyword, Extended<CssNumber>];
+    [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword] |
+    [HorizontalPositionKeyword, VerticalPositionKeyword, Extended<CssLength>] |
+    [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword, Extended<CssLength>];
 
 /** Type describing multiple `<position>` CSS types */
 export type MultiCssPosition = Extended<CssPosition>[];
@@ -568,13 +447,21 @@ export type CssRadius = OneOrPair<CssLength>;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IUrlProxy interface represents an invocation of the CSS url() function.
+ * The IUrlProxy function represents an invocation of the CSS url() function.
  */
-export interface IUrlProxy
-{
-    /** Flag indicating that this object implements the IUrlProxy interface */
-    readonly isUrlProxy: boolean;
-}
+export interface IUrlProxy extends IGenericProxy<"url"> {};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// attr() function support
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" | "angle" | "time" | "frequency";
+
+export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnits | ResolutionUnits | FrequencyUnits;
 
 
 

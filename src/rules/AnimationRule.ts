@@ -1,6 +1,7 @@
-import {IAnimationRule, AnimationFrame, INamedEntity} from "./RuleTypes"
-import {Rule, RuleType, ITopLevelRuleContainer, createNames} from "./Rule"
-import {StyleRule} from "./StyleRule";
+import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "./RuleTypes"
+import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer} from "./Rule"
+import {StyleRule} from "./StyleRules";
+import { val2str } from "../styles/UtilFuncs";
 
 
 
@@ -11,10 +12,10 @@ export class AnimationRule extends Rule implements IAnimationRule
 {
 	public constructor( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule)
 	{
-		super( RuleType.ANIMATION);
+		super();
 
 		if (frames)
-			this.frameRules = frames.map( (keyframe) => new AnimationFrameRule( keyframe));
+			this.frameRules = frames.map( frame => new AnimationFrameRule( frame[0], frame[1]));
 
 		this.nameOverride = nameOverride;
 	}
@@ -22,14 +23,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process(  owner: ITopLevelRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string)
 	{
-		super.process( owner, ruleName);
+		super.process( container, ownerContainer, ruleName);
 
-		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride);
+		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride);
 
 		for( let keyframeRule of this.frameRules)
-			keyframeRule.process( owner, ruleName);
+			keyframeRule.process( container, ownerContainer, ruleName);
 	}
 
 
@@ -37,9 +38,9 @@ export class AnimationRule extends Rule implements IAnimationRule
 	// Creates a copy of the rule.
 	public clone(): AnimationRule
 	{
-		let newRule = new AnimationRule();
+		let newRule = new AnimationRule(undefined, this.nameOverride);
 		if (this.frameRules)
-			newRule.frameRules = this.frameRules.map( (keyframeRule) => keyframeRule.clone());
+			newRule.frameRules = this.frameRules.map( frameRule => frameRule.clone() as AnimationFrameRule);
 		newRule.nameOverride = this.nameOverride;
 		return newRule;
 	}
@@ -55,11 +56,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 		this.cssRule = Rule.addRuleToDOM( `@keyframes ${this.name} {}`, parent) as CSSKeyframesRule;
 
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
-		for( let keyframeRule of this.frameRules)
+		for( let frameRule of this.frameRules)
 		{
 			try
 			{
-				cssKeyframesRule.appendRule( keyframeRule.toCssString())
+				cssKeyframesRule.appendRule( frameRule.toCssString())
+				let cssRule = cssKeyframesRule.cssRules.item(  cssKeyframesRule.cssRules.length - 1);
+				if (cssRule)
+					frameRule.cssKeyframeRule = cssRule as CSSKeyframeRule;
 			}
 			catch(x)
 			{
@@ -69,18 +73,16 @@ export class AnimationRule extends Rule implements IAnimationRule
 	}
 
 
+	// This function is called to convert an object to a string. Animation rule returns its name.
+	public valueToString(): string
+	{
+		return this.name;
+	}
 
-    /** Flag indicating that this object implements the IAnimationNameProxy interface */
-    public get isAnimationNameProxy(): boolean { return true; }
 
-    /** Converts internally held value(s) to string - returns the name of the animation */
-    public valueToString(): string { return this.name; }
-
+	
 	/** SOM keyframes rule */
 	public cssRule: CSSKeyframesRule;
-
-	/** Only needed to distinguish from class and ID rules */
-	public frameRules: AnimationFrameRule[];
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -96,9 +98,12 @@ export class AnimationRule extends Rule implements IAnimationRule
 	 */
 	public cssName: string;
 
+	/** List of style rules representing animation frames */
+	public frameRules: AnimationFrameRule[];
+
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | INamedEntity;
+	private nameOverride?: string | IAnimationRule;
 }
 
 
@@ -106,39 +111,35 @@ export class AnimationRule extends Rule implements IAnimationRule
 /**
  * The AnimationFrameRule class represents a single keyframe clause in the animation rule.
  */
-class AnimationFrameRule extends StyleRule
+class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 {
-	public constructor( frame?: AnimationFrame)
+	public constructor( waypoint: AnimationWaypoint, styleset?: AnimationStyleset)
 	{
-		super( RuleType.KEYFRAME, frame ? frame[1] : undefined);
-
-		if (frame)
-			this.waypoint = typeof frame[0] === "string" ? frame[0] : frame[0] + "%";
+		super( styleset);
+		this.waypoint = waypoint;
 	}
-
-
 
 	// Creates a copy of the rule.
-	public clone(): AnimationFrameRule
+	public cloneObject(): AnimationFrameRule
 	{
-		let newRule = new AnimationFrameRule();
-		newRule.copyFrom( this);
-		newRule.waypoint = this.waypoint;
-		return newRule;
+		return new AnimationFrameRule( this.waypoint);
 	}
-
-
 
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return this.waypoint;
+		return val2str( this.waypoint, {
+			fromNumber: v => v + "%",
+			arrFunc: v => val2str( v, { fromNumber: v => v + "%" }),
+			arrSep: ","
+		})
 	}
 
+	/** Identifier of the waypoint */
+	public waypoint: AnimationWaypoint;
 
-
-	/** Identifier of the waypoint as a string */
-	public waypoint: string;
+	/** SOM keyframe rule */
+	public cssKeyframeRule: CSSKeyframeRule;
 }
 
 

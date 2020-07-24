@@ -3,14 +3,33 @@ import {IRule, INamedEntity, StyleDefinition} from "./RuleTypes"
 
 
 /**
- * The IRuleContainerOwner interface represents a stylesheet that "owns" the rules under this
- * container. In particular, the owner's job is to generate "scoped" unique names.
+ * The IRuleContainer interface represents an object that accompanies and is associated with
+ * a style definition object.
  */
-export interface ITopLevelRuleContainer
+export interface IRuleContainer
 {
 	/** Returns the instance of the stylesheet definition class */
 	getDefinitionInstance(): StyleDefinition;
 
+	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
+	insertRules( parent: CSSStyleSheet | CSSGroupingRule): void;
+
+	/** Clears all CSS rule objects defined in this container. */
+	clearRules(): void;
+
+	/** Sets the given value for the custom CSS roperty with the given name. */
+	setCustomVarValue( name: string, value: string | null, important?: boolean, schedulerType?: number): void;
+}
+
+
+
+/**
+ * The ITopLevelRuleContainer interface represents a top-level style definition object that "owns"
+ * the rules under this container. In particular, the owner's job is to generate "scoped" unique
+ * names.
+ */
+export interface ITopLevelRuleContainer extends IRuleContainer
+{
 	/** Generates a name, which will be unique in this stylesheet */
 	getScopedRuleName( ruleName: string): string;
 }
@@ -18,28 +37,32 @@ export interface ITopLevelRuleContainer
 
 
 /**
- * The RuleType enumeration lists types of rules that Mimcss library works with.
+ * The RuleLike abstract class is a base for all "rules" defined in the style definition classes -
+ * whether they correspond to real CssRules (and thus derive from the Rule class) or not (such as
+ * counters, grid lines and grid areas).
  */
-export const enum RuleType
+export abstract class RuleLike
 {
-    TAG = 1,
-    CLASS,
-    ID,
-    SELECTOR,
-    ANIMATION,
-    KEYFRAME,
-    SUPPORTS,
-    MEDIA,
-    FONTFACE,
-    IMPORT,
-    NAMESPACE,
-    PAGE,
-	VIEWPORT,
-	DOCUMENT,
+	// Processes the rule.
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	{
+        this.container = container;
+		this.ownerContainer = ownerContainer;
+		this.ruleName = ruleName;
+	}
 
-	// not real rules but derive from the Rule object
-	ABSTRACT,
-	NESTED,
+	// Creates a copy of the rule.
+	public abstract clone(): RuleLike;
+
+	// Container at the top of the chain of containers to which this rule belongs.
+	public ownerContainer: ITopLevelRuleContainer;
+
+	// Name of the property of the stylesheet definition to which this rule was assigned. This can
+	// be null for rules not created via assignment to style definition properties.
+	public ruleName: string | null;
+
+	// Rule container to which this rule belongs.
+	public container: IRuleContainer;
 }
 
 
@@ -49,24 +72,10 @@ export const enum RuleType
  * class is also an ancestor for Stylesheet; however, most of its the fields are undefined in
  * te Stylesheet instances.
  */
-export abstract class Rule implements IRule
+export abstract class Rule extends RuleLike implements IRule
 {
-	constructor( ruleType: RuleType)
-	{
-		this.ruleType = ruleType;
-	}
-
-
-
-	// Processes the rule.
-	public process( owner: ITopLevelRuleContainer, ruleName: string): void
-	{
-		this.owner = owner;
-		this.ruleName = ruleName;
-	}
-
 	// Creates a copy of the rule.
-	public clone(): Rule { return null; }
+	public abstract clone(): Rule;
 
 	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
 	// style definition class, to which this rule belongs, is activated.
@@ -79,7 +88,7 @@ export abstract class Rule implements IRule
 
 
 	// Inserts the given rule into the given parent rule or stylesheet.
-	public static addRuleToDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule
+	public static addRuleToDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule | null
 	{
 		try
 		{
@@ -95,34 +104,31 @@ export abstract class Rule implements IRule
 
 
 
-	/** Type of the rule */
-	public readonly ruleType: RuleType;
-
-	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
-	public owner: ITopLevelRuleContainer;
-
-	// Name of the property of the stylesheet definition to which this rule was assigned. This is
-	// null for Stylesheet.
-	public ruleName: string;
-
 	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
 	// the styles sheet or the parent rule. This is undefined for Stylesheet objects.
-	public cssRule: CSSRule;
+	public cssRule: CSSRule | null;
 }
 
 
 
 /** Creates scoped names based on the given parameters */
-export function createNames( owner: ITopLevelRuleContainer, ruleName: string, nameOverride: string | INamedEntity,
+export function createNames( ownerContainer: ITopLevelRuleContainer, ruleName: string | null, nameOverride?: string | INamedEntity,
 	cssPrefix?: string): [string,string]
 {
+	if (!ruleName && !nameOverride)
+		return ["", ""];
+
 	let name = !nameOverride
-		? owner.getScopedRuleName( ruleName)
+		? ownerContainer.getScopedRuleName( ruleName!)
 		: typeof nameOverride === "string"
 			? nameOverride
 			: nameOverride.name;
 
-	return [name, cssPrefix ? name.startsWith( cssPrefix) ? name : cssPrefix + name : name];
+	return !cssPrefix
+		? [name,name]
+		: name.startsWith( cssPrefix)
+			? [name.substr( cssPrefix.length), name]
+			: [name, cssPrefix + name];
 }
 
 

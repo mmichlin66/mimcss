@@ -1,10 +1,5 @@
-﻿import * as SelectorTypes from "./SelectorTypes"
-import * as RuleTypes from "../rules/RuleTypes"
-import {Rule, RuleType} from "../rules/Rule";
-import {TagRule} from "../rules/TagRule"
-import {ClassRule} from "../rules/ClassRule"
-import {IDRule} from "../rules/IDRule"
-import {SelectorRule} from "../rules/SelectorRule"
+﻿import {CssSelector} from "./SelectorTypes";
+import {val2str} from "./UtilFuncs";
 
 
 
@@ -15,86 +10,45 @@ import {SelectorRule} from "../rules/SelectorRule"
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts the selector object into full selector string.
+ * Converts the given two-number tuple to a string in the form An+B.
  */
-export function selectorToCssString( selector: SelectorTypes.CssSelector): string
+function nthTupleToString( val: [number, number?]): string
 {
-	if (!selector)
-		return "";
-	else if (typeof selector === "string")
-		return selector;
-	else if (selector instanceof SelectorProxy)
-		return selector.valueToString();
-	else
-		return selector.toString();
+	let v0 = val2str( val[0]);
+	let v1n = val[1];
+
+	// the '!v1n' expression covers null, undefined and 0.
+	let v1 = !v1n ? "" : v1n > 0 ? "+" + val2str( v1n) : "-" + val2str( -v1n);
+
+	return `${v0}n${v1}`;
 }
 
 
 
 /**
- * The SelectorProxy class implements the IStringProxy interface by encapsulating a selector
- * template string with optional placeholders (e.g. {0}), which will be replaced by names
- * of tags, classes and IDs and other possible types.
+ * Returns a string representation of a selector.
  */
-export class SelectorProxy implements SelectorTypes.ISelectorProxy
+export function selectorToString( val: CssSelector): string
 {
-    /** Flag indicating that this object implements the ISelectorProxy interface */
-    public get isSelectorProxy(): boolean { return true; }
+	return val2str( val, {
+		arrSep: ""
+	})
+}
 
-    constructor( private template: string, private params: SelectorTypes.SelectorTokenType[])
-    {
-    }
 
-    /** Converts internally held value(s) to string */
-    public valueToString(): string
-    {
-		let tokens: string[] = this.template.split( /{(\d+)}/g);
-		let tokenIsNumber = false;
-		let arr: string[] = [];
-		for (let token of tokens)
-		{
-			if (tokenIsNumber)
-			{
-				let index = parseInt( token, 10);
-				if (index >= this.params.length)
-					continue;
 
-				let item = this.params[index];
-				if (item == null)
-					continue;
-				else if (typeof item === "string")
-					arr.push( item);
-				else if (item instanceof Rule)
-				{
-					// if (item.ruleType === RuleType.TAG)
-					// 	arr.push( (item as any as RuleTypes.ITagRule).tag);
-					// else if (item.ruleType === RuleType.CLASS)
-					// 	arr.push( (item as any as RuleTypes.IClassRule).cssName);
-					// else if (item.ruleType === RuleType.ID)
-					// 	arr.push( (item as any as RuleTypes.IIDRule).cssName);
-					// else if (item.ruleType === RuleType.SELECTOR)
-					// 	arr.push( (item as any as RuleTypes.ISelectorRule).selectorText);
+/**
+ * Returns a string representation of a parameterized pseudo entity.
+ */
+export function pseudoEntityToString( entityName: string, val: any): string
+{
+	if (!entityName)
+		return "";
 
-					if (item instanceof TagRule)
-						arr.push( item.tag);
-					else if (item instanceof ClassRule)
-						arr.push( item.cssName);
-					else if (item instanceof IDRule)
-						arr.push( item.cssName);
-					else if (item instanceof SelectorRule)
-						arr.push( item.selectorText);
-				}
-				else 
-					arr.push( item.toString());
-			}
-			else if (token)
-				arr.push( token);
-	
-			tokenIsNumber = !tokenIsNumber;
-		}
-	
-		return arr.join( "");
-    }
+	if (entityName.startsWith( ":nth"))
+		return val2str( val, { fromArray: nthTupleToString });
+	else
+		return val2str(val);
 }
 
 

@@ -1,8 +1,7 @@
 import {IVarRule} from "./RuleTypes"
-import {RuleContainer} from "./RuleContainer"
 import {VarValueType, VarTemplateName} from "../styles/StyleTypes"
-import {stylePropToCssString} from "../styles/StyleFuncs"
-import {createNames, ITopLevelRuleContainer} from "./Rule";
+import {stylePropToString} from "../styles/StyleFuncs"
+import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
 
@@ -13,13 +12,14 @@ import {createNames, ITopLevelRuleContainer} from "./Rule";
  * name, which will be used when defining and using this custom property in CSS.
  * 
  * Note that while the type parameter K is a key of the ICssStyleset interface, the value is of
- * type IStileset[K], whcih is Extended<ICssStyleset[K]>. This allows specifying values that are
+ * type IStileset[K], which is Extended<ICssStyleset[K]>. This allows specifying values that are
  * valid for the Extended roperty type.
  */
-export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
+export class VarRule<K extends VarTemplateName = any> extends RuleLike implements IVarRule<K>
 {
 	public constructor( template: K, value?: VarValueType<K>, nameOverride?: string | IVarRule<K>)
 	{
+        super();
 		this.template = template;
 		this.value = value;
 		this.nameOverride = nameOverride;
@@ -28,10 +28,10 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 
 
 	// Processes the given rule.
-	public process( container: RuleContainer, owner: ITopLevelRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		this.container = container;
-		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");
+		super.process( container, ownerContainer, ruleName);
+		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride, "--");
 	}
 
 
@@ -45,9 +45,9 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 
 
 	// Converts the rule to CSS string.
-	public toCssString(): string
+	public toCssString(): string | null
 	{
-		return `${this.cssName}: ${stylePropToCssString( this.template, this.value, true)}`;
+		return this.value == null ? null : `${this.cssName}: ${stylePropToString( this.template, this.value, true)}`;
 	}
 
 
@@ -65,10 +65,14 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	 * Sets new value of this custom CSS property.
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
+	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-	public setValue( value: VarValueType<K>, important?: boolean): void
+	public setValue( value: VarValueType<K>, important?: boolean, schedulerType?: number): void
 	{
-		this.container.setCustomVarValue( this.cssName, stylePropToCssString( this.template, value, true), important)
+		this.container.setCustomVarValue( this.cssName,
+            value == null ? null : stylePropToString( this.template, value, true),
+            important, schedulerType)
 	}
 
 
@@ -100,9 +104,6 @@ export class VarRule<K extends VarTemplateName = any> implements IVarRule<K>
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | IVarRule<K>;
-
-	// Rule container to which this rule belongs. This is "this" for Stylesheet.
-	public container: RuleContainer;
 }
 
 

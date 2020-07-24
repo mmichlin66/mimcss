@@ -1,19 +1,25 @@
 {
-	"compilerOptions": {
+	"compilerOptions":
+	{
+		"composite": true,
 		"declaration": true,
-		"outDir": "./lib/",
 		"sourceMap": true,
+		"declarationMap": true,
+		"strictNullChecks": true,
 		"noImplicitAny": false,
-		"strictNullChecks": false,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": false,
+		"experimentalDecorators": true,
+		"preserveConstEnums": false,
 		"module": "commonjs",
 		"target": "ES2017",
 		"lib": [ "ES2017", "dom" ],
-		"experimentalDecorators": true,
-		"jsx": "react",
-		"preserveConstEnums": false
+		"rootDir": "src",
+		"outDir": "./lib"
 	},
 
 	"include": [
-		"./src/**/*"
+		"src/**/*"
 	]
 }

@@ -2,6 +2,8 @@
  * This module contains types for working with CSS colors.
  */
 
+import { IGenericProxy } from "./UtilTypes";
+
 
 
 /**
@@ -164,25 +166,33 @@ export interface INamedColors
 
 /**
  * The IColorProxy interface represents an invocation of one of CSS functions that are used for
- * secifying colors. This interface is returned from functions like: rgb(), alpha(), etc.
+ * specifying colors. This interface is returned from functions like: rgb(), alpha(), etc.
  */
-export interface IColorProxy
-{
-    /** Flag indicating that this object implements the IColorProxy interface */
-    readonly isColorProxy: boolean;
-}
+export interface IColorProxy extends IGenericProxy<"color"> {};
+
+
+
+/**
+ * The SystemColors type defines keywords for system colors that are used in forced-color mode
+ * (but can be also used in the regular mode).
+ */
+export type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas" | "CanvasText" |
+    "Field" | "FieldText" | "GrayText" | "Highlight" | "HighlightText" | "LinkText" | "VisitedText";
 
 
 
 /**
  * Type for CSS color. Color can be represented using the following types:
- *   - string (e.g. "red" or "#fe5" or "rgba(190, 200, 235, 90%)", etc.)
- *   - number:
- *     - positive integer numbers less than or equal to 0xFFFFFF are treated as RGB separations 0xRRGGBB.
- *     - positive integer numbers greater than 0xFFFFFF are treated as RGBA separations 0xRRGGBBAA.
- *     - negative and floating point numbers are rejected.
+ * - keywords: any string that is a name of a property in the INamedColors interface.
+ * - number:
+ *   - negative numbers are treated as inverted colors.
+ *   - integer part of the number must be less than or equal to 0xFFFFFF - everything else is
+ *     ignored.
+ *   - floating point part of the number is treated as percents of alpha channel. If there is no
+ *     floating part, alpha is 1.
+ * - functions: rgb(), hsl(), alpha() as well as any function that returns the IColorProxy type.
  */
-export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | IColorProxy;
+export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | IColorProxy | SystemColors;
 
 
 
