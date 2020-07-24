@@ -367,12 +367,12 @@ export interface IGridAreaRule extends INamedEntity
 
 
 /**
- * Symbol that is used for the property in the StyleDefinition class that keeps reference to the
- * top-level style definition class. Developers can use this property to access rules in the
- * chain of nested grouping rules. We need to avoid enumerating this property when processing
- * the rules in the style definition object.
+ * Symbol that is used by the `owner` property in the StyleDefinition class that keeps reference
+ * to the top-level style definition class. Developers can use this property to access rules in
+ * the chain of nested grouping rules. We need this symbol to avoid enumerating the `owner`
+ * property when processing the rules in the style definition object.
  */
-export const symOwner = Symbol("owner");
+const symOwner = Symbol("owner");
 
 
 
@@ -413,7 +413,7 @@ export abstract class StyleDefinition<O extends StyleDefinition = any>
 	/**
 	 * Refers to the singleton instance of the style definition class which is the *owner* of
 	 * this style definition object. The owner is the top-level class in the chain of style
-	 * definition classes. Through this memeber, all rules and other memebers defined in the owner
+	 * definition classes. Through this member, all rules and other members defined in the owner
 	 * definition class can be accessed.
 	 */
 	public get owner(): O | null { return this[symOwner]; }

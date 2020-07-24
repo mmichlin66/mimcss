@@ -22,9 +22,9 @@ export class GridLineRule extends RuleLike implements IGridLineRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, owner, ruleName);
+        super.process( container, ownerContainer, ruleName);
 
         let nameOverride = this.nameOverride;
         if (nameOverride instanceof GridLineRule)
@@ -40,7 +40,7 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
         else
         {
-            [this.name] = createNames( owner, ruleName, this.nameOverride);
+            [this.name] = createNames( ownerContainer, ruleName, this.nameOverride);
 
             // if the obtained name doesn't have "-start" or "-end" but the isStartEndOrNone flag is
             // defined (that is, it is either start or end line), we need to append the suffix. If the
@@ -140,15 +140,15 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, owner, ruleName);
+        super.process( container, ownerContainer, ruleName);
 
-        [this.name] = createNames( owner, ruleName, this.nameOverride);
+        [this.name] = createNames( ownerContainer, ruleName, this.nameOverride);
 
         // process line rules
-        this.startLine.process( container, owner, null);
-        this.endLine.process( container, owner, null);
+        this.startLine.process( container, ownerContainer, null);
+        this.endLine.process( container, ownerContainer, null);
 	}
 
 

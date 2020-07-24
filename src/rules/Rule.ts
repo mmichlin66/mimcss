@@ -44,25 +44,24 @@ export interface ITopLevelRuleContainer extends IRuleContainer
 export abstract class RuleLike
 {
 	// Processes the rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
         this.container = container;
-		this.owner = owner;
+		this.ownerContainer = ownerContainer;
 		this.ruleName = ruleName;
 	}
 
 	// Creates a copy of the rule.
 	public abstract clone(): RuleLike;
 
-	// Stylesheet to which this rule belongs. This is "this" for Stylesheet.
-	public owner: ITopLevelRuleContainer;
+	// Container at the top of the chain of containers to which this rule belongs.
+	public ownerContainer: ITopLevelRuleContainer;
 
-	// Name of the property of the stylesheet definition to which this rule was assigned. This is
-	// null for Stylesheet.
+	// Name of the property of the stylesheet definition to which this rule was assigned. This can
+	// be null for rules not created via assignment to style definition properties.
 	public ruleName: string | null;
 
-	// Rule container to which this rule belongs and which hase the CSSStyleRule through which
-	// the value of this custom variable can be changed.
+	// Rule container to which this rule belongs.
 	public container: IRuleContainer;
 }
 
@@ -113,14 +112,14 @@ export abstract class Rule extends RuleLike implements IRule
 
 
 /** Creates scoped names based on the given parameters */
-export function createNames( owner: ITopLevelRuleContainer, ruleName: string | null, nameOverride?: string | INamedEntity,
+export function createNames( ownerContainer: ITopLevelRuleContainer, ruleName: string | null, nameOverride?: string | INamedEntity,
 	cssPrefix?: string): [string,string]
 {
 	if (!ruleName && !nameOverride)
 		return ["", ""];
 
 	let name = !nameOverride
-		? owner.getScopedRuleName( ruleName!)
+		? ownerContainer.getScopedRuleName( ruleName!)
 		: typeof nameOverride === "string"
 			? nameOverride
 			: nameOverride.name;

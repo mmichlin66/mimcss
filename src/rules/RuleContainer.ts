@@ -16,7 +16,7 @@ const symInstance = Symbol("definition");
  * Property on the style definition instance pointing to the RuleContainer object that is
  * responsible for processing rules.
  */
-const symRuleContainer = Symbol("ruleContainer");
+const symContainer = Symbol("container");
 
 
 
@@ -51,7 +51,7 @@ class RuleContainer implements ITopLevelRuleContainer
 	private process(): void
 	{
 		// put reference to this container in the symbol property of the definition instance.
-		this.instance[symRuleContainer] = this;
+		this.instance[symContainer] = this;
 
 		// if the owner taken from the instance is null (that is, this is a top-level definition),
 		// change our owner property to point to the instance itself
@@ -61,7 +61,7 @@ class RuleContainer implements ITopLevelRuleContainer
 			this.topLevelContainer = this;
 		}
 		else
-			this.topLevelContainer = this.owner[symRuleContainer];
+			this.topLevelContainer = this.owner[symContainer];
 
 		// if our container is not the top-level container, prefix our name with the upper one
 		if (!this.isTopLevel && this.topLevelContainer)
@@ -142,7 +142,7 @@ class RuleContainer implements ITopLevelRuleContainer
 	{
 		// if the rule object is already processed as part of another instance, we create a clone
 		// of the rule and set it to our instance.
-		if (rule.owner)
+		if (rule.ownerContainer)
 		{
 			if (propName)
 				this.instance[propName] = rule = rule.clone();
@@ -234,7 +234,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// activate referenced style definitions
 		for( let ref of this.refs)
-			ref[symRuleContainer].activate();
+			ref[symContainer].activate();
 
 		// isert our custom variables in a ":root" rule
 		if (this.vars.length > 0)
@@ -264,7 +264,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// deactivate imported stylesheets
 		for( let ref of this.refs)
-			ref[symRuleContainer].deactivate();
+			ref[symContainer].deactivate();
 	}
 
 
@@ -330,7 +330,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 	// Instance of the top-level style definition class in the chain of grouping rules that
 	// lead to this rule container. For top-level style definitions, this points to the same
-	// singleton definition instance as the 'definition' property.
+	// singleton definition instance as the 'instance' property.
 	private owner: StyleDefinition;
 
 	// Rule container that belongs to the owner style defintion. If our container is top-level,
@@ -441,8 +441,8 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
 		return null;
 
 	// loop over prototypes
-	let baseClass = definitionClass;
-	while( (baseClass = Object.getPrototypeOf( baseClass)) !== StyleDefinition)
+    for( let baseClass = Object.getPrototypeOf( definitionClass);
+            baseClass !== StyleDefinition; baseClass = Object.getPrototypeOf( baseClass))
 	{
 		// check if the base class already has an associated instance; if yes, check whether
 		// it hase a property with the given rule name. If yes, then use this rule's already
@@ -482,7 +482,8 @@ export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDef
 	if (!instOrClass)
 		return null;
 
-	if (instOrClass instanceof StyleDefinition)
+	// instOrClass has type "object" if it is an instance and "function" if it is a class
+	if (typeof instOrClass === "object")
 	{
 		processInstance( instOrClass);
 		return instOrClass;
@@ -510,13 +511,14 @@ export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDef
 function processClass( definitionClass: IStyleDefinitionClass,
 	owner?: StyleDefinition): StyleDefinition | null
 {
-	// call the 'use' function for all the base classes so that rule names are generated. We
-	// don't activate styles for these clases because derived classes will have all the
-	// rules from all the base classes as their own and so these rules will be activated as
-	// part of the derived class.
-	let baseClass = definitionClass;
-	while( (baseClass = Object.getPrototypeOf( baseClass)) !== StyleDefinition)
+    // process all the base classes so that rule names are generated. We don't activate styles
+    // for these clases because derived classes will have all the rules from all the base classes
+    // as their own and so these rules will be activated as part of the derived class.
+    for( let baseClass = Object.getPrototypeOf( definitionClass);
+            baseClass !== StyleDefinition; baseClass = Object.getPrototypeOf( baseClass))
+    {
 		processClass( baseClass, owner);
+    }
 
 	try
 	{
@@ -542,15 +544,15 @@ function processClass( definitionClass: IStyleDefinitionClass,
 
 
 /**
- * Processes the given stylesheet definition instance and assigns names to its rules. If the
- * instance has already been processed, we just return it back; if no, we assign new unique names
+ * Processes the given style definition instance and assigns names to its rules. If the
+ * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
 function processInstance( instance: StyleDefinition, embeddingContainer?: RuleContainer): void
 {
-	// if the instance is already processed, just return it; in this case we ignore the
+	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.
-	let ruleContainer = instance[symRuleContainer] as RuleContainer;
+	let ruleContainer = instance[symContainer] as RuleContainer;
 	if (ruleContainer)
 		return;
 
@@ -575,7 +577,7 @@ function processInstance( instance: StyleDefinition, embeddingContainer?: RuleCo
  */
 export function getContainerFromInstance( instance: StyleDefinition): RuleContainer
 {
-	return instance ? instance[symRuleContainer] : null;
+	return instance ? instance[symContainer] : null;
 }
 
 

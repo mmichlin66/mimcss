@@ -130,18 +130,18 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		super.process( container, owner, ruleName);
+		super.process( container, ownerContainer, ruleName);
 
 		// if dependent rules exist, process them under the same container
 		for( let propName in this.dependentRules)
 		{
 			let propVal = this.dependentRules[propName];
 			if (Array.isArray(propVal) && propVal.length > 0)
-				propVal.forEach( (depRule: DependentRule) => depRule.process( container, owner, null));
+				propVal.forEach( (depRule: DependentRule) => depRule.process( container, ownerContainer, null));
 			else
-				(propVal as DependentRule).process( container, owner, null);
+				(propVal as DependentRule).process( container, ownerContainer, null);
 		}
 	}
 
@@ -517,11 +517,11 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string): void
 	{
-		super.process( container, owner, ruleName);
+		super.process( container, ownerContainer, ruleName);
 
-		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, this.cssPrefix);
+		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride, this.cssPrefix);
 	}
 
 	// Returns the selector part of the style rule.

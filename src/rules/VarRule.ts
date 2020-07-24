@@ -28,10 +28,10 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		super.process( container, owner, ruleName);
-		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride, "--");
+		super.process( container, ownerContainer, ruleName);
+		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride, "--");
 	}
 
 

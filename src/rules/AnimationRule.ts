@@ -23,14 +23,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string)
 	{
-		super.process( container, owner, ruleName);
+		super.process( container, ownerContainer, ruleName);
 
-		[this.name, this.cssName] = createNames( owner, ruleName, this.nameOverride);
+		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride);
 
 		for( let keyframeRule of this.frameRules)
-			keyframeRule.process( container, owner, ruleName);
+			keyframeRule.process( container, ownerContainer, ruleName);
 	}
 
 

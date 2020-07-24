@@ -22,11 +22,11 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, owner: ITopLevelRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string)
 	{
-		super.process( container, owner, ruleName);
+		super.process( container, ownerContainer, ruleName);
 
-		let instance = processInstanceOrClass( this.instanceOrClass, owner.getDefinitionInstance());
+		let instance = processInstanceOrClass( this.instanceOrClass, ownerContainer.getDefinitionInstance());
 		if (!instance)
 			return;
 
@@ -72,6 +72,12 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 
 
+	// Instance of the style definition class defining the rules under this grouping rule
+	public get rules(): T { return this.instance as T; }
+
+	/** SOM supports rule */
+	public cssRule: CSSGroupingRule | null;
+
 	// Style definition class that defines rules under this grouping rule.
 	protected instanceOrClass: T | IStyleDefinitionClass;
 
@@ -80,12 +86,6 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 	// Rule container for the definition instance.
 	protected ruleContainer: IRuleContainer;
-
-	// Instance of the style definition class defining the rules under this grouping rule
-	public get rules(): T { return this.instance as T; }
-
-	/** SOM supports rule */
-	public cssRule: CSSGroupingRule | null;
 }
 
 

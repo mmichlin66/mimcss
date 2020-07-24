@@ -202,7 +202,7 @@ export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefini
 {
 	// return definition instance without processing it. This is the indication that the defintion
 	// will be embedded into another definition.
-	return instOrClass instanceof StyleDefinition ? instOrClass : new instOrClass();
+	return instOrClass instanceof StyleDefinition ? instOrClass : new instOrClass(null);
 }
 
 
