@@ -26,7 +26,9 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 	{
 		super.process( container, ownerContainer, ruleName);
 
-		let instance = processInstanceOrClass( this.instanceOrClass, ownerContainer.getDefinitionInstance());
+        // container to which our groupng rule belongs becomes the parent container for the
+        // style definition instance
+		let instance = processInstanceOrClass( this.instanceOrClass, container.getDefinitionInstance());
 		if (!instance)
 			return;
 
@@ -93,9 +95,9 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 /**
  * The SupportRule class describes a CSS @supports rule.
  */
-export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
+export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( query: SupportsQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>)
+	public constructor( query: SupportsQuery, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super( instanceOrClass);
 
@@ -105,9 +107,9 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 
 
 	// Creates a copy of the rule.
-	public clone(): SupportsRule<T,O>
+	public clone(): SupportsRule<T>
 	{
-		return new SupportsRule<T,O>( this.query, this.instanceOrClass);
+		return new SupportsRule<T>( this.query, this.instanceOrClass);
 	}
 
 
@@ -124,11 +126,17 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 
 
 
+	/** Flag indicated whether the browser supports this rule's query */
+    public get isSupported(): boolean
+    {
+        return  CSS.supports( supportsQueryToString( this.query));
+    }
+
 	/** SOM supports rule */
 	public cssRule: CSSSupportsRule | null;
 
-	// support query for this rule in a string form.
-	public query: SupportsQuery;
+	// support query for this rule.
+	private query: SupportsQuery;
 }
 
 
@@ -136,9 +144,9 @@ export class SupportsRule<T extends StyleDefinition<O>, O extends StyleDefinitio
 /**
  * The MediaRule class describes a CSS @media rule.
  */
-export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> extends GroupRule<T> implements IMediaRule<T>
+export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( query: string | MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T,O>)
+	public constructor( query: string | MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super( instanceOrClass);
 
@@ -148,9 +156,9 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 
 
 	// Creates a copy of the rule.
-	public clone(): MediaRule<T,O>
+	public clone(): MediaRule<T>
 	{
-		return new MediaRule<T,O>( this.query, this.instanceOrClass);
+		return new MediaRule<T>( this.query, this.instanceOrClass);
 	}
 
 
@@ -158,8 +166,7 @@ export class MediaRule<T extends StyleDefinition<O>, O extends StyleDefinition> 
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string | null
 	{
-		let queryString = typeof this.query === "string" ? this.query : mediaQueryToString( this.query);
-		return `@media ${queryString}`;
+		return `@media ${mediaQueryToString( this.query)}`;
 	}
 
 

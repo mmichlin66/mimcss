@@ -76,7 +76,7 @@ export class ImportRule extends Rule implements IImportRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let url;
+		let url: string;
 		if (!this.url)
 			return;
 		else if (this.url.startsWith("url") || this.url.startsWith("\"") || this.url.startsWith("'"))
@@ -84,21 +84,11 @@ export class ImportRule extends Rule implements IImportRule
 		else
 			url = `url(${this.url})`;
 
-		let supportsQueryString = !this.supportsQuery
-			? ""
-			: typeof this.supportsQuery === "string"
-				? this.supportsQuery
-				: supportsQueryToString( this.supportsQuery);
-
+		let supportsQueryString = !this.supportsQuery ? "" : supportsQueryToString( this.supportsQuery);
 		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
-		supportsQueryString = `supports( ${supportsQueryString} )`;
+		    supportsQueryString = `supports( ${supportsQueryString} )`;
 
-		let mediaQueryString = !this.mediaQuery
-			? ""
-			: typeof this.mediaQuery === "string"
-				? this.mediaQuery
-				: mediaQueryToString( this.mediaQuery);
-				
+		let mediaQueryString = !this.mediaQuery ? "" : mediaQueryToString( this.mediaQuery);
 		this.cssRule = Rule.addRuleToDOM( `@import ${url} ${supportsQueryString} ${mediaQueryString}`,
 			parent) as CSSImportRule;
 }

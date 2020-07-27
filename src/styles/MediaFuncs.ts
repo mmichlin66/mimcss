@@ -1,5 +1,5 @@
-﻿import * as UtilFuncs from "./UtilFuncs"
-import * as MediaTypes from "./MediaTypes"
+﻿import * as MediaTypes from "./MediaTypes"
+import {val2str, camelToDash, arr2str} from "./UtilFuncs";
 
 
 
@@ -55,14 +55,12 @@ type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = conver
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function mediaQueryToString( query: MediaTypes.MediaQuery): string | null
+export function mediaQueryToString( query: string | MediaTypes.MediaQuery): string
 {
-    if (!query)
-        return null;
-    else if (Array.isArray(query))
-        return query.map( (singleQuery) => singleMediaQueryToString( singleQuery)).join(", ");
-    else
-        return singleMediaQueryToString( query);
+    return val2str( query, {
+        fromAny: singleMediaQueryToString,
+        arrSep: ","
+    })
 }
 
 
@@ -70,10 +68,10 @@ export function mediaQueryToString( query: MediaTypes.MediaQuery): string | null
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function singleMediaQueryToString( query: MediaTypes.SingleMediaQuery): string | null
+export function singleMediaQueryToString( query: MediaTypes.SingleMediaQuery): string
 {
     if (!query)
-        return null;
+        return "";
 
     let mediaType = query.$mediaType;
     let only = query.$only;
@@ -108,7 +106,7 @@ export function mediaFeatureToString( featureName: string, propVal: any, valueOn
     // find information object 
     let info: MediaFeatureInfo = mediaFeatures[featureName];
 
-    let realFeatureName = UtilFuncs.camelToDash( featureName);
+    let realFeatureName = camelToDash( featureName);
 
     // if defaultValue is defined and the property value is equal to it, no value should be returned.
     let defaultValue = typeof info === "object" ? info.defaultValue : undefined;
@@ -142,7 +140,7 @@ function mediaFeatureSingleValueToString( propVal: any, convert?: convertFuncTyp
     else if (typeof propVal === "string")
         return propVal;
     else if (Array.isArray( propVal))
-        return UtilFuncs.arr2str( propVal);
+        return arr2str( propVal);
     else
         return propVal.toString();
 }
