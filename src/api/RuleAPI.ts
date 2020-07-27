@@ -157,8 +157,8 @@ export function $page( pseudoClass?: PagePseudoClass, style?: Styleset): IPageRu
 /**
  * Creates new supports rule.
  */
-export function $supports<T extends StyleDefinition<O>, O extends StyleDefinition>(
-	query: SupportsQuery, instOrClass: T | IStyleDefinitionClass<T,O>): ISupportsRule<T>
+export function $supports<T extends StyleDefinition>( query: SupportsQuery,
+    instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>
 {
 	return new SupportsRule( query, instOrClass);
 }
@@ -166,8 +166,8 @@ export function $supports<T extends StyleDefinition<O>, O extends StyleDefinitio
 /**
  * Creates new media rule.
  */
-export function $media<T extends StyleDefinition<O>, O extends StyleDefinition>(
-	query: string | MediaQuery, instOrClass: T | IStyleDefinitionClass<T,O>): IMediaRule<T>
+export function $media<T extends StyleDefinition>( query: string | MediaQuery,
+    instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>
 {
 	return new MediaRule( query, instOrClass);
 }

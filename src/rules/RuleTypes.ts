@@ -367,9 +367,19 @@ export interface IGridAreaRule extends INamedEntity
 
 
 /**
- * Symbol that is used by the `owner` property in the StyleDefinition class that keeps reference
+ * Symbol that is used by the `$parent` property in the StyleDefinition class that keeps reference
+ * to the parnt style definition class. Developers can use this property to access rules in
+ * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
+ * property when processing the rules in the style definition object.
+ */
+const symParent = Symbol("parent");
+
+
+
+/**
+ * Symbol that is used by the `$owner` property in the StyleDefinition class that keeps reference
  * to the top-level style definition class. Developers can use this property to access rules in
- * the chain of nested grouping rules. We need this symbol to avoid enumerating the `owner`
+ * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$owner`
  * property when processing the rules in the style definition object.
  */
 const symOwner = Symbol("owner");
@@ -378,45 +388,40 @@ const symOwner = Symbol("owner");
 
 /**
  * The StyleDefinition class is a base for all classes that contain defininitions of CSS rules.
- * Use it the following way:
- * 
- * ```typescript
- * class MyStyles extend StyleDefinition
- * {
- *     // 8px padding on regular devices
- *     defaultPadding = $var( "padding", 8)
- * 
- *     ifNarrowDevice = $media( {maxWidth: 600 },
- *         class extends StyleDefinition<MyStyles>
- *         {
- *             // 4px padding on narrow devices
- *             defaultPadding = $var( "padding", Len.calc( "{0} / 2", this.owner.defaultPadding))
- *         }
- *     )
- * }
- * ```
- * @typeparam O Top-level style definition class, which is the owner of this class.
+ * @typeparam P Parent style definition class. Parent of top-lvel class is null.
+ * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
+ * class is its own owner.
  */
-export abstract class StyleDefinition<O extends StyleDefinition = any>
+export abstract class StyleDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
 {
 	/**
 	 * Style definition classes are created directly only by the *styled components* - that is,
 	 * components that use different styles for each instance. Otherwise, style definition
 	 * class instances are created when either the [[$use]] or [[$activate]] function is called.
-	 * @param owner Reference to the top-level style definition class
+	 * @param parent Reference to the parent style definition class
 	 */
-	public constructor( owner: O | null = null)
+	public constructor( parent?: P)
 	{
-		this[symOwner] = owner;
+		this[symParent] = parent;
+
+        // Owner is taken from the parent class; a top-level class is its own owner.
+		this[symOwner] = parent ? parent.$owner : this;
 	}
 
 	/**
-	 * Refers to the singleton instance of the style definition class which is the *owner* of
+	 * Refers to the instance of the style definition class which is the parnt of this style
+     * definition object in the chain of style definition classes. Through this member, all rules
+     * and other members defined in the parent definition class can be accessed.
+	 */
+	public get $parent(): P | undefined { return this[symOwner]; }
+
+	/**
+	 * Refers to the instance of the style definition class which is the owner of
 	 * this style definition object. The owner is the top-level class in the chain of style
 	 * definition classes. Through this member, all rules and other members defined in the owner
 	 * definition class can be accessed.
 	 */
-	public get owner(): O | null { return this[symOwner]; }
+	public get $owner(): O | undefined { return this[symOwner]; }
 }
 
 
@@ -424,10 +429,11 @@ export abstract class StyleDefinition<O extends StyleDefinition = any>
 /**
  * "Constructor" interface defining how style definition classes can be created.
  */
-export interface IStyleDefinitionClass<T extends StyleDefinition<O> = any, O extends StyleDefinition = any>
+export interface IStyleDefinitionClass<T extends StyleDefinition<P,O> = any,
+    P extends StyleDefinition = any, O extends StyleDefinition = any>
 {
 	/** All style definition classes should conform to this constructor */
-	new( owner?: O): T;
+	new( parent?: P): T;
 }
 
 

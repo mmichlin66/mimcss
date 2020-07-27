@@ -35,8 +35,9 @@ class RuleContainer implements ITopLevelRuleContainer
 		this.name = name;
 		this.embeddingContainer = embeddingContainer;
 
-		this.definitionClass = instance.constructor as IStyleDefinitionClass;
-		this.owner = instance.owner;
+        this.definitionClass = instance.constructor as IStyleDefinitionClass;
+        this.parent = instance.$parent;
+		this.owner = instance.$owner;
 
 		this.activationRefCount = 0;
 		this.domStyleElm = null;
@@ -53,19 +54,16 @@ class RuleContainer implements ITopLevelRuleContainer
 		// put reference to this container in the symbol property of the definition instance.
 		this.instance[symContainer] = this;
 
-		// if the owner taken from the instance is null (that is, this is a top-level definition),
-		// change our owner property to point to the instance itself
-		if (!this.owner)
-		{
-			this.owner = this.instance;
-			this.topLevelContainer = this;
-		}
-		else
+		// get containers for the parent and owner style definition
+        if (this.parent)
+            this.parent[symContainer];
+
+		if (this.owner)
 			this.topLevelContainer = this.owner[symContainer];
 
-		// if our container is not the top-level container, prefix our name with the upper one
-		if (!this.isTopLevel && this.topLevelContainer)
-			this.name = `${this.topLevelContainer.name}_${this.name}`;
+		// if our container has parent container, prefix our name with the upper one
+		if (this.parentContainer)
+			this.name = `${this.parentContainer.name}_${this.name}`;
 
 		this.imports = [];
 		this.namespaces = [];
@@ -252,7 +250,8 @@ class RuleContainer implements ITopLevelRuleContainer
 	/** Clears all CSS rule objects defined in this container. */
 	public clearRules(): void
 	{
-		if (this.owner === this.instance)
+        // import and namespace rules can only exist in the top-level style definition class
+		if (this.isTopLevel)
 		{
 			this.imports && this.imports.forEach( rule => rule.clear());
 			this.namespaces && this.namespaces.forEach( rule => rule.clear());
@@ -327,6 +326,14 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Name of this container, which, depending on the mode, is either taken from the class
 	// definition name or generated uniquely.
 	private name: string
+
+	// Instance of the parent style definition class in the chain of grouping rules that
+	// lead to this rule container. For top-level style definitions, this is undefined.
+	private parent?: StyleDefinition;
+
+	// Rule container that belongs to the parent style defintion. If our container is top-level,
+	// this property is undefined.
+	private parentContainer?: RuleContainer;
 
 	// Instance of the top-level style definition class in the chain of grouping rules that
 	// lead to this rule container. For top-level style definitions, this points to the same
@@ -477,7 +484,7 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
  * to its rules.
  */
 export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDefinitionClass,
-	owner?: StyleDefinition): StyleDefinition | null
+	parent?: StyleDefinition): StyleDefinition | null
 {
 	if (!instOrClass)
 		return null;
@@ -493,7 +500,7 @@ export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDef
 		// check whether this definition class is already associated with an instance
 		return instOrClass.hasOwnProperty(symInstance)
 			? instOrClass[symInstance]
-			: processClass( instOrClass, owner);
+			: processClass( instOrClass, parent);
 	}
 }
 
@@ -509,7 +516,7 @@ export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDef
  * @param owner 
  */
 function processClass( definitionClass: IStyleDefinitionClass,
-	owner?: StyleDefinition): StyleDefinition | null
+	parent?: StyleDefinition): StyleDefinition | null
 {
     // process all the base classes so that rule names are generated. We don't activate styles
     // for these clases because derived classes will have all the rules from all the base classes
@@ -517,13 +524,13 @@ function processClass( definitionClass: IStyleDefinitionClass,
     for( let baseClass = Object.getPrototypeOf( definitionClass);
             baseClass !== StyleDefinition; baseClass = Object.getPrototypeOf( baseClass))
     {
-		processClass( baseClass, owner);
+		processClass( baseClass, parent);
     }
 
 	try
 	{
 		// create the instance of the definition class
-		let instance = new definitionClass( owner);
+		let instance = new definitionClass( parent);
 
 		// get the name for our container
 		let name = s_useUniqueStyleNames || !definitionClass.name
