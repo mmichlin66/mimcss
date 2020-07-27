@@ -11,10 +11,9 @@ import {
 } from "../styles/StyleFuncs"
 import {
 	CssPercentMath, CssLengthMath, arr2str, CssAngleMath, CssNumberMath, pos2str,
-	 templateStringToString,
-	 camelToDash,
-     val2str
+	templateStringToString, val2str
 } from "../styles/UtilFuncs";
+import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
 
 
 
@@ -55,16 +54,10 @@ export function getStylePropValue<K extends keyof ExtendedStyleset>( stylePropNa
  * @param elm HTML element whose styles will be set.
  * @param styleset Styleset object which provides values for style properties.
  */
-export function setElementStyle( elm: HTMLElement, styleset: Styleset | null | undefined): void
+export function setElementStyle( elm: HTMLElement, styleset: Styleset | null | undefined,
+	schedulerType?: number): void
 {
-	if (!styleset)
-		elm.removeAttribute( "style");
-	else
-	{
-		let elmStyle = elm.style;
-		forAllPropsInStylset( styleset,
-			(name: string, value: string): void => { elmStyle.setProperty( camelToDash( name), value) });
-	}
+    setElementStringStyle( elm, styleset ? stylesetToStringStyleset(styleset) : null, schedulerType);
 }
 
 
@@ -75,16 +68,10 @@ export function setElementStyle( elm: HTMLElement, styleset: Styleset | null | u
  * @param elm HTML element whose styles will be set.
  * @param styleset StringStyleset object which provides values for style properties.
  */
-export function setElementStringStyle( elm: HTMLElement, styleset: StringStyleset | null | undefined): void
+export function setElementStringStyle( elm: HTMLElement, styleset: StringStyleset | null | undefined,
+	schedulerType?: number): void
 {
-	if (!styleset)
-		elm.removeAttribute( "style");
-	else
-	{
-		let style = (elm as HTMLElement).style;
-		for( let propName in styleset)
-			style[propName] = styleset[propName];
-	}
+    s_scheduleStylePropertyUpdate( elm, null, styleset, false, schedulerType);
 }
 
 

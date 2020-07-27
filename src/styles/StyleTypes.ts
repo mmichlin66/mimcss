@@ -1815,10 +1815,9 @@ export interface ICssStyleset
 
 
 /**
- * The StringStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
- * string values.
+ * The StringStyleset type maps CSS properties including custom properties to the string values.
  */
-export type StringStyleset = { [K in keyof ICssStyleset]?: string }
+export type StringStyleset = { [K: string]: string | null | undefined }
 
 
 

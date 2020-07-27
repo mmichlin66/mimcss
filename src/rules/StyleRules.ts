@@ -289,7 +289,18 @@ export abstract class StyleRule extends Rule implements IStyleRule
     public setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K],
         important?: boolean, schedulerType?: number): void
 	{
-		this.setPropInternal( name, value, important, schedulerType);
+		// first set/remove the value in our internal styleset object
+		if (value == null)
+			delete this.styleset[name];
+		else
+			this.styleset[name] = important ? { "!": value as any } : value as any;
+
+		// second, if CSSRule alredy exists, set/remove the property value there
+		if (this.cssRule)
+        {
+		    s_scheduleStylePropertyUpdate( this.cssRule, camelToDash( name),
+                value == null ? null : stylePropToString( name, value, true), important, schedulerType);
+        }
 	}
 
 
@@ -308,38 +319,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (!varObj || !(varObj instanceof VarRule))
 			return;
 
-		return this.setCustomPropInternal( varObj, value, important, schedulerType);
-	}
-
-
-
-	/**
-	 * Adds/replaces/removes the value of the given CSS property in this rule.
-	 */
-	private setPropInternal( name: string, value: any, important?: boolean, schedulerType?: number): void
-	{
-		// first set/remove the value in our internal styleset object
-		if (value == null)
-			delete this.styleset[name];
-		else
-			this.styleset[name] = important ? { "!": value } : value;
-
-		// second, if CSSRule alredy exists, set/remove the property value there
-		if (!this.cssRule)
-			return;
-
-		s_scheduleStylePropertyUpdate( this.cssRule, camelToDash( name),
-			value == null ? null : stylePropToString( name, value, true), important, schedulerType);
-	}
-
-
-
-	/**
-	 * Adds/replaces/removes the value of the given custmom cSS property in this rule.
-	 */
-    private setCustomPropInternal( varObj: VarRule, value: any, important?: boolean,
-        schedulerType?: number): void
-	{
 		// first set/remove the value in our internal styleset object
 		let currCustomProps = this.styleset["--"] as CustomVar_StyleType[];
 		if (currCustomProps || value != null)
@@ -352,7 +331,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					if (index >= 0)
 					{
 						if (currCustomProps.length === 1)
-							this.styleset[""] = undefined;
+							this.styleset["--"] = undefined;
 						else
 							currCustomProps.splice( index, 1);
 					}
@@ -374,12 +353,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		}
 
 		// second, if CSSRule alredy exists, set/remove the property value there
-		if (!this.cssRule)
-			return;
-
-		s_scheduleStylePropertyUpdate( this.cssRule, varObj.cssName,
+		if (this.cssRule)
+        {
+            s_scheduleStylePropertyUpdate( this.cssRule, varObj.cssName,
                 value == null ? null : stylePropToString( varObj.template, value, true),
                 important, schedulerType);
+        }
 	}
 
 

@@ -1,5 +1,6 @@
 import {SchedulerType, StyleDefinition, IScheduler} from "./RuleTypes";
 import {activateInstance, deactivateInstance} from "./RuleContainer";
+import {StringStyleset} from "../styles/StyleTypes";
 
 
 
@@ -22,9 +23,11 @@ export interface IActivator
 	deactivate( definition: StyleDefinition): void;
 
 	/**
-	 * Instructs to set the value of the property in the given CSS style rule.
+	 * Instructs to set the value of either a single property or a set of properties in the given
+     * CSS style object.
 	 */
-	setStyleProperty( rule: CSSStyleRule, name: string, value?: string | null, important?: boolean): void;
+    setStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+        value?: string | StringStyleset | null, important?: boolean): void;
 
 	/**
 	 * Performs activation/deactivation for all style definitions accumulated since the last
@@ -39,6 +42,37 @@ export interface IActivator
 	 * for this activation mechanism.
 	 */
 	cancelActivation(): void;
+}
+
+
+
+/**
+ * Set the value of either a single property or a set of properties in the given
+ * CSS style object.
+ */
+function updateStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    value?: string | StringStyleset | null, important?: boolean): void
+{
+    if (!name && value == null)
+    {
+        if (ruleOrElm instanceof CSSStyleRule)
+            ruleOrElm.cssText = "";
+        else
+            (ruleOrElm as any as Element).removeAttribute( "style");
+    }
+    else if (name)
+    {
+        if (value == null)
+            ruleOrElm.style.removeProperty( name);
+        else
+            ruleOrElm.style.setProperty( name, value as string, important ? "!important" : undefined);
+    }
+    else
+    {
+        let styleset = value as StringStyleset;
+        for( let propName in styleset)
+            ruleOrElm.style[propName] = styleset[propName];
+    }
 }
 
 
@@ -70,14 +104,13 @@ class SynchronousActivator implements IActivator
 	}
 
 	/**
-	 * Instructs to set the value of the property in the given CSS style rule.
+	 * Instructs to set the value of either a single property or a set of properties in the given
+     * CSS style object.
 	 */
-	public setStyleProperty( rule: CSSStyleRule, name: string, value?: string | null, important?: boolean): void
+    public setStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+        value?: string | StringStyleset | null, important?: boolean): void
 	{
-		if (value == null)
-			rule.style.removeProperty( name);
-		else
-			rule.style.setProperty( name, value, important ? "!important" : undefined);
+        updateStyleProperty( ruleOrElm, name, value, important);
 	}
 
 	/**
@@ -99,19 +132,33 @@ class SynchronousActivator implements IActivator
 
 /**
  * Represents objects that are used by the SchedulingActivator class for setting property values.
+ * When both name and value properties are null, the style will be set to an empty string
+ * effectively removing all styles from the element or the rule.
  */
 interface ScheduledStylePropValue
 {
-	/** Style rule in which to set the property value */
-	rule: CSSStyleRule;
+	/**
+     * Style object in which to set the property value. The style object can belong to either a
+     * style rulee or to an HTML element.
+     */
+	ruleOrElm: CSSStyleRule | ElementCSSInlineStyle;
 
-	/** Dashe-cased property name */
-	name: string;
+	/**
+     * Dashe-cased property name if setting a value of a single property or null if setting values
+     * of multiple properties.
+     */
+	name: string | null;
 
-	/** Property value. If the value is null or undefined, it is removed. */
-	value?: string | null;
+	/**
+     * Property value if setting a value of a single property or a StringStyleset object if setting
+     * values of multiple properties. If the value is null or undefined, it is removed.
+     */
+	value?: string | StringStyleset | null;
 
-	/** Flag indicating whether the property should be marked "!important" */
+	/**
+     * Flag indicating whether the property should be marked "!important". This flag is ignored
+     * when setting values of multiple properties.
+     */
 	important?: boolean;
 }
 
@@ -195,14 +242,16 @@ export class SchedulingActivator implements IActivator
 
 
 	/**
-	 * Instructs to set the value of the property in the given CSS style rule.
+	 * Instructs to set the value of either a single property or a set of properties in the given
+     * CSS style object.
 	 */
-	public setStyleProperty( rule: CSSStyleRule, name: string, value?: string | null, important?: boolean): void
+    public setStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+        value?: string | StringStyleset | null, important?: boolean): void
 	{
 		if (this.definitions.size === 0 && this.props.length === 0)
             this.scheduler && this.scheduler.scheduleActivation();
 
-		this.props.push({ rule, name, value, important });
+		this.props.push({ ruleOrElm, name, value, important });
 	}
 
 
@@ -242,6 +291,7 @@ export class SchedulingActivator implements IActivator
 	 */
 	private doActivation(): void
 	{
+        // activate/deactivate style definitions
 		this.definitions.forEach( (refCount: number, definition: StyleDefinition) =>
 		{
 			if (refCount > 0)
@@ -252,14 +302,8 @@ export class SchedulingActivator implements IActivator
 
 		this.definitions.clear();
 
-		this.props.forEach( prop =>
-		{
-			if (prop.value == null)
-				prop.rule.style.removeProperty( prop.name);
-			else
-				prop.rule.style.setProperty( prop.name, prop.value, prop.important ? "!important" : undefined);
-		})
-
+        // update style properties
+		this.props.forEach( prop => updateStyleProperty( prop.ruleOrElm, prop.name, prop.value, prop.important));
 		this.props = [];
     }
     
@@ -335,11 +379,12 @@ class AnimationFrameScheduler implements IScheduler
 /**
  * Schedules the update of the value of the given CSS property in the given rule.
  */
-export function s_scheduleStylePropertyUpdate( rule: CSSStyleRule, name: string,
-	value?: string | null, important?: boolean, schedulerType?: number): void
+export function s_scheduleStylePropertyUpdate( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle,
+    name: string | null, value?: string | StringStyleset | null,
+    important?: boolean, schedulerType?: number): void
 {
 	s_scheduleCall( (activator: IActivator) =>
-		activator.setStyleProperty( rule, name, value, important), schedulerType);
+		activator.setStyleProperty( ruleOrElm, name, value, important), schedulerType);
 }
 
 
