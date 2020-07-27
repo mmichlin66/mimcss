@@ -126,11 +126,17 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 
 
 
+	/** Flag indicated whether the browser supports this rule's query */
+    public get isSupported(): boolean
+    {
+        return  CSS.supports( supportsQueryToString( this.query));
+    }
+
 	/** SOM supports rule */
 	public cssRule: CSSSupportsRule | null;
 
-	// support query for this rule in a string form.
-	public query: SupportsQuery;
+	// support query for this rule.
+	private query: SupportsQuery;
 }
 
 
@@ -160,8 +166,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string | null
 	{
-		let queryString = typeof this.query === "string" ? this.query : mediaQueryToString( this.query);
-		return `@media ${queryString}`;
+		return `@media ${mediaQueryToString( this.query)}`;
 	}
 
 

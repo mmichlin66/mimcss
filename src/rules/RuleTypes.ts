@@ -458,6 +458,9 @@ export interface IGroupRule<T extends StyleDefinition = any> extends IRule
  */
 export interface ISupportsRule<T extends StyleDefinition = any> extends IGroupRule<T>
 {
+	/** Flag indicated whether the browser supports this rule's query */
+    readonly isSupported: boolean;
+
 	/** SOM supports rule */
 	readonly cssRule: CSSSupportsRule | null;
 }

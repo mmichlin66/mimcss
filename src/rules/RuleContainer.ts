@@ -449,7 +449,8 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
 
 	// loop over prototypes
     for( let baseClass = Object.getPrototypeOf( definitionClass);
-            baseClass !== StyleDefinition; baseClass = Object.getPrototypeOf( baseClass))
+            baseClass !== StyleDefinition;
+                baseClass = Object.getPrototypeOf( baseClass))
 	{
 		// check if the base class already has an associated instance; if yes, check whether
 		// it hase a property with the given rule name. If yes, then use this rule's already
@@ -512,17 +513,16 @@ export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDef
  * Symbol property. The owner parameter is a reference to the top-level style defiition
  * object or null if the given class is itself a top-level class (that is, is not a class
  * that defines rules within nested grouping rules).
- * @param definitionClass 
- * @param owner 
  */
 function processClass( definitionClass: IStyleDefinitionClass,
 	parent?: StyleDefinition): StyleDefinition | null
 {
     // process all the base classes so that rule names are generated. We don't activate styles
-    // for these clases because derived classes will have all the rules from all the base classes
+    // for these classes because derived classes will have all the rules from all the base classes
     // as their own and so these rules will be activated as part of the derived class.
     for( let baseClass = Object.getPrototypeOf( definitionClass);
-            baseClass !== StyleDefinition; baseClass = Object.getPrototypeOf( baseClass))
+            baseClass !== StyleDefinition;
+                baseClass = Object.getPrototypeOf( baseClass))
     {
 		processClass( baseClass, parent);
     }
