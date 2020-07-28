@@ -12,13 +12,13 @@ export interface IActivator
 {
 	/**
 	 * Instructs to activate the given style definition instance. This method is called when the
-	 * $activate function is called for this activation mechanism.
+	 * activate function is called for this activation mechanism.
 	 */
 	activate( definition: StyleDefinition): void;
 
 	/**
 	 * Instructs to deactivate the given style definition instance. This method is called when the
-	 * $deactivate function is called for this activation mechanism.
+	 * deactivate function is called for this activation mechanism.
 	 */
 	deactivate( definition: StyleDefinition): void;
 
@@ -31,17 +31,17 @@ export interface IActivator
 
 	/**
 	 * Performs activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation. This method is called when the $forceActivation function is called
+	 * activation/deactivation. This method is called when the forceDOMUpdate function is called
 	 * for this activation mechanism.
 	 */
-	forceActivation(): void;
+	forceDOMUpdate(): void;
 
 	/**
 	 * Cancel activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation. This method is called when the $cancelActivation function is called
+	 * activation/deactivation. This method is called when the cancelDOMUpdate function is called
 	 * for this activation mechanism.
 	 */
-	cancelActivation(): void;
+	cancelDOMUpdate(): void;
 }
 
 
@@ -79,13 +79,13 @@ function updateStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, n
 
 /**
  * The SynchronousActivator class represents the synchronous activation mechanism, which writes
- * style changes to the DOM when the $activate and $deactivate functions are called.
+ * style changes to the DOM when the activate and deactivate functions are called.
  */
 class SynchronousActivator implements IActivator
 {
 	/**
 	 * Instructs to activate the given style definition instance. This method is called when the
-	 * $activate function is called for this activation mechanism.
+	 * activate function is called for this activation mechanism.
 	 * @param definition
 	 */
 	public activate( definition: StyleDefinition): void
@@ -95,7 +95,7 @@ class SynchronousActivator implements IActivator
 
 	/**
 	 * Instructs to deactivate the given style definition instance. This method is called when the
-	 * $deactivate function is called for this activation mechanism.
+	 * deactivate function is called for this activation mechanism.
 	 * @param definition
 	 */
 	public deactivate( definition: StyleDefinition): void
@@ -115,17 +115,17 @@ class SynchronousActivator implements IActivator
 
 	/**
 	 * Performs activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation. This method is called when the $forceActivation function is called
+	 * activation/deactivation. This method is called when the forceDOMUpdate function is called
 	 * for this activation mechanism.
 	 */
-	public forceActivation(): void {}
+	public forceDOMUpdate(): void {}
 
 	/**
 	 * Cancel activation/deactivation for all style definitions accumulated since the last
-	 * activation/deactivation. This method is called when the $cancelActivation function is called
+	 * activation/deactivation. This method is called when the cancelDOMUpdate function is called
 	 * for this activation mechanism.
 	 */
-	public cancelActivation(): void {}
+	public cancelDOMUpdate(): void {}
 }
 
 
@@ -167,7 +167,7 @@ interface ScheduledStylePropValue
 /**
  * The SchedulingActivator class keeps a map of StyleDefinition instances that are scheduled for
  * activation or deactivation. Each instance is mapped to a refernce count, which is incremented
- * upon the $activate calls and decremented upon the $deactivate calls. When the doActivation
+ * upon the activate calls and decremented upon the deactivate calls. When the doActivation
  * method is called The style definition will be either activated or deactivated based on whether
  * the reference count is positive or negative.
  */
@@ -188,7 +188,7 @@ export class SchedulingActivator implements IActivator
     {
         if (scheduler)
         {
-            scheduler.init( () => this.doActivation());
+            scheduler.init( () => this.doDOMUpdate());
             this.scheduler = scheduler;
         }
     }
@@ -205,12 +205,12 @@ export class SchedulingActivator implements IActivator
 		{
 			this.definitions.delete( definition);
 			if (this.definitions.size === 0 && this.props.length === 0)
-				this.scheduler && this.scheduler.unscheduleActivation();
+				this.scheduler && this.scheduler.cancelDOMUpdate();
 		}
 		else
 		{
 			if (this.definitions.size === 0 && this.props.length === 0)
-                this.scheduler && this.scheduler.scheduleActivation();
+                this.scheduler && this.scheduler.scheduleDOMUpdate();
 				
 			this.definitions.set( definition, ++refCount);
 		}
@@ -228,12 +228,12 @@ export class SchedulingActivator implements IActivator
 		{
 			this.definitions.delete( definition);
 			if (this.definitions.size === 0 && this.props.length === 0)
-                this.scheduler && this.scheduler.unscheduleActivation();
+                this.scheduler && this.scheduler.cancelDOMUpdate();
 		}
 		else
 		{
 			if (this.definitions.size === 0 && this.props.length === 0)
-                this.scheduler && this.scheduler.scheduleActivation();
+                this.scheduler && this.scheduler.scheduleDOMUpdate();
 				
 			this.definitions.set( definition, --refCount);
 		}
@@ -249,7 +249,7 @@ export class SchedulingActivator implements IActivator
         value?: string | StringStyleset | null, important?: boolean): void
 	{
 		if (this.definitions.size === 0 && this.props.length === 0)
-            this.scheduler && this.scheduler.scheduleActivation();
+            this.scheduler && this.scheduler.scheduleDOMUpdate();
 
 		this.props.push({ ruleOrElm, name, value, important });
 	}
@@ -259,12 +259,12 @@ export class SchedulingActivator implements IActivator
 	/**
 	 * Performs activation/deactivation for all style definitions in our internal map.
 	 */
-	public forceActivation(): void
+	public forceDOMUpdate(): void
 	{
 		if (this.definitions.size > 0 || this.props.length > 0)
 		{
-            this.doActivation();
-            this.scheduler && this.scheduler.unscheduleActivation();
+            this.doDOMUpdate();
+            this.scheduler && this.scheduler.cancelDOMUpdate();
 		}
 	}
 
@@ -274,22 +274,22 @@ export class SchedulingActivator implements IActivator
 	 * Cancel activation/deactivation for all style definitions accumulated since the last
 	 * activation/deactivation.
 	 */
-	public cancelActivation(): void
+	public cancelDOMUpdate(): void
 	{
 		if (this.definitions.size > 0 || this.props.length > 0)
 		{
 			this.clearActivation();
-            this.scheduler && this.scheduler.unscheduleActivation();
+            this.scheduler && this.scheduler.cancelDOMUpdate();
 		}
 	}
 
 
 
 	/**
-	 * Performs activation/deactivation for all style definitions in our internal map. This method
-	 * should be used by the derived classes when scheduled activations should be performed.
+	 * Performs activation/deactivation and property set operations accumulated internally. This
+     * method should be used by the derived classes when scheduled activations should be performed.
 	 */
-	private doActivation(): void
+	private doDOMUpdate(): void
 	{
         // activate/deactivate style definitions
 		this.definitions.forEach( (refCount: number, definition: StyleDefinition) =>
@@ -331,22 +331,22 @@ class AnimationFrameScheduler implements IScheduler
 	private requestHandle = 0;
 
     // Callback to call to write changes to the DOM.
-	private doActivation: () => void;
+	private doDOMUpdate: () => void;
 
 
     /**
      * Initializes the scheduler object and provides the callback that should be invoked when the
      * scheduler decides to make changes to the DOM.
      */
-    public init( doActivation: () => void)
+    public init( doDOMUpdate: () => void)
     {
-        this.doActivation = doActivation;
+        this.doDOMUpdate = doDOMUpdate;
     }
 
 	/**
 	 * Is invoked when the scheduler needs to schedule its callback or event.
 	 */
-    public scheduleActivation(): void
+    public scheduleDOMUpdate(): void
     {
 		this.requestHandle = requestAnimationFrame( this.onAnimationFrame)
     }
@@ -354,7 +354,7 @@ class AnimationFrameScheduler implements IScheduler
 	/**
 	 * Is invoked when the scheduler needs to cancels its scheduled callback or event.
 	 */
-    public unscheduleActivation(): void
+    public cancelDOMUpdate(): void
     {
 		if (this.requestHandle > 0)
 		{
@@ -370,7 +370,7 @@ class AnimationFrameScheduler implements IScheduler
 	private onAnimationFrame = (): void =>
 	{
 		this.requestHandle = 0;
-		this.doActivation();
+		this.doDOMUpdate();
 	}
 }
 
@@ -412,7 +412,7 @@ export function s_getDefaultSchedulerType(): number
 
 
 /**
- * Sets the default scheduling type that is used by $activate and $deactivate functions that are
+ * Sets the default scheduling type that is used by activate and deactivate functions that are
  * called without explicitly providing value to the scheduling parameter. Returns the type of the
  * previous default activator or 0 if an error occurs (e.g. the given scheduler type ID is not
  * registered).
@@ -434,7 +434,7 @@ export function s_setDefaultSchedulerType( schedulerType: number): number
 
 /**
  * Registers the given scheduler object and returns the scheduler type identifier, which
- * should be used when calling $activate and $deactivate functions.
+ * should be used when calling activate and deactivate functions.
  */
 export function s_registerScheduler( scheduler: IScheduler): number
 {
@@ -468,7 +468,7 @@ export function s_unregisterScheduler( id: number): void
 
 /**
  * Current default scheduler. This scheduler will be used if scheduler type is not explicitly
- * specified in calls such as $activate or IStyleRule.setProp.
+ * specified in calls such as activate or IStyleRule.setProp.
  */
 let s_defaultSchedulerType: number = SchedulerType.Sync;
 
@@ -479,7 +479,7 @@ let s_synchronousActivator = new SynchronousActivator();
 
 /**
  * Current default activator. This activator will be used if scheduler type is not explicitly
- * specified in calls such as $activate or IStyleRule.setProp.
+ * specified in calls such as activate or IStyleRule.setProp.
  */
 let s_defaultActivator: IActivator = s_synchronousActivator;
 

@@ -14,7 +14,7 @@ import {
  * a reference counter of how many times it was activated and deactivated. The rules are inserted
  * into DOM only upon first activation.
  */
-export function $activate<T extends StyleDefinition>(
+export function activate<T extends StyleDefinition>(
 	instanceOrClass: T | IStyleDefinitionClass<T>,
 	schedulerType?: number): T | null
 {
@@ -32,7 +32,7 @@ export function $activate<T extends StyleDefinition>(
  * style definition instance maintains a reference counter of how many times it was activated and
  * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function $deactivate( instance: StyleDefinition, schedulerType?: number): void
+export function deactivate( instance: StyleDefinition, schedulerType?: number): void
 {
 	s_scheduleCall( (activator: IActivator) => activator.deactivate( instance), schedulerType);
 }
@@ -40,29 +40,29 @@ export function $deactivate( instance: StyleDefinition, schedulerType?: number):
 
 
 /**
- * Writes to DOM all style changes caused by the calls to the $activate and $deactivate functions
+ * Writes to DOM all style changes caused by the calls to the activate and deactivate functions
  * accumulated since the last activation of the given scheduling type.
  */
-export function $forceActivation( schedulerType?: number): void
+export function forceDOMUpdate( schedulerType?: number): void
 {
-	s_scheduleCall( (activator: IActivator) => activator.forceActivation(), schedulerType);
+	s_scheduleCall( (activator: IActivator) => activator.forceDOMUpdate(), schedulerType);
 }
 
 
 
 /**
- * Removes all scheduled activations caused by the calls to the $activate and $deactivate functions
+ * Removes all scheduled activations caused by the calls to the activate and deactivate functions
  * accumulated since the last activation of the given scheduling type.
  */
-export function $cancelActivation( schedulerType?: number): void
+export function cancelDOMUpdate( schedulerType?: number): void
 {
-	s_scheduleCall( (activator: IActivator) => activator.cancelActivation(), schedulerType);
+	s_scheduleCall( (activator: IActivator) => activator.cancelDOMUpdate(), schedulerType);
 }
 
 
 
 /**
- * Sets the default scheduler type that is used by $activate and $deactivate functions that are
+ * Sets the default scheduler type that is used by activate and deactivate functions that are
  * called without explicitly providing value to the scheduler type parameter. Returns the type of
  * the previous default scheduler or 0 if an error occurs (e.g. the given scheduler type ID is not
  * registered).
@@ -75,7 +75,7 @@ export function setDefaultSchedulerType( schedulerType: number): number
 
 
 /**
- * Returns the default scheduler type that is used by $activate and $deactivate functions that are
+ * Returns the default scheduler type that is used by activate and deactivate functions that are
  * called without explicitly providing value to the scheduler type parameter.
  */
 export function getDefaultSchedulerType(): number
@@ -87,7 +87,7 @@ export function getDefaultSchedulerType(): number
 
 /**
  * Registers the given scheduler object and returns the scheduler type identifier, which
- * should be used when calling $activate and $deactivate functions.
+ * should be used when calling activate and deactivate functions.
  */
 export function registerScheduler( scheduler: IScheduler): number
 {

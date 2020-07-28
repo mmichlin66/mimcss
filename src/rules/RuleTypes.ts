@@ -397,7 +397,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
 	/**
 	 * Style definition classes are created directly only by the *styled components* - that is,
 	 * components that use different styles for each instance. Otherwise, style definition
-	 * class instances are created when either the [[$use]] or [[$activate]] function is called.
+	 * class instances are created when either the [[$use]] or [[activate]] function is called.
 	 * @param parent Reference to the parent style definition class
 	 */
 	public constructor( parent?: P)
@@ -481,25 +481,25 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 
 /**
  * The SchedulerType enumeration provides values used to define how the calls to the
- * $activate and $deactivate functions schedule the writing of style changes to the DOM.
+ * activate and deactivate functions schedule the writing of style changes to the DOM.
  */
 export const enum SchedulerType
 {
 	/**
-	 * Synchronous activation - style definitions are written to the DOM upon the $activate
-	 * and $deactivate calls.
+	 * Synchronous activation - style definitions are written to the DOM upon the activate
+	 * and deactivate calls.
 	 */
 	Sync = 1,
 
 	/**
-	 * Calls to $activate and $deactivate functions are accumulated until the next animation
+	 * Calls to activate and deactivate functions are accumulated until the next animation
 	 * frame and then executed alltogether.
 	 */
 	AnimationFrame,
 
 	/**
-	 * Calls to $activate and $deactivate functions are accumulated until the call to the
-	 * $forceActivation function and then executed alltogether.
+	 * Calls to activate and deactivate functions are accumulated until the call to the
+	 * forceDOMUpdate function and then executed alltogether.
 	 */
 	Manual,
 }
@@ -516,15 +516,15 @@ export interface IScheduler
      * Initializes the scheduler object and provides the callback that should be invoked when the
      * scheduler decides to make changes to the DOM.
      */
-    init( doActivation: () => void);
+    init( doDOMUpdate: () => void);
 
 	/**
 	 * Is invoked when the scheduler needs to schedule its callback or event.
 	 */
-	scheduleActivation(): void;
+	scheduleDOMUpdate(): void;
 
 	/**
 	 * Is invoked when the scheduler needs to cancels its scheduled callback or event.
 	 */
-	unscheduleActivation(): void;
+	cancelDOMUpdate(): void;
 }

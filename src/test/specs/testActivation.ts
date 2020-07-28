@@ -18,12 +18,12 @@ describe("activation:", () =>
 			red = css.$class({ color: "red" })
 		}
 
-		let myStyles = css.$activate( MyStyles);
+		let myStyles = css.activate( MyStyles);
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 		expect(elms[0].id).toEqual("MyStyles");
 
-		css.$deactivate( myStyles!);
+		css.deactivate( myStyles!);
 		dom.expectNoStylesInHead();
 	})
 
@@ -36,16 +36,16 @@ describe("activation:", () =>
 			red = css.$class({ color: "red" })
 		}
 
-		let myStyles1 = css.$activate( MyStyles);
-		let myStyles2 = css.$activate( MyStyles);
-		let myStyles3 = css.$activate( MyStyles);
+		let myStyles1 = css.activate( MyStyles);
+		let myStyles2 = css.activate( MyStyles);
+		let myStyles3 = css.activate( MyStyles);
 
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-		css.$deactivate( myStyles1!);
-		css.$deactivate( myStyles2!);
-		css.$deactivate( myStyles3!);
+		css.deactivate( myStyles1!);
+		css.deactivate( myStyles2!);
+		css.deactivate( myStyles3!);
 		dom.expectNoStylesInHead();
 	})
 
@@ -64,11 +64,11 @@ describe("activation:", () =>
 			blue = css.$class({ color: "blue" })
 		}
 
-		let b = css.$activate( B);
+		let b = css.activate( B);
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(2);
 
-		css.$deactivate( b!);
+		css.deactivate( b!);
 		dom.expectNoStylesInHead();
 	})
 
@@ -93,13 +93,13 @@ describe("activation:", () =>
 			green = css.$class({ color: "green" })
 		}
 
-		let b = css.$activate( B);
-		let c = css.$activate( C);
+		let b = css.activate( B);
+		let c = css.activate( C);
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(3);
 
-		css.$deactivate( b!);
-		css.$deactivate( c!);
+		css.deactivate( b!);
+		css.deactivate( c!);
 		dom.expectNoStylesInHead();
 	})
 
@@ -117,11 +117,11 @@ describe("activation:", () =>
 			blue = css.$class({ color: "blue" })
 		}
 
-		let b = css.$activate( B);
+		let b = css.activate( B);
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-		css.$deactivate( b!);
+		css.deactivate( b!);
 		dom.expectNoStylesInHead();
 	})
 
@@ -146,12 +146,12 @@ describe("activation:", () =>
 			blue = css.$class({ color: "blue" })
 		}
 
-		let myStyles1 = css.$activate( MyStyles);
+		let myStyles1 = css.activate( MyStyles);
 
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-		css.$deactivate( myStyles1!);
+		css.deactivate( myStyles1!);
 		dom.expectNoStylesInHead();
 	})
 
@@ -170,12 +170,12 @@ describe("activation:", () =>
 			red = css.$class({ color: "darkred" })
 		}
 
-		let myStyles1 = css.$activate( MyStyles);
+		let myStyles1 = css.activate( MyStyles);
 
 		let elms = dom.getAllStylesFromHead();
 		expect((elms[0].sheet as CSSStyleSheet).cssRules.length).toEqual(2);
 
-		css.$deactivate( myStyles1!);
+		css.deactivate( myStyles1!);
 		dom.expectNoStylesInHead();
 	})
 })

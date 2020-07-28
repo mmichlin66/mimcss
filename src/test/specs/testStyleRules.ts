@@ -21,13 +21,13 @@ describe("style rules:", () =>
 			selector = css.$style( "div > span", {})
 		}
 
-		let a = css.$activate( A);
+		let a = css.activate( A);
 		expect(a!.cls.cssRule).not.toBeDefined();
 		expect(a!.id.cssRule).not.toBeDefined();
 		expect(a!.tag.cssRule).not.toBeDefined();
 		expect(a!.selector.cssRule).not.toBeDefined();
 
-		css.$deactivate( a!);
+		css.deactivate( a!);
 	})
 
 
@@ -42,13 +42,13 @@ describe("style rules:", () =>
 			selector = css.$style( "div > span", { color: "red" })
 		}
 
-		let a = css.$activate( A);
+		let a = css.activate( A);
 		expect(a!.cls.cssRule).toBeTruthy();
 		expect(a!.id.cssRule).toBeTruthy();
 		expect(a!.tag.cssRule).toBeTruthy();
 		expect(a!.selector.cssRule).toBeTruthy();
 
-		css.$deactivate( a!);
+		css.deactivate( a!);
 		expect(a!.cls.cssRule).toBeFalsy();
 		expect(a!.id.cssRule).toBeFalsy();
 		expect(a!.tag.cssRule).toBeFalsy();
@@ -67,13 +67,13 @@ describe("style rules:", () =>
 			selector = css.$style( "div > span", { color: "red" })
 		}
 
-		let a = css.$activate( A);
+		let a = css.activate( A);
 		expect(a!.cls.cssRule?.selectorText).toEqual(".A_cls");
 		expect(a!.id.cssRule?.selectorText).toEqual("#A_id");
 		expect(a!.tag.cssRule?.selectorText).toEqual("h1");
 		expect(a!.selector.cssRule?.selectorText).toEqual("div > span");
 
-		css.$deactivate( a!);
+		css.deactivate( a!);
 	})
 
 
@@ -91,7 +91,7 @@ describe("style rules:", () =>
 			})
 		}
 
-		let a = css.$activate( A);
+		let a = css.activate( A);
 		let elm = dom.getStyleElementWithID( "A");
 		expect(elm).toBeTruthy();
 		let cssRules = (elm!.sheet as CSSStyleSheet).cssRules;
@@ -101,7 +101,7 @@ describe("style rules:", () =>
 		expect((cssRules[1] as CSSStyleRule).selectorText).toEqual(".A_cls:hover");
 		expect((cssRules[2] as CSSStyleRule).selectorText).toEqual(".A_cls:hover:visited");
 
-		css.$deactivate( a!);
+		css.deactivate( a!);
 	})
 
 
@@ -117,7 +117,7 @@ describe("style rules:", () =>
 			})
 		}
 
-		let a = css.$activate( A);
+		let a = css.activate( A);
 		let elm = dom.getStyleElementWithID( "A");
 		expect(elm).toBeTruthy();
 		let cssRules = (elm!.sheet as CSSStyleSheet).cssRules;
@@ -126,7 +126,7 @@ describe("style rules:", () =>
 		expect((cssRules[0] as CSSStyleRule).selectorText).toEqual(".A_cls2 > .A_cls1");
 		expect((cssRules[1] as CSSStyleRule).selectorText).toEqual(".A_cls1 + .A_cls2");
 
-		css.$deactivate( a!);
+		css.deactivate( a!);
 	})
 
 
@@ -146,7 +146,7 @@ describe("style rules:", () =>
 			})
 		}
 
-		let a = css.$activate( A);
+		let a = css.activate( A);
 		let elm = dom.getStyleElementWithID( "A");
 		expect(elm).toBeTruthy();
 		let cssRules = (elm!.sheet as CSSStyleSheet).cssRules;
@@ -157,7 +157,7 @@ describe("style rules:", () =>
 		expect((cssRules[2] as CSSStyleRule).selectorText).toEqual(".A_cls.other, .other.A_cls div > span");
 		expect((cssRules[3] as CSSStyleRule).selectorText).toEqual(".A_cls.A_cls1, .A_cls1.A_cls + table");
 
-		css.$deactivate( a!);
+		css.deactivate( a!);
 	})
 
 
@@ -177,7 +177,7 @@ describe("style rules:", () =>
 			clsCopy = css.$class({ "+": this.cls })
 		}
 
-		let a = css.$activate( A);
+		let a = css.activate( A);
 		let elm = dom.getStyleElementWithID( "A");
 		expect(elm).toBeTruthy();
 		let cssRules = (elm!.sheet as CSSStyleSheet).cssRules;
@@ -191,7 +191,7 @@ describe("style rules:", () =>
 		expect((cssRules[4] as CSSStyleRule).selectorText).toEqual(".A_clsCopy.other, .other.A_clsCopy div > span");
 		expect((cssRules[5] as CSSStyleRule).selectorText).toEqual(".A_clsCopy > table");
 
-		css.$deactivate( a!);
+		css.deactivate( a!);
 	})
 
 

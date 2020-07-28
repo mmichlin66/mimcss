@@ -83,10 +83,10 @@ export function testLonghandProp<K extends keyof Styleset>( propName: K, propVal
 		c = css.$class( { [propName]: propVal })
 	}
 
-	let a = css.$activate( A);
+	let a = css.activate( A);
 	verifyPropValue( a!.c, propName, ...expected);
 
-	css.$deactivate( a!);
+	css.deactivate( a!);
 }
 
 
@@ -100,10 +100,10 @@ export function testShorthandProp<K extends keyof Styleset>( propName: K, propVa
 		c = css.$class( { [propName]: propVal })
 	}
 
-	let a = css.$activate( A);
+	let a = css.activate( A);
 	verifyMultiPropValues( a!.c, expected);
 
-	css.$deactivate( a!);
+	css.deactivate( a!);
 }
 
 
@@ -116,10 +116,10 @@ export function testPropPriority<K extends keyof Styleset>( propName: K, propVal
 		c = css.$class( { [propName]: propVal })
 	}
 
-	let a = css.$activate( A);
+	let a = css.activate( A);
 	verifyPropPriority( a!.c, propName, expectedPriority);
 
-	css.$deactivate( a!);
+	css.deactivate( a!);
 }
 
 

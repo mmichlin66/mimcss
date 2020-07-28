@@ -761,7 +761,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
  * @param forCustomProp 
  */
 export function forAllPropsInStylset( styleset: Styleset,
-    forProp: (name: string, val: any, isCustom: boolean) => void)
+    forProp: (name: string, val: string, isCustom: boolean) => void)
 {
 	for( let propName in styleset)
 	{
@@ -799,17 +799,17 @@ export function forAllPropsInStylset( styleset: Styleset,
  * to strings. This is used to reduce the size of the object used for mapping style properties to
  * conversion functions.
  * 
- * Note!!!: the order in the enumeration cannot be changed - otherwise, it will not be backwards
+ * Note!!!: the values in the enumeration cannot be changed - otherwise, it will not be backwards
  * compatible. All new values must be appended at the end.
  */
 const enum WellKnownFunc
 {
     Length = 1,
-    MultiLengthWithSpace,
-    Color,
-    Border,
-    Position,
-    CornerRadius,
+    MultiLengthWithSpace = 2,
+    Color = 3,
+    Border = 4,
+    Position = 5,
+    CornerRadius = 6,
 }
 
 
