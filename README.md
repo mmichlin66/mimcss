@@ -1,6 +1,6 @@
 # Mimcss: Style Authoring in TypeScript
 
-[![npm version](https://badge.fury.io/js/mimcss.svg)](https://badge.fury.io/js/mimcss)
+[![npm version](https://badge.fury.io/js/mimcss.svg)](https://badge.fury.io/js/mimcss) [![Join the chat at https://gitter.im/mimcss/general](https://badges.gitter.im/mimcss/general.svg)](https://gitter.im/mimcss/general?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 * [Motivation](#motivation)
 * [Features](#features)
