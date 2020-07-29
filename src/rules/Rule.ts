@@ -3,6 +3,21 @@ import {IRule, INamedEntity, StyleDefinition} from "./RuleTypes"
 
 
 /**
+ * The IRuleSerializationContext interface keeps information during serialization of style
+ * definition classes and instances.
+ */
+export interface IRuleSerializationContext
+{
+    // Adds rule text
+    addRuleText( s: string, isTopLevelRule?: boolean): void;
+
+    // Adds rule text
+    addStyleDefinition( instance: StyleDefinition): void;
+}
+
+
+
+/**
  * The IRuleContainer interface represents an object that accompanies and is associated with
  * a style definition object.
  */
@@ -17,7 +32,10 @@ export interface IRuleContainer
 	/** Clears all CSS rule objects defined in this container. */
 	clearRules(): void;
 
-	/** Sets the given value for the custom CSS roperty with the given name. */
+	/** Writes all rules recursively to the given string. */
+	serializeRules( ctx: IRuleSerializationContext): void;
+
+    /** Sets the given value for the custom CSS roperty with the given name. */
 	setCustomVarValue( name: string, value: string | null, important?: boolean, schedulerType?: number): void;
 }
 
@@ -79,11 +97,14 @@ export abstract class Rule extends RuleLike implements IRule
 
 	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
 	// style definition class, to which this rule belongs, is activated.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
+	public abstract insert( parent: CSSStyleSheet | CSSGroupingRule): void;
 
 	// Clers the CSS rule object. This method is called when the style definition class, to which
 	// this rule belongs, is deactivated.
 	public clear(): void { this.cssRule = null; }
+
+	// Serializes this rule to a string.
+	public abstract serialize( ctx: IRuleSerializationContext): void;
 
 
 

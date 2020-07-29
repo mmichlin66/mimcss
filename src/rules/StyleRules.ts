@@ -1,7 +1,7 @@
 import {IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "./RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
-import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer} from "./Rule";
+import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps} from "../styles/StyleFuncs"
 import {val2str, camelToDash} from "../styles/UtilFuncs";
 import {VarRule} from "./VarRule";
@@ -243,6 +243,25 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				(propVal as DependentRule).clear();
 		}
 	}
+
+
+
+	// Serializes this rule to a string.
+    public serialize( ctx: IRuleSerializationContext): void
+    {
+		if (Object.keys(this.styleset).length > 0)
+			ctx.addRuleText( this.toCssString());
+
+		// if dependent rules exist, insert them under the same parent
+		for( let propName in this.dependentRules)
+		{
+			let propVal = this.dependentRules[propName];
+			if (Array.isArray(propVal) && propVal.length > 0)
+				propVal.forEach( (depRule: DependentRule) => depRule.serialize( ctx));
+			else
+				(propVal as DependentRule).serialize( ctx);
+		}
+    }
 
 
 

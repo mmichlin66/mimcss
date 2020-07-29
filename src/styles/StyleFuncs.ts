@@ -1157,7 +1157,7 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
 export function supportsQueryToString( query: SupportsQuery): string
 {
     return val2str( query, {
-        arrItemFunc: singleSupportsQueryToString,
+        fromAny: singleSupportsQueryToString,
         arrSep: " or "
     });
 }

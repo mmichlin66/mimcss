@@ -1,6 +1,6 @@
 import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "./RuleTypes"
 import {getContainerFromInstance, processInstanceOrClass} from "./RuleContainer"
-import {IRuleContainer, ITopLevelRuleContainer, Rule} from "./Rule"
+import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
 import {supportsQueryToString} from "../styles/StyleFuncs";
 import {SupportsQuery} from "../styles/StyleTypes";
 import {MediaQuery} from "../styles/MediaTypes";
@@ -54,6 +54,26 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 		if (this.cssRule)
 			this.ruleContainer.insertRules( this.cssRule);
 	}
+
+
+
+	// Serializes this rule to a string.
+    public serialize( ctx: IRuleSerializationContext): void
+    {
+		if (!this.ruleContainer)
+			return;
+
+		let selector = this.getGroupSelectorText();
+		if (!selector)
+			return;
+
+		ctx.addRuleText( `${selector} {`);
+
+		// insert sub-rules
+		this.ruleContainer.serializeRules( ctx);
+
+		ctx.addRuleText( "}");
+    }
 
 
 

@@ -1,7 +1,7 @@
 import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule} from "./RuleTypes";
 import {IFontFace} from "../styles/FontFaceTypes"
 import {fontFaceToString} from "../styles/FontFaceFuncs"
-import {Rule} from "./Rule";
+import {Rule, IRuleSerializationContext} from "./Rule";
 import {MediaQuery} from "../styles/MediaTypes";
 import {SupportsQuery, Styleset} from "../styles/StyleTypes";
 import {supportsQueryToString} from "../styles/StyleFuncs";
@@ -12,9 +12,132 @@ import {PagePseudoClass} from "../styles/SelectorTypes";
 
 
 /**
+ * The MiscRule class serves as a base class for simple rules.
+ */
+abstract class MiscRule<T extends CSSRule> extends Rule
+{
+	public constructor( isTopLevelRule?: boolean)
+	{
+		super();
+		this.isTopLevelRule = isTopLevelRule;
+	}
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	{
+		this.cssRule = Rule.addRuleToDOM( this.getRuleText(), parent) as T;
+	}
+
+	// Serializes this rule to a string.
+    public serialize( ctx: IRuleSerializationContext): void
+    {
+		ctx.addRuleText( this.getRuleText(), this.isTopLevelRule);
+    }
+
+	// Returns CSS string for this rule.
+    protected abstract getRuleText(): string;
+
+	/** SOM font-face rule */
+	public cssRule: T;
+
+    // Flag indicating whether this rule can only be at the top-level of stylesheets (e.g. @import
+    // and @namespace).
+    private isTopLevelRule?: boolean;
+}
+
+
+
+/**
+ * The ImportRule class describes a CSS @import rule.
+ */
+export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
+{
+	public constructor( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery)
+	{
+        // this is a top-level rule
+		super( true);
+
+		this.url = url;
+		this.mediaQuery = mediaQuery;
+		this.supportsQuery = supportsQuery;
+	}
+
+	// Creates a copy of the rule.
+	public clone(): ImportRule
+	{
+		return new ImportRule( this.url, this.mediaQuery, this.supportsQuery);
+	}
+
+	// Returns CSS string for this rule.
+    protected getRuleText(): string
+    {
+		let url: string;
+		if (this.url.startsWith("url") || this.url.startsWith("\"") || this.url.startsWith("'"))
+			url = this.url;
+		else
+			url = `url(${this.url})`;
+
+		let supportsQueryString = !this.supportsQuery ? "" : supportsQueryToString( this.supportsQuery);
+		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
+		    supportsQueryString = `supports( ${supportsQueryString} )`;
+
+		let mediaQueryString = !this.mediaQuery ? "" : mediaQueryToString( this.mediaQuery);
+		return `@import ${url} ${supportsQueryString} ${mediaQueryString}`;
+    }
+
+	// URL to import from.
+	public url: string;
+
+	// Optional media query for this rule.
+	public mediaQuery?: string | MediaQuery;
+
+	// Optional supports query for this rule.
+	public supportsQuery?: string | SupportsQuery;
+}
+
+
+
+/**
+ * The NamespaceRule class describes a CSS @namespace rule.
+ */
+export class NamespaceRule extends MiscRule<CSSNamespaceRule> implements INamespaceRule
+{
+	public constructor( namespace: string, prefix?: string)
+	{
+        // this is a top-level rule
+		super( true);
+
+		this.namespace = namespace;
+		this.prefix = prefix;
+	}
+
+	// Creates a copy of the rule.
+	public clone(): NamespaceRule
+	{
+		return new NamespaceRule( this.namespace, this.prefix);
+	}
+
+	// Returns CSS string for this rule.
+    protected getRuleText(): string
+    {
+		let url = this.namespace.startsWith( "url(") ? this.namespace : `url(${this.namespace})`;
+		return `@namespace ${this.prefix ? this.prefix : ""} ${url}`;
+    }
+
+	/** Namespace string for the rule */
+	public namespace: string;
+
+	/** Optional prefix for the rule */
+	public prefix: string | undefined;
+
+}
+
+
+
+/**
  * The FontFaceRule class describes a @font-face CSS rule.
  */
-export class FontFaceRule extends Rule implements IFontFaceRule
+export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFaceRule
 {
 	public constructor( fontface: IFontFace)
 	{
@@ -29,83 +152,14 @@ export class FontFaceRule extends Rule implements IFontFaceRule
 		return new FontFaceRule( this.fontface);
 	}
 
-
-
-	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
-	{
-		this.cssRule = Rule.addRuleToDOM( `@font-face ${fontFaceToString( this.fontface)}`,
-			parent) as CSSFontFaceRule;
-	}
-
-
-
-	/** SOM font-face rule */
-	public cssRule: CSSFontFaceRule;
+	// Returns CSS string for this rule.
+    protected getRuleText(): string
+    {
+		return `@font-face ${fontFaceToString( this.fontface)}`;
+    }
 
 	// Object defining font-face properties.
 	public fontface: IFontFace;
-}
-
-
-
-/**
- * The ImportRule class describes a CSS @import rule.
- */
-export class ImportRule extends Rule implements IImportRule
-{
-	public constructor( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery)
-	{
-		super();
-
-		this.url = url;
-		this.mediaQuery = mediaQuery;
-		this.supportsQuery = supportsQuery;
-	}
-
-
-
-	// Creates a copy of the rule.
-	public clone(): ImportRule
-	{
-		return new ImportRule( this.url, this.mediaQuery, this.supportsQuery);
-	}
-
-
-
-	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
-	{
-		let url: string;
-		if (!this.url)
-			return;
-		else if (this.url.startsWith("url") || this.url.startsWith("\"") || this.url.startsWith("'"))
-			url = this.url;
-		else
-			url = `url(${this.url})`;
-
-		let supportsQueryString = !this.supportsQuery ? "" : supportsQueryToString( this.supportsQuery);
-		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
-		    supportsQueryString = `supports( ${supportsQueryString} )`;
-
-		let mediaQueryString = !this.mediaQuery ? "" : mediaQueryToString( this.mediaQuery);
-		this.cssRule = Rule.addRuleToDOM( `@import ${url} ${supportsQueryString} ${mediaQueryString}`,
-			parent) as CSSImportRule;
-}
-
-
-
-	/** SOM import rule */
-	public cssRule: CSSImportRule;
-
-	// URL to import from.
-	public url: string;
-
-	// Optional media query for this rule.
-	public mediaQuery?: string | MediaQuery;
-
-	// Optional supports query for this rule.
-	public supportsQuery?: string | SupportsQuery;
 }
 
 
@@ -121,15 +175,11 @@ export class PageRule extends StyleRule implements IPageRule
 		this.pseudoClass = pseudoClass;
 	}
 
-
-
 	// Creates a copy of the rule.
 	public cloneObject(): PageRule
 	{
 		return new PageRule( this.pseudoClass);
 	}
-
-
 
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
@@ -137,62 +187,11 @@ export class PageRule extends StyleRule implements IPageRule
 		return `@page ${this.pseudoClass ? this.pseudoClass : ""}`;
 	}
 
-
-
 	/** SOM page rule */
 	public cssRule: CSSPageRule;
 
 	/** Optional name of the page pseudo style (e.g. "":first") */
 	public pseudoClass: PagePseudoClass | undefined;
-}
-
-
-
-/**
- * The NamespaceRule class describes a CSS @namespace rule.
- */
-export class NamespaceRule extends Rule implements INamespaceRule
-{
-	public constructor( namespace: string, prefix?: string)
-	{
-		super();
-
-		this.namespace = namespace;
-		this.prefix = prefix;
-	}
-
-
-
-	// Creates a copy of the rule.
-	public clone(): NamespaceRule
-	{
-		return new NamespaceRule( this.namespace, this.prefix);
-	}
-
-
-
-	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
-	{
-		if (!this.namespace)
-			return;
-
-		let url = this.namespace.startsWith( "url(") ? this.namespace : `url(${this.namespace})`;
-		this.cssRule = Rule.addRuleToDOM( `@namespace ${this.prefix ? this.prefix : ""} ${url}`,
-			parent) as CSSNamespaceRule;
-	}
-
-
-
-	/** SOM namespace rule */
-	public cssRule: CSSNamespaceRule;
-
-	/** Namespace string for the rule */
-	public namespace: string;
-
-	/** Optional prefix for the rule */
-	public prefix: string | undefined;
-
 }
 
 

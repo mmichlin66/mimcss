@@ -1,5 +1,5 @@
 import {StyleDefinition, IStyleDefinitionClass} from "./RuleTypes"
-import {Rule, ITopLevelRuleContainer, RuleLike} from "./Rule"
+import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
 import {s_scheduleStylePropertyUpdate} from "./Scheduling";
@@ -308,6 +308,33 @@ class RuleContainer implements ITopLevelRuleContainer
 
 			this.domStyleElm = null;
 		}
+	}
+
+
+
+	/** Writes all rules recursively to the given string. */
+	public serializeRules( ctx: IRuleSerializationContext): void
+	{
+		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
+		// rule, don't insert @import and @namespace rules at all
+		if (this.isTopLevel)
+		{
+			this.imports && this.imports.forEach( rule => rule.serialize( ctx));
+			this.namespaces && this.namespaces.forEach( rule => rule.serialize( ctx));
+		}
+
+		// activate referenced style definitions
+        for( let ref of this.refs)
+            ctx.addStyleDefinition( ref);
+
+		// serialize our custom variables in a ":root" rule
+		if (this.vars.length > 0)
+		{
+			ctx.addRuleText( `:root {${this.vars.map( varObj => varObj.toCssString()).filter( v => v != null).join(";")}}`);
+		}
+
+		// serialize all other rules
+		this.otherRules.forEach( rule => rule.serialize( ctx));
 	}
 
 
@@ -621,6 +648,18 @@ export function deactivateInstance( instance: StyleDefinition, count: number): v
 		for( let i = 0; i < count; i++)
 			ruleContainer.deactivate();
 	}
+}
+
+
+
+/**
+ * Serializes the given style definition to the given string.
+ */
+export function serializeInstance( instance: StyleDefinition, ctx: IRuleSerializationContext): void
+{
+	let ruleContainer = getContainerFromInstance( instance);
+	if (ruleContainer)
+	    ruleContainer.serializeRules( ctx);
 }
 
 

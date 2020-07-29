@@ -1,5 +1,5 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "./RuleTypes"
-import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer} from "./Rule"
+import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule"
 import {StyleRule} from "./StyleRules";
 import { val2str } from "../styles/UtilFuncs";
 
@@ -71,6 +71,22 @@ export class AnimationRule extends Rule implements IAnimationRule
 			}
 		}
 	}
+
+
+	// Serializes this rule to a string.
+    public serialize( ctx: IRuleSerializationContext): void
+    {
+		if (!this.frameRules)
+			return;
+
+		ctx.addRuleText( `@keyframes ${this.name} {`);
+
+		for( let frameRule of this.frameRules)
+			ctx.addRuleText( frameRule.toCssString())
+        
+		ctx.addRuleText( "}");
+    }
+
 
 
 	// This function is called to convert an object to a string. Animation rule returns its name.
