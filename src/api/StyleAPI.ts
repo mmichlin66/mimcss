@@ -759,7 +759,7 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fill",
     ...tracks: GridTrack[]): IRepeatProxy
 {
     // return () => `repeat(${val2str(count)},${stylePropToString( "gridTemplateRows", tracks, true)})`;
-    return () => `repeat(${val2str(count)},${val2str( tracks, { arrFunc: gridTrackToString })})`;
+    return () => `repeat(${val2str(count)},${val2str( tracks, { arrItemFunc: gridTrackToString })})`;
 }
 
 

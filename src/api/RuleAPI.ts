@@ -229,7 +229,7 @@ export function enableShortNames( enable: boolean, prefix?: string): void
 export function classes( ...classes: (IClassRule | Extended<string>)[]): string
 {
 	return val2str( classes, {
-		arrFunc: v => v instanceof ClassRule ? v.name : val2str(v)
+		arrItemFunc: v => v instanceof ClassRule ? v.name : val2str(v)
 	});
 }
 

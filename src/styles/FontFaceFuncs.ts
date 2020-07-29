@@ -41,7 +41,7 @@ function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): stri
 {
     return val2str( val, {
         fromNumber: CssPercentMath.styleToString,
-        arrFunc: CssPercentMath.styleToString
+        arrItemFunc: CssPercentMath.styleToString
     });
 }
 

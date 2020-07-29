@@ -1032,7 +1032,7 @@ export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" 
 export type TextEmphasisFill = "filled" | "open";
 
 /** Type for the text-emphasis-style style property */
-export type TextEmphasisStyle_StyleType = "none" | TextEmphasisShape | TextEmphasisFill |
+export type TextEmphasisStyle_StyleType = "none" | TextEmphasisFill | TextEmphasisShape |
     [Extended<TextEmphasisFill>, Extended<TextEmphasisShape>];
 
 

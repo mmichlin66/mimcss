@@ -69,7 +69,7 @@ export interface IValueConvertOptions
     fromAny?: (val: any) => string;
 
     // Called to convert array items if fromArray is not defined
-    arrFunc?: (v: any) => string;
+    arrItemFunc?: (v: any) => string;
 
     // Separator for array items - used only if fromArray is not defined
     arrSep?: string;
@@ -125,7 +125,7 @@ export function val2str( val: any, options?: IValueConvertOptions): string
             else
             {
                 let separator = options.arrSep != null ? options.arrSep : " ";
-                return arr2str( val, options.arrFunc || options.fromAny || undefined, separator);
+                return arr2str( val, options.arrItemFunc || options.fromAny || undefined, separator);
             }
         }
         else if (typeof val === "object")
@@ -231,7 +231,7 @@ function multiStyleToString<T extends string>( val: Extended<MultiNumberBase<T>>
 {
     return val2str( val, {
         fromNumber: convertFunc,
-        arrFunc: v => numberBaseToString( v, convertFunc),
+        arrItemFunc: v => numberBaseToString( v, convertFunc),
         arrSep: separator
     });
 }
@@ -542,7 +542,7 @@ export function pos2str( val: Extended<CssPosition>): string
 export function multiPos2str( val: Extended<MultiCssPosition>, separator: string): string
 {
     return val2str( val, {
-        arrFunc: pos2str,
+        arrItemFunc: pos2str,
         arrSep: separator
     });
 }

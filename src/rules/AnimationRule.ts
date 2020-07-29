@@ -130,7 +130,7 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 	{
 		return val2str( this.waypoint, {
 			fromNumber: v => v + "%",
-			arrFunc: v => val2str( v, { fromNumber: v => v + "%" }),
+			arrItemFunc: v => val2str( v, { fromNumber: v => v + "%" }),
 			arrSep: ","
 		})
 	}

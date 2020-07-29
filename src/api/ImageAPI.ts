@@ -167,7 +167,7 @@ function conicGradientToString( name: string, stopsOrHints: GradientStopOrHint[]
 function crossFadeToString( args: CrossFadeParam[]): string
 {
     let paramsString = val2str( args, {
-        arrFunc: crossFadeParamToString,
+        arrItemFunc: crossFadeParamToString,
         arrSep: ","
     })
 

@@ -18,13 +18,6 @@ import {IIDRule} from "../rules/RuleTypes";
 
 
 
-function multiLengthToStringWithSpace( val: Extended<CssMultiLength>): string
-{ return CssLengthMath.multiStyleToString( val, " "); }
-
-function multiTimeToStringWithComma( val: Extended<CssMultiTime>): string
-{ return CssTimeMath.multiStyleToString( val, ","); }
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Functions for converting CSS property types to strings.
@@ -185,7 +178,7 @@ function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): s
 {
     return val2str( val, {
         fromNumber: unitlessOrPercentToString,
-        arrFunc: v => val2str( v, {
+        arrItemFunc: v => val2str( v, {
             fromBool: () => "fill",
             fromNumber: unitlessOrPercentToString,
         })
@@ -214,7 +207,7 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
 function singleCornerRadiusToString( val: Extended<CssRadius>): string
 {
     return val2str( val, {
-        arrFunc: CssLengthMath.styleToString,
+        arrItemFunc: CssLengthMath.styleToString,
         fromAny: CssLengthMath.styleToString
     });
 }
@@ -307,7 +300,7 @@ function cursorToString( val: Extended<Cursor_StyleType>): string
             else
             {
                 return val2str( v, {
-                    arrFunc: cursorToString,
+                    arrItemFunc: cursorToString,
                     arrSep: ","
                 })
             }
@@ -444,7 +437,7 @@ function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
 {
     return val2str( val, {
         fromNumber: v => CssLengthMath.styleToString( v),
-        arrFunc: gridTrackToString
+        arrItemFunc: gridTrackToString
     });
 }
 
@@ -794,6 +787,36 @@ export function forAllPropsInStylset( styleset: Styleset,
 
 
 
+// Helper function converts the given multi-length value to string. If the value is an array, the
+// items will be separated by space.
+function multiLengthToStringWithSpace( val: Extended<CssMultiLength>): string
+{
+    return CssLengthMath.multiStyleToString( val, " ");
+}
+
+// Helper function converts the given multi-time value to string. If the value is an array, the
+// items will be separated by comma.
+function multiTimeToStringWithComma( val: Extended<CssMultiTime>): string
+{
+    return CssTimeMath.multiStyleToString( val, ",");
+}
+
+// Helper function converts the given value to string. If the value is an array, the items will be
+// separated by comma.
+function arrayToStringWithComma( val: any)
+{
+    return val2str( val, { arrSep: "," });
+};
+
+// Helper function converts the given value to string. If the value is an array, the items will be
+// separated by slash.
+function arrayToStringWithSlash( val: any)
+{
+    return val2str( val, { arrSep: "/" });
+};
+
+
+
 /**
  * Numeric identifiers corresponding to well known functions used to convert style property values
  * to strings. This is used to reduce the size of the object used for mapping style properties to
@@ -805,11 +828,15 @@ export function forAllPropsInStylset( styleset: Styleset,
 const enum WellKnownFunc
 {
     Length = 1,
-    MultiLengthWithSpace = 2,
-    Color = 3,
-    Border = 4,
-    Position = 5,
-    CornerRadius = 6,
+    Color,
+    Border,
+    Position,
+    CornerRadius,
+    MultiLengthWithSpace,
+    MultiTimeWithComma,
+    ArrayWithComma,
+    ArrayWithSlash,
+    GridAxis,
 }
 
 
@@ -822,17 +849,20 @@ const enum WellKnownFunc
  */
 function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): string
 {
-    switch( funcType)
-    {
-        case WellKnownFunc.Length: return CssLengthMath.styleToString( val);
-        case WellKnownFunc.MultiLengthWithSpace: return multiLengthToStringWithSpace( val);
-        case WellKnownFunc.Color: return colorToString( val);
-        case WellKnownFunc.Border: return borderToString( val);
-        case WellKnownFunc.Position: return pos2str( val);
-        case WellKnownFunc.CornerRadius: return singleCornerRadiusToString( val);
+    let func =
+        funcType === WellKnownFunc.Length ? CssLengthMath.styleToString :
+        funcType === WellKnownFunc.Color ? colorToString :
+        funcType === WellKnownFunc.Border ? borderToString :
+        funcType === WellKnownFunc.Position ? pos2str :
+        funcType === WellKnownFunc.CornerRadius ? singleCornerRadiusToString :
+        funcType === WellKnownFunc.MultiLengthWithSpace ? multiLengthToStringWithSpace :
+        funcType === WellKnownFunc.MultiTimeWithComma ? multiTimeToStringWithComma :
+        funcType === WellKnownFunc.ArrayWithComma ? arrayToStringWithComma :
+        funcType === WellKnownFunc.ArrayWithSlash ? arrayToStringWithSlash :
+        funcType === WellKnownFunc.GridAxis ? gridAxisToString :
+        null;
 
-        default: return "";
-    }
+    return func ? func(val) : "";
 }
 
 
@@ -842,16 +872,6 @@ function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): strin
 // Registry of CSS properties that specifies how their values should be converted to strings.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Helper object that is used to indicate that values in an array should be separated by a comma.
-// We use it many times in the stucture below.
-let commaArraySeparator = { arrSep: "," };
-
-// Helper object that is used to indicate that values in an array should be separated by a slash.
-// We use it many times in the stucture below.
-let slashArraySeparator = { arrSep: "/" };
-
-
 
 /**
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
@@ -864,31 +884,31 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
         fromAny: singleAnimation_fromStyle,
         arrSep: ",",
     },
-    animationDelay: multiTimeToStringWithComma,
-    animationDuration: multiTimeToStringWithComma,
-    animationIterationCount: commaArraySeparator,
-    animationFillMode: commaArraySeparator,
-    animationName: commaArraySeparator,
-    animationPlayState: commaArraySeparator,
+    animationDelay: WellKnownFunc.MultiTimeWithComma,
+    animationDuration: WellKnownFunc.MultiTimeWithComma,
+    animationIterationCount: WellKnownFunc.ArrayWithComma,
+    animationFillMode: WellKnownFunc.ArrayWithComma,
+    animationName: WellKnownFunc.ArrayWithComma,
+    animationPlayState: WellKnownFunc.ArrayWithComma,
     animationTimingFunction: timingFunctionToString,
 
     background: {
         fromNumber: colorToString,
         fromObj: singleBackground_fromObject,
         fromAny: singleBackground_fromStyle,
-        arrFunc: singleBackground_fromStyle,
+        arrItemFunc: singleBackground_fromStyle,
         arrSep: ",",
     },
-    backgroundAttachment: commaArraySeparator,
-    backgroundBlendMode: commaArraySeparator,
-    backgroundClip: commaArraySeparator,
+    backgroundAttachment: WellKnownFunc.ArrayWithComma,
+    backgroundBlendMode: WellKnownFunc.ArrayWithComma,
+    backgroundClip: WellKnownFunc.ArrayWithComma,
     backgroundColor: WellKnownFunc.Color,
-    backgroundOrigin: commaArraySeparator,
+    backgroundOrigin: WellKnownFunc.ArrayWithComma,
     backgroundPosition: v => multiPos2str( v, ","),
-    backgroundRepeat: commaArraySeparator,
+    backgroundRepeat: WellKnownFunc.ArrayWithComma,
     backgroundSize: {
         fromNumber: CssLengthMath.styleToString,
-        arrFunc: singleBackgroundSize_fromStyle,
+        arrItemFunc: singleBackgroundSize_fromStyle,
         arrSep: ","
     },
     baselineShift: WellKnownFunc.Length,
@@ -905,7 +925,6 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     borderBottomRightRadius: WellKnownFunc.CornerRadius,
     borderBottomWidth: WellKnownFunc.Length,
     borderColor: {
-        arrFunc: colorToString,
         fromAny: colorToString
     },
     borderImage: {
@@ -966,14 +985,14 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     gridColumnGap: WellKnownFunc.Length,
     gridGap: WellKnownFunc.MultiLengthWithSpace,
     gridRowGap: WellKnownFunc.Length,
-    gridArea: slashArraySeparator,
-    gridAutoColumns: gridAxisToString,
-    gridAutoRows: gridAxisToString,
-    gridColumn: slashArraySeparator,
-    gridRow: slashArraySeparator,
+    gridArea: WellKnownFunc.ArrayWithSlash,
+    gridAutoColumns: WellKnownFunc.GridAxis,
+    gridAutoRows: WellKnownFunc.GridAxis,
+    gridColumn: WellKnownFunc.ArrayWithSlash,
+    gridRow: WellKnownFunc.ArrayWithSlash,
     gridTemplateAreas: gridTemplateAreasToString,
-    gridTemplateColumns: gridAxisToString,
-    gridTemplateRows: gridAxisToString,
+    gridTemplateColumns: WellKnownFunc.GridAxis,
+    gridTemplateRows: WellKnownFunc.GridAxis,
 
     height: WellKnownFunc.Length,
 
@@ -1031,7 +1050,7 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     },
 
     quotes: {
-        arrFunc: v => `"${v}"`
+        arrItemFunc: v => `"${v}"`
     },
 
     right: WellKnownFunc.Length,
@@ -1039,7 +1058,7 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     rowGap: WellKnownFunc.Length,
 
     scrollbarColor: {
-        arrFunc: colorToString
+        arrItemFunc: colorToString
     },
     scrollMargin: WellKnownFunc.MultiLengthWithSpace,
     scrollMarginBlock: WellKnownFunc.MultiLengthWithSpace,
@@ -1078,12 +1097,11 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     textDecorationColor: WellKnownFunc.Color,
     textDecorationThickness: WellKnownFunc.Length,
     textEmphasis: {
-        arrFunc: colorToString
+        fromAny: colorToString
     },
     textEmphasisColor: WellKnownFunc.Color,
     textIndent: {
-        fromNumber: CssLengthMath.styleToString,
-        arrFunc: CssLengthMath.styleToString
+        fromAny: CssLengthMath.styleToString
     },
     textShadow: {
         fromObj: singleBoxShadow_fromObject,
@@ -1099,22 +1117,14 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
         fromAny: singleTransition_fromStyle,
         arrSep: ",",
     },
-    transitionDelay: {
-        fromAny: CssTimeMath.styleToString,
-        arrSep: ","
-    },
-    transitionDuration: {
-        fromAny: CssTimeMath.styleToString,
-        arrSep: ","
-    },
+    transitionDelay: WellKnownFunc.MultiTimeWithComma,
+    transitionDuration: WellKnownFunc.MultiTimeWithComma,
     transitionTimingFunction: timingFunctionToString,
     translate: {
         fromAny: CssLengthMath.styleToString
     },
 
-    verticalAlign: {
-        fromNumber: CssLengthMath.styleToString
-    },
+    verticalAlign: WellKnownFunc.Length,
 
     width: WellKnownFunc.Length,
     willChange: {
@@ -1146,14 +1156,10 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
 /** Converts the given supports query to its string representation */
 export function supportsQueryToString( query: SupportsQuery): string
 {
-    if (!query)
-        return "";
-    else if (typeof query === "string")
-        return query;
-    else if (Array.isArray( query))
-        return query.map( (singleQuery) => singleSupportsQueryToString( singleQuery)).join(" or ");
-    else
-        return singleSupportsQueryToString( query);
+    return val2str( query, {
+        arrItemFunc: singleSupportsQueryToString,
+        arrSep: " or "
+    });
 }
 
 
@@ -1161,18 +1167,17 @@ export function supportsQueryToString( query: SupportsQuery): string
 /** Converts the given supports query to its string representation */
 export function singleSupportsQueryToString( query: SingleSupportsQuery): string
 {
-    if (!query)
-        return "";
-    else if (typeof query === "string")
-        return query;
+    return val2str( query, {
+        fromObj: (v: ExtendedStyleset & { $negate?: boolean; }) => {
+            let propNames = Object.keys( v).filter( (propName) => propName != "$negate");
+            if (propNames.length === 0)
+                return "";
 
-    let propNames = Object.keys( query).filter( (propName) => propName != "$negate");
-    if (propNames.length === 0)
-        return "";
-
-    let not = query.$negate ? "not" : "";
-    return  `${not} (${propNames.map( (propName) =>
-        stylePropToString( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
+            let not = v.$negate ? "not" : "";
+            return  `${not} (${propNames.map( (propName) =>
+                stylePropToString( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
+        }
+    });
 }
 
 
