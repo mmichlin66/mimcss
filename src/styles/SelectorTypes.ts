@@ -1,5 +1,5 @@
 ﻿import {IStringProxy, IGenericProxy} from "./UtilTypes";
-import {IStyleRule} from "../rules/RuleTypes";
+import {IStyleRule, IClassNameRule} from "../rules/RuleTypes";
 
 
 
@@ -12,7 +12,7 @@ export interface ISelectorProxy extends IGenericProxy<"selector"> {};
 
 
 /** Type for a single selector token that can be used as an argument to the [[selector]] function */
-export type SelectorItem = string | IStyleRule | IStringProxy | ISelectorProxy;
+export type SelectorItem = string | IStyleRule | IClassNameRule | IStringProxy | ISelectorProxy;
 
 
 
