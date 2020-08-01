@@ -1,7 +1,7 @@
 ﻿import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
-    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule
+    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule
 } from "../rules/RuleTypes";
 import {processInstanceOrClass, s_enableShortNames, serializeInstance} from "../rules/RuleContainer";
 import {Extended} from "../styles/UtilTypes";
@@ -14,10 +14,10 @@ import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
 import {CounterRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
-import {FontFaceRule, ImportRule, NamespaceRule, PageRule} from "../rules/MiscRules"
+import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {val2str} from "../styles/UtilFuncs";
-import { IRuleSerializationContext } from "../rules/Rule";
+import {IRuleSerializationContext} from "../rules/Rule";
 
 
 
@@ -38,9 +38,19 @@ export function $abstract( style: CombinedStyleset): IStyleRule
  * style definition classes.
  */
 export function $class( style?: CombinedStyleset,
-	nameOverride?: string | IClassRule): IClassRule
+    nameOverride?: string | IClassRule | IClassNameRule): IClassRule
 {
 	return new ClassRule( style, nameOverride);
+}
+
+/**
+ * Creates new class name rule, which combines one or more other class names. This creates a
+ * "synonym" that is easier to apply to an element's class attribute than an array of two or
+ * more clas rules.
+ */
+export function $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
+{
+	return new ClassNameRule( classes);
 }
 
 /**
@@ -50,8 +60,7 @@ export function $class( style?: CombinedStyleset,
  * the ID. Such ID can be later used either in conditional grouping rules or in derived
  * style definition classes.
  */
-export function $id( style?: CombinedStyleset,
-	nameOverride?: string | IIDRule): IIDRule
+export function $id( style?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
 {
 	return new IDRule( style, nameOverride);
 }

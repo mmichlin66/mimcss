@@ -174,6 +174,18 @@ export interface IClassRule extends INamedStyleRule
 
 
 /**
+ * The IClassNameRule interface represents a combination of two or more class names. It can be
+ * used to make it easier to create elements with more than one CSS class.
+ */
+export interface IClassNameRule extends INamedEntity
+{
+	/** Name of all the class names prefixed with "." */
+	readonly cssClassName: string;
+}
+
+
+
+/**
  * The IIDRule interface represents a style rule where the selector is a single element ID.
  */
 export interface IIDRule extends INamedStyleRule

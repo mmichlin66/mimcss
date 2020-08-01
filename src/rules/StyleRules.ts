@@ -1,4 +1,4 @@
-import {IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "./RuleTypes";
+import {IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IClassNameRule} from "./RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../styles/StyleTypes"
 import {CssSelector} from "../styles/SelectorTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
@@ -564,7 +564,7 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
  */
 export class ClassRule extends NamedStyleRule implements IClassRule
 {
-	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
+	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity | IClassNameRule)
 	{
 		super( style, nameOverride);
 	}

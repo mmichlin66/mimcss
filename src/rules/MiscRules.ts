@@ -1,7 +1,7 @@
-import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule} from "./RuleTypes";
+import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "./RuleTypes";
 import {IFontFace} from "../styles/FontFaceTypes"
 import {fontFaceToString} from "../styles/FontFaceFuncs"
-import {Rule, IRuleSerializationContext} from "./Rule";
+import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 import {MediaQuery} from "../styles/MediaTypes";
 import {SupportsQuery, Styleset} from "../styles/StyleTypes";
 import {supportsQueryToString} from "../styles/StyleFuncs";
@@ -192,6 +192,60 @@ export class PageRule extends StyleRule implements IPageRule
 
 	/** Optional name of the page pseudo style (e.g. "":first") */
 	public pseudoClass: PagePseudoClass | undefined;
+}
+
+
+
+/**
+ * The PageRule class represents the CSS @page rule.
+ */
+export class ClassNameRule extends RuleLike implements IClassNameRule
+{
+	public constructor( classes: (IClassRule | IClassNameRule | string)[])
+	{
+		super();
+		this.classes = classes;
+	}
+
+	// Creates a copy of the rule.
+	public clone(): ClassNameRule
+	{
+		return new ClassNameRule( this.classes);
+	}
+
+	// Processes the given rule.
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	{
+        super.process( container, ownerContainer, ruleName);
+
+        this.name = this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
+        this.cssClassName = "." + this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(".");
+    }
+
+	/**
+	 * This function allows the object to particpate in "valueToString" serialization. Whenever
+	 * the ClassNameRule object is encountered by the `UtilFunc.valueToString` function,
+	 * the rule's CSS name (the one with the dots) will be used.
+	 */
+	public valueToString(): string
+	{
+		return this.cssClassName;
+	}
+
+    // Implementation of the toString method returns the combined name of the classes (without
+    // the CSS prefixes).
+	public toString(): string
+	{
+		return this.name;
+	}
+
+    /** All class names concatenated with space */
+    public name: string;
+    
+    /** All class CSS names (with dots) concatenated together */
+    public cssClassName: string;
+
+    private classes: (IClassRule | IClassNameRule | string)[];
 }
 
 
