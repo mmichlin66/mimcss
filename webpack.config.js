@@ -36,7 +36,7 @@ function config( outFileName, mode, devtool, ifdefLoaderOptions)
 module.exports =
 [
     config( "mimcss.dev.js", "development", "#inline-source-map", dev_ifdefLoaderOptions),
-    config( "mimcss.js", "production", "source-map", prod_ifdefLoaderOptions),
+    config( "mimcss.js", "production", undefined, prod_ifdefLoaderOptions),
 ];
 
 

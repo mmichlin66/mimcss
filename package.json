@@ -33,7 +33,6 @@
 	},
 	"files": [
 		"lib/mimcss.js",
-		"lib/mimcss.js.map",
 		"lib/mimcss.dev.js",
 		"lib/mimcssTypes.d.ts",
 		"lib/styles/UtilTypes.d.ts",
