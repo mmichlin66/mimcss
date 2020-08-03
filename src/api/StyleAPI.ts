@@ -755,7 +755,7 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 /**
  * Returns an IRepeatProxy function representing the `repeat()` CSS function.
  */
-export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fill",
+export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
     ...tracks: GridTrack[]): IRepeatProxy
 {
     // return () => `repeat(${val2str(count)},${stylePropToString( "gridTemplateRows", tracks, true)})`;
