@@ -236,7 +236,7 @@ export function enableShortNames( enable: boolean, prefix?: string): void
  * `class` property of an HTML element.
  * @param classes
  */
-export function classes( ...classes: (IClassRule | Extended<string>)[]): string
+export function classes( ...classes: (IClassRule | IClassNameRule | Extended<string>)[]): string
 {
 	return val2str( classes, {
 		arrItemFunc: v => v instanceof ClassRule ? v.name : val2str(v)
@@ -244,6 +244,12 @@ export function classes( ...classes: (IClassRule | Extended<string>)[]): string
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Rule virtualization.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * The IStyleSerializationContext interface allows adding style definition classes and objects
@@ -364,6 +370,84 @@ class RuleSerializationContext implements IRuleSerializationContext
 
     // Set of style definition instances that were already serialized in this context.
     private instances = new Set<StyleDefinition>();
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Rule virtualization.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Decorator that should be applied to a rule if it is defined and used in the same style
+ * definition class but then is overridden in a derived style definition class. The problem
+ * this solves is this: when a rule is defined in a base class and then overridden in a derived
+ * class, when an instance of the derived class is created, the rules that are created in the
+ * base and derived classes see different values of the rule. Since our rules are defined as
+ * part of the constructor, the base class constructor's code only sees the value assigned in that
+ * code. If another rule in the base class uses this first rule, this value is remembered.
+ * 
+ * The `@virtual` decorator creates a Proxy object for the rule with the handler that keeps the
+ * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
+ * rule, the first rule will see the overridden value of the rule when accessed in the
+ * post-constructor code.
+ */
+export function virtual( target, name: string)
+{
+    // symbol to keep the proxy handler value
+    let sym = Symbol(name + "_proxy_handler");
+
+    // we still need to have a regular enumerable property so that RuleContainer can see it.
+    let attrName = "_v_" + name;
+    Object.defineProperty( target, name, {
+        get()
+        {
+            return this[attrName];
+        },
+
+        set(v)
+        {
+            // check whether we already have the handler and created it if we don't
+            let handler = this[sym];
+            if (!handler)
+                this[sym] = handler = new VirtHandler();
+
+            // create a new proxy each time because we want the proxy to have the new value.
+            let proxy = new Proxy( v, handler);
+            // handler.proxy = proxy;
+
+            // set the new vaule to the handler so that it will use it from now on
+            handler.v = v;
+
+            // keep the proxy in the regular attribute from which it is read in the get() method
+            this[attrName] = proxy;
+        }
+    });
+}
+
+
+
+/**
+ * Handler for the proxy created by the `@virtual` decorator. It keeps the current value of a
+ * rule so that the most recent value is used whenever the proxy is accessed.
+ */
+class VirtHandler
+{
+    // public proxy: any;
+    public v: any;
+
+    get( t: any, p: PropertyKey, r: any): any
+    {
+        return this.v[p];
+    }
+
+    set(  t: any, p: PropertyKey, v: any, r: any): boolean
+    {
+        this.v[p] = v;
+        return true;
+    }
 }
 
 

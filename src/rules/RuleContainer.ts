@@ -56,7 +56,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// get containers for the parent and owner style definition
         if (this.parent)
-            this.parent[symContainer];
+            this.parentContainer = this.parent[symContainer];
 
 		if (this.owner)
 			this.topLevelContainer = this.owner[symContainer];
@@ -524,35 +524,31 @@ export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDef
 		return instOrClass;
 	}
 	else
-	{
-		// check whether this definition class is already associated with an instance
-		return instOrClass.hasOwnProperty(symInstance)
-			? instOrClass[symInstance]
-			: processClass( instOrClass, parent);
-	}
+		return processClass( instOrClass, parent);
 }
 
 
 
 /**
  * Processes the given style definition class by creating its instance and associating a
- * rule container object with it. The class will be associated with the instance using the
- * Symbol property. The owner parameter is a reference to the top-level style defiition
+ * rule container object with it. The class will be associated with the instance using a
+ * Symbol property. The parent parameter is a reference to the parent style defiition
  * object or null if the given class is itself a top-level class (that is, is not a class
  * that defines rules within nested grouping rules).
  */
 function processClass( definitionClass: IStyleDefinitionClass,
 	parent?: StyleDefinition): StyleDefinition | null
 {
-    // process all the base classes so that rule names are generated. We don't activate styles
+    // check whether this definition class is already associated with an instance
+    if (definitionClass.hasOwnProperty(symInstance))
+        return definitionClass[symInstance]
+
+    // recursively process all base classes so that rule names are generated. We don't activate styles
     // for these classes because derived classes will have all the rules from all the base classes
     // as their own and so these rules will be activated as part of the derived class.
-    for( let baseClass = Object.getPrototypeOf( definitionClass);
-            baseClass !== StyleDefinition;
-                baseClass = Object.getPrototypeOf( baseClass))
-    {
+    let baseClass = Object.getPrototypeOf( definitionClass);
+    if (baseClass !== StyleDefinition)
 		processClass( baseClass, parent);
-    }
 
 	try
 	{

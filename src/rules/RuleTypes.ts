@@ -425,7 +425,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
      * definition object in the chain of style definition classes. Through this member, all rules
      * and other members defined in the parent definition class can be accessed.
 	 */
-	public get $parent(): P | undefined { return this[symOwner]; }
+	public get $parent(): P | undefined { return this[symParent]; }
 
 	/**
 	 * Refers to the instance of the style definition class which is the owner of
