@@ -4,7 +4,6 @@
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule
 } from "../rules/RuleTypes";
 import {processInstanceOrClass, s_enableShortNames, serializeInstance} from "../rules/RuleContainer";
-import {Extended} from "../styles/UtilTypes";
 import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
 import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
 import {MediaQuery} from "../styles/MediaTypes"
@@ -236,7 +235,7 @@ export function enableShortNames( enable: boolean, prefix?: string): void
  * `class` property of an HTML element.
  * @param classes
  */
-export function classes( ...classes: (IClassRule | IClassNameRule | Extended<string>)[]): string
+export function classes( ...classes: (IClassRule | IClassNameRule | string)[]): string
 {
 	return val2str( classes, {
 		arrItemFunc: v => v instanceof ClassRule ? v.name : val2str(v)
@@ -252,7 +251,7 @@ export function classes( ...classes: (IClassRule | IClassNameRule | Extended<str
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IStyleSerializationContext interface allows adding style definition classes and objects
+ * The ICssSerializer interface allows adding style definition classes and objects
  * and serializing them to a single string. This can be used for server-side rendering when
  * the resultant string can be set as the content of a `<style>` element.
  */

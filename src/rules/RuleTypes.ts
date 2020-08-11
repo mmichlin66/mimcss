@@ -14,7 +14,7 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
 /**
  * The CombinedStyleset type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset and allow building dependent style rules:
- * - The `+` property specifies one or more parent style rules. This allows specifying
+ * - The `"+"` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation.
  * - Properties with pseudo class names (e.g. ":hover") or pseudo element names (e.g. "::after").
  *   These properties define a styleset that will be assigned to the selector obtained by using
@@ -47,13 +47,13 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
  * }
  * ```
  * 
- * This will translate to the following CSS (class name is auto-generated):
+ * This will translate to the following CSS (in reality, class names are auto-generated):
  * 
  * ```css
- * .m123 { backgroundColor: white; }
- * .m123:hover { backgroundColor: grey; }
- * li > .m123 { backgroundColor: yellow; }
- * .m123.m122 { backgroundColor: orange; }
+ * .class2 { backgroundColor: white; }
+ * .class2:hover { backgroundColor: grey; }
+ * li > .class2 { backgroundColor: yellow; }
+ * .class2.class1 { backgroundColor: orange; }
  * ```
  */
 export type CombinedStyleset = Styleset &

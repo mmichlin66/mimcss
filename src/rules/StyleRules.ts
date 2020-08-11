@@ -65,7 +65,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 		for( let propName in inputStyleset)
 		{
-			// skip over already processed parents, important and custom properties
+			// skip over already processed parents and custom properties
 			if (propName === "+" || propName === "--")
 				continue;
 

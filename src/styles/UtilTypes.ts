@@ -20,7 +20,7 @@
  * other proxy functions. This is because we want to distinguish between different CSS types,
  * so that a function used for one CSS type cannot be used for a different CSS type. For
  * example, the `calc()` function returns the NumberProxy function, while the
- * `linearIngradient()` function returns the ImageProxy function. Thus you cannot use the
+ * `gradient.linear()` function returns the ImageProxy function. Thus you cannot use the
  * 'calc()` function for image-based CSS properties and vice versa.
  */
 
