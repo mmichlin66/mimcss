@@ -394,37 +394,76 @@ class RuleSerializationContext implements IRuleSerializationContext
  * rule, the first rule will see the overridden value of the rule when accessed in the
  * post-constructor code.
  */
-export function virtual( target, name: string)
+export function virtual( target: any, name: string)
 {
     // symbol to keep the proxy handler value
     let sym = Symbol(name + "_proxy_handler");
 
-    // we still need to have a regular enumerable property so that RuleContainer can see it.
-    let attrName = "_v_" + name;
     Object.defineProperty( target, name, {
+        enumerable: true,
         get()
         {
-            return this[attrName];
+            // return the proxy from the handler if already exists; if it doesn't that means
+            // our value has not been assigned yet
+            return this[sym]?.proxy;
         },
 
         set(v)
         {
             // check whether we already have the handler and created it if we don't
-            let handler = this[sym];
+            let handler = this[sym] as VirtHandler;
             if (!handler)
                 this[sym] = handler = new VirtHandler();
 
-            // create a new proxy each time because we want the proxy to have the new value.
-            let proxy = new Proxy( v, handler);
-            // handler.proxy = proxy;
+            // depending on the object type we may have a different object to pass to the proxy;
+            // also we need to know whether the object is a special (internal to JavaScript) one
+            // and the handler will have to treat it specially
+            let [newTarget, isSpecial] = getProxiableObject(v);
 
-            // set the new vaule to the handler so that it will use it from now on
-            handler.v = v;
+            // if the assigned value is null or undefined, we dont create a proxy object
+            let proxy = newTarget == null ? newTarget : new Proxy( newTarget, handler);
 
-            // keep the proxy in the regular attribute from which it is read in the get() method
-            this[attrName] = proxy;
+            // set the new vaules to the handler so that it will use it from now on
+            handler.proxy = proxy;
+            handler.target = newTarget;
+            handler.isSpecial = isSpecial;
         }
     });
+}
+
+
+
+/**
+ * For the given value returns a two-element tuple:
+ * - the first element is the value that should be passed to a proxy. For objects, it is the input
+ *   value. For primitive types it is the boxed object (e.g. Number for numbers). For null and
+ *   undefined it is null and undefined respectively
+ * - the second element is the "special" flag, which is true if the proxy handler will have to have
+ *   a special treatment the objects' methods; that is, it will have to bind them to the target
+ *   object before returning them from the get method. This is true for "internal" JavaScript
+ *   classes like boxed primitive types, Map, Set, Promise and some others.
+ */
+function getProxiableObject( v: any): [any, boolean]
+{
+    if (v == null)
+        return [v, false];
+    else if (typeof v === "string")
+        return [new String(v), true];
+    else if (typeof v === "number")
+        return [new Number(v), true];
+    else if (typeof v === "boolean")
+        return [new Boolean(v), true];
+    else if (typeof v === "symbol")
+        return [new Object(v), true];
+    else if (typeof v === "object")
+    {
+        if (v instanceof Map || v instanceof Set || v instanceof Promise)
+            return [v, true];
+        else
+            return [v, false];
+    }
+    else
+        return [v, false];
 }
 
 
@@ -433,21 +472,47 @@ export function virtual( target, name: string)
  * Handler for the proxy created by the `@virtual` decorator. It keeps the current value of a
  * rule so that the most recent value is used whenever the proxy is accessed.
  */
-class VirtHandler
+class VirtHandler implements ProxyHandler<any>
 {
-    // public proxy: any;
-    public v: any;
+    public proxy: any;
+    public target: any;
+    public isSpecial: boolean;
 
+    // interesting things happen in the get method
     get( t: any, p: PropertyKey, r: any): any
     {
-        return this.v[p];
+        // if our value is null or undefined and the requested property is a well-known symbol
+        // toPrimitive we return a function that returns either null or undefined. This will help
+        // if our proxy either participate in an arithmetic expression or or is combined with a
+        // string.
+        if (this.target == null && p === Symbol.toPrimitive)
+            return () => this.target;
+
+        // get the value of the request property; if the value is null or undefined, an exception
+        // will be thrown - which is expected.
+        let pv = Reflect.get( this.target, p, r);
+
+        // if the requested property is a function of a boxed primitive, bind the original method
+        // to the target object
+        return this.isSpecial && typeof pv === "function" ? pv.bind( this.target) : pv;
     }
 
-    set(  t: any, p: PropertyKey, v: any, r: any): boolean
-    {
-        this.v[p] = v;
-        return true;
-    }
+    // the rest of the methods delegate the calls to the latest target instead of the original target
+    getPrototypeOf( t: any): object | null { return Reflect.getPrototypeOf( this.target); }
+    setPrototypeOf(t: any, v: any): boolean { return Reflect.setPrototypeOf( this.target, v); }
+    isExtensible(t: any): boolean { return Reflect.isExtensible( this.target); }
+    preventExtensions(t: any): boolean { return Reflect.preventExtensions( this.target); }
+    getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
+        { return Reflect.getOwnPropertyDescriptor( this.target, p); }
+    has(t: any, p: PropertyKey): boolean { return Reflect.has( this.target, p); }
+    set( t: any, p: PropertyKey, v: any, r: any): boolean { return Reflect.set( this.target, p, v, r); }
+    deleteProperty(t: any, p: PropertyKey): boolean { return Reflect.deleteProperty( this.target, p); }
+    defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
+        { return Reflect.defineProperty( this.target, p, attrs); }
+    enumerate(t: any): PropertyKey[] { return Array.from( Reflect.enumerate( this.target)); }
+    ownKeys(t: any): PropertyKey[] { return Reflect.ownKeys( this.target); }
+    apply(t: any, thisArg: any, args?: any): any { return this.target.apply( this, args); }
+    construct(t: any, args: any, newTarget?: any): object { return Reflect.construct( this.target, args, newTarget); }
 }
 
 
