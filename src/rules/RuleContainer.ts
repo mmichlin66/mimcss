@@ -481,11 +481,11 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
 	{
 		// check if the base class already has an associated instance; if yes, check whether
 		// it hase a property with the given rule name. If yes, then use this rule's already
-		// generated name (if exists).
+        // generated name (if exists).
 		if (baseClass.hasOwnProperty(symInstance))
 		{
-			let baseInst = baseClass[symInstance];
-			if (baseInst && ruleName in baseInst && "name" in baseInst[ruleName])
+            let baseInst = baseClass[symInstance];
+			if (baseInst &&  baseInst[ruleName] != null && "name" in baseInst[ruleName])
 				return baseInst[ruleName].name;
 		}
 	}

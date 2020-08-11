@@ -1,6 +1,7 @@
 {
 	"mode": "modules",
-	"readme": "none",
+    "readme": "none",
+    "name": "Mimcss Reference",
 	"excludeExternals": true,
 	"excludeNotExported": true,
     "excludePrivate": true,

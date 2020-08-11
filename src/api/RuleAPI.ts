@@ -402,28 +402,34 @@ export function virtual( target: any, name: string)
         enumerable: true,
         get()
         {
-            // return the proxy from the handler if already exists; if it doesn't that means
-            // our value has not been assigned yet
-            return this[sym]?.proxy;
+            // check whether we already have the handler and create it if we don't. In this
+            // case we also create a proxy for an empty object
+            let handler = this[sym] as VirtHandler;
+            if (!handler)
+            {
+                this[sym] = handler = new VirtHandler();
+                handler.proxy = new Proxy( {}, handler);
+            }
+
+            return handler.proxy;
         },
 
         set(v)
         {
-            // check whether we already have the handler and created it if we don't
-            let handler = this[sym] as VirtHandler;
-            if (!handler)
-                this[sym] = handler = new VirtHandler();
-
             // depending on the object type we may have a different object to pass to the proxy;
             // also we need to know whether the object is a special (internal to JavaScript) one
             // and the handler will have to treat it specially
             let [newTarget, isSpecial] = getProxiableObject(v);
 
-            // if the assigned value is null or undefined, we dont create a proxy object
-            let proxy = newTarget == null ? newTarget : new Proxy( newTarget, handler);
+            // check whether we already have the handler and create it if we don't
+            let handler = this[sym] as VirtHandler;
+            if (!handler)
+            {
+                this[sym] = handler = new VirtHandler();
+                handler.proxy = newTarget == null ? {} : new Proxy( newTarget, handler);
+            }
 
             // set the new vaules to the handler so that it will use it from now on
-            handler.proxy = proxy;
             handler.target = newTarget;
             handler.isSpecial = isSpecial;
         }
@@ -454,13 +460,8 @@ function getProxiableObject( v: any): [any, boolean]
         return [new Boolean(v), true];
     else if (typeof v === "symbol")
         return [new Object(v), true];
-    else if (typeof v === "object")
-    {
-        if (v instanceof Map || v instanceof Set || v instanceof Promise)
-            return [v, true];
-        else
-            return [v, false];
-    }
+    else if (typeof v === "object" && (v instanceof Map || v instanceof Set))
+        return [v, true];
     else
         return [v, false];
 }
@@ -496,22 +497,36 @@ class VirtHandler implements ProxyHandler<any>
         return this.isSpecial && typeof pv === "function" ? pv.bind( this.target) : pv;
     }
 
-    // the rest of the methods delegate the calls to the latest target instead of the original target
-    getPrototypeOf( t: any): object | null { return Reflect.getPrototypeOf( this.target); }
-    setPrototypeOf(t: any, v: any): boolean { return Reflect.setPrototypeOf( this.target, v); }
-    isExtensible(t: any): boolean { return Reflect.isExtensible( this.target); }
-    preventExtensions(t: any): boolean { return Reflect.preventExtensions( this.target); }
+    // the rest of the methods mostly delegate the calls to the latest target instead of the
+    // original target. In some cases, we check whether the target is null or undefined so that
+    // we don'tthrow exceptions wher we can avoid it.
+
+    getPrototypeOf( t: any): object | null
+        { return this.target == null ? null : Reflect.getPrototypeOf( this.target); }
+    setPrototypeOf(t: any, v: any): boolean
+        { return Reflect.setPrototypeOf( this.target, v); }
+    isExtensible(t: any): boolean
+        { return this.target == null ? false : Reflect.isExtensible( this.target); }
+    preventExtensions(t: any): boolean
+        { return this.target == null ? false : Reflect.preventExtensions( this.target); }
     getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
         { return Reflect.getOwnPropertyDescriptor( this.target, p); }
-    has(t: any, p: PropertyKey): boolean { return Reflect.has( this.target, p); }
-    set( t: any, p: PropertyKey, v: any, r: any): boolean { return Reflect.set( this.target, p, v, r); }
-    deleteProperty(t: any, p: PropertyKey): boolean { return Reflect.deleteProperty( this.target, p); }
+    has(t: any, p: PropertyKey): boolean
+        { return this.target == null ? false : Reflect.has( this.target, p); }
+    set( t: any, p: PropertyKey, v: any, r: any): boolean
+        { return Reflect.set( this.target, p, v, r); }
+    deleteProperty(t: any, p: PropertyKey): boolean
+        { return Reflect.deleteProperty( this.target, p); }
     defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
         { return Reflect.defineProperty( this.target, p, attrs); }
-    enumerate(t: any): PropertyKey[] { return Array.from( Reflect.enumerate( this.target)); }
-    ownKeys(t: any): PropertyKey[] { return Reflect.ownKeys( this.target); }
-    apply(t: any, thisArg: any, args?: any): any { return this.target.apply( this, args); }
-    construct(t: any, args: any, newTarget?: any): object { return Reflect.construct( this.target, args, newTarget); }
+    enumerate(t: any): PropertyKey[]
+        { return Array.from( Reflect.enumerate( this.target)); }
+    ownKeys(t: any): PropertyKey[]
+        { return Reflect.ownKeys( this.target); }
+    apply(t: any, thisArg: any, args?: any): any
+        { return this.target.apply( this, args); }
+    construct(t: any, args: any, newTarget?: any): object
+        { return Reflect.construct( this.target, args, newTarget); }
 }
 
 

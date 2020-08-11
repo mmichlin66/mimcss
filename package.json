@@ -9,7 +9,8 @@
 	"types": "./lib/mimcssTypes.d.ts",
 	"scripts": {
 		"build": "tsc -b && webpack",
-		"build-tests": "tsc -b && webpack --config src/test/webpack.config.js"
+		"build-tests": "tsc -b && webpack --config src/test/webpack.config.js",
+		"typedoc": "typedoc"
 	},
 	"author": {
 		"name": "Michael Michlin",
