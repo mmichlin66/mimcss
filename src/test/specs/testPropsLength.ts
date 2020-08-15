@@ -1,4 +1,4 @@
-import * as css from "../../mimcssTypes"
+import * as css from "../../index"
 import * as dom from "../utils/dom"
 
 

@@ -1,4 +1,4 @@
-import * as css from "../../mimcssTypes"
+import * as css from "../../index"
 import {Styleset} from "../../styles/StyleTypes";
 import {camelToDash} from "../../styles/UtilFuncs";
 

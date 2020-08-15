@@ -13,7 +13,7 @@
 		"experimentalDecorators": true,
 		"preserveConstEnums": false,
         "noEmitOnError": true,
-        "module": "CommonJS",
+        "module": "ESNext",
         "moduleResolution": "node",
 		"target": "ES2017",
 		"lib": [ "ES2017", "dom" ],
