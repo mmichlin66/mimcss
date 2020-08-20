@@ -231,15 +231,45 @@ export function enableShortNames( enable: boolean, prefix?: string): void
 
 
 /**
+ * Type for defining the class property of HTML elements.
+ */				
+export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType[];
+
+/**
  * Concatenates the names of the given classes into a single string that can be assigned to a
  * `class` property of an HTML element.
- * @param classes
+ * @param classProps
  */
-export function classes( ...classes: (IClassRule | IClassNameRule | string)[]): string
+export function classes( ...classProps: ClassPropType[]): string
 {
-	return val2str( classes, {
-		arrItemFunc: v => v instanceof ClassRule ? v.name : val2str(v)
+	return val2str( classProps, {
+		arrItemFunc: v => v instanceof ClassRule ? v.name : classes(v)
 	});
+}
+
+/**
+ * Chooses the first non-null name from the given list of classes.
+ * @param classProps
+ */
+export function chooseClass( ...classProps: ClassPropType[]): string | null
+{
+    for( let cls of classProps)
+    {
+        if (!cls)
+            continue;
+        else if (typeof cls === "string")
+            return cls;
+        else if (Array.isArray(cls))
+        {
+            let name = chooseClass( cls);
+            if (name)
+                return name;
+        }
+        else if (cls.name)
+            return cls.name;
+    }
+
+	return null;
 }
 
 
