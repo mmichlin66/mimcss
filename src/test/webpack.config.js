@@ -1,3 +1,5 @@
+const CopyPlugin = require('copy-webpack-plugin');
+
 module.exports =
 [
     // development
@@ -33,5 +35,17 @@ module.exports =
                 { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
             ]
         },
+
+        plugins: [
+            new CopyPlugin({
+                patterns: [
+                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine_favicon.png" },
+                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine.css" },
+                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine.js" },
+                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine-html.js" },
+                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/boot.js" },
+                ],
+            })
+        ],
     }
 ];

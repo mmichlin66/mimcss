@@ -26,6 +26,7 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@types/jasmine": "^3.5.12",
+		"copy-webpack-plugin": "^6.0.3",
 		"ifdef-loader": "^2.1.5",
 		"source-map-loader": "^0.2.4",
 		"typescript": "^3.9.7",
