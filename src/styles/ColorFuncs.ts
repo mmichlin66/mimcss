@@ -62,7 +62,7 @@ function colorNumberToString( val: number): string
  *   - Floating number -1.0 to 1.0 non-inclusive, which is multiplied by 100 treated as percentage.
  *     Floating numbers beyond this range will be rounded and treated as integer numbers. Negative
  *     numbers will be inverted.
- * 
+ *
  * @param c Color separation value.
  */
 function separationToString( c: number): string
@@ -112,7 +112,7 @@ function alphaToString( a?: number): string
         a = -a;
 
     // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
-    // is greater than 100, set it to 1; otherwise, 
+    // is greater than 100, set it to 1; otherwise,
     return (a > 100 ? 1 : a > 1 ? a / 100 : a).toFixed(2);
 }
 
@@ -127,13 +127,13 @@ function alphaToString( a?: number): string
  *   - Floating number -1.0 to 1.0 non-inclusive, which is multiplied by 100 treated as percentage.
  *     Floating numbers beyond this range will be rounded and treated as integer numbers. Negative
  *     numbers will be inverted.
- * 
+ *
  * The alpha mask can be one of the following:
  *   - Floating number 0 to 1 inclusive.
  *   - Integer or floating number 1 to 100, which is divided by 100. Floating numbers will be
  *     rounded. Numbers beyond this range will be clamped.
  *   - The sign of alpha is ignored; that is, only the absolute value is considered.
- * 
+ *
  * @param r Red separation value.
  * @param g Green separation value.
  * @param b Blue separation value.
@@ -160,7 +160,7 @@ function colorPercentToString( n: number): string
         n = -n;
 
     // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
-    // is greater than 100, clamp it. 
+    // is greater than 100, clamp it.
     return (n > 100 ? 100 : Math.round(n <= 1 ? n * 100 : n)).toString() + "%";
 }
 
@@ -170,9 +170,9 @@ function colorPercentToString( n: number): string
  * Converts the color specified as hue-saturation-lightness components and an optional alpha
  * mask to a CSS color representation. This method should be used when defining CSS color
  * values in styleset properties.
- * 
+ *
  * The Hue component is treated as the CSS `<angle>` type. Numbers are considered degrees.
- * 
+ *
  * The Saturation and Lightness components are treated as percentages:
  *   - The sign is ignored; that is, only the absolute value is considered.
  *   - Floating number 0 to 1 inclusive are multiplied by 100 and treated as percentage.
@@ -184,7 +184,7 @@ function colorPercentToString( n: number): string
  *   - Integer or floating number 1 to 100, which is divided by 100. Floating numbers will be
  *     rounded. Numbers beyond this range will be clamped.
  *   - The sign of alpha is ignored; that is, only the absolute value is considered.
- * 
+ *
  * @param h Hue component as an angle value.
  * @param s Saturation component as a percentage value.
  * @param l Lightness component as a percentage value.
@@ -200,15 +200,15 @@ export function hslToString( h: number | string, s: number, l: number, a?: numbe
 /**
  * Converts the given color and the alpha mask to the CSS Color representation. This
  * method should be used when defining CSS color values in styleset properties.
- * 
+ *
  * The color can be specified as a numeric value or as a string color name.
- * 
+ *
  * The alpha mask is specified as a number:
  *   - The sign is ignored; that is, only the absolute value is considered.
  *   - Number 0 to 1 inclusive, which is treated as percentage.
  *   - Number 1 to 100 inclusive, which is treated as percentage.
  *   - Numbers greater than 100 are clamped to 100;
- * 
+ *
  * @param c Color value as either a number or a named color
  * @param a Alpha channel value
  */
@@ -222,7 +222,7 @@ export function colorWithAlphaToString( c: number | keyof INamedColors, a: numbe
     // string that we cannot find in the Colors object, return pure white.
     let n = typeof c === "string" ? Colors[c] : c;
     if (n == null)
-        return "FFF";
+        return "#FFF";
 
     // negative and positive values of alpha are treated identically, so convert to positive
     if (a < 0)
@@ -233,7 +233,7 @@ export function colorWithAlphaToString( c: number | keyof INamedColors, a: numbe
     a = a === 1 || a >= 100 ? 0 : a > 1 ? a / 100 : a;
 
     // make the new alpha
-    return colorNumberToString( n > 0 ? n + a : n - a);
+    return colorNumberToString( n >= 0 ? n + a : n - a);
 }
 
 
