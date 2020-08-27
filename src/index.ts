@@ -2,7 +2,6 @@
 
 export * from "./styles/UtilTypes";
 export * from "./styles/ColorTypes";
-export * from "./styles/ImageTypes";
 export * from "./styles/StyleTypes";
 export * from "./styles/SelectorTypes";
 export * from "./styles/MediaTypes";

@@ -266,7 +266,7 @@ function calcFunc<T extends string>( parts: TemplateStringsArray, params: Extend
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
  */
-class NumberBaseMath<T extends string> implements INumberBaseMath<T>
+class NumberBaseMath<T extends string = any> implements INumberBaseMath<T>
 {
     constructor( protected convertFunc: ConvertNumberFuncType)
     {
@@ -314,7 +314,7 @@ class NumberBaseMath<T extends string> implements INumberBaseMath<T>
  * The INumberMathClass interface represents a "static" side of classes derived from the
  * NumberMath class.
  */
-export interface INumberBaseMathClass<T extends string>
+export interface INumberBaseMathClass<T extends string = any>
 {
     convertFunc( n: number): string;
 

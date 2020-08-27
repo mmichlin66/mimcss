@@ -5,7 +5,6 @@
     CssPoint, ExtendedProp, IGenericProxy, CssLengthPair, IQuotedProxy
 } from "./UtilTypes"
 import {CssColor} from "./ColorTypes"
-import {CssImage} from "./ImageTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "../rules/RuleTypes";
 
@@ -435,7 +434,7 @@ export type ColumnSpan_StyleType = "none" | "all";
 /**
  * Type for columns style property. The value can be provided in one of the following forms and
  * and will be converted to string as follows:
- * 
+ *
  * - string: will be treated as is.
  * - number: will be converted to a unitless number - count of columns.
  * - ILengthProxy (e.g. px(8)): converted to a number with the proper length units.
@@ -498,7 +497,7 @@ export type Display_StyleType = "block" | "inline" | "run-in" | "contents" | "no
     "list-item" | "list-item block" | "list-item inline" | "list-item flow" | "list-item flow-root" |
         "list-item block flow" | "list-item block flow-root" | "flow list-item block";
 
-                
+
 
 /** Type for dominant-baseline style property */
 export type DominantBaseline_StyleType = "auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
@@ -995,7 +994,7 @@ export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecora
 
 /** Type for the text-decoration-line style property */
 export type TextDecorationLine_StyleType = "none" | "spelling-error" | "grammar-error" |
-    OneOrMany<"underline" | "overline" | "line-through">; 
+    OneOrMany<"underline" | "overline" | "line-through">;
 
 
 
@@ -1225,6 +1224,21 @@ export type DefaultStyleType = string;
 // Proxy types.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The ImageProxy interface represents an invocation of one of CSS functions that are used for
+ * secifying images. This interface is returned from functions like: [[linearGradient]],
+ * [[crossFade]] and others.
+ */
+export interface IImageProxy extends IGenericProxy<"image"> {};
+
+/**
+ * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
+ * Image can be specified either using the [[url]] function that returns the [[IUrlProxy]]
+ * interface or any of the functions that return the [[IImageProxy]] interface such as
+ * [[linearGradient]], [[crossFade]] and others.
+ */
+export type CssImage = IUrlProxy | IImageProxy;
 
 /**
  * The IFilterProxy function represents an invocation of one the CSS `<filter>` functions.
@@ -1917,27 +1931,27 @@ export type VarValueType<K extends VarTemplateName> = VarTemplates[K];
  * The CustomVarStyleType type represents a custom CSS property name and value that are used to
  * define custom properties in a Styleset. This object is used in conjunction with the
  * `--` property of the Styleset type.
- * 
+ *
  * CustomVarStyleType objects should be mostly used to override custom properties that have
  * previously been defined at the top-level using the $var function. That way you can have a
  * "global" value of a custom property and assign a different value to it under a certain CSS
  * selector.
- * 
+ *
  * The values of the type can be specified as either a two-item or a three-item array. The
  * two-item array is used with a previously defined custom CSS property represented by an IVarRule
  * object:
  * - The first item is the IVarRule object.
  * - The second item is the value
- * 
+ *
  * The three-item array allows directly specifying the custom CSS property name:
  * - The first item is a string - the name of the custom CSS property. If the name is not prefixed
  * with two dashes they will be added automatically.
  * - The second item is the name of a non-custom CSS property whose type determines the type of the
  * custom property value.
  * - The third item is the value
- * 
+ *
  * Use the CustomVarStyleType type in the following manner:
- * 
+ *
  * ```typescript
  * class MyStyles extends StyleDefinition
  * {
@@ -1949,16 +1963,16 @@ export type VarValueType<K extends VarTemplateName> = VarTemplates[K];
  *     blue = $class({ "--": [ ["different-color", "color", "blue"] ] })
  * });
  * ```
- * 
+ *
  * This is equivalent to the following CSS:
- * 
+ *
  * ```css
  * :root { --MyStyles_mainColor: "black"; }
  * .brown { --MyStyles_mainColor: "brown"; }
  * .blue { --different-olor: "blue"; }
  * ```
  */
-export type CustomVar_StyleType<K extends VarTemplateName = any> = 
+export type CustomVar_StyleType<K extends VarTemplateName = any> =
     [IVarRule<K>, VarValueType<K>] | [string, K, VarValueType<K>]
 
 
@@ -1989,7 +2003,7 @@ export type Styleset = ExtendedStyleset &
  * Type representing a single set of styles as part of the @supports rules. The styles in the
  * styleset are combined with the "and" operator. The entire styleset can be negated, which will
  * result in placing the "not" operator that will act on all styles in the query.
- * 
+ *
  * Note that using PureStyleset object doesn't allow for checking whether two or more values of
  * a given property are supported. For example, although we can test that the "display" property
  * supports the "flex" value, we cannot check whether both "flex" and "grid" values are supported.

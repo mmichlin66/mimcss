@@ -38,7 +38,6 @@
 		"lib/index.d.ts",
 		"lib/styles/UtilTypes.d.ts",
 		"lib/styles/ColorTypes.d.ts",
-		"lib/styles/ImageTypes.d.ts",
 		"lib/styles/StyleTypes.d.ts",
 		"lib/styles/SelectorTypes.d.ts",
 		"lib/styles/MediaTypes.d.ts",

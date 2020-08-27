@@ -15,7 +15,7 @@ import {stylePropToString} from "../styles/StyleFuncs";
 
 
 /**
- * The Num object contains static methods that implement CSS mathematic functions on the `<number>`
+ * The Num object contains methods that implement CSS mathematic functions on the `<number>`
  * CSS type. When arguments for these functions are of the number JavaScript type they are
  * converted to strings without appending any units to them.
  */
@@ -24,7 +24,7 @@ export let Num: ICssNumberMath = new CssNumberMath();
 
 
 /**
- * The Percent object contains static methods that implement CSS mathematic functions on the
+ * The Percent object contains methods that implement CSS mathematic functions on the
  * `<percentage>` CSS type by appending a "%" unit suffix.
  */
 export let Percent: ICssPercentMath = new CssPercentMath();
@@ -37,7 +37,7 @@ export function percent( n: number): IPercentProxy { return () => n + "%"; }
 
 
 /**
- * The Len object contains static methods that implement CSS mathematic functions on the `<length>`
+ * The Len object contains methods that implement CSS mathematic functions on the `<length>`
  * CSS type by appending a length unit suffix.
  * Integer numbers use "px"; floating point numbers use "em".
  */
@@ -112,7 +112,7 @@ export function fr( n: number): ILengthProxy { return () => n + "fr"; }
 
 
 /**
- * The Angle object contains static methods that implement CSS mathematic functions on the `<angle>`
+ * The Angle object contains methods that implement CSS mathematic functions on the `<angle>`
  * CSS type by appending an angle unit suffix.
  * Integer numbers use "deg"; floating point numbers use "turn".
  */
@@ -135,7 +135,7 @@ export function turn( n: number): IAngleProxy { return () => n + "turn"; }
 
 
 /**
- * The Time object contains static methods that implement CSS mathematic functions on the `<time>`
+ * The Time object contains methods that implement CSS mathematic functions on the `<time>`
  * CSS type by appending a time unit suffix.
  * Integer numbers use "ms"; floating point numbers use "s".
  */
@@ -151,7 +151,7 @@ export function s( n: number): ITimeProxy { return () => n + "s"; }
 
 
 /**
- * The Resolution object contains static methods that implement CSS mathematic functions on the
+ * The Resolution object contains methods that implement CSS mathematic functions on the
  * `<resolution>` CSS type by appending a resolution unit suffix.
  * Integer numbers use "dpi"; floating point numbers use "dpcm".
  */
@@ -174,7 +174,7 @@ export function x( n: number): IResolutionProxy { return () => n + "x"; }
 
 
 /**
- * The Frequency object contains static methods that implement CSS mathematic functions on the
+ * The Frequency object contains methods that implement CSS mathematic functions on the
  * `<frequency>` CSS type by appending a frequency unit suffix.
  * Integer numbers use "Hz"; floating point numbers use "kHz".
  */
@@ -190,18 +190,25 @@ export function khz( n: number): IFrequencyProxy { return () => n + "khz"; }
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// utility functions
+// Utility functions
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns a function encapsulating the given string-like parameter. This function
- * allows specifying arbitrary text for properties whose type normally doesn't allow strings.
- * This is used as an "escape hatch" when a string value already exists and there is no sense
- * to convert it to a proper type. This function is a tag function and must be invoked with
- * the template string without parentheses.
+ * The `raw` function allows specifying arbitrary text for properties whose type normally doesn't
+ * allow strings.This function is a tag function and must be invoked with the template string
+ * without parentheses. The `raw` function can be used for any style property. Note, however, that
+ * no validation checks are performed on the structure of the template. If the resulting string
+ * isn't valid for the style property, the property will not be come part of the style rule
+ * inserted into the DOM.
+ *
+ * **Example**
+ *
+ * ```typescript
+ * clip-path: raw`polygon(50% 20%, 90% 80%, 10% 80%)`
+ * ```
  */
 export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProxy
 {
