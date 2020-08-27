@@ -1,5 +1,5 @@
 import * as css from "../../index"
-import {Styleset} from "../../styles/StyleTypes";
+import {Styleset} from "../../api/StyleTypes";
 import {camelToDash} from "../../styles/UtilFuncs";
 
 

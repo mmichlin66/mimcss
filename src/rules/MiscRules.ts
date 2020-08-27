@@ -1,13 +1,13 @@
-import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "./RuleTypes";
-import {IFontFace} from "../styles/FontFaceTypes"
+import {PagePseudoClass} from "../api/BasicTypes";
+import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "../api/RuleTypes";
+import {SupportsQuery, Styleset} from "../api/StyleTypes";
+import {IFontFace} from "../api/FontFaceAPI"
 import {fontFaceToString} from "../styles/FontFaceFuncs"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
-import {MediaQuery} from "../styles/MediaTypes";
-import {SupportsQuery, Styleset} from "../styles/StyleTypes";
+import {MediaQuery} from "../api/MediaAPI";
 import {supportsQueryToString} from "../styles/StyleFuncs";
 import {mediaQueryToString} from "../styles/MediaFuncs";
 import {StyleRule} from "./StyleRules";
-import {PagePseudoClass} from "../styles/SelectorTypes";
 
 
 
@@ -207,6 +207,14 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 		this.classes = classes;
 	}
 
+	/** CSS rule selector string */
+	public get selectorText(): string
+	{
+		return this.cssClassName;
+	}
+
+
+
 	// Creates a copy of the rule.
 	public clone(): ClassNameRule
 	{
@@ -241,7 +249,7 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 
     /** All class names concatenated with space */
     public name: string;
-    
+
     /** All class CSS names (with dots) concatenated together */
     public cssClassName: string;
 

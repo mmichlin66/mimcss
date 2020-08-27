@@ -2,11 +2,12 @@
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
     CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, CssFrequency,
     CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword, VerticalPositionKeyword,
-    CssPoint, ExtendedProp, IGenericProxy, CssLengthPair, IQuotedProxy
-} from "./UtilTypes"
-import {CssColor} from "./ColorTypes"
-import {FontStretch_Single} from "./FontFaceTypes";
-import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "../rules/RuleTypes";
+    CssPoint, ExtendedProp, CssLengthPair, IQuotedProxy, CssColor, CssImage, BasicShape,
+    GeometryBoxKeyword, IFilterProxy, IMinMaxProxy, IFitContentProxy, IRepeatProxy, ISpanProxy,
+    IRayProxy, ITransformProxy
+} from "./BasicTypes"
+import {FontStretch_Single} from "./FontFaceAPI";
+import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
 
 
 
@@ -379,19 +380,6 @@ export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start
 
 /** Type for clip style property */
 export type Clip_StyleType = "auto" | CssLengthBox;
-
-
-
-/** Type used for several properties */
-export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
-    "fill-box" | "stroke-box" | "view-box";
-
-
-
-/**
- * Type representing extent for the `radial-gradient()` or `ray()` CSS function.
- */
-export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
 
 
 
@@ -1216,146 +1204,6 @@ export type Zoom_StyleType = "normal" | "reset" | CssPercent;
 
 /** Type for style properties for which there is no special type defined. */
 export type DefaultStyleType = string;
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Proxy types.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The ImageProxy interface represents an invocation of one of CSS functions that are used for
- * secifying images. This interface is returned from functions like: [[linearGradient]],
- * [[crossFade]] and others.
- */
-export interface IImageProxy extends IGenericProxy<"image"> {};
-
-/**
- * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
- * Image can be specified either using the [[url]] function that returns the [[IUrlProxy]]
- * interface or any of the functions that return the [[IImageProxy]] interface such as
- * [[linearGradient]], [[crossFade]] and others.
- */
-export type CssImage = IUrlProxy | IImageProxy;
-
-/**
- * The IFilterProxy function represents an invocation of one the CSS `<filter>` functions.
- */
-export interface IFilterProxy extends IGenericProxy<"filter"> {};
-
-/**
- * The IBasicShapeProxy function represents an invocation of one the CSS `<basic-shape>` functions
- * except the `path()` function.
- */
-export interface IBasicShapeProxy extends IGenericProxy<"basic-shape"> {};
-
-/**
- * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions including
- * the `path()` function.
- */
-export type BasicShape = IBasicShapeProxy | IPathBuilder;
-
-/**
- * The IRayProxy function represents an invocation of one the CSS `ray()` functions.
- */
-export interface IRayProxy extends IGenericProxy<"ray"> {};
-
-/**
- * The ITransformProxy function represents an invocation of one the CSS `<basic-shape>` functions.
- */
-export interface ITransformProxy extends IGenericProxy<"transform"> {};
-
-/**
- * The IMinMaxProxy function represents an invocation of the minmax() function
- */
-export interface IMinMaxProxy extends IGenericProxy<"minmax"> {}
-
-/**
- * The IFitContentProxy function represents an invocation of the fit-content() function
- */
-export interface IFitContentProxy extends IGenericProxy<"fit-content"> {}
-
-/**
- * The IRepeatProxy function represents an invocation of the repeat() function
- */
-export interface IRepeatProxy extends IGenericProxy<"repeat"> {}
-
-/**
- * The ISpanProxy function produces the span expression for grid layouts
- */
-export interface ISpanProxy extends IGenericProxy<"span"> {}
-
-
-
-/**
- * The IPathBuilder interface represents the object that accumulates path commands that are then
- * converted to a string parameter of the CSS `path()` function.
- */
-export interface IPathBuilder
-{
-    // Move-to command with absolute coordinates.
-    M( first: [number,number], ...next: [number,number][]): IPathBuilder;
-
-    // Move-to command with relative coordinates.
-    m( first: [number,number], ...next: [number,number][]): IPathBuilder;
-
-    // Line-to command with absolute coordinates.
-	L( first: [number,number], ...next: [number,number][]): IPathBuilder;
-
-    // Line-to command with relative coordinates.
-    l( first: [number,number], ...next: [number,number][]): IPathBuilder;
-
-    // Horizontal line-to command with absolute coordinates.
-	H( first: number, ...next: number[]): IPathBuilder;
-
-    // Horizontal line-to command with relative coordinates.
-    h( first: number, ...next: number[]): IPathBuilder;
-
-    // Vertical line-to command with absolute coordinates.
-	V( first: number, ...next: number[]): IPathBuilder;
-
-    // Vertical line-to command with relative coordinates.
-    v( first: number, ...next: number[]): IPathBuilder;
-
-    // Cubic bezier curve command with absolute coordinates.
-	C( first: [number,number,number,number,number,number],
-		...next: [number,number,number,number,number,number][]): IPathBuilder;
-
-    // Cubic bezier curve command with relative coordinates.
-	c( first: [number,number,number,number,number,number],
-		...next: [number,number,number,number,number,number][]): IPathBuilder;
-
-    // Smooth cubic bezier curve command with absolute coordinates.
-	S( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
-
-    // Smooth cubic bezier curve command with relative coordinates.
-	s( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
-
-    // Quadratic bezier curve command with absolute coordinates.
-	Q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
-
-    // Quadratic bezier curve command with relative coordinates.
-	q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
-
-    // Smooth quadratic bezier curve command with absolute coordinates.
-	T( first: [number,number], ...next: [number,number][]): IPathBuilder;
-
-    // Smooth quadratic bezier curve command with relative coordinates.
-	t( first: [number,number], ...next: [number,number][]): IPathBuilder;
-
-    // Elliptical arc curve command with absolute coordinates.
-	A( first: [number,number,number,0|1,0|1,number,number],
-		...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
-
-    // Elliptical arc curve command with relative coordinates.
-	a( first: [number,number,number,0|1,0|1,number,number],
-		...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
-
-    // Close-path command.
-    z(): IPathBuilder;
-}
 
 
 

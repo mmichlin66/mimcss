@@ -1,6 +1,5 @@
-﻿import {INamedColors, CssColor, Colors} from "./ColorTypes"
-import {CssAngleMath, val2str} from "./UtilFuncs"
-import {Extended} from "./UtilTypes";
+﻿import {INamedColors, CssColor, Colors, Extended} from "../api/BasicTypes"
+import {AngleMath, val2str} from "./UtilFuncs"
 
 
 
@@ -192,7 +191,7 @@ function colorPercentToString( n: number): string
  */
 export function hslToString( h: number | string, s: number, l: number, a?: number): string
 {
-    return `hsla(${CssAngleMath.styleToString(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
+    return `hsla(${AngleMath.styleToString(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
 }
 
 

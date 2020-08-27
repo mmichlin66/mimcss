@@ -1,5 +1,5 @@
-import {IVarRule} from "./RuleTypes"
-import {VarValueType, VarTemplateName} from "../styles/StyleTypes"
+import {IVarRule} from "../api/RuleTypes"
+import {VarValueType, VarTemplateName} from "../api/StyleTypes"
 import {stylePropToString} from "../styles/StyleFuncs"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
@@ -10,7 +10,7 @@ import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./R
  * class because it is not a real CSS rule; however, in many aspects it repeats the Rule's
  * functionality. In particular it has the process function that allows it to obtain an actual
  * name, which will be used when defining and using this custom property in CSS.
- * 
+ *
  * Note that while the type parameter K is a key of the ICssStyleset interface, the value is of
  * type IStileset[K], which is Extended<ICssStyleset[K]>. This allows specifying values that are
  * valid for the Extended roperty type.
@@ -76,7 +76,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	}
 
 
-	
+
 	// // Name of the property of the stylesheet definition to which this rule was assigned. This is
 	// // null for Stylesheet.
 	// public ruleName: string;

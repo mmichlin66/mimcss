@@ -403,7 +403,7 @@ In CSS, there is a list of pre-defined colors, which can be specified by names. 
 
 ```tsx
 // Some TypeScript trickery to "extend" the INamedColors interface with your own name
-declare module "mimcss/lib/styles/ColorTypes"
+declare module "mimcss/lib/api/BasicTypes"
 {
     interface INamedColors
     {

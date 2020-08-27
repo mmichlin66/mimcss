@@ -1,4 +1,4 @@
-import {ICounterRule} from "./RuleTypes"
+import {ICounterRule} from "../api/RuleTypes"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 

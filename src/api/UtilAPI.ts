@@ -1,15 +1,15 @@
 ﻿import {
-	ICssNumberMath, ICssLengthMath, ICssAngleMath, ICssTimeMath, ICssResolutionMath,
-    ICssFrequencyMath, ICssPercentMath, Extended, IStringProxy, IUrlProxy,
+	INumberMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath,
+    IFrequencyMath, IPercentMath, Extended, IStringProxy, IUrlProxy,
     AttrTypeKeyword, AttrUnitKeyword, ILengthProxy, IPercentProxy, IAngleProxy,
     ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy
-} from "../styles/UtilTypes"
+} from "../api/BasicTypes"
+import {IVarRule, ICounterRule, IIDRule} from "./RuleTypes";
+import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "./StyleTypes";
 import {
-	CssNumberMath, CssLengthMath, CssAngleMath, CssTimeMath, CssResolutionMath,
-	CssFrequencyMath, CssPercentMath, val2str, templateStringToString
+	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath,
+	FrequencyMath, PercentMath, val2str, templateStringToString
 } from "../styles/UtilFuncs"
-import {IVarRule, ICounterRule, IIDRule} from "../rules/RuleTypes";
-import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "../styles/StyleTypes";
 import {stylePropToString} from "../styles/StyleFuncs";
 
 
@@ -19,7 +19,7 @@ import {stylePropToString} from "../styles/StyleFuncs";
  * CSS type. When arguments for these functions are of the number JavaScript type they are
  * converted to strings without appending any units to them.
  */
-export let Num: ICssNumberMath = new CssNumberMath();
+export let Num: INumberMath = new NumberMath();
 
 
 
@@ -27,7 +27,7 @@ export let Num: ICssNumberMath = new CssNumberMath();
  * The Percent object contains methods that implement CSS mathematic functions on the
  * `<percentage>` CSS type by appending a "%" unit suffix.
  */
-export let Percent: ICssPercentMath = new CssPercentMath();
+export let Percent: IPercentMath = new PercentMath();
 
 
 
@@ -41,7 +41,7 @@ export function percent( n: number): IPercentProxy { return () => n + "%"; }
  * CSS type by appending a length unit suffix.
  * Integer numbers use "px"; floating point numbers use "em".
  */
-export let Len: ICssLengthMath = new CssLengthMath();
+export let Len: ILengthMath = new LengthMath();
 
 
 
@@ -116,7 +116,7 @@ export function fr( n: number): ILengthProxy { return () => n + "fr"; }
  * CSS type by appending an angle unit suffix.
  * Integer numbers use "deg"; floating point numbers use "turn".
  */
-export let Angle: ICssAngleMath = new CssAngleMath();
+export let Angle: IAngleMath = new AngleMath();
 
 
 
@@ -139,7 +139,7 @@ export function turn( n: number): IAngleProxy { return () => n + "turn"; }
  * CSS type by appending a time unit suffix.
  * Integer numbers use "ms"; floating point numbers use "s".
  */
-export let Time: ICssTimeMath = new CssTimeMath();
+export let Time: ITimeMath = new TimeMath();
 
 
 
@@ -155,7 +155,7 @@ export function s( n: number): ITimeProxy { return () => n + "s"; }
  * `<resolution>` CSS type by appending a resolution unit suffix.
  * Integer numbers use "dpi"; floating point numbers use "dpcm".
  */
-export let Resolution: ICssResolutionMath = new CssResolutionMath();
+export let Resolution: IResolutionMath = new ResolutionMath();
 
 
 
@@ -178,7 +178,7 @@ export function x( n: number): IResolutionProxy { return () => n + "x"; }
  * `<frequency>` CSS type by appending a frequency unit suffix.
  * Integer numbers use "Hz"; floating point numbers use "kHz".
  */
-export let Frequency: ICssFrequencyMath = new CssFrequencyMath();
+export let Frequency: IFrequencyMath = new FrequencyMath();
 
 
 

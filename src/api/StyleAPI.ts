@@ -1,19 +1,23 @@
-﻿import {Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, CssPoint} from "../styles/UtilTypes"
-import {CssColor} from "../styles/ColorTypes"
-import {SelectorItem, ISelectorProxy} from "../styles/SelectorTypes";
+﻿import {
+    Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, CssPoint, CssColor,
+    SelectorItem, ISelectorProxy, IFilterProxy, IBasicShapeProxy, IPathBuilder, IRayProxy,
+    IFitContentProxy, IRepeatProxy, IMinMaxProxy, ITransformProxy, ISpanProxy, ExtentKeyword,
+    IColorProxy, INamedColors
+} from "../api/BasicTypes"
 import {
-	Styleset, ExtendedStyleset, StringStyleset, ExtentKeyword, IFilterProxy, IBasicShapeProxy,
-	ITransformProxy, BorderRadius_StyleType, FillRule_StyleType, IPathBuilder, IRayProxy,
-	IFitContentProxy, IRepeatProxy, IMinMaxProxy, GridTrackSize, GridTrack, ISpanProxy, GridLineCountOrName
-} from "../styles/StyleTypes"
+	Styleset, ExtendedStyleset, StringStyleset, BorderRadius_StyleType, FillRule_StyleType,
+	GridTrackSize, GridTrack, GridLineCountOrName
+} from "./StyleTypes"
 import {
-	stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset, gridTrackToString
-} from "../styles/StyleFuncs"
-import {
-	CssPercentMath, CssLengthMath, arr2str, CssAngleMath, CssNumberMath, pos2str,
+	PercentMath, LengthMath, arr2str, AngleMath, NumberMath, pos2str,
 	templateStringToString, val2str
 } from "../styles/UtilFuncs";
+import {
+    stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset,
+    gridTrackToString
+} from "../styles/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
+import { rgbToString, hslToString, colorWithAlphaToString } from "../styles/ColorFuncs";
 
 
 
@@ -167,7 +171,7 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
 // Helper function converting percent value to invocation of the given CSS function.
 function percentFilter( name: string, amount: Extended<CssPercent>): IFilterProxy
 {
-    return () => `${name}(${CssPercentMath.styleToString( amount)})`;
+    return () => `${name}(${PercentMath.styleToString( amount)})`;
 }
 
 
@@ -247,7 +251,7 @@ export function sepia( amount: Extended<CssPercent>): IFilterProxy
  */
 export function blur( radius: Extended<CssLength>): IFilterProxy
 {
-    return () => `blur(${CssLengthMath.styleToString( radius)})`;
+    return () => `blur(${LengthMath.styleToString( radius)})`;
 }
 
 
@@ -277,7 +281,7 @@ export function dropShadow(
  */
 export function hueRotate( amount: Extended<CssAngle>): IFilterProxy
 {
-    return () => `hue-rotate(${CssPercentMath.styleToString( amount)})`;
+    return () => `hue-rotate(${PercentMath.styleToString( amount)})`;
 }
 
 
@@ -316,7 +320,7 @@ export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
     let f: any = () =>
     {
         let r = f.radius != null ? " round " + borderRadiusToString( f.radius) : "";
-        return `inset(${CssLengthMath.multiStyleToString( [o1, o2, o3, o4], " ")}${r})`;
+        return `inset(${LengthMath.multiStyleToString( [o1, o2, o3, o4], " ")}${r})`;
     }
 
     f.round = (radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy => {
@@ -362,7 +366,7 @@ export function circle( radius?: ShapeRadius): ICircleProxy
 {
     let f: any = () =>
     {
-        let rs =  radius != null ? CssLengthMath.styleToString(radius) : "";
+        let rs =  radius != null ? LengthMath.styleToString(radius) : "";
         let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
         return `circle(${rs}${pos})`;
     }
@@ -400,8 +404,8 @@ export function ellipse( radiusX?: ShapeRadius, radiusY?: ShapeRadius): IEllipse
 {
     let f: any = () =>
     {
-        let rxs =  radiusX != null ? CssLengthMath.styleToString(radiusX) : "";
-        let rys =  radiusY != null ? " " + CssLengthMath.styleToString(radiusY) : "";
+        let rxs =  radiusX != null ? LengthMath.styleToString(radiusX) : "";
+        let rys =  radiusY != null ? " " + LengthMath.styleToString(radiusY) : "";
         let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
         return `ellipse(${rxs}${rys}${pos})`
     }
@@ -443,7 +447,7 @@ export function polygon( ...points: CssPoint[]): IPolygonProxy
 		if (f.fillParam)
 			s += f.fillParam + ",";
 
-		s += points.map( pt => CssLengthMath.multiStyleToString( pt, " ")).join(",");
+		s += points.map( pt => LengthMath.multiStyleToString( pt, " ")).join(",");
 
 		return s + ")";
     };
@@ -463,8 +467,8 @@ export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | 
 {
 	return () =>
 	{
-		let angleString = CssAngleMath.styleToString( angle);
-		let sizeString = size =! null ? "," + CssLengthMath.styleToString( size) : "";
+		let angleString = AngleMath.styleToString( angle);
+		let sizeString = size =! null ? "," + LengthMath.styleToString( size) : "";
 		let containString = contain ? ",contain" : "";
 		return `ray(${angleString}${sizeString}${containString})`;
 	};
@@ -600,7 +604,7 @@ export function matrix3d(
  */
 export function perspective( d: Extended<CssLength>): ITransformProxy
 {
-    return () => `perspective(${CssLengthMath.styleToString(d)})`;
+    return () => `perspective(${LengthMath.styleToString(d)})`;
 }
 
 
@@ -610,7 +614,7 @@ export function perspective( d: Extended<CssLength>): ITransformProxy
  */
 function rotateImpl( name: string, a: Extended<CssAngle>): ITransformProxy
 {
-    return () => `${name}(${CssAngleMath.styleToString(a)})`;
+    return () => `${name}(${AngleMath.styleToString(a)})`;
 }
 
 
@@ -662,8 +666,8 @@ export function rotate3d(
 	x: Extended<CssNumber>, y: Extended<CssNumber>, z: Extended<CssNumber>,
 	a: Extended<CssAngle>): ITransformProxy
 {
-	let v = [CssNumberMath.styleToString(x), CssNumberMath.styleToString(y),
-		CssNumberMath.styleToString(z), CssAngleMath.styleToString(a)].join(",");
+	let v = [NumberMath.styleToString(x), NumberMath.styleToString(y),
+		NumberMath.styleToString(z), AngleMath.styleToString(a)].join(",");
     return () => `rotate3d(${v})`;
 }
 
@@ -674,7 +678,7 @@ export function rotate3d(
  */
 export function scale( cx: Extended<CssNumber>, sy?: Extended<CssNumber>): ITransformProxy
 {
-    return () => `scale(${CssNumberMath.styleToString(cx)}${sy != null ? "," + CssNumberMath.styleToString(sy) : ""})`;
+    return () => `scale(${NumberMath.styleToString(cx)}${sy != null ? "," + NumberMath.styleToString(sy) : ""})`;
 }
 
 
@@ -684,7 +688,7 @@ export function scale( cx: Extended<CssNumber>, sy?: Extended<CssNumber>): ITran
  */
 function scaleImpl( name: string, s: Extended<CssNumber>): ITransformProxy
 {
-    return () => `${name}(${CssNumberMath.styleToString(s)})`;
+    return () => `${name}(${NumberMath.styleToString(s)})`;
 }
 
 
@@ -725,8 +729,8 @@ export function scaleZ( s: Extended<CssNumber>): ITransformProxy
 export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
 	sz: Extended<CssNumber>): ITransformProxy
 {
-	let v = [CssNumberMath.styleToString(sx), CssNumberMath.styleToString(sy),
-		CssNumberMath.styleToString(sz)].join(",");
+	let v = [NumberMath.styleToString(sx), NumberMath.styleToString(sy),
+		NumberMath.styleToString(sz)].join(",");
     return () => `scale3d(${v})`;
 }
 
@@ -737,7 +741,7 @@ export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
  */
 export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransformProxy
 {
-    return () => `skew(${CssAngleMath.styleToString(ax)}${ay != null ? "," + CssAngleMath.styleToString(ay) : ""})`;
+    return () => `skew(${AngleMath.styleToString(ax)}${ay != null ? "," + AngleMath.styleToString(ay) : ""})`;
 }
 
 
@@ -747,7 +751,7 @@ export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransfo
  */
 export function skewX( ax: Extended<CssAngle>): ITransformProxy
 {
-    return () => `skewX(${CssAngleMath.styleToString(ax)})`;
+    return () => `skewX(${AngleMath.styleToString(ax)})`;
 }
 
 
@@ -757,7 +761,7 @@ export function skewX( ax: Extended<CssAngle>): ITransformProxy
  */
 export function skewY( ay: Extended<CssAngle>): ITransformProxy
 {
-    return () => `skewX(${CssAngleMath.styleToString(ay)})`;
+    return () => `skewX(${AngleMath.styleToString(ay)})`;
 }
 
 
@@ -767,7 +771,7 @@ export function skewY( ay: Extended<CssAngle>): ITransformProxy
  */
 export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITransformProxy
 {
-    return () => `translate(${CssLengthMath.styleToString(x)}${y != null ? "," + CssLengthMath.styleToString(y) : ""})`;
+    return () => `translate(${LengthMath.styleToString(x)}${y != null ? "," + LengthMath.styleToString(y) : ""})`;
 }
 
 
@@ -777,7 +781,7 @@ export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITr
  */
 function translateImpl( name: string, s: Extended<CssLength>): ITransformProxy
 {
-    return () => `${name}(${CssLengthMath.styleToString(s)})`;
+    return () => `${name}(${LengthMath.styleToString(s)})`;
 }
 
 
@@ -818,8 +822,8 @@ export function translateZ( z: Extended<CssLength>): ITransformProxy
 export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
 	z: Extended<CssLength>): ITransformProxy
 {
-	let v = [CssLengthMath.styleToString(x), CssLengthMath.styleToString(y),
-		CssLengthMath.styleToString(z)].join(",");
+	let v = [LengthMath.styleToString(x), LengthMath.styleToString(y),
+		LengthMath.styleToString(z)].join(",");
     return () => `translate3d(${v})`;
 }
 
@@ -836,7 +840,7 @@ export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
  */
 export function fitContent( size: Extended<CssLength>): IFitContentProxy
 {
-    return () => `fit-content(${CssLengthMath.styleToString(size)})`;
+    return () => `fit-content(${LengthMath.styleToString(size)})`;
 }
 
 
@@ -846,7 +850,7 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
  */
 export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 {
-    let options = { fromNumber: CssLengthMath.convertFunc };
+    let options = { fromNumber: LengthMath.convertFunc };
     return () => `minmax(${val2str( min, options)},${val2str( max, options)})`;
 }
 
@@ -875,6 +879,93 @@ export function span( countOrName: Extended<GridLineCountOrName>,
     let firstElm = val2str(countOrName);
     let secondElm = nameOrCount ? val2str( nameOrCount) : "";
     return () => `span ${firstElm} ${secondElm}`;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Color functions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the color specified as red, green, blue separation values and an optional alpha
+ * mask to a CSS color representation. Each color separation can be represented as a number with
+ * the following meaning:
+ *   - Integer number -255 to 255. Numbers beyond this range will be clamped. Negative numbers
+ *     will be inverted.
+ *   - Floating number -1.0 to 1.0 non-inclusive, which is multiplied by 100 treated as percentage.
+ *     Floating numbers beyond this range will be rounded and treated as integer numbers. Negative
+ *     numbers will be inverted.
+ *
+ * The alpha mask can be one of the following:
+ *   - Floating number 0 to 1 inclusive.
+ *   - Integer or floating number 1 to 100, which is divided by 100. Floating numbers will be
+ *     rounded. Numbers beyond this range will be clamped.
+ *   - The sign of alpha is ignored; that is, only the absolute value is considered.
+ *
+ * @param r Red separation value.
+ * @param g Green separation value.
+ * @param b Blue separation value.
+ * @param a Optional alpha mask as a percentage value.
+ */
+export function rgb( r: number, g: number, b: number, a?: number): IColorProxy
+{
+    return () => rgbToString( r, g, b, a);
+}
+
+
+
+/**
+ * Converts the color specified as hue-saturation-lightness components and an optional alpha
+ * mask to a CSS color representation. This method should be used when defining CSS color
+ * values in styleset properties.
+ *
+ * The Hue component is treated as the CSS `<angle>` type. Numbers are considered degrees.
+ *
+ * The Saturation and Lightness components are treated as percentages:
+ *   - The sign is ignored; that is, only the absolute value is considered.
+ *   - Floating number 0 to 1 inclusive are multiplied by 100 and treated as percentage.
+ *   - Integer or floating number 1 to 100 are treated as percentage. Floating numbers will be
+ *     rounded. Numbers beyond this range will be clamped to 100.
+ *
+ * The alpha mask can be one of the following:
+ *   - Floating number 0 to 1 inclusive.
+ *   - Integer or floating number 1 to 100, which is divided by 100. Floating numbers will be
+ *     rounded. Numbers beyond this range will be clamped.
+ *   - The sign of alpha is ignored; that is, only the absolute value is considered.
+ *
+ * @param h Hue component as an angle value.
+ * @param s Saturation component as a percentage value.
+ * @param l Lightness component as a percentage value.
+ * @param a Optional alpha mask as a percentage value.
+ */
+export function hsl( h: number | string, s: number, l: number, a?: number): IColorProxy
+{
+    return () => hslToString( h, s, l, a);
+}
+
+
+
+/**
+ * Converts the given color and the alpha mask to the CSS Color representation. This
+ * method should be used when defining CSS color values in styleset properties.
+ *
+ * The color can be specified as a numeric value or as a string color name.
+ *
+ * The alpha mask is specified as a number:
+ *   - The sign is ignored; that is, only the absolute value is considered.
+ *   - Number 0 to 1 inclusive, which is treated as percentage.
+ *   - Number 1 to 100 inclusive, which is treated as percentage.
+ *   - Numbers greater than 100 are clamped to 100;
+ *
+ * @param c Color value as either a number or a named color
+ * @param a Alpha channel value
+ */
+export function alpha( c: number | keyof INamedColors, a: number): IColorProxy
+{
+    return () => colorWithAlphaToString( c, a);
 }
 
 

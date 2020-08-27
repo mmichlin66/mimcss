@@ -1,11 +1,16 @@
-import {IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IClassNameRule} from "./RuleTypes";
-import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../styles/StyleTypes"
-import {CssSelector} from "../styles/SelectorTypes"
+import {CssSelector} from "../api/BasicTypes"
+import {
+    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule,
+    IClassNameRule
+} from "../api/RuleTypes";
+import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps} from "../styles/StyleFuncs"
 import {val2str, camelToDash} from "../styles/UtilFuncs";
+import {
+    mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps, selectorToString,
+    pseudoEntityToString
+} from "../styles/StyleFuncs"
 import {VarRule} from "./VarRule";
-import {pseudoEntityToString, selectorToString} from "../styles/SelectorFuncs";
 import {s_scheduleStylePropertyUpdate} from "./Scheduling";
 
 
@@ -193,7 +198,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		if (this.cachedSelectorString == null)
 			this.cachedSelectorString = this.getSelectorString();
-			
+
 		return `${this.cachedSelectorString} {${stylesetToString( this.styleset)}}`;
 	}
 
@@ -270,7 +275,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	{
 		if (this.cachedSelectorString == null)
 			this.cachedSelectorString = this.getSelectorString();
-			
+
 		return this.cachedSelectorString;
 	}
 

@@ -1,6 +1,6 @@
-﻿import * as FontFaceTypes from "./FontFaceTypes"
+﻿import * as FontFaceTypes from "../api/FontFaceAPI"
 import {obj2str} from "./StyleFuncs";
-import {camelToDash, val2str, CssPercentMath, CssAngleMath, arr2str, CssNumberMath} from "./UtilFuncs";
+import {camelToDash, val2str, PercentMath, AngleMath, arr2str, NumberMath} from "./UtilFuncs";
 
 
 
@@ -40,8 +40,8 @@ export function fontFaceToString( fontface: FontFaceTypes.IFontFace): string | n
 function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): string
 {
     return val2str( val, {
-        fromNumber: CssPercentMath.styleToString,
-        arrItemFunc: CssPercentMath.styleToString
+        fromNumber: PercentMath.styleToString,
+        arrItemFunc: PercentMath.styleToString
     });
 }
 
@@ -50,8 +50,8 @@ function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): stri
 function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 {
     return val2str( val, {
-        fromNumber: v => `oblique ${CssAngleMath.styleToString(v)}`,
-        fromArray: v => `oblique ${arr2str( v, CssAngleMath.styleToString)}`
+        fromNumber: v => `oblique ${AngleMath.styleToString(v)}`,
+        fromArray: v => `oblique ${arr2str( v, AngleMath.styleToString)}`
     });
 }
 
@@ -60,7 +60,7 @@ function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
 {
     return val2str( val, {
-        fromAny: CssNumberMath.styleToString
+        fromAny: NumberMath.styleToString
     });
 }
 

@@ -1,4 +1,4 @@
-import {IRule, INamedEntity, StyleDefinition} from "./RuleTypes"
+import {IRule, INamedEntity, StyleDefinition} from "../api/RuleTypes"
 
 
 

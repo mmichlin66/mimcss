@@ -1,9 +1,9 @@
-import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "./RuleTypes"
+import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
 import {getContainerFromInstance, processInstanceOrClass} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
 import {supportsQueryToString} from "../styles/StyleFuncs";
-import {SupportsQuery} from "../styles/StyleTypes";
-import {MediaQuery} from "../styles/MediaTypes";
+import {SupportsQuery} from "../api/StyleTypes";
+import {MediaQuery} from "../api/MediaAPI";
 import {mediaQueryToString} from "../styles/MediaFuncs";
 
 

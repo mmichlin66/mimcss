@@ -1,13 +1,13 @@
-﻿import {
+﻿import {CssSelector, PagePseudoClass} from "../api/BasicTypes";
+import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule
-} from "../rules/RuleTypes";
+} from "./RuleTypes";
+import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "./StyleTypes";
 import {processInstanceOrClass, s_enableShortNames, serializeInstance} from "../rules/RuleContainer";
-import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
-import {CssSelector, PagePseudoClass} from "../styles/SelectorTypes";
-import {MediaQuery} from "../styles/MediaTypes"
-import {IFontFace} from "../styles/FontFaceTypes";
+import {MediaQuery} from "./MediaAPI"
+import {IFontFace} from "./FontFaceAPI";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule} from "../rules/VarRule"
@@ -201,7 +201,7 @@ export function $use<T extends StyleDefinition>( instOrClass: T | IStyleDefiniti
  * the embedded object doesn't create its own `<style>` element but uses that of its owner. This
  * allows creating many small style definition classes instead of one huge one without incurring
  * the overhead of many `<style>` elements.
- * 
+ *
  * Note that as opposed to the $use function, the $embed function always creates a new instance of
  * the given class and doesn't associate the class with the created instance. That means that if
  * a class is embedded into more than one "owner", two separate instances of each CSS rule will be
@@ -232,7 +232,7 @@ export function enableShortNames( enable: boolean, prefix?: string): void
 
 /**
  * Type for defining the class property of HTML elements.
- */				
+ */
 export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType[];
 
 /**
@@ -417,7 +417,7 @@ class RuleSerializationContext implements IRuleSerializationContext
  * base and derived classes see different values of the rule. Since our rules are defined as
  * part of the constructor, the base class constructor's code only sees the value assigned in that
  * code. If another rule in the base class uses this first rule, this value is remembered.
- * 
+ *
  * The `@virtual` decorator creates a Proxy object for the rule with the handler that keeps the
  * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
  * rule, the first rule will see the overridden value of the rule when accessed in the

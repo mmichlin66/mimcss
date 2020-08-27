@@ -1,4 +1,4 @@
-﻿import * as MediaTypes from "./MediaTypes"
+﻿import * as MediaTypes from "../api/MediaAPI"
 import {val2str, camelToDash, arr2str} from "./UtilFuncs";
 
 
@@ -103,7 +103,7 @@ export function mediaFeatureToString( featureName: string, propVal: any, valueOn
     if (!featureName || propVal == null)
         return null;
 
-    // find information object 
+    // find information object
     let info: MediaFeatureInfo = mediaFeatures[featureName];
 
     let realFeatureName = camelToDash( featureName);

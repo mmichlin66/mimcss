@@ -1,4 +1,4 @@
-import {StyleDefinition, IStyleDefinitionClass, IScheduler} from "../rules/RuleTypes";
+import {StyleDefinition, IStyleDefinitionClass, IScheduler} from "./RuleTypes";
 import {processInstanceOrClass} from "../rules/RuleContainer";
 import {
     s_scheduleCall, s_setDefaultSchedulerType, s_getDefaultSchedulerType,

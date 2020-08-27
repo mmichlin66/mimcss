@@ -1,4 +1,4 @@
-import {IGridLineRule, IGridAreaRule} from "./RuleTypes"
+import {IGridLineRule, IGridAreaRule} from "../api/RuleTypes"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 

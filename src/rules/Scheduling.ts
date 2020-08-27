@@ -1,6 +1,6 @@
-import {SchedulerType, StyleDefinition, IScheduler} from "./RuleTypes";
+import {SchedulerType, StyleDefinition, IScheduler} from "../api/RuleTypes";
 import {activateInstance, deactivateInstance} from "./RuleContainer";
-import {StringStyleset} from "../styles/StyleTypes";
+import {StringStyleset} from "../api/StyleTypes";
 
 
 
@@ -178,7 +178,7 @@ export class SchedulingActivator implements IActivator
 
     // Array of style property values to be set/removed.
     private props: ScheduledStylePropValue[] = [];
-    
+
     // optional scheduler object
     private scheduler?: IScheduler;
 
@@ -211,7 +211,7 @@ export class SchedulingActivator implements IActivator
 		{
 			if (this.definitions.size === 0 && this.props.length === 0)
                 this.scheduler && this.scheduler.scheduleDOMUpdate();
-				
+
 			this.definitions.set( definition, ++refCount);
 		}
 	}
@@ -234,7 +234,7 @@ export class SchedulingActivator implements IActivator
 		{
 			if (this.definitions.size === 0 && this.props.length === 0)
                 this.scheduler && this.scheduler.scheduleDOMUpdate();
-				
+
 			this.definitions.set( definition, --refCount);
 		}
 	}
@@ -306,7 +306,7 @@ export class SchedulingActivator implements IActivator
 		this.props.forEach( prop => updateStyleProperty( prop.ruleOrElm, prop.name, prop.value, prop.important));
 		this.props = [];
     }
-    
+
 
 
 	/**

@@ -1,4 +1,4 @@
-import {StyleDefinition, IStyleDefinitionClass} from "./RuleTypes"
+import {StyleDefinition, IStyleDefinitionClass} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
@@ -506,7 +506,7 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
  * If the parameter is a style definition class we check whether there is an instance already
  * created for it as a class will have only a single associated instane no matter how many times
  * this function is called.
- * 
+ *
  * If the parameter is an object (an instance of the StyleDefinition class) then we check whether
  * it has already been processed. If yes, we just return it back; if no, we assign new unique names
  * to its rules.

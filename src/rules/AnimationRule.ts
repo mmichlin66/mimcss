@@ -1,7 +1,7 @@
-import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "./RuleTypes"
+import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule"
 import {StyleRule} from "./StyleRules";
-import { val2str } from "../styles/UtilFuncs";
+import {val2str} from "../styles/UtilFuncs";
 
 
 
@@ -83,7 +83,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 		for( let frameRule of this.frameRules)
 			ctx.addRuleText( frameRule.toCssString())
-        
+
 		ctx.addRuleText( "}");
     }
 
@@ -96,7 +96,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 	}
 
 
-	
+
 	/** SOM keyframes rule */
 	public cssRule: CSSKeyframesRule;
 

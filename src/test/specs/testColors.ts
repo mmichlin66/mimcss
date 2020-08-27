@@ -3,7 +3,7 @@ import * as dom from "../utils/dom"
 
 
 // Color augmentation
-declare module "../../styles/ColorTypes"
+declare module "../../api/BasicTypes"
 {
 	interface INamedColors
 	{
@@ -56,7 +56,7 @@ describe("Colors", () =>
 	})
 
 
-	
+
 	describe("Numeric colors", () =>
 	{
 		it("numeric color not corresponding to named color", () =>

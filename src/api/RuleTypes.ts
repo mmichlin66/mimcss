@@ -1,8 +1,8 @@
-﻿import {ICustomVar, OneOrMany} from "../styles/UtilTypes";
-import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType} from "../styles/StyleTypes";
-import {
-	PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity
-} from "../styles/SelectorTypes";
+﻿import {
+    ICustomVar, OneOrMany, PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity,
+    IRuleWithSelector
+} from "../api/BasicTypes";
+import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType} from "./StyleTypes";
 
 
 
@@ -28,10 +28,10 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
  *   defining a selector and a style corresponding to this selector. Selectors can use the
  *   ampersand symbol to refer to the parent style selector. If the ampersand symbol is not used,
  *   the selector will be simply appended to the parent selector.
- * 
+ *
  * Functions that return style rules (e.g. $class) accept the CombinedStyleset as a parameter,
  * for example:
- * 
+ *
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
@@ -46,9 +46,9 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
  *     })
  * }
  * ```
- * 
+ *
  * This will translate to the following CSS (in reality, class names are auto-generated):
- * 
+ *
  * ```css
  * .class2 { backgroundColor: white; }
  * .class2:hover { backgroundColor: grey; }
@@ -77,8 +77,8 @@ export interface IRule
 
 
 /**
- * The INamedRule interface is a base interface implemented by all rules that have a name; that is,
- * class, ID, keyframes and custom CSS property.
+ * The INamedEntity interface is a base interface implemented by all rules that have a name; that is,
+ * classes, IDs, keyframes, custom CSS properties, counters, grid lines and areas.
  */
 export interface INamedEntity
 {
@@ -110,13 +110,10 @@ export type DependentRules =
  * from which it inherits. A styleset combines all the properties from its own property block as
  * well as from all of style rules it inherites from.
  */
-export interface IStyleRule extends IRule
+export interface IStyleRule extends IRule, IRuleWithSelector
 {
 	/** SOM style rule */
 	readonly cssRule: CSSStyleRule | null;
-
-	/** CSS rule selector string */
-	readonly selectorText: string;
 
 	/**
 	 * Object containing dependent rules. Property names are taken from special properties
@@ -177,7 +174,7 @@ export interface IClassRule extends INamedStyleRule
  * The IClassNameRule interface represents a combination of two or more class names. It can be
  * used to make it easier to create elements with more than one CSS class.
  */
-export interface IClassNameRule extends INamedEntity
+export interface IClassNameRule extends INamedEntity, IRuleWithSelector
 {
 	/** Name of all the class names prefixed with "." */
 	readonly cssClassName: string;
