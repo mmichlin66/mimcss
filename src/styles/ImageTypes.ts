@@ -2,9 +2,8 @@
  * This module contains types used to define CSS `<image>` type and related functions.
  */
 
-import {IUrlProxy, Extended, CssNumber, CssAngle, NumberBase, CssLength, CssPosition, IGenericProxy} from "./UtilTypes"
+import {IUrlProxy, Extended, CssNumber, CssAngle, NumberBase, CssLength, IGenericProxy} from "./UtilTypes"
 import {CssColor} from "./ColorTypes";
-import { ExtentKeyword } from "./StyleTypes";
 
 
 /**
@@ -87,65 +86,6 @@ export type RadialGradientSize = Extended<CssLength> | [Extended<CssLength>, Ext
  * Type representing parameters for the `cross-fade()` CSS function.
  */
 export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<CssNumber>];
-
-
-
-/**
- * The IGradient interface represents properties that return interfaces representing `<gradient>`
- * CSS functions.
- */
-export interface IGradient
-{
-    readonly linear: ILinearGradient;
-    readonly repeatingLinear: ILinearGradient;
-    readonly radial: IRadialGradient;
-    readonly repeatingRadial: IRadialGradient;
-    readonly conic: IConicGradient;
-    readonly repeatingConic: IConicGradient;
-}
-
-
-
-/**
- * The ILinearGradient interface represents a function that produces either `liner-gradient` or
- * `repeating-liner-gradient` CSS function. The interface allows specifying an angle parameter
- * before invocation that accepts a list of color stops and hints.
- */
-export interface ILinearGradient
-{
-    (...stopsOrHints: GradientStopOrHint[]): IImageProxy;
-	to( angle: LinearGradAngle): ILinearGradient;
-}
-
-
-
-/**
- * The IRadialGradient interface represents a function that produces either `radial-gradient` or
- * `repeating-radial-gradient` CSS function. The interface allows specifying the shape, size and
- * extent parameters before invocation that accepts a list of color stops and hints.
- */
-export interface IRadialGradient
-{
-    (...stopsOrHints: GradientStopOrHint[]): IImageProxy;
-	circle( sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>): IRadialGradient;
-	ellipse( sizeOrExtent?: [Extended<CssLength>, Extended<CssLength>] | Extended<ExtentKeyword>): IRadialGradient;
-	extent( extent: Extended<ExtentKeyword>): IRadialGradient;
-	at( pos: Extended<CssPosition>): IRadialGradient;
-}
-
-
-
-/**
- * The IConicGradient interface represents a function that produces either `conic-gradient` or
- * `repeating-conic-gradient` CSS function. The interface allows specifying the `from` and
- * `position` parameters before invocation that accepts a list of color stops and hints.
- */
-export interface IConicGradient
-{
-    (...stopsOrHints: GradientStopOrHint[]): IImageProxy;
-	from( angle: Extended<CssAngle>): IConicGradient;
-	at( pos: Extended<CssPosition>): IConicGradient;
-}
 
 
 

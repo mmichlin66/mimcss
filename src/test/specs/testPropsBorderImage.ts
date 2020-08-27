@@ -153,7 +153,7 @@ describe("border-image shorthand property:", () =>
 	{
 		dom.testShorthandProp( "borderImage",
 			{
-				source: css.gradient.linear( "red", "blue"),
+				source: css.linearGradient( "red", "blue"),
 				slice: [10, "5%"],
 				width: 10,
 				outset: [1, "2px", "0.3rem", 2]
@@ -170,7 +170,7 @@ describe("border-image shorthand property:", () =>
 	{
 		dom.testShorthandProp( "borderImage",
 			{
-				source: css.gradient.linear( "red", "blue"),
+				source: css.linearGradient( "red", "blue"),
 				outset: 2
 			},
 			{

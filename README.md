@@ -82,7 +82,7 @@ export class MyStyles extends css.StyleDefinition
         padding: 8,
         border: [1, "solid", "blue"],
         boxShadow: { blur: 4, color: "cyan" },
-        backgroundImage: css.gradient.conic.from(45).at("center")(Color.orange, Color.pink),
+        backgroundImage: css.conicGradient(Color.orange, Color.pink).from(45).at("center"),
         ":hover": { opacity: 0.7 }
     });
 }
@@ -445,12 +445,12 @@ class MyStyles extends css.StyleDefinition
 
     // initial angle for the conic gradient will be 45deg.
     cls3 = css.$class({
-        backgroundImage: css.gradient.conic( 45, "center", "red", "blue")
+        backgroundImage: css.conicGradient( "red", "blue").from(45)
     })
 
     // initial angle for the conic gradient will be 0.25turn.
     cls4 = css.$class({
-        backgroundImage: css.gradient.conic( 0.25, "center", "red", "blue")
+        backgroundImage: css.conicGradient( "red", "blue").from(0.25)
     })
 }
 ```

@@ -1,6 +1,6 @@
 ﻿/**
  * This file contains basic types and functions used to define CSS property types.
- * 
+ *
  * All CSS properties should accept string as the type of their value even if normally
  * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
  * color) property. This is because in addition to their normal values any property
@@ -8,19 +8,19 @@
  * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
  * Intellisense and it doesn't prompt developers for the possible values. The IValueProxy
  * can be used instead of string and this solves the Intellisense issue.
- * 
+ *
  * Another benefit of using functions is that they are
  * constructed at one time but the string generation occurs at another time. This allows
  * using these objects in the style definition classes. They can reference objects like
  * IVarRule that are not fully initialized yet. However, when the styles should be inserted
  * into DOM the initialization will have already occurred and the function will
  * return a correct string.
- * 
+ *
  * Note that the proxy functions have a parameter that distinguishes them from
  * other proxy functions. This is because we want to distinguish between different CSS types,
  * so that a function used for one CSS type cannot be used for a different CSS type. For
  * example, the `calc()` function returns the NumberProxy function, while the
- * `gradient.linear()` function returns the ImageProxy function. Thus you cannot use the
+ * `linearGradient()` function returns the ImageProxy function. Thus you cannot use the
  * 'calc()` function for image-based CSS properties and vice versa.
  */
 
@@ -58,7 +58,7 @@ export interface IGenericProxy<T extends string>
  * The IStringProxy interface represents a function that returns a string. This function is part
  * of type definition for all CSS properties - even for those that don't have `string` as part of
  * their type.
- * 
+ *
  * This function is returned from the `raw()` function, which allows by-passing the property
  * typing rules and specifying a string directly. This might be useful, when a string value is
  * obtained from some external calculations.
@@ -419,7 +419,7 @@ export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyw
     [HorizontalPositionKeyword | Extended<CssLength>, VerticalPositionKeyword | Extended<CssLength>];
 
 /** Type describing the full up to 4 values `<position>` CSS type */
-export type CssPosition = SimpleCssPosition | 
+export type CssPosition = SimpleCssPosition |
     [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword] |
     [HorizontalPositionKeyword, VerticalPositionKeyword, Extended<CssLength>] |
     [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword, Extended<CssLength>];

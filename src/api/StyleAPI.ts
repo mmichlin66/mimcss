@@ -1,4 +1,4 @@
-﻿import {Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, OneOrBox, CssPoint} from "../styles/UtilTypes"
+﻿import {Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, CssPoint} from "../styles/UtilTypes"
 import {CssColor} from "../styles/ColorTypes"
 import {SelectorItem, ISelectorProxy} from "../styles/SelectorTypes";
 import {
@@ -79,7 +79,7 @@ export function setElementStringStyle( elm: HTMLElement, styleset: StringStylese
 /**
  * Converts the given [[Styleset]] object into an object, where each Styleset's property is
  * converted to its string value.
- * @param styleset 
+ * @param styleset
  */
 export function stylesetToStringStyleset( styleset: Styleset): StringStyleset
 {
@@ -98,8 +98,8 @@ export function stylesetToStringStyleset( styleset: Styleset): StringStyleset
  * that contains string values of properties that were new or have different values in the new
  * styleset and undefined values for properties that exist in the old styleset but don't exist
  * in the new one.
- * @param oldStyleset 
- * @param newStyleset 
+ * @param oldStyleset
+ * @param newStyleset
  * @returns StringStyleset object with properties that have different values in the old and new
  * stylesets. Properties that existed in the old but don't exist in the new styleset, will have
  * their values set to undefined. If there is no differences between the two stylesets null is
@@ -265,10 +265,9 @@ export function dropShadow(
     x: Extended<CssLength>,
     y: Extended<CssLength>,
     color?: Extended<CssColor>,
-    blur?: Extended<CssLength>,
-    spread?: Extended<CssLength>): IFilterProxy
+    blur?: Extended<CssLength>): IFilterProxy
 {
-	return () => `drop-shadow(${singleBoxShadow_fromObject( { x, y, color, blur, spread})})`;
+	return () => `drop-shadow(${singleBoxShadow_fromObject( { x, y, color, blur})})`;
 }
 
 
@@ -290,12 +289,42 @@ export function hueRotate( amount: Extended<CssAngle>): IFilterProxy
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an IBasicShapeProxy function representing the `inset()` CSS function.
+ * The IInsetProxy interface represents the CSS inset basic shape. It is the result of invoking
+ * the [[inset]] function and it can be directly assigned to a suitable style property (e.g.
+ * clip-path). In addition it has the `round` method that can be called to specify the radii of
+ * the inset rectangle's corners.
  */
-export function inset( offset: Extended<OneOrBox<CssLength>>, radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy
+export interface IInsetProxy extends IBasicShapeProxy
 {
-	let r = radius != null ? "round " + borderRadiusToString( radius) : "";
-    return () => `inset(${CssLengthMath.multiStyleToString( offset, " ")}${r})`;
+    round( radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy;
+}
+
+/**
+ * Returns an IInsetProxy function representing the `inset()` CSS function.
+ *
+ * *Example:*
+ *
+ * ```typescript
+ * clipPath: inset( "15%")
+ *
+ * clipPath: inset( "15%").round( 8)
+ * ```
+ */
+export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
+    o3?: Extended<CssLength>, o4?: Extended<CssLength>): IInsetProxy
+{
+    let f: any = () =>
+    {
+        let r = f.radius != null ? " round " + borderRadiusToString( f.radius) : "";
+        return `inset(${CssLengthMath.multiStyleToString( [o1, o2, o3, o4], " ")}${r})`;
+    }
+
+    f.round = (radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy => {
+        f.radius = radius;
+        return f;
+    }
+
+    return f;
 }
 
 
@@ -308,49 +337,120 @@ export type ShapeRadius = Extended<CssLength | "closest-side" | "farthest-side">
 
 
 /**
- * Returns an IBasicShapeProxy function representing the `circle()` CSS function.
+ * The ICircleProxy interface represents the CSS circle basic shape. It is the result of invoking
+ * the [[circle]] function and it can be directly assigned to a suitable style property (e.g.
+ * clip-path). In addition it has the `at` method that can be called to specify the position of
+ * the circle's center.
  */
-export function circle( center?: ShapeRadius, position?: Extended<CssPosition>): IBasicShapeProxy
+export interface ICircleProxy extends IBasicShapeProxy
 {
-    let c =  center != null ? CssLengthMath.styleToString(center) : "";
-	let pos = position != null ? " at " + pos2str( position) : "";
-    return () => `circle(${c}${pos})`;
+    at( pos: Extended<CssPosition>): IBasicShapeProxy;
+}
+
+/**
+ * Returns an ICircleProxy function representing the `circle()` CSS function.
+ *
+ * *Example:*
+ *
+ * ```typescript
+ * clipPath: circle( 100)
+ *
+ * clipPath: circle( 100).at( ["center", "30%"])
+ * ```
+ */
+export function circle( radius?: ShapeRadius): ICircleProxy
+{
+    let f: any = () =>
+    {
+        let rs =  radius != null ? CssLengthMath.styleToString(radius) : "";
+        let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
+        return `circle(${rs}${pos})`;
+    }
+
+    f.at = (pos: Extended<CssPosition>): IBasicShapeProxy => { f.pos = pos; return f; }
+
+    return f;
 }
 
 
 
 /**
- * Returns an IBasicShapeProxy function representing the `ellipse()` CSS function.
+ * The IEllipseProxy interface represents the CSS ellipse basic shape. It is the result of invoking
+ * the [[ellipse]] function and it can be directly assigned to a suitable style property (e.g.
+ * clip-path). In addition it has the `at` method that can be called to specify the position of
+ * the ellipse's center.
  */
-export function ellipse( rx?: ShapeRadius, ry?: ShapeRadius,
-	position?: Extended<CssPosition>): IBasicShapeProxy
+export interface IEllipseProxy extends IBasicShapeProxy
 {
-    let rxs =  rx != null ? CssLengthMath.styleToString(rx) : "";
-    let rys =  ry != null ? " " + CssLengthMath.styleToString(ry) : "";
-	let pos = position != null ? " at " + pos2str( position) : "";
-    return () => `ellipse(${rxs}${rys}${pos})`;
+    at( pos: Extended<CssPosition>): IBasicShapeProxy;
+}
+
+/**
+ * Returns an IEllipseProxy function representing the `ellipse()` CSS function.
+ *
+ * *Example:*
+ *
+ * ```typescript
+ * clipPath: ellipse( 100, 50)
+ *
+ * clipPath: ellipse( 100, 50).at( ["center", "30%"])
+ * ```
+ */
+export function ellipse( radiusX?: ShapeRadius, radiusY?: ShapeRadius): IEllipseProxy
+{
+    let f: any = () =>
+    {
+        let rxs =  radiusX != null ? CssLengthMath.styleToString(radiusX) : "";
+        let rys =  radiusY != null ? " " + CssLengthMath.styleToString(radiusY) : "";
+        let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
+        return `ellipse(${rxs}${rys}${pos})`
+    }
+
+    f.at = (pos: Extended<CssPosition>): IBasicShapeProxy => { f.pos = pos; return f; }
+
+    return f;
 }
 
 
 
 /**
- * Returns an IBasicShapeProxy function representing the `polygon()` CSS function.
+ * The IPolygonProxy interface represents the CSS polygon basic shape. It is the result of invoking
+ * the [[polygon]] function and it can be directly assigned to a suitable style property (e.g.
+ * clip-path). In addition it has the `fill` method that can be called to specify the fill
+ * rule.
  */
-export function polygon( pointOrRule: CssPoint | FillRule_StyleType,
-	...points: CssPoint[]): IBasicShapeProxy
+export interface IPolygonProxy extends IBasicShapeProxy
 {
-	return () =>
+    fill( rule: FillRule_StyleType): IBasicShapeProxy;
+}
+
+/**
+ * Returns an IPolygon interface representing the `polygon()` CSS function.
+ *
+ * *Example:*
+ *
+ * ```typescript
+ * clipPath: css.polygon( [0,100], [50,0], [100,100])
+ *
+ * clipPath: css.polygon( [0,100], [50,0], [100,100]).fill( "evenodd")
+ * ```
+ */
+export function polygon( ...points: CssPoint[]): IPolygonProxy
+{
+	let f: any = () =>
 	{
 		let s = "polygon(";
-		if (typeof pointOrRule === "string")
-			s += pointOrRule + ",";
-		else
-			s += `${CssLengthMath.multiStyleToString( pointOrRule, " ")},`;
+		if (f.fillParam)
+			s += f.fillParam + ",";
 
 		s += points.map( pt => CssLengthMath.multiStyleToString( pt, " ")).join(",");
 
 		return s + ")";
-	};
+    };
+
+    f.fill = (rule: FillRule_StyleType): IBasicShapeProxy => { f.fillParam = rule; return f; };
+
+    return f;
 }
 
 
@@ -403,7 +503,7 @@ class PathBuilder implements IPathBuilder
 	public valueToString() : string { return this.buf + "')"; }
 
 
-	
+
     // Move-to command with absolute coordinates.
 	private items( command: string, ...items: (number | number[])[]): IPathBuilder
 	{
