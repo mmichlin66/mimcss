@@ -1,6 +1,6 @@
 ﻿import {Extended, CssPosition, CssAngle, CssLength, CssNumber, CssColor, IImageProxy, CssImage, ExtentKeyword} from "../api/BasicTypes"
-import {colorToString} from "../styles/ColorFuncs";
-import {val2str, INumberBaseMathClass, AngleMath, pos2str, PercentMath, LengthMath} from "../styles/UtilFuncs";
+import {colorToString} from "../impl/ColorFuncs";
+import {val2str, INumberBaseMathClass, AngleMath, pos2str, PercentMath, LengthMath} from "../impl/UtilFuncs";
 
 
 

@@ -11,13 +11,13 @@ import {
 import {
 	PercentMath, LengthMath, arr2str, AngleMath, NumberMath, pos2str,
 	templateStringToString, val2str
-} from "../styles/UtilFuncs";
+} from "../impl/UtilFuncs";
 import {
     stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset,
     gridTrackToString
-} from "../styles/StyleFuncs"
+} from "../impl/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
-import { rgbToString, hslToString, colorWithAlphaToString } from "../styles/ColorFuncs";
+import { rgbToString, hslToString, colorWithAlphaToString } from "../impl/ColorFuncs";
 
 
 

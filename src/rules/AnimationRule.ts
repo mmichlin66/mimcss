@@ -1,7 +1,7 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule"
 import {StyleRule} from "./StyleRules";
-import {val2str} from "../styles/UtilFuncs";
+import {val2str} from "../impl/UtilFuncs";
 
 
 

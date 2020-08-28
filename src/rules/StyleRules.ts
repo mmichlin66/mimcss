@@ -5,11 +5,11 @@ import {
 } from "../api/RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {val2str, camelToDash} from "../styles/UtilFuncs";
+import {val2str, camelToDash} from "../impl/UtilFuncs";
 import {
     mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps, selectorToString,
     pseudoEntityToString
-} from "../styles/StyleFuncs"
+} from "../impl/StyleFuncs"
 import {VarRule} from "./VarRule";
 import {s_scheduleStylePropertyUpdate} from "./Scheduling";
 

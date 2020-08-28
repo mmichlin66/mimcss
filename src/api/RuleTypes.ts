@@ -248,6 +248,15 @@ export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity,
 {
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly template: K;
+
+    // /**
+	//  * Sets new value of this custom CSS property.
+	//  * @param value New value for the CSS property.
+	//  * @param important Flag indicating whether to set the "!important" flag on the property value.
+	//  * @param schedulerType ID of a registered scheduler type that is used to write the property
+	//  * value to the DOM. If undefined, the current default scheduler will be used.
+	//  */
+	// setValue( value: VarValueType<K>, important?: boolean, schedulerType?: number): void;
 }
 
 

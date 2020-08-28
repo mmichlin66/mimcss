@@ -1,4 +1,4 @@
-﻿import {CssSelector, PagePseudoClass} from "../api/BasicTypes";
+﻿import {CssSelector, PagePseudoClass, IStringProxy} from "../api/BasicTypes";
 import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
@@ -15,8 +15,9 @@ import {CounterRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
-import {val2str} from "../styles/UtilFuncs";
+import {val2str} from "../impl/UtilFuncs";
 import {IRuleSerializationContext} from "../rules/Rule";
+import { stylePropToString } from "../impl/StyleFuncs";
 
 
 
@@ -97,6 +98,28 @@ export function $var<K extends VarTemplateName>( template: K, propVal?: VarValue
 				nameOverride?: string | IVarRule<K>): IVarRule<K>
 {
 	return new VarRule( template, propVal, nameOverride);
+}
+
+/**
+ * Creates a "constant" that can be used anywhere the type defined by the `template` parameter can
+ * be used. These are called constants, because they provide the convenient and lightweight way
+ * of defining values that are unchanged during the application lifetime. Although constants are
+ * defined very similarly to custom properties (see the [[var]] function), they cannot participate
+ * in the cascade and cannot be redefined under elements.
+ *
+ * Constant can, however, use any expression that satisfies the type defined by the `template`
+ * parameter including other constants, custom properties and functions.
+ *
+ * @param template Either a name of a style property (camel case) or a name of the property from
+ * the [[ICssVarTemplates]] interface. The type corresponding to that property defines the type
+ * of the second parameter.
+ * @param value The value assigned to the constant.
+ * @returns A function that returns a string value of the constant. The function will be invoked
+ * once when the style definition is processed.
+ */
+export function $const<K extends VarTemplateName>( template: K, value?: VarValueType<K>): IStringProxy
+{
+	return () => stylePropToString( template, value, true);
 }
 
 /**

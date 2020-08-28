@@ -9,8 +9,8 @@ import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "./StyleTyp
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath,
 	FrequencyMath, PercentMath, val2str, templateStringToString
-} from "../styles/UtilFuncs"
-import {stylePropToString} from "../styles/StyleFuncs";
+} from "../impl/UtilFuncs"
+import {stylePropToString} from "../impl/StyleFuncs";
 
 
 

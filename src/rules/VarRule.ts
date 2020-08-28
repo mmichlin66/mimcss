@@ -1,6 +1,6 @@
 import {IVarRule} from "../api/RuleTypes"
 import {VarValueType, VarTemplateName} from "../api/StyleTypes"
-import {stylePropToString} from "../styles/StyleFuncs"
+import {stylePropToString} from "../impl/StyleFuncs"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
@@ -62,6 +62,16 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 
 
 	/**
+	 * Gets the value of the property.
+	 */
+    public getValue(): VarValueType<K>
+    {
+        return this.value;
+    }
+
+
+
+    /**
 	 * Sets new value of this custom CSS property.
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
@@ -70,6 +80,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	 */
 	public setValue( value: VarValueType<K>, important?: boolean, schedulerType?: number): void
 	{
+        this.value = value;
 		this.container.setCustomVarValue( this.cssName,
             value == null ? null : stylePropToString( this.template, value, true),
             important, schedulerType)

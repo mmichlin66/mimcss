@@ -69,12 +69,18 @@ export interface IStringProxy extends IGenericProxy<"string"> {}
 
 /**
  * The ICustomVar interface represents a CSS custom property object with values of the given type.
- * This interface is needed because every style property can accept value in the form of the var()
- * CSS function.
+ * This interface is needed because every style property can accept value in the form of the
+ * `var()` CSS function. This interface is extended by the [[IVarRule]] interface that is returned
+ * from the [[$var]] function.
  */
 export interface ICustomVar<T = any>
 {
-	/**
+	// /**
+	//  * Gets the value of the property.
+	//  */
+	// getValue(): T;
+
+    /**
 	 * Sets new value of this custom CSS property.
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
@@ -99,7 +105,7 @@ export type Extended<T> = T | ICustomVar<T> | IStringProxy | undefined;
  * Type that encapsulates the type of property in an object with a single "!" property. This
  * type is used to indicate that the property value must be flagged as "!important".
  */
-export type ImportantProp<T> = { "!": Extended<T> };
+export type ImportantProp<T> = { "!": ExtendedProp<T> };
 
 
 

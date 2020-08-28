@@ -1181,14 +1181,15 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     zoom: util.PercentMath.styleToString,
 
     // special properties for IVarRule types
-    "CssLength": WellKnownFunc.Length,
-    "CssAngle": util.AngleMath.styleToString,
-    "CssTime": util.TimeMath.styleToString,
-    "CssResolution": util.ResolutionMath.styleToString,
-    "CssFrequency": util.FrequencyMath.styleToString,
-    "CssPercent": util.PercentMath.styleToString,
-    "CssPosition": WellKnownFunc.Position,
-    "CssColor": WellKnownFunc.Color,
+    CssLength: WellKnownFunc.Length,
+    CssAngle: util.AngleMath.styleToString,
+    CssTime: util.TimeMath.styleToString,
+    CssResolution: util.ResolutionMath.styleToString,
+    CssFrequency: util.FrequencyMath.styleToString,
+    CssPercent: util.PercentMath.styleToString,
+    CssPosition: WellKnownFunc.Position,
+    CssRadius: WellKnownFunc.CornerRadius,
+    CssColor: WellKnownFunc.Color,
 };
 
 
