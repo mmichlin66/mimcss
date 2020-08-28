@@ -45,8 +45,8 @@ export function camelToDash( camel: string): string
  */
 export interface IValueConvertOptions
 {
-    // Called if value is null or undefined
-    fromNull?: ( val: null | undefined) => string;
+    // String value to use or function to call if value is null or undefined
+    fromNull?: string | ((val: null | undefined) => string);
 
     // Called if value is a string. This allows transforming one string to another.
     fromString?: ( val: string) => string;
@@ -109,7 +109,7 @@ export function val2str( val: any, options?: IValueConvertOptions): string
         // processing with options. For all types except null and string, if the type-specific
         // function is not defined, call fromAny if defined.
         if (val == null)
-            return options.fromNull ? options.fromNull( val) : "";
+            return options.fromNull ? typeof options.fromNull === "string" ? options.fromNull : options.fromNull( val) : "";
         else if (typeof val === "string")
             return options.fromString ? options.fromString( val) : val;
         else if (typeof val === "number")
@@ -529,7 +529,6 @@ export class FrequencyMath extends NumberBaseMath<FrequencyType> implements IFre
 export function pos2str( val: Extended<CssPosition>): string
 {
     return val2str( val, {
-        fromNull: v => "",
         fromNumber: LengthMath.styleToString,
         fromArray: v => LengthMath.multiStyleToString( v, " ")
     });

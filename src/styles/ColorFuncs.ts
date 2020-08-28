@@ -1,4 +1,4 @@
-﻿import {INamedColors, CssColor, Colors, Extended} from "../api/BasicTypes"
+﻿import {INamedColors, CssColor, Colors, Extended, CssAngle} from "../api/BasicTypes"
 import {AngleMath, val2str} from "./UtilFuncs"
 
 
@@ -64,55 +64,64 @@ function colorNumberToString( val: number): string
  *
  * @param c Color separation value.
  */
-function separationToString( c: number): string
+function separationToString( c: Extended<number>): string
 {
-    if (c !== 0 && c > -1 && c < 1)
-    {
-        // invert negative value
-        if (c < 0)
-            c = 1 + c;
+    return val2str( c, {
+        fromNumber: c => {
+            if (c !== 0 && c > -1 && c < 1)
+            {
+                // invert negative value
+                if (c < 0)
+                    c = 1 + c;
 
-        return Math.round( c * 100) + "%";
-    }
-    else
-    {
-        // clamp the value between -255 and 255
-        c = c > 255 ? 255 : c < -255 ? -255 : c;
+                return Math.round( c * 100) + "%";
+            }
+            else
+            {
+                // clamp the value between -255 and 255
+                c = c > 255 ? 255 : c < -255 ? -255 : c;
 
-        if (!Number.isInteger(c))
-            c = Math.round(c);
+                if (!Number.isInteger(c))
+                    c = Math.round(c);
 
-        // invert negative value
-        if (c < 0)
-            c = 255 + c;
+                // invert negative value
+                if (c < 0)
+                    c = 255 + c;
 
-        return c.toString();
-    }
+                return c.toString();
+            }
+        }
+    })
 }
 
 
 
 /**
- * Converts the alpha channel value to a CSS string. Alpha is represented as a number
- * with the following meaning:
- *   - The sign of alpha is ignored; that is, only the absolute value is considered.
- *   - Floating number 0 to 1 inclusive, which is multiplied by 100 and treated as percentage.
- *   - Integer or floating number 1 to 100, which is treated as percentage. Floating numbers will be
- *     rounded. Numbers beyond this range will be clamped.
+ * Converts the alpha channel value to a CSS string. Alpha can be represented using the following
+ * types:
+ * - Floating number 0 to 1 inclusive.
+ * - Integer or floating number 1 to 100, which is treated as percentage. Floating numbers will be
+ *   rounded. Numbers beyond this range will be clamped.
+ * - ICustomVar - CSS custom property, for which the var() expression is returned
  */
-function alphaToString( a?: number): string
+function alphaToString( a?: Extended<number>): string
 {
-    // if alpha is null or undefined, set it to 1
-    if (a == null)
-        return "1";
+    return val2str( a, {
+        fromNull: "1",
+        fromNumber: a => {
+            // if alpha is null or undefined, set it to 1
+            if (a == null)
+                return "1";
 
-    // negative and positive values of alpha are treated identically, so convert to positive
-    if (a < 0)
-        a = -a;
+            // negative and positive values of alpha are treated identically, so convert to positive
+            if (a < 0)
+                a = -a;
 
-    // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
-    // is greater than 100, set it to 1; otherwise,
-    return (a > 100 ? 1 : a > 1 ? a / 100 : a).toFixed(2);
+            // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
+            // is greater than 100, set it to 1; otherwise,
+            return (a > 100 ? 1 : a > 1 ? a / 100 : a).toFixed(2);
+        }
+    })
 }
 
 
@@ -138,7 +147,7 @@ function alphaToString( a?: number): string
  * @param b Blue separation value.
  * @param a Optional alpha mask as a percentage value.
  */
-export function rgbToString( r: number, g: number, b: number, a?: number): string
+export function rgbToString( r: Extended<number>, g: Extended<number>, b: Extended<number>, a?: Extended<number>): string
 {
     return `rgba(${separationToString( r)},${separationToString( g)},${separationToString( b)},${alphaToString( a)})`;
 }
@@ -152,15 +161,19 @@ export function rgbToString( r: number, g: number, b: number, a?: number): strin
  *   - Integer or floating number 1 to 100 are treated as percentage. Floating numbers will be
  *     rounded. Numbers beyond this range will be clamped to 100.
  */
-function colorPercentToString( n: number): string
+function colorPercentToString( n: Extended<number>): string
 {
-    // negative and positive values are treated identically, so convert to positive
-    if (n < 0)
-        n = -n;
+    return val2str( n, {
+        fromNumber: n => {
+            // negative and positive values are treated identically, so convert to positive
+            if (n < 0)
+                n = -n;
 
-    // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
-    // is greater than 100, clamp it.
-    return (n > 100 ? 100 : Math.round(n <= 1 ? n * 100 : n)).toString() + "%";
+            // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
+            // is greater than 100, clamp it.
+            return (n > 100 ? 100 : Math.round(n <= 1 ? n * 100 : n)).toString() + "%";
+        }
+    })
 }
 
 
@@ -189,7 +202,7 @@ function colorPercentToString( n: number): string
  * @param l Lightness component as a percentage value.
  * @param a Optional alpha mask as a percentage value.
  */
-export function hslToString( h: number | string, s: number, l: number, a?: number): string
+export function hslToString( h: Extended<CssAngle>, s: Extended<number>, l: Extended<number>, a?: Extended<number>): string
 {
     return `hsla(${AngleMath.styleToString(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
 }

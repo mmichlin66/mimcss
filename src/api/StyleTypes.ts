@@ -882,7 +882,7 @@ export type Resize_StyleType = "none" | "both" | "horizontal" | "vertical" | "bl
 
 
 /** Type for rotate style property */
-export type Rotate_StyleType = "none" | ["x" | "y" | "z", Extended<CssAngle>] |
+export type Rotate_StyleType = "none" | CssAngle | ["x" | "y" | "z", Extended<CssAngle>] |
     [Extended<CssNumber>, Extended<CssNumber>, Extended<CssNumber>, Extended<CssAngle>];
 
 
@@ -1425,8 +1425,8 @@ export interface ICssStyleset
     marginTop?: CssLength;
     marker?: DefaultStyleType;
     markerEnd?: Marker_StyleType;
-    markerMid?: DefaultStyleType;
-    markerStart?: DefaultStyleType;
+    markerMid?: Marker_StyleType;
+    markerStart?: Marker_StyleType;
     mask?: DefaultStyleType;
     maskComposite?: DefaultStyleType;
     maskImage?: DefaultStyleType;
@@ -1503,7 +1503,7 @@ export interface ICssStyleset
     rubyOverhang?: DefaultStyleType;
     rubyPosition?: DefaultStyleType;
 
-    scale?: DefaultStyleType;
+    scale?: Scale_StyleType;
     scrollbarColor?: ScrollbarColor_StyleType;
     scrollbarWidth?: ScrollbarWidth_StyleType;
     scrollBehavior?: ScrollBehavior_StyleType;
@@ -1603,75 +1603,6 @@ export interface ICssStyleset
 
     zIndex?: ZIndex_StyleType;
     zoom?: Zoom_StyleType;
-
-    // webkitBorderImage?: DefaultStyleType;
-    // webkitBoxDirection?: DefaultStyleType;
-    // webkitBoxOrient?: DefaultStyleType;
-    // webkitColumnBreakAfter?: DefaultStyleType;
-    // webkitColumnBreakBefore?: DefaultStyleType;
-    // webkitColumnBreakInside?: DefaultStyleType;
-    // webkitColumnCount?: ColumnCountStyleType;
-    // webkitColumnGap?: SingleGapStyleType;
-    // webkitColumnRule?: ColumnRuleStyleType;
-    // webkitColumnRuleColor?: CssColor;
-    // webkitColumnRuleStyle?: ColumnRuleStyleType;
-    // webkitColumnRuleWidth?: BorderLengthStyleType;
-    // webkitColumnSpan?: DefaultStyleType;
-    // webkitColumnWidth?: DefaultStyleType;
-    // webkitColumns?: DefaultStyleType;
-    // webkitLineClamp?: DefaultStyleType;
-    // webkitTapHighlightColor?: DefaultStyleType;
-    // webkitUserModify?: DefaultStyleType;
-    // webkitUserSelect?: DefaultStyleType;
-    // webkitWritingMode?: DefaultStyleType;
-
-    // msContentZoomChaining?: DefaultStyleType;
-    // msContentZoomLimit?: DefaultStyleType;
-    // msContentZoomLimitMax?: DefaultStyleType;
-    // msContentZoomLimitMin?: DefaultStyleType;
-    // msContentZoomSnap?: DefaultStyleType;
-    // msContentZoomSnapPoints?: DefaultStyleType;
-    // msContentZoomSnapType?: DefaultStyleType;
-    // msContentZooming?: DefaultStyleType;
-    // msFlowFrom?: DefaultStyleType;
-    // msFlowInto?: DefaultStyleType;
-    // msFontFeatureSettings?: DefaultStyleType;
-    // msGridColumn?: DefaultStyleType;
-    // msGridColumnAlign?: DefaultStyleType;
-    // msGridColumnSpan?: DefaultStyleType;
-    // msGridColumns?: DefaultStyleType;
-    // msGridRow?: DefaultStyleType;
-    // msGridRowAlign?: DefaultStyleType;
-    // msGridRowSpan?: DefaultStyleType;
-    // msGridRows?: DefaultStyleType;
-    // msHighContrastAdjust?: DefaultStyleType;
-    // msHyphenateLimitChars?: DefaultStyleType;
-    // msHyphenateLimitLines?: DefaultStyleType;
-    // msHyphenateLimitZone?: DefaultStyleType;
-    // msHyphens?: DefaultStyleType;
-    // msImeAlign?: DefaultStyleType;
-    // msOverflowStyle?: DefaultStyleType;
-    // msScrollChaining?: DefaultStyleType;
-    // msScrollLimit?: DefaultStyleType;
-    // msScrollLimitXMax?: DefaultStyleType;
-    // msScrollLimitXMin?: DefaultStyleType;
-    // msScrollLimitYMax?: DefaultStyleType;
-    // msScrollLimitYMin?: DefaultStyleType;
-    // msScrollRails?: DefaultStyleType;
-    // msScrollSnapPointsX?: DefaultStyleType;
-    // msScrollSnapPointsY?: DefaultStyleType;
-    // msScrollSnapType?: DefaultStyleType;
-    // msScrollSnapX?: DefaultStyleType;
-    // msScrollSnapY?: DefaultStyleType;
-    // msScrollTranslation?: DefaultStyleType;
-    // msTextCombineHorizontal?: DefaultStyleType;
-    // msTextSizeAdjust?: DefaultStyleType;
-    // msTouchAction?: DefaultStyleType;
-    // msTouchSelect?: DefaultStyleType;
-    // msUserSelect?: DefaultStyleType;
-    // msWrapFlow?: DefaultStyleType;
-    // msWrapMargin?: DefaultStyleType;
-    // msWrapThrough?: DefaultStyleType;
 }
 
 

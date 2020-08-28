@@ -501,6 +501,7 @@ function markerStyleToString( val: Extended<Marker_StyleType>): string
 function rotateToString( val:Rotate_StyleType): string
 {
     return util.val2str( val, {
+        fromNumber: util.AngleMath.styleToString,
         fromArray: v => {
             if (v.length === 2)
                 return `${v[0]} ${util.AngleMath.styleToString(v[1])}`;

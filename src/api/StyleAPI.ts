@@ -666,9 +666,11 @@ export function rotate3d(
 	x: Extended<CssNumber>, y: Extended<CssNumber>, z: Extended<CssNumber>,
 	a: Extended<CssAngle>): ITransformProxy
 {
-	let v = [NumberMath.styleToString(x), NumberMath.styleToString(y),
-		NumberMath.styleToString(z), AngleMath.styleToString(a)].join(",");
-    return () => `rotate3d(${v})`;
+    return () => {
+        let v = [NumberMath.styleToString(x), NumberMath.styleToString(y),
+                NumberMath.styleToString(z), AngleMath.styleToString(a)];
+        return `rotate3d(${v.join(",")})`;
+    }
 }
 
 
@@ -729,9 +731,10 @@ export function scaleZ( s: Extended<CssNumber>): ITransformProxy
 export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
 	sz: Extended<CssNumber>): ITransformProxy
 {
-	let v = [NumberMath.styleToString(sx), NumberMath.styleToString(sy),
-		NumberMath.styleToString(sz)].join(",");
-    return () => `scale3d(${v})`;
+    return () => {
+        let v = [NumberMath.styleToString(sx), NumberMath.styleToString(sy), NumberMath.styleToString(sz)];
+        return `scale3d(${v.join(",")})`;
+    }
 }
 
 
@@ -822,9 +825,10 @@ export function translateZ( z: Extended<CssLength>): ITransformProxy
 export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
 	z: Extended<CssLength>): ITransformProxy
 {
-	let v = [LengthMath.styleToString(x), LengthMath.styleToString(y),
-		LengthMath.styleToString(z)].join(",");
-    return () => `translate3d(${v})`;
+    return () => {
+        let v = [LengthMath.styleToString(x), LengthMath.styleToString(y), LengthMath.styleToString(z)];
+        return `translate3d(${v.join(",")})`;
+    }
 }
 
 
@@ -850,8 +854,10 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
  */
 export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 {
-    let options = { fromNumber: LengthMath.convertFunc };
-    return () => `minmax(${val2str( min, options)},${val2str( max, options)})`;
+    return () => {
+        let options = { fromNumber: LengthMath.convertFunc };
+        return `minmax(${val2str( min, options)},${val2str( max, options)})`;
+    }
 }
 
 
@@ -862,7 +868,6 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
     ...tracks: GridTrack[]): IRepeatProxy
 {
-    // return () => `repeat(${val2str(count)},${stylePropToString( "gridTemplateRows", tracks, true)})`;
     return () => `repeat(${val2str(count)},${val2str( tracks, { arrItemFunc: gridTrackToString })})`;
 }
 
@@ -876,9 +881,7 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
 export function span( countOrName: Extended<GridLineCountOrName>,
     nameOrCount?: Extended<GridLineCountOrName>): ISpanProxy
 {
-    let firstElm = val2str(countOrName);
-    let secondElm = nameOrCount ? val2str( nameOrCount) : "";
-    return () => `span ${firstElm} ${secondElm}`;
+    return () => `span ${val2str(countOrName)} ${nameOrCount ? val2str( nameOrCount) : ""}`;
 }
 
 
@@ -910,7 +913,7 @@ export function span( countOrName: Extended<GridLineCountOrName>,
  * @param b Blue separation value.
  * @param a Optional alpha mask as a percentage value.
  */
-export function rgb( r: number, g: number, b: number, a?: number): IColorProxy
+export function rgb( r: Extended<number>, g: Extended<number>, b: Extended<number>, a?: Extended<number>): IColorProxy
 {
     return () => rgbToString( r, g, b, a);
 }
@@ -941,7 +944,7 @@ export function rgb( r: number, g: number, b: number, a?: number): IColorProxy
  * @param l Lightness component as a percentage value.
  * @param a Optional alpha mask as a percentage value.
  */
-export function hsl( h: number | string, s: number, l: number, a?: number): IColorProxy
+export function hsl( h: Extended<CssAngle>, s: Extended<number>, l: Extended<number>, a?: Extended<number>): IColorProxy
 {
     return () => hslToString( h, s, l, a);
 }
