@@ -1,23 +1,22 @@
-﻿import {CssSelector, PagePseudoClass, IStringProxy} from "../api/BasicTypes";
+﻿import {CssSelector, PagePseudoClass} from "../api/BasicTypes";
 import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
-    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule
+    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule
 } from "./RuleTypes";
-import {SupportsQuery, Styleset, VarTemplateName, VarValueType} from "./StyleTypes";
+import {SupportsQuery, Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
 import {processInstanceOrClass, s_enableShortNames, serializeInstance} from "../rules/RuleContainer";
 import {MediaQuery} from "./MediaAPI"
 import {IFontFace} from "./FontFaceAPI";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
-import {VarRule} from "../rules/VarRule"
+import {VarRule, ConstRule} from "../rules/VarRule"
 import {CounterRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {val2str} from "../impl/UtilFuncs";
 import {IRuleSerializationContext} from "../rules/Rule";
-import { stylePropToString } from "../impl/StyleFuncs";
 
 
 
@@ -94,7 +93,7 @@ export function $keyframes( frames?: AnimationFrame[],
  * variable can be later used either in conditional grouping rules or in derived style definition
  * classes.
  */
-export function $var<K extends VarTemplateName>( template: K, propVal?: VarValueType<K>,
+export function $var<K extends VarTemplateName>( template: K, propVal?: ExtendedVarValue<K>,
 				nameOverride?: string | IVarRule<K>): IVarRule<K>
 {
 	return new VarRule( template, propVal, nameOverride);
@@ -114,12 +113,12 @@ export function $var<K extends VarTemplateName>( template: K, propVal?: VarValue
  * the [[ICssVarTemplates]] interface. The type corresponding to that property defines the type
  * of the second parameter.
  * @param value The value assigned to the constant.
- * @returns A function that returns a string value of the constant. The function will be invoked
- * once when the style definition is processed.
+ * @returns A function that returns a string value of the constant. The function is invoked once
+ * when the style definition is processed.
  */
-export function $const<K extends VarTemplateName>( template: K, value?: VarValueType<K>): IStringProxy
+export function $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
 {
-	return () => stylePropToString( template, value, true);
+	return new ConstRule( template, value);
 }
 
 /**

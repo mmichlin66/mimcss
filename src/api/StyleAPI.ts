@@ -678,9 +678,9 @@ export function rotate3d(
 /**
  * Returns an ITransformProxy function representing the `scale()` CSS function.
  */
-export function scale( cx: Extended<CssNumber>, sy?: Extended<CssNumber>): ITransformProxy
+export function scale( cx: Extended<CssNumber>, cy?: Extended<CssNumber>): ITransformProxy
 {
-    return () => `scale(${NumberMath.styleToString(cx)}${sy != null ? "," + NumberMath.styleToString(sy) : ""})`;
+    return () => `scale(${NumberMath.styleToString(cx)}${cy != null ? "," + NumberMath.styleToString(cy) : ""})`;
 }
 
 

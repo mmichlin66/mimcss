@@ -1685,24 +1685,17 @@ export interface ICssVarTemplates extends ICssStyleset
  */
 export type VarTemplateName = keyof ICssVarTemplates;
 
-
-
 /**
- * The VarTemplates type maps all template properties defined in the [[ICssVarTemplates]]
- * interface to the "extended" versions of their types. These extended types are defined using
- * the [[Extended]] generic type, which adds basic keywords (e.g. "unset", "initial", etc.) as
- * well as [[StringProxy]] and [[ICustomVar]] to the type that is defined in the ICssVarTemplates
- * interface.
+ * The VarValueType generic type defines the type of the value that can be assigned to the custom
+ * CSS property using the generic type K as its template.
  */
-export type VarTemplates = { [K in VarTemplateName]: ExtendedProp<ICssVarTemplates[K]> }
-
-
+export type VarValue<K extends VarTemplateName> = ICssVarTemplates[K];
 
 /**
  * The VarValueType generic type defines the type of the value that can be assigned to the custom
  * CSS property using the generic type K as its template.
  */
-export type VarValueType<K extends VarTemplateName> = VarTemplates[K];
+export type ExtendedVarValue<K extends VarTemplateName> = Extended<VarValue<K>>;
 
 
 
@@ -1752,7 +1745,7 @@ export type VarValueType<K extends VarTemplateName> = VarTemplates[K];
  * ```
  */
 export type CustomVar_StyleType<K extends VarTemplateName = any> =
-    [IVarRule<K>, VarValueType<K>] | [string, K, VarValueType<K>]
+    [IVarRule<K>, ExtendedVarValue<K>] | [string, K, ExtendedVarValue<K>]
 
 
 

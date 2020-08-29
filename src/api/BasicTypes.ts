@@ -75,19 +75,10 @@ export interface IStringProxy extends IGenericProxy<"string"> {}
  */
 export interface ICustomVar<T = any>
 {
-	// /**
-	//  * Gets the value of the property.
-	//  */
-	// getValue(): T;
-
-    /**
-	 * Sets new value of this custom CSS property.
-	 * @param value New value for the CSS property.
-	 * @param important Flag indicating whether to set the "!important" flag on the property value.
-	 * @param schedulerType ID of a registered scheduler type that is used to write the property
-	 * value to the DOM. If undefined, the current default scheduler will be used.
+	/**
+	 * Gets the value of the property.
 	 */
-	setValue( value: T, important?: boolean, schedulerType?: number): void;
+	getValue(): Extended<T>;
 }
 
 
@@ -552,6 +543,11 @@ export interface IParameterizedPseudoElement
 export interface IParameterizedPseudoEntity extends IParameterizedPseudoClass, IParameterizedPseudoElement
 {
 }
+
+
+
+/** Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules */
+export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" | " &" | ">&" | "+&" | "~&";
 
 
 

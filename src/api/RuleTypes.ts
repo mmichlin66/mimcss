@@ -1,13 +1,9 @@
 ﻿import {
     ICustomVar, OneOrMany, PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity,
-    IRuleWithSelector
+    IRuleWithSelector,
+    SelectorCombinator
 } from "../api/BasicTypes";
-import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType} from "./StyleTypes";
-
-
-
-/** Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules */
-export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" | " &" | ">&" | "+&" | "~&";
+import {ExtendedStyleset, Styleset, VarTemplateName, VarValue, ExtendedVarValue} from "./StyleTypes";
 
 
 
@@ -143,7 +139,7 @@ export interface IStyleRule extends IRule, IRuleWithSelector
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: VarValueType<K>,
+	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: ExtendedVarValue<K>,
 		important?: boolean, schedulerType?: number): void;
 }
 
@@ -200,9 +196,10 @@ export interface IIDRule extends INamedStyleRule
 export type AnimationWaypoint = OneOrMany<"from" | "to" | number>;
 
 /**
- * The AnimationStyles type defines a object containing style properties for an animation frame.
- * Stylesets for keyframes allow custom properties (via "--"). Animation styleset can extend
- * other style rules; however, any dependent rules will be ignored.
+ * The AnimationStyleset type defines an object containing style properties for an animation frame.
+ * Stylesets for keyframes allow custom properties (via "--") but don't allow dependent rules
+ * (because dependent rules are actually separate CSS rules). Animation styleset can extend other
+ * style rules; however, any dependent rules will be ignored.
  */
 export type AnimationStyleset = Styleset & { "+"?: IStyleRule | IStyleRule[] };
 
@@ -244,19 +241,40 @@ export interface IAnimationFrameRule extends IStyleRule
  * The IVarRule interface represents a CSS custom property definition.
  * Objects implementing this interface are returned from the [[$var]] function.
  */
-export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, ICustomVar<VarValueType<K>>
+export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, ICustomVar<VarValue<K>>
 {
 	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
 	readonly template: K;
 
-    // /**
-	//  * Sets new value of this custom CSS property.
-	//  * @param value New value for the CSS property.
-	//  * @param important Flag indicating whether to set the "!important" flag on the property value.
-	//  * @param schedulerType ID of a registered scheduler type that is used to write the property
-	//  * value to the DOM. If undefined, the current default scheduler will be used.
-	//  */
-	// setValue( value: VarValueType<K>, important?: boolean, schedulerType?: number): void;
+    /**
+	 * Sets new value of this custom CSS property.
+	 * @param value New value for the CSS property.
+	 * @param important Flag indicating whether to set the "!important" flag on the property value.
+	 * @param schedulerType ID of a registered scheduler type that is used to write the property
+	 * value to the DOM. If undefined, the current default scheduler will be used.
+	 */
+	setValue( value: ExtendedVarValue<K>, important?: boolean, schedulerType?: number): void;
+}
+
+
+
+/**
+ * The IConstRule interface represents a "constant" that can be used anywhere the type defined by
+ * the `template` parameter can be used. These are called constants, because they provide the
+ * convenient and lightweight way of defining values that are unchanged during the application
+ * lifetime. Although constants are defined very similarly to custom properties (see the
+ * [[IVarRule]] function), they cannot participate in the cascade and cannot be redefined under
+ * elements. Constant can, however, use any expression that satisfies the type defined by the
+ * `template` parameter including other constants, custom properties and functions.
+ * Objects implementing this interface are returned from the [[$const]] function.
+ */
+export interface IConstRule<K extends VarTemplateName = any> extends ICustomVar<VarValue<K>>
+{
+	/**
+     * Name of a non-custom CSS property or simple type whose type determines the type of the
+     * custom property value.
+     */
+	readonly template: K;
 }
 
 

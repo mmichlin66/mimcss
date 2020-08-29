@@ -3,7 +3,7 @@ import {
     IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule,
     IClassNameRule
 } from "../api/RuleTypes";
-import {ExtendedStyleset, Styleset, VarTemplateName, VarValueType, CustomVar_StyleType} from "../api/StyleTypes"
+import {ExtendedStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {val2str, camelToDash} from "../impl/UtilFuncs";
 import {
@@ -337,7 +337,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: VarValueType<K>,
+	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: ExtendedVarValue<K>,
 		important?: boolean, schedulerType?: number): void
 	{
 		if (!varObj || !(varObj instanceof VarRule))

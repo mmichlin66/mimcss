@@ -5,7 +5,7 @@
     ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy
 } from "../api/BasicTypes"
 import {IVarRule, ICounterRule, IIDRule} from "./RuleTypes";
-import {VarTemplateName, VarValueType, ListStyleType_StyleType} from "./StyleTypes";
+import {VarTemplateName, ListStyleType_StyleType, ExtendedVarValue} from "./StyleTypes";
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath,
 	FrequencyMath, PercentMath, val2str, templateStringToString
@@ -221,7 +221,7 @@ export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProx
  * Returns a function representing the invocation of the `var()` CSS function for
  * the given custom CSS property with optional fallbacks.
  */
-export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: VarValueType<K>): IStringProxy
+export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
 {
     return () => fallback
         ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
