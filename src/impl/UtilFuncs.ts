@@ -39,6 +39,16 @@ export function camelToDash( camel: string): string
 
 
 
+// /**
+//  * Symbol under which a function is defined that converts an object to a string. We need a special
+//  * symbol because the standard method toString exists on every object and we only want some to
+//  * exlicitly provide the support
+//  */
+
+//  let symValueToString = Symbol("symValueToString");
+
+
+
 /**
  * The IValueConvertOptions interface defines optional functions that convertvalues of differnt
  * types to strings.
@@ -88,8 +98,8 @@ export function val2str( val: any, options?: IValueConvertOptions): string
     {
         // standard processing:
         // - null/undefined become empty string.
-        // - call valueToString (proxy objects) if exist.
-        // - function: call without parameters.
+        // - call [symValueToString] method on objects that have it.
+        // - function: call without parameters - support for proxies.
         // - everything else: call toString().
         if (val == null)
             return "";

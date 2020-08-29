@@ -1,7 +1,6 @@
 import {CssSelector} from "../api/BasicTypes"
 import {
-    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule,
-    IClassNameRule
+    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule
 } from "../api/RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
@@ -282,8 +281,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	/**
-	 * This function allows the object to particpate in "valueToString" serialization. Whenever
-	 * the StyleRule-derived object is encountered by the `UtilFunc.valueToString` function,
+	 * This function allows the object to particpate in "val2str" serialization. Whenever
+	 * the StyleRule-derived object is encountered by the `UtilFunc.val2str` function,
 	 * the rule's selector will be used.
 	 */
 	public valueToString(): string
@@ -569,7 +568,7 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
  */
 export class ClassRule extends NamedStyleRule implements IClassRule
 {
-	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity | IClassNameRule)
+	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
 	{
 		super( style, nameOverride);
 	}
@@ -636,7 +635,7 @@ export class SelectorRule extends StyleRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return val2str( this.selector);
+		return val2str( this.selector, { arrSep: ","});
 	}
 
 	// selector object for this rule.

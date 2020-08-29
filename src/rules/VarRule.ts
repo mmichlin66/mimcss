@@ -62,7 +62,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	 */
     public getValue(): ExtendedVarValue<K>
     {
-        return this.value;
+        return this.value!;
     }
 
 
@@ -102,7 +102,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	public cssName: string;
 
 	// Value of the custom CSS property.
-	private value: ExtendedVarValue<K>;
+	private value?: ExtendedVarValue<K>;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
@@ -165,7 +165,7 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 	 */
     public getValue(): ExtendedVarValue<K>
     {
-        return this.value;
+        return this.value!;
     }
 
 
@@ -174,7 +174,7 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 	public template: K;
 
 	// Value of the custom CSS property.
-	private value: ExtendedVarValue<K>;
+	private value?: ExtendedVarValue<K>;
 
 	// Property value cached when the rule is proceed.
 	public cachedValue?: string;

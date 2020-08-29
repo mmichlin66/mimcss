@@ -200,7 +200,35 @@ export type BackgroundPosition_StyleType = MultiCssPosition;
 
 
 
-/** Type for single background repeat */
+/** Type for background-position-x single item */
+export type BackgroundPositionX_Single = HorizontalPositionKeyword | CssLength |
+    [HorizontalPositionKeyword , Extended<CssLength>];
+
+/**
+ * Type for background-position-x style property. To use the two-value syntax, e.g. `left 30px`,
+ * the values must specified as a tuple inside an array; that is: `[["left", 30]]`. If values
+ * are put into a single array, they will be considered two different items and will be
+ * separated by comma. For example: `["left", 30]` will become `left, 30px`.
+ */
+export type BackgroundPositionX_StyleType = OneOrMany<BackgroundPositionX_Single>;
+
+
+
+/** Type for background-position-y single item */
+export type BackgroundPositionY_Single = VerticalPositionKeyword | CssLength |
+    [VerticalPositionKeyword , Extended<CssLength>];
+
+/**
+ * Type for background-position-y style property. To use the two-value syntax, e.g. `top 30px`,
+ * the values must specified as a tuple inside an array; that is: `[["top", 30]]`. If values
+ * are put into a single array, they will be considered two different items and will be
+ * separated by comma. For example: `["top", 30]` will become `top, 30px`.
+ */
+export type BackgroundPositionY_StyleType = OneOrMany<BackgroundPositionY_Single>;
+
+
+
+    /** Type for single background repeat */
 export type BackgroundRepeatKeyword_Single = "repeat" | "space" | "round" | "no-repeat";
 
 /** Type for single background repeat */
@@ -1214,7 +1242,9 @@ export type DefaultStyleType = string;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Interface representing a collection of built-in style properties and their values.
+ * Interface representing a collection of built-in style properties. Every builtin property
+ * appears in this interface. Also it is possible to add aditional properties via module
+ * augmentation technique.
  */
 export interface ICssStyleset
 {
@@ -1243,8 +1273,8 @@ export interface ICssStyleset
     backgroundImage?: BackgroundImage_StyleType;
     backgroundOrigin?: BackgroundOrigin_StyleType;
     backgroundPosition?: BackgroundPosition_StyleType;
-    backgroundPositionX?: DefaultStyleType;
-    backgroundPositionY?: DefaultStyleType;
+    backgroundPositionX?: BackgroundPositionX_StyleType;
+    backgroundPositionY?: BackgroundPositionY_StyleType;
     backgroundRepeat?: BackgroundRepeat_StyleType;
     backgroundRepeatX?: DefaultStyleType;
     backgroundRepeatY?: DefaultStyleType;
@@ -1695,44 +1725,49 @@ export type VarValue<K extends VarTemplateName> = ICssVarTemplates[K];
  * The VarValueType generic type defines the type of the value that can be assigned to the custom
  * CSS property using the generic type K as its template.
  */
-export type ExtendedVarValue<K extends VarTemplateName> = Extended<VarValue<K>>;
+export type ExtendedVarValue<K extends VarTemplateName> = ExtendedProp<VarValue<K>>;
+
+// // The following would be more correct type representation; however, TypeScript produces error
+// // "TS2590: Expression produces a union type that is too complex to represent".
+// export type ExtendedVarValue<K extends VarTemplateName> =
+//     K extends keyof ICssStyleset ? ExtendedProp<VarValue<K>> : Extended<VarValue<K>>;
 
 
 
 /**
- * The CustomVarStyleType type represents a custom CSS property name and value that are used to
+ * The `CustomVar_StyleType` type represents a custom CSS property name and value that are used to
  * define custom properties in a Styleset. This object is used in conjunction with the
- * `--` property of the Styleset type.
+ * `"--""` property of the Styleset type.
  *
- * CustomVarStyleType objects should be mostly used to override custom properties that have
- * previously been defined at the top-level using the $var function. That way you can have a
+ * `CustomVar_StyleType` objects should be mostly used to override custom properties that have
+ * previously been defined at the top-level using the [[$var]] function. That way you can have a
  * "global" value of a custom property and assign a different value to it under a certain CSS
  * selector.
  *
- * The values of the type can be specified as either a two-item or a three-item array. The
- * two-item array is used with a previously defined custom CSS property represented by an IVarRule
+ * The values of the type can be specified as either a two-item or a three-item tuple. The
+ * two-item tuple is used with a previously defined custom CSS property represented by an [[IVarRule]]
  * object:
- * - The first item is the IVarRule object.
+ * - The first item is the [[IVarRule]] object.
  * - The second item is the value
  *
- * The three-item array allows directly specifying the custom CSS property name:
+ * The three-item array allows explicitly specifying the custom CSS property name:
  * - The first item is a string - the name of the custom CSS property. If the name is not prefixed
  * with two dashes they will be added automatically.
  * - The second item is the name of a non-custom CSS property whose type determines the type of the
  * custom property value.
  * - The third item is the value
  *
- * Use the CustomVarStyleType type in the following manner:
+ * Use the `CustomVar_StyleType` type in the following manner:
  *
  * ```typescript
- * class MyStyles extends StyleDefinition
+ * class MyStyles extends css.StyleDefinition
  * {
  *     // define global custom CSS property and re-define its value under "brown" class.
- *     mainColor = $var( "color", "black");
- *     brown = $class({ "--": [ [this.mainColor, "brown"] ] })
+ *     mainColor = css.$var( "color", "black");
+ *     brown = css.$class({ "--": [ [this.mainColor, "brown"] ] })
 
- *     // directly define custom CSS property under "blue" class.
- *     blue = $class({ "--": [ ["different-color", "color", "blue"] ] })
+ *     // define custom CSS property with the given name under "blue" class.
+ *     blue = css.$class({ "--": [ ["different-color", "color", "blue"] ] })
  * });
  * ```
  *
@@ -1741,7 +1776,7 @@ export type ExtendedVarValue<K extends VarTemplateName> = Extended<VarValue<K>>;
  * ```css
  * :root { --MyStyles_mainColor: "black"; }
  * .brown { --MyStyles_mainColor: "brown"; }
- * .blue { --different-olor: "blue"; }
+ * .blue { --different-color: "blue"; }
  * ```
  */
 export type CustomVar_StyleType<K extends VarTemplateName = any> =
@@ -1752,12 +1787,13 @@ export type CustomVar_StyleType<K extends VarTemplateName = any> =
 /**
  * Type representing a collection of style properties and their values. In addition to the
  * properties representing the standard CSS styles, this type also includes the "--" property,
- * which is an array of CustomVarStyleType objects.
+ * which is an array of [[CustomVar_StyleType]] objects each specifying a value for a single
+ * custom property.
  */
 export type Styleset = ExtendedStyleset &
     {
         /**
-         * Special property "--" specifies an array that contains CustomVarStyleType objects each
+         * Special property "--" specifies an array that contains [[CustomVar_StyleType]] objects each
          * representing a definition of a custom CSS property.
          */
         "--"?: CustomVar_StyleType[];
@@ -1776,10 +1812,10 @@ export type Styleset = ExtendedStyleset &
  * styleset are combined with the "and" operator. The entire styleset can be negated, which will
  * result in placing the "not" operator that will act on all styles in the query.
  *
- * Note that using PureStyleset object doesn't allow for checking whether two or more values of
- * a given property are supported. For example, although we can test that the "display" property
- * supports the "flex" value, we cannot check whether both "flex" and "grid" values are supported.
- * To check such criteria you must specify the query as a string.
+ * Note that using the `ExtendedStyleset` object doesn't allow for checking whether two or more
+ * values of a given property are supported. For example, although we can test that the `display`
+ * property supports the `flex` value, we cannot check whether both `flex` and `grid` values are
+ * supported. To check such criteria you must specify the query as a string.
  */
 export type SingleSupportsQuery = string | ExtendedStyleset & { $negate?: boolean; };
 

@@ -231,8 +231,8 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
     }
 
 	/**
-	 * This function allows the object to particpate in "valueToString" serialization. Whenever
-	 * the ClassNameRule object is encountered by the `UtilFunc.valueToString` function,
+	 * This function allows the object to particpate in "val2str" serialization. Whenever
+	 * the ClassNameRule object is encountered by the `UtilFunc.val2str` function,
 	 * the rule's CSS name (the one with the dots) will be used.
 	 */
 	public valueToString(): string

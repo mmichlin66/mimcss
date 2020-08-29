@@ -1,27 +1,15 @@
 ﻿/**
- * This file contains basic types and functions used to define CSS property types.
+ * This module describes common types and functions used in Mimcss. These include:
  *
- * All CSS properties should accept string as the type of their value even if normally
- * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
- * color) property. This is because in addition to their normal values any property
- * can use custom CSS property in the form `var(--propname)`. However, if we add string type
- * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
- * Intellisense and it doesn't prompt developers for the possible values. The IValueProxy
- * can be used instead of string and this solves the Intellisense issue.
- *
- * Another benefit of using functions is that they are
- * constructed at one time but the string generation occurs at another time. This allows
- * using these objects in the style definition classes. They can reference objects like
- * IVarRule that are not fully initialized yet. However, when the styles should be inserted
- * into DOM the initialization will have already occurred and the function will
- * return a correct string.
- *
- * Note that the proxy functions have a parameter that distinguishes them from
- * other proxy functions. This is because we want to distinguish between different CSS types,
- * so that a function used for one CSS type cannot be used for a different CSS type. For
- * example, the `calc()` function returns the NumberProxy function, while the
- * `linearGradient()` function returns the ImageProxy function. Thus you cannot use the
- * 'calc()` function for image-based CSS properties and vice versa.
+ * - basic types used for all style properties
+ * - numeric types used for style properties of CSS types such as `<length>`, `<angle>`, etc.
+ * - pseudo classes and pseudo elements
+ * - selectors
+ * - colors
+ * - shapes
+ * - filters
+ * - transforms
+ * - utility types
  */
 
 
@@ -46,6 +34,25 @@ export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
  * parameter helps differentiate these interfaces so that functions that can be assigned to one
  * type of style properties (e.g. `transform`) cannot be assigned to an incompatible style property
  * (e.g. `filter`).
+ *
+ * All CSS properties should accept string as the type of their value even if normally
+ * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
+ * color) property. This is because in addition to their normal values any property
+ * can use custom CSS property in the form `var(--propname)`. However, if we add string type
+ * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
+ * Intellisense and it doesn't prompt developers for the possible values. The `IGenericProxy`
+ * can be used instead of string and this solves the Intellisense issue.
+ *
+ * Another benefit of using functions is that they are
+ * constructed at one time but the string generation occurs at another time. This allows
+ * using these objects in the style definition classes. They can reference objects like
+ * `IVarRule` that are not fully initialized yet. However, when the styles should be inserted
+ * into DOM the initialization will have already occurred and the function will
+ * return a correct string.
+ *
+ * @typeParam T String constant that is used to differentiate between proxies used for different
+ * purposes. The parameter `p` of this callable interface has the type T but it is not used
+ * in any way.
  */
 export interface IGenericProxy<T extends string>
 {
@@ -78,7 +85,7 @@ export interface ICustomVar<T = any>
 	/**
 	 * Gets the value of the property.
 	 */
-	getValue(): Extended<T>;
+	getValue(): ExtendedProp<T>;
 }
 
 

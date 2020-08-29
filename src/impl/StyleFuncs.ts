@@ -570,9 +570,9 @@ export type ToStringFunc = (val: any) => string;
  * property expected in the value object to be converted. Each property is converted according
  * to the following rules:
  * - If the array item is just a string, the corresponding value's property is converted using
- *   the valueToString function.
+ *   the val2str function.
  * - If the second element is null or undefined, the corresponding value's property is converted using
- *   the valueToString function..
+ *   the val2str function..
  * - If the second element is a string it is treated as a name of a longhand style property. The
  *   value's property is converted using the stylePropToString function for this longhand style
  *   property.
@@ -951,6 +951,8 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     backgroundColor: WellKnownFunc.Color,
     backgroundOrigin: WellKnownFunc.ArrayWithComma,
     backgroundPosition: v => util.multiPos2str( v, ","),
+    backgroundPositionX: v => util.multiPos2str( v, ","),
+    backgroundPositionY: v => util.multiPos2str( v, ","),
     backgroundRepeat: WellKnownFunc.ArrayWithComma,
     backgroundSize: {
         fromNumber: util.LengthMath.styleToString,

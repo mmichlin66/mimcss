@@ -1,4 +1,11 @@
-﻿import {CssSelector, PagePseudoClass} from "../api/BasicTypes";
+﻿/**
+ * This module describes functions used to create rules within style definition classes andsome
+ * helper types and functions
+ */
+
+
+
+import {CssSelector, PagePseudoClass} from "../api/BasicTypes";
 import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
@@ -21,55 +28,234 @@ import {IRuleSerializationContext} from "../rules/Rule";
 
 
 /**
- * Creates new abstract rule, which defines a styleset that can be extended by other style
- * rules. Abstract rules don't have selectors and are not inserted into DOM.
+ * Creates a new abstract rule, which defines a styleset that can be extended by other style rules.
+ * Abstract rules don't have selectors and are not inserted into the DOM. Abstract rules can
+ * themselves extend other rules - both abstract and non-abstract.
+ *
+ * @param styleset Styleset that will be inherited by style rules that extend this abstract rule.
+ * @returns `IStyleRule` object that should be used by the derived rules in the `"+"` property.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     colorBox = css.$abstract({
+ *         backgroundColor: "orange",
+ *         borderRadius: "10%",
+ *         border: [4, "solid", "red"],
+ *         ":hover": {
+ *             opacity: 0.7
+ *         }
+ *     })
+ *
+ *     box1 = css.$class({
+ *         "+": this.colorBox,
+ *         width: 200,
+ *         height: 200,
+ *     })
+ *
+ *     box2 = css.$class({
+ *         "+": this.colorBox,
+ *         width: 600,
+ *         height: 400,
+ *     })
+ * }
+ * ```
  */
-export function $abstract( style: CombinedStyleset): IStyleRule
+export function $abstract( styleset: CombinedStyleset): IStyleRule
 {
-	return new AbstractRule( style);
+	return new AbstractRule( styleset);
 }
 
+
+
 /**
- * Creates new class rule. The class name will be created when the rule is processed as part of
+ * Creates a new class rule. The class name will be created when the rule is processed as part of
  * the style definition class. The name can be also overridden by providing either an explicit
  * name or another class rule. The function can be called without parameters just to "declare"
  * the class. Such class can be later used either in conditional grouping rules or in derived
  * style definition classes.
- */
-export function $class( style?: CombinedStyleset,
-    nameOverride?: string | IClassRule | IClassNameRule): IClassRule
+ *
+ * The returned [[IClassRule]] interface has the `name` property that should be used to assign
+ * the class to an HTML element
+ *
+ * @param styleset Styleset that defines style properties of the class.
+ * @param nameOverride string or another `IClassRule` object that determines the name of the class.
+ * If this optional parameter is defined, the name will override the Mimcss name assignment
+ * mechanism. This might be useful if there is a need for the class to match a name of another,
+ * probably external, class.
+ * @returns `IClassRule` object that should be used for getting the class name and for accessing
+ * the style properties if needed.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     vbox = css.$class({
+ *         display: "flex",
+ *         flexDirection: "column",
+ *         alignItems: "center"
+ *     })
+ * }
+ * ...
+ * let styles = css.activate( MyClasses);
+ * ...
+ * render
+ * {
+ *     return <div class={styles.vbox.name}>
+ *         <span>Hello</span>
+ *         <span>World!</span>
+ *     </div>
+ * }
+ * ```
+*/
+export function $class( styleset?: CombinedStyleset, nameOverride?: string | IClassRule): IClassRule
 {
-	return new ClassRule( style, nameOverride);
+	return new ClassRule( styleset, nameOverride);
 }
 
+
+
 /**
- * Creates new class name rule, which combines one or more other class names. This creates a
+ * Creates a new class name rule, which combines one or more other class names. This creates a
  * "synonym" that is easier to apply to an element's class attribute than an array of two or
- * more clas rules.
+ * more class rules.
+ *
+ * @param ...classes List of class names specified either as a string or `IClassRule` objects.
+ * @returns `IClassNameRule` object whose `name` property contains the combined class name. The
+ * `cssClassName` property contains the combined selector, e.g. `.class1.class2`.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // declare class - just to be used later
+ *     spaced = css.class()
+ *
+ *     vbox = css.$class({
+ *         display: "flex",
+ *         flexDirection: "column",
+ *         alignItems: "center",
+ *         "&": [
+ *             [this.spaced, {
+ *                 gap: 8
+ *             }
+ *         ]
+ *     })
+ *
+ *     // use $classname rule to combine the names of classes vbox and spaced
+ *     spacedVbox = css.$classname( this.vbox, this.spaced)
+ * }
+ * ...
+ * let styles = css.activate( MyClasses);
+ * ...
+ * render
+ * {
+ *     // without spacedVbox, the class would be: {[styles.vbox.name, styles.spaced.name]}
+ *     return <div class={styles.spacedVbox.name}>
+ *         <span>Hello</span>
+ *         <span>World!</span>
+ *     </div>
+ * }
+ *
+ * ```
  */
 export function $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
 {
 	return new ClassNameRule( classes);
 }
 
+
+
 /**
- * Creates new ID rule. The ID name will be created when the rule is processed as part of
+ * Creates a new ID rule. The ID name will be created when the rule is processed as part of
  * the style definition class. The name can be also overridden by providing either an explicit
  * name or another ID rule. The function can be called without parameters just to "declare"
  * the ID. Such ID can be later used either in conditional grouping rules or in derived
  * style definition classes.
+ *
+ * The returned [[IIDRule]] interface has the `name` property that should be used to assign
+ * the ID to an HTML element.
+ *
+ * @param styleset Styleset that defines style properties of the element.
+ * @param nameOverride string or another `IIDRule` object that determines the name of the ID.
+ * If this optional parameter is defined, the name will override the Mimcss name assignment
+ * mechanism. This might be useful if there is a need for the ID to match a name of another ID.
+ * @returns `IIDRule` object that should be used for getting the ID name and for accessing
+ * the style properties if needed.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     container = css.$id({
+ *         display: "flex",
+ *         flexDirection: "column",
+ *         alignItems: "center"
+ *     })
+ * }
+ * ...
+ * let styles = css.activate( MyClasses);
+ * ...
+ * render
+ * {
+ *     return <div id={styles.container.name}>
+ *         <span>Hello</span>
+ *         <span>World!</span>
+ *     </div>
+ * }
  */
-export function $id( style?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
+export function $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
 {
-	return new IDRule( style, nameOverride);
+	return new IDRule( styleset, nameOverride);
 }
 
+
+
 /**
- * Creates new selector rule. Selector can be specified as a string or via the selector function.
+ * Creates a new style rule with an arbitrary complex selector. Selectors can be specified as
+ * one or array of [[SelectorItem]] objects where each `SelectorItem` is one of the following
+ * types:
+ * - string - allows any content but lacks type-safety checks.
+ * - any style rule, that is a rule that implements the [[IStyleRule]] interface. This allows
+ *   using prevously defined class, ID and other style rules as selector items
+ * - [[selector]] function - a tag function that allows convenient mixing of free-format strings
+ *   and strongly typed style rules.
+ *
+ * When multiple selector items are specified, they will be treated as the selector list; that is,
+ * they will be separated by commas.
+ *
+ * @param selector One or more [[SelectorItem]] objects
+ * @param styleset Styleset that defines style properties for this selector.
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // using string for selecting elemnet type
+ *     h1 = css.$style( "h1", {})
+ *
+ *     // using string for a slightly more complex selector
+ *     style1 = css.$style( "*, ::after, ::before", {})
+ *
+ *     id = css.$id()
+ *     cls = css.$class()
+ *
+ *     // using an array of style rules. The selector will be "#id, .cls"
+ *     style1 = css.$style( [this.id, this.cls], {})
+ *
+ *     // using the selector function. The selector will be "#id > .cls"
+ *     style1 = css.$style( css.selector`[this.id] > [this.cls]`, {})
+ * }
  */
-export function $style( selector: CssSelector, style: CombinedStyleset): IStyleRule
+export function $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
 {
-	return new SelectorRule( selector, style);
+	return new SelectorRule( selector, styleset);
 }
 
 /**
@@ -180,9 +366,9 @@ export function $namespace( namespace: string, prefix?: string): INamespaceRule
 /**
  * Creates new page rule.
  */
-export function $page( pseudoClass?: PagePseudoClass, style?: Styleset): IPageRule
+export function $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
 {
-	return new PageRule( pseudoClass, style);
+	return new PageRule( pseudoClass, styleset);
 }
 
 /**
@@ -298,7 +484,7 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Rule virtualization.
+// Style definition serialization.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 

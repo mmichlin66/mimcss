@@ -8,24 +8,24 @@ import {ExtendedStyleset, Styleset, VarTemplateName, VarValue, ExtendedVarValue}
 
 
 /**
- * The CombinedStyleset type extends the Styleset type with certain properties that provide
+ * The `CombinedStyleset` type extends the Styleset type with certain properties that provide
  * additional meaning to the styleset and allow building dependent style rules:
  * - The `"+"` property specifies one or more parent style rules. This allows specifying
  *   parent rules using a convenient style-property-like notation.
- * - Properties with pseudo class names (e.g. ":hover") or pseudo element names (e.g. "::after").
+ * - Properties with pseudo class names (e.g. `:hover`) or pseudo element names (e.g. `::after`).
  *   These properties define a styleset that will be assigned to the selector obtained by using
  *   the original styleset's owner followed by the given pseudo class or pseudo element.
- * - Properties with names of parameterized pseudo classes (e.g. ":nth-child") or parameterized
- *   pseudo elements (e.g. "::slotted"). These properties contain a tuple, where the first
+ * - Properties with names of parameterized pseudo classes (e.g. `:nth-child`) or parameterized
+ *   pseudo elements (e.g. `::slotted`). These properties contain a tuple, where the first
  *   element is the parameter for the selector and the second element is the styleset.
  *   These properties define a styleset that will be assigned to the selector obtained by using
  *   the original styleset's owner followed by the given pseudo class or pseudo element.
- * - Properties with the ampersand symbol ('&') that contain arrays of two-element tuples each
+ * - Properties with the ampersand symbol (`&`) that contain arrays of two-element tuples each
  *   defining a selector and a style corresponding to this selector. Selectors can use the
  *   ampersand symbol to refer to the parent style selector. If the ampersand symbol is not used,
  *   the selector will be simply appended to the parent selector.
  *
- * Functions that return style rules (e.g. $class) accept the CombinedStyleset as a parameter,
+ * Functions that return style rules (e.g. [[$class]]) accept the `CombinedStyleset` as a parameter,
  * for example:
  *
  * ```typescript
