@@ -2,6 +2,7 @@ import {IVarRule, IConstRule} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue} from "../api/StyleTypes"
 import {stylePropToString} from "../impl/StyleFuncs"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import { symValueToString } from "../impl/UtilFuncs";
 
 
 
@@ -19,6 +20,10 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 		this.template = template;
 		this.value = value;
 		this.nameOverride = nameOverride;
+
+        // This function is used when the object is specified as a value of a style property.
+        // We return the var(--name) expression.
+        this[symValueToString] = (): string => `var(${this.cssName})`;
 	}
 
 
@@ -45,15 +50,6 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	{
 		return this.value == null ? null : `${this.cssName}: ${stylePropToString( this.template, this.value, true)}`;
 	}
-
-
-
-	// The valueToString function is used when the object is specified as a value of a style property.
-	// We return the var(--name) expression.
-    public valueToString(): string
-    {
-		return `var(${this.cssName})`;
-    }
 
 
 
@@ -129,6 +125,9 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 		this.template = template;
         this.value = value;
         this.cachedValue = cachedValue;
+
+        // This function is used when the object is specified as a value of a style property.
+        this[symValueToString] = (): string => this.cachedValue!;
 	}
 
 
@@ -149,14 +148,6 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 	{
 		return new ConstRule<K>(this.template, this.value, this.cachedValue);
 	}
-
-
-
-	// The valueToString function is used when the object is specified as a value of a style property.
-    public valueToString(): string
-    {
-		return this.cachedValue!;
-    }
 
 
 

@@ -10,14 +10,14 @@ import {
 } from "./StyleTypes"
 import {
 	PercentMath, LengthMath, arr2str, AngleMath, NumberMath, pos2str,
-	templateStringToString, val2str
+	templateStringToString, val2str, symValueToString
 } from "../impl/UtilFuncs";
 import {
     stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset,
     gridTrackToString
 } from "../impl/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
-import { rgbToString, hslToString, colorWithAlphaToString } from "../impl/ColorFuncs";
+import {rgbToString, hslToString, colorWithAlphaToString} from "../impl/ColorFuncs";
 
 
 
@@ -501,10 +501,10 @@ class PathBuilder implements IPathBuilder
 			this.buf += fillRule + ",";
 
 		this.buf += "'";
-	}
 
-	// Returns the accumulated string
-	public valueToString() : string { return this.buf + "')"; }
+        // Returns the accumulated string
+        this[symValueToString] = (): string => this.buf + "')";
+	}
 
 
 

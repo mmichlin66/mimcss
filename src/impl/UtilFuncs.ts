@@ -39,13 +39,13 @@ export function camelToDash( camel: string): string
 
 
 
-// /**
-//  * Symbol under which a function is defined that converts an object to a string. We need a special
-//  * symbol because the standard method toString exists on every object and we only want some to
-//  * exlicitly provide the support
-//  */
+/**
+ * Symbol under which a function is defined that converts an object to a string. We need a special
+ * symbol because the standard method toString exists on every object and we only want some to
+ * explicitly provide this support.
+ */
 
-//  let symValueToString = Symbol("symValueToString");
+ export let symValueToString = Symbol("symValueToString");
 
 
 
@@ -109,8 +109,8 @@ export function val2str( val: any, options?: IValueConvertOptions): string
             return arr2str( val);
         else if (typeof val === "function")
             return val();
-        else if (typeof val.valueToString === "function")
-            return val.valueToString();
+        else if (typeof val[symValueToString] === "function")
+            return val[symValueToString]();
         else
             return val.toString();
     }
@@ -138,8 +138,8 @@ export function val2str( val: any, options?: IValueConvertOptions): string
         }
         else if (typeof val === "object")
         {
-            if (typeof val.valueToString === "function")
-                return val.valueToString();
+            if (typeof val[symValueToString] === "function")
+                return val[symValueToString]();
             else if (options.fromObj)
                 return options.fromObj( val);
             else if (options.fromAny)

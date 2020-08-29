@@ -1,5 +1,6 @@
 import {ICounterRule} from "../api/RuleTypes"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import {symValueToString} from "../impl/UtilFuncs";
 
 
 
@@ -15,6 +16,10 @@ export class CounterRule extends RuleLike implements ICounterRule
 	{
         super();
 		this.nameOverride = nameOverride;
+
+        // This function is used when the object is specified as a value of a style property.
+        // We return the counter name.
+        this[symValueToString] = (): string => this.name;
 	}
 
 
@@ -33,15 +38,6 @@ export class CounterRule extends RuleLike implements ICounterRule
 	{
 		return new CounterRule( this.nameOverride);
 	}
-
-
-
-	// The valueToString function is used when the object is specified as a value of a style property.
-	// We return the counter name.
-    public valueToString(): string
-    {
-		return this.name;
-    }
 
 
 

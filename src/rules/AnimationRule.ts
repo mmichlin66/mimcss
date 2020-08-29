@@ -1,7 +1,7 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule"
 import {StyleRule} from "./StyleRules";
-import {val2str} from "../impl/UtilFuncs";
+import {val2str, symValueToString} from "../impl/UtilFuncs";
 
 
 
@@ -18,6 +18,9 @@ export class AnimationRule extends Rule implements IAnimationRule
 			this.frameRules = frames.map( frame => new AnimationFrameRule( frame[0], frame[1]));
 
 		this.nameOverride = nameOverride;
+
+        // This function is called to convert an object to a string. Animation rule returns its name.
+        this[symValueToString] = (): string => this.name;
 	}
 
 
@@ -86,14 +89,6 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 		ctx.addRuleText( "}");
     }
-
-
-
-	// This function is called to convert an object to a string. Animation rule returns its name.
-	public valueToString(): string
-	{
-		return this.name;
-	}
 
 
 

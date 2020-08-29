@@ -1,5 +1,6 @@
 import {IGridLineRule, IGridAreaRule} from "../api/RuleTypes"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import {symValueToString} from "../impl/UtilFuncs";
 
 
 
@@ -17,9 +18,11 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         super();
         this.nameOverride = nameOverride;
         this.isStartEndOrNone = isStartEndOrNone;
+
+        // This function is used when the object is specified as a value of a style property.
+        // We return the line name.
+        this[symValueToString] = (): string => this.name;
 	}
-
-
 
 	// Processes the given rule.
 	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
@@ -72,24 +75,11 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
 	}
 
-
-
 	// Creates a copy of the rule.
 	public clone(): GridLineRule
 	{
 		return new GridLineRule( this.nameOverride, this.isStartEndOrNone);
 	}
-
-
-
-	// The valueToString function is used when the object is specified as a value of a style property.
-	// We return the line name.
-    public valueToString(): string
-    {
-		return this.name;
-    }
-
-
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -135,9 +125,11 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
         // create line rules
         this.startLine = new GridLineRule( this, true);
         this.endLine = new GridLineRule( this, false);
+
+        // This function is used when the object is specified as a value of a style property.
+        // We return the are name.
+        this[symValueToString] = (): string => this.name;
 	}
-
-
 
 	// Processes the given rule.
 	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
@@ -151,24 +143,11 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
         this.endLine.process( container, ownerContainer, null);
 	}
 
-
-
 	// Creates a copy of the rule.
 	public clone(): GridAreaRule
 	{
 		return new GridAreaRule( this.nameOverride);
 	}
-
-
-
-	// The valueToString function is used when the object is specified as a value of a style property.
-	// We return the line name.
-    public valueToString(): string
-    {
-		return this.name;
-    }
-
-
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name

@@ -4,7 +4,7 @@ import {
 } from "../api/RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {val2str, camelToDash} from "../impl/UtilFuncs";
+import {val2str, camelToDash, symValueToString} from "../impl/UtilFuncs";
 import {
     mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps, selectorToString,
     pseudoEntityToString
@@ -31,6 +31,13 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 		if (styleset)
 			this.parseInputStyleset( styleset as CombinedStyleset);
+
+        /**
+         * This function allows the object to particpate in "val2str" serialization. Whenever
+         * the StyleRule-derived object is encountered by the `UtilFunc.val2str` function,
+         * the rule's selector will be used.
+         */
+        this[symValueToString] = (): string => this.selectorText;
 	}
 
 
@@ -276,18 +283,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			this.cachedSelectorString = this.getSelectorString();
 
 		return this.cachedSelectorString;
-	}
-
-
-
-	/**
-	 * This function allows the object to particpate in "val2str" serialization. Whenever
-	 * the StyleRule-derived object is encountered by the `UtilFunc.val2str` function,
-	 * the rule's selector will be used.
-	 */
-	public valueToString(): string
-	{
-		return this.selectorText;
 	}
 
 

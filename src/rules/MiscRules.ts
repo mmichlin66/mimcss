@@ -8,6 +8,7 @@ import {MediaQuery} from "../api/MediaAPI";
 import {supportsQueryToString} from "../impl/StyleFuncs";
 import {mediaQueryToString} from "../impl/MediaFuncs";
 import {StyleRule} from "./StyleRules";
+import { symValueToString } from "../impl/UtilFuncs";
 
 
 
@@ -205,6 +206,10 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 	{
 		super();
 		this.classes = classes;
+
+        // This function is used when the object is specified as a value of a style property.
+        // We return the CSS class name.
+        this[symValueToString] = (): string => this.cssClassName;
 	}
 
 	/** CSS rule selector string */
@@ -212,8 +217,6 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 	{
 		return this.cssClassName;
 	}
-
-
 
 	// Creates a copy of the rule.
 	public clone(): ClassNameRule
@@ -229,16 +232,6 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
         this.name = this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
         this.cssClassName = "." + this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(".");
     }
-
-	/**
-	 * This function allows the object to particpate in "val2str" serialization. Whenever
-	 * the ClassNameRule object is encountered by the `UtilFunc.val2str` function,
-	 * the rule's CSS name (the one with the dots) will be used.
-	 */
-	public valueToString(): string
-	{
-		return this.cssClassName;
-	}
 
     // Implementation of the toString method returns the combined name of the classes (without
     // the CSS prefixes).
