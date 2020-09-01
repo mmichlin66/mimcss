@@ -264,6 +264,32 @@ export function $style( selector: CssSelector, styleset: CombinedStyleset): ISty
  * explicit name or another animation rule. The function can be called without parameters just to
  * "declare" the animation. Such animation can be later used either in conditional grouping rules
  * or in derived style definition classes.
+ *
+ * The returned [[IAnimationRule]] interface represents an object that should be used when
+ * using the keyframes name in the `animation-name` or `animation` style properties.
+ *
+ * @param frames Array of [[AnimationFrame]] objects. Each animation frame contains a waypoint
+ * and a styleset.
+ * @param nameOverride Atring or another `IAnimationRule` object that determines the name of the
+ * animation. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * another animation.
+ * @returns `IAnimationRule` object that should be used for getting the animation name.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     vanish = css.$keyframes([
+ *         [0, { opacity: 100 }],
+ *     	   [100, { opacity: 0 }],
+ *     ])
+ *
+ *     vanishingBlock = css.$class({
+ *         animation: { name: this.vanish, duration: 2000, count: "infinite", direction: "alternate" }
+ *     })
+ * }
  */
 export function $keyframes( frames?: AnimationFrame[],
 	nameOverride?: string | IAnimationRule): IAnimationRule
@@ -278,29 +304,73 @@ export function $keyframes( frames?: AnimationFrame[],
  * function can be called without specifying the value just to "declare" the variable. Such
  * variable can be later used either in conditional grouping rules or in derived style definition
  * classes.
+ *
+ * Custom properties defined using the `$var` function are included into the `:root {}` block;
+ * however, they can be redefined with different values under any style rule.
+ *
+ * @param template Either a name of a style property (in camel-case) or a name of the property from
+ * the [[ICssVarTemplates]] interface. The type corresponding to that property defines the type
+ * of the second parameter.
+ * @param value The value assigned to the property.
+ * @param nameOverride String or another `IVarRule` object that determines the name of the
+ * custom property. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing property.
+ * @returns The `IVarRule` object that represents the custom property. Any usage of this object in
+ * style properties or function parameters is substituted by the `var()` CSS function invocation.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // defining and using custom CSS property
+ *     importantTextColor = css.$var( "color", "red")
+ *     important = css.$class({
+ *         color: this.importantTextColor
+ *     })
+ *
+ *     // use different value for the custom property under another CSS class
+ *     special = css.$class({
+ *         "+": this.important,
+ *         "--": [ [this.importantTextColor, "maroon"]]
+ *     })
+ * }
  */
-export function $var<K extends VarTemplateName>( template: K, propVal?: ExtendedVarValue<K>,
+export function $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
 				nameOverride?: string | IVarRule<K>): IVarRule<K>
 {
-	return new VarRule( template, propVal, nameOverride);
+	return new VarRule( template, value, nameOverride);
 }
 
 /**
  * Creates a "constant" that can be used anywhere the type defined by the `template` parameter can
- * be used. These are called constants, because they provide the convenient and lightweight way
- * of defining values that are unchanged during the application lifetime. Although constants are
+ * be used. These are called constants, because they provide a convenient and lightweight way of
+ * defining values that are unchanged during the application lifetime. Although constants are
  * defined very similarly to custom properties (see the [[var]] function), they cannot participate
  * in the cascade and cannot be redefined under elements.
  *
  * Constant can, however, use any expression that satisfies the type defined by the `template`
  * parameter including other constants, custom properties and functions.
  *
- * @param template Either a name of a style property (camel case) or a name of the property from
+ * @param template Either a name of a style property (in camel-case) or a name of the property from
  * the [[ICssVarTemplates]] interface. The type corresponding to that property defines the type
  * of the second parameter.
  * @param value The value assigned to the constant.
- * @returns A function that returns a string value of the constant. The function is invoked once
- * when the style definition is processed.
+ * @returns The `IConstRule` object that represents the value of the constant. The value is
+ * computed once when the style definition is processed.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // defining and using custom CSS property
+ *     defaultTextColor = css.$const( "color", "red")
+ *     para = css.$style( "p", {
+ *         color: this.defaultTextColor
+ *     })
+ * }
  */
 export function $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
 {
@@ -311,6 +381,29 @@ export function $const<K extends VarTemplateName>( template: K, value?: Extended
  * Creates new counter object. The counter name will be created when the rule is processed as
  * part of the style definition class. The name can be also overridden by providing either an
  * explicit name or another counter rule.
+ *
+ * Counter rules don't create any CSS rules, but they create unique names that can be used
+ * for `counter-reset` and `counter-increment` style properties. Counter rules are usually used
+ * in conjunction with the [[counter]] and [[counters]] functions.
+ *
+ * @param nameOverride String or another `ICounterRule` object that determines the name of the
+ * counter. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing counter.
+ * @returns The `ICounterRule` object that represents the counter.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     counter = css.$counter()
+ *     ol = css.$style( "ol", { counterReset: this.counter, listStyleType: "none" })
+ *     li = css.$style( "li", {
+ *         counterIncrement: this.counter,
+ *         "::before": { content: css.counters( this.counter) }
+ *     })
+ * }
  */
 export function $counter( nameOverride?: string | ICounterRule): ICounterRule
 {

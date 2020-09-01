@@ -949,6 +949,7 @@ const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFu
     backgroundBlendMode: WellKnownFunc.ArrayWithComma,
     backgroundClip: WellKnownFunc.ArrayWithComma,
     backgroundColor: WellKnownFunc.Color,
+    backgroundImage: WellKnownFunc.ArrayWithComma,
     backgroundOrigin: WellKnownFunc.ArrayWithComma,
     backgroundPosition: v => util.multiPos2str( v, ","),
     backgroundPositionX: v => util.multiPos2str( v, ","),

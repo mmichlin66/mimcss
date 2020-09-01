@@ -51,7 +51,7 @@ export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
  * return a correct string.
  *
  * @typeParam T String constant that is used to differentiate between proxies used for different
- * purposes. The parameter `p` of this callable interface has the type T but it is not used
+ * purposes. The parameter `p` of this callable interface is of type T but it is not used
  * in any way.
  */
 export interface IGenericProxy<T extends string>

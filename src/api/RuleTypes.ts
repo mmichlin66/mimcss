@@ -243,11 +243,18 @@ export interface IAnimationFrameRule extends IStyleRule
  */
 export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, ICustomVar<VarValue<K>>
 {
-	/** Name of a non-custom CSS property whose type determines the type of the custom property value. */
+	/**
+     * Name of a non-custom CSS property whose type determines the type of the custom property
+     * value. This name is a property of [[ICssVarTemplates]] interface; that is, it is either
+     * a name of a CSS style property (in camel-case) or a string corresponding to one of basic
+     * Mimcss types such as `"CssLength"`, `"CssColor"`, etc.
+     */
 	readonly template: K;
 
     /**
-	 * Sets new value of this custom CSS property.
+	 * Sets new value of this custom CSS property at the global level; that is, under `:root`. To
+     * set a value of the CSS custom property under a certain CSS rule, use the
+     * [[IStyleRule.setCustomProp]] method.
 	 * @param value New value for the CSS property.
 	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property

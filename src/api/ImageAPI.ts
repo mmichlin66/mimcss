@@ -129,7 +129,7 @@ function linearGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
             }) + ",";
         }
 
-        return `${name}(${angleString}${gradientStopsOrHintsToString( stopsOrHints, PercentMath)})`;
+        return `${name}(${angleString}${gradientStopsOrHintsToString( stopsOrHints, LengthMath)})`;
     }
 
 	f.to = (angle: LinearGradAngle) => {
@@ -204,7 +204,7 @@ function radialGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
         let sizeOrExtentString = f.sizeOrExtent ? LengthMath.multiStyleToString( f.sizeOrExtent, " ") : "";
         let posString = f.pos ? `at ${pos2str( f.pos)}` : "";
         let whatAndWhere = f.shape || sizeOrExtentString || f.pos ? `${shapeString} ${sizeOrExtentString} ${posString},` : "";
-        return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, PercentMath)})`;
+        return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, LengthMath)})`;
     }
 
     f.circle = (sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>) => {

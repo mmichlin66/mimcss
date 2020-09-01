@@ -72,10 +72,13 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	 */
 	public setValue( value: ExtendedVarValue<K>, important?: boolean, schedulerType?: number): void
 	{
-        this.value = value;
-		this.container.setCustomVarValue( this.cssName,
-            value == null ? null : stylePropToString( this.template, value, true),
-            important, schedulerType)
+        // this.value = value;
+        if (this.container)
+		{
+            this.container.setCustomVarValue( this.cssName,
+                value == null ? null : stylePropToString( this.template, value, true),
+                important, schedulerType)
+        }
 	}
 
 
