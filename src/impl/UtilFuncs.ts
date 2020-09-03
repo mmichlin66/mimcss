@@ -1,9 +1,8 @@
 ﻿import {
     Extended, NumberBase, MultiNumberBase, INumberBaseMath, IGenericProxy, NumberType, CssNumber,
-    CssMultiNumber, PercentType, IPercentMath, CssPercent, CssMultiPercent, LengthType, ILengthMath,
-    CssLength, CssMultiLength, AngleType, IAngleMath, CssAngle, CssMultiAngle, TimeType, ITimeMath,
-    CssTime, CssMultiTime, ResolutionType, IResolutionMath, CssResolution, CssMultiResolution,
-    FrequencyType, IFrequencyMath, CssFrequency, CssMultiFrequency, CssPosition, MultiCssPosition
+    CssMultiNumber, PercentType, IPercentMath, CssPercent, LengthType, ILengthMath, CssLength,
+    AngleType, IAngleMath, CssAngle, TimeType, ITimeMath, CssTime, ResolutionType, IResolutionMath,
+    CssResolution, FrequencyType, IFrequencyMath, CssFrequency, CssPosition, OneOrMany
 } from "../api/BasicTypes";
 
 
@@ -73,7 +72,8 @@ export interface IValueConvertOptions
     // Called if value is an object
     fromObj?: (val: any) => string;
 
-    // Called if type-specific function is not defined
+    // Called if type-specific function is not defined except for null and string values. This is
+    // also used for array elements if arrItemFunc is not defined.
     fromAny?: (val: any) => string;
 
     // Called to convert array items if fromArray is not defined
@@ -380,7 +380,7 @@ export class PercentMath extends NumberBaseMath<PercentType> implements IPercent
     public static styleToString( val: Extended<CssPercent>): string
         { return numberBaseToString( val, PercentMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<CssMultiPercent>, separator: string): string
+    public static multiStyleToString( val: Extended<OneOrMany<CssPercent>>, separator: string): string
         { return multiStyleToString( val, PercentMath.convertFunc, separator); }
 
     constructor() { super( PercentMath.convertFunc) }
@@ -414,7 +414,7 @@ export class LengthMath extends NumberBaseMath<LengthType> implements ILengthMat
     public static styleToString( val: Extended<CssLength>): string
         { return numberBaseToString( val, LengthMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<CssMultiLength>, separator: string): string
+    public static multiStyleToString( val: Extended<OneOrMany<CssLength>>, separator: string): string
         { return multiStyleToString( val, LengthMath.convertFunc, separator); }
 
     constructor() { super( LengthMath.convertFunc) }
@@ -444,7 +444,7 @@ export class AngleMath extends NumberBaseMath<AngleType> implements IAngleMath
     public static styleToString( val: Extended<CssAngle>): string
         { return numberBaseToString( val, AngleMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<CssMultiAngle>, separator: string): string
+    public static multiStyleToString( val: Extended<OneOrMany<CssAngle>>, separator: string): string
         { return multiStyleToString( val, AngleMath.convertFunc, separator); }
 
     constructor() { super( AngleMath.convertFunc) }
@@ -469,7 +469,7 @@ export class TimeMath extends NumberBaseMath<TimeType> implements ITimeMath
     public static styleToString( val: Extended<CssTime>): string
         { return numberBaseToString( val, TimeMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<CssMultiTime>, separator: string): string
+    public static multiStyleToString( val: Extended<OneOrMany<CssTime>>, separator: string): string
         { return multiStyleToString( val, TimeMath.convertFunc, separator); }
 
     constructor() { super( TimeMath.convertFunc) }
@@ -494,7 +494,7 @@ export class ResolutionMath extends NumberBaseMath<ResolutionType> implements IR
     public static styleToString( val: Extended<CssResolution>): string
         { return numberBaseToString( val, ResolutionMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<CssMultiResolution>, separator: string): string
+    public static multiStyleToString( val: Extended<OneOrMany<CssResolution>>, separator: string): string
         { return multiStyleToString( val, ResolutionMath.convertFunc, separator); }
 
     constructor() { super( ResolutionMath.convertFunc) }
@@ -519,7 +519,7 @@ export class FrequencyMath extends NumberBaseMath<FrequencyType> implements IFre
     public static styleToString( val: Extended<CssFrequency>): string
         { return numberBaseToString( val, FrequencyMath.convertFunc); }
 
-    public static multiStyleToString( val: Extended<CssMultiFrequency>, separator: string): string
+    public static multiStyleToString( val: Extended<OneOrMany<CssFrequency>>, separator: string): string
         { return multiStyleToString( val, FrequencyMath.convertFunc, separator); }
 
     constructor() { super( FrequencyMath.convertFunc) }
@@ -547,7 +547,7 @@ export function pos2str( val: Extended<CssPosition>): string
 /**
  * Converts multi-position style value to the CSS string.
  */
-export function multiPos2str( val: Extended<MultiCssPosition>, separator: string): string
+export function multiPos2str( val: Extended<OneOrMany<CssPosition>>, separator: string): string
 {
     return val2str( val, {
         arrItemFunc: pos2str,

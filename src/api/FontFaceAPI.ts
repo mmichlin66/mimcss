@@ -41,7 +41,8 @@ export type FontSrcFormat_Keyword = "woff" | "woff2" | "truetype" | "opentype" |
 export type FontSrc_Single = string | { local: FontFaceExtended<string> } |
     {
         url: FontFaceExtended<string>,
-        format?: FontFaceExtended<FontSrcFormat_Keyword | FontSrcFormat_Keyword[]> };
+        format?: FontFaceExtended<FontSrcFormat_Keyword | FontSrcFormat_Keyword[]>
+    };
 
 /** Type of src property */
 export type FontSrc_FontFaceType = FontSrc_Single | FontSrc_Single[];

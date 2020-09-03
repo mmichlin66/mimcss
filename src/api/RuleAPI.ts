@@ -258,6 +258,8 @@ export function $style( selector: CssSelector, styleset: CombinedStyleset): ISty
 	return new SelectorRule( selector, styleset);
 }
 
+
+
 /**
  * Creates new animation rule. The animation name will be created when the rule is processed as
  * part of the style definition class. The name can be also overridden by providing either an
@@ -296,6 +298,8 @@ export function $keyframes( frames?: AnimationFrame[],
 {
 	return new AnimationRule( frames, nameOverride);
 }
+
+
 
 /**
  * Creates new custom variable object that defines a custom CSS property. The variable name will
@@ -343,15 +347,20 @@ export function $var<K extends VarTemplateName>( template: K, value?: ExtendedVa
 	return new VarRule( template, value, nameOverride);
 }
 
+
+
 /**
  * Creates a "constant" that can be used anywhere the type defined by the `template` parameter can
- * be used. These are called constants, because they provide a convenient and lightweight way of
+ * be used. They are called constants, because they provide a convenient and lightweight way of
  * defining values that are unchanged during the application lifetime. Although constants are
  * defined very similarly to custom properties (see the [[var]] function), they cannot participate
- * in the cascade and cannot be redefined under elements.
+ * in the cascade and cannot be redefined under style rules. Constant can use any expression that
+ * satisfies the type defined by the `template` parameter including other constants, custom
+ * properties and functions.
  *
- * Constant can, however, use any expression that satisfies the type defined by the `template`
- * parameter including other constants, custom properties and functions.
+ * No CSS rules are created for costants and due to this fact constants are preferable to custom
+ * properties unless the intention is to change the variable value at run-time or to redefine its
+ * value under different style rules.
  *
  * @param template Either a name of a style property (in camel-case) or a name of the property from
  * the [[ICssVarTemplates]] interface. The type corresponding to that property defines the type
@@ -376,6 +385,8 @@ export function $const<K extends VarTemplateName>( template: K, value?: Extended
 {
 	return new ConstRule( template, value);
 }
+
+
 
 /**
  * Creates new counter object. The counter name will be created when the rule is processed as
@@ -411,9 +422,45 @@ export function $counter( nameOverride?: string | ICounterRule): ICounterRule
 }
 
 /**
- * Creates new grid line object. The line name will be created when the rule is processed as
+ * Creates a new grid line rule. The line name will be created when the rule is processed as
  * part of the style definition class. The name can be also overridden by providing either an
- * explicit name or another grid line rule.
+ * explicit name or another grid line rule. The grid line rules are used to define values of
+ * style properties `grid-row-start/end` and `grid-column-start/end`.
+ *
+ * No CSS rule is created for grid lines - these objects are solely used for creating names, which
+ * can be type-safely referred to from style rules.
+ *
+ * @param nameOverride String or another `IGridLineRule` object that determines the name of the
+ * line. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing grid line.
+ * @param isStartEndOrNone Flag indicating whether the `"-start"` or `"-end"` suffix should be
+ * appended to the rule name. If the flag is true, `"-start"` is appended; if the flag is false,
+ * `"-end"` is appended; if the flag is undefined, no suffix is appended to the rule name.
+ * @returns The `IGridLineRule` object that represents the grid line.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     gridLineFirst = css.$gridline()
+ *     gridLineLast = css.$gridline()
+ *
+ *     grid = css.$class({
+ *         display: "grid",
+ *         gridTemplateColumns: [ [this.gridLineFirst], "1fr", "2fr", [this.gridLineLast] ],
+ *         gridTemplateRows: css.repeat( 2, "1fr"),
+ *     })
+ *
+ *     first = css.$class({
+ *         gridColumnStart: this.gridLineFirst,
+ *     })
+ *
+ *     last = css.$class({
+ *         gridColumnEnd: this.gridLineLast,
+ *     })
+ * }
  */
 export function $gridline( nameOverride?: string | IGridLineRule,
     isStartEndOrNone?: boolean): IGridLineRule
@@ -421,31 +468,97 @@ export function $gridline( nameOverride?: string | IGridLineRule,
 	return new GridLineRule( nameOverride, isStartEndOrNone);
 }
 
+
+
 /**
- * Creates new grid area object. The area name will be created when the rule is processed as
+ * Creates a new grid area rule. The area name will be created when the rule is processed as
  * part of the style definition class. The name can be also overridden by providing either an
- * explicit name or another grid area rule.
+ * explicit name or another grid area rule. The grid area rules are used to define values of
+ * style properties `grid-area`, `grid-row-start/end`, `grid-column-start/end` and
+ * `grid-template-areas`.
+ *
+ * No CSS rule is created for grid areas - these objects are solely used for creating names, which
+ * can be type-safely referred to from style rules.
+ *
+ * Every grid area defines two grid line rules in each direction, which can be accessed using the
+ * [[IGridAreaRule.startLine]] and [[IGridAreaRule.endLine]] properties.
+ *
+ * @param nameOverride String or another `IGridAreaRule` object that determines the name of the
+ * area. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing grid area.
+ * @returns The `IGridAreaRule` object that represents the grid area.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     headerArea = css.$gridarea();
+ *     mainArea = css.$gridarea();
+ *
+ *     grid = css.$class({
+ *         display: "grid",
+ *         gridTemplateColumns: "1fr",
+ *         gridTemplateRows: ["3em", "1fr"],
+ *         gridTemplateAreas: [
+ *             [this.headerArea, 1,1, 1,1],
+ *             [this.mainArea, 2,1, 2,1],
+ *         ],
+ *     })
+ *
+ *     header = css.$class({
+ *         gridArea: this.headerArea,
+ *         backgroundColor: "blue"
+ *     })
+ *
+ *     main = css.$class({
+ *         gridArea: this.mainArea,
+ *         backgroundColor: "lightgrey"
+ *     })
+ * }
  */
 export function $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
 {
 	return new GridAreaRule( nameOverride);
 }
 
+
+
 /**
- * Creates new import rule.
+ * Creates a new `@font-face` rule.
+ *
+ * @param fontface Object implementing the `IFontFace` interface defining the parameter of the
+ * font to use.
+ * @returns The `IFontFaceRule` object that represents the font-face rule.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     font = css.$fontface({
+ *         fontFamily: "Roboto",
+ *         fontStyle: "italic",
+ *         fontWeight: 700,
+ *         src: {url: 'roboto.woff', format: 'woff'}
+ *     });
+ * }
+ */
+export function $fontface( fontface: IFontFace): IFontFaceRule
+{
+	return new FontFaceRule( fontface);
+}
+
+
+
+/**
+ * Creates a new `@import` rule referencing the given CSS file.
  */
 export function $import( url: string, mediaQuery?: string | MediaQuery,
 	supportsQuery?: string | SupportsQuery): IImportRule
 {
 	return new ImportRule( url, mediaQuery, supportsQuery);
-}
-
-/**
- * Creates new font-face rule.
- */
-export function $fontface( fontface: IFontFace): IFontFaceRule
-{
-	return new FontFaceRule( fontface);
 }
 
 /**

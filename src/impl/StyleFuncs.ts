@@ -1,4 +1,4 @@
-﻿import {CssSelector, Extended, OneOrMany, CssRadius, CssMultiLength, CssMultiTime} from "../api/BasicTypes";
+﻿import {CssSelector, Extended, OneOrMany, CssRadius, CssLength, CssTime} from "../api/BasicTypes";
 import {
     TimingFunction_Single, Animation_Single, Background_Single, BackgroundSize_Single,
     BorderImage_Object, BorderImageSlice_StyleType, BoxShadow_Single, BorderRadius_StyleType,
@@ -835,14 +835,14 @@ export function forAllPropsInStylset( styleset: Styleset,
 
 // Helper function converts the given multi-length value to string. If the value is an array, the
 // items will be separated by space.
-function multiLengthToStringWithSpace( val: Extended<CssMultiLength>): string
+function multiLengthToStringWithSpace( val: Extended<OneOrMany<CssLength>>): string
 {
     return util.LengthMath.multiStyleToString( val, " ");
 }
 
 // Helper function converts the given multi-time value to string. If the value is an array, the
 // items will be separated by comma.
-function multiTimeToStringWithComma( val: Extended<CssMultiTime>): string
+function multiTimeToStringWithComma( val: Extended<OneOrMany<CssTime>>): string
 {
     return util.TimeMath.multiStyleToString( val, ",");
 }

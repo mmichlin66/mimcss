@@ -62,7 +62,7 @@ export interface IGenericProxy<T extends string>
 
 
 /**
- * The IStringProxy interface represents a function that returns a string. This function is part
+ * The `IStringProxy` interface represents a function that returns a string. This function is part
  * of type definition for all CSS properties - even for those that don't have `string` as part of
  * their type.
  *
@@ -75,10 +75,14 @@ export interface IStringProxy extends IGenericProxy<"string"> {}
 
 
 /**
- * The ICustomVar interface represents a CSS custom property object with values of the given type.
- * This interface is needed because every style property can accept value in the form of the
- * `var()` CSS function. This interface is extended by the [[IVarRule]] interface that is returned
- * from the [[$var]] function.
+ * The `ICustomVar` interface represents a custom property or a constant with values of the given
+ * type. Every style property can accept a custom CSS property value in the form of the `var()` CSS
+ * function. Mimcss also allows defining "constants", which are a more lightweight way to provide
+ * values that are used in other rules and properties.
+ *
+ * Th `ICustomVar` interface is extended by the [[IVarRule]] interface that is returned
+ * from the [[$var]] function and by the [[IConstRule]] interface that is returned from the
+ * [[$const]] function.
  */
 export interface ICustomVar<T = any>
 {
@@ -123,13 +127,27 @@ export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Type for pair-like property that can have 1 to 2 values of the given type */
-export type OneOrPair<T> = T | [Extended<T>, Extended<T>];
+/**
+ * Type for pair-like properties that can have 1 or 2 values of the given type. This type is used
+ * for style properties that can specify values for two dimensions (x and y), but also allow for a
+ * single value, in which case it applies to both dimensions. For example, it used by style
+ * properties such as `overflow`, `border-radius`, `background-repeat` and others.
+ */
+export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
 
-/** Type for box-like property that can have 1 to 4 values of the given type */
-export type OneOrBox<T> = T | [Extended<T>, Extended<T>, Extended<T>?, Extended<T>?];
+/**
+ * Type for box-like properties that can have 1 to 4 values of the given type. This type is used
+ * for style properties that specify values for the four sides of an element box and have rules how
+ * specifying 1, 2 or 3 values determine the values applied to all four sides. For example, it used
+ * by style properties such as `margin`, `padding`, `border-color` and others.
+ */
+export type OneOrBox<T> = T | [Extended<T>, Extended<T>?, Extended<T>?, Extended<T>?];
 
-/** Type for a property that can have 1 or more values of the given type */
+/**
+ * Type for properties that can have 1 or more values of the given type. It is used by many style
+ * properties such as `animation` and all its longhands, `background` and all its longhands,
+ * `transition` and all its longhands, `box-shadow`, `filter` and others.
+ */
 export type OneOrMany<T> = T | Extended<T>[];
 
 /**
@@ -219,9 +237,6 @@ export type PercentType = "Percent";
 /** Type for single style property of the `<percent>` CSS type */
 export type CssPercent = NumberBase<PercentType>;
 
-/** Type for multi-part style property of the `<percent>` CSS type */
-export type CssMultiPercent = OneOrMany<CssPercent>;
-
 /** Proxy interface that represents values of the `<percent>` CSS type */
 export interface IPercentProxy extends IGenericProxy<PercentType> {};
 
@@ -250,15 +265,6 @@ export type LengthType = "Length" | PercentType;
 
 /** Type for single style property of the `<length>` CSS type */
 export type CssLength = NumberBase<LengthType>;
-
-/** Type for multi-part style property of the `<length>` CSS type */
-export type CssMultiLength = OneOrMany<CssLength>;
-
-/** Type for 1-to-2-part style property of the `<length>` CSS type */
-export type CssLengthPair = OneOrPair<CssLength>;
-
-/** Type for 1-to-4-part style property of the `<length>` CSS type */
-export type CssLengthBox = OneOrBox<CssLength>;
 
 /** Proxy interface that represents values of the `<length>` CSS type */
 export interface ILengthProxy extends IGenericProxy<LengthType> {};
@@ -290,9 +296,6 @@ export type AngleType = "Angle" | PercentType;
 /** Type for single style property of the `<angle>` CSS type */
 export type CssAngle = NumberBase<AngleType>;
 
-/** Type for multi-part style property of the `<angle>` CSS type */
-export type CssMultiAngle = OneOrMany<CssAngle>;
-
 /** Proxy interface that represents values of the `<angle>` CSS type */
 export interface IAngleProxy extends IGenericProxy<AngleType> {};
 
@@ -320,9 +323,6 @@ export type TimeType = "Time";
 
 /** Type for single style property of the `<time>` CSS type */
 export type CssTime = NumberBase<TimeType>;
-
-/** Type for multi-part style property of the `<time>` CSS type */
-export type CssMultiTime = OneOrMany<CssTime>;
 
 /** Proxy interface that represents values of the `<time>` CSS type*/
 export interface ITimeProxy extends IGenericProxy<TimeType> {};
@@ -352,9 +352,6 @@ export type ResolutionType = "Resolution";
 /** Type for single style property of the `<resolution>` CSS type */
 export type CssResolution = NumberBase<ResolutionType>;
 
-/** Type for multi-part style property of the `<resolution>` CSS type */
-export type CssMultiResolution = OneOrMany<CssResolution>;
-
 /** Proxy interface that represents values of the `<resolution>` CSS type */
 export interface IResolutionProxy extends IGenericProxy<ResolutionType> {};
 
@@ -383,9 +380,6 @@ export type FrequencyType = "Frequency";
 /** Type for single style property of the `<frequency>` CSS type */
 export type CssFrequency = NumberBase<FrequencyType>;
 
-/** Type for multi-part style property of the `<frequency>` CSS type */
-export type CssMultiFrequency = OneOrMany<CssFrequency>;
-
 /** Proxy interface that represents values of the `<frequency>` CSS type */
 export interface IFrequencyProxy extends IGenericProxy<FrequencyType> {};
 
@@ -412,24 +406,31 @@ export type CssPoint = [Extended<CssLength>, Extended<CssLength>];
 
 
 
-/** Type describing the horizontal position */
+/** Horizontal position keywords */
 export type HorizontalPositionKeyword = "left" | "center" | "right";
 
-/** Type describing the horizontal position */
+/** Single-value horizontal position */
+export type HorizontalPosition = HorizontalPositionKeyword | CssLength;
+
+/** Vertical position keywords */
 export type VerticalPositionKeyword = "top" | "center" | "bottom";
 
+/** Single-value vertical position */
+export type VerticalPosition = VerticalPositionKeyword | CssLength;
+
 /** Type describing a simple 1 or two values `<position>` CSS type */
-export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyword | Extended<CssLength> |
-    [HorizontalPositionKeyword | Extended<CssLength>, VerticalPositionKeyword | Extended<CssLength>];
+export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyword | CssLength |
+    [Extended<HorizontalPosition>, Extended<VerticalPosition>] |
+    [Extended<VerticalPosition>, Extended<HorizontalPosition>];
 
 /** Type describing the full up to 4 values `<position>` CSS type */
 export type CssPosition = SimpleCssPosition |
-    [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword] |
-    [HorizontalPositionKeyword, VerticalPositionKeyword, Extended<CssLength>] |
-    [HorizontalPositionKeyword, Extended<CssLength>, VerticalPositionKeyword, Extended<CssLength>];
-
-/** Type describing multiple `<position>` CSS types */
-export type MultiCssPosition = Extended<CssPosition>[];
+    [Extended<HorizontalPositionKeyword>, Extended<CssLength>, Extended<VerticalPositionKeyword>] |
+    [Extended<HorizontalPositionKeyword>, Extended<VerticalPositionKeyword>, Extended<CssLength>] |
+    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPositionKeyword>] |
+    [Extended<VerticalPositionKeyword>, Extended<HorizontalPositionKeyword>, Extended<CssLength>] |
+    [Extended<HorizontalPositionKeyword>, Extended<CssLength>, Extended<VerticalPositionKeyword>, Extended<CssLength>] |
+    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPositionKeyword>, Extended<CssLength>];
 
 
 

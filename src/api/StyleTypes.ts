@@ -1,8 +1,7 @@
 ﻿import {
-    Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, MultiCssPosition,
-    CssTime, CssLength, CssAngle, CssPercent, CssLengthBox, CssMultiTime, CssFrequency,
-    CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword, VerticalPositionKeyword,
-    CssPoint, ExtendedProp, CssLengthPair, IQuotedProxy, CssColor, CssImage, BasicShape,
+    Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, CssTime, CssLength, CssAngle,
+    CssPercent, CssFrequency, CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword,
+    VerticalPositionKeyword, CssPoint, ExtendedProp, IQuotedProxy, CssColor, CssImage, BasicShape,
     GeometryBoxKeyword, IFilterProxy, IMinMaxProxy, IFitContentProxy, IRepeatProxy, ISpanProxy,
     IRayProxy, ITransformProxy
 } from "./BasicTypes"
@@ -64,7 +63,7 @@ export type Animation_StyleType = string | OneOrMany<Animation_Single>;
 
 
 /** Type for animation-delay style property */
-export type AnimationDelay_StyleType = CssMultiTime;
+export type AnimationDelay_StyleType = OneOrMany<CssTime>;
 
 
 
@@ -77,7 +76,7 @@ export type AnimationDirection_StyleType = OneOrMany<AnimationDirection_Single>;
 
 
 /** Type for animation-duraton style property */
-export type AnimationDuration_StyleType = CssMultiTime;
+export type AnimationDuration_StyleType = OneOrMany<CssTime>;
 
 
 
@@ -196,7 +195,7 @@ export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin_Single>;
 
 
 /** Type for background-position style property */
-export type BackgroundPosition_StyleType = MultiCssPosition;
+export type BackgroundPosition_StyleType = OneOrMany<CssPosition>;
 
 
 
@@ -317,7 +316,7 @@ export type BorderImageWidth_StyleType = OneOrBox<CssNumber | "auto" | string>;
 
 
 /** Type for border-radius style property */
-export type BorderRadius_StyleType = OneOrPair<CssLengthBox>;
+export type BorderRadius_StyleType = OneOrPair<OneOrBox<CssLength>>;
 
 
 
@@ -407,7 +406,7 @@ export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start
 
 
 /** Type for clip style property */
-export type Clip_StyleType = "auto" | CssLengthBox;
+export type Clip_StyleType = "auto" | OneOrBox<CssLength>;
 
 
 
@@ -657,11 +656,15 @@ export type GridAutoFlow_StyleType = "row" | "column" | "dense" | "row dense" | 
 
 
 
-/** Type for specifying either number of grid lines or name of grid line or area */
-export type GridLineCountOrName = CssNumber | IGridAreaRule | IGridLineRule | string;
+/**
+ * Type for specifying either number of grid lines or name of grid line or area. This type is used
+ * when defining grid-column-start/end and grid-row-start/end style properties.
+ */
+export type GridLineCountOrName = CssNumber | IGridAreaRule | IGridLineRule;
 
 /** Type for grid-column-start/end and grid-row-start/end style properties */
-export type GridAxisSide_StyleType = "auto" | GridLineCountOrName | ISpanProxy;
+export type GridAxisSide_StyleType = "auto" | GridLineCountOrName | ISpanProxy |
+    [Extended<CssNumber>, IGridAreaRule | IGridLineRule];
 
 
 
@@ -1444,7 +1447,7 @@ export interface ICssStyleset
     listStylePosition?: ListStylePosition_StyleType;
     listStyleType?: ListStyleType_StyleType;
 
-    margin?: CssLengthBox;
+    margin?: OneOrBox<CssLength>;
     marginBlockEnd?: CssLength;
     marginBlockStart?: CssLength;
     marginBottom?: CssLength;
@@ -1502,7 +1505,7 @@ export interface ICssStyleset
     overscrollBehaviorX?: OverscrollBehavior_Single_StyleType;
     overscrollBehaviorY?: OverscrollBehavior_Single_StyleType;
 
-    padding?: CssLengthBox;
+    padding?: OneOrBox<CssLength>;
     paddingBlockEnd?: CssLength;
     paddingBlockStart?: CssLength;
     paddingBottom?: CssLength;
@@ -1537,23 +1540,23 @@ export interface ICssStyleset
     scrollbarColor?: ScrollbarColor_StyleType;
     scrollbarWidth?: ScrollbarWidth_StyleType;
     scrollBehavior?: ScrollBehavior_StyleType;
-    scrollMargin?: CssLengthBox;
-    scrollMarginBlock?: CssLengthPair;
+    scrollMargin?: OneOrBox<CssLength>;
+    scrollMarginBlock?: OneOrPair<CssLength>;
     scrollMarginBlockEnd?: CssLength;
     scrollMarginBlockStart?: CssLength;
     scrollMarginBottom?: CssLength;
-    scrollMarginInline?: CssLengthPair;
+    scrollMarginInline?: OneOrPair<CssLength>;
     scrollMarginInlineEnd?: CssLength;
     scrollMarginInlineStart?: CssLength;
     scrollMarginLeft?: CssLength;
     scrollMarginRight?: CssLength;
     scrollMarginTop?: CssLength;
-    scrollPadding?: CssLengthBox;
-    scrollPaddingBlock?: CssLengthPair;
+    scrollPadding?: OneOrBox<CssLength>;
+    scrollPaddingBlock?: OneOrPair<CssLength>;
     scrollPaddingBlockEnd?: CssLength;
     scrollPaddingBlockStart?: CssLength;
     scrollPaddingBottom?: CssLength;
-    scrollPaddingInline?: CssLengthPair;
+    scrollPaddingInline?: OneOrPair<CssLength>;
     scrollPaddingInlineEnd?: CssLength;
     scrollPaddingInlineStart?: CssLength;
     scrollPaddingLeft?: CssLength;

@@ -874,7 +874,7 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
 
 
 /**
- * Returns an ISpanProxy function representing the span expression for grid layouts. If the first
+ * Returns an ISpanProxy function representing the `span` expression for grid layouts. If the first
  * parameter is a number, the second parameter (if defined) must be a name; if the first parameter
  * is a name, the second parameter (if defined) must be a number.
  */

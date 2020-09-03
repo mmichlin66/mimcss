@@ -38,7 +38,7 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
         else if (nameOverride instanceof GridAreaRule)
         {
-            this.name = nameOverride.name + (this.isStartEndOrNone ? "-start" : "-end");
+            this.name = nameOverride.name + (this.isStartEndOrNone === true ? "-start" : this.isStartEndOrNone === false ? "-end" : "");
             this.areaName = nameOverride.name;
         }
         else
