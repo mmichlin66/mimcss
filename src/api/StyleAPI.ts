@@ -468,7 +468,7 @@ export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | 
 	return () =>
 	{
 		let angleString = AngleMath.styleToString( angle);
-		let sizeString = size =! null ? "," + LengthMath.styleToString( size) : "";
+		let sizeString = size != null ? "," + LengthMath.styleToString( size) : "";
 		let containString = contain ? ",contain" : "";
 		return `ray(${angleString}${sizeString}${containString})`;
 	};

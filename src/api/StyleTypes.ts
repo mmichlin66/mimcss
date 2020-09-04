@@ -3,7 +3,7 @@
     CssPercent, CssFrequency, CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword,
     VerticalPositionKeyword, CssPoint, ExtendedProp, IQuotedProxy, CssColor, CssImage, BasicShape,
     GeometryBoxKeyword, IFilterProxy, IMinMaxProxy, IFitContentProxy, IRepeatProxy, ISpanProxy,
-    IRayProxy, ITransformProxy
+    IRayProxy, ITransformProxy, ILengthProxy
 } from "./BasicTypes"
 import {FontStretch_Single} from "./FontFaceAPI";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
@@ -138,10 +138,10 @@ export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 
 
 /** Type for single background value */
-export type Background_Single = string | CssColor |
+export type Background_Single = CssColor |
     {
         color?: Extended<CssColor>,
-        image?: Extended<CssImage | string>,
+        image?: Extended<CssImage>,
         position?: Extended<CssPosition>,
         size?: Extended<BackgroundSize_Single>,
         repeat?: Extended<BackgroundRepeat_Single>,
@@ -182,7 +182,7 @@ export type BackgroundClip_StyleType = OneOrMany<BackgroundClip_Single>;
 
 
 /** Type for background-image style property */
-export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage | string>;
+export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
 
 
 
@@ -228,10 +228,10 @@ export type BackgroundPositionY_StyleType = OneOrMany<BackgroundPositionY_Single
 
 
     /** Type for single background repeat */
-export type BackgroundRepeatKeyword_Single = "repeat" | "space" | "round" | "no-repeat";
+export type BackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat";
 
 /** Type for single background repeat */
-export type BackgroundRepeat_Single = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeyword_Single>;
+export type BackgroundRepeat_Single = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeyword>;
 
 /** Type for background-repeat style property */
 export type BackgroundRepeat_StyleType = OneOrMany<BackgroundRepeat_Single>;
@@ -283,35 +283,35 @@ export type BorderImage_Object =
     };
 
 /** Type for border-image style property. */
-export type BorderImage_StyleType = string | CssImage | BorderImage_Object;
+export type BorderImage_StyleType = CssImage | BorderImage_Object;
 
 /**
  * Type for border-image-outset style property. It is CssNumber and not CssLength because
  * border-image-outset can be specified as a unitless number.
  */
-export type BorderImageOutset_StyleType = OneOrBox<CssNumber | string>;
+export type BorderImageOutset_StyleType = OneOrBox<CssNumber | ILengthProxy>;
 
 /** Type for border-image-repeat keywords */
-export type BorderImageRepeat_Keyword = "stretch" | "repeat" | "round" | "space";
+export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space";
 
 /** Type for border-image-repeat style property */
-export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeat_Keyword>;
+export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeatKeyword>;
 
 /** Type for border-image-slice style property */
-export type BorderImageSlice_StyleType = OneOrBox<CssNumber | string> |
-    [Extended<CssNumber | string>, true] |
-    [Extended<CssNumber | string>, Extended<CssNumber | string>, true] |
-    [Extended<CssNumber | string>, Extended<CssNumber | string>, Extended<CssNumber | string>, true] |
-    [Extended<CssNumber | string>, Extended<CssNumber | string>, Extended<CssNumber | string>, Extended<CssNumber | string>, true];
+export type BorderImageSlice_StyleType = OneOrBox<CssPercent> |
+    [Extended<CssPercent>, boolean?] |
+    [Extended<CssPercent>, Extended<CssPercent>, boolean?] |
+    [Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, boolean?] |
+    [Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, boolean?];
 
 /** Type for border-image-source style property */
-export type BorderImageSource_StyleType = OneOrBox<CssImage | string>;
+export type BorderImageSource_StyleType = OneOrBox<CssImage> | "none";
 
 /**
  * Type for border-image-width style property. It is CssNumber and not CssLength because
  * border-image-width can be specified as a unitless number.
  */
-export type BorderImageWidth_StyleType = OneOrBox<CssNumber | "auto" | string>;
+export type BorderImageWidth_StyleType = OneOrBox<CssNumber | ILengthProxy | "auto">;
 
 
 
@@ -326,19 +326,24 @@ export type BorderSpacing_StyleType = OneOrPair<CssLength>;
 
 
 /** Type for single border side style property */
-export type BorderStyle_Keyword = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
+export type BorderStyle_Single = "none" | "hidden" | "dotted" | "dashed" | "solid" | "double" |
     "groove" | "ridge" | "inset" | "outset";
 
 
 
 /** Type for border-style style property */
-export type BorderStyle_StyleType = OneOrBox<BorderStyle_Keyword>;
+export type BorderStyle_StyleType = OneOrBox<BorderStyle_Single>;
 
 
 
 /** Type for border style property */
-export type Border_StyleType = CssLength | BorderStyle_Keyword | CssColor |
-    [Extended<CssLength>?, Extended<BorderStyle_Keyword>?, Extended<CssColor>?];
+export type Border_StyleType = BorderWidth_Single | BorderStyle_Single | CssColor |
+    [Extended<BorderWidth_Single>, Extended<BorderStyle_Single>?, Extended<CssColor>?] |
+    [Extended<BorderWidth_Single>, Extended<CssColor>?, Extended<BorderStyle_Single>?] |
+    [Extended<BorderStyle_Single>, Extended<BorderWidth_Single>?, Extended<CssColor>?] |
+    [Extended<BorderStyle_Single>, Extended<CssColor>?, Extended<BorderWidth_Single>?] |
+    [Extended<CssColor>, Extended<BorderWidth_Single>?, Extended<BorderStyle_Single>?] |
+    [Extended<CssColor>, Extended<BorderStyle_Single>?, Extended<BorderWidth_Single>?];
 
 
 
@@ -351,7 +356,7 @@ export type BorderWidth_StyleType = OneOrBox<BorderWidth_Single>;
 
 
 /** Type for single box shadow. */
-export type BoxShadow_Single = "none" | string |
+export type BoxShadow_Single = "none" |
     {
         x: Extended<CssLength>,
         y: Extended<CssLength>,
@@ -756,7 +761,7 @@ export type LineBreak_StyleType = "auto" | "loose" | "normal" | "strict" | "anyw
 
 
 /** Type for line-height style property */
-export type LineHeight_StyleType = CssNumber | string;
+export type LineHeight_StyleType = CssNumber | ILengthProxy;
 
 
 
@@ -1077,7 +1082,7 @@ export type TextOverflow_StyleType = OneOrPair<"clip" | "ellipsis" | "fade" | st
 
 
 /** Type for the single value of the text-shadow style property */
-export type TextShadow_Single = "none" | string |
+export type TextShadow_Single = "none" |
     {
         x: Extended<CssLength>,
         y: Extended<CssLength>,
@@ -1119,7 +1124,7 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
 
 
 /** Type for transform style property */
-export type Transform_StyleType = "none" | string | OneOrMany<ITransformProxy>;
+export type Transform_StyleType = "none" | OneOrMany<ITransformProxy>;
 
 
 
@@ -1287,17 +1292,17 @@ export interface ICssStyleset
     border?: Border_StyleType;
     borderBlockEnd?: Border_StyleType;
     borderBlockEndColor?: CssColor;
-    borderBlockEndStyle?: BorderStyle_Keyword;
+    borderBlockEndStyle?: BorderStyle_Single;
     borderBlockEndWidth?: BorderWidth_Single;
     borderBlockStart?: Border_StyleType;
     borderBlockStartColor?: CssColor;
-    borderBlockStartStyle?: BorderStyle_Keyword;
+    borderBlockStartStyle?: BorderStyle_Single;
     borderBlockStartWidth?: BorderWidth_Single;
     borderBottom?: Border_StyleType;
     borderBottomColor?: CssColor;
     borderBottomLeftRadius?: CssRadius;
     borderBottomRightRadius?: CssRadius;
-    borderBottomStyle?: BorderStyle_Keyword;
+    borderBottomStyle?: BorderStyle_Single;
     borderBottomWidth?: BorderWidth_Single;
     borderCollapse?: BorderColapse_StyleType;
     borderColor?: BorderColor_StyleType;
@@ -1309,20 +1314,20 @@ export interface ICssStyleset
     borderImageWidth?: BorderImageWidth_StyleType;
     borderInlineEnd?: Border_StyleType;
     borderInlineEndColor?: CssColor;
-    borderInlineEndStyle?: BorderStyle_Keyword;
+    borderInlineEndStyle?: BorderStyle_Single;
     borderInlineEndWidth?: BorderWidth_Single;
     borderInlineStart?: Border_StyleType;
     borderInlineStartColor?: CssColor;
-    borderInlineStartStyle?: BorderStyle_Keyword;
+    borderInlineStartStyle?: BorderStyle_Single;
     borderInlineStartWidth?: BorderWidth_Single;
     borderLeft?: Border_StyleType;
     borderLeftColor?: CssColor;
-    borderLeftStyle?: BorderStyle_Keyword;
+    borderLeftStyle?: BorderStyle_Single;
     borderLeftWidth?: BorderWidth_Single;
     borderRadius?: BorderRadius_StyleType;
     borderRight?: Border_StyleType;
     borderRightColor?: CssColor;
-    borderRightStyle?: BorderStyle_Keyword;
+    borderRightStyle?: BorderStyle_Single;
     borderRightWidth?: BorderWidth_Single;
     borderSpacing?: BorderSpacing_StyleType;
     borderStyle?: BorderStyle_StyleType;
@@ -1330,7 +1335,7 @@ export interface ICssStyleset
     borderTopColor?: CssColor;
     borderTopLeftRadius?: CssRadius;
     borderTopRightRadius?: CssRadius;
-    borderTopStyle?: BorderStyle_Keyword;
+    borderTopStyle?: BorderStyle_Single;
     borderTopWidth?: BorderWidth_Single;
     borderWidth?: BorderWidth_StyleType;
     bottom?: CssLength;
@@ -1355,7 +1360,7 @@ export interface ICssStyleset
     columnGap?: ColumnGap_StyleType;
     columnRule?: Border_StyleType;
     columnRuleColor?: CssColor;
-    columnRuleStyle?: BorderStyle_Keyword;
+    columnRuleStyle?: BorderStyle_Single;
     columnRuleWidth?: BorderWidth_Single;
     columnSpan?: ColumnSpan_StyleType;
     columnWidth?: CssLength;
@@ -1447,15 +1452,15 @@ export interface ICssStyleset
     listStylePosition?: ListStylePosition_StyleType;
     listStyleType?: ListStyleType_StyleType;
 
-    margin?: OneOrBox<CssLength>;
-    marginBlockEnd?: CssLength;
-    marginBlockStart?: CssLength;
-    marginBottom?: CssLength;
-    marginInlineEnd?: CssLength;
-    marginInlineStart?: CssLength;
-    marginLeft?: CssLength;
-    marginRight?: CssLength;
-    marginTop?: CssLength;
+    margin?: OneOrBox<CssLength> | "auto";
+    marginBlockEnd?: CssLength | "auto";
+    marginBlockStart?: CssLength | "auto";
+    marginBottom?: CssLength | "auto";
+    marginInlineEnd?: CssLength | "auto";
+    marginInlineStart?: CssLength | "auto";
+    marginLeft?: CssLength | "auto";
+    marginRight?: CssLength | "auto";
+    marginTop?: CssLength | "auto";
     marker?: DefaultStyleType;
     markerEnd?: Marker_StyleType;
     markerMid?: Marker_StyleType;

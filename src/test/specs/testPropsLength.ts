@@ -61,7 +61,7 @@ describe("style properties of type <length>:", () =>
 
 		it("margin, four different numbers", () =>
 		{
-			dom.testShorthandProp( "margin", [0.25, 4, "1%", 3],
+			dom.testShorthandProp( "margin", [0.25, 4, css.percent(1), 3],
 				{
 					marginTop: "0.25em",
 					marginRight: "4px",
@@ -78,7 +78,7 @@ describe("style properties of type <length>:", () =>
 	{
 		it("min", () =>
 		{
-			dom.testLonghandProp( "width", css.Len.min( "90%", 250, 30.5), "min(90%, 250px, 30.5em)");
+			dom.testLonghandProp( "width", css.Len.min( css.percent(90), 250, 30.5), "min(90%, 250px, 30.5em)");
 		})
 
 		it("calc", () =>

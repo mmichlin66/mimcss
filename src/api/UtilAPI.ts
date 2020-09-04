@@ -102,10 +102,10 @@ export function rem( n: number): ILengthProxy { return () => n + "rem"; }
 export function rlh( n: number): ILengthProxy { return () => n + "rlh"; }
 
 /** Creates length value in the units which are a smaller value between vw and vh */
-export function vmin( n: number): ILengthProxy { return () => n + "vmax"; }
+export function vmin( n: number): ILengthProxy { return () => n + "vmin"; }
 
 /** Creates length value in the units which are a larger value between vw and vh */
-export function vmax( n: number): ILengthProxy { return () => n + "vmin"; }
+export function vmax( n: number): ILengthProxy { return () => n + "vmax"; }
 
 /** Creates length value for flex */
 export function fr( n: number): ILengthProxy { return () => n + "fr"; }

@@ -17,12 +17,12 @@ describe("border-image- longhand properties", () =>
 
 		it("single string", () =>
 		{
-			dom.testLonghandProp( "borderImageOutset", "3px", "3px");
+			dom.testLonghandProp( "borderImageOutset", css.px(3), "3px");
 		})
 
 		it("two numbers, two strings", () =>
 		{
-			dom.testLonghandProp( "borderImageOutset", [2, "2px", "0.4em", 1.5], "2 2px 0.4em 1.5");
+			dom.testLonghandProp( "borderImageOutset", [2, css.px(2), css.em(0.4), 1.5], "2 2px 0.4em 1.5");
 		})
 	})
 
@@ -52,12 +52,12 @@ describe("border-image- longhand properties", () =>
 
 		it("single percentage", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", "5%", "5%");
+			dom.testLonghandProp( "borderImageSlice", css.percent(5), "5%");
 		})
 
 		it("two numbers, two percentages", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", ["5%", 10, 5, "10%"], "5% 10 5 10%");
+			dom.testLonghandProp( "borderImageSlice", [css.percent(5), 10, 5, css.percent(10)], "5% 10 5 10%");
 		})
 
 		it("'fill' with single number", () =>
@@ -67,17 +67,17 @@ describe("border-image- longhand properties", () =>
 
 		it("'fill' with single percentage", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", ["5%", true], "5% fill");
+			dom.testLonghandProp( "borderImageSlice", [css.percent(5), true], "5% fill");
 		})
 
 		it("'fill' with two numbers one percentage", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", [10, "5%", 12, true], "10 5% 12 fill");
+			dom.testLonghandProp( "borderImageSlice", [10, css.percent(5), 12, true], "10 5% 12 fill");
 		})
 
 		it("'fill' with two numbers two percentages", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", [10, "5%", 15, "6%", true], "10 5% 15 6% fill");
+			dom.testLonghandProp( "borderImageSlice", [10, css.percent(5), 15, css.percent(6), true], "10 5% 15 6% fill");
 		})
 	})
 
@@ -90,9 +90,9 @@ describe("border-image- longhand properties", () =>
 			dom.testLonghandProp( "borderImageSource", css.url("image.png"), "url(\"image.png\")");
 		})
 
-		it("string", () =>
+		it("raw", () =>
 		{
-			dom.testLonghandProp( "borderImageSource", "url(image.png)", "url(\"image.png\")");
+			dom.testLonghandProp( "borderImageSource", css.raw`url(image.png)`, "url(\"image.png\")");
 		})
 	})
 })
@@ -131,14 +131,14 @@ describe("border-image shorthand property:", () =>
 		);
 	})
 
-	it("image string, slice number and fill, repeat one, width two numbers two strings", () =>
+	it("image raw, slice number and fill, repeat one, width two numbers two strings", () =>
 	{
 		dom.testShorthandProp( "borderImage",
 			{
-				source: "url(image.png)",
+				source: css.raw`url(image.png)`,
 				slice: [10, true],
 				repeat: "stretch",
-				width: [1, "2px", "0.3rem", 2]
+				width: [1, css.px(2), css.rem(0.3), 2]
 			},
 			{
 				borderImageSource: "url(\"image.png\")",
@@ -154,9 +154,9 @@ describe("border-image shorthand property:", () =>
 		dom.testShorthandProp( "borderImage",
 			{
 				source: css.linearGradient( "red", "blue"),
-				slice: [10, "5%"],
+				slice: [10, css.percent(5)],
 				width: 10,
-				outset: [1, "2px", "0.3rem", 2]
+				outset: [1, css.px(2), css.rem(0.3), 2]
 			},
 			{
 				borderImageSource: "linear-gradient(red, blue)",
