@@ -2,7 +2,7 @@
 	INumberMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath,
     IFrequencyMath, IPercentMath, Extended, IStringProxy, IUrlProxy,
     AttrTypeKeyword, AttrUnitKeyword, ILengthProxy, IPercentProxy, IAngleProxy,
-    ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy
+    ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy, CssLength, IFitContentProxy
 } from "../api/BasicTypes"
 import {IVarRule, ICounterRule, IIDRule} from "./RuleTypes";
 import {VarTemplateName, ListStyleType_StyleType, ExtendedVarValue} from "./StyleTypes";
@@ -16,8 +16,7 @@ import {stylePropToString} from "../impl/StyleFuncs";
 
 /**
  * The Num object contains methods that implement CSS mathematic functions on the `<number>`
- * CSS type. When arguments for these functions are of the number JavaScript type they are
- * converted to strings without appending any units to them.
+ * CSS type.
  */
 export let Num: INumberMath = new NumberMath();
 
@@ -31,7 +30,10 @@ export let Percent: IPercentMath = new PercentMath();
 
 
 
-/** Creates percent value */
+/**
+ * Creates percent value by appenfing the `"%"` sign to the given number. This function should be
+ * used whenever a `<percentage>` CSS type is used for a style property or value.
+ */
 export function percent( n: number): IPercentProxy { return () => n + "%"; }
 
 
@@ -226,6 +228,16 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
     return () => fallback
         ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
         : `var(--${varObj.name})`;
+}
+
+
+
+/**
+ * Returns an IFitContentProxy function representing the `fit-content()` CSS function.
+ */
+export function fitContent( size: Extended<CssLength>): IFitContentProxy
+{
+    return () => `fit-content(${LengthMath.styleToString(size)})`;
 }
 
 

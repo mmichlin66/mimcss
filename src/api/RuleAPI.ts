@@ -42,7 +42,7 @@ import {IRuleSerializationContext} from "../rules/Rule";
  * {
  *     colorBox = css.$abstract({
  *         backgroundColor: "orange",
- *         borderRadius: "10%",
+ *         borderRadius: css.percent(10),
  *         border: [4, "solid", "red"],
  *         ":hover": {
  *             opacity: 0.7

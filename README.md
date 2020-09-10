@@ -438,7 +438,7 @@ class MyStyles extends css.StyleDefinition
 
     // width is 80%, min-width is 1.5em and max-width is 500px.
     cls2 = css.$class({
-        width: "80%",
+        width: css.percent(80),
         minWidth: 1.5,
         maxWidth: 500
     })

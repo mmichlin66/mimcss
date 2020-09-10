@@ -1,7 +1,7 @@
 ﻿import {
     Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, CssPoint, CssColor,
     SelectorItem, ISelectorProxy, IFilterProxy, IBasicShapeProxy, IPathBuilder, IRayProxy,
-    IFitContentProxy, IRepeatProxy, IMinMaxProxy, ITransformProxy, ISpanProxy, ExtentKeyword,
+    IRepeatProxy, IMinMaxProxy, ITransformProxy, ISpanProxy, ExtentKeyword,
     IColorProxy, INamedColors
 } from "../api/BasicTypes"
 import {
@@ -309,9 +309,9 @@ export interface IInsetProxy extends IBasicShapeProxy
  * *Example:*
  *
  * ```typescript
- * clipPath: inset( "15%")
+ * clipPath: inset( css.percent(15))
  *
- * clipPath: inset( "15%").round( 8)
+ * clipPath: inset( css.percent(15)).round( 8)
  * ```
  */
 export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
@@ -359,7 +359,7 @@ export interface ICircleProxy extends IBasicShapeProxy
  * ```typescript
  * clipPath: circle( 100)
  *
- * clipPath: circle( 100).at( ["center", "30%"])
+ * clipPath: circle( 100).at( ["center", css.percent(30)])
  * ```
  */
 export function circle( radius?: ShapeRadius): ICircleProxy
@@ -397,7 +397,7 @@ export interface IEllipseProxy extends IBasicShapeProxy
  * ```typescript
  * clipPath: ellipse( 100, 50)
  *
- * clipPath: ellipse( 100, 50).at( ["center", "30%"])
+ * clipPath: ellipse( 100, 50).at( ["center", css.percent(30)])
  * ```
  */
 export function ellipse( radiusX?: ShapeRadius, radiusY?: ShapeRadius): IEllipseProxy
@@ -838,16 +838,6 @@ export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
 // Grid functions
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns an IFitContentProxy function representing the `fit-content()` CSS function.
- */
-export function fitContent( size: Extended<CssLength>): IFitContentProxy
-{
-    return () => `fit-content(${LengthMath.styleToString(size)})`;
-}
-
-
 
 /**
  * Returns an IMinMaxProxy function representing the `minmax()` CSS function.

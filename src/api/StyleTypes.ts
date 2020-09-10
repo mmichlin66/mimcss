@@ -3,7 +3,7 @@
     CssPercent, CssFrequency, CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword,
     VerticalPositionKeyword, CssPoint, ExtendedProp, IQuotedProxy, CssColor, CssImage, BasicShape,
     GeometryBoxKeyword, IFilterProxy, IMinMaxProxy, IFitContentProxy, IRepeatProxy, ISpanProxy,
-    IRayProxy, ITransformProxy, ILengthProxy
+    IRayProxy, ITransformProxy, ILengthProxy, CssSize
 } from "./BasicTypes"
 import {FontStretch_Single} from "./FontFaceAPI";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
@@ -58,7 +58,7 @@ export type Animation_Single =
     };
 
 /** Type for animation style property */
-export type Animation_StyleType = string | OneOrMany<Animation_Single>;
+export type Animation_StyleType = OneOrMany<Animation_Single>;
 
 
 
@@ -536,7 +536,7 @@ export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 /** Type for filter and backdrop-filter style single value */
-export type Filter_Single = string | IUrlProxy | IFilterProxy;
+export type Filter_Single = IUrlProxy | IFilterProxy;
 
 /** Type for filter and backdrop-filter style property */
 export type Filter_StyleType = OneOrMany<Filter_Single>;
@@ -579,7 +579,7 @@ export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inli
 export type Font_SystemKeyword = "caption" | "icon" | "menu" | "message-box" | "small-caption" | "status-bar";
 
 /** Type for font style property */
-export type Font_StyleType = string | Font_SystemKeyword |
+export type Font_StyleType = Font_SystemKeyword |
     {
         size: Extended<CssLength>;
         family: Extended<string>;
@@ -645,12 +645,6 @@ export type Gap_StyleType = RowGap_StyleType | [RowGap_StyleType, ColumnGap_Styl
 
 
 
-/** Type for a single template element defining track size in grid template */
-export type GridTrackSize = CssLength | "min-content" | "max-content" | "auto" |
-    IMinMaxProxy | IFitContentProxy | IRepeatProxy;
-
-
-
 /** Type for grid-auto-columns and grid-auto-rows style properties */
 export type GridAutoAxis_StyleType = OneOrMany<GridTrackSize>;
 
@@ -696,17 +690,21 @@ export type GridTemplateAreas_StyleType = "none" | OneOrMany<IQuotedProxy> |
 
 
 
+/** Type for grid-template-columns and grid-template-rows style properties */
+export type GridTemplateAxis_StyleType = "none" | OneOrMany<GridTrack> | "subgrid";
+
+/** Type for a single track element of grid template axis */
+export type GridTrack = GridTrackSize | GridTrackLine;
+
 /**
  * Type for a single template element defining name or names for a grid line in grid template.
  * This is always an array - even if a single name is given.
  */
 export type GridTrackLine = (IGridLineRule | Extended<string>)[];
 
-/** Type for a single track element of grid template axis */
-export type GridTrack = GridTrackSize | GridTrackLine;
-
-/** Type for grid-template-columns and grid-template-rows style properties */
-export type GridTemplateAxis_StyleType = "none" | OneOrMany<GridTrack> | "subgrid";
+/** Type for a single template element defining track size in grid template */
+export type GridTrackSize = CssLength | "min-content" | "max-content" | "auto" |
+    IFitContentProxy | IMinMaxProxy | IRepeatProxy;
 
 
 
@@ -797,6 +795,11 @@ export type ListStyleType_StyleType = "none" | "disc" | "circle" | "square" | "d
 
 
 
+/** Type for the margin-trim style properties */
+export type MarginTrim_StyleType = "none" | "in-flow" | "all";
+
+
+
 /** Type for the marker-start, marker-mid and marker-end style properties */
 export type Marker_StyleType = "none" | IIDRule;
 
@@ -808,7 +811,7 @@ export type ObjectFit_StyleType = "fill" | "contain" | "cover" | "none" | "scale
 
 
 /** Type for the offset style property */
-export type Offset_StyleType = string | OffsetPath_StyleType |
+export type Offset_StyleType = OffsetPath_StyleType |
 {
     anchor?: OffsetAnchor_StyleType,
     distance?: CssLength,
@@ -1288,8 +1291,9 @@ export interface ICssStyleset
     backgroundRepeatY?: DefaultStyleType;
     backgroundSize?: BackgroundSize_StyleType;
     baselineShift?: BaselineShift_StyleType;
-    blockSize?: CssLength;
+    blockSize?: CssSize;
     border?: Border_StyleType;
+    borderBlock?: Border_StyleType;
     borderBlockEnd?: Border_StyleType;
     borderBlockEndColor?: CssColor;
     borderBlockEndStyle?: BorderStyle_Single;
@@ -1312,6 +1316,7 @@ export interface ICssStyleset
     borderImageSlice?: BorderImageSlice_StyleType;
     borderImageSource?: BorderImageSource_StyleType;
     borderImageWidth?: BorderImageWidth_StyleType;
+    borderInline?: Border_StyleType;
     borderInlineEnd?: Border_StyleType;
     borderInlineEndColor?: CssColor;
     borderInlineEndStyle?: BorderStyle_Single;
@@ -1431,11 +1436,11 @@ export interface ICssStyleset
     gridTemplateColumns?: GridTemplateAxis_StyleType;
     gridTemplateRows?: GridTemplateAxis_StyleType;
 
-    height?: CssLength;
+    height?: CssSize;
     hyphens?: Hyphens_StyleType;
 
     imageRendering?: ImageRendering_StyleType;
-    inlineSize?: CssLength;
+    inlineSize?: CssSize;
     isolation?: Isolation_StyleType;
 
     justifyContent?: JustifyContent_StyleType;
@@ -1453,14 +1458,17 @@ export interface ICssStyleset
     listStyleType?: ListStyleType_StyleType;
 
     margin?: OneOrBox<CssLength> | "auto";
+    marginBlock?: OneOrPair<CssLength> | "auto";
     marginBlockEnd?: CssLength | "auto";
     marginBlockStart?: CssLength | "auto";
     marginBottom?: CssLength | "auto";
+    marginInline?: OneOrPair<CssLength> | "auto";
     marginInlineEnd?: CssLength | "auto";
     marginInlineStart?: CssLength | "auto";
     marginLeft?: CssLength | "auto";
     marginRight?: CssLength | "auto";
     marginTop?: CssLength | "auto";
+    marginTrim?: MarginTrim_StyleType;
     marker?: DefaultStyleType;
     markerEnd?: Marker_StyleType;
     markerMid?: Marker_StyleType;
@@ -1511,9 +1519,11 @@ export interface ICssStyleset
     overscrollBehaviorY?: OverscrollBehavior_Single_StyleType;
 
     padding?: OneOrBox<CssLength>;
+    paddingBlock?: OneOrPair<CssLength>;
     paddingBlockEnd?: CssLength;
     paddingBlockStart?: CssLength;
     paddingBottom?: CssLength;
+    paddingInline?: OneOrPair<CssLength>;
     paddingInlineEnd?: CssLength;
     paddingInlineStart?: CssLength;
     paddingLeft?: CssLength;
@@ -1633,7 +1643,7 @@ export interface ICssStyleset
 
     whiteSpace?: WhiteSpace_StyleType;
     widows?: CssNumber;
-    width?: CssLength;
+    width?: CssSize;
     willChange?: WillChange_StyleType;
     wordBreak?: WordBreak_StyleType;
     wordSpacing?: WordSpacing_StyleType;
@@ -1672,46 +1682,49 @@ export type ExtendedStyleset = { [K in keyof ICssStyleset]?: ExtendedProp<ICssSt
  */
 export interface ICssVarTemplates extends ICssStyleset
 {
-    /** Allows having CSS variables that accept value of any type */
+    /** Allows having CSS variables and constants that accept value of any type */
     "any"?: any;
 
-    /** Allows having CSS variables that accept a string value */
+    /** Allows having CSS variables and constants that accept a string value */
     CssString?: string;
 
-    /** Allows having CSS variables that accept a `<number>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<number>` CSS value */
     CssNumber?: CssNumber;
 
-    /** Allows having CSS variables that accept a `<length>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<length>` CSS value */
     CssLength?: CssLength;
 
-    /** Allows having CSS variables that accept an `<angle>` CSS value */
+    /** Allows having CSS variables and constants that accept an `<angle>` CSS value */
     CssAngle?: CssAngle;
 
-    /** Allows having CSS variables that accept a `<time>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<time>` CSS value */
     CssTime?: CssTime;
 
-    /** Allows having CSS variables that accept a `<resolution>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<resolution>` CSS value */
     CssResolution?: CssResolution;
 
-    /** Allows having CSS variables that accept a `<frequency>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<frequency>` CSS value */
     CssFrequency?: CssFrequency;
 
-    /** Allows having CSS variables that accept a `<percent>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<percent>` CSS value */
     CssPercent?: CssPercent;
 
-    /** Allows having CSS variables that accept a Point value */
+    /** Allows having CSS variables and constants that accept a size value */
+    CssSize?: CssSize;
+
+    /** Allows having CSS variables and constants that accept a point value */
     CssPoint?: CssPoint;
 
-    /** Allows having CSS variables that accept a `<position>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<position>` CSS value */
     CssPosition?: CssPosition;
 
-    /** Allows having CSS variables that accept a `Radius` CSS value */
+    /** Allows having CSS variables and constants that accept a `<radius>` CSS value */
     CssRadius?: CssRadius;
 
-    /** Allows having CSS variables that accept a `<color>` CSS value */
+    /** Allows having CSS variables and constants that accept a `<color>` CSS value */
     CssColor?: CssColor;
 
-    /** Allows having CSS variables that accept an `<image>` CSS value */
+    /** Allows having CSS variables and constants that accept an `<image>` CSS value */
     CssImage?: CssImage;
 }
 

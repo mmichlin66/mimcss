@@ -3,7 +3,7 @@
     PercentType, IPercentMath, CssPercent, LengthType, ILengthMath, CssLength,
     AngleType, IAngleMath, CssAngle, TimeType, ITimeMath, CssTime, ResolutionType, IResolutionMath,
     CssResolution, FrequencyType, IFrequencyMath, CssFrequency, CssPosition, OneOrMany, LengthUnits,
-    ILengthProxy, PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits, INumberMath
+    PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits, INumberMath
 } from "../api/BasicTypes";
 
 
@@ -422,11 +422,6 @@ export class LengthMath extends NumberBaseMath<CssLength, LengthUnits | PercentU
         { return multiStyleToString( val, LengthMath.convertFunc, separator); }
 
     constructor() { super( LengthMath.convertFunc) }
-
-    public minmax( min: Extended<CssLength>, max: Extended<CssLength>): ILengthProxy
-    {
-        return () => mathFunc( "minmax", [min, max], LengthMath.convertFunc);
-    }
 }
 
 

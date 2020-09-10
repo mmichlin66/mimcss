@@ -132,6 +132,21 @@ export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
  * for style properties that can specify values for two dimensions (x and y), but also allow for a
  * single value, in which case it applies to both dimensions. For example, it used by style
  * properties such as `overflow`, `border-radius`, `background-repeat` and others.
+ *
+ * @typeparam T Type of the values
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // single value
+ *     cls1 = css.$class({ overflow: "auto" })
+
+ *     // two values
+ *     cls2 = css.$class({ overflow: ["scroll", "hidden"] })
+ * }
+ * ```
  */
 export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
 
@@ -140,20 +155,51 @@ export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
  * for style properties that specify values for the four sides of an element box and have rules how
  * specifying 1, 2 or 3 values determine the values applied to all four sides. For example, it used
  * by style properties such as `margin`, `padding`, `border-color` and others.
+ *
+ * @typeparam T Type of the values
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // single value
+ *     cls1 = css.$class({ margin: "auto" })
+ *
+ *     // two values
+ *     cls2 = css.$class({ margin: [0, 8] })
+ *
+ *     // three values
+ *     cls3 = css.$class({ margin: [6, 6, 8] })
+ *
+ *     // four values
+ *     cls4 = css.$class({ margin: [4, 6, 8, 12] })
+ * }
+ * ```
  */
 export type OneOrBox<T> = T | [Extended<T>, Extended<T>?, Extended<T>?, Extended<T>?];
 
 /**
  * Type for properties that can have 1 or more values of the given type. It is used by many style
  * properties such as `animation` and all its longhands, `background` and all its longhands,
- * `transition` and all its longhands, `box-shadow`, `filter` and others.
+ * `transition` and all its longhands, `box-shadow`, `transform`, `filter` and others.
+ *
+ * @typeparam T Type of the values
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // single value
+ *     cls1 = css.$class({ transform: scale(0.5) })
+ *
+ *     // several values
+ *     cls2 = css.$class({ transform: [scale(0.5, rotate(90), translateX(200))] })
+ * }
+ * ```
  */
 export type OneOrMany<T> = T | Extended<T>[];
-
-/**
- * The IQuotedProxy function represents a string in quotation marks
- */
-export interface IQuotedProxy extends IGenericProxy<"quoted"> {}
 
 
 
@@ -164,26 +210,132 @@ export interface IQuotedProxy extends IGenericProxy<"quoted"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The INumberBaseMath interface contains methods that implement CSS mathematic functions on the
- * numeric CSS types.
+ * The INumberBaseMath interface contains methods that implement CSS mathematical functions on the
+ * numeric CSS types. This interface is extended by dimension-specific interfaces such as
+ * [[INumberMath]], [[ILengthMath]], [[IAngleMath]], etc.
+ *
+ * @typeparam T Type of values participating in the mathematical functions. For example, the
+ * [[ILengthMath]] interface specifies it as [[CssLength]].
+ * @typeparam U Type that contains string literals defining units available for the given numeric
+ * type.
+ * @typeparam P String literal type that distinguishes one numeric type from another. This
+ * parameter is passed to the [[IGenericProxy]] interface, which is used as a return value from the
+ * interface methods.
  */
 export interface INumberBaseMath<T, U extends string, P extends string>
 {
-    /** Creates value from the given number and unit. */
+    /**
+     * Creates value from the given number and unit. This method can be used to dynamically
+     * construct the needed dimension.
+     *
+     * @param n Numeric value.
+     * @param unit Unit to append to the numeric value.
+     * @returns Function implementing the `IGenericProxy<P>` callable interface. This allows the
+     * result of the `units` method to be assigned only to the properties of compatible numeric
+     * type.
+     */
     units( n: number, unit: U): IGenericProxy<P>;
 
-    /** Creates property value using the CSS min() function. */
+    /**
+     * Creates property value using the CSS `min()` function. Parameters are of the type
+     * `Extended<T>`; that is, they can be either of the generic type `T`, or a CSS custom variable
+     * or constant of type `T`.
+     *
+     * @param params One or more values to choose the minimum from.
+     * @returns Function implementing the `IGenericProxy<P>` callable interface. This allows the
+     * result of the `min` method to be assigned only to the properties of a compatible numeric
+     * type.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // min( 200px, 25.5em, 45%)
+     *     cls1 = css.$class({
+     *         width: css.min( 200, 25.5, css.percent(45))
+     *     })
+     * }
+     * ```
+     */
     min( ...params: Extended<T>[]): IGenericProxy<P>;
 
-    /** Creates property value using the CSS max() function. */
+    /**
+     * Creates property value using the CSS `max()` function. Parameters are of the type
+     * `Extended<T>`; that is, they can be either of the generic type `T`, or a CSS custom variable
+     * or constant of type `T`.
+     *
+     * @param params One or more values to choose the maximum from.
+     * @returns Function implementing the `IGenericProxy<P>` callable interface. This allows the
+     * result of the `max` method to be assigned only to the properties of a compatible numeric
+     * type.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // max( 200px, 25.5em, 45%)
+     *     cls1 = css.$class({
+     *         width: css.max( 200, 25.5, css.percent(45))
+     *     })
+     * }
+     * ```
+     */
     max( ...params: Extended<T>[]): IGenericProxy<P>;
 
-    /** Creates property value using the CSS clamp() function. */
+    /**
+     * Creates property value using the CSS `clamp()` function. Parameters are of the type
+     * `Extended<T>`; that is, they can be either of the generic type `T`, or a CSS custom variable
+     * or constant of type `T`.
+     *
+     * @param min Lower bound for the return value.
+     * @param pref Preferred value.
+     * @param min Upper bound for the return value.
+     * @returns Function implementing the `IGenericProxy<P>` callable interface. This allows the
+     * result of the `clamp` method to be assigned only to the properties of a compatible numeric
+     * type.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // clamp( 200px, 25.5em, 45%)
+     *     cls1 = css.$class({
+     *         width: css.clamp( 200, 25.5, css.percent(45))
+     *     })
+     * }
+     * ```
+     */
     clamp( min: Extended<T>, pref: Extended<T>, max: Extended<T>): IGenericProxy<P>;
 
     /**
-     * Creates property value using the CSS calc() function. This method is a tag function and must
-     * be invoked with a template string without parentheses.
+     * Creates property value using the CSS `calc()` function. This method is a tag function and must
+     * be invoked with a template string without parentheses. Parameters in the template string
+     * are of the type `Extended<T>`; that is, they can be either of the generic type `T`, or a
+     * CSS custom variable or constant of type `T`.
+     *
+     * @param formularParts Array of strings, whcih are part of the template string and which are
+     * not parameters.
+     * @param params Array of parameters from the template string.
+     * @returns Function implementing the `IGenericProxy<P>` callable interface. This allows the
+     * result of the `calc` method to be assigned only to the properties of a compatible numeric
+     * type.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     defaultPadding = css.var( "CssLength", 8)
+     *
+     *     // calc( 200px - (2 * var(--defaultPadding)))
+     *     cls1 = css.$class({
+     *         width: css.calc` 200px - (2 * ${this.defaultPadding})`
+     *     })
+     * }
+     * ```
      */
     calc( formulaParts: TemplateStringsArray, ...params: Extended<T>[]): IGenericProxy<P>;
 }
@@ -202,12 +354,12 @@ export type NumberType = "Number";
 /** Proxy interface that represents values of the `<percent>` CSS type */
 export interface INumberProxy extends IGenericProxy<NumberType> {};
 
-/** Type for single style property of the `<number>` CSS type */
+/** Type for a value of the `<number>` CSS type */
 export type CssNumber = number | INumberProxy;
 
 /**
  * The ICssNumberMath interface contains methods that implement CSS mathematic functions on the
- * `<number>` CSS types.
+ * `<number>` CSS types. This interface is implemented by the [[Num]] object.
  */
 export interface INumberMath extends INumberBaseMath<CssNumber, "", NumberType> {}
 
@@ -233,7 +385,7 @@ export type CssPercent = number | IPercentProxy | "100%";
 
 /**
  * The ICssPercentMath interface contains methods that implement CSS mathematic functions on the
- * `<percent>` CSS types.
+ * `<percent>` CSS types. This interface is implemented by the [[Percent]] object.
  */
 export interface IPercentMath extends INumberBaseMath<CssPercent, PercentUnits, PercentType>
 {
@@ -265,16 +417,18 @@ export interface ILengthProxy extends IGenericProxy<LengthType> {};
  * developers to write these frequently used values. Other `<length>` units should be specified
  * using the functions such as [[rem]], [[vh]], [[vmin]], etc.
  */
-export type CssLength = number | ILengthProxy | "100%" | "100vh" | "100vw" | "1fr";
+export type CssLength = number | ILengthProxy |
+    "5%" | "10%" | "15%" | "20%" | "25%" | "30%" | "35%" | "40%" | "45%" | "50%" |
+    "55%" | "60%" | "65%" | "70%" | "75%" | "80%" | "85%" | "90%" | "95%" | "100%" |
+    "100vh" | "100vw" |
+    "1fr" | "2fr" | "3fr" | "4fr" | "5fr" | "6fr" | "7fr" | "8fr" | "9fr" | "10fr" | "11fr" | "12fr";
 
 /**
  * The ICssLengthMath interface contains methods that implement CSS mathematic functions on the
- * `<length>` CSS types.
+ * `<length>` CSS types. This interface is implemented by the [[Len]] object.
  */
 export interface ILengthMath extends INumberBaseMath<CssLength, LengthUnits | PercentUnits, LengthType>
 {
-    /** Creates property value using the CSS minmax() function. */
-    minmax( min: Extended<CssLength>, max: Extended<CssLength>): ILengthProxy;
 }
 
 
@@ -299,7 +453,7 @@ export type CssAngle = number | IAngleProxy;
 
 /**
  * The ICssAngleMath interface contains methods that implement CSS mathematic functions on the
- * `<angle>` CSS types.
+ * `<angle>` CSS types. This interface is implemented by the [[Angle]] object.
  */
 export interface IAngleMath extends INumberBaseMath<CssAngle, AngleUnits | PercentUnits, AngleType>
 {
@@ -327,7 +481,7 @@ export type CssTime = number | ITimeProxy;
 
 /**
  * The ICssTimeMath interface contains methods that implement CSS mathematic functions on the
- * `<time>` CSS types.
+ * `<time>` CSS types. This interface is implemented by the [[Time]] object.
  */
 export interface ITimeMath extends INumberBaseMath<CssTime, TimeUnits, TimeType>
 {
@@ -355,7 +509,7 @@ export type CssResolution = number | IResolutionProxy;
 
 /**
  * The ICssResolutionMath interface contains methods that implement CSS mathematic functions on the
- * `<resolution>` CSS types.
+ * `<resolution>` CSS types. This interface is implemented by the [[Resolution]] object.
  */
 export interface IResolutionMath extends INumberBaseMath<CssResolution, ResolutionUnits, ResolutionType>
 {
@@ -383,7 +537,7 @@ export type CssFrequency = number | IFrequencyProxy;
 
 /**
  * The ICssFrequencyMath interface contains methods that implement CSS mathematic functions on the
- * `<frequency>` CSS types.
+ * `<frequency>` CSS types. This interface is implemented by the [[Frequency]] object.
  */
 export interface IFrequencyMath extends INumberBaseMath<CssFrequency, FrequencyUnits, FrequencyType>
 {
@@ -393,12 +547,24 @@ export interface IFrequencyMath extends INumberBaseMath<CssFrequency, FrequencyU
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Point, Position, Radius
+// Size, Point, Position, Radius
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+/** Type for `width`, `height`, `block-size` and `inline-size` style properties */
+export type CssSize = CssLength | "auto" | "max-content" | "min-content" | IFitContentProxy;
+
 /**
- * Type representing a point using x and y coordinates.
+ * The IFitContentProxy interface represents an invocation of the CSS `fit-content()` function. It
+ * is returned from the [[fitContent]] function.
+ */
+export interface IFitContentProxy extends IGenericProxy<"fit-content"> {}
+
+
+
+/**
+ * Type representing a point as a two element tuple where x and y coordinates are specified using
+ * the [[CssLength]] type.
  */
 export type CssPoint = [Extended<CssLength>, Extended<CssLength>];
 
@@ -407,13 +573,13 @@ export type CssPoint = [Extended<CssLength>, Extended<CssLength>];
 /** Horizontal position keywords */
 export type HorizontalPositionKeyword = "left" | "center" | "right";
 
-/** Single-value horizontal position */
+/** Type of a value specifying the horizontal position */
 export type HorizontalPosition = HorizontalPositionKeyword | CssLength;
 
 /** Vertical position keywords */
 export type VerticalPositionKeyword = "top" | "center" | "bottom";
 
-/** Single-value vertical position */
+/** Type of a value specifying the vertical position */
 export type VerticalPosition = VerticalPositionKeyword | CssLength;
 
 /** Type describing a simple 1 or two values `<position>` CSS type */
@@ -423,12 +589,10 @@ export type SimpleCssPosition = HorizontalPositionKeyword | VerticalPositionKeyw
 
 /** Type describing the full up to 4 values `<position>` CSS type */
 export type CssPosition = SimpleCssPosition |
-    [Extended<HorizontalPositionKeyword>, Extended<CssLength>, Extended<VerticalPositionKeyword>] |
     [Extended<HorizontalPositionKeyword>, Extended<VerticalPositionKeyword>, Extended<CssLength>] |
-    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPositionKeyword>] |
+    [Extended<HorizontalPositionKeyword>, Extended<CssLength>, Extended<VerticalPositionKeyword>, Extended<CssLength>?] |
     [Extended<VerticalPositionKeyword>, Extended<HorizontalPositionKeyword>, Extended<CssLength>] |
-    [Extended<HorizontalPositionKeyword>, Extended<CssLength>, Extended<VerticalPositionKeyword>, Extended<CssLength>] |
-    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPositionKeyword>, Extended<CssLength>];
+    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPositionKeyword>, Extended<CssLength>?];
 
 
 
@@ -980,12 +1144,6 @@ export interface ITransformProxy extends IGenericProxy<"transform"> {};
 export interface IMinMaxProxy extends IGenericProxy<"minmax"> {}
 
 /**
- * The IFitContentProxy interface represents an invocation of the CSS `fit-content()` function. It
- * is returned from the [[fitContent]] function.
- */
-export interface IFitContentProxy extends IGenericProxy<"fit-content"> {}
-
-/**
  * The IRepeatProxy interface represents an invocation of the CSS `repeat()` function. It is
  * returned from the [[repeat]] function.
  */
@@ -1098,6 +1256,11 @@ export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner
 export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" | "angle" | "time" | "frequency";
 
 export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnits | ResolutionUnits | FrequencyUnits;
+
+/**
+ * The IQuotedProxy function represents a string in quotation marks
+ */
+export interface IQuotedProxy extends IGenericProxy<"quoted"> {}
 
 
 
