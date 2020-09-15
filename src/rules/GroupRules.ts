@@ -166,7 +166,7 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
  */
 export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( query: string | MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( query: MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super( instanceOrClass);
 
@@ -195,7 +195,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	public cssRule: CSSMediaRule | null;
 
 	// media query for this rule.
-	public query: string | MediaQuery;
+	public query: MediaQuery;
 }
 
 

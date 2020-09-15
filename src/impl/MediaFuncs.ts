@@ -1,38 +1,43 @@
-﻿import * as MediaTypes from "../api/MediaAPI"
-import {val2str, camelToDash, arr2str} from "./UtilFuncs";
+﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery} from "../api/MediaAPI";
+import {CssAspectRatio, CssResolution, CssLength} from "../api/BasicTypes";
+import {val2str, camelToDash, ResolutionMath, LengthMath} from "./UtilFuncs";
 
 
 
-function aspectRatioToString( val: MediaTypes.AspectRatioFeatureType): string
+function aspectRatioToString( val: CssAspectRatio): string
 {
-    return typeof val === "string" ? val : val[0] + "/" + val[1];
+    return val2str( val, { arrSep: "/" })
 }
 
 
 
-function lengthFeatureToString( val: MediaTypes.LengthFeatureType): string
+function lengthFeatureToString( val: CssLength): string
 {
-    return typeof val === "string" ? val : val + "px";
+    return val2str( val, {
+        fromNumber: LengthMath.styleToString
+    });
 }
 
 
 
-function resolutionFeatureToString( val: MediaTypes.ResolutionFeatureType): string
+function resolutionFeatureToString( val: CssResolution): string
 {
-    return typeof val === "string" ? val : val + "dpi";
+    return val2str( val, {
+        fromNumber: ResolutionMath.styleToString
+    });
 }
 
 
 
 /** Type of a function that converts the property-specific type to CSS string */
-type convertFuncType<K extends keyof MediaTypes.MediaFeatureset = any> = (val: MediaTypes.MediaFeatureset[K]) => string;
+type convertFuncType<K extends keyof IMediaFeatureset = any> = (val: IMediaFeatureset[K]) => string;
 
 
 
 /**
  * The MediaFeatureInfo represents information that we keep for style properties
  */
-type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = convertFuncType<K> | boolean |
+type MediaFeatureInfo<K extends keyof IMediaFeatureset = any> = convertFuncType<K> | boolean |
     {
         /** Function that converts from the property-specific type to CSS string */
         convert?: convertFuncType<K>;
@@ -41,7 +46,7 @@ type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = conver
          * If defined, indicates the value, which we will not put into CSS string. This is needed for
          * media features that can be specified without the value, e.g. color or color-index.
          */
-        defaultValue?: MediaTypes.MediaFeatureset[K];
+        defaultValue?: IMediaFeatureset[K];
 
         /**
          * Flag indicating whether the feature is a "range" feature; that is, can be used in an
@@ -55,7 +60,7 @@ type MediaFeatureInfo<K extends keyof MediaTypes.MediaFeatureset = any> = conver
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function mediaQueryToString( query: string | MediaTypes.MediaQuery): string
+export function mediaQueryToString( query: MediaQuery): string
 {
     return val2str( query, {
         fromAny: singleMediaQueryToString,
@@ -68,7 +73,7 @@ export function mediaQueryToString( query: string | MediaTypes.MediaQuery): stri
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function singleMediaQueryToString( query: MediaTypes.SingleMediaQuery): string
+function singleMediaQueryToString( query: ExtendedSingleMediaQuery): string
 {
     if (!query)
         return "";
@@ -98,9 +103,9 @@ export function singleMediaQueryToString( query: MediaTypes.SingleMediaQuery): s
 /**
  * Converts the given media feature to the CSS media query string
  */
-export function mediaFeatureToString( featureName: string, propVal: any, valueOnly?: boolean): string | null
+function mediaFeatureToString( featureName: string, val: any, valueOnly?: boolean): string | null
 {
-    if (!featureName || propVal == null)
+    if (!featureName || val == null)
         return null;
 
     // find information object
@@ -110,44 +115,34 @@ export function mediaFeatureToString( featureName: string, propVal: any, valueOn
 
     // if defaultValue is defined and the property value is equal to it, no value should be returned.
     let defaultValue = typeof info === "object" ? info.defaultValue : undefined;
-    if (defaultValue !== undefined && propVal === defaultValue)
+    if (defaultValue !== undefined && val === defaultValue)
         return valueOnly ? "" : realFeatureName;
 
     let convert = typeof info === "function" ? info : typeof info === "object" ? info.convert : undefined;
     let isRange = typeof info === "boolean" ? info : typeof info === "object" ? info.isRange : undefined;
-    if (isRange && !valueOnly && Array.isArray( propVal) && propVal.length === 2)
+    if (isRange && !valueOnly && Array.isArray( val) && val.length === 2)
     {
-        let s1 = mediaFeatureSingleValueToString( propVal[0], convert);
-        let s2 = mediaFeatureSingleValueToString( propVal[1], convert);
+        let s1 = mediaFeatureSingleValueToString( val[0], convert);
+        let s2 = mediaFeatureSingleValueToString( val[1], convert);
         return `${s1} <= ${realFeatureName} <= ${s2}`;
     }
     else
     {
-        let s = mediaFeatureSingleValueToString( propVal, convert);
+        let s = mediaFeatureSingleValueToString( val, convert);
         return valueOnly ? s : realFeatureName + ":" + s;
     }
 }
 
 
 
-function mediaFeatureSingleValueToString( propVal: any, convert?: convertFuncType): string
+function mediaFeatureSingleValueToString( val: any, convert?: convertFuncType): string
 {
-    if (propVal == null)
-        return "";
-
-    if (convert)
-        return convert( propVal);
-    else if (typeof propVal === "string")
-        return propVal;
-    else if (Array.isArray( propVal))
-        return arr2str( propVal);
-    else
-        return propVal.toString();
+    return convert ? convert( val) : val2str( val);
 }
 
 
 
-let mediaFeatures: { [K in keyof MediaTypes.MediaFeatureset]?: MediaFeatureInfo<K> } =
+let mediaFeatures: { [K in keyof IMediaFeatureset]?: MediaFeatureInfo<K> } =
 {
     aspectRatio: aspectRatioToString,
     minAspectRatio: aspectRatioToString,

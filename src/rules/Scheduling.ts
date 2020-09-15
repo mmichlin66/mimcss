@@ -65,7 +65,7 @@ function updateStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, n
         if (value == null)
             ruleOrElm.style.removeProperty( name);
         else
-            ruleOrElm.style.setProperty( name, value as string, important ? "!important" : undefined);
+            ruleOrElm.style.setProperty( name, value as string, important ? "important" : undefined);
     }
     else
     {

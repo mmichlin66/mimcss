@@ -589,7 +589,7 @@ export function $supports<T extends StyleDefinition>( query: SupportsQuery,
 /**
  * Creates new media rule.
  */
-export function $media<T extends StyleDefinition>( query: string | MediaQuery,
+export function $media<T extends StyleDefinition>( query: MediaQuery,
     instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>
 {
 	return new MediaRule( query, instOrClass);

@@ -66,18 +66,25 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
     /**
 	 * Sets new value of this custom CSS property.
 	 * @param value New value for the CSS property.
-	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-	public setValue( value: ExtendedVarValue<K>, important?: boolean, schedulerType?: number): void
+	public setValue( value: ExtendedVarValue<K>, schedulerType?: number): void
 	{
         // this.value = value;
         if (this.container)
 		{
+            let important = false;
+            if (value != null && typeof value === "object" && "!" in value)
+            {
+                important = true;
+                value = value["!"];
+            }
+
             this.container.setCustomVarValue( this.cssName,
-                value == null ? null : stylePropToString( this.template, value, true),
-                important, schedulerType)
+                value == null
+                    ? null
+                    : stylePropToString( this.template, value, true), important, schedulerType)
         }
 	}
 

@@ -1,8 +1,8 @@
 ﻿import {
-	INumberMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath,
-    IFrequencyMath, IPercentMath, Extended, IStringProxy, IUrlProxy,
-    AttrTypeKeyword, AttrUnitKeyword, ILengthProxy, IPercentProxy, IAngleProxy,
-    ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy, CssLength, IFitContentProxy
+    INumberMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath, IPercentMath,
+    Extended, IStringProxy, IUrlProxy, AttrTypeKeyword, AttrUnitKeyword, ILengthProxy,
+    IPercentProxy, IAngleProxy, ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy,
+    CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy
 } from "../api/BasicTypes"
 import {IVarRule, ICounterRule, IIDRule} from "./RuleTypes";
 import {VarTemplateName, ListStyleType_StyleType, ExtendedVarValue} from "./StyleTypes";
@@ -250,6 +250,16 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
 export function url( val: Extended<string | IIDRule>): IUrlProxy
 {
 	return () => `url(${val2str(val)})`;
+}
+
+
+
+/**
+ * Returns an IAspectRatioProxy function representing the `<ratio>` CSS type.
+ */
+export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
+{
+    return () => NumberMath.styleToString(w) + (h ? "/" + NumberMath.styleToString(h) : "");
 }
 
 
