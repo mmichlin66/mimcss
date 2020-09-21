@@ -1,8 +1,8 @@
 ﻿import {
     Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, CssPoint, CssColor,
     SelectorItem, ISelectorProxy, IFilterProxy, IBasicShapeProxy, IPathBuilder, IRayProxy,
-    IRepeatProxy, IMinMaxProxy, ITransformProxy, ISpanProxy, ExtentKeyword,
-    IColorProxy, INamedColors
+    IRepeatProxy, IMinMaxProxy, ITransformProxy, ISpanProxy, ExtentKeyword, IColorProxy,
+    INamedColors
 } from "../api/BasicTypes"
 import {
 	Styleset, ExtendedStyleset, StringStyleset, BorderRadius_StyleType, FillRule_StyleType,
@@ -14,7 +14,7 @@ import {
 } from "../impl/UtilFuncs";
 import {
     stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset,
-    gridTrackToString
+    gridTrackToString, s_registerStylePropertyInfo
 } from "../impl/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
 import {rgbToString, hslToString, colorWithAlphaToString} from "../impl/ColorFuncs";
@@ -28,6 +28,24 @@ import {rgbToString, hslToString, colorWithAlphaToString} from "../impl/ColorFun
 export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy
 {
 	return () => templateStringToString( parts, params);
+}
+
+
+
+/**
+ * Registers the given function to be used for converting values of the given style property to
+ * string. The `registerStyleProperty` function must be used after adding the property to the
+ * [[ICssStyleset]] interface via the module augmentation technique if the conversion to string
+ * requires non-standard operations. This function should not be called for propeties whose
+ * values only include numbers, strings, functions returning a string, objects whose `toString`
+ * method produces the necessary string or arrays of the above types.
+ *
+ * This function can be used for style properties that are not yet supported by Mimcss. This is
+ * also the way to support properties with vendor prefixes.
+ */
+export function registerStyleProperty( name: string, toStringFunc: (v: any) => string): boolean
+{
+    return s_registerStylePropertyInfo( name, toStringFunc);
 }
 
 
@@ -281,7 +299,7 @@ export function dropShadow(
  */
 export function hueRotate( amount: Extended<CssAngle>): IFilterProxy
 {
-    return () => `hue-rotate(${PercentMath.styleToString( amount)})`;
+    return () => `hue-rotate(${AngleMath.styleToString( amount)})`;
 }
 
 

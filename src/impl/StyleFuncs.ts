@@ -764,7 +764,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         return "";
 
     // find information object for the property
-    let info: any = StylePropertyInfos[dashToCamel(propName)];
+    let info: any = stylePropertyInfos[dashToCamel(propName)];
 
     // if the property value is an object with the "!" property, then the actual value is the
     // value of this property and we also need to set the "!important" flag
@@ -922,11 +922,24 @@ function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): strin
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+type StylePropertyInfo = WellKnownFunc | ToStringFunc | IValueConvertOptions;
+
+export function s_registerStylePropertyInfo( name: string, toStringFunc: ToStringFunc)
+{
+    if (name in stylePropertyInfos)
+        return false;
+    else
+    {
+        stylePropertyInfos[name] = toStringFunc;
+        return true;
+    }
+}
+
 /**
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const StylePropertyInfos: { [K in VarTemplateName]?: (WellKnownFunc | ToStringFunc | IValueConvertOptions) } =
+const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
 {
     animation: {
         fromObj: singleAnimation_fromObject,

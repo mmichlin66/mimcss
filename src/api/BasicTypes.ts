@@ -410,7 +410,9 @@ export type PercentUnits = "%";
 export interface IPercentProxy extends IGenericProxy<PercentType> {};
 
 /** Type for single style property of the `<percent>` CSS type */
-export type CssPercent = number | IPercentProxy | "100%";
+export type CssPercent = number | IPercentProxy |
+    "5%" | "10%" | "15%" | "20%" | "25%" | "30%" | "35%" | "40%" | "45%" | "50%" |
+    "55%" | "60%" | "65%" | "70%" | "75%" | "80%" | "85%" | "90%" | "95%" | "100%";
 
 /**
  * The ICssPercentMath interface contains methods that implement CSS mathematic functions on the
@@ -446,9 +448,7 @@ export interface ILengthProxy extends IGenericProxy<LengthType> {};
  * developers to write these frequently used values. Other `<length>` units should be specified
  * using the functions such as [[rem]], [[vh]], [[vmin]], etc.
  */
-export type CssLength = number | ILengthProxy |
-    "5%" | "10%" | "15%" | "20%" | "25%" | "30%" | "35%" | "40%" | "45%" | "50%" |
-    "55%" | "60%" | "65%" | "70%" | "75%" | "80%" | "85%" | "90%" | "95%" | "100%" |
+export type CssLength = CssPercent |
     "100vh" | "100vw" |
     "1fr" | "2fr" | "3fr" | "4fr" | "5fr" | "6fr" | "7fr" | "8fr" | "9fr" | "10fr" | "11fr" | "12fr";
 
@@ -469,7 +469,7 @@ export interface ILengthMath extends INumberBaseMath<CssLength, LengthUnits | Pe
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Unique string literal that distinguishes the Angle type from other numeric types */
-export type AngleType = "Angle" | PercentType;
+export type AngleType = "Angle";
 
 /** Units of angle */
 export type AngleUnits = "deg" | "rad" | "grad" | "turn";
@@ -534,7 +534,9 @@ export type ResolutionUnits = "dpi" | "dpcm" | "dppx" | "x";
 export interface IResolutionProxy extends IGenericProxy<ResolutionType> {};
 
 /** Type for single style property of the `<resolution>` CSS type */
-export type CssResolution = number | IResolutionProxy;
+export type CssResolution = number | IResolutionProxy |
+    "1x" | "2x" | "3x" | "4x" | "5x" | "6x" | "7x" | "8x" | "9x" | "10x" |
+    "1dppx" | "2dppx" | "3dppx" | "4dppx" | "5dppx" | "6dppx" | "7dppx" | "8dppx" | "9dppx" | "10dppx";
 
 /**
  * The ICssResolutionMath interface contains methods that implement CSS mathematic functions on the
@@ -637,10 +639,33 @@ export type CssRadius = OneOrPair<CssLength>;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The CssAspectRatio interface represents the CSS `<ratio>` type.
+ * The CssAspectRatio interface represents the CSS `<ratio>` type. This type can be used for the
+ * `aspect-ratio` CSS property although this property is not implemented yet by most of the
+ * browsers. More frequently though this type is used by the `aspect-ratio` media feature in a
+ * `@media` rule.
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // using string value
+ *     mediaRule1 = css.$media( {aspectRatio: "4/3"}, ...)
+ *
+ *     // using the `ratio()` function
+ *     mediaRule2 = css.$media( {aspectRatio: css.ratio( 4, 3)}, ...)
+ *
+ *     // using a single number (not widely supported yet)
+ *     mediaRule3 = css.$media( {aspectRatio: 1.33}, ...)
+ *
+ *     // using a tuple to specify range; this will result in the following media condition:
+ *     // (min-aspect-ratio: 4/3) and (max-aspect-ratio:16/9)
+ *     mediaRule4 = css.$media( {aspectRatio: ["4/3","16/9"]}, ...)
+ * }
+ * ```
  */
-export type CssAspectRatio = CssNumber | [Extended<CssNumber>, Extended<CssNumber>] |
-    IAspectRatioProxy | "1/1" | "4/3" | "16/9" | "185/100" | "239/100";
+export type CssAspectRatio = CssNumber | IAspectRatioProxy |
+    "1/1" | "4/3" | "16/9" | "185/100" | "239/100";
 
 /**
  * The IAspectRatioProxy interface represents an invocation of the [[ratio]] function.
@@ -952,22 +977,59 @@ export type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas"
 
 /**
  * Type for CSS color. Color can be represented using the following types:
- * - keywords: any string that is a name of a property in the INamedColors interface.
+ * - keywords: any string that is a name of a property in the [[INamedColors]] interface or of the
+ *   [[SystemColors]] type.
  * - number:
  *   - negative numbers are treated as inverted colors.
  *   - integer part of the number must be less than or equal to 0xFFFFFF - everything else is
  *     ignored.
  *   - floating point part of the number is treated as percents of alpha channel. If there is no
  *     floating part, alpha is 1.
- * - functions: rgb(), hsl(), alpha() as well as any function that returns the IColorProxy type.
+ * - functions: [[rgb]], [[hsl]], [[alpha]] as well as any function that returns the IColorProxy type.
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // using string value and numeric value of Web colors
+ *     cls1 = css.$class({ color: "red", backgroundColor: css.Colors.yellow })
+ *
+ *     // using string value of a system color
+ *     cls2 = css.$class({ color: "LinkText" })
+ *
+ *     // using numeric value
+ *     cls3 = css.$class({ color: 0xCCCCCC })
+ *
+ *     // using numeric value with fractional part for alpha
+ *     cls4 = css.$class({ color: 0x123456 + 0.4 })
+ *
+ *     // using negative numeric value for inverted color
+ *     cls5 = css.$class({ color: -0x123456 })
+ *
+ *     // using negative numeric value with fractional part for inverted color with alpha
+ *     cls6 = css.$class({ color: -(0x123456 + 0.4) })
+ *
+ *     // using the [[alpha]] function with named color
+ *     cls7 = css.$class({ color: css.alpha( "red", 0.4) })
+ *
+ *     // using the [[rgb]] function
+ *     cls8 = css.$class({ color: css.rgb( 256, 0, 128) })
+ *
+ *     // using the [[hsl]] function
+ *     cls9 = css.$class({ color: css.hsl( 200, 90, 52) })
+ * }
+ * ```
  */
 export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | IColorProxy | SystemColors;
 
 
 
 /**
- * Object whose property names are names of well-known colors and values correspond to the hexadecimal
- * representartion of the RGB separations (without an alpha mask).
+ * Object whose property names are names of well-known colors and values correspond to the
+ * hexadecimal representation of the RGB separations (without an alpha mask). The properties of
+ * this object can be used wherever the [[CssColor]] type can be used. Since the properties are
+ * of the `number` type, they can be used for manipulating the color value.
  */
 export let Colors: INamedColors =
 {
@@ -1163,37 +1225,35 @@ export type CssImage = IUrlProxy | IImageProxy;
 export interface IFilterProxy extends IGenericProxy<"filter"> {};
 
 /**
- * The IBasicShapeProxy interface represents an invocation of one the CSS `<basic-shape>` functions
- * except the `path()` function.
+ * The IBasicShapeProxy interface represents an invocation of one the CSS `<basic-shape>`
+ * functions, for example, [[circle]], [[polygone]], etc. (except the [[path]] function).
  */
 export interface IBasicShapeProxy extends IGenericProxy<"basic-shape"> {};
 
 /**
- * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions including
- * the `path()` function.
+ * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions such as
+ * [[circle]], [[polygone]], [[path]], etc.
  */
 export type BasicShape = IBasicShapeProxy | IPathBuilder;
 
 /**
- * The IRayProxy function represents an invocation of one the CSS `ray()` functions.
+ * The IRayProxy function represents an invocation of the CSS [[ray]] function.
  */
 export interface IRayProxy extends IGenericProxy<"ray"> {};
 
 /**
- * The ITransformProxy interface represents an invocation of one the CSS `<basic-shape>` functions.
- * It is returned from the multiple functions such as [[scale]], [[skew]] and others.
+ * The ITransformProxy interface represents an invocation of one the CSS `<transform>` functions
+ * such as [[scale]], [[skew]] and others.
  */
 export interface ITransformProxy extends IGenericProxy<"transform"> {};
 
 /**
- * The IMinMaxProxy interface represents an invocation of the minmax() function. It is returned from
- * the [[minmax]] function.
+ * The IMinMaxProxy interface represents an invocation of the [[minmax]] function.
  */
 export interface IMinMaxProxy extends IGenericProxy<"minmax"> {}
 
 /**
- * The IRepeatProxy interface represents an invocation of the CSS `repeat()` function. It is
- * returned from the [[repeat]] function.
+ * The IRepeatProxy interface represents an invocation of the [[repeat]] function.
  */
 export interface IRepeatProxy extends IGenericProxy<"repeat"> {}
 
@@ -1212,65 +1272,65 @@ export interface ISpanProxy extends IGenericProxy<"span"> {}
  */
 export interface IPathBuilder
 {
-    // Move-to command with absolute coordinates.
+    /** Move-to command with absolute coordinates. */
     M( first: [number,number], ...next: [number,number][]): IPathBuilder;
 
-    // Move-to command with relative coordinates.
+    /** Move-to command with relative coordinates. */
     m( first: [number,number], ...next: [number,number][]): IPathBuilder;
 
-    // Line-to command with absolute coordinates.
+    /** Line-to command with absolute coordinates. */
 	L( first: [number,number], ...next: [number,number][]): IPathBuilder;
 
-    // Line-to command with relative coordinates.
+    /** Line-to command with relative coordinates. */
     l( first: [number,number], ...next: [number,number][]): IPathBuilder;
 
-    // Horizontal line-to command with absolute coordinates.
+    /** Horizontal line-to command with absolute coordinates. */
 	H( first: number, ...next: number[]): IPathBuilder;
 
-    // Horizontal line-to command with relative coordinates.
+    /** Horizontal line-to command with relative coordinates. */
     h( first: number, ...next: number[]): IPathBuilder;
 
-    // Vertical line-to command with absolute coordinates.
+    /** Vertical line-to command with absolute coordinates. */
 	V( first: number, ...next: number[]): IPathBuilder;
 
-    // Vertical line-to command with relative coordinates.
+    /** Vertical line-to command with relative coordinates. */
     v( first: number, ...next: number[]): IPathBuilder;
 
-    // Cubic bezier curve command with absolute coordinates.
+    /** Cubic bezier curve command with absolute coordinates. */
 	C( first: [number,number,number,number,number,number],
 		...next: [number,number,number,number,number,number][]): IPathBuilder;
 
-    // Cubic bezier curve command with relative coordinates.
+    /** Cubic bezier curve command with relative coordinates. */
 	c( first: [number,number,number,number,number,number],
 		...next: [number,number,number,number,number,number][]): IPathBuilder;
 
-    // Smooth cubic bezier curve command with absolute coordinates.
+    /** Smooth cubic bezier curve command with absolute coordinates. */
 	S( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
 
-    // Smooth cubic bezier curve command with relative coordinates.
+    /** Smooth cubic bezier curve command with relative coordinates. */
 	s( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
 
-    // Quadratic bezier curve command with absolute coordinates.
+    /** Quadratic bezier curve command with absolute coordinates. */
 	Q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
 
-    // Quadratic bezier curve command with relative coordinates.
+    /** Quadratic bezier curve command with relative coordinates. */
 	q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
 
-    // Smooth quadratic bezier curve command with absolute coordinates.
+    /** Smooth quadratic bezier curve command with absolute coordinates. */
 	T( first: [number,number], ...next: [number,number][]): IPathBuilder;
 
-    // Smooth quadratic bezier curve command with relative coordinates.
+    /** Smooth quadratic bezier curve command with relative coordinates. */
 	t( first: [number,number], ...next: [number,number][]): IPathBuilder;
 
-    // Elliptical arc curve command with absolute coordinates.
+    /** Elliptical arc curve command with absolute coordinates. */
 	A( first: [number,number,number,0|1,0|1,number,number],
 		...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
 
-    // Elliptical arc curve command with relative coordinates.
+    /** Elliptical arc curve command with relative coordinates. */
 	a( first: [number,number,number,0|1,0|1,number,number],
 		...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
 
-    // Close-path command.
+    /** Close-path command. */
     z(): IPathBuilder;
 }
 
@@ -1282,14 +1342,16 @@ export interface IPathBuilder
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Type used for several properties */
+/**
+ * Type representing the boundaries of a box
+ */
 export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
     "fill-box" | "stroke-box" | "view-box";
 
 
 
 /**
- * Type representing extent for the `radial-gradient()` or `ray()` CSS function.
+ * Type representing extent for the [[radial-gradient]] or [[ray]] functions.
  */
 export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
 
@@ -1301,12 +1363,18 @@ export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Type representing keywords used to define a type used in the CSS `attr()` function.
+ */
 export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" | "angle" | "time" | "frequency";
 
+/**
+ * Type representing keywords used to define a unit used in the CSS `attr()` function.
+ */
 export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnits | ResolutionUnits | FrequencyUnits;
 
 /**
- * The IQuotedProxy function represents a string in quotation marks
+ * The IQuotedProxy function represents a string that will be taken into quotation marks
  */
 export interface IQuotedProxy extends IGenericProxy<"quoted"> {}
 

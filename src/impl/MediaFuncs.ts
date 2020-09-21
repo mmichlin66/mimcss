@@ -92,7 +92,7 @@ function singleMediaQueryToString( query: ExtendedSingleMediaQuery): string
             continue;
 
         if (query[propName])
-            items.push( `(${mediaFeatureToString( propName, query[propName])})`);
+            items.push( mediaFeatureToString( propName, query[propName]));
     }
 
     return `${negate ? "not " : ""}${items.join(" and ")}`;
@@ -103,10 +103,10 @@ function singleMediaQueryToString( query: ExtendedSingleMediaQuery): string
 /**
  * Converts the given media feature to the CSS media query string
  */
-function mediaFeatureToString( featureName: string, val: any, valueOnly?: boolean): string | null
+function mediaFeatureToString( featureName: string, val: any, valueOnly?: boolean): string
 {
     if (!featureName || val == null)
-        return null;
+        return "()";
 
     // find information object
     let info: MediaFeatureInfo = mediaFeatures[featureName];
@@ -124,12 +124,16 @@ function mediaFeatureToString( featureName: string, val: any, valueOnly?: boolea
     {
         let s1 = mediaFeatureSingleValueToString( val[0], convert);
         let s2 = mediaFeatureSingleValueToString( val[1], convert);
-        return `${s1} <= ${realFeatureName} <= ${s2}`;
+
+        return `(${"min-" + realFeatureName}:${s1}) and (${"max-" + realFeatureName}:${s2})`;
+
+        // this syntax is not widely supported yet
+        // return `${s1} <= ${realFeatureName} <= ${s2}`;
     }
     else
     {
         let s = mediaFeatureSingleValueToString( val, convert);
-        return valueOnly ? s : realFeatureName + ":" + s;
+        return valueOnly ? s : `(${realFeatureName}:${s})`;
     }
 }
 
@@ -144,7 +148,7 @@ function mediaFeatureSingleValueToString( val: any, convert?: convertFuncType): 
 
 let mediaFeatures: { [K in keyof IMediaFeatureset]?: MediaFeatureInfo<K> } =
 {
-    aspectRatio: aspectRatioToString,
+    aspectRatio: { convert: aspectRatioToString, isRange: true },
     minAspectRatio: aspectRatioToString,
     maxAspectRatio: aspectRatioToString,
     color: { defaultValue: 0, isRange: true },

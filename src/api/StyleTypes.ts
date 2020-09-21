@@ -132,6 +132,11 @@ export type AnimationTimingFunction_StyleType = OneOrMany<TimingFunction_Single>
 
 
 
+/** Type for aspect-ratio style property */
+export type AspectRatio_StyleType = CssAspectRatio | "auto";
+
+
+
 /** Type for backface-visibility style property */
 export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 
@@ -1273,7 +1278,7 @@ export interface ICssStyleset
     animationName?: AnimationName_StyleType;
     animationPlayState?: AnimationPlayState_StyleType;
     animationTimingFunction?: AnimationTimingFunction_StyleType;
-    aspectRatio?: CssAspectRatio;
+    aspectRatio?: AspectRatio_StyleType;
 
     backdropFilter?: Filter_StyleType;
     backfaceVisibility?: BackfaceVisibilityMode_StyleType;
