@@ -6,7 +6,7 @@ import {fontFaceToString} from "../impl/FontFaceFuncs"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 import {MediaQuery} from "../api/MediaAPI";
 import {supportsQueryToString} from "../impl/StyleFuncs";
-import {mediaQueryToString} from "../impl/MediaFuncs";
+import {s_mediaQueryToString} from "../impl/MediaFuncs";
 import {StyleRule} from "./StyleRules";
 import { symValueToString } from "../impl/UtilFuncs";
 
@@ -82,7 +82,7 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
 		    supportsQueryString = `supports( ${supportsQueryString} )`;
 
-		let mediaQueryString = !this.mediaQuery ? "" : mediaQueryToString( this.mediaQuery);
+		let mediaQueryString = !this.mediaQuery ? "" : s_mediaQueryToString( this.mediaQuery);
 		return `@import ${url} ${supportsQueryString} ${mediaQueryString}`;
     }
 

@@ -1,6 +1,7 @@
 ﻿import {
     CssAspectRatio, CssNumber, CssLength, CssResolution, IConstant, IStringProxy
 } from "./BasicTypes";
+import {s_mediaQueryToString} from "../impl/MediaFuncs";
 
 
 
@@ -108,6 +109,18 @@ export type ExtendedSingleMediaQuery = { [K in keyof ISingleMediaQuery]?: Extend
  * the "and" operator.
  */
 export type MediaQuery = string | ExtendedSingleMediaQuery | ExtendedSingleMediaQuery[];
+
+
+
+/**
+ * Converts the given media query value to the CSS media query string. This function should be used
+ * by libraries that allow specifying the [[MediaQuery]] type for the `media` attribute of elements
+ * such as `<link>`, `<style>` and `<source>`
+ */
+export function mediaQueryToString( query: MediaQuery): string
+{
+    return s_mediaQueryToString( query);
+}
 
 
 

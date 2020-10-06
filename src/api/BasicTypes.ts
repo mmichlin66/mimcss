@@ -1010,13 +1010,13 @@ export type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas"
  *     // using negative numeric value with fractional part for inverted color with alpha
  *     cls6 = css.$class({ color: -(0x123456 + 0.4) })
  *
- *     // using the [[alpha]] function with named color
+ *     // using the `alpha()` function with named color
  *     cls7 = css.$class({ color: css.alpha( "red", 0.4) })
  *
- *     // using the [[rgb]] function
+ *     // using the `rgb()` function
  *     cls8 = css.$class({ color: css.rgb( 256, 0, 128) })
  *
- *     // using the [[hsl]] function
+ *     // using the `hsl()` function
  *     cls9 = css.$class({ color: css.hsl( 200, 90, 52) })
  * }
  * ```

@@ -4,7 +4,7 @@ import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext}
 import {supportsQueryToString} from "../impl/StyleFuncs";
 import {SupportsQuery} from "../api/StyleTypes";
 import {MediaQuery} from "../api/MediaAPI";
-import {mediaQueryToString} from "../impl/MediaFuncs";
+import {s_mediaQueryToString} from "../impl/MediaFuncs";
 
 
 
@@ -186,7 +186,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string | null
 	{
-		return `@media ${mediaQueryToString( this.query)}`;
+		return `@media ${s_mediaQueryToString( this.query)}`;
 	}
 
 

@@ -60,7 +60,7 @@ type MediaFeatureInfo<K extends keyof IMediaFeatureset = any> = convertFuncType<
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function mediaQueryToString( query: MediaQuery): string
+export function s_mediaQueryToString( query: MediaQuery): string
 {
     return val2str( query, {
         fromAny: singleMediaQueryToString,
