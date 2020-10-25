@@ -1,6 +1,6 @@
 ﻿/**
- * This module describes functions used to create rules within style definition classes andsome
- * helper types and functions
+ * This module describes functions used to create rules within style definition classes and some
+ * helper types and functions.
  */
 
 
@@ -272,7 +272,7 @@ export function $style( selector: CssSelector, styleset: CombinedStyleset): ISty
  *
  * @param frames Array of [[AnimationFrame]] objects. Each animation frame contains a waypoint
  * and a styleset.
- * @param nameOverride Atring or another `IAnimationRule` object that determines the name of the
+ * @param nameOverride String or another `IAnimationRule` object that determines the name of the
  * animation. If this optional parameter is defined, the name will override the Mimcss name
  * assignment mechanism. This might be useful if there is a need for the name to match a name of
  * another animation.
@@ -328,7 +328,7 @@ export function $keyframes( frames?: AnimationFrame[],
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     // defining and using custom CSS property
+ *     // define and use custom CSS property
  *     importantTextColor = css.$var( "color", "red")
  *     important = css.$class({
  *         color: this.importantTextColor
@@ -337,7 +337,7 @@ export function $keyframes( frames?: AnimationFrame[],
  *     // use different value for the custom property under another CSS class
  *     special = css.$class({
  *         "+": this.important,
- *         "--": [ [this.importantTextColor, "maroon"]]
+ *         "--": [ [this.importantTextColor, "maroon"] ]
  *     })
  * }
  */
@@ -353,7 +353,7 @@ export function $var<K extends VarTemplateName>( template: K, value?: ExtendedVa
  * Creates a "constant" that can be used anywhere the type defined by the `template` parameter can
  * be used. They are called constants, because they provide a convenient and lightweight way of
  * defining values that are unchanged during the application lifetime. Although constants are
- * defined very similarly to custom properties (see the [[var]] function), they cannot participate
+ * defined very similarly to custom properties (see the [[$var]] function), they cannot participate
  * in the cascade and cannot be redefined under style rules. Constant can use any expression that
  * satisfies the type defined by the `template` parameter including other constants, custom
  * properties and functions.
@@ -530,7 +530,7 @@ export function $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
  *
  * @param fontface Object implementing the `IFontFace` interface defining the parameter of the
  * font to use.
- * @returns The `IFontFaceRule` object that represents the font-face rule.
+ * @returns The `IFontFaceRule` object that represents the @font-face rule.
  *
  * **Example:**
  *
@@ -554,6 +554,21 @@ export function $fontface( fontface: IFontFace): IFontFaceRule
 
 /**
  * Creates a new `@import` rule referencing the given CSS file.
+ *
+ * @param url URL to the CSS file. Relative URLs are resolved relative to the base URL of the
+ * page where the Mimcss library is invoked.
+ * @returns The `IImportRule` object that represents the `@import` rule.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     importedCssFiles = [
+ *         css.$import( "common-3rdparty.css"),
+ *         css.$import( "small-screen-3rdparty.css", {maxWidth: 600}),
+ *     ]
+ * }
  */
 export function $import( url: string, mediaQuery?: string | MediaQuery,
 	supportsQuery?: string | SupportsQuery): IImportRule
@@ -578,7 +593,7 @@ export function $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPag
 }
 
 /**
- * Creates new supports rule.
+ * Creates a new `@supports` rule.
  */
 export function $supports<T extends StyleDefinition>( query: SupportsQuery,
     instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>
@@ -634,8 +649,14 @@ export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefini
  * Sets the flag indicating whether to use optimized (short) rule names. If yes, the names
  * will be created by appending a unique number to the given prefix. If the prefix is not
  * specified, the standard prefix "n" will be used.
- * @param enable
- * @param prefix
+ *
+ * By default the development version of the liberary (mimcss.dev.js) uses scoped names and the
+ * production version uses short names. This function can be called to switch to the alternative
+ * method of name generation in either the development or the production builds.
+ *
+ * @param enable `true` to use short names of CSS entities and `false` to use scoped names.
+ * @param prefix Optional string that will serve as a prefix to which unique numbers will be added
+ * to generate short names. Ignored if the `enable` parameter is set to `false`.
  */
 export function enableShortNames( enable: boolean, prefix?: string): void
 {
@@ -657,7 +678,7 @@ export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType
 export function classes( ...classProps: ClassPropType[]): string
 {
 	return val2str( classProps, {
-		arrItemFunc: v => v instanceof ClassRule ? v.name : classes(v)
+		arrItemFunc: (v: ClassPropType) => v instanceof ClassRule || v instanceof ClassNameRule ? v.name : classes(v)
 	});
 }
 
@@ -667,20 +688,20 @@ export function classes( ...classProps: ClassPropType[]): string
  */
 export function chooseClass( ...classProps: ClassPropType[]): string | null
 {
-    for( let cls of classProps)
+    for( let classProp of classProps)
     {
-        if (!cls)
+        if (!classProp)
             continue;
-        else if (typeof cls === "string")
-            return cls;
-        else if (Array.isArray(cls))
+        else if (typeof classProp === "string")
+            return classProp;
+        else if (Array.isArray(classProp))
         {
-            let name = chooseClass( cls);
+            let name = chooseClass( classProp);
             if (name)
                 return name;
         }
-        else if (cls.name)
-            return cls.name;
+        else if (classProp.name)
+            return classProp.name;
     }
 
 	return null;
@@ -731,14 +752,13 @@ export function createCssSerializer(): ICssSerializer
  * representation. This can be used for server-side rendering when the resultant string can be
  * set as the content of a `<style>` element.
  */
-export function serializeToCSS( arg1: StyleDefinition | IStyleDefinitionClass,
-    ...args: (StyleDefinition | IStyleDefinitionClass)[]): string
+export function serializeToCSS( ...args: (StyleDefinition | IStyleDefinitionClass)[]): string
 {
-    let serializer = new CssSerializer();
-    serializer.add( arg1);
-    if (args.length > 0)
-        args.forEach( instOrClass => serializer.add( instOrClass));
+    if (!args || args.length === 0)
+        return "";
 
+    let serializer = new CssSerializer();
+    args.forEach( instOrClass => serializer.add( instOrClass));
     return serializer.serialize();
 }
 
@@ -768,6 +788,9 @@ class CssSerializer implements ICssSerializer
      */
     public serialize(): string
     {
+        if (this.instances.size === 0)
+            return "";
+
         let ctx = new RuleSerializationContext();
         this.instances.forEach( instance => ctx.addStyleDefinition( instance));
         return ctx.topLevelBuf + ctx.nonTopLevelBuf;
@@ -780,9 +803,8 @@ class CssSerializer implements ICssSerializer
 
 
 /**
- * The StyleSerializer class allows adding style definition classes and objects
- * and serializing them to a single string. This can be used for server-side rendering when
- * the resultant string can be set as the content of a `<style>` element.
+ * The RuleSerializationContext class implements the IRuleSerializationContext interface and
+ * accumulates text of serialized CSS rules.
  */
 class RuleSerializationContext implements IRuleSerializationContext
 {

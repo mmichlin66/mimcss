@@ -57,7 +57,7 @@ Mimcss contains many exported types and functions; therefore, it is recommended 
 import * as css from "mimcss"
 ```
 
-Mimcss provides [Guide](https://mmichlin66.github.io/mimcss/guide/introduction.html) and [Reference](https://mmichlin66.github.io/mimcss/ref/overview.html) documents for developers. Both documents undergo constant improvements. Mimcss also provides a [Playground](https://mmichlin66.github.io/demo/mimcss/playground.html), where you can write TypeScript code using Mimcss features and immediately see the results.
+Mimcss provides [Guide](https://mmichlin66.github.io/mimcss/guide/introduction.html) and [Reference](https://mmichlin66.github.io/mimcss/reference.html) documents for developers. Both documents undergo constant improvements. Mimcss also provides a [Playground](https://mmichlin66.github.io/demo/mimcss/playground.html), where you can write TypeScript code using Mimcss features and immediately see the results.
 
 ## Quick Start
 Let's assume that we need to create several styles for a couple of classes and an element ID. With Mimcss, you create a TypeScript class and then, in your component's TypeScript code, you refer to the CSS classes and IDs using the TypeScript class's properties:
