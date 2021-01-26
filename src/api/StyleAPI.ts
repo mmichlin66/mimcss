@@ -150,7 +150,7 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
 		if (newStringVal == null)
 		{
 			updateVal = updateVal || {};
-			updateVal[key] = undefined;
+			updateVal[key] = "unset";
 		}
 		else
 		{
