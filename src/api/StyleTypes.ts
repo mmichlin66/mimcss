@@ -2,12 +2,234 @@
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, CssTime, CssLength, CssAngle,
     CssPercent, CssFrequency, CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword,
     VerticalPositionKeyword, CssPoint, ExtendedProp, IQuotedProxy, CssColor, CssImage, BasicShape,
-    GeometryBoxKeyword, IFilterProxy, IMinMaxProxy, IFitContentProxy, IRepeatProxy, ISpanProxy,
-    IRayProxy, ITransformProxy, ILengthProxy, CssSize, CssAspectRatio
+    GeometryBoxKeyword, IMinMaxProxy, IFitContentProxy, IRepeatProxy, ISpanProxy,
+    IRayProxy, ILengthProxy, CssSize, CssAspectRatio
 } from "./BasicTypes"
 import {FontStretch_Single} from "./FontFaceAPI";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Filters
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Object representing CSS functions that accept a percent value and can be used for `filter`
+ * style property.
+ */
+export interface IFilterPercent
+{
+    fn: "brightness" | "contrast" | "grayscale" | "invert" | "opacity" | "saturate" | "sepia";
+    p: Extended<CssPercent>;
+}
+
+
+
+/**
+ * Object representing blur CSS function that can be used for `filter` style property.
+ */
+export interface IFilterBlur
+{
+    fn: "blur";
+    r: Extended<CssLength>;
+}
+
+
+
+/**
+ * Object representing drop-shadow CSS function that can be used for `filter` style property.
+ */
+export interface IFilterDropShadow
+{
+    fn: "drop-shadow";
+    x: Extended<CssLength>;
+    y: Extended<CssLength>;
+    color?: Extended<CssColor>;
+    blur?: Extended<CssLength>;
+}
+
+
+
+/**
+ * Object representing blur CSS function that can be used for `filter` style property.
+ */
+export interface IFilterHueRotate
+{
+    fn: "hue-rotate";
+    a: Extended<CssAngle>;
+}
+
+
+
+/**
+ * Type accepted by the `filter` style property
+ */
+ export type FilterFunc = IFilterPercent | IFilterBlur | IFilterDropShadow | IFilterHueRotate;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Transforms
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Object representing matrix CSS function that can be used for `transform` property.
+ */
+export interface ITransformMatrix
+{
+    fn: "matrix";
+    a: Extended<CssNumber>; b: Extended<CssNumber>; c: Extended<CssNumber>; d: Extended<CssNumber>;
+    tx: Extended<CssNumber>; ty: Extended<CssNumber>;
+}
+
+/**
+ * Object representing matrix3d CSS function that can be used for `transform` property.
+ */
+export interface ITransformMatrix3d
+{
+    fn: "matrix3d";
+    a1: Extended<CssNumber>; b1: Extended<CssNumber>; c1: Extended<CssNumber>; d1: Extended<CssNumber>;
+    a2: Extended<CssNumber>; b2: Extended<CssNumber>; c2: Extended<CssNumber>; d2: Extended<CssNumber>;
+    a3: Extended<CssNumber>; b3: Extended<CssNumber>; c3: Extended<CssNumber>; d3: Extended<CssNumber>;
+    a4: Extended<CssNumber>; b4: Extended<CssNumber>; c4: Extended<CssNumber>; d4: Extended<CssNumber>;
+}
+
+
+
+/**
+ * Object representing perspective CSS function that can be used for `transform` property.
+ */
+export interface ITransformPerspective
+{
+    fn: "perspective";
+    d: Extended<CssLength>;
+}
+
+
+
+/**
+ * Object representing single-dimensional rotate CSS function that can be used for `transform` property.
+ */
+export interface ITransformRotate1d
+{
+    fn: "rotate" | "rotateX" | "rotateY" | "rotateZ";
+    a: Extended<CssAngle>;
+}
+
+/**
+ * Object representing three-dimensional rotate CSS function that can be used for `transform` property.
+ */
+export interface ITransformRotate3d
+{
+    fn: "rotate3d";
+    x: Extended<CssNumber>;
+    y: Extended<CssNumber>;
+    z: Extended<CssNumber>;
+    a: Extended<CssAngle>;
+}
+
+
+
+/**
+ * Object representing single-dimensional scale CSS function that can be used for `transform` property.
+ */
+export interface ITransformScale1d
+{
+    fn: "scaleX" | "scaleY" | "scaleZ";
+    s: Extended<CssNumber>;
+}
+
+/**
+ * Object representing two-dimensional scale CSS function that can be used for `transform` property.
+ */
+export interface ITransformScale2d
+{
+    fn: "scale";
+    sx: Extended<CssNumber>;
+    sy?: Extended<CssNumber>;
+}
+
+/**
+ * Object representing three-dimensional scale CSS function that can be used for `transform` property.
+ */
+export interface ITransformScale3d
+{
+    fn: "scale3d";
+    sx: Extended<CssNumber>;
+    sy: Extended<CssNumber>;
+    sz: Extended<CssNumber>;
+}
+
+
+
+/**
+ * Object representing single-dimensional skew CSS function that can be used for `transform` property.
+ */
+export interface ITransformSkew1d
+{
+    fn: "skewX" | "skewY";
+    a: Extended<CssAngle>;
+}
+
+/**
+ * Object representing two-dimensional skew CSS function that can be used for `transform` property.
+ */
+export interface ITransformSkew2d
+{
+    fn: "skew";
+    ax: Extended<CssAngle>;
+    ay?: Extended<CssAngle>;
+}
+
+
+
+/**
+ * Object representing single-dimensional translate CSS function that can be used for `transform` property.
+ */
+export interface ITransformTranslate1d
+{
+    fn: "translateX" | "translateY" | "translateZ";
+    d: Extended<CssLength>;
+}
+
+/**
+ * Object representing two-dimensional translate CSS function that can be used for `transform` property.
+ */
+export interface ITransformTranslate2d
+{
+    fn: "translate";
+    x: Extended<CssLength>;
+    y?: Extended<CssLength>;
+}
+
+/**
+ * Object representing three-dimensional translate CSS function that can be used for `transform` property.
+ */
+export interface ITransformTranslate3d
+{
+    fn: "translate3d";
+    x: Extended<CssLength>;
+    y: Extended<CssLength>;
+    z: Extended<CssLength>;
+}
+
+
+
+/**
+ * Type accepted by the `transform` style property
+ */
+export type TransformFunc =
+    ITransformMatrix | ITransformMatrix3d | ITransformPerspective |
+    ITransformRotate1d | ITransformRotate3d |
+    ITransformScale1d | ITransformScale2d | ITransformScale3d |
+    ITransformSkew1d | ITransformSkew2d |
+    ITransformTranslate1d | ITransformTranslate2d | ITransformTranslate3d;
 
 
 
@@ -541,7 +763,7 @@ export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 /** Type for filter and backdrop-filter style single value */
-export type Filter_Single = IUrlProxy | IFilterProxy;
+export type Filter_Single = IUrlProxy | FilterFunc;
 
 /** Type for filter and backdrop-filter style property */
 export type Filter_StyleType = OneOrMany<Filter_Single>;
@@ -1132,7 +1354,7 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
 
 
 /** Type for transform style property */
-export type Transform_StyleType = "none" | OneOrMany<ITransformProxy>;
+export type Transform_StyleType = "none" | OneOrMany<TransformFunc>;
 
 
 

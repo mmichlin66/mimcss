@@ -1,19 +1,19 @@
 ﻿import {
     Extended, CssPosition, CssLength, CssPercent, CssAngle, CssNumber, CssPoint, CssColor,
-    SelectorItem, ISelectorProxy, IFilterProxy, IBasicShapeProxy, IPathBuilder, IRayProxy,
-    IRepeatProxy, IMinMaxProxy, ITransformProxy, ISpanProxy, ExtentKeyword, IColorProxy,
-    INamedColors
-} from "../api/BasicTypes"
+    SelectorItem, ISelectorProxy, IBasicShapeProxy, IPathBuilder, IRayProxy,
+    IRepeatProxy, IMinMaxProxy, ISpanProxy, ExtentKeyword, IColorProxy, INamedColors,
+} from "./BasicTypes"
 import {
+    ITransformMatrix, ITransformMatrix3d, ITransformPerspective,
+    ITransformRotate1d, ITransformRotate3d,
+    ITransformSkew1d, ITransformSkew2d, ITransformScale1d, ITransformScale2d, ITransformScale3d,
+    ITransformTranslate1d, ITransformTranslate3d, ITransformTranslate2d,
 	Styleset, ExtendedStyleset, StringStyleset, BorderRadius_StyleType, FillRule_StyleType,
-	GridTrackSize, GridTrack, GridLineCountOrName
+	GridTrackSize, GridTrack, GridLineCountOrName, IFilterPercent, IFilterBlur, IFilterDropShadow, IFilterHueRotate
 } from "./StyleTypes"
+import {LengthMath, AngleMath, pos2str, templateStringToString, val2str, symValueToString} from "../impl/UtilFuncs";
 import {
-	PercentMath, LengthMath, arr2str, AngleMath, NumberMath, pos2str,
-	templateStringToString, val2str, symValueToString
-} from "../impl/UtilFuncs";
-import {
-    stylePropToString, singleBoxShadow_fromObject, borderRadiusToString, forAllPropsInStylset,
+    stylePropToString, borderRadiusToString, forAllPropsInStylset,
     gridTrackToString, s_registerStylePropertyInfo
 } from "../impl/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
@@ -186,20 +186,12 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-// Helper function converting percent value to invocation of the given CSS function.
-function percentFilter( name: string, amount: Extended<CssPercent>): IFilterProxy
-{
-    return () => `${name}(${PercentMath.styleToString( amount)})`;
-}
-
-
-
 /**
- * Returns an IFilterProxy function representing the `brightness()` CSS function.
+ * Returns an IFilterPercent object representing the `brightness()` CSS function.
  */
-export function brightness( amount: Extended<CssPercent>): IFilterProxy
+export function brightness( p: Extended<CssPercent>): IFilterPercent
 {
-    return percentFilter( "brightness", amount);
+    return { fn: "brightness", p };
 }
 
 
@@ -207,9 +199,9 @@ export function brightness( amount: Extended<CssPercent>): IFilterProxy
 /**
  * Returns an IFilterProxy function representing the `contrast()` CSS function.
  */
-export function contrast( amount: Extended<CssPercent>): IFilterProxy
+export function contrast( p: Extended<CssPercent>): IFilterPercent
 {
-    return percentFilter( "contrast", amount);
+    return { fn: "contrast", p };
 }
 
 
@@ -217,9 +209,9 @@ export function contrast( amount: Extended<CssPercent>): IFilterProxy
 /**
  * Returns an IFilterProxy function representing the `grayscale()` CSS function.
  */
-export function grayscale( amount: Extended<CssPercent>): IFilterProxy
+export function grayscale( p: Extended<CssPercent>): IFilterPercent
 {
-    return percentFilter( "grayscale", amount);
+    return { fn: "grayscale", p };
 }
 
 
@@ -227,9 +219,9 @@ export function grayscale( amount: Extended<CssPercent>): IFilterProxy
 /**
  * Returns an IFilterProxy function representing the `invert()` CSS function.
  */
-export function invert( amount: Extended<CssPercent>): IFilterProxy
+export function invert( p: Extended<CssPercent>): IFilterPercent
 {
-    return percentFilter( "invert", amount);
+    return { fn: "invert", p };
 }
 
 
@@ -237,9 +229,9 @@ export function invert( amount: Extended<CssPercent>): IFilterProxy
 /**
  * Returns an IFilterProxy function representing the `opacity()` CSS function.
  */
-export function opacity( amount: Extended<CssPercent>): IFilterProxy
+export function opacity( p: Extended<CssPercent>): IFilterPercent
 {
-    return percentFilter( "opacity", amount);
+    return { fn: "opacity", p };
 }
 
 
@@ -247,9 +239,9 @@ export function opacity( amount: Extended<CssPercent>): IFilterProxy
 /**
  * Returns an IFilterProxy function representing the `saturate()` CSS function.
  */
-export function saturate( amount: Extended<CssPercent>): IFilterProxy
+export function saturate( p: Extended<CssPercent>): IFilterPercent
 {
-    return percentFilter( "saturate", amount);
+    return { fn: "saturate", p };
 }
 
 
@@ -257,9 +249,9 @@ export function saturate( amount: Extended<CssPercent>): IFilterProxy
 /**
  * Returns an IFilterProxy function representing the `sepia()` CSS function.
  */
-export function sepia( amount: Extended<CssPercent>): IFilterProxy
+export function sepia( p: Extended<CssPercent>): IFilterPercent
 {
-    return percentFilter( "sepia", amount);
+    return { fn: "sepia", p };
 }
 
 
@@ -267,9 +259,9 @@ export function sepia( amount: Extended<CssPercent>): IFilterProxy
 /**
  * Returns an IFilterProxy function representing the `blur()` CSS function.
  */
-export function blur( radius: Extended<CssLength>): IFilterProxy
+export function blur( r: Extended<CssLength>): IFilterBlur
 {
-    return () => `blur(${LengthMath.styleToString( radius)})`;
+    return { fn: "blur", r };
 }
 
 
@@ -280,16 +272,11 @@ export function blur( radius: Extended<CssLength>): IFilterProxy
  * @param y Vertical offset of the shadow.
  * @param color Color of the shadow.
  * @param blur Value of the shadow's blurring. The default value is 1 pixel.
- * @param spread Value of the shadow's spreading. The default value is 0.
- * @param inset Flag indicating whether the shadow goes inside the shape. The default value is false.
  */
-export function dropShadow(
-    x: Extended<CssLength>,
-    y: Extended<CssLength>,
-    color?: Extended<CssColor>,
-    blur?: Extended<CssLength>): IFilterProxy
+export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
+    color?: Extended<CssColor>, blur?: Extended<CssLength>): IFilterDropShadow
 {
-	return () => `drop-shadow(${singleBoxShadow_fromObject( { x, y, color, blur})})`;
+	return { fn: "drop-shadow", x, y, color, blur };
 }
 
 
@@ -297,9 +284,9 @@ export function dropShadow(
 /**
  * Returns an IFilterProxy function representing the `hue-rotate()` CSS function.
  */
-export function hueRotate( amount: Extended<CssAngle>): IFilterProxy
+export function hueRotate( a: Extended<CssAngle>): IFilterHueRotate
 {
-    return () => `hue-rotate(${AngleMath.styleToString( amount)})`;
+	return { fn: "hue-rotate", a };
 }
 
 
@@ -526,7 +513,7 @@ class PathBuilder implements IPathBuilder
 
 
 
-    // Move-to command with absolute coordinates.
+    // Adds the given command and parameters to the path.
 	private items( command: string, ...items: (number | number[])[]): IPathBuilder
 	{
 		this.buf += " " + command;
@@ -592,12 +579,12 @@ class PathBuilder implements IPathBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an ITransformProxy function representing the `matrix()` CSS function.
+ * Returns an ITransformMatrix function representing the `matrix()` CSS function.
  */
 export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
-	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): ITransformProxy
+	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): ITransformMatrix
 {
-    return () => `matrix(${arr2str( [a, b, c, d, tx, ty], undefined, ",")})`;
+    return { fn: "matrix", a, b, c, d, tx, ty };
 }
 
 
@@ -610,9 +597,9 @@ export function matrix3d(
 		a2: Extended<CssNumber>, b2: Extended<CssNumber>, c2: Extended<CssNumber>, d2: Extended<CssNumber>,
 		a3: Extended<CssNumber>, b3: Extended<CssNumber>, c3: Extended<CssNumber>, d3: Extended<CssNumber>,
 		a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>,
-	): ITransformProxy
+	): ITransformMatrix3d
 {
-    return () => `matrix(${arr2str( [a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4], undefined, ",")})`;
+    return { fn: "matrix3d", a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4 };
 }
 
 
@@ -620,139 +607,95 @@ export function matrix3d(
 /**
  * Returns an ITransformProxy function representing the `perspective()` CSS function.
  */
-export function perspective( d: Extended<CssLength>): ITransformProxy
+export function perspective( d: Extended<CssLength>): ITransformPerspective
 {
-    return () => `perspective(${LengthMath.styleToString(d)})`;
+    return { fn: "perspective", d};
 }
 
 
 
 /**
- * Returns an ITransformProxy function representing the given CSS rotation function.
+ * Returns an ITransformRotate2d object representing the `rotate()` CSS function.
  */
-function rotateImpl( name: string, a: Extended<CssAngle>): ITransformProxy
+export function rotate( a: Extended<CssAngle>): ITransformRotate1d
 {
-    return () => `${name}(${AngleMath.styleToString(a)})`;
+    return { fn: "rotate", a};
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `rotate()` CSS function.
+ * Returns an ITransformRotate object representing the `rotateX()` CSS function.
  */
-export function rotate( a: Extended<CssAngle>): ITransformProxy
+export function rotateX( a: Extended<CssAngle>): ITransformRotate1d
 {
-    return rotateImpl( "rotate", a);
+    return { fn: "rotateX", a };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `rotateX()` CSS function.
+ * Returns an ITransformRotate object representing the `rotateY()` CSS function.
  */
-export function rotateX( a: Extended<CssAngle>): ITransformProxy
+export function rotateY( a: Extended<CssAngle>): ITransformRotate1d
 {
-    return rotateImpl( "rotateX", a);
+    return { fn: "rotateY", a };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `rotateY()` CSS function.
+ * Returns an ITransformRotate object representing the `rotateZ()` CSS function.
  */
-export function rotateY( a: Extended<CssAngle>): ITransformProxy
+export function rotateZ( a: Extended<CssAngle>): ITransformRotate1d
 {
-    return rotateImpl( "rotateY", a);
+    return { fn: "rotateZ", a };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `rotateZ()` CSS function.
+ * Returns an ITransformRotate3d object representing the `rotate3d()` CSS function.
  */
-export function rotateZ( a: Extended<CssAngle>): ITransformProxy
+export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
+    z: Extended<CssNumber>, a: Extended<CssAngle>): ITransformRotate3d
 {
-    return rotateImpl( "rotateZ", a);
+    return { fn: "rotate3d", x, y, z, a }
 }
 
 
 
 /**
- * Returns an ITransformProxy function representing the `rotate3d()` CSS function.
+ * Returns an ITransformScale2d object representing the `scale()` CSS function.
  */
-export function rotate3d(
-	x: Extended<CssNumber>, y: Extended<CssNumber>, z: Extended<CssNumber>,
-	a: Extended<CssAngle>): ITransformProxy
+export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): ITransformScale2d
 {
-    return () => {
-        let v = [NumberMath.styleToString(x), NumberMath.styleToString(y),
-                NumberMath.styleToString(z), AngleMath.styleToString(a)];
-        return `rotate3d(${v.join(",")})`;
-    }
+    return { fn: "scale", sx, sy};
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `scale()` CSS function.
+ * Returns an ITransformScale object representing the `scaleX()` CSS function.
  */
-export function scale( cx: Extended<CssNumber>, cy?: Extended<CssNumber>): ITransformProxy
+export function scaleX( s: Extended<CssNumber>): ITransformScale1d
 {
-    return () => `scale(${NumberMath.styleToString(cx)}${cy != null ? "," + NumberMath.styleToString(cy) : ""})`;
+    return { fn: "scaleX", s };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the given scale CSS function.
+ * Returns an ITransformScale object representing the `scaleY()` CSS function.
  */
-function scaleImpl( name: string, s: Extended<CssNumber>): ITransformProxy
+export function scaleY( s: Extended<CssNumber>): ITransformScale1d
 {
-    return () => `${name}(${NumberMath.styleToString(s)})`;
+    return { fn: "scaleY", s };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `scaleX()` CSS function.
+ * Returns an ITransformScale object representing the `scaleZ()` CSS function.
  */
-export function scaleX( s: Extended<CssNumber>): ITransformProxy
+export function scaleZ( s: Extended<CssNumber>): ITransformScale1d
 {
-    return scaleImpl( "scaleX", s);
+    return { fn: "scaleZ", s };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `scaleY()` CSS function.
- */
-export function scaleY( s: Extended<CssNumber>): ITransformProxy
-{
-    return scaleImpl( "scaleY", s);
-}
-
-
-
-/**
- * Returns an ITransformProxy function representing the `scaleZ()` CSS function.
- */
-export function scaleZ( s: Extended<CssNumber>): ITransformProxy
-{
-    return scaleImpl( "scaleZ", s);
-}
-
-
-
-/**
- * Returns an ITransformProxy function representing the `scale3d()` CSS function.
+ * Returns an ITransformScale3d object representing the `scale3d()` CSS function.
  */
 export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
-	sz: Extended<CssNumber>): ITransformProxy
+    sz: Extended<CssNumber>): ITransformScale3d
 {
-    return () => {
-        let v = [NumberMath.styleToString(sx), NumberMath.styleToString(sy), NumberMath.styleToString(sz)];
-        return `scale3d(${v.join(",")})`;
-    }
+    return { fn: "scale3d", sx, sy, sz }
 }
 
 
@@ -760,93 +703,68 @@ export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
 /**
  * Returns an ITransformProxy function representing the `skew()` CSS function.
  */
-export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransformProxy
+export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransformSkew2d
 {
-    return () => `skew(${AngleMath.styleToString(ax)}${ay != null ? "," + AngleMath.styleToString(ay) : ""})`;
+    return { fn: "skew", ax, ay };
 }
-
-
 
 /**
  * Returns an ITransformProxy function representing the `skewX()` CSS function.
  */
-export function skewX( ax: Extended<CssAngle>): ITransformProxy
+export function skewX( a: Extended<CssAngle>): ITransformSkew1d
 {
-    return () => `skewX(${AngleMath.styleToString(ax)})`;
+    return { fn: "skewX", a };
 }
-
-
 
 /**
  * Returns an ITransformProxy function representing the `skewY()` CSS function.
  */
-export function skewY( ay: Extended<CssAngle>): ITransformProxy
+export function skewY( a: Extended<CssAngle>): ITransformSkew1d
 {
-    return () => `skewX(${AngleMath.styleToString(ay)})`;
+    return { fn: "skewY", a };
 }
 
 
 
 /**
- * Returns an ITransformProxy function representing the `translate()` CSS function.
+ * Returns an ITransformTranslate2d object representing the `translate()` CSS function.
  */
-export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITransformProxy
+export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITransformTranslate2d
 {
-    return () => `translate(${LengthMath.styleToString(x)}${y != null ? "," + LengthMath.styleToString(y) : ""})`;
+    return { fn: "translate", x, y};
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the given translate CSS function.
+ * Returns an ITransformTranslate object representing the `translateX()` CSS function.
  */
-function translateImpl( name: string, s: Extended<CssLength>): ITransformProxy
+export function translateX( d: Extended<CssLength>): ITransformTranslate1d
 {
-    return () => `${name}(${LengthMath.styleToString(s)})`;
+    return { fn: "translateX", d };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `translateX()` CSS function.
+ * Returns an ITransformTranslate object representing the `translateY()` CSS function.
  */
-export function translateX( x: Extended<CssLength>): ITransformProxy
+export function translateY( d: Extended<CssLength>): ITransformTranslate1d
 {
-    return translateImpl( "translateX", x);
+    return { fn: "translateY", d };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `translateY()` CSS function.
+ * Returns an ITransformTranslate object representing the `translateZ()` CSS function.
  */
-export function translateY( y: Extended<CssLength>): ITransformProxy
+export function translateZ( d: Extended<CssLength>): ITransformTranslate1d
 {
-    return translateImpl( "translateY", y);
+    return { fn: "translateZ", d };
 }
 
-
-
 /**
- * Returns an ITransformProxy function representing the `translateZ()` CSS function.
- */
-export function translateZ( z: Extended<CssLength>): ITransformProxy
-{
-    return translateImpl( "translateZ", z);
-}
-
-
-
-/**
- * Returns an ITransformProxy function representing the `translate3d()` CSS function.
+ * Returns an ITransformTranslate3d object representing the `translate3d()` CSS function.
  */
 export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
-	z: Extended<CssLength>): ITransformProxy
+	z: Extended<CssLength>): ITransformTranslate3d
 {
-    return () => {
-        let v = [LengthMath.styleToString(x), LengthMath.styleToString(y), LengthMath.styleToString(z)];
-        return `translate3d(${v.join(",")})`;
-    }
+    return { fn: "translate3d", x, y, z }
 }
 
 

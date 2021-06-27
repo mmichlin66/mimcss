@@ -1,6 +1,5 @@
 ﻿import * as FontFaceTypes from "../api/FontFaceAPI"
-import {obj2str} from "./StyleFuncs";
-import {camelToDash, val2str, PercentMath, AngleMath, arr2str, NumberMath} from "./UtilFuncs";
+import {camelToDash, val2str, PercentMath, AngleMath, arr2str, obj2str, NumberMath} from "./UtilFuncs";
 
 
 

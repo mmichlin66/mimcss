@@ -1220,11 +1220,6 @@ export interface IImageProxy extends IGenericProxy<"image"> {};
 export type CssImage = IUrlProxy | IImageProxy;
 
 /**
- * The IFilterProxy interface represents an invocation of one the CSS `<filter>` functions.
- */
-export interface IFilterProxy extends IGenericProxy<"filter"> {};
-
-/**
  * The IBasicShapeProxy interface represents an invocation of one the CSS `<basic-shape>`
  * functions, for example, [[circle]], [[polygone]], etc. (except the [[path]] function).
  */
@@ -1241,11 +1236,7 @@ export type BasicShape = IBasicShapeProxy | IPathBuilder;
  */
 export interface IRayProxy extends IGenericProxy<"ray"> {};
 
-/**
- * The ITransformProxy interface represents an invocation of one the CSS `<transform>` functions
- * such as [[scale]], [[skew]] and others.
- */
-export interface ITransformProxy extends IGenericProxy<"transform"> {};
+
 
 /**
  * The IMinMaxProxy interface represents an invocation of the [[minmax]] function.

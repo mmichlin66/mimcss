@@ -173,6 +173,64 @@ export function arr2str( val: any[], func?: (v) => string, separator: string = "
 
 
 
+/** Type defnition of a function that takes a value and converts it to string */
+export type ToStringFunc = (val: any) => string;
+
+
+
+
+/**
+ * Converts the given value to a CSS string using the info parameter to inform how the object's
+ * properties should be converted to strings. The info parameter is an array of either strings
+ * or two- or thre-element tuples. The only string and the first tuple element corresponds to a
+ * property expected in the value object to be converted. Each property is converted according
+ * to the following rules:
+ * - If the array item is just a string, the corresponding value's property is converted using
+ *   the val2str function.
+ * - If the second element is null or undefined, the corresponding value's property is converted using
+ *   the val2str function..
+ * - If the second element is a function, it is used to convert the value's property.
+ * - If a third element exists in the tuple it is treated as a prefix to be placed before the
+ *   converted property value.
+ *
+ * The order of the names determines in which order the properties should be added to the string.
+ */
+ export function obj2str( val: any,
+    info: (string | [string, null | ToStringFunc, string?] )[],
+    separator: string = " "): string
+{
+    if (val == null)
+        return "";
+    else if (typeof val !== "object")
+        return val.toString();
+
+    let buf: (string)[] = [];
+    info.forEach( nameOrTuple =>
+    {
+        // get the name of the property in the value to be converted and the corresponding value;
+        // if the properties value is not defined, skip it.
+        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
+        let propVal = val[propName];
+        if (propVal == null)
+            return;
+
+        // check whether we have a prefix
+        let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
+        if (prefix)
+            buf.push( prefix);
+
+        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+        if (!convertor)
+            buf.push( val2str( propVal));
+        else
+            buf.push( convertor( propVal));
+    });
+
+	return buf.join(separator);
+}
+
+
+
 /**
  * The templateStringToString is a tag function helper that converts the template string with
  * parameters to a string using the given function to convert parameters.

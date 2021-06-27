@@ -5,11 +5,13 @@ import {
     Border_StyleType, Columns_StyleType, Cursor_StyleType, Flex_StyleType, Font_StyleType,
     GridTemplateAreas_StyleType, GridTemplateArea_Definition, GridTrack, GridTemplateAxis_StyleType,
     Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType, Transition_Single, Offset_StyleType,
-    Styleset, CustomVar_StyleType, VarTemplateName, SupportsQuery, SingleSupportsQuery, ExtendedStyleset
+    Styleset, CustomVar_StyleType, VarTemplateName, SupportsQuery, SingleSupportsQuery, ExtendedStyleset,
+    TransformFunc,
+    FilterFunc
 } from "../api/StyleTypes";
 import {
     val2str, TimeMath, NumberMath, arr2str, pos2str, LengthMath, unitlessOrPercentToString, AngleMath,
-    camelToDash, dashToCamel, IValueConvertOptions, multiPos2str, PercentMath, ResolutionMath, FrequencyMath
+    camelToDash, dashToCamel, IValueConvertOptions, multiPos2str, PercentMath, ResolutionMath, FrequencyMath, ToStringFunc
 } from "./UtilFuncs";
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -69,13 +71,209 @@ export function pseudoEntityToString( entityName: string, val: any): string
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// Utility functions for converting values to strings.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Numeric identifiers corresponding to well known functions used to convert style property values
+ * to strings. This is used to reduce the size of the object used for mapping style properties to
+ * conversion functions.
+ *
+ * Note!!!: the values in the enumeration cannot be changed - otherwise, it will not be backwards
+ * compatible. All new values must be appended at the end.
+ */
+ const enum WellKnownFunc
+ {
+     Length = 1,
+     Color,
+     Border,
+     Position,
+     CornerRadius,
+     MultiLengthWithSpace,
+     MultiTimeWithComma,
+     ArrayWithComma,
+     ArrayWithSlash,
+     GridAxis,
+     Angle,
+     Number,
+     Percent,
+ }
+
+
+
+ /**
+  * Converts the given value to string using a well-known function indicated by the given
+  * enumeration value.
+  * @param val
+  * @param funcType
+  */
+ function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): string
+ {
+     let func: ToStringFunc | null =
+         funcType === WellKnownFunc.Length ? LengthMath.styleToString :
+         funcType === WellKnownFunc.Angle ? AngleMath.styleToString :
+         funcType === WellKnownFunc.Number ? NumberMath.styleToString :
+         funcType === WellKnownFunc.Percent ? PercentMath.styleToString :
+         funcType === WellKnownFunc.Color ? colorToString :
+         funcType === WellKnownFunc.Border ? borderToString :
+         funcType === WellKnownFunc.Position ? pos2str :
+         funcType === WellKnownFunc.CornerRadius ? singleCornerRadiusToString :
+         funcType === WellKnownFunc.MultiLengthWithSpace ? multiLengthToStringWithSpace :
+         funcType === WellKnownFunc.MultiTimeWithComma ? multiTimeToStringWithComma :
+         funcType === WellKnownFunc.ArrayWithComma ? arrayToStringWithComma :
+         funcType === WellKnownFunc.ArrayWithSlash ? arrayToStringWithSlash :
+         funcType === WellKnownFunc.GridAxis ? gridAxisToString :
+         null;
+
+     return func ? func(val) : "";
+ }
+
+
+
+// Helper function converts the given multi-length value to string. If the value is an array, the
+// items will be separated by space.
+function multiLengthToStringWithSpace( val: OneOrMany<CssLength>): string
+{
+    return LengthMath.multiStyleToString( val, " ");
+}
+
+// Helper function converts the given multi-time value to string. If the value is an array, the
+// items will be separated by comma.
+function multiTimeToStringWithComma( val: OneOrMany<CssTime>): string
+{
+    return TimeMath.multiStyleToString( val, ",");
+}
+
+// Helper function converts the given value to string. If the value is an array, the items will be
+// separated by comma.
+function arrayToStringWithComma( val: any)
+{
+    return val2str( val, { arrSep: "," });
+};
+
+// Helper function converts the given value to string. If the value is an array, the items will be
+// separated by slash.
+function arrayToStringWithSlash( val: any)
+{
+    return val2str( val, { arrSep: "/" });
+};
+
+
+
+/**
+ * Converts the given value to a CSS function string using the given function name and the info
+ * parameter to inform how the object's properties should be converted to strings. The info
+ * parameter is an array of either strings or two-element tuples. The only string and the first
+ * tuple element corresponds to a property expected in the value object to be converted. Each
+ * property is converted according to the following rules:
+ * - If the array item is just a string, the corresponding value's property is converted using
+ *   the val2str function.
+ * - If the second element is null or undefined, the corresponding value's property is converted using
+ *   the val2str function..
+ * - If the second element is a number it is treated as an index of a well-known conversion function.
+ * - If the second element is a function, it is used to convert the value's property.
+ *
+ * Since the elements in the info array constitute parameters for the function, processing stops as
+ * soon as an undefined parameter is encountered because undefined parameter indicates that optional
+ * parameters started with this one were not passed to the function.
+ */
+ function funcObj2String( val: { fn: string, [p: string]: any },
+    info: (string | [string, WellKnownFunc | ToStringFunc])[]): string
+{
+    if (val == null)
+        return "";
+
+    let params: string[] = [];
+    for( let nameOrTuple of info)
+    {
+        // get the name of the property in the value to be converted and the corresponding value;
+        // if the properties value is not defined, skip it.
+        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
+        let propVal = val[propName];
+        if (propVal == null)
+            break;
+
+        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+        if (!convertor)
+            params.push( val2str( propVal));
+        else if (typeof convertor === "number")
+            params.push( valueToStringByWellKnownFunc( propVal, convertor));
+        else
+            params.push( convertor( propVal));
+    }
+
+	return `${val.fn}(${params.join(",")})`;
+}
+
+
+
+/**
+ * Converts the given value to a CSS string using the info parameter to inform how the object's
+ * properties should be converted to strings. The info parameter is an array of either strings
+ * or two- or thre-element tuples. The only string and the first tuple element corresponds to a
+ * property expected in the value object to be converted. Each property is converted according
+ * to the following rules:
+ * - If the array item is just a string, the corresponding value's property is converted using
+ *   the val2str function.
+ * - If the second element is null or undefined, the corresponding value's property is converted using
+ *   the val2str function..
+ * - If the second element is a string it is treated as a name of a longhand style property. The
+ *   value's property is converted using the stylePropToString function for this longhand style
+ *   property.
+ * - If the second element is a function, it is used to convert the value's property.
+ * - If a third element exists in the tuple it is treated as a prefix to be placed before the
+ *   converted property value.
+ *
+ * The order of the names determines in which order the properties should be added to the string.
+ */
+function styleObj2String( val: any,
+    info: (string | [string, null | string | ToStringFunc, string?] )[],
+    separator: string = " "): string
+{
+    if (val == null)
+        return "";
+    else if (typeof val !== "object")
+        return val.toString();
+
+    let buf: string[] = [];
+    info.forEach( nameOrTuple =>
+    {
+        // get the name of the property in the value to be converted and the corresponding value;
+        // if the properties value is not defined, skip it.
+        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
+        let propVal = val[propName];
+        if (propVal == null)
+            return;
+
+        // check whether we have a prefix
+        let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
+        if (prefix)
+            buf.push( prefix);
+
+        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+        if (!convertor)
+            buf.push( val2str( propVal));
+        else if (typeof convertor === "string")
+            buf.push( stylePropToString( convertor, propVal, true));
+        else
+            buf.push( convertor( propVal));
+    });
+
+	return buf.join(separator);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Functions for converting CSS property types to strings.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 function singleAnimation_fromObject( val: Animation_Single): string
 {
-    return obj2str( val, [
+    return styleObj2String( val, [
         ["duration", TimeMath.styleToString],
         ["func", singleTimingFunction_fromStyle],
         ["delay", TimeMath.styleToString],
@@ -162,7 +360,7 @@ function singleTimingFunction_fromStyle( val: Extended<TimingFunction_Single>): 
 
 function singleBackground_fromObject( val: Background_Single): string
 {
-    return obj2str( val, [
+    return styleObj2String( val, [
         ["color", colorToString],
         "image",
         ["position", pos2str],
@@ -209,7 +407,7 @@ function borderImageToString( val: BorderImage_Object): string
     if (val.width == null && val.outset != null)
         valCopy.width = 1;
 
-    return obj2str( valCopy, [
+    return styleObj2String( valCopy, [
         "source",
         ["slice", "borderImageSlice"],
         ["width", null, "/"],
@@ -238,7 +436,7 @@ function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): s
 
 export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
 {
-    return obj2str( val, [
+    return styleObj2String( val, [
         ["inset", v => v ? "inset" : ""],
         ["x", LengthMath.styleToString],
         ["y", LengthMath.styleToString],
@@ -380,7 +578,7 @@ function flexToString( val: Extended<Flex_StyleType>): string
 
 function font_fromObject( val: any): string
 {
-    return obj2str( val, [
+    return styleObj2String( val, [
         ["style", fontStyleToString],
         "variant",
         "weight",
@@ -516,7 +714,7 @@ function rotateToString( val:Rotate_StyleType): string
 
 function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): string
 {
-    return obj2str( val, [
+    return styleObj2String( val, [
         "line",
         "style",
         ["color", colorToString],
@@ -528,7 +726,7 @@ function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): st
 
 function singleTransition_fromObject( val: Extended<Transition_Single>): string
 {
-    return obj2str( val, [
+    return styleObj2String( val, [
         ["property", camelToDash],
         ["duration", TimeMath.styleToString],
         ["func", singleTimingFunction_fromStyle],
@@ -549,7 +747,7 @@ function singleTransition_fromStyle( val: Extended<Transition_Single>): string
 
 function offsetToString( val: Offset_StyleType): string
 {
-    return obj2str( val, [
+    return styleObj2String( val, [
         ["position", "offsetPosition"],
         ["path", "offsetPath"],
         ["distance", "offsetDistance"],
@@ -560,65 +758,78 @@ function offsetToString( val: Offset_StyleType): string
 
 
 
-/** Type defnition of a function that takes a value and converts it to string */
-export type ToStringFunc = (val: any) => string;
-
-
-
-
-/**
- * Converts the given value to a CSS string using the info parameter to inform how the object's
- * properties should be converted to strings. The info parameter is an array of either strings
- * or two- or thre-element tuples. The only string and the first tuple element corresponds to a
- * property expected in the value object to be converted. Each property is converted according
- * to the following rules:
- * - If the array item is just a string, the corresponding value's property is converted using
- *   the val2str function.
- * - If the second element is null or undefined, the corresponding value's property is converted using
- *   the val2str function..
- * - If the second element is a string it is treated as a name of a longhand style property. The
- *   value's property is converted using the stylePropToString function for this longhand style
- *   property.
- * - If the second element is a function, it is used to convert the value's property.
- * - If a third element exists in the tuple it is treated as a prefix to be placed before the
- *   converted property value.
- *
- * The order of the names determines in which order the properties should be added to the string.
- */
-export function obj2str( val: any,
-    info: (string | [string, null | string | ToStringFunc, string?] )[],
-    separator: string = " "): string
+function filter_fromObject( val: FilterFunc): string
 {
-    if (val == null)
-        return "";
-    else if (typeof val !== "object")
-        return val.toString();
-
-    let buf: (string)[] = [];
-    info.forEach( nameOrTuple =>
+    switch (val.fn)
     {
-        // get the name of the property in the value to be converted and the corresponding value;
-        // if the properties value is not defined, skip it.
-        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
-        let propVal = val[propName];
-        if (propVal == null)
-            return;
+        case "brightness":
+        case "contrast":
+        case "grayscale":
+        case "invert":
+        case "opacity":
+        case "saturate":
+        case "sepia":
+            return funcObj2String( val, [["p", WellKnownFunc.Percent]]);
 
-        // check whether we have a prefix
-        let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
-        if (prefix)
-            buf.push( prefix);
+        case "blur":
+            return funcObj2String( val, [["r", WellKnownFunc.Length]]);
 
-        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-        if (!convertor)
-            buf.push( val2str( propVal));
-        else if (typeof convertor === "string")
-            buf.push( stylePropToString( convertor, propVal, true));
-        else
-            buf.push( convertor( propVal));
-    });
+        case "drop-shadow":
+            return 	`drop-shadow(${singleBoxShadow_fromObject( val)})`;
 
-	return buf.join(separator);
+        case "hue-rotate":
+            return funcObj2String( val, [["a", WellKnownFunc.Angle]]);
+
+        default: return "";
+    }
+}
+
+
+
+function transform_fromObject( val: TransformFunc): string
+{
+    switch (val.fn)
+    {
+        case "matrix":
+            return funcObj2String( val, ["a","b","c","d","tx","ty"]);
+        case "matrix3d":
+            return funcObj2String( val, ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"]);
+
+        case "perspective":
+            return funcObj2String( val, [["a", WellKnownFunc.Length]]);
+
+        case "rotate":
+        case "rotateX":
+        case "rotateY":
+        case "rotateZ":
+            return funcObj2String( val, [["a", WellKnownFunc.Angle]]);
+        case "rotate3d":
+            return funcObj2String( val, [ "x", "y", "z", ["a", WellKnownFunc.Angle] ]);
+
+        case "scaleX":
+        case "scaleY":
+        case "scaleZ":
+            return funcObj2String( val, ["s"]);
+        case "scale":
+        case "scale3d":
+            return funcObj2String( val, ["sx", "sy", "sz"]);
+
+        case "skewX":
+        case "skewY":
+            return funcObj2String( val, [["a", WellKnownFunc.Angle]]);
+        case "skew":
+            return funcObj2String( val, [ ["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle] ]);
+
+        case "translateX":
+        case "translateY":
+        case "translateZ":
+            return funcObj2String( val, [["d", WellKnownFunc.Length]]);
+        case "translate":
+        case "translate3d":
+            return funcObj2String( val, [ ["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length] ]);
+
+        default: return "";
+    }
 }
 
 
@@ -800,7 +1011,6 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
  * function that gets the property name and the value converted to string.
  * @param styleset
  * @param forProp
- * @param forCustomProp
  */
 export function forAllPropsInStylset( styleset: Styleset,
     forProp: (name: string, val: string, isCustom: boolean) => void)
@@ -832,86 +1042,6 @@ export function forAllPropsInStylset( styleset: Styleset,
             forProp( propName, stylePropToString( propName, styleset[propName], true), false);
 		}
 	}
-}
-
-
-
-// Helper function converts the given multi-length value to string. If the value is an array, the
-// items will be separated by space.
-function multiLengthToStringWithSpace( val: OneOrMany<CssLength>): string
-{
-    return LengthMath.multiStyleToString( val, " ");
-}
-
-// Helper function converts the given multi-time value to string. If the value is an array, the
-// items will be separated by comma.
-function multiTimeToStringWithComma( val: OneOrMany<CssTime>): string
-{
-    return TimeMath.multiStyleToString( val, ",");
-}
-
-// Helper function converts the given value to string. If the value is an array, the items will be
-// separated by comma.
-function arrayToStringWithComma( val: any)
-{
-    return val2str( val, { arrSep: "," });
-};
-
-// Helper function converts the given value to string. If the value is an array, the items will be
-// separated by slash.
-function arrayToStringWithSlash( val: any)
-{
-    return val2str( val, { arrSep: "/" });
-};
-
-
-
-/**
- * Numeric identifiers corresponding to well known functions used to convert style property values
- * to strings. This is used to reduce the size of the object used for mapping style properties to
- * conversion functions.
- *
- * Note!!!: the values in the enumeration cannot be changed - otherwise, it will not be backwards
- * compatible. All new values must be appended at the end.
- */
-const enum WellKnownFunc
-{
-    Length = 1,
-    Color,
-    Border,
-    Position,
-    CornerRadius,
-    MultiLengthWithSpace,
-    MultiTimeWithComma,
-    ArrayWithComma,
-    ArrayWithSlash,
-    GridAxis,
-}
-
-
-
-/**
- * Converts the given value to string using a well-known function indicated by the given
- * enumeration value.
- * @param val
- * @param funcType
- */
-function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): string
-{
-    let func: ((v: any) => string) | null =
-        funcType === WellKnownFunc.Length ? LengthMath.styleToString :
-        funcType === WellKnownFunc.Color ? colorToString :
-        funcType === WellKnownFunc.Border ? borderToString :
-        funcType === WellKnownFunc.Position ? pos2str :
-        funcType === WellKnownFunc.CornerRadius ? singleCornerRadiusToString :
-        funcType === WellKnownFunc.MultiLengthWithSpace ? multiLengthToStringWithSpace :
-        funcType === WellKnownFunc.MultiTimeWithComma ? multiTimeToStringWithComma :
-        funcType === WellKnownFunc.ArrayWithComma ? arrayToStringWithComma :
-        funcType === WellKnownFunc.ArrayWithSlash ? arrayToStringWithSlash :
-        funcType === WellKnownFunc.GridAxis ? gridAxisToString :
-        null;
-
-    return func ? func(val) : "";
 }
 
 
@@ -1040,6 +1170,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
 
     fill: WellKnownFunc.Color,
     fillOpacity: PercentMath.styleToString,
+    filter: {
+        fromAny: filter_fromObject,
+    },
     flex: flexToString,
     flexBasis: WellKnownFunc.Length,
     floodColor: WellKnownFunc.Color,
@@ -1181,6 +1314,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     },
     textSizeAdjust: PercentMath.styleToString,
     top: WellKnownFunc.Length,
+    transform: {
+        fromAny: transform_fromObject
+    },
     transformOrigin: {
         fromAny: LengthMath.styleToString
     },
