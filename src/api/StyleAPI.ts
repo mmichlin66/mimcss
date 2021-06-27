@@ -11,7 +11,7 @@ import {
 	Styleset, ExtendedStyleset, StringStyleset, BorderRadius_StyleType, FillRule_StyleType,
 	GridTrackSize, GridTrack, GridLineCountOrName, IFilterPercent, IFilterBlur, IFilterDropShadow, IFilterHueRotate
 } from "./StyleTypes"
-import {LengthMath, AngleMath, pos2str, templateStringToString, val2str, symValueToString} from "../impl/UtilFuncs";
+import {LengthMath, AngleMath, pos2str, templateStringToString, v2s, symValueToString} from "../impl/UtilFuncs";
 import {
     stylePropToString, borderRadiusToString, forAllPropsInStylset,
     gridTrackToString, s_registerStylePropertyInfo
@@ -325,7 +325,7 @@ export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
     let f: any = () =>
     {
         let r = f.radius != null ? " round " + borderRadiusToString( f.radius) : "";
-        return `inset(${LengthMath.multiStyleToString( [o1, o2, o3, o4], " ")}${r})`;
+        return `inset(${LengthMath.ms2s( [o1, o2, o3, o4], " ")}${r})`;
     }
 
     f.round = (radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy => {
@@ -371,7 +371,7 @@ export function circle( radius?: ShapeRadius): ICircleProxy
 {
     let f: any = () =>
     {
-        let rs =  radius != null ? LengthMath.styleToString(radius) : "";
+        let rs =  radius != null ? LengthMath.s2s(radius) : "";
         let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
         return `circle(${rs}${pos})`;
     }
@@ -409,8 +409,8 @@ export function ellipse( radiusX?: ShapeRadius, radiusY?: ShapeRadius): IEllipse
 {
     let f: any = () =>
     {
-        let rxs =  radiusX != null ? LengthMath.styleToString(radiusX) : "";
-        let rys =  radiusY != null ? " " + LengthMath.styleToString(radiusY) : "";
+        let rxs =  radiusX != null ? LengthMath.s2s(radiusX) : "";
+        let rys =  radiusY != null ? " " + LengthMath.s2s(radiusY) : "";
         let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
         return `ellipse(${rxs}${rys}${pos})`
     }
@@ -452,7 +452,7 @@ export function polygon( ...points: CssPoint[]): IPolygonProxy
 		if (f.fillParam)
 			s += f.fillParam + ",";
 
-		s += points.map( pt => LengthMath.multiStyleToString( pt, " ")).join(",");
+		s += points.map( pt => LengthMath.ms2s( pt, " ")).join(",");
 
 		return s + ")";
     };
@@ -472,8 +472,8 @@ export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | 
 {
 	return () =>
 	{
-		let angleString = AngleMath.styleToString( angle);
-		let sizeString = size != null ? "," + LengthMath.styleToString( size) : "";
+		let angleString = AngleMath.s2s( angle);
+		let sizeString = size != null ? "," + LengthMath.s2s( size) : "";
 		let containString = contain ? ",contain" : "";
 		return `ray(${angleString}${sizeString}${containString})`;
 	};
@@ -782,7 +782,7 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 {
     return () => {
         let options = { fromNumber: LengthMath.convertFunc };
-        return `minmax(${val2str( min, options)},${val2str( max, options)})`;
+        return `minmax(${v2s( min, options)},${v2s( max, options)})`;
     }
 }
 
@@ -794,7 +794,7 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
     ...tracks: GridTrack[]): IRepeatProxy
 {
-    return () => `repeat(${val2str(count)},${val2str( tracks, { arrItemFunc: gridTrackToString })})`;
+    return () => `repeat(${v2s(count)},${v2s( tracks, { arrItemFunc: gridTrackToString })})`;
 }
 
 
@@ -807,7 +807,7 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
 export function span( countOrName: Extended<GridLineCountOrName>,
     nameOrCount?: Extended<GridLineCountOrName>): ISpanProxy
 {
-    return () => `span ${val2str(countOrName)} ${nameOrCount ? val2str( nameOrCount) : ""}`;
+    return () => `span ${v2s(countOrName)} ${nameOrCount ? v2s( nameOrCount) : ""}`;
 }
 
 

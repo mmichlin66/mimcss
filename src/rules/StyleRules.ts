@@ -4,7 +4,7 @@ import {
 } from "../api/RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {val2str, camelToDash, symValueToString} from "../impl/UtilFuncs";
+import {v2s, camelToDash, symValueToString} from "../impl/UtilFuncs";
 import {
     mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps, selectorToString,
     pseudoEntityToString
@@ -630,7 +630,7 @@ export class SelectorRule extends StyleRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return val2str( this.selector, { arrSep: ","});
+		return v2s( this.selector, { arrSep: ","});
 	}
 
 	// selector object for this rule.

@@ -1,6 +1,6 @@
 ﻿import {Extended, CssPosition, CssAngle, CssLength, CssNumber, CssColor, IImageProxy, CssImage, ExtentKeyword} from "../api/BasicTypes"
 import {colorToString} from "../impl/ColorFuncs";
-import {val2str, INumberBaseMathClass, AngleMath, pos2str, PercentMath, LengthMath} from "../impl/UtilFuncs";
+import {v2s, INumberBaseMathClass, AngleMath, pos2str, PercentMath, LengthMath} from "../impl/UtilFuncs";
 
 
 
@@ -123,7 +123,7 @@ function linearGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
         let angleString = "";
         if (f.angle)
         {
-            angleString = val2str( f.angle, {
+            angleString = v2s( f.angle, {
                 fromNumber: AngleMath.convertFunc,
                 fromString: v => /\d+.*/.test(v) ? v : "to " + v
             }) + ",";
@@ -201,7 +201,7 @@ function radialGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
     let f: any = () =>
     {
         let shapeString = f.shape ? f.shape : "";
-        let sizeOrExtentString = f.sizeOrExtent ? LengthMath.multiStyleToString( f.sizeOrExtent, " ") : "";
+        let sizeOrExtentString = f.sizeOrExtent ? LengthMath.ms2s( f.sizeOrExtent, " ") : "";
         let posString = f.pos ? `at ${pos2str( f.pos)}` : "";
         let whatAndWhere = f.shape || sizeOrExtentString || f.pos ? `${shapeString} ${sizeOrExtentString} ${posString},` : "";
         return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, LengthMath)})`;
@@ -280,7 +280,7 @@ function conicGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssAn
 {
     let f: any = () =>
     {
-        let angleString = f.angle ? `from ${AngleMath.styleToString( f.angle)}` : "";
+        let angleString = f.angle ? `from ${AngleMath.s2s( f.angle)}` : "";
         let posString = f.pos ? `at ${pos2str( f.pos)}` : "";
         let whatAndWhere = f.angle || f.pos ? `${angleString} ${posString},` : "";
         return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, AngleMath)})`;
@@ -306,17 +306,17 @@ function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[],
 
 function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: INumberBaseMathClass): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromNumber: colorToString,
         fromArray: v => {
             if (v.length === 0)
                 return "";
             else if (v.length === 1)
-                return mathClass.styleToString( v[0]);
+                return mathClass.s2s( v[0]);
             else
             {
-                let secondStop = v.length > 2 ? mathClass.styleToString( v[2]) : "";
-                return `${colorToString(v[0])} ${mathClass.styleToString( v[1])} ${secondStop}`;
+                let secondStop = v.length > 2 ? mathClass.s2s( v[2]) : "";
+                return `${colorToString(v[0])} ${mathClass.s2s( v[1])} ${secondStop}`;
             }
         }
     });
@@ -341,7 +341,7 @@ export function crossFade( ...args: CrossFadeParam[]): IImageProxy
 
 function crossFadeToString( args: CrossFadeParam[]): string
 {
-    let paramsString = val2str( args, {
+    let paramsString = v2s( args, {
         arrItemFunc: crossFadeParamToString,
         arrSep: ","
     })
@@ -351,8 +351,8 @@ function crossFadeToString( args: CrossFadeParam[]): string
 
 function crossFadeParamToString( val: CrossFadeParam): string
 {
-    return val2str( val, {
-        fromArray: v => `${val2str(v[0])},${PercentMath.styleToString(v[1])}`
+    return v2s( val, {
+        fromArray: v => `${v2s(v[0])},${PercentMath.s2s(v[1])}`
     });
 }
 

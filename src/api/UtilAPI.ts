@@ -8,7 +8,7 @@ import {IVarRule, ICounterRule, IIDRule} from "./RuleTypes";
 import {VarTemplateName, ListStyleType_StyleType, ExtendedVarValue} from "./StyleTypes";
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath,
-	FrequencyMath, PercentMath, val2str, templateStringToString
+	FrequencyMath, PercentMath, v2s, templateStringToString
 } from "../impl/UtilFuncs"
 import {stylePropToString} from "../impl/StyleFuncs";
 
@@ -237,7 +237,7 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
  */
 export function fitContent( size: Extended<CssLength>): IFitContentProxy
 {
-    return () => `fit-content(${LengthMath.styleToString(size)})`;
+    return () => `fit-content(${LengthMath.s2s(size)})`;
 }
 
 
@@ -249,7 +249,7 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
  */
 export function url( val: Extended<string | IIDRule>): IUrlProxy
 {
-	return () => `url(${val2str(val)})`;
+	return () => `url(${v2s(val)})`;
 }
 
 
@@ -259,7 +259,7 @@ export function url( val: Extended<string | IIDRule>): IUrlProxy
  */
 export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
 {
-    return () => NumberMath.styleToString(w) + (h ? "/" + NumberMath.styleToString(h) : "");
+    return () => NumberMath.s2s(w) + (h ? "/" + NumberMath.s2s(h) : "");
 }
 
 
@@ -283,7 +283,7 @@ export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrType
  */
 export function quoted( val: any): IQuotedProxy
 {
-    return () => `"${val2str(val)}"`;
+    return () => `"${v2s(val)}"`;
 }
 
 
@@ -304,10 +304,10 @@ export function counter( counterObj: Extended<ICounterRule | string>,
 {
 	return () =>
 	{
-		let styleString = style ? `,${val2str( style)}` : "";
-		let before = textBefore ? `"${val2str( textBefore)}"` : "";
-		let after = textAfter ? `"${val2str( textAfter)}"` : "";
-		return `${before} counter(${val2str(counterObj)}${styleString}) ${after}`;
+		let styleString = style ? `,${v2s( style)}` : "";
+		let before = textBefore ? `"${v2s( textBefore)}"` : "";
+		let after = textAfter ? `"${v2s( textAfter)}"` : "";
+		return `${before} counter(${v2s(counterObj)}${styleString}) ${after}`;
 	}
 }
 
@@ -323,11 +323,11 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 {
 	return () =>
 	{
-		let sepString = separator ? `"${val2str( separator)}"` : `"."`;
-		let styleString = style ? `,${val2str( style)}` : "";
-		let before = textBefore ? `"${val2str( textBefore)}"` : "";
-		let after = textAfter ? `"${val2str( textAfter)}"` : "";
-		return `${before} counters(${val2str(counterObj)},${sepString}${styleString}) ${after}`;
+		let sepString = separator ? `"${v2s( separator)}"` : `"."`;
+		let styleString = style ? `,${v2s( style)}` : "";
+		let before = textBefore ? `"${v2s( textBefore)}"` : "";
+		let after = textAfter ? `"${v2s( textAfter)}"` : "";
+		return `${before} counters(${v2s(counterObj)},${sepString}${styleString}) ${after}`;
 	}
 }
 

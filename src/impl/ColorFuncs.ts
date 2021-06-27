@@ -1,5 +1,5 @@
 ﻿import {INamedColors, CssColor, Colors, Extended, CssAngle} from "../api/BasicTypes"
-import {AngleMath, val2str} from "./UtilFuncs"
+import {AngleMath, v2s} from "./UtilFuncs"
 
 
 
@@ -66,7 +66,7 @@ function colorNumberToString( val: number): string
  */
 function separationToString( c: Extended<number>): string
 {
-    return val2str( c, {
+    return v2s( c, {
         fromNumber: c => {
             if (c !== 0 && c > -1 && c < 1)
             {
@@ -106,7 +106,7 @@ function separationToString( c: Extended<number>): string
  */
 function alphaToString( a?: Extended<number>): string
 {
-    return val2str( a, {
+    return v2s( a, {
         fromNull: "1",
         fromNumber: a => {
             // if alpha is null or undefined, set it to 1
@@ -163,7 +163,7 @@ export function rgbToString( r: Extended<number>, g: Extended<number>, b: Extend
  */
 function colorPercentToString( n: Extended<number>): string
 {
-    return val2str( n, {
+    return v2s( n, {
         fromNumber: n => {
             // negative and positive values are treated identically, so convert to positive
             if (n < 0)
@@ -204,7 +204,7 @@ function colorPercentToString( n: Extended<number>): string
  */
 export function hslToString( h: Extended<CssAngle>, s: Extended<number>, l: Extended<number>, a?: Extended<number>): string
 {
-    return `hsla(${AngleMath.styleToString(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
+    return `hsla(${AngleMath.s2s(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
 }
 
 
@@ -258,7 +258,7 @@ export function colorWithAlphaToString( c: number | keyof INamedColors, a: numbe
  */
 export function colorToString( val: Extended<CssColor>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromString: v => Colors[v] ? colorNumberToString( Colors[v]) : v,
         fromNumber: colorNumberToString
     });

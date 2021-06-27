@@ -1,20 +1,20 @@
 ﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery} from "../api/MediaAPI";
 import {CssAspectRatio, CssResolution, CssLength} from "../api/BasicTypes";
-import {val2str, camelToDash, ResolutionMath, LengthMath} from "./UtilFuncs";
+import {v2s, camelToDash, ResolutionMath, LengthMath} from "./UtilFuncs";
 
 
 
 function aspectRatioToString( val: CssAspectRatio): string
 {
-    return val2str( val, { arrSep: "/" })
+    return v2s( val, { arrSep: "/" })
 }
 
 
 
 function lengthFeatureToString( val: CssLength): string
 {
-    return val2str( val, {
-        fromNumber: LengthMath.styleToString
+    return v2s( val, {
+        fromNumber: LengthMath.s2s
     });
 }
 
@@ -22,8 +22,8 @@ function lengthFeatureToString( val: CssLength): string
 
 function resolutionFeatureToString( val: CssResolution): string
 {
-    return val2str( val, {
-        fromNumber: ResolutionMath.styleToString
+    return v2s( val, {
+        fromNumber: ResolutionMath.s2s
     });
 }
 
@@ -62,7 +62,7 @@ type MediaFeatureInfo<K extends keyof IMediaFeatureset = any> = convertFuncType<
  */
 export function s_mediaQueryToString( query: MediaQuery): string
 {
-    return val2str( query, {
+    return v2s( query, {
         fromAny: singleMediaQueryToString,
         arrSep: ","
     })
@@ -141,7 +141,7 @@ function mediaFeatureToString( featureName: string, val: any, valueOnly?: boolea
 
 function mediaFeatureSingleValueToString( val: any, convert?: convertFuncType): string
 {
-    return convert ? convert( val) : val2str( val);
+    return convert ? convert( val) : v2s( val);
 }
 
 

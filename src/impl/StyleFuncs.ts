@@ -10,7 +10,7 @@ import {
     FilterFunc
 } from "../api/StyleTypes";
 import {
-    val2str, TimeMath, NumberMath, arr2str, pos2str, LengthMath, unitlessOrPercentToString, AngleMath,
+    v2s, TimeMath, NumberMath, arr2str, pos2str, LengthMath, unitlessOrPercentToString, AngleMath,
     camelToDash, dashToCamel, IValueConvertOptions, multiPos2str, PercentMath, ResolutionMath, FrequencyMath, ToStringFunc
 } from "./UtilFuncs";
 import {colorToString} from "./ColorFuncs";
@@ -30,11 +30,11 @@ import {IIDRule} from "../api/RuleTypes";
  */
 function nthTupleToString( val: [number, number?]): string
 {
-	let v0 = val2str( val[0]);
+	let v0 = v2s( val[0]);
 	let v1n = val[1];
 
 	// the '!v1n' expression covers null, undefined and 0.
-	let v1 = !v1n ? "" : v1n > 0 ? "+" + val2str( v1n) : "-" + val2str( -v1n);
+	let v1 = !v1n ? "" : v1n > 0 ? "+" + v2s( v1n) : "-" + v2s( -v1n);
 
 	return `${v0}n${v1}`;
 }
@@ -46,7 +46,7 @@ function nthTupleToString( val: [number, number?]): string
  */
 export function selectorToString( val: CssSelector): string
 {
-	return val2str( val, {
+	return v2s( val, {
 		arrSep: ""
 	})
 }
@@ -62,9 +62,9 @@ export function pseudoEntityToString( entityName: string, val: any): string
 		return "";
 
 	if (entityName.startsWith( ":nth"))
-		return val2str( val, { fromArray: nthTupleToString });
+		return v2s( val, { fromArray: nthTupleToString });
 	else
-		return val2str(val);
+		return v2s(val);
 }
 
 
@@ -111,10 +111,10 @@ export function pseudoEntityToString( entityName: string, val: any): string
  function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): string
  {
      let func: ToStringFunc | null =
-         funcType === WellKnownFunc.Length ? LengthMath.styleToString :
-         funcType === WellKnownFunc.Angle ? AngleMath.styleToString :
-         funcType === WellKnownFunc.Number ? NumberMath.styleToString :
-         funcType === WellKnownFunc.Percent ? PercentMath.styleToString :
+         funcType === WellKnownFunc.Length ? LengthMath.s2s :
+         funcType === WellKnownFunc.Angle ? AngleMath.s2s :
+         funcType === WellKnownFunc.Number ? NumberMath.s2s :
+         funcType === WellKnownFunc.Percent ? PercentMath.s2s :
          funcType === WellKnownFunc.Color ? colorToString :
          funcType === WellKnownFunc.Border ? borderToString :
          funcType === WellKnownFunc.Position ? pos2str :
@@ -135,28 +135,28 @@ export function pseudoEntityToString( entityName: string, val: any): string
 // items will be separated by space.
 function multiLengthToStringWithSpace( val: OneOrMany<CssLength>): string
 {
-    return LengthMath.multiStyleToString( val, " ");
+    return LengthMath.ms2s( val, " ");
 }
 
 // Helper function converts the given multi-time value to string. If the value is an array, the
 // items will be separated by comma.
 function multiTimeToStringWithComma( val: OneOrMany<CssTime>): string
 {
-    return TimeMath.multiStyleToString( val, ",");
+    return TimeMath.ms2s( val, ",");
 }
 
 // Helper function converts the given value to string. If the value is an array, the items will be
 // separated by comma.
 function arrayToStringWithComma( val: any)
 {
-    return val2str( val, { arrSep: "," });
+    return v2s( val, { arrSep: "," });
 };
 
 // Helper function converts the given value to string. If the value is an array, the items will be
 // separated by slash.
 function arrayToStringWithSlash( val: any)
 {
-    return val2str( val, { arrSep: "/" });
+    return v2s( val, { arrSep: "/" });
 };
 
 
@@ -196,7 +196,7 @@ function arrayToStringWithSlash( val: any)
 
         let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
         if (!convertor)
-            params.push( val2str( propVal));
+            params.push( v2s( propVal));
         else if (typeof convertor === "number")
             params.push( valueToStringByWellKnownFunc( propVal, convertor));
         else
@@ -253,7 +253,7 @@ function styleObj2String( val: any,
 
         let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
         if (!convertor)
-            buf.push( val2str( propVal));
+            buf.push( v2s( propVal));
         else if (typeof convertor === "string")
             buf.push( stylePropToString( convertor, propVal, true));
         else
@@ -274,10 +274,10 @@ function styleObj2String( val: any,
 function singleAnimation_fromObject( val: Animation_Single): string
 {
     return styleObj2String( val, [
-        ["duration", TimeMath.styleToString],
+        ["duration", TimeMath.s2s],
         ["func", singleTimingFunction_fromStyle],
-        ["delay", TimeMath.styleToString],
-        ["count", NumberMath.styleToString],
+        ["delay", TimeMath.s2s],
+        ["count", NumberMath.s2s],
         "direction",
         "mode",
         "state",
@@ -289,7 +289,7 @@ function singleAnimation_fromObject( val: Animation_Single): string
 
 function singleAnimation_fromStyle( val: Extended<Animation_Single>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromObj: singleAnimation_fromObject
     });
 }
@@ -298,7 +298,7 @@ function singleAnimation_fromStyle( val: Extended<Animation_Single>): string
 
 function timingFunctionToString( val: Extended<OneOrMany<TimingFunction_Single>>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromNumber: timingFunction_fromNumber,
         fromArray: timingFunction_fromArray
     });
@@ -324,7 +324,7 @@ function timingFunction_fromArray( val: any[]): string
 
 function singleTimingFunction_fromStyle( val: Extended<TimingFunction_Single>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromNumber: timingFunction_fromNumber,
         fromArray: v =>
         {
@@ -376,7 +376,7 @@ function singleBackground_fromObject( val: Background_Single): string
 
 function singleBackground_fromStyle( val: Extended<Background_Single>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromNumber: colorToString,
         fromObj: singleBackground_fromObject
     });
@@ -386,8 +386,8 @@ function singleBackground_fromStyle( val: Extended<Background_Single>): string
 
 function singleBackgroundSize_fromStyle( val: Extended<BackgroundSize_Single>): string
 {
-    return val2str( val, {
-        fromNumber: LengthMath.styleToString,
+    return v2s( val, {
+        fromNumber: LengthMath.s2s,
         fromArray: multiLengthToStringWithSpace
     });
 }
@@ -423,9 +423,9 @@ function borderImageToString( val: BorderImage_Object): string
  */
 function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromNumber: unitlessOrPercentToString,
-        arrItemFunc: v => val2str( v, {
+        arrItemFunc: v => v2s( v, {
             fromBool: () => "fill",
             fromNumber: unitlessOrPercentToString,
         })
@@ -438,10 +438,10 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
 {
     return styleObj2String( val, [
         ["inset", v => v ? "inset" : ""],
-        ["x", LengthMath.styleToString],
-        ["y", LengthMath.styleToString],
-        ["blur", LengthMath.styleToString],
-        ["spread", LengthMath.styleToString],
+        ["x", LengthMath.s2s],
+        ["y", LengthMath.s2s],
+        ["blur", LengthMath.s2s],
+        ["spread", LengthMath.s2s],
         ["color", colorToString]
     ]);
 }
@@ -453,9 +453,9 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
  */
 function singleCornerRadiusToString( val: Extended<CssRadius>): string
 {
-    return val2str( val, {
-        arrItemFunc: LengthMath.styleToString,
-        fromAny: LengthMath.styleToString
+    return v2s( val, {
+        arrItemFunc: LengthMath.s2s,
+        fromAny: LengthMath.s2s
     });
 }
 
@@ -466,23 +466,23 @@ function singleCornerRadiusToString( val: Extended<CssRadius>): string
  */
 export function borderRadiusToString( val: Extended<BorderRadius_StyleType>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromArray: v =>
         {
             if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = arr2str( v[0], LengthMath.styleToString, " ");
+                let s = arr2str( v[0], LengthMath.s2s, " ");
                 s += " / ";
-                return s + arr2str( v[1], LengthMath.styleToString, " ");
+                return s + arr2str( v[1], LengthMath.s2s, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return arr2str( v, LengthMath.styleToString, " ");
+                return arr2str( v, LengthMath.s2s, " ");
             }
         },
-        fromAny: LengthMath.styleToString
+        fromAny: LengthMath.s2s
     });
 }
 
@@ -493,16 +493,16 @@ export function borderRadiusToString( val: Extended<BorderRadius_StyleType>): st
  */
 function borderToString( val: Extended<Border_StyleType>): string
 {
-    return val2str( val, {
-        fromNumber: LengthMath.styleToString,
+    return v2s( val, {
+        fromNumber: LengthMath.s2s,
         fromArray: v =>
         {
             let buf: string[] = [];
             if (v[0] != null)
-                buf.push( LengthMath.styleToString( v[0]))
+                buf.push( LengthMath.s2s( v[0]))
 
             if (v[1] != null)
-                buf.push( val2str(v[1]));
+                buf.push( v2s(v[1]));
 
             if (v[2] != null)
                 buf.push( colorToString(v[2]));
@@ -520,8 +520,8 @@ function borderToString( val: Extended<Border_StyleType>): string
  */
 function columnsToString( val: Extended<Columns_StyleType>): string
 {
-    return val2str( val, {
-        fromArray: v => v[0] + " " + LengthMath.styleToString( v[1])
+    return v2s( val, {
+        fromArray: v => v[0] + " " + LengthMath.s2s( v[1])
     });
 }
 
@@ -536,17 +536,17 @@ function cursorToString( val: Extended<Cursor_StyleType>): string
     // if the first element is a function, then we need to use space as a separator (because
     // this is a URL with optional numbers for the hot spot); otherwise, we use comma as a
     // separator - because these are multiple cursor definitions.
-    return val2str( val, {
+    return v2s( val, {
         fromArray: v => {
             if (v.length === 0)
                 return "";
             else if (v.length === 1)
-                return val2str(v);
+                return v2s(v);
             else if (typeof v[1] === "number")
-                return val2str( v, { arrSep: " "})
+                return v2s( v, { arrSep: " "})
             else
             {
-                return val2str( v, {
+                return v2s( v, {
                     arrItemFunc: cursorToString,
                     arrSep: ","
                 })
@@ -562,15 +562,15 @@ function cursorToString( val: Extended<Cursor_StyleType>): string
  */
 function flexToString( val: Extended<Flex_StyleType>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromArray: v =>
         {
             if (v.length === 2)
                 return v.join( " ");
             else
-                return v[0] + " " + v[1] + " " + LengthMath.styleToString( v[2]);
+                return v[0] + " " + v[1] + " " + LengthMath.s2s( v[2]);
         },
-        fromAny: LengthMath.styleToString
+        fromAny: LengthMath.s2s
     });
 }
 
@@ -583,7 +583,7 @@ function font_fromObject( val: any): string
         "variant",
         "weight",
         "stretch",
-        ["size", LengthMath.styleToString],
+        ["size", LengthMath.s2s],
         ["lineHeight", null, "/"],
         "family"
     ]);
@@ -593,8 +593,8 @@ function font_fromObject( val: any): string
 
 function fontStyleToString( val: Extended<Font_StyleType>): string
 {
-    return val2str( val, {
-        fromNumber: v => "oblique " + AngleMath.styleToString( v)
+    return v2s( val, {
+        fromNumber: v => "oblique " + AngleMath.s2s( v)
     });
 }
 
@@ -603,7 +603,7 @@ function fontStyleToString( val: Extended<Font_StyleType>): string
 function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>): string
 {
     // val can be array of functions (IQuotedProxy[]) or arrays (GridTemplateArea_Definition[])
-    return val2str( val, {
+    return v2s( val, {
         fromArray: v => {
             if (v.length === 0)
                 return "";
@@ -642,7 +642,7 @@ function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definiti
     // go over definitions and fill the appropriate places in the cells with area names
     for( let def of defs)
     {
-        let name = val2str( def[0]);
+        let name = v2s( def[0]);
         for( let i = def[1]; i <= def[3]; i++)
         {
             for( let j = def[2]; j <= def[4]; j++)
@@ -672,8 +672,8 @@ function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definiti
 
 export function gridTrackToString( val: GridTrack): string
 {
-    return val2str( val, {
-        fromNumber: v => LengthMath.styleToString( v),
+    return v2s( val, {
+        fromNumber: v => LengthMath.s2s( v),
         fromArray: v => `[${arr2str(v)}]`
     });
 }
@@ -682,8 +682,8 @@ export function gridTrackToString( val: GridTrack): string
 
 function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
 {
-    return val2str( val, {
-        fromNumber: v => LengthMath.styleToString( v),
+    return v2s( val, {
+        fromNumber: v => LengthMath.s2s( v),
         arrItemFunc: gridTrackToString
     });
 }
@@ -692,7 +692,7 @@ function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
 
 function markerStyleToString( val: Extended<Marker_StyleType>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromObj: v => `url(#${(val as IIDRule).name})`
     });
 }
@@ -701,13 +701,13 @@ function markerStyleToString( val: Extended<Marker_StyleType>): string
 
 function rotateToString( val:Rotate_StyleType): string
 {
-    return val2str( val, {
-        fromNumber: AngleMath.styleToString,
+    return v2s( val, {
+        fromNumber: AngleMath.s2s,
         fromArray: v => {
             if (v.length === 2)
-                return `${v[0]} ${AngleMath.styleToString(v[1])}`;
+                return `${v[0]} ${AngleMath.s2s(v[1])}`;
             else
-                return `${v[0]} ${v[1]} ${v[2]} ${AngleMath.styleToString(v[3])}`;
+                return `${v[0]} ${v[1]} ${v[2]} ${AngleMath.s2s(v[3])}`;
         }
     });
 }
@@ -718,7 +718,7 @@ function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): st
         "line",
         "style",
         ["color", colorToString],
-        ["thickness", LengthMath.styleToString],
+        ["thickness", LengthMath.s2s],
     ]);
 }
 
@@ -728,9 +728,9 @@ function singleTransition_fromObject( val: Extended<Transition_Single>): string
 {
     return styleObj2String( val, [
         ["property", camelToDash],
-        ["duration", TimeMath.styleToString],
+        ["duration", TimeMath.s2s],
         ["func", singleTimingFunction_fromStyle],
-        ["delay", TimeMath.styleToString]
+        ["delay", TimeMath.s2s]
     ]);
 }
 
@@ -738,7 +738,7 @@ function singleTransition_fromObject( val: Extended<Transition_Single>): string
 
 function singleTransition_fromStyle( val: Extended<Transition_Single>): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromObj: singleTransition_fromObject
     });
 }
@@ -988,9 +988,9 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
     }
 
     let stringValue = !info
-        ? val2str( varValue)
+        ? v2s( varValue)
         : typeof info === "object"
-            ? val2str( varValue, info as IValueConvertOptions)
+            ? v2s( varValue, info as IValueConvertOptions)
             : typeof info === "number"
                 ? valueToStringByWellKnownFunc( varValue, info)
                 : (info as ToStringFunc)( varValue);
@@ -1102,7 +1102,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     backgroundPositionY: v => multiPos2str( v, ","),
     backgroundRepeat: WellKnownFunc.ArrayWithComma,
     backgroundSize: {
-        fromNumber: LengthMath.styleToString,
+        fromNumber: LengthMath.s2s,
         arrItemFunc: singleBackgroundSize_fromStyle,
         arrSep: ","
     },
@@ -1169,7 +1169,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     cursor: cursorToString,
 
     fill: WellKnownFunc.Color,
-    fillOpacity: PercentMath.styleToString,
+    fillOpacity: PercentMath.s2s,
     filter: {
         fromAny: filter_fromObject,
     },
@@ -1232,7 +1232,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     offsetDistance: WellKnownFunc.Length,
     offsetPosition: WellKnownFunc.Position,
     offsetRotate: {
-        fromAny: AngleMath.styleToString
+        fromAny: AngleMath.s2s
     },
     outline: WellKnownFunc.Border,
     outlineColor: WellKnownFunc.Color,
@@ -1251,7 +1251,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     paddingTop: WellKnownFunc.Length,
     perspective: WellKnownFunc.Length,
     perspectiveOrigin: {
-        fromAny: LengthMath.styleToString
+        fromAny: LengthMath.s2s
     },
 
     quotes: {
@@ -1306,19 +1306,19 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     },
     textEmphasisColor: WellKnownFunc.Color,
     textIndent: {
-        fromAny: LengthMath.styleToString
+        fromAny: LengthMath.s2s
     },
     textShadow: {
         fromObj: singleBoxShadow_fromObject,
         arrSep: ",",
     },
-    textSizeAdjust: PercentMath.styleToString,
+    textSizeAdjust: PercentMath.s2s,
     top: WellKnownFunc.Length,
     transform: {
         fromAny: transform_fromObject
     },
     transformOrigin: {
-        fromAny: LengthMath.styleToString
+        fromAny: LengthMath.s2s
     },
     transition: {
         fromObj: singleTransition_fromObject,
@@ -1329,7 +1329,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     transitionDuration: WellKnownFunc.MultiTimeWithComma,
     transitionTimingFunction: timingFunctionToString,
     translate: {
-        fromAny: LengthMath.styleToString
+        fromAny: LengthMath.s2s
     },
 
     verticalAlign: WellKnownFunc.Length,
@@ -1340,15 +1340,15 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     },
     wordSpacing: WellKnownFunc.Length,
 
-    zoom: PercentMath.styleToString,
+    zoom: PercentMath.s2s,
 
     // special properties for IVarRule types
     CssLength: WellKnownFunc.Length,
-    CssAngle: AngleMath.styleToString,
-    CssTime: TimeMath.styleToString,
-    CssResolution: ResolutionMath.styleToString,
-    CssFrequency: FrequencyMath.styleToString,
-    CssPercent: PercentMath.styleToString,
+    CssAngle: AngleMath.s2s,
+    CssTime: TimeMath.s2s,
+    CssResolution: ResolutionMath.s2s,
+    CssFrequency: FrequencyMath.s2s,
+    CssPercent: PercentMath.s2s,
     CssPosition: WellKnownFunc.Position,
     CssRadius: WellKnownFunc.CornerRadius,
     CssColor: WellKnownFunc.Color,
@@ -1365,7 +1365,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
 /** Converts the given supports query to its string representation */
 export function supportsQueryToString( query: SupportsQuery): string
 {
-    return val2str( query, {
+    return v2s( query, {
         fromAny: singleSupportsQueryToString,
         arrSep: " or "
     });
@@ -1376,7 +1376,7 @@ export function supportsQueryToString( query: SupportsQuery): string
 /** Converts the given supports query to its string representation */
 export function singleSupportsQueryToString( query: SingleSupportsQuery): string
 {
-    return val2str( query, {
+    return v2s( query, {
         fromObj: (v: ExtendedStyleset & { $negate?: boolean; }) => {
             let propNames = Object.keys( v).filter( (propName) => propName != "$negate");
             if (propNames.length === 0)

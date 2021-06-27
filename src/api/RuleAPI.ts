@@ -22,7 +22,7 @@ import {CounterRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
-import {val2str} from "../impl/UtilFuncs";
+import {v2s} from "../impl/UtilFuncs";
 import {IRuleSerializationContext} from "../rules/Rule";
 
 
@@ -677,7 +677,7 @@ export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType
  */
 export function classes( ...classProps: ClassPropType[]): string
 {
-	return val2str( classProps, {
+	return v2s( classProps, {
 		arrItemFunc: (v: ClassPropType) => v instanceof ClassRule || v instanceof ClassNameRule ? v.name : classes(v)
 	});
 }

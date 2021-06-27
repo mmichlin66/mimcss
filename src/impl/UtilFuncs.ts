@@ -93,7 +93,7 @@ export interface IValueConvertOptions
  * Converts a value of an arbitrary type to a single string. The optional options parameter
  * can define how specific types are converted.
  */
-export function val2str( val: any, options?: IValueConvertOptions): string
+export function v2s( val: any, options?: IValueConvertOptions): string
 {
    if (!options)
     {
@@ -126,7 +126,7 @@ export function val2str( val: any, options?: IValueConvertOptions): string
         else if (typeof val === "number")
             return options.fromNumber ? options.fromNumber( val) : options.fromAny ? options.fromAny( val) : val.toString();
         else if (typeof val === "function")
-            return val2str( options.funcArgs ? val( ...options.funcArgs) : val());
+            return v2s( options.funcArgs ? val( ...options.funcArgs) : val());
         else if (Array.isArray(val))
         {
             if (options.fromArray)
@@ -167,7 +167,7 @@ export function arr2str( val: any[], func?: (v) => string, separator: string = "
 {
     return !val || val.length === 0
         ? ""
-        : val.filter( x => x != null).map( y => func ? func(y) : val2str( y)).join( separator);
+        : val.filter( x => x != null).map( y => func ? func(y) : v2s( y)).join( separator);
 }
 
 
@@ -221,7 +221,7 @@ export type ToStringFunc = (val: any) => string;
 
         let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
         if (!convertor)
-            buf.push( val2str( propVal));
+            buf.push( v2s( propVal));
         else
             buf.push( convertor( propVal));
     });
@@ -245,7 +245,7 @@ export function templateStringToString( parts: TemplateStringsArray, params: any
 
     let s = "";
     for( let i = 0; i < paramsLen; i++)
-        s += parts[i] + (convertFunc ? convertFunc( params[i]) : val2str( params[i]));
+        s += parts[i] + (convertFunc ? convertFunc( params[i]) : v2s( params[i]));
 
     // add the last part
     return s + parts[paramsLen];
@@ -283,7 +283,7 @@ function numberToString( n: number, intUnit: string = "", floatUint: string = ""
  */
 function numberBaseToString<T>( val: Extended<T>, convertFunc?: ConvertNumberFuncType): string
 {
-    return val2str( val, { fromNumber: convertFunc});
+    return v2s( val, { fromNumber: convertFunc});
 }
 
 /**
@@ -295,7 +295,7 @@ function numberBaseToString<T>( val: Extended<T>, convertFunc?: ConvertNumberFun
 function multiStyleToString<T>( val: OneOrMany<T>, convertFunc?: ConvertNumberFuncType,
     separator: string = " "): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromNumber: convertFunc,
         arrItemFunc: v => numberBaseToString( v, convertFunc),
         arrSep: separator
@@ -337,21 +337,6 @@ class NumberBaseMath<T = any, U extends string = any, P extends string = any> im
     {
     }
 
-    public numberToString = (n: number): string =>
-    {
-        return this.convertFunc( n);
-    }
-
-    public styleToString = (val: Extended<T>): string =>
-    {
-        return numberBaseToString( val, this.convertFunc);
-    }
-
-    public multiStyleToString = (val: OneOrMany<T>, separator: string = " "): string =>
-    {
-        return multiStyleToString( val, this.convertFunc, separator);
-    }
-
     /** Creates CssLength value from the number and the given unit. */
     public units( n: number, unit: U): IGenericProxy<P>
     {
@@ -389,9 +374,9 @@ export interface INumberBaseMathClass<T = any, U extends string = any, P extends
 {
     convertFunc( n: number): string;
 
-    styleToString( val: Extended<T>): string;
+    s2s( val: Extended<T>): string;
 
-    multiStyleToString( val: OneOrMany<T>, separator: string): string;
+    ms2s( val: OneOrMany<T>, separator: string): string;
 
     new(): INumberBaseMath<T,U,P>;
 }
@@ -413,10 +398,10 @@ export class NumberMath extends NumberBaseMath<CssNumber, "", NumberType> implem
 {
     public static convertFunc( n: number): string { return n.toString(); }
 
-    public static styleToString( val: Extended<CssNumber>): string
+    public static s2s( val: Extended<CssNumber>): string
         { return numberBaseToString( val, NumberMath.convertFunc); }
 
-    public static multiStyleToString( val: OneOrMany<CssNumber>, separator: string): string
+    public static ms2s( val: OneOrMany<CssNumber>, separator: string): string
         { return multiStyleToString( val, NumberMath.convertFunc, separator); }
 
     constructor() { super( NumberMath.convertFunc) }
@@ -439,10 +424,10 @@ export class PercentMath extends NumberBaseMath<CssPercent, PercentUnits, Percen
     public static convertFunc( n: number): string
         { return (Number.isInteger(n) ? n : Math.round(n * 100)) + "%"; }
 
-    public static styleToString( val: Extended<CssPercent>): string
+    public static s2s( val: Extended<CssPercent>): string
         { return numberBaseToString( val, PercentMath.convertFunc); }
 
-    public static multiStyleToString( val: OneOrMany<CssPercent>, separator: string): string
+    public static ms2s( val: OneOrMany<CssPercent>, separator: string): string
         { return multiStyleToString( val, PercentMath.convertFunc, separator); }
 
     constructor() { super( PercentMath.convertFunc) }
@@ -473,10 +458,10 @@ export class LengthMath extends NumberBaseMath<CssLength, LengthUnits | PercentU
 {
     public static convertFunc( n: number): string { return numberToString( n, "px", "em"); }
 
-    public static styleToString( val: Extended<CssLength | string>): string
+    public static s2s( val: Extended<CssLength | string>): string
         { return numberBaseToString( val, LengthMath.convertFunc); }
 
-    public static multiStyleToString( val: OneOrMany<CssLength>, separator: string): string
+    public static ms2s( val: OneOrMany<CssLength>, separator: string): string
         { return multiStyleToString( val, LengthMath.convertFunc, separator); }
 
     constructor() { super( LengthMath.convertFunc) }
@@ -498,10 +483,10 @@ export class AngleMath extends NumberBaseMath<CssAngle, AngleUnits | PercentUnit
 {
     public static convertFunc( n: number): string { return numberToString( n, "deg", "turn"); }
 
-    public static styleToString( val: Extended<CssAngle>): string
+    public static s2s( val: Extended<CssAngle>): string
         { return numberBaseToString( val, AngleMath.convertFunc); }
 
-    public static multiStyleToString( val: OneOrMany<CssAngle>, separator: string): string
+    public static ms2s( val: OneOrMany<CssAngle>, separator: string): string
         { return multiStyleToString( val, AngleMath.convertFunc, separator); }
 
     constructor() { super( AngleMath.convertFunc) }
@@ -523,10 +508,10 @@ export class TimeMath extends NumberBaseMath<CssTime, TimeUnits, TimeType> imple
 {
     public static convertFunc( n: number): string { return numberToString( n, "ms", "s"); }
 
-    public static styleToString( val: Extended<CssTime>): string
+    public static s2s( val: Extended<CssTime>): string
         { return numberBaseToString( val, TimeMath.convertFunc); }
 
-    public static multiStyleToString( val: OneOrMany<CssTime>, separator: string): string
+    public static ms2s( val: OneOrMany<CssTime>, separator: string): string
         { return multiStyleToString( val, TimeMath.convertFunc, separator); }
 
     constructor() { super( TimeMath.convertFunc) }
@@ -548,10 +533,10 @@ export class ResolutionMath extends NumberBaseMath<CssResolution, ResolutionUnit
 {
     public static convertFunc( n: number): string { return numberToString( n, "dpi", "x"); }
 
-    public static styleToString( val: Extended<CssResolution>): string
+    public static s2s( val: Extended<CssResolution>): string
         { return numberBaseToString( val, ResolutionMath.convertFunc); }
 
-    public static multiStyleToString( val: OneOrMany<CssResolution>, separator: string): string
+    public static ms2s( val: OneOrMany<CssResolution>, separator: string): string
         { return multiStyleToString( val, ResolutionMath.convertFunc, separator); }
 
     constructor() { super( ResolutionMath.convertFunc) }
@@ -573,10 +558,10 @@ export class FrequencyMath extends NumberBaseMath<CssFrequency, FrequencyUnits, 
 {
     public static convertFunc( n: number): string { return numberToString( n, "Hz", "kHz"); }
 
-    public static styleToString( val: Extended<CssFrequency>): string
+    public static s2s( val: Extended<CssFrequency>): string
         { return numberBaseToString( val, FrequencyMath.convertFunc); }
 
-    public static multiStyleToString( val: OneOrMany<CssFrequency>, separator: string): string
+    public static ms2s( val: OneOrMany<CssFrequency>, separator: string): string
         { return multiStyleToString( val, FrequencyMath.convertFunc, separator); }
 
     constructor() { super( FrequencyMath.convertFunc) }
@@ -595,9 +580,9 @@ export class FrequencyMath extends NumberBaseMath<CssFrequency, FrequencyUnits, 
  */
 export function pos2str( val: Extended<CssPosition>): string
 {
-    return val2str( val, {
-        fromNumber: LengthMath.styleToString,
-        fromArray: v => LengthMath.multiStyleToString( v, " ")
+    return v2s( val, {
+        fromNumber: LengthMath.s2s,
+        fromArray: v => LengthMath.ms2s( v, " ")
     });
 }
 
@@ -606,7 +591,7 @@ export function pos2str( val: Extended<CssPosition>): string
  */
 export function multiPos2str( val: Extended<OneOrMany<CssPosition>>, separator: string): string
 {
-    return val2str( val, {
+    return v2s( val, {
         arrItemFunc: pos2str,
         arrSep: separator
     });

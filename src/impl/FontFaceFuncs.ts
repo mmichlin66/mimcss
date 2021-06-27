@@ -1,5 +1,5 @@
 ﻿import * as FontFaceTypes from "../api/FontFaceAPI"
-import {camelToDash, val2str, PercentMath, AngleMath, arr2str, obj2str, NumberMath} from "./UtilFuncs";
+import {camelToDash, v2s, PercentMath, AngleMath, arr2str, obj2str, NumberMath} from "./UtilFuncs";
 
 
 
@@ -38,9 +38,9 @@ export function fontFaceToString( fontface: FontFaceTypes.IFontFace): string | n
 
 function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): string
 {
-    return val2str( val, {
-        fromNumber: PercentMath.styleToString,
-        arrItemFunc: PercentMath.styleToString
+    return v2s( val, {
+        fromNumber: PercentMath.s2s,
+        arrItemFunc: PercentMath.s2s
     });
 }
 
@@ -48,9 +48,9 @@ function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): stri
 
 function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 {
-    return val2str( val, {
-        fromNumber: v => `oblique ${AngleMath.styleToString(v)}`,
-        fromArray: v => `oblique ${arr2str( v, AngleMath.styleToString)}`
+    return v2s( val, {
+        fromNumber: v => `oblique ${AngleMath.s2s(v)}`,
+        fromArray: v => `oblique ${arr2str( v, AngleMath.s2s)}`
     });
 }
 
@@ -58,8 +58,8 @@ function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 
 function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
 {
-    return val2str( val, {
-        fromAny: NumberMath.styleToString
+    return v2s( val, {
+        fromAny: NumberMath.s2s
     });
 }
 
@@ -67,7 +67,7 @@ function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
 
 function fontSrcToString( val: FontFaceTypes.FontSrc_FontFaceType): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromAny: fontSingleSrcToString,
         arrSep: ","
     });
@@ -88,7 +88,7 @@ function fontSingleSrcToString( val: FontFaceTypes.FontSrc_Single): string
 
 function fontFormatToString( val: FontFaceTypes.FontSrc_Single): string
 {
-    return val2str( val, {
+    return v2s( val, {
         fromString: v => `\"${v}\"`,
         arrSep: ","
     });
