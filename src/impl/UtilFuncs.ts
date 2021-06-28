@@ -44,8 +44,12 @@ export function camelToDash( camel: string): string
  * symbol because the standard method toString exists on every object and we only want some to
  * explicitly provide this support.
  */
-
  export let symValueToString = Symbol("symValueToString");
+
+
+
+/** Type defnition of a function that takes a value and converts it to string */
+export type ToStringFunc = (val: any) => string;
 
 
 
@@ -109,9 +113,11 @@ export function v2s( val: any, options?: IValueConvertOptions): string
         else if (Array.isArray(val))
             return a2s( val);
         else if (typeof val === "function")
-            return val();
+            return v2s(val());
         else if (typeof val[symValueToString] === "function")
             return val[symValueToString]();
+        else if (typeof val.fn === "string")
+            return funcObj2String(val);
         else
             return val.toString();
     }
@@ -128,7 +134,7 @@ export function v2s( val: any, options?: IValueConvertOptions): string
         else if (typeof val === "number")
             func = options.fromNumber || options.fromAny;
         else if (typeof val === "function")
-            return v2s( options.funcArgs ? val( ...options.funcArgs) : val());
+            return v2s( options.funcArgs ? val( ...options.funcArgs) : val(), options);
         else if (Array.isArray(val))
         {
             if (options.fromArray)
@@ -141,10 +147,12 @@ export function v2s( val: any, options?: IValueConvertOptions): string
         }
         else if (typeof val === "object")
         {
-            if (typeof val[symValueToString] === "function")
-                return val[symValueToString]();
-            else
+            if (options.fromObj || options.fromAny)
                 func = options.fromObj || options.fromAny;
+            else if (typeof val[symValueToString] === "function")
+                return val[symValueToString]();
+            else if (typeof val.fn === "string")
+                return funcObj2String(val);
         }
         else if (typeof val === "boolean")
             func = options.fromBool || options.fromAny;
@@ -165,16 +173,49 @@ export function a2s( val: any[], func?: number | ((v) => string), separator: str
 {
     return !val || val.length === 0
         ? ""
-        : val.filter( v => v != null).map(
-            v => typeof func === "number" ? v2sByFuncID( v, func) : func ? func(v) : v2s( v)
+        : val.filter( v => v != null).map( v =>
+            {
+                if (typeof v === "function")
+                    v = v2s(v());
+
+                return typeof func === "number" ? v2sByFuncID( v, func) : func ? func(v) : v2s( v)
+            }
         ).join( separator);
 }
 
 
 
+// Defines a type of objects representing name and parameters of CSS functions
+type CSSFuncObj = { fn: string, [p: string]: any };
 
-/** Type defnition of a function that takes a value and converts it to string */
-export type ToStringFunc = (val: any) => string;
+
+
+/**
+ * Converts the given value to a CSS function string using the given function name and the info
+ * parameter to inform how the object's properties should be converted to strings. The info
+ * parameter is an array of either strings or two-element tuples. The only string and the first
+ * tuple element corresponds to a property expected in the value object to be converted. Each
+ * property is converted according to the following rules:
+ * - If the array item is just a string, the corresponding value's property is converted using
+ *   the val2str function.
+ * - If the second element is null or undefined, the corresponding value's property is converted using
+ *   the val2str function..
+ * - If the second element is a number it is treated as an index of a well-known conversion function.
+ * - If the second element is a function, it is used to convert the value's property.
+ *
+ * Since the elements in the info array constitute parameters for the function, processing stops as
+ * soon as an undefined parameter is encountered because undefined parameter indicates that optional
+ * parameters started with this one were not passed to the function.
+ */
+ function funcObj2String( val: CSSFuncObj): string
+{
+    if (val == null)
+        return "";
+
+    let func = registeredV2PFuncs.get( val.fn);
+    return `${val.fn}(${func ? func(val).join(",") : ""})`;
+}
+
 
 
 
@@ -622,7 +663,7 @@ export const enum WellKnownFunc
 
 
 // Map of function IDs to functions that convert a value to string
-let registeredToStringFuncs = new Map<number,ToStringFunc>([
+let registeredV2SFuncs = new Map<number,ToStringFunc>([
     [WellKnownFunc.Number, NumberMath.s2s],
     [WellKnownFunc.Percent, PercentMath.s2s],
     [WellKnownFunc.Length, LengthMath.s2s],
@@ -640,7 +681,7 @@ let registeredToStringFuncs = new Map<number,ToStringFunc>([
 
 
 // Next identifier for registering a function that converts a value to string.
-let nextRegisteredFuncID = 1000;
+let nextRegisteredV2SFuncID = 1000;
 
 
 
@@ -650,8 +691,8 @@ let nextRegisteredFuncID = 1000;
  */
 export function registerV2SFuncID( func: ToStringFunc): number
 {
-    let funcID = nextRegisteredFuncID++;
-    registeredToStringFuncs.set( funcID, func);
+    let funcID = nextRegisteredV2SFuncID++;
+    registeredV2SFuncs.set( funcID, func);
     return funcID;
 }
 
@@ -665,8 +706,84 @@ export function registerV2SFuncID( func: ToStringFunc): number
  */
 export function v2sByFuncID( val: any, funcID: number): string
 {
-    let func = registeredToStringFuncs.get( funcID);
+    let func = registeredV2SFuncs.get( funcID);
     return func ? func(val) : "";
+}
+
+
+
+// Defines type of functions converting parameters of CSS functions to their string representations.
+type V2PFunc = (val: CSSFuncObj) => string[];
+
+
+
+// Map of CSS function names to functions that convert an object representing parameters of the
+// CSS function to arrays of string representations of these parameters
+let registeredV2PFuncs = new Map<string,V2PFunc>();
+
+
+
+/**
+ * Registers the given function so that it can be used for converting parameters of a CSS function
+ * represented by an object to array of parameter string representations.
+ */
+export function registerV2PFunc( fn: string | string[], func: V2PFunc): void
+{
+    if (typeof fn == "string")
+        registeredV2PFuncs.set( fn, func);
+    else
+    {
+        for( let name of fn)
+            registeredV2PFuncs.set( name, func);
+    }
+}
+
+
+
+/**
+ * Converts the given value representing parameters of a CSS function to array of string
+ * representations of these parametersusing the information object instructing how the object's
+ * properties should be converted to strings. The info parameter is an array of either strings
+ * or two-element tuples. The only string and the first tuple element corresponds to a property
+ * expected in the value object to be converted. Each property is converted according to the
+ * following rules:
+ * - If the array item is just a string, the corresponding value's property is converted using
+ *   the val2str function.
+ * - If the second element is null or undefined, the corresponding value's property is converted using
+ *   the val2str function..
+ * - If the second element is a number it is treated as an index of a well-known conversion function.
+ * - If the second element is a function, it is used to convert the value's property.
+ *
+ * Since the elements in the info array constitute parameters for the function, processing stops as
+ * soon as an undefined parameter is encountered because undefined parameter indicates that optional
+ * parameters started with this one were not passed to the function.
+ */
+ export function paramsToStrings<T>( val: T,
+    info: (keyof T | [keyof T, number | ToStringFunc])[]): string[]
+{
+    if (val == null)
+        return [];
+
+    let params: string[] = [];
+    for( let nameOrTuple of info)
+    {
+        // get the name of the property in the value to be converted and the corresponding value;
+        // if the properties value is not defined, skip it.
+        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
+        let propVal = val[propName];
+        if (propVal == null)
+            break;
+
+        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+        if (!convertor)
+            params.push( v2s( propVal));
+        else if (typeof convertor === "number")
+            params.push( v2sByFuncID( propVal, convertor));
+        else
+            params.push( convertor( propVal));
+    }
+
+	return params;
 }
 
 

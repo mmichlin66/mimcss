@@ -6,13 +6,14 @@ import {
     GridTemplateAreas_StyleType, GridTemplateArea_Definition, GridTrack, GridTemplateAxis_StyleType,
     Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType, Transition_Single, Offset_StyleType,
     Styleset, CustomVar_StyleType, VarTemplateName, SupportsQuery, SingleSupportsQuery, ExtendedStyleset,
-    TransformFunc,
-    FilterFunc
+    ITransformPerspective, ITransformMatrix, ITransformMatrix3d, ITransformRotate1d, ITransformRotate3d,
+    ITransformScale1d, ITransformScale3d, ITransformSkew1d, ITransformSkew2d,
+    ITransformTranslate1d, ITransformTranslate3d, IFilterPercent, IFilterBlur, IFilterHueRotate, IFilterDropShadow
 } from "../api/StyleTypes";
 import {
     v2s, a2s, LengthMath, AngleMath, camelToDash, dashToCamel, IValueConvertOptions,
     PercentMath, ResolutionMath, FrequencyMath, ToStringFunc, v2sByFuncID, WellKnownFunc,
-    registerV2SFuncID, obj2str
+    registerV2SFuncID, obj2str, registerV2PFunc, paramsToStrings
 } from "./UtilFuncs";
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -73,57 +74,6 @@ export function pseudoEntityToString( entityName: string, val: any): string
 // Utility functions for converting values to strings.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-let colorFuncID = registerV2SFuncID( colorToString);
-
-
-
-/**
- * Converts the given value to a CSS function string using the given function name and the info
- * parameter to inform how the object's properties should be converted to strings. The info
- * parameter is an array of either strings or two-element tuples. The only string and the first
- * tuple element corresponds to a property expected in the value object to be converted. Each
- * property is converted according to the following rules:
- * - If the array item is just a string, the corresponding value's property is converted using
- *   the val2str function.
- * - If the second element is null or undefined, the corresponding value's property is converted using
- *   the val2str function..
- * - If the second element is a number it is treated as an index of a well-known conversion function.
- * - If the second element is a function, it is used to convert the value's property.
- *
- * Since the elements in the info array constitute parameters for the function, processing stops as
- * soon as an undefined parameter is encountered because undefined parameter indicates that optional
- * parameters started with this one were not passed to the function.
- */
- function funcObj2String( val: { fn: string, [p: string]: any },
-    info: (string | [string, number | ToStringFunc])[]): string
-{
-    if (val == null)
-        return "";
-
-    let params: string[] = [];
-    for( let nameOrTuple of info)
-    {
-        // get the name of the property in the value to be converted and the corresponding value;
-        // if the properties value is not defined, skip it.
-        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
-        let propVal = val[propName];
-        if (propVal == null)
-            break;
-
-        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-        if (!convertor)
-            params.push( v2s( propVal));
-        else if (typeof convertor === "number")
-            params.push( v2sByFuncID( propVal, convertor));
-        else
-            params.push( convertor( propVal));
-    }
-
-	return `${val.fn}(${params.join(",")})`;
-}
-
-
 
 /**
  * Converts the given value to a CSS string using the info parameter to inform how the object's
@@ -646,82 +596,6 @@ function offsetToString( val: Offset_StyleType): string
 
 
 
-function filter_fromObject( val: FilterFunc): string
-{
-    switch (val.fn)
-    {
-        case "brightness":
-        case "contrast":
-        case "grayscale":
-        case "invert":
-        case "opacity":
-        case "saturate":
-        case "sepia":
-            return funcObj2String( val, [["p", WellKnownFunc.Percent]]);
-
-        case "blur":
-            return funcObj2String( val, [["r", WellKnownFunc.Length]]);
-
-        case "drop-shadow":
-            return 	`drop-shadow(${singleBoxShadow_fromObject( val)})`;
-
-        case "hue-rotate":
-            return funcObj2String( val, [["a", WellKnownFunc.Angle]]);
-
-        default: return "";
-    }
-}
-
-
-
-function transform_fromObject( val: TransformFunc): string
-{
-    switch (val.fn)
-    {
-        case "matrix":
-            return funcObj2String( val, ["a","b","c","d","tx","ty"]);
-        case "matrix3d":
-            return funcObj2String( val, ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"]);
-
-        case "perspective":
-            return funcObj2String( val, [["a", WellKnownFunc.Length]]);
-
-        case "rotate":
-        case "rotateX":
-        case "rotateY":
-        case "rotateZ":
-            return funcObj2String( val, [["a", WellKnownFunc.Angle]]);
-        case "rotate3d":
-            return funcObj2String( val, [ "x", "y", "z", ["a", WellKnownFunc.Angle] ]);
-
-        case "scaleX":
-        case "scaleY":
-        case "scaleZ":
-            return funcObj2String( val, ["s"]);
-        case "scale":
-        case "scale3d":
-            return funcObj2String( val, ["sx", "sy", "sz"]);
-
-        case "skewX":
-        case "skewY":
-            return funcObj2String( val, [["a", WellKnownFunc.Angle]]);
-        case "skew":
-            return funcObj2String( val, [ ["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle] ]);
-
-        case "translateX":
-        case "translateY":
-        case "translateZ":
-            return funcObj2String( val, [["d", WellKnownFunc.Length]]);
-        case "translate":
-        case "translate3d":
-            return funcObj2String( val, [ ["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length] ]);
-
-        default: return "";
-    }
-}
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Functions for handling Stylesets.
@@ -959,6 +833,10 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: ToStrin
 let singleCornerRadiusFuncID = registerV2SFuncID( singleCornerRadiusToString);
 let borderFuncID = registerV2SFuncID( borderToString);
 let gridAxisFuncID = registerV2SFuncID( gridAxisToString);
+let colorFuncID = registerV2SFuncID( colorToString);
+
+
+
 
 
 
@@ -1067,9 +945,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
 
     fill: colorFuncID,
     fillOpacity: PercentMath.s2s,
-    filter: {
-        fromAny: filter_fromObject,
-    },
     flex: flexToString,
     flexBasis: WellKnownFunc.Length,
     floodColor: colorFuncID,
@@ -1211,9 +1086,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     },
     textSizeAdjust: WellKnownFunc.Percent,
     top: WellKnownFunc.Length,
-    transform: {
-        fromAny: transform_fromObject
-    },
     transformOrigin: {
         fromAny: WellKnownFunc.Length
     },
@@ -1285,6 +1157,56 @@ export function singleSupportsQueryToString( query: SingleSupportsQuery): string
         }
     });
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Registration of function converting parameters of CSS functions.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+registerV2PFunc( "matrix", (val: ITransformMatrix) =>
+    paramsToStrings( val, ["a","b","c","d","tx","ty"]));
+registerV2PFunc( "matrix3d", (val: ITransformMatrix3d) =>
+    paramsToStrings( val, ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"]));
+
+registerV2PFunc( "perspective", (val: ITransformPerspective) =>
+    paramsToStrings( val, [["d", WellKnownFunc.Length]]));
+
+registerV2PFunc( ["rotate", "rotateX", "rotateY", "rotateZ"], (val: ITransformRotate1d) =>
+    paramsToStrings( val, [["a", WellKnownFunc.Angle]]));
+registerV2PFunc( "rotate3d", (val: ITransformRotate3d) =>
+    paramsToStrings( val, [ "x", "y", "z", ["a", WellKnownFunc.Angle] ]));
+
+registerV2PFunc( ["scale", "scaleX", "scaleY", "scaleZ"], (val: ITransformScale1d) =>
+    paramsToStrings( val, ["s"]));
+registerV2PFunc( ["scale", "scale3d"], (val: ITransformScale3d) =>
+    paramsToStrings( val, ["sx", "sy", "sz"]));
+
+registerV2PFunc( ["skewX", "skewY"], (val: ITransformSkew1d) =>
+    paramsToStrings( val, [["a", WellKnownFunc.Angle]]));
+registerV2PFunc( "skewd", (val: ITransformSkew2d) =>
+    paramsToStrings( val, [ ["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle] ]));
+
+registerV2PFunc( ["translate", "translateX", "translateY", "translateZ"], (val: ITransformTranslate1d) =>
+    paramsToStrings( val, [["d", WellKnownFunc.Length]]));
+registerV2PFunc( ["translate", "translate3d"], (val: ITransformTranslate3d) =>
+    paramsToStrings( val, [ ["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length] ]));
+
+
+
+registerV2PFunc( ["brightness", "contrast", "grayscale", "invert", "opacity", "saturate", "sepia"], (val: IFilterPercent) =>
+    paramsToStrings( val, [["p", WellKnownFunc.Percent]]));
+
+registerV2PFunc( "blur", (val: IFilterBlur) =>
+    paramsToStrings( val, [["r", WellKnownFunc.Length]]));
+
+registerV2PFunc( "drop-shadow", (val: IFilterDropShadow) =>
+    paramsToStrings( val, [ ["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["blur", WellKnownFunc.Length],["color", colorToString]]));
+
+registerV2PFunc( "hue-rotate", (val: IFilterHueRotate) =>
+    paramsToStrings( val, [["a", WellKnownFunc.Angle]]));
 
 
 
