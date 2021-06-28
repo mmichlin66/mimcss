@@ -8,13 +8,6 @@
     "ignoreCompilerErrors": true,
 	"out": "./reference",
 	"inputFiles": [
-		"./src/api",
-		"./src/styles/UtilTypes.ts",
-		"./src/styles/ColorTypes.ts",
-		"./src/styles/StyleTypes.ts",
-		"./src/styles/SelectorTypes.ts",
-		"./src/styles/MediaTypes.ts",
-		"./src/styles/FontFaceTypes.ts",
-		"./src/rules/RuleTypes.ts"
+		"./src/api"
 	]
 }

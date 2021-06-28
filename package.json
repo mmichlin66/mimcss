@@ -37,15 +37,17 @@
 		"lib/mimcss.js",
 		"lib/mimcss.dev.js",
 		"lib/index.d.ts",
-		"lib/api/BasicTypes.d.ts",
-		"lib/api/StyleTypes.d.ts",
-		"lib/api/RuleTypes.d.ts",
-		"lib/api/UtilAPI.d.ts",
-		"lib/api/ImageAPI.d.ts",
-		"lib/api/StyleAPI.d.ts",
-		"lib/api/RuleAPI.d.ts",
+		"lib/api/CoreTypes.d.ts",
+		"lib/api/CoreAPI.d.ts",
+		"lib/api/ExtraTypes.d.ts",
+		"lib/api/ExtraAPI.d.ts",
+		"lib/api/FontFaceTypes.d.ts",
+		"lib/api/MediaTypes.d.ts",
 		"lib/api/MediaAPI.d.ts",
-		"lib/api/FontFaceAPI.d.ts",
-		"lib/api/SchedulingAPI.d.ts"
+		"lib/api/RuleTypes.d.ts",
+		"lib/api/RuleAPI.d.ts",
+		"lib/api/SchedulingAPI.d.ts",
+		"lib/api/StyleTypes.d.ts",
+		"lib/api/StyleAPI.d.ts"
 	]
 }

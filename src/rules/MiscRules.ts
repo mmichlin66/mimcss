@@ -1,14 +1,13 @@
-import {PagePseudoClass} from "../api/BasicTypes";
+import {PagePseudoClass} from "../api/CoreTypes";
 import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "../api/RuleTypes";
-import {SupportsQuery, Styleset} from "../api/StyleTypes";
-import {IFontFace} from "../api/FontFaceAPI"
+import {Styleset} from "../api/StyleTypes";
+import {IFontFace} from "../api/FontFaceTypes"
+import {MediaQuery, SupportsQuery} from "../api/MediaTypes";
 import {fontFaceToString} from "../impl/FontFaceFuncs"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
-import {MediaQuery} from "../api/MediaAPI";
-import {supportsQueryToString} from "../impl/StyleFuncs";
-import {s_mediaQueryToString} from "../impl/MediaFuncs";
+import {s_mediaQueryToString, supportsQueryToString} from "../impl/MediaFuncs";
 import {StyleRule} from "./StyleRules";
-import { symValueToString } from "../impl/UtilFuncs";
+import {symValueToString} from "../impl/CoreFuncs";
 
 
 

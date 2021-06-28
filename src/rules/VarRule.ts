@@ -2,7 +2,7 @@ import {IVarRule, IConstRule} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue} from "../api/StyleTypes"
 import {stylePropToString} from "../impl/StyleFuncs"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
-import { symValueToString } from "../impl/UtilFuncs";
+import { symValueToString } from "../impl/CoreFuncs";
 
 
 

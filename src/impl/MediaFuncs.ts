@@ -1,6 +1,8 @@
-﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery} from "../api/MediaAPI";
-import {CssAspectRatio, CssResolution, CssLength} from "../api/BasicTypes";
-import {v2s, camelToDash, ResolutionMath, LengthMath} from "./UtilFuncs";
+﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery, SupportsQuery, SingleSupportsQuery} from "../api/MediaTypes";
+import {CssAspectRatio, CssResolution, CssLength} from "../api/CoreTypes";
+import {ExtendedStyleset} from "../api/StyleTypes";
+import {v2s, camelToDash, ResolutionMath, LengthMath} from "./CoreFuncs";
+import {stylePropToString} from "./StyleFuncs";
 
 
 
@@ -164,6 +166,41 @@ let mediaFeatures: { [K in keyof IMediaFeatureset]?: MediaFeatureInfo<K> } =
     minWidth: lengthFeatureToString,
     maxWidth: lengthFeatureToString,
 };
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS supports query.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Converts the given supports query to its string representation */
+export function supportsQueryToString( query: SupportsQuery): string
+{
+    return v2s( query, {
+        fromAny: singleSupportsQueryToString,
+        arrSep: " or "
+    });
+}
+
+
+
+/** Converts the given supports query to its string representation */
+function singleSupportsQueryToString( query: SingleSupportsQuery): string
+{
+    return v2s( query, {
+        fromObj: (v: ExtendedStyleset & { $negate?: boolean; }) => {
+            let propNames = Object.keys( v).filter( (propName) => propName != "$negate");
+            if (propNames.length === 0)
+                return "";
+
+            let not = v.$negate ? "not" : "";
+            return  `${not} (${propNames.map( (propName) =>
+                stylePropToString( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
+        }
+    });
+}
 
 
 

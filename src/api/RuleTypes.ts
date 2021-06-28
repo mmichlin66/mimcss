@@ -1,7 +1,7 @@
 ﻿import {
     ICustomVar, OneOrMany, PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity,
     IRuleWithSelector, SelectorCombinator, IConstant
-} from "../api/BasicTypes";
+} from "./CoreTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, VarValue, ExtendedVarValue} from "./StyleTypes";
 
 

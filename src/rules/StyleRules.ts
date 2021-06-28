@@ -1,10 +1,10 @@
-import {CssSelector} from "../api/BasicTypes"
+import {CssSelector} from "../api/CoreTypes"
 import {
     IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule
 } from "../api/RuleTypes";
 import {ExtendedStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {v2s, camelToDash, symValueToString} from "../impl/UtilFuncs";
+import {v2s, camelToDash, symValueToString} from "../impl/CoreFuncs";
 import {
     mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps, selectorToString,
     pseudoEntityToString

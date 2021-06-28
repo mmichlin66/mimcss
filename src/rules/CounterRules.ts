@@ -1,6 +1,6 @@
 import {ICounterRule} from "../api/RuleTypes"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
-import {symValueToString} from "../impl/UtilFuncs";
+import {symValueToString} from "../impl/CoreFuncs";
 
 
 

@@ -1,23 +1,26 @@
-﻿import {CssSelector, Extended, OneOrMany, CssRadius} from "../api/BasicTypes";
+﻿import {CssSelector, Extended, OneOrMany, CssRadius} from "../api/CoreTypes";
 import {
     TimingFunction_Single, Animation_Single, Background_Single, BackgroundSize_Single,
     BorderImage_Object, BorderImageSlice_StyleType, BoxShadow_Single, BorderRadius_StyleType,
     Border_StyleType, Columns_StyleType, Cursor_StyleType, Flex_StyleType, Font_StyleType,
     GridTemplateAreas_StyleType, GridTemplateArea_Definition, GridTrack, GridTemplateAxis_StyleType,
     Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType, Transition_Single, Offset_StyleType,
-    Styleset, CustomVar_StyleType, VarTemplateName, SupportsQuery, SingleSupportsQuery, ExtendedStyleset,
-    ITransformPerspective, ITransformMatrix, ITransformMatrix3d, ITransformRotate1d, ITransformRotate3d,
-    ITransformScale1d, ITransformScale3d, ITransformSkew1d, ITransformSkew2d,
-    ITransformTranslate1d, ITransformTranslate3d, IFilterPercent, IFilterBlur, IFilterHueRotate, IFilterDropShadow
+    Styleset, CustomVar_StyleType, VarTemplateName,
 } from "../api/StyleTypes";
+import {
+    IFilterBlur, IFilterDropShadow, IFilterHueRotate, IFilterPercent, ITransformMatrix,
+    ITransformMatrix3d, ITransformPerspective, ITransformRotate1d, ITransformRotate3d,
+    ITransformScale1d, ITransformScale3d, ITransformSkew1d, ITransformSkew2d,
+    ITransformTranslate1d, ITransformTranslate3d
+} from "../api/ExtraTypes";
+import {IIDRule} from "../api/RuleTypes";
 import {
     v2s, a2s, LengthMath, AngleMath, camelToDash, dashToCamel, IValueConvertOptions,
     PercentMath, ResolutionMath, FrequencyMath, ToStringFunc, v2sByFuncID, WellKnownFunc,
     registerV2SFuncID, obj2str, registerV2PFunc, paramsToStrings
-} from "./UtilFuncs";
-import {colorToString} from "./ColorFuncs";
+} from "./CoreFuncs";
+import {colorToString} from "./ExtraFuncs";
 import {VarRule} from "../rules/VarRule";
-import {IIDRule} from "../api/RuleTypes";
 
 
 
@@ -1127,45 +1130,11 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// CSS supports query.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/** Converts the given supports query to its string representation */
-export function supportsQueryToString( query: SupportsQuery): string
-{
-    return v2s( query, {
-        fromAny: singleSupportsQueryToString,
-        arrSep: " or "
-    });
-}
-
-
-
-/** Converts the given supports query to its string representation */
-export function singleSupportsQueryToString( query: SingleSupportsQuery): string
-{
-    return v2s( query, {
-        fromObj: (v: ExtendedStyleset & { $negate?: boolean; }) => {
-            let propNames = Object.keys( v).filter( (propName) => propName != "$negate");
-            if (propNames.length === 0)
-                return "";
-
-            let not = v.$negate ? "not" : "";
-            return  `${not} (${propNames.map( (propName) =>
-                stylePropToString( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
-        }
-    });
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // Registration of function converting parameters of CSS functions.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Transform functions
 registerV2PFunc( "matrix", (val: ITransformMatrix) =>
     paramsToStrings( val, ["a","b","c","d","tx","ty"]));
 registerV2PFunc( "matrix3d", (val: ITransformMatrix3d) =>
@@ -1196,6 +1165,7 @@ registerV2PFunc( ["translate", "translate3d"], (val: ITransformTranslate3d) =>
 
 
 
+// Filter functions
 registerV2PFunc( ["brightness", "contrast", "grayscale", "invert", "opacity", "saturate", "sepia"], (val: IFilterPercent) =>
     paramsToStrings( val, [["p", WellKnownFunc.Percent]]));
 

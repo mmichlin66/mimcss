@@ -1,4 +1,4 @@
-﻿import {IStringProxy} from "./BasicTypes";
+﻿import {IStringProxy} from "./CoreTypes";
 
 
 

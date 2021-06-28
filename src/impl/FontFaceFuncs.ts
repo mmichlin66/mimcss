@@ -1,5 +1,5 @@
-﻿import * as FontFaceTypes from "../api/FontFaceAPI"
-import {camelToDash, v2s, PercentMath, AngleMath, a2s, obj2str, NumberMath} from "./UtilFuncs";
+﻿import * as FontFaceTypes from "../api/FontFaceTypes"
+import {camelToDash, v2s, PercentMath, AngleMath, a2s, obj2str, WellKnownFunc} from "./CoreFuncs";
 
 
 
@@ -59,7 +59,7 @@ function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
 {
     return v2s( val, {
-        fromAny: NumberMath.s2s
+        fromAny: WellKnownFunc.Number
     });
 }
 

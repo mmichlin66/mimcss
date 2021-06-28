@@ -2,14 +2,14 @@
     INumberMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath, IPercentMath,
     Extended, IStringProxy, IUrlProxy, AttrTypeKeyword, AttrUnitKeyword, ILengthProxy,
     IPercentProxy, IAngleProxy, ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy,
-    CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy
-} from "../api/BasicTypes"
+    CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy, SelectorItem, ISelectorProxy
+} from "./CoreTypes"
 import {IVarRule, ICounterRule, IIDRule} from "./RuleTypes";
 import {VarTemplateName, ListStyleType_StyleType, ExtendedVarValue} from "./StyleTypes";
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath,
 	FrequencyMath, PercentMath, v2s, templateStringToString
-} from "../impl/UtilFuncs"
+} from "../impl/CoreFuncs"
 import {stylePropToString} from "../impl/StyleFuncs";
 
 
@@ -197,6 +197,17 @@ export function khz( n: number): IFrequencyProxy { return () => n + "khz"; }
 // Utility functions
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a string representation of a selector. This function is a tag function and must be
+ * invoked with the template string without parentheses.
+ */
+ export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy
+ {
+     return () => templateStringToString( parts, params);
+ }
+
+
 
 /**
  * The `raw` function allows specifying arbitrary text for properties whose type normally doesn't

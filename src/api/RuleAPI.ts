@@ -5,16 +5,16 @@
 
 
 
-import {CssSelector, PagePseudoClass} from "../api/BasicTypes";
+import {CssSelector, PagePseudoClass} from "./CoreTypes";
 import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule
 } from "./RuleTypes";
-import {SupportsQuery, Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
+import {MediaQuery, SupportsQuery} from "./MediaTypes"
+import {IFontFace} from "./FontFaceTypes";
+import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
 import {processInstanceOrClass, s_enableShortNames, serializeInstance} from "../rules/RuleContainer";
-import {MediaQuery} from "./MediaAPI"
-import {IFontFace} from "./FontFaceAPI";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
@@ -22,7 +22,7 @@ import {CounterRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
-import {v2s} from "../impl/UtilFuncs";
+import {v2s} from "../impl/CoreFuncs";
 import {IRuleSerializationContext} from "../rules/Rule";
 
 
