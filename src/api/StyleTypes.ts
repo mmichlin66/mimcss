@@ -66,7 +66,7 @@ export interface IFilterHueRotate
 
 
 /**
- * Type accepted by the `filter` style property
+ * Type representing CSS `<filter>` functions accepted by the `filter` style property
  */
  export type FilterFunc = IFilterPercent | IFilterBlur | IFilterDropShadow | IFilterHueRotate;
 
@@ -222,7 +222,7 @@ export interface ITransformTranslate3d
 
 
 /**
- * Type accepted by the `transform` style property
+ * Type representing CSS `<transform>` functions accepted by the `transform` style property
  */
 export type TransformFunc =
     ITransformMatrix | ITransformMatrix3d | ITransformPerspective |

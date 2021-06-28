@@ -1,5 +1,5 @@
 ﻿import * as FontFaceTypes from "../api/FontFaceAPI"
-import {camelToDash, v2s, PercentMath, AngleMath, arr2str, obj2str, NumberMath} from "./UtilFuncs";
+import {camelToDash, v2s, PercentMath, AngleMath, a2s, obj2str, NumberMath} from "./UtilFuncs";
 
 
 
@@ -50,7 +50,7 @@ function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 {
     return v2s( val, {
         fromNumber: v => `oblique ${AngleMath.s2s(v)}`,
-        fromArray: v => `oblique ${arr2str( v, AngleMath.s2s)}`
+        fromArray: v => `oblique ${a2s( v, AngleMath.s2s)}`
     });
 }
 

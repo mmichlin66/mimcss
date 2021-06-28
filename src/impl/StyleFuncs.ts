@@ -1,4 +1,4 @@
-﻿import {CssSelector, Extended, OneOrMany, CssRadius, CssLength, CssTime} from "../api/BasicTypes";
+﻿import {CssSelector, Extended, OneOrMany, CssRadius} from "../api/BasicTypes";
 import {
     TimingFunction_Single, Animation_Single, Background_Single, BackgroundSize_Single,
     BorderImage_Object, BorderImageSlice_StyleType, BoxShadow_Single, BorderRadius_StyleType,
@@ -10,8 +10,9 @@ import {
     FilterFunc
 } from "../api/StyleTypes";
 import {
-    v2s, TimeMath, NumberMath, arr2str, pos2str, LengthMath, unitlessOrPercentToString, AngleMath,
-    camelToDash, dashToCamel, IValueConvertOptions, multiPos2str, PercentMath, ResolutionMath, FrequencyMath, ToStringFunc
+    v2s, a2s, LengthMath, AngleMath, camelToDash, dashToCamel, IValueConvertOptions,
+    PercentMath, ResolutionMath, FrequencyMath, ToStringFunc, v2sByFuncID, WellKnownFunc,
+    registerV2SFuncID, obj2str
 } from "./UtilFuncs";
 import {colorToString} from "./ColorFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -46,9 +47,7 @@ function nthTupleToString( val: [number, number?]): string
  */
 export function selectorToString( val: CssSelector): string
 {
-	return v2s( val, {
-		arrSep: ""
-	})
+	return v2s( val, { arrSep: "" });
 }
 
 
@@ -75,89 +74,7 @@ export function pseudoEntityToString( entityName: string, val: any): string
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Numeric identifiers corresponding to well known functions used to convert style property values
- * to strings. This is used to reduce the size of the object used for mapping style properties to
- * conversion functions.
- *
- * Note!!!: the values in the enumeration cannot be changed - otherwise, it will not be backwards
- * compatible. All new values must be appended at the end.
- */
- const enum WellKnownFunc
- {
-     Length = 1,
-     Color,
-     Border,
-     Position,
-     CornerRadius,
-     MultiLengthWithSpace,
-     MultiTimeWithComma,
-     ArrayWithComma,
-     ArrayWithSlash,
-     GridAxis,
-     Angle,
-     Number,
-     Percent,
- }
-
-
-
- /**
-  * Converts the given value to string using a well-known function indicated by the given
-  * enumeration value.
-  * @param val
-  * @param funcType
-  */
- function valueToStringByWellKnownFunc( val: any, funcType: WellKnownFunc): string
- {
-     let func: ToStringFunc | null =
-         funcType === WellKnownFunc.Length ? LengthMath.s2s :
-         funcType === WellKnownFunc.Angle ? AngleMath.s2s :
-         funcType === WellKnownFunc.Number ? NumberMath.s2s :
-         funcType === WellKnownFunc.Percent ? PercentMath.s2s :
-         funcType === WellKnownFunc.Color ? colorToString :
-         funcType === WellKnownFunc.Border ? borderToString :
-         funcType === WellKnownFunc.Position ? pos2str :
-         funcType === WellKnownFunc.CornerRadius ? singleCornerRadiusToString :
-         funcType === WellKnownFunc.MultiLengthWithSpace ? multiLengthToStringWithSpace :
-         funcType === WellKnownFunc.MultiTimeWithComma ? multiTimeToStringWithComma :
-         funcType === WellKnownFunc.ArrayWithComma ? arrayToStringWithComma :
-         funcType === WellKnownFunc.ArrayWithSlash ? arrayToStringWithSlash :
-         funcType === WellKnownFunc.GridAxis ? gridAxisToString :
-         null;
-
-     return func ? func(val) : "";
- }
-
-
-
-// Helper function converts the given multi-length value to string. If the value is an array, the
-// items will be separated by space.
-function multiLengthToStringWithSpace( val: OneOrMany<CssLength>): string
-{
-    return LengthMath.ms2s( val, " ");
-}
-
-// Helper function converts the given multi-time value to string. If the value is an array, the
-// items will be separated by comma.
-function multiTimeToStringWithComma( val: OneOrMany<CssTime>): string
-{
-    return TimeMath.ms2s( val, ",");
-}
-
-// Helper function converts the given value to string. If the value is an array, the items will be
-// separated by comma.
-function arrayToStringWithComma( val: any)
-{
-    return v2s( val, { arrSep: "," });
-};
-
-// Helper function converts the given value to string. If the value is an array, the items will be
-// separated by slash.
-function arrayToStringWithSlash( val: any)
-{
-    return v2s( val, { arrSep: "/" });
-};
+let colorFuncID = registerV2SFuncID( colorToString);
 
 
 
@@ -179,7 +96,7 @@ function arrayToStringWithSlash( val: any)
  * parameters started with this one were not passed to the function.
  */
  function funcObj2String( val: { fn: string, [p: string]: any },
-    info: (string | [string, WellKnownFunc | ToStringFunc])[]): string
+    info: (string | [string, number | ToStringFunc])[]): string
 {
     if (val == null)
         return "";
@@ -198,7 +115,7 @@ function arrayToStringWithSlash( val: any)
         if (!convertor)
             params.push( v2s( propVal));
         else if (typeof convertor === "number")
-            params.push( valueToStringByWellKnownFunc( propVal, convertor));
+            params.push( v2sByFuncID( propVal, convertor));
         else
             params.push( convertor( propVal));
     }
@@ -228,39 +145,18 @@ function arrayToStringWithSlash( val: any)
  * The order of the names determines in which order the properties should be added to the string.
  */
 function styleObj2String( val: any,
-    info: (string | [string, null | string | ToStringFunc, string?] )[],
+    info: (string | [string, null | string | number | ToStringFunc, string?] )[],
     separator: string = " "): string
 {
-    if (val == null)
-        return "";
-    else if (typeof val !== "object")
-        return val.toString();
-
-    let buf: string[] = [];
-    info.forEach( nameOrTuple =>
-    {
-        // get the name of the property in the value to be converted and the corresponding value;
-        // if the properties value is not defined, skip it.
-        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
-        let propVal = val[propName];
-        if (propVal == null)
-            return;
-
-        // check whether we have a prefix
-        let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
-        if (prefix)
-            buf.push( prefix);
-
+    // call utility function substituting every touple with style property name with function
+    // that converts this property value to string
+    return obj2str( val, info.map( nameOrTuple => {
         let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-        if (!convertor)
-            buf.push( v2s( propVal));
-        else if (typeof convertor === "string")
-            buf.push( stylePropToString( convertor, propVal, true));
+        if (typeof convertor === "string")
+            return [nameOrTuple[0], v => stylePropToString( convertor as string, v, true), nameOrTuple[2]];
         else
-            buf.push( convertor( propVal));
-    });
-
-	return buf.join(separator);
+            return nameOrTuple as string | [string, null | number | ToStringFunc, string?];
+    }), separator);
 }
 
 
@@ -274,10 +170,10 @@ function styleObj2String( val: any,
 function singleAnimation_fromObject( val: Animation_Single): string
 {
     return styleObj2String( val, [
-        ["duration", TimeMath.s2s],
+        ["duration", WellKnownFunc.Time],
         ["func", singleTimingFunction_fromStyle],
-        ["delay", TimeMath.s2s],
-        ["count", NumberMath.s2s],
+        ["delay", WellKnownFunc.Time],
+        ["count", WellKnownFunc.Number],
         "direction",
         "mode",
         "state",
@@ -289,9 +185,7 @@ function singleAnimation_fromObject( val: Animation_Single): string
 
 function singleAnimation_fromStyle( val: Extended<Animation_Single>): string
 {
-    return v2s( val, {
-        fromObj: singleAnimation_fromObject
-    });
+    return v2s( val, { fromObj: singleAnimation_fromObject });
 }
 
 
@@ -317,7 +211,7 @@ function timingFunction_fromArray( val: any[]): string
 {
     return typeof val[0] === "number"
         ? singleTimingFunction_fromStyle( val as TimingFunction_Single)
-        : arr2str( val, singleTimingFunction_fromStyle, ",");
+        : a2s( val, singleTimingFunction_fromStyle, ",");
 }
 
 
@@ -363,8 +257,8 @@ function singleBackground_fromObject( val: Background_Single): string
     return styleObj2String( val, [
         ["color", colorToString],
         "image",
-        ["position", pos2str],
-        ["size", multiLengthToStringWithSpace, "/"],
+        ["position", WellKnownFunc.Position],
+        ["size", WellKnownFunc.MultiLengthWithSpace, "/"],
         "repeat",
         "attachment",
         "origin",
@@ -386,10 +280,7 @@ function singleBackground_fromStyle( val: Extended<Background_Single>): string
 
 function singleBackgroundSize_fromStyle( val: Extended<BackgroundSize_Single>): string
 {
-    return v2s( val, {
-        fromNumber: LengthMath.s2s,
-        fromArray: multiLengthToStringWithSpace
-    });
+    return v2s( val, { fromAny: WellKnownFunc.Length });
 }
 
 
@@ -411,7 +302,7 @@ function borderImageToString( val: BorderImage_Object): string
         "source",
         ["slice", "borderImageSlice"],
         ["width", null, "/"],
-        ["outset",null, "/"],
+        ["outset", null, "/"],
         "repeat"
     ]);
 }
@@ -424,10 +315,10 @@ function borderImageToString( val: BorderImage_Object): string
 function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): string
 {
     return v2s( val, {
-        fromNumber: unitlessOrPercentToString,
+        fromNumber: WellKnownFunc.UnitlessOrPercent,
         arrItemFunc: v => v2s( v, {
             fromBool: () => "fill",
-            fromNumber: unitlessOrPercentToString,
+            fromNumber: WellKnownFunc.UnitlessOrPercent,
         })
     });
 }
@@ -438,10 +329,10 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
 {
     return styleObj2String( val, [
         ["inset", v => v ? "inset" : ""],
-        ["x", LengthMath.s2s],
-        ["y", LengthMath.s2s],
-        ["blur", LengthMath.s2s],
-        ["spread", LengthMath.s2s],
+        ["x", WellKnownFunc.Length],
+        ["y", WellKnownFunc.Length],
+        ["blur", WellKnownFunc.Length],
+        ["spread", WellKnownFunc.Length],
         ["color", colorToString]
     ]);
 }
@@ -453,10 +344,7 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
  */
 function singleCornerRadiusToString( val: Extended<CssRadius>): string
 {
-    return v2s( val, {
-        arrItemFunc: LengthMath.s2s,
-        fromAny: LengthMath.s2s
-    });
+    return v2s( val, { fromAny: WellKnownFunc.Length });
 }
 
 
@@ -472,14 +360,14 @@ export function borderRadiusToString( val: Extended<BorderRadius_StyleType>): st
             if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = arr2str( v[0], LengthMath.s2s, " ");
+                let s = a2s( v[0], WellKnownFunc.Length, " ");
                 s += " / ";
-                return s + arr2str( v[1], LengthMath.s2s, " ");
+                return s + a2s( v[1], WellKnownFunc.Length, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return arr2str( v, LengthMath.s2s, " ");
+                return a2s( v, WellKnownFunc.Length, " ");
             }
         },
         fromAny: LengthMath.s2s
@@ -494,7 +382,7 @@ export function borderRadiusToString( val: Extended<BorderRadius_StyleType>): st
 function borderToString( val: Extended<Border_StyleType>): string
 {
     return v2s( val, {
-        fromNumber: LengthMath.s2s,
+        fromNumber: WellKnownFunc.Length,
         fromArray: v =>
         {
             let buf: string[] = [];
@@ -570,7 +458,7 @@ function flexToString( val: Extended<Flex_StyleType>): string
             else
                 return v[0] + " " + v[1] + " " + LengthMath.s2s( v[2]);
         },
-        fromAny: LengthMath.s2s
+        fromAny: WellKnownFunc.Length
     });
 }
 
@@ -583,7 +471,7 @@ function font_fromObject( val: any): string
         "variant",
         "weight",
         "stretch",
-        ["size", LengthMath.s2s],
+        ["size", WellKnownFunc.Length],
         ["lineHeight", null, "/"],
         "family"
     ]);
@@ -608,7 +496,7 @@ function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>):
             if (v.length === 0)
                 return "";
             else if (typeof v[0] === "function")
-                return arr2str( v);
+                return a2s( v);
             else
                 return createGridTemplateAreasFromDefinitions(v);
         }
@@ -673,8 +561,8 @@ function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definiti
 export function gridTrackToString( val: GridTrack): string
 {
     return v2s( val, {
-        fromNumber: v => LengthMath.s2s( v),
-        fromArray: v => `[${arr2str(v)}]`
+        fromNumber: WellKnownFunc.Length,
+        fromArray: v => `[${a2s(v)}]`
     });
 }
 
@@ -683,7 +571,7 @@ export function gridTrackToString( val: GridTrack): string
 function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
 {
     return v2s( val, {
-        fromNumber: v => LengthMath.s2s( v),
+        fromNumber: WellKnownFunc.Length,
         arrItemFunc: gridTrackToString
     });
 }
@@ -693,7 +581,7 @@ function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
 function markerStyleToString( val: Extended<Marker_StyleType>): string
 {
     return v2s( val, {
-        fromObj: v => `url(#${(val as IIDRule).name})`
+        fromObj: v => `url(#${(v as IIDRule).name})`
     });
 }
 
@@ -702,7 +590,7 @@ function markerStyleToString( val: Extended<Marker_StyleType>): string
 function rotateToString( val:Rotate_StyleType): string
 {
     return v2s( val, {
-        fromNumber: AngleMath.s2s,
+        fromNumber: WellKnownFunc.Angle,
         fromArray: v => {
             if (v.length === 2)
                 return `${v[0]} ${AngleMath.s2s(v[1])}`;
@@ -718,7 +606,7 @@ function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): st
         "line",
         "style",
         ["color", colorToString],
-        ["thickness", LengthMath.s2s],
+        ["thickness", WellKnownFunc.Length],
     ]);
 }
 
@@ -728,9 +616,9 @@ function singleTransition_fromObject( val: Extended<Transition_Single>): string
 {
     return styleObj2String( val, [
         ["property", camelToDash],
-        ["duration", TimeMath.s2s],
+        ["duration", WellKnownFunc.Time],
         ["func", singleTimingFunction_fromStyle],
-        ["delay", TimeMath.s2s]
+        ["delay", WellKnownFunc.Time]
     ]);
 }
 
@@ -992,7 +880,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         : typeof info === "object"
             ? v2s( varValue, info as IValueConvertOptions)
             : typeof info === "number"
-                ? valueToStringByWellKnownFunc( varValue, info)
+                ? v2sByFuncID( varValue, info)
                 : (info as ToStringFunc)( varValue);
 
     if (!stringValue && !valueOnly)
@@ -1065,6 +953,15 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: ToStrin
     }
 }
 
+
+
+// Register frequently used conversion functions
+let singleCornerRadiusFuncID = registerV2SFuncID( singleCornerRadiusToString);
+let borderFuncID = registerV2SFuncID( borderToString);
+let gridAxisFuncID = registerV2SFuncID( gridAxisToString);
+
+
+
 /**
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
@@ -1094,59 +991,59 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     backgroundAttachment: WellKnownFunc.ArrayWithComma,
     backgroundBlendMode: WellKnownFunc.ArrayWithComma,
     backgroundClip: WellKnownFunc.ArrayWithComma,
-    backgroundColor: WellKnownFunc.Color,
+    backgroundColor: colorFuncID,
     backgroundImage: WellKnownFunc.ArrayWithComma,
     backgroundOrigin: WellKnownFunc.ArrayWithComma,
-    backgroundPosition: v => multiPos2str( v, ","),
-    backgroundPositionX: v => multiPos2str( v, ","),
-    backgroundPositionY: v => multiPos2str( v, ","),
+    backgroundPosition: WellKnownFunc.MultiPositionWithComman,
+    backgroundPositionX: WellKnownFunc.MultiPositionWithComman,
+    backgroundPositionY: WellKnownFunc.MultiPositionWithComman,
     backgroundRepeat: WellKnownFunc.ArrayWithComma,
     backgroundSize: {
-        fromNumber: LengthMath.s2s,
+        fromNumber: WellKnownFunc.Length,
         arrItemFunc: singleBackgroundSize_fromStyle,
         arrSep: ","
     },
     baselineShift: WellKnownFunc.Length,
     blockSize: WellKnownFunc.Length,
-    border: WellKnownFunc.Border,
-    borderBlock: WellKnownFunc.Border,
-    borderBlockEnd: WellKnownFunc.Border,
-    borderBlockEndColor: WellKnownFunc.Color,
+    border: borderFuncID,
+    borderBlock: borderFuncID,
+    borderBlockEnd: borderFuncID,
+    borderBlockEndColor: colorFuncID,
     borderBlockEndWidth: WellKnownFunc.Length,
-    borderBlockStart: WellKnownFunc.Border,
-    borderBlockStartColor: WellKnownFunc.Color,
+    borderBlockStart: borderFuncID,
+    borderBlockStartColor: colorFuncID,
     borderBlockStartWidth: WellKnownFunc.Length,
-    borderBottom: WellKnownFunc.Border,
-    borderBottomColor: WellKnownFunc.Color,
-    borderBottomLeftRadius: WellKnownFunc.CornerRadius,
-    borderBottomRightRadius: WellKnownFunc.CornerRadius,
+    borderBottom: borderFuncID,
+    borderBottomColor: colorFuncID,
+    borderBottomLeftRadius: singleCornerRadiusFuncID,
+    borderBottomRightRadius: singleCornerRadiusFuncID,
     borderBottomWidth: WellKnownFunc.Length,
     borderColor: {
-        fromAny: colorToString
+        fromAny: colorFuncID
     },
     borderImage: {
         fromObj: borderImageToString,
     },
     borderImageSlice: borderImageSliceToString,
-    borderInline: WellKnownFunc.Border,
-    borderInlineEnd: WellKnownFunc.Border,
-    borderInlineEndColor: WellKnownFunc.Color,
+    borderInline: borderFuncID,
+    borderInlineEnd: borderFuncID,
+    borderInlineEndColor: colorFuncID,
     borderInlineEndWidth: WellKnownFunc.Length,
-    borderInlineStart: WellKnownFunc.Border,
-    borderInlineStartColor: WellKnownFunc.Color,
+    borderInlineStart: borderFuncID,
+    borderInlineStartColor: colorFuncID,
     borderInlineStartWidth: WellKnownFunc.Length,
-    borderLeft: WellKnownFunc.Border,
-    borderLeftColor: WellKnownFunc.Color,
+    borderLeft: borderFuncID,
+    borderLeftColor: colorFuncID,
     borderLeftWidth: WellKnownFunc.Length,
     borderRadius: borderRadiusToString,
-    borderRight: WellKnownFunc.Border,
-    borderRightColor: WellKnownFunc.Color,
+    borderRight: borderFuncID,
+    borderRightColor: colorFuncID,
     borderRightWidth: WellKnownFunc.Length,
     borderSpacing: WellKnownFunc.MultiLengthWithSpace,
-    borderTop: WellKnownFunc.Border,
-    borderTopColor: WellKnownFunc.Color,
-    borderTopLeftRadius: WellKnownFunc.CornerRadius,
-    borderTopRightRadius: WellKnownFunc.CornerRadius,
+    borderTop: borderFuncID,
+    borderTopColor: colorFuncID,
+    borderTopLeftRadius: singleCornerRadiusFuncID,
+    borderTopRightRadius: singleCornerRadiusFuncID,
     borderTopWidth: WellKnownFunc.Length,
     borderWidth: WellKnownFunc.MultiLengthWithSpace,
     bottom: WellKnownFunc.Length,
@@ -1155,27 +1052,27 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
         arrSep: ",",
     },
 
-    caretColor: WellKnownFunc.Color,
+    caretColor: colorFuncID,
     clip:  {
-        fromArray: v => `rect(${multiLengthToStringWithSpace(v)}`
+        fromArray: v => `rect(${LengthMath.ms2s(v," ")}`
     },
-    color: WellKnownFunc.Color,
+    color: colorFuncID,
     columnGap: WellKnownFunc.Length,
-    columnRule: WellKnownFunc.Border,
-    columnRuleColor: WellKnownFunc.Color,
+    columnRule: borderFuncID,
+    columnRuleColor: colorFuncID,
     columnRuleWidth: WellKnownFunc.MultiLengthWithSpace,
     columns: columnsToString,
     columnWidth: WellKnownFunc.Length,
     cursor: cursorToString,
 
-    fill: WellKnownFunc.Color,
+    fill: colorFuncID,
     fillOpacity: PercentMath.s2s,
     filter: {
         fromAny: filter_fromObject,
     },
     flex: flexToString,
     flexBasis: WellKnownFunc.Length,
-    floodColor: WellKnownFunc.Color,
+    floodColor: colorFuncID,
     font: {
         fromObj: font_fromObject
     },
@@ -1187,13 +1084,13 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     gridGap: WellKnownFunc.MultiLengthWithSpace,
     gridRowGap: WellKnownFunc.Length,
     gridArea: WellKnownFunc.ArrayWithSlash,
-    gridAutoColumns: WellKnownFunc.GridAxis,
-    gridAutoRows: WellKnownFunc.GridAxis,
+    gridAutoColumns: gridAxisFuncID,
+    gridAutoRows: gridAxisFuncID,
     gridColumn: WellKnownFunc.ArrayWithSlash,
     gridRow: WellKnownFunc.ArrayWithSlash,
     gridTemplateAreas: gridTemplateAreasToString,
-    gridTemplateColumns: WellKnownFunc.GridAxis,
-    gridTemplateRows: WellKnownFunc.GridAxis,
+    gridTemplateColumns: gridAxisFuncID,
+    gridTemplateRows: gridAxisFuncID,
 
     height: WellKnownFunc.Length,
 
@@ -1201,7 +1098,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
 
     left: WellKnownFunc.Length,
     letterSpacing: WellKnownFunc.Length,
-    lightingColor: WellKnownFunc.Color,
+    lightingColor: colorFuncID,
 
     margin: WellKnownFunc.MultiLengthWithSpace,
     marginBlock: WellKnownFunc.MultiLengthWithSpace,
@@ -1232,10 +1129,10 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     offsetDistance: WellKnownFunc.Length,
     offsetPosition: WellKnownFunc.Position,
     offsetRotate: {
-        fromAny: AngleMath.s2s
+        fromAny: WellKnownFunc.Angle
     },
-    outline: WellKnownFunc.Border,
-    outlineColor: WellKnownFunc.Color,
+    outline: borderFuncID,
+    outlineColor: colorFuncID,
     outlineOffset: WellKnownFunc.Length,
 
     padding: WellKnownFunc.MultiLengthWithSpace,
@@ -1251,7 +1148,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     paddingTop: WellKnownFunc.Length,
     perspective: WellKnownFunc.Length,
     perspectiveOrigin: {
-        fromAny: LengthMath.s2s
+        fromAny: WellKnownFunc.Length
     },
 
     quotes: {
@@ -1263,7 +1160,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     rowGap: WellKnownFunc.Length,
 
     scrollbarColor: {
-        arrItemFunc: colorToString
+        arrItemFunc: colorFuncID
     },
     scrollMargin: WellKnownFunc.MultiLengthWithSpace,
     scrollMarginBlock: WellKnownFunc.MultiLengthWithSpace,
@@ -1288,37 +1185,37 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     scrollPaddingRight: WellKnownFunc.Length,
     scrollPaddingTop: WellKnownFunc.Length,
     shapeMargin: WellKnownFunc.Length,
-    stopColor: WellKnownFunc.Color,
-    stroke: WellKnownFunc.Color,
+    stopColor: colorFuncID,
+    stroke: colorFuncID,
 
     tabSize: WellKnownFunc.Length,
     textCombineUpright: {
         fromNumber: v => `digits ${v}`
     },
     textDecoration: {
-        fromNumber: colorToString,
+        fromNumber: colorFuncID,
         fromObj: textDecoration_fromObject
     },
-    textDecorationColor: WellKnownFunc.Color,
+    textDecorationColor: colorFuncID,
     textDecorationThickness: WellKnownFunc.Length,
     textEmphasis: {
-        fromAny: colorToString
+        fromAny: colorFuncID
     },
-    textEmphasisColor: WellKnownFunc.Color,
+    textEmphasisColor: colorFuncID,
     textIndent: {
-        fromAny: LengthMath.s2s
+        fromAny: WellKnownFunc.Length
     },
     textShadow: {
         fromObj: singleBoxShadow_fromObject,
         arrSep: ",",
     },
-    textSizeAdjust: PercentMath.s2s,
+    textSizeAdjust: WellKnownFunc.Percent,
     top: WellKnownFunc.Length,
     transform: {
         fromAny: transform_fromObject
     },
     transformOrigin: {
-        fromAny: LengthMath.s2s
+        fromAny: WellKnownFunc.Length
     },
     transition: {
         fromObj: singleTransition_fromObject,
@@ -1329,7 +1226,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     transitionDuration: WellKnownFunc.MultiTimeWithComma,
     transitionTimingFunction: timingFunctionToString,
     translate: {
-        fromAny: LengthMath.s2s
+        fromAny: WellKnownFunc.Length
     },
 
     verticalAlign: WellKnownFunc.Length,
@@ -1340,18 +1237,18 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     },
     wordSpacing: WellKnownFunc.Length,
 
-    zoom: PercentMath.s2s,
+    zoom: WellKnownFunc.Percent,
 
     // special properties for IVarRule types
     CssLength: WellKnownFunc.Length,
-    CssAngle: AngleMath.s2s,
-    CssTime: TimeMath.s2s,
+    CssAngle: WellKnownFunc.Angle,
+    CssTime: WellKnownFunc.Time,
     CssResolution: ResolutionMath.s2s,
     CssFrequency: FrequencyMath.s2s,
-    CssPercent: PercentMath.s2s,
+    CssPercent: WellKnownFunc.Percent,
     CssPosition: WellKnownFunc.Position,
-    CssRadius: WellKnownFunc.CornerRadius,
-    CssColor: WellKnownFunc.Color,
+    CssRadius: singleCornerRadiusFuncID,
+    CssColor: colorFuncID,
 };
 
 

@@ -59,26 +59,26 @@ export interface IValueConvertOptions
     fromNull?: string | ((val: null | undefined) => string);
 
     // Called if value is a string. This allows transforming one string to another.
-    fromString?: ( val: string) => string;
+    fromString?: number | (( val: string) => string);
 
     // Called if value is a boolean
-    fromBool?: (val: boolean) => string;
+    fromBool?: number | ((val: boolean) => string);
 
     // Called if value is a number
-    fromNumber?: (val: number) => string;
+    fromNumber?: number | ((val: number) => string);
 
     // Called if value is an array
-    fromArray?: (val: any[]) => string;
+    fromArray?: number | ((val: any[]) => string);
 
     // Called if value is an object
-    fromObj?: (val: any) => string;
+    fromObj?: number | ((val: any) => string);
 
     // Called if type-specific function is not defined except for null and string values. This is
     // also used for array elements if arrItemFunc is not defined.
-    fromAny?: (val: any) => string;
+    fromAny?: number | ((val: any) => string);
 
     // Called to convert array items if fromArray is not defined
-    arrItemFunc?: (v: any) => string;
+    arrItemFunc?: number | ((v: any) => string);
 
     // Separator for array items - used only if fromArray is not defined
     arrSep?: string;
@@ -107,7 +107,7 @@ export function v2s( val: any, options?: IValueConvertOptions): string
         else if (typeof val === "string")
             return val;
         else if (Array.isArray(val))
-            return arr2str( val);
+            return a2s( val);
         else if (typeof val === "function")
             return val();
         else if (typeof val[symValueToString] === "function")
@@ -119,41 +119,39 @@ export function v2s( val: any, options?: IValueConvertOptions): string
     {
         // processing with options. For all types except null and string, if the type-specific
         // function is not defined, call fromAny if defined.
+        let func: number | ToStringFunc | undefined = undefined;
+
         if (val == null)
             return options.fromNull ? typeof options.fromNull === "string" ? options.fromNull : options.fromNull( val) : "";
         else if (typeof val === "string")
-            return options.fromString ? options.fromString( val) : val;
+            func = options.fromString;
         else if (typeof val === "number")
-            return options.fromNumber ? options.fromNumber( val) : options.fromAny ? options.fromAny( val) : val.toString();
+            func = options.fromNumber || options.fromAny;
         else if (typeof val === "function")
             return v2s( options.funcArgs ? val( ...options.funcArgs) : val());
         else if (Array.isArray(val))
         {
             if (options.fromArray)
-                return options.fromArray( val);
+                func = options.fromArray;
             else
             {
                 let separator = options.arrSep != null ? options.arrSep : " ";
-                return arr2str( val, options.arrItemFunc || options.fromAny || undefined, separator);
+                return a2s( val, options.arrItemFunc || options.fromAny, separator);
             }
         }
         else if (typeof val === "object")
         {
             if (typeof val[symValueToString] === "function")
                 return val[symValueToString]();
-            else if (options.fromObj)
-                return options.fromObj( val);
-            else if (options.fromAny)
-                return options.fromAny( val);
             else
-                return val.toString();
+                func = options.fromObj || options.fromAny;
         }
         else if (typeof val === "boolean")
-            return options.fromBool ? options.fromBool( val) : options.fromAny ? options.fromAny( val) : val.toString();
-        else if (options.fromAny)
-            return options.fromAny( val);
+            func = options.fromBool || options.fromAny;
         else
-            return val.toString();
+            func = options.fromAny;
+
+        return typeof func === "number" ? v2sByFuncID( val, func) : func ? func( val) : val.toString();
     }
 }
 
@@ -163,11 +161,13 @@ export function v2s( val: any, options?: IValueConvertOptions): string
  * Converts an array of the given typeto a single string using the given separator.
  * Elements of the array are converted to strings using the given function.
  */
-export function arr2str( val: any[], func?: (v) => string, separator: string = " "): string
+export function a2s( val: any[], func?: number | ((v) => string), separator: string = " "): string
 {
     return !val || val.length === 0
         ? ""
-        : val.filter( x => x != null).map( y => func ? func(y) : v2s( y)).join( separator);
+        : val.filter( v => v != null).map(
+            v => typeof func === "number" ? v2sByFuncID( v, func) : func ? func(v) : v2s( v)
+        ).join( separator);
 }
 
 
@@ -196,7 +196,7 @@ export type ToStringFunc = (val: any) => string;
  * The order of the names determines in which order the properties should be added to the string.
  */
  export function obj2str( val: any,
-    info: (string | [string, null | ToStringFunc, string?] )[],
+    info: (string | [string, null | number | ToStringFunc, string?] )[],
     separator: string = " "): string
 {
     if (val == null)
@@ -205,14 +205,14 @@ export type ToStringFunc = (val: any) => string;
         return val.toString();
 
     let buf: (string)[] = [];
-    info.forEach( nameOrTuple =>
+    for( let nameOrTuple of info)
     {
         // get the name of the property in the value to be converted and the corresponding value;
         // if the properties value is not defined, skip it.
         let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
         let propVal = val[propName];
         if (propVal == null)
-            return;
+            continue;
 
         // check whether we have a prefix
         let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
@@ -222,9 +222,11 @@ export type ToStringFunc = (val: any) => string;
         let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
         if (!convertor)
             buf.push( v2s( propVal));
+        else if (typeof convertor === "number")
+            buf.push( v2sByFuncID( propVal, convertor));
         else
             buf.push( convertor( propVal));
-    });
+    }
 
 	return buf.join(separator);
 }
@@ -580,21 +582,91 @@ export class FrequencyMath extends NumberBaseMath<CssFrequency, FrequencyUnits, 
  */
 export function pos2str( val: Extended<CssPosition>): string
 {
-    return v2s( val, {
-        fromNumber: LengthMath.s2s,
-        fromArray: v => LengthMath.ms2s( v, " ")
-    });
+    return v2s( val, { fromAny: WellKnownFunc.Length });
 }
 
 /**
  * Converts multi-position style value to the CSS string.
  */
-export function multiPos2str( val: Extended<OneOrMany<CssPosition>>, separator: string): string
+function multiPos2str( val: Extended<OneOrMany<CssPosition>>, separator: string): string
 {
     return v2s( val, {
-        arrItemFunc: pos2str,
+        arrItemFunc: WellKnownFunc.Position,
         arrSep: separator
     });
+}
+
+
+
+/**
+ * Numeric identifiers corresponding to well known functions used to convert style property values
+ * to strings. This is used to reduce the size of the object used for mapping style properties to
+ * conversion functions.
+ */
+export const enum WellKnownFunc
+{
+    Number = 1,
+    Percent,
+    Length,
+    Angle,
+    Time,
+    Position,
+    MultiPositionWithComman,
+    MultiLengthWithSpace,
+    MultiTimeWithComma,
+    ArrayWithComma,
+    ArrayWithSlash,
+    UnitlessOrPercent,
+}
+
+
+
+// Map of function IDs to functions that convert a value to string
+let registeredToStringFuncs = new Map<number,ToStringFunc>([
+    [WellKnownFunc.Number, NumberMath.s2s],
+    [WellKnownFunc.Percent, PercentMath.s2s],
+    [WellKnownFunc.Length, LengthMath.s2s],
+    [WellKnownFunc.Angle, AngleMath.s2s],
+    [WellKnownFunc.Time, TimeMath.s2s],
+    [WellKnownFunc.Position, pos2str],
+    [WellKnownFunc.MultiPositionWithComman, val => multiPos2str( val, ",")],
+    [WellKnownFunc.MultiLengthWithSpace, val => LengthMath.ms2s( val, " ")],
+    [WellKnownFunc.MultiTimeWithComma, val => LengthMath.ms2s( val, ",")],
+    [WellKnownFunc.ArrayWithComma, val => v2s( val, { arrSep: "," })],
+    [WellKnownFunc.ArrayWithSlash, val => v2s( val, { arrSep: "/" })],
+    [WellKnownFunc.UnitlessOrPercent, unitlessOrPercentToString],
+]);
+
+
+
+// Next identifier for registering a function that converts a value to string.
+let nextRegisteredFuncID = 1000;
+
+
+
+/**
+ * Registers the given function so that it can be used for converting a value to string using
+ * the v2sByFuncID function.
+ */
+export function registerV2SFuncID( func: ToStringFunc): number
+{
+    let funcID = nextRegisteredFuncID++;
+    registeredToStringFuncs.set( funcID, func);
+    return funcID;
+}
+
+
+
+/**
+ * Converts the given value to string using a registered conversion function indicated by the
+ * given function ID.
+ * @param val Value to convert
+ * @param funcID ID of the previously registered conversion function
+ */
+export function v2sByFuncID( val: any, funcID: number): string
+{
+    let func = registeredToStringFuncs.get( funcID);
+    return func ? func(val) : "";
 }
 
 
