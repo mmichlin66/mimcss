@@ -1,20 +1,4 @@
-﻿/**
- * This module describes common types and functions used in Mimcss. These include:
- *
- * - basic types used for all style properties
- * - numeric types used for style properties of CSS types such as `<length>`, `<angle>`, etc.
- * - pseudo classes and pseudo elements
- * - selectors
- * - colors
- * - shapes
- * - filters
- * - transforms
- * - utility types
- */
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Basic types.
 //

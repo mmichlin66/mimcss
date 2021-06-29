@@ -9,7 +9,8 @@ import {CssSelector, PagePseudoClass} from "./CoreTypes";
 import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
-    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule
+    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
+    IConstRule, ClassPropType, ICssSerializer, IScheduler
 } from "./RuleTypes";
 import {MediaQuery, SupportsQuery} from "./MediaTypes"
 import {IFontFace} from "./FontFaceTypes";
@@ -24,6 +25,10 @@ import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {v2s} from "../impl/CoreFuncs";
 import {IRuleSerializationContext} from "../rules/Rule";
+import {
+    IActivator, s_getDefaultSchedulerType, s_registerScheduler, s_scheduleCall,
+    s_setDefaultSchedulerType, s_unregisterScheduler
+} from "../rules/Scheduling";
 
 
 
@@ -666,11 +671,6 @@ export function enableShortNames( enable: boolean, prefix?: string): void
 
 
 /**
- * Type for defining the class property of HTML elements.
- */
-export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType[];
-
-/**
  * Concatenates the names of the given classes into a single string that can be assigned to a
  * `class` property of an HTML element.
  * @param classProps
@@ -711,29 +711,114 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Style definition serialization.
+// Scheduling.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The ICssSerializer interface allows adding style definition classes and objects
- * and serializing them to a single string. This can be used for server-side rendering when
- * the resultant string can be set as the content of a `<style>` element.
+ * Activates the given style definition class or instance and inserts all its rules into DOM. If
+ * the input object is not an instance but a class, which is not yet associated with an instance,
+ * the instance is first created and processed. Note that each style definition instance maintains
+ * a reference counter of how many times it was activated and deactivated. The rules are inserted
+ * into DOM only upon first activation.
  */
-export interface ICssSerializer
+ export function activate<T extends StyleDefinition>(
+	instanceOrClass: T | IStyleDefinitionClass<T>,
+	schedulerType?: number): T | null
 {
-    /**
-     * Adds style definition class or instance.
-     */
-    add( instOrClass: StyleDefinition | IStyleDefinitionClass): void;
+	let instance = processInstanceOrClass( instanceOrClass) as T;
+	if (instance)
+		s_scheduleCall( (activator: IActivator) => activator.activate( instance), schedulerType);
 
-    /**
-     * Returns concatenated string representation of all CSS rules added to the context.
-     */
-    serialize(): string;
+	return instance;
 }
 
 
+
+/**
+ * Deactivates the given style definition instance by removing its rules from DOM. Note that each
+ * style definition instance maintains a reference counter of how many times it was activated and
+ * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
+ */
+export function deactivate( instance: StyleDefinition, schedulerType?: number): void
+{
+	s_scheduleCall( (activator: IActivator) => activator.deactivate( instance), schedulerType);
+}
+
+
+
+/**
+ * Writes to DOM all style changes caused by the calls to the activate and deactivate functions
+ * accumulated since the last activation of the given scheduling type.
+ */
+export function forceDOMUpdate( schedulerType?: number): void
+{
+	s_scheduleCall( (activator: IActivator) => activator.forceDOMUpdate(), schedulerType);
+}
+
+
+
+/**
+ * Removes all scheduled activations caused by the calls to the activate and deactivate functions
+ * accumulated since the last activation of the given scheduling type.
+ */
+export function cancelDOMUpdate( schedulerType?: number): void
+{
+	s_scheduleCall( (activator: IActivator) => activator.cancelDOMUpdate(), schedulerType);
+}
+
+
+
+/**
+ * Sets the default scheduler type that is used by activate and deactivate functions that are
+ * called without explicitly providing value to the scheduler type parameter. Returns the type of
+ * the previous default scheduler or 0 if an error occurs (e.g. the given scheduler type ID is not
+ * registered).
+ */
+export function setDefaultSchedulerType( schedulerType: number): number
+{
+	return s_setDefaultSchedulerType( schedulerType);
+}
+
+
+
+/**
+ * Returns the default scheduler type that is used by activate and deactivate functions that are
+ * called without explicitly providing value to the scheduler type parameter.
+ */
+export function getDefaultSchedulerType(): number
+{
+	return s_getDefaultSchedulerType();
+}
+
+
+
+/**
+ * Registers the given scheduler object and returns the scheduler type identifier, which
+ * should be used when calling activate and deactivate functions.
+ */
+export function registerScheduler( scheduler: IScheduler): number
+{
+    return s_registerScheduler( scheduler);
+}
+
+
+
+/**
+ * Unregisters a scheduler object with the given scheduler type identifier.
+ */
+export function unregisterScheduler( id: number): void
+{
+    return s_unregisterScheduler( id);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Style definition serialization.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Creates a new ICssSerializer object that allows adding style definition classes
@@ -994,4 +1079,10 @@ class VirtHandler implements ProxyHandler<any>
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Scheduling.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
 

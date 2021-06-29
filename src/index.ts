@@ -12,4 +12,3 @@ export * from "./api/ExtraAPI";
 export * from "./api/MediaAPI";
 export * from "./api/RuleAPI";
 export * from "./api/StyleAPI";
-export * from "./api/SchedulingAPI";

@@ -178,6 +178,13 @@ export interface IClassNameRule extends INamedEntity, IRuleWithSelector
 
 
 /**
+ * Type for defining the class property of HTML elements.
+ */
+export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType[];
+
+
+
+/**
  * The IIDRule interface represents a style rule where the selector is a single element ID.
  */
 export interface IIDRule extends INamedStyleRule
@@ -525,6 +532,12 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Scheduling.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * The SchedulerType enumeration provides values used to define how the calls to the
  * activate and deactivate functions schedule the writing of style changes to the DOM.
@@ -574,3 +587,32 @@ export interface IScheduler
 	 */
 	cancelDOMUpdate(): void;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Serialization.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The ICssSerializer interface allows adding style definition classes and objects
+ * and serializing them to a single string. This can be used for server-side rendering when
+ * the resultant string can be set as the content of a `<style>` element.
+ */
+ export interface ICssSerializer
+ {
+     /**
+      * Adds style definition class or instance.
+      */
+     add( instOrClass: StyleDefinition | IStyleDefinitionClass): void;
+
+     /**
+      * Returns concatenated string representation of all CSS rules added to the context.
+      */
+     serialize(): string;
+ }
+
+
+
