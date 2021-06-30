@@ -1,10 +1,13 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, CssTime, CssLength, CssAngle,
-    CssPercent, CssFrequency, CssResolution, CssRadius, IUrlProxy, HorizontalPositionKeyword,
+    CssPercent, CssFrequency, CssResolution, CssRadius, HorizontalPositionKeyword,
     VerticalPositionKeyword, CssPoint, ExtendedProp, IQuotedProxy,
     GeometryBoxKeyword, IFitContentProxy, ILengthProxy, CssSize, CssAspectRatio
 } from "./CoreTypes"
-import {BasicShape, CssColor, CssImage, FilterFunc, IMinMaxProxy, IRayProxy, IRepeatProxy, ISpanProxy, TransformFunc} from "./ExtraTypes";
+import {
+    IUrlFunc, BasicShape, CssColor, CssImage, FilterFunc, IMinMaxProxy, IRepeatProxy,
+    ISpanProxy, TransformFunc, IRayFunc
+} from "./ExtraTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
 
@@ -421,7 +424,7 @@ export type Clip_StyleType = "auto" | OneOrBox<CssLength>;
 
 
 /** Type for clip-path style property */
-export type ClipPath_StyleType = "none" | IUrlProxy | BasicShape | GeometryBoxKeyword |
+export type ClipPath_StyleType = "none" | IUrlFunc | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -500,7 +503,7 @@ export type Cursor_Keyword = "auto" | "default" | "none" | "context-menu" | "hel
     "zoom-out" | "grab" | "grabbing";
 
 /** Type for cursor style property single value */
-export type Cursor_Single = Cursor_Keyword | IUrlProxy | [IUrlProxy, Extended<CssNumber>, Extended<CssNumber>];
+export type Cursor_Single = Cursor_Keyword | IUrlFunc | [IUrlFunc, Extended<CssNumber>, Extended<CssNumber>];
 
 /** Type for cursor style property */
 export type Cursor_StyleType = OneOrMany<Cursor_Single>;
@@ -541,7 +544,7 @@ export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 /** Type for filter and backdrop-filter style single value */
-export type Filter_Single = IUrlProxy | FilterFunc;
+export type Filter_Single = IUrlFunc | FilterFunc;
 
 /** Type for filter and backdrop-filter style property */
 export type Filter_StyleType = OneOrMany<Filter_Single>;
@@ -778,7 +781,7 @@ export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_St
 
 
 /** Type for line-style-image style property */
-export type ListStyleImage_StyleType = "none" | IUrlProxy;
+export type ListStyleImage_StyleType = "none" | IUrlFunc;
 
 
 
@@ -833,7 +836,7 @@ export type OffsetAnchor_StyleType = "auto" | CssPosition;
 
 
 /** Type for offset-path style property */
-export type OffsetPath_StyleType = "none" | IRayProxy | IUrlProxy | BasicShape | GeometryBoxKeyword |
+export type OffsetPath_StyleType = "none" | IRayFunc | IUrlFunc | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -975,7 +978,7 @@ export type ScrollSnapType_StyleType = "none" |
 
 
 /** Type for shape-outside style property */
-export type ShapeOutside_StyleType = IUrlProxy | BasicShape | GeometryBoxKeyword | CssImage;
+export type ShapeOutside_StyleType = IUrlFunc | BasicShape | GeometryBoxKeyword | CssImage;
 
 
 

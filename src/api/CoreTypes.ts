@@ -665,7 +665,7 @@ export interface IAspectRatioProxy extends IGenericProxy<"aspect-ratio"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IRuleWithSelector interface represents an entity that has a selector string..
+ * The IRuleWithSelector interface represents an entity that has a selector string.
  */
 export interface IRuleWithSelector
 {
@@ -780,14 +780,21 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// URLs.
+// CSS function invocations.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IUrlProxy function represents an invocation of the CSS url() function.
+ * The ICssFuncInvocation serves as a base for interfaces that represent CSS function invocations.
+ * This interface defines the `fn` property of the given string-based template type. This type
+ * indicates the function name. The rest of the properties in the derived classes contain values of
+ * function parameters.
  */
-export interface IUrlProxy extends IGenericProxy<"url"> {};
+export interface ICssFuncInvocation<T extends string>
+{
+    /** Name of the CSS function */
+    fn: T;
+};
 
 
 

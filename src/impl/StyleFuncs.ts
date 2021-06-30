@@ -7,17 +7,11 @@ import {
     Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType, Transition_Single, Offset_StyleType,
     Styleset, CustomVar_StyleType, VarTemplateName,
 } from "../api/StyleTypes";
-import {
-    IFilterBlur, IFilterDropShadow, IFilterHueRotate, IFilterPercent, ITransformMatrix,
-    ITransformMatrix3d, ITransformPerspective, ITransformRotate1d, ITransformRotate3d,
-    ITransformScale1d, ITransformScale3d, ITransformSkew1d, ITransformSkew2d,
-    ITransformTranslate1d, ITransformTranslate3d
-} from "../api/ExtraTypes";
 import {IIDRule} from "../api/RuleTypes";
 import {
     v2s, a2s, LengthMath, AngleMath, camelToDash, dashToCamel, IValueConvertOptions,
     PercentMath, ResolutionMath, FrequencyMath, ToStringFunc, v2sByFuncID, WellKnownFunc,
-    registerV2SFuncID, obj2str, registerV2PFunc, paramsToStrings
+    registerV2SFuncID, obj2str
 } from "./CoreFuncs";
 import {colorToString} from "./ExtraFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -1125,58 +1119,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     CssRadius: singleCornerRadiusFuncID,
     CssColor: colorFuncID,
 };
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Registration of function converting parameters of CSS functions.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Transform functions
-registerV2PFunc( "matrix", (val: ITransformMatrix) =>
-    paramsToStrings( val, ["a","b","c","d","tx","ty"]));
-registerV2PFunc( "matrix3d", (val: ITransformMatrix3d) =>
-    paramsToStrings( val, ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"]));
-
-registerV2PFunc( "perspective", (val: ITransformPerspective) =>
-    paramsToStrings( val, [["d", WellKnownFunc.Length]]));
-
-registerV2PFunc( ["rotate", "rotateX", "rotateY", "rotateZ"], (val: ITransformRotate1d) =>
-    paramsToStrings( val, [["a", WellKnownFunc.Angle]]));
-registerV2PFunc( "rotate3d", (val: ITransformRotate3d) =>
-    paramsToStrings( val, [ "x", "y", "z", ["a", WellKnownFunc.Angle] ]));
-
-registerV2PFunc( ["scale", "scaleX", "scaleY", "scaleZ"], (val: ITransformScale1d) =>
-    paramsToStrings( val, ["s"]));
-registerV2PFunc( ["scale", "scale3d"], (val: ITransformScale3d) =>
-    paramsToStrings( val, ["sx", "sy", "sz"]));
-
-registerV2PFunc( ["skewX", "skewY"], (val: ITransformSkew1d) =>
-    paramsToStrings( val, [["a", WellKnownFunc.Angle]]));
-registerV2PFunc( "skewd", (val: ITransformSkew2d) =>
-    paramsToStrings( val, [ ["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle] ]));
-
-registerV2PFunc( ["translate", "translateX", "translateY", "translateZ"], (val: ITransformTranslate1d) =>
-    paramsToStrings( val, [["d", WellKnownFunc.Length]]));
-registerV2PFunc( ["translate", "translate3d"], (val: ITransformTranslate3d) =>
-    paramsToStrings( val, [ ["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length] ]));
-
-
-
-// Filter functions
-registerV2PFunc( ["brightness", "contrast", "grayscale", "invert", "opacity", "saturate", "sepia"], (val: IFilterPercent) =>
-    paramsToStrings( val, [["p", WellKnownFunc.Percent]]));
-
-registerV2PFunc( "blur", (val: IFilterBlur) =>
-    paramsToStrings( val, [["r", WellKnownFunc.Length]]));
-
-registerV2PFunc( "drop-shadow", (val: IFilterDropShadow) =>
-    paramsToStrings( val, [ ["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["blur", WellKnownFunc.Length],["color", colorToString]]));
-
-registerV2PFunc( "hue-rotate", (val: IFilterHueRotate) =>
-    paramsToStrings( val, [["a", WellKnownFunc.Angle]]));
 
 
 

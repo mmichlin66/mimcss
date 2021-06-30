@@ -1,6 +1,6 @@
-﻿import {CssColor, INamedColors} from "../api/ExtraTypes";
+﻿import {CssColor, INamedColors, IRayFunc} from "../api/ExtraTypes";
 import {Extended, CssAngle} from "../api/CoreTypes"
-import {AngleMath, v2s} from "./CoreFuncs"
+import {AngleMath, LengthMath, registerV2PFuncs, v2s, WellKnownFunc} from "./CoreFuncs"
 
 
 
@@ -430,6 +430,54 @@ export function colorToString( val: Extended<CssColor>): string
         fromNumber: colorNumberToString
     });
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Registration of function converting parameters of CSS functions.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Transform functions
+registerV2PFuncs(
+    ["matrix", ["a","b","c","d","tx","ty"]],
+    ["matrix3d", ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"]],
+    ["perspective", [["d", WellKnownFunc.Length]]],
+    [["rotate", "rotateX", "rotateY", "rotateZ"], [["a", WellKnownFunc.Angle]]],
+    ["rotate3d", [ "x", "y", "z", ["a", WellKnownFunc.Angle]]],
+    [["scale", "scaleX", "scaleY", "scaleZ"], ["s"]],
+    [["scale", "scale3d"], ["sx", "sy", "sz"]],
+    [["skewX", "skewY"], [["a", WellKnownFunc.Angle]]],
+    ["skewd", [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]]],
+    [["translate", "translateX", "translateY", "translateZ"], [["d", WellKnownFunc.Length]]],
+    [["translate", "translate3d"], [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]]],
+);
+
+
+
+// Filter functions
+registerV2PFuncs(
+    [["brightness", "contrast", "grayscale", "invert", "opacity", "saturate", "sepia"], [["p", WellKnownFunc.Percent]]],
+    ["blur", [["r", WellKnownFunc.Length]]],
+    ["drop-shadow", [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["blur", WellKnownFunc.Length], ["color", colorToString]]],
+    ["hue-rotate", [["a", WellKnownFunc.Angle]]],
+);
+
+
+
+// URL functions
+registerV2PFuncs(
+    ["url", ["p"]],
+    [
+        "ray", (v: IRayFunc) => {
+            let angleString = AngleMath.s2s( v.angle);
+            let sizeString = v.size != null ? " " + LengthMath.s2s( v.size) : "";
+            let containString = v.contain ? " contain" : "";
+            return [`ray(${angleString}${sizeString}${containString})`];
+        }
+    ],
+);
 
 
 

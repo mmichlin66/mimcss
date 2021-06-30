@@ -1,10 +1,10 @@
 ﻿import {
     INumberMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath, IPercentMath,
-    Extended, IStringProxy, IUrlProxy, AttrTypeKeyword, AttrUnitKeyword, ILengthProxy,
+    Extended, IStringProxy, AttrTypeKeyword, AttrUnitKeyword, ILengthProxy,
     IPercentProxy, IAngleProxy, ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy,
     CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy, SelectorItem, ISelectorProxy
 } from "./CoreTypes"
-import {IVarRule, ICounterRule, IIDRule} from "./RuleTypes";
+import {IVarRule, ICounterRule} from "./RuleTypes";
 import {VarTemplateName, ListStyleType_StyleType, ExtendedVarValue} from "./StyleTypes";
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath,
@@ -249,18 +249,6 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 export function fitContent( size: Extended<CssLength>): IFitContentProxy
 {
     return () => `fit-content(${LengthMath.s2s(size)})`;
-}
-
-
-
-/**
- * Returns a function representing the CSS `url()` function. The string parameter
- * will be wrapped in a "url()" invocation. The function can also accept the IIDRule object to
- * create url(#element) invocation, which is often used to address SVG elements by their IDs.
- */
-export function url( val: Extended<string | IIDRule>): IUrlProxy
-{
-	return () => `url(${v2s(val)})`;
 }
 
 

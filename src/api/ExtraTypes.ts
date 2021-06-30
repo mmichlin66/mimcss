@@ -1,9 +1,9 @@
-﻿/**
- * This module describes types that work with colors
- */
-
-import {CssAngle, CssLength, CssNumber, CssPercent, CssPosition, Extended, ExtentKeyword, IGenericProxy, IUrlProxy} from "./CoreTypes";
+﻿import {
+    CssAngle, CssLength, CssNumber, CssPercent, CssPosition, Extended, ExtentKeyword, ICssFuncInvocation,
+    IGenericProxy
+} from "./CoreTypes";
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
+import {IIDRule} from "./RuleTypes";
 
 
 
@@ -255,11 +255,11 @@ export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | num
 
  /**
   * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
-  * Image can be specified either using the [[url]] function that returns the [[IUrlProxy]]
+  * Image can be specified either using the [[url]] function that returns the [[IUrlFunc]]
   * interface or any of the functions that return the [[IImageProxy]] interface such as
   * [[linearGradient]], [[crossFade]] and others.
   */
- export type CssImage = IUrlProxy | IImageProxy;
+ export type CssImage = IUrlFunc | IImageProxy;
 
 
 
@@ -389,9 +389,9 @@ export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<
  * Object representing CSS functions that accept a percent value and can be used for `filter`
  * style property.
  */
-export interface IFilterPercent
+export interface IFilterPercent extends ICssFuncInvocation<"brightness" | "contrast" |
+    "grayscale" | "invert" | "opacity" | "saturate" | "sepia">
 {
-    fn: "brightness" | "contrast" | "grayscale" | "invert" | "opacity" | "saturate" | "sepia";
     p: Extended<CssPercent>;
 }
 
@@ -400,9 +400,8 @@ export interface IFilterPercent
 /**
  * Object representing blur CSS function that can be used for `filter` style property.
  */
-export interface IFilterBlur
+export interface IFilterBlur extends ICssFuncInvocation<"blur">
 {
-    fn: "blur";
     r: Extended<CssLength>;
 }
 
@@ -411,9 +410,8 @@ export interface IFilterBlur
 /**
  * Object representing drop-shadow CSS function that can be used for `filter` style property.
  */
-export interface IFilterDropShadow
+export interface IFilterDropShadow extends ICssFuncInvocation<"drop-shadow">
 {
-    fn: "drop-shadow";
     x: Extended<CssLength>;
     y: Extended<CssLength>;
     color?: Extended<CssColor>;
@@ -425,9 +423,8 @@ export interface IFilterDropShadow
 /**
  * Object representing blur CSS function that can be used for `filter` style property.
  */
-export interface IFilterHueRotate
+export interface IFilterHueRotate extends ICssFuncInvocation<"hue-rotate">
 {
-    fn: "hue-rotate";
     a: Extended<CssAngle>;
 }
 
@@ -449,9 +446,8 @@ export type FilterFunc = IFilterPercent | IFilterBlur | IFilterDropShadow | IFil
 /**
  * Object representing matrix CSS function that can be used for `transform` property.
  */
-export interface ITransformMatrix
+export interface ITransformMatrix extends ICssFuncInvocation<"matrix">
 {
-    fn: "matrix";
     a: Extended<CssNumber>; b: Extended<CssNumber>; c: Extended<CssNumber>; d: Extended<CssNumber>;
     tx: Extended<CssNumber>; ty: Extended<CssNumber>;
 }
@@ -459,9 +455,8 @@ export interface ITransformMatrix
 /**
  * Object representing matrix3d CSS function that can be used for `transform` property.
  */
-export interface ITransformMatrix3d
+export interface ITransformMatrix3d extends ICssFuncInvocation<"matrix3d">
 {
-    fn: "matrix3d";
     a1: Extended<CssNumber>; b1: Extended<CssNumber>; c1: Extended<CssNumber>; d1: Extended<CssNumber>;
     a2: Extended<CssNumber>; b2: Extended<CssNumber>; c2: Extended<CssNumber>; d2: Extended<CssNumber>;
     a3: Extended<CssNumber>; b3: Extended<CssNumber>; c3: Extended<CssNumber>; d3: Extended<CssNumber>;
@@ -473,9 +468,8 @@ export interface ITransformMatrix3d
 /**
  * Object representing perspective CSS function that can be used for `transform` property.
  */
-export interface ITransformPerspective
+export interface ITransformPerspective extends ICssFuncInvocation<"perspective">
 {
-    fn: "perspective";
     d: Extended<CssLength>;
 }
 
@@ -484,18 +478,16 @@ export interface ITransformPerspective
 /**
  * Object representing single-dimensional rotate CSS function that can be used for `transform` property.
  */
-export interface ITransformRotate1d
+export interface ITransformRotate1d extends ICssFuncInvocation<"rotate" | "rotateX" | "rotateY" | "rotateZ">
 {
-    fn: "rotate" | "rotateX" | "rotateY" | "rotateZ";
     a: Extended<CssAngle>;
 }
 
 /**
  * Object representing three-dimensional rotate CSS function that can be used for `transform` property.
  */
-export interface ITransformRotate3d
+export interface ITransformRotate3d extends ICssFuncInvocation<"rotate3d">
 {
-    fn: "rotate3d";
     x: Extended<CssNumber>;
     y: Extended<CssNumber>;
     z: Extended<CssNumber>;
@@ -507,18 +499,16 @@ export interface ITransformRotate3d
 /**
  * Object representing single-dimensional scale CSS function that can be used for `transform` property.
  */
-export interface ITransformScale1d
+export interface ITransformScale1d extends ICssFuncInvocation<"scaleX" | "scaleY" | "scaleZ">
 {
-    fn: "scaleX" | "scaleY" | "scaleZ";
     s: Extended<CssNumber>;
 }
 
 /**
  * Object representing two-dimensional scale CSS function that can be used for `transform` property.
  */
-export interface ITransformScale2d
+export interface ITransformScale2d extends ICssFuncInvocation<"scale">
 {
-    fn: "scale";
     sx: Extended<CssNumber>;
     sy?: Extended<CssNumber>;
 }
@@ -526,9 +516,8 @@ export interface ITransformScale2d
 /**
  * Object representing three-dimensional scale CSS function that can be used for `transform` property.
  */
-export interface ITransformScale3d
+export interface ITransformScale3d extends ICssFuncInvocation<"scale3d">
 {
-    fn: "scale3d";
     sx: Extended<CssNumber>;
     sy: Extended<CssNumber>;
     sz: Extended<CssNumber>;
@@ -539,18 +528,16 @@ export interface ITransformScale3d
 /**
  * Object representing single-dimensional skew CSS function that can be used for `transform` property.
  */
-export interface ITransformSkew1d
+export interface ITransformSkew1d extends ICssFuncInvocation<"skewX" | "skewY">
 {
-    fn: "skewX" | "skewY";
     a: Extended<CssAngle>;
 }
 
 /**
  * Object representing two-dimensional skew CSS function that can be used for `transform` property.
  */
-export interface ITransformSkew2d
+export interface ITransformSkew2d extends ICssFuncInvocation<"skew">
 {
-    fn: "skew";
     ax: Extended<CssAngle>;
     ay?: Extended<CssAngle>;
 }
@@ -560,18 +547,16 @@ export interface ITransformSkew2d
 /**
  * Object representing single-dimensional translate CSS function that can be used for `transform` property.
  */
-export interface ITransformTranslate1d
+export interface ITransformTranslate1d extends ICssFuncInvocation<"translateX" | "translateY" | "translateZ">
 {
-    fn: "translateX" | "translateY" | "translateZ";
     d: Extended<CssLength>;
 }
 
 /**
  * Object representing two-dimensional translate CSS function that can be used for `transform` property.
  */
-export interface ITransformTranslate2d
+export interface ITransformTranslate2d extends ICssFuncInvocation<"translate">
 {
-    fn: "translate";
     x: Extended<CssLength>;
     y?: Extended<CssLength>;
 }
@@ -579,9 +564,8 @@ export interface ITransformTranslate2d
 /**
  * Object representing three-dimensional translate CSS function that can be used for `transform` property.
  */
-export interface ITransformTranslate3d
+export interface ITransformTranslate3d extends ICssFuncInvocation<"translate3d">
 {
-    fn: "translate3d";
     x: Extended<CssLength>;
     y: Extended<CssLength>;
     z: Extended<CssLength>;
@@ -681,9 +665,14 @@ export type BasicShape = IBasicShapeProxy | IPathBuilder;
 
 
 /**
- * The IRayProxy function represents an invocation of the CSS [[ray]] function.
+ * The IRayFunc function represents an invocation of the CSS `ray()` function.
  */
-export interface IRayProxy extends IGenericProxy<"ray"> {};
+export interface IRayFunc extends ICssFuncInvocation<"ray">
+{
+    angle: Extended<CssAngle>;
+    size?: Extended<ExtentKeyword | CssLength>;
+    contain?: boolean
+}
 
 
 
@@ -779,6 +768,22 @@ export interface IRepeatProxy extends IGenericProxy<"repeat"> {}
  * the [[span]] function.
  */
 export interface ISpanProxy extends IGenericProxy<"span"> {}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// URLs.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The IUrlFunc interface represents an invocation of the CSS `url()` function.
+ */
+export interface IUrlFunc extends ICssFuncInvocation<"url">
+{
+    p: Extended<string | IIDRule>;
+};
 
 
 

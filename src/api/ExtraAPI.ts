@@ -2,16 +2,17 @@
     CrossFadeParam, CssColor, GradientStopOrHint, IBasicShapeProxy, ICircleProxy, IColorProxy,
     IConicGradient, IEllipseProxy, IFilterBlur, IFilterDropShadow, IFilterHueRotate,
     IFilterPercent, IImageProxy, IInsetProxy, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
-    IPolygonProxy, IRadialGradient, IRayProxy, IRepeatProxy, ISpanProxy, ITransformMatrix,
+    IPolygonProxy, IRadialGradient, IRayFunc, IRepeatProxy, ISpanProxy, ITransformMatrix,
     ITransformMatrix3d, ITransformPerspective, ITransformRotate1d, ITransformRotate3d,
     ITransformScale1d, ITransformScale2d, ITransformScale3d, ITransformSkew1d, ITransformSkew2d,
-    ITransformTranslate1d, ITransformTranslate2d, ITransformTranslate3d, LinearGradAngle, ShapeRadius
+    ITransformTranslate1d, ITransformTranslate2d, ITransformTranslate3d, IUrlFunc, LinearGradAngle, ShapeRadius
 } from "./ExtraTypes";
 import {BorderRadius_StyleType, FillRule_StyleType, GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
 import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword} from "./CoreTypes";
 import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
 import {AngleMath, INumberBaseMathClass, LengthMath, PercentMath, pos2str, symValueToString, v2s } from "../impl/CoreFuncs";
 import {borderRadiusToString, gridTrackToString} from "../impl/StyleFuncs";
+import { IIDRule } from "./RuleTypes";
 
 
 
@@ -809,18 +810,12 @@ export function polygon( ...points: CssPoint[]): IPolygonProxy
 
 
 /**
- * Returns an IRayProxy function representing the `ray()` CSS function.
+ * Returns an IRayFunc function representing invocation of the `ray()` CSS function.
  */
 export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
-    contain?: boolean): IRayProxy
+    contain?: boolean): IRayFunc
 {
-    return () =>
-    {
-        let angleString = AngleMath.s2s( angle);
-        let sizeString = size != null ? "," + LengthMath.s2s( size) : "";
-        let containString = contain ? ",contain" : "";
-        return `ray(${angleString}${sizeString}${containString})`;
-    };
+    return { fn: "ray", angle, size, contain };
 }
 
 
@@ -955,6 +950,24 @@ export function span( countOrName: Extended<GridLineCountOrName>,
     nameOrCount?: Extended<GridLineCountOrName>): ISpanProxy
 {
     return () => `span ${v2s(countOrName)} ${nameOrCount ? v2s( nameOrCount) : ""}`;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// URLs.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a function representing the CSS `url()` function. The string parameter
+ * will be wrapped in a `url()` invocation. The function can also accept the IIDRule object to
+ * create url(#element) invocation, which is often used to address SVG elements by their IDs.
+ */
+export function url( p: Extended<string | IIDRule>): IUrlFunc
+{
+    return { fn: "url", p };
 }
 
 
