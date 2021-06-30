@@ -1,6 +1,6 @@
 ﻿import {CssColor, INamedColors} from "../api/ExtraTypes";
 import {Extended, CssAngle} from "../api/CoreTypes"
-import {AngleMath, v2s} from "./CoreFuncs"
+import {AngleMath, registerV2SFuncID, v2s, WellKnownFunc} from "./CoreFuncs"
 
 
 
@@ -438,6 +438,10 @@ export function colorToString( val: Extended<CssColor>): string
 // Registration of function converting parameters of CSS functions.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+registerV2SFuncID( colorToString, WellKnownFunc.Color);
+
+
 
 // // Transform functions
 // registerV2PFuncs(

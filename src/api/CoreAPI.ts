@@ -4,13 +4,10 @@
     IPercentProxy, IAngleProxy, ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy,
     CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy, SelectorItem, ISelectorProxy
 } from "./CoreTypes"
-import {IVarRule, ICounterRule} from "./RuleTypes";
-import {VarTemplateName, ListStyleType_StyleType, ExtendedVarValue} from "./StyleTypes";
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath,
 	FrequencyMath, PercentMath, v2s, templateStringToString
 } from "../impl/CoreFuncs"
-import {stylePropToString} from "../impl/StyleFuncs";
 
 
 
@@ -231,19 +228,6 @@ export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProx
 
 
 /**
- * Returns a function representing the invocation of the `var()` CSS function for
- * the given custom CSS property with optional fallbacks.
- */
-export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
-{
-    return () => fallback
-        ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
-        : `var(--${varObj.name})`;
-}
-
-
-
-/**
  * Returns an IFitContentProxy function representing the `fit-content()` CSS function.
  */
 export function fitContent( size: Extended<CssLength>): IFitContentProxy
@@ -283,51 +267,6 @@ export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrType
 export function quoted( val: any): IQuotedProxy
 {
     return () => `"${v2s(val)}"`;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Counters
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a function representing the CSS `counter()` function with additional
- * optional strings added after and/or before the counter.
- */
-export function counter( counterObj: Extended<ICounterRule | string>,
-	style?: Extended<ListStyleType_StyleType>,
-	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
-{
-	return () =>
-	{
-		let styleString = style ? `,${v2s( style)}` : "";
-		let before = textBefore ? `"${v2s( textBefore)}"` : "";
-		let after = textAfter ? `"${v2s( textAfter)}"` : "";
-		return `${before} counter(${v2s(counterObj)}${styleString}) ${after}`;
-	}
-}
-
-
-
-/**
- * Returns a function representing the CSS `countesr()` function with the given
- * separator string and additional optional strings added after and/or before the counter.
- */
-export function counters( counterObj: Extended<ICounterRule | string>,
-	separator: Extended<string>, style?: Extended<ListStyleType_StyleType>,
-	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
-{
-	return () =>
-	{
-		let sepString = separator ? `"${v2s( separator)}"` : `"."`;
-		let styleString = style ? `,${v2s( style)}` : "";
-		let before = textBefore ? `"${v2s( textBefore)}"` : "";
-		let after = textAfter ? `"${v2s( textAfter)}"` : "";
-		return `${before} counters(${v2s(counterObj)},${sepString}${styleString}) ${after}`;
-	}
 }
 
 

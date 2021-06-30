@@ -5,7 +5,6 @@
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
 import {IIDRule} from "./RuleTypes";
 import {CssFuncInvocation, WellKnownFunc} from "../impl/CoreFuncs";
-import {colorToString} from "../impl/ExtraFuncs";
 
 
 
@@ -443,7 +442,7 @@ export class FilterDropShadow extends CssFuncInvocation
         super( "drop-shadow", [
             ["x", WellKnownFunc.Length],
             ["x", WellKnownFunc.Length],
-            ["color", colorToString],
+            ["color", WellKnownFunc.Color],
             ["blur", WellKnownFunc.Length]
         ]);
         this.x = x;

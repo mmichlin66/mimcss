@@ -612,13 +612,20 @@ export const enum WellKnownFunc
     Length,
     Angle,
     Time,
+    Resolution,
+    Frequency,
     Position,
+    Color,
     MultiPositionWithComman,
     MultiLengthWithSpace,
     MultiTimeWithComma,
     ArrayWithComma,
     ArrayWithSlash,
     UnitlessOrPercent,
+    Radius,
+    Border,
+    GridAxis,
+
 }
 
 
@@ -630,6 +637,8 @@ let registeredV2SFuncs = new Map<number,ToStringFunc>([
     [WellKnownFunc.Length, LengthMath.s2s],
     [WellKnownFunc.Angle, AngleMath.s2s],
     [WellKnownFunc.Time, TimeMath.s2s],
+    [WellKnownFunc.Resolution, ResolutionMath.s2s],
+    [WellKnownFunc.Frequency, FrequencyMath.s2s],
     [WellKnownFunc.Position, pos2str],
     [WellKnownFunc.MultiPositionWithComman, val => multiPos2str( val, ",")],
     [WellKnownFunc.MultiLengthWithSpace, val => LengthMath.ms2s( val, " ")],
@@ -650,9 +659,9 @@ let nextRegisteredV2SFuncID = 1000;
  * Registers the given function so that it can be used for converting a value to string using
  * the v2sByFuncID function.
  */
-export function registerV2SFuncID( func: ToStringFunc): number
+export function registerV2SFuncID( func: ToStringFunc, weelKnownID?: WellKnownFunc): number
 {
-    let funcID = nextRegisteredV2SFuncID++;
+    let funcID = weelKnownID ?? nextRegisteredV2SFuncID++;
     registeredV2SFuncs.set( funcID, func);
     return funcID;
 }

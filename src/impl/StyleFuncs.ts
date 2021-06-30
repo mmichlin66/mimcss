@@ -10,8 +10,7 @@ import {
 import {IIDRule} from "../api/RuleTypes";
 import {
     v2s, a2s, LengthMath, AngleMath, camelToDash, dashToCamel, IValueConvertOptions,
-    PercentMath, ResolutionMath, FrequencyMath, ToStringFunc, v2sByFuncID, WellKnownFunc,
-    registerV2SFuncID, obj2str
+    ToStringFunc, v2sByFuncID, WellKnownFunc, registerV2SFuncID, obj2str
 } from "./CoreFuncs";
 import {colorToString} from "./ExtraFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -202,7 +201,7 @@ function singleTimingFunction_fromStyle( val: Extended<TimingFunction_Single>): 
 function singleBackground_fromObject( val: Background_Single): string
 {
     return styleObj2String( val, [
-        ["color", colorToString],
+        ["color", WellKnownFunc.Color],
         "image",
         ["position", WellKnownFunc.Position],
         ["size", WellKnownFunc.MultiLengthWithSpace, "/"],
@@ -218,7 +217,7 @@ function singleBackground_fromObject( val: Background_Single): string
 function singleBackground_fromStyle( val: Extended<Background_Single>): string
 {
     return v2s( val, {
-        fromNumber: colorToString,
+        fromNumber: WellKnownFunc.Color,
         fromObj: singleBackground_fromObject
     });
 }
@@ -280,7 +279,7 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
         ["y", WellKnownFunc.Length],
         ["blur", WellKnownFunc.Length],
         ["spread", WellKnownFunc.Length],
-        ["color", colorToString]
+        ["color", WellKnownFunc.Color]
     ]);
 }
 
@@ -317,7 +316,7 @@ export function borderRadiusToString( val: Extended<BorderRadius_StyleType>): st
                 return a2s( v, WellKnownFunc.Length, " ");
             }
         },
-        fromAny: LengthMath.s2s
+        fromAny: WellKnownFunc.Length
     });
 }
 
@@ -552,7 +551,7 @@ function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): st
     return styleObj2String( val, [
         "line",
         "style",
-        ["color", colorToString],
+        ["color", WellKnownFunc.Color],
         ["thickness", WellKnownFunc.Length],
     ]);
 }
@@ -827,10 +826,9 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: ToStrin
 
 
 // Register frequently used conversion functions
-let singleCornerRadiusFuncID = registerV2SFuncID( singleCornerRadiusToString);
-let borderFuncID = registerV2SFuncID( borderToString);
-let gridAxisFuncID = registerV2SFuncID( gridAxisToString);
-let colorFuncID = registerV2SFuncID( colorToString);
+registerV2SFuncID( singleCornerRadiusToString, WellKnownFunc.Radius);
+registerV2SFuncID( borderToString, WellKnownFunc.Border);
+registerV2SFuncID( gridAxisToString, WellKnownFunc.GridAxis);
 
 
 
@@ -857,7 +855,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     animationTimingFunction: timingFunctionToString,
 
     background: {
-        fromNumber: colorToString,
+        fromNumber: WellKnownFunc.Color,
         fromObj: singleBackground_fromObject,
         fromAny: singleBackground_fromStyle,
         arrItemFunc: singleBackground_fromStyle,
@@ -866,7 +864,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     backgroundAttachment: WellKnownFunc.ArrayWithComma,
     backgroundBlendMode: WellKnownFunc.ArrayWithComma,
     backgroundClip: WellKnownFunc.ArrayWithComma,
-    backgroundColor: colorFuncID,
+    backgroundColor: WellKnownFunc.Color,
     backgroundImage: WellKnownFunc.ArrayWithComma,
     backgroundOrigin: WellKnownFunc.ArrayWithComma,
     backgroundPosition: WellKnownFunc.MultiPositionWithComman,
@@ -880,45 +878,45 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     },
     baselineShift: WellKnownFunc.Length,
     blockSize: WellKnownFunc.Length,
-    border: borderFuncID,
-    borderBlock: borderFuncID,
-    borderBlockEnd: borderFuncID,
-    borderBlockEndColor: colorFuncID,
+    border: WellKnownFunc.Border,
+    borderBlock: WellKnownFunc.Border,
+    borderBlockEnd: WellKnownFunc.Border,
+    borderBlockEndColor: WellKnownFunc.Color,
     borderBlockEndWidth: WellKnownFunc.Length,
-    borderBlockStart: borderFuncID,
-    borderBlockStartColor: colorFuncID,
+    borderBlockStart: WellKnownFunc.Border,
+    borderBlockStartColor: WellKnownFunc.Color,
     borderBlockStartWidth: WellKnownFunc.Length,
-    borderBottom: borderFuncID,
-    borderBottomColor: colorFuncID,
-    borderBottomLeftRadius: singleCornerRadiusFuncID,
-    borderBottomRightRadius: singleCornerRadiusFuncID,
+    borderBottom: WellKnownFunc.Border,
+    borderBottomColor: WellKnownFunc.Color,
+    borderBottomLeftRadius: WellKnownFunc.Radius,
+    borderBottomRightRadius: WellKnownFunc.Radius,
     borderBottomWidth: WellKnownFunc.Length,
     borderColor: {
-        fromAny: colorFuncID
+        fromAny: WellKnownFunc.Color
     },
     borderImage: {
         fromObj: borderImageToString,
     },
     borderImageSlice: borderImageSliceToString,
-    borderInline: borderFuncID,
-    borderInlineEnd: borderFuncID,
-    borderInlineEndColor: colorFuncID,
+    borderInline: WellKnownFunc.Border,
+    borderInlineEnd: WellKnownFunc.Border,
+    borderInlineEndColor: WellKnownFunc.Color,
     borderInlineEndWidth: WellKnownFunc.Length,
-    borderInlineStart: borderFuncID,
-    borderInlineStartColor: colorFuncID,
+    borderInlineStart: WellKnownFunc.Border,
+    borderInlineStartColor: WellKnownFunc.Color,
     borderInlineStartWidth: WellKnownFunc.Length,
-    borderLeft: borderFuncID,
-    borderLeftColor: colorFuncID,
+    borderLeft: WellKnownFunc.Border,
+    borderLeftColor: WellKnownFunc.Color,
     borderLeftWidth: WellKnownFunc.Length,
     borderRadius: borderRadiusToString,
-    borderRight: borderFuncID,
-    borderRightColor: colorFuncID,
+    borderRight: WellKnownFunc.Border,
+    borderRightColor: WellKnownFunc.Color,
     borderRightWidth: WellKnownFunc.Length,
     borderSpacing: WellKnownFunc.MultiLengthWithSpace,
-    borderTop: borderFuncID,
-    borderTopColor: colorFuncID,
-    borderTopLeftRadius: singleCornerRadiusFuncID,
-    borderTopRightRadius: singleCornerRadiusFuncID,
+    borderTop: WellKnownFunc.Border,
+    borderTopColor: WellKnownFunc.Color,
+    borderTopLeftRadius: WellKnownFunc.Radius,
+    borderTopRightRadius: WellKnownFunc.Radius,
     borderTopWidth: WellKnownFunc.Length,
     borderWidth: WellKnownFunc.MultiLengthWithSpace,
     bottom: WellKnownFunc.Length,
@@ -927,24 +925,24 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
         arrSep: ",",
     },
 
-    caretColor: colorFuncID,
+    caretColor: WellKnownFunc.Color,
     clip:  {
         fromArray: v => `rect(${LengthMath.ms2s(v," ")}`
     },
-    color: colorFuncID,
+    color: WellKnownFunc.Color,
     columnGap: WellKnownFunc.Length,
-    columnRule: borderFuncID,
-    columnRuleColor: colorFuncID,
+    columnRule: WellKnownFunc.Border,
+    columnRuleColor: WellKnownFunc.Color,
     columnRuleWidth: WellKnownFunc.MultiLengthWithSpace,
     columns: columnsToString,
     columnWidth: WellKnownFunc.Length,
     cursor: cursorToString,
 
-    fill: colorFuncID,
-    fillOpacity: PercentMath.s2s,
+    fill: WellKnownFunc.Color,
+    fillOpacity: WellKnownFunc.Percent,
     flex: flexToString,
     flexBasis: WellKnownFunc.Length,
-    floodColor: colorFuncID,
+    floodColor: WellKnownFunc.Color,
     font: {
         fromObj: font_fromObject
     },
@@ -956,13 +954,13 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     gridGap: WellKnownFunc.MultiLengthWithSpace,
     gridRowGap: WellKnownFunc.Length,
     gridArea: WellKnownFunc.ArrayWithSlash,
-    gridAutoColumns: gridAxisFuncID,
-    gridAutoRows: gridAxisFuncID,
+    gridAutoColumns: WellKnownFunc.GridAxis,
+    gridAutoRows: WellKnownFunc.GridAxis,
     gridColumn: WellKnownFunc.ArrayWithSlash,
     gridRow: WellKnownFunc.ArrayWithSlash,
     gridTemplateAreas: gridTemplateAreasToString,
-    gridTemplateColumns: gridAxisFuncID,
-    gridTemplateRows: gridAxisFuncID,
+    gridTemplateColumns: WellKnownFunc.GridAxis,
+    gridTemplateRows: WellKnownFunc.GridAxis,
 
     height: WellKnownFunc.Length,
 
@@ -970,7 +968,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
 
     left: WellKnownFunc.Length,
     letterSpacing: WellKnownFunc.Length,
-    lightingColor: colorFuncID,
+    lightingColor: WellKnownFunc.Color,
 
     margin: WellKnownFunc.MultiLengthWithSpace,
     marginBlock: WellKnownFunc.MultiLengthWithSpace,
@@ -1003,8 +1001,8 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     offsetRotate: {
         fromAny: WellKnownFunc.Angle
     },
-    outline: borderFuncID,
-    outlineColor: colorFuncID,
+    outline: WellKnownFunc.Border,
+    outlineColor: WellKnownFunc.Color,
     outlineOffset: WellKnownFunc.Length,
 
     padding: WellKnownFunc.MultiLengthWithSpace,
@@ -1032,7 +1030,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     rowGap: WellKnownFunc.Length,
 
     scrollbarColor: {
-        arrItemFunc: colorFuncID
+        arrItemFunc: WellKnownFunc.Color
     },
     scrollMargin: WellKnownFunc.MultiLengthWithSpace,
     scrollMarginBlock: WellKnownFunc.MultiLengthWithSpace,
@@ -1057,23 +1055,23 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     scrollPaddingRight: WellKnownFunc.Length,
     scrollPaddingTop: WellKnownFunc.Length,
     shapeMargin: WellKnownFunc.Length,
-    stopColor: colorFuncID,
-    stroke: colorFuncID,
+    stopColor: WellKnownFunc.Color,
+    stroke: WellKnownFunc.Color,
 
     tabSize: WellKnownFunc.Length,
     textCombineUpright: {
         fromNumber: v => `digits ${v}`
     },
     textDecoration: {
-        fromNumber: colorFuncID,
+        fromNumber: WellKnownFunc.Color,
         fromObj: textDecoration_fromObject
     },
-    textDecorationColor: colorFuncID,
+    textDecorationColor: WellKnownFunc.Color,
     textDecorationThickness: WellKnownFunc.Length,
     textEmphasis: {
-        fromAny: colorFuncID
+        fromAny: WellKnownFunc.Color
     },
-    textEmphasisColor: colorFuncID,
+    textEmphasisColor: WellKnownFunc.Color,
     textIndent: {
         fromAny: WellKnownFunc.Length
     },
@@ -1112,12 +1110,12 @@ const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
     CssLength: WellKnownFunc.Length,
     CssAngle: WellKnownFunc.Angle,
     CssTime: WellKnownFunc.Time,
-    CssResolution: ResolutionMath.s2s,
-    CssFrequency: FrequencyMath.s2s,
+    CssResolution: WellKnownFunc.Resolution,
+    CssFrequency: WellKnownFunc.Frequency,
     CssPercent: WellKnownFunc.Percent,
     CssPosition: WellKnownFunc.Position,
-    CssRadius: singleCornerRadiusFuncID,
-    CssColor: colorFuncID,
+    CssRadius: WellKnownFunc.Radius,
+    CssColor: WellKnownFunc.Color,
 };
 
 

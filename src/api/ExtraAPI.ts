@@ -1,4 +1,5 @@
-﻿import {
+﻿import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword, IStringProxy} from "./CoreTypes";
+import {
     CrossFadeParam, CssColor, GradientStopOrHint, IBasicShapeProxy, ICircleProxy, IColorProxy,
     IConicGradient, IEllipseProxy, FilterBlur, FilterDropShadow, FilterHueRotate,
     FilterPercent, IImageProxy, IInsetProxy, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
@@ -7,12 +8,14 @@
     TransformScale1d, TransformScale2d, TransformScale3d, TransformSkew1d, TransformSkew2d,
     TransformTranslate1d, TransformTranslate2d, TransformTranslate3d, UrlFunc, LinearGradAngle, ShapeRadius
 } from "./ExtraTypes";
-import {BorderRadius_StyleType, FillRule_StyleType, GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
-import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword} from "./CoreTypes";
-import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
+import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
+import {
+    BorderRadius_StyleType, ExtendedVarValue, FillRule_StyleType, GridLineCountOrName, GridTrack,
+    GridTrackSize, ListStyleType_StyleType, VarTemplateName
+} from "./StyleTypes";
 import {AngleMath, INumberBaseMathClass, LengthMath, PercentMath, pos2str, symValueToString, v2s } from "../impl/CoreFuncs";
-import {borderRadiusToString, gridTrackToString} from "../impl/StyleFuncs";
-import { IIDRule } from "./RuleTypes";
+import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
+import {borderRadiusToString, gridTrackToString, stylePropToString} from "../impl/StyleFuncs";
 
 
 
@@ -954,9 +957,54 @@ export function span( countOrName: Extended<GridLineCountOrName>,
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Counters
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a function representing the CSS `counter()` function with additional
+ * optional strings added after and/or before the counter.
+ */
+ export function counter( counterObj: Extended<ICounterRule | string>,
+	style?: Extended<ListStyleType_StyleType>,
+	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
+{
+	return () =>
+	{
+		let styleString = style ? `,${v2s( style)}` : "";
+		let before = textBefore ? `"${v2s( textBefore)}"` : "";
+		let after = textAfter ? `"${v2s( textAfter)}"` : "";
+		return `${before} counter(${v2s(counterObj)}${styleString}) ${after}`;
+	}
+}
+
+
+
+/**
+ * Returns a function representing the CSS `countesr()` function with the given
+ * separator string and additional optional strings added after and/or before the counter.
+ */
+export function counters( counterObj: Extended<ICounterRule | string>,
+	separator: Extended<string>, style?: Extended<ListStyleType_StyleType>,
+	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
+{
+	return () =>
+	{
+		let sepString = separator ? `"${v2s( separator)}"` : `"."`;
+		let styleString = style ? `,${v2s( style)}` : "";
+		let before = textBefore ? `"${v2s( textBefore)}"` : "";
+		let after = textAfter ? `"${v2s( textAfter)}"` : "";
+		return `${before} counters(${v2s(counterObj)},${sepString}${styleString}) ${after}`;
+	}
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// URLs.
+// Miscellaneous functions.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -969,6 +1017,19 @@ export function url( p: Extended<string | IIDRule>): UrlFunc
 {
     return new UrlFunc(p);
 }
+
+
+
+/**
+ * Returns a function representing the invocation of the `var()` CSS function for
+ * the given custom CSS property with optional fallbacks.
+ */
+ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
+ {
+     return () => fallback
+         ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
+         : `var(--${varObj.name})`;
+ }
 
 
 
