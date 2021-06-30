@@ -780,26 +780,6 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// CSS function invocations.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The ICssFuncInvocation serves as a base for interfaces that represent CSS function invocations.
- * This interface defines the `fn` property of the given string-based template type. This type
- * indicates the function name. The rest of the properties in the derived classes contain values of
- * function parameters.
- */
-export interface ICssFuncInvocation<T extends string>
-{
-    /** Name of the CSS function */
-    fn: T;
-};
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // Types used in different style contexts
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////

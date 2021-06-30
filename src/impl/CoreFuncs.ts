@@ -3,7 +3,7 @@
     PercentType, IPercentMath, CssPercent, LengthType, ILengthMath, CssLength,
     AngleType, IAngleMath, CssAngle, TimeType, ITimeMath, CssTime, ResolutionType, IResolutionMath,
     CssResolution, FrequencyType, IFrequencyMath, CssFrequency, CssPosition, OneOrMany, LengthUnits,
-    PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits, INumberMath, ICssFuncInvocation
+    PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits, INumberMath
 } from "../api/CoreTypes";
 
 
@@ -116,8 +116,6 @@ export function v2s( val: any, options?: IValueConvertOptions): string
             return v2s(val());
         else if (typeof val[symValueToString] === "function")
             return val[symValueToString]();
-        else if (typeof val.fn === "string")
-            return funcObj2String(val);
         else
             return val.toString();
     }
@@ -151,8 +149,6 @@ export function v2s( val: any, options?: IValueConvertOptions): string
                 func = options.fromObj || options.fromAny;
             else if (typeof val[symValueToString] === "function")
                 return val[symValueToString]();
-            else if (typeof val.fn === "string")
-                return funcObj2String(val);
         }
         else if (typeof val === "boolean")
             func = options.fromBool || options.fromAny;
@@ -677,75 +673,10 @@ export function v2sByFuncID( val: any, funcID: number): string
 
 
 
-// Defines type of functions converting parameters of CSS functions to their string representations.
-type V2PFunc = (val: ICssFuncInvocation<any>) => string[];
-
 // Defines type containing array of either property names or tuples where the first element is
 // the name of a property and the second elemet is either the ID of registered function or the
 // function converting the value of the property to string.
 type V2PDef = (string | [string, number | ToStringFunc])[];
-
-
-
-// Map of CSS function names to functions that convert an object representing parameters of the
-// CSS function to arrays of string representations of these parameters
-let registeredV2PFuncs = new Map<string,V2PFunc | V2PDef>();
-
-
-
-/**
- * Converts the given value to a CSS function string using the given function name and the info
- * parameter to inform how the object's properties should be converted to strings. The info
- * parameter is an array of either strings or two-element tuples. The only string and the first
- * tuple element corresponds to a property expected in the value object to be converted. Each
- * property is converted according to the following rules:
- * - If the array item is just a string, the corresponding value's property is converted using
- *   the val2str function.
- * - If the second element is null or undefined, the corresponding value's property is converted using
- *   the val2str function..
- * - If the second element is a number it is treated as an index of a well-known conversion function.
- * - If the second element is a function, it is used to convert the value's property.
- *
- * Since the elements in the info array constitute parameters for the function, processing stops as
- * soon as an undefined parameter is encountered because undefined parameter indicates that optional
- * parameters started with this one were not passed to the function.
- */
- function funcObj2String( val: ICssFuncInvocation<any>): string
-{
-    if (val == null)
-        return "";
-
-    let s = `${val.fn}(`;
-    let funcOrDef = registeredV2PFuncs.get( val.fn);
-    if (typeof funcOrDef === "function")
-        s += funcOrDef(val).join(",");
-    else if (funcOrDef)
-        s += paramsToStrings<any>( val, funcOrDef).join(",");
-
-    return s + ")";
-}
-
-
-
-/**
- * Registers the given function so that it can be used for converting parameters of a CSS function
- * represented by an object to array of parameter string representations.
- */
-export function registerV2PFuncs( ...namesAndFuncs: [string | string[], V2PFunc | V2PDef][]): void
-{
-    for( let namesAndFunc of namesAndFuncs)
-    {
-        let fn = namesAndFunc[0];
-        let funcOrDef = namesAndFunc[1];
-        if (typeof fn === "string")
-            registeredV2PFuncs.set( fn, funcOrDef);
-        else
-        {
-            for( let name of fn)
-                registeredV2PFuncs.set( name, funcOrDef);
-        }
-    }
-}
 
 
 
@@ -767,8 +698,7 @@ export function registerV2PFuncs( ...namesAndFuncs: [string | string[], V2PFunc 
  * soon as an undefined parameter is encountered because undefined parameter indicates that optional
  * parameters started with this one were not passed to the function.
  */
- export function paramsToStrings<T>( val: T,
-    info: (keyof T | [keyof T, number | ToStringFunc])[]): string[]
+function paramsToStrings( val: any, info: V2PDef): string[]
 {
     if (val == null)
         return [];
@@ -797,25 +727,26 @@ export function registerV2PFuncs( ...namesAndFuncs: [string | string[], V2PFunc 
 
 
 
-// export abstract class CssFuncInvocation<N extends string, T extends ICssFuncInvocation<N>>
-// {
-//     protected fn: N;
-//     protected paramInfo?: (keyof T | [keyof T, number | ToStringFunc])[];
+export abstract class CssFuncInvocation
+{
+    private fn: string;
+    private paramInfo?: V2PDef;
+    private delimiter: string;
 
-//     constructor( fn: N, paramInfo?: (keyof T | [keyof T, number | ToStringFunc])[])
-//     {
-//         this.fn = fn;
-//         this.paramInfo = paramInfo;
-//         this[symValueToString] = () => `${this.fn}(${this.p2s()})`;
-//     }
+    constructor( fn: string, paramInfo?: V2PDef, delimiter?: string)
+    {
+        this.fn = fn;
+        this.paramInfo = paramInfo;
+        this.delimiter = delimiter ?? ",";
 
-//     protected p2s(): string
-//     {
-//         if (!this.paramInfo)
-//             return "";
-//         else
-//     }
-// }
+        this[symValueToString] = () => `${this.fn}(${this.p2s()})`;
+    }
+
+    public p2s(): string
+    {
+        return this.paramInfo ? paramsToStrings( this, this.paramInfo).join(this.delimiter) : "";
+    }
+}
 
 
 

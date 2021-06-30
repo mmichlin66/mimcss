@@ -1,9 +1,11 @@
 ﻿import {
-    CssAngle, CssLength, CssNumber, CssPercent, CssPosition, Extended, ExtentKeyword, ICssFuncInvocation,
+    CssAngle, CssLength, CssNumber, CssPercent, CssPosition, Extended, ExtentKeyword,
     IGenericProxy
 } from "./CoreTypes";
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
 import {IIDRule} from "./RuleTypes";
+import {CssFuncInvocation, WellKnownFunc} from "../impl/CoreFuncs";
+import {colorToString} from "../impl/ExtraFuncs";
 
 
 
@@ -259,7 +261,7 @@ export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | num
   * interface or any of the functions that return the [[IImageProxy]] interface such as
   * [[linearGradient]], [[crossFade]] and others.
   */
- export type CssImage = IUrlFunc | IImageProxy;
+ export type CssImage = UrlFunc | IImageProxy;
 
 
 
@@ -389,43 +391,83 @@ export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<
  * Object representing CSS functions that accept a percent value and can be used for `filter`
  * style property.
  */
-export interface IFilterPercent extends ICssFuncInvocation<"brightness" | "contrast" |
-    "grayscale" | "invert" | "opacity" | "saturate" | "sepia">
+export class FilterPercent extends CssFuncInvocation
 {
+    /** Percent alue */
     p: Extended<CssPercent>;
+
+    constructor( fn: "brightness" | "contrast" | "grayscale" | "invert" | "opacity" |
+        "saturate" | "sepia", p: Extended<CssPercent>)
+    {
+        super( fn, [["p", WellKnownFunc.Percent]]);
+        this.p = p;
+    }
 }
 
 
 
 /**
- * Object representing blur CSS function that can be used for `filter` style property.
+ * Object representing `blur()` CSS function that can be used for `filter` style property.
  */
-export interface IFilterBlur extends ICssFuncInvocation<"blur">
+export class FilterBlur extends CssFuncInvocation
 {
+    /** Blur radius */
     r: Extended<CssLength>;
+
+    constructor( r: Extended<CssLength>)
+    {
+        super( "blur", [["r", WellKnownFunc.Length]]);
+        this.r = r;
+    }
 }
 
 
 
 /**
- * Object representing drop-shadow CSS function that can be used for `filter` style property.
+ * Object representing `drop-shadow()` CSS function that can be used for `filter` style property.
  */
-export interface IFilterDropShadow extends ICssFuncInvocation<"drop-shadow">
+export class FilterDropShadow extends CssFuncInvocation
 {
+    /** Size along the X axis */
     x: Extended<CssLength>;
+    /** Size along the Y axis */
     y: Extended<CssLength>;
+    /** Shadow color */
     color?: Extended<CssColor>;
+    /** Blur radius */
     blur?: Extended<CssLength>;
+
+    constructor( x: Extended<CssLength>, y: Extended<CssLength>, color?: Extended<CssColor>,
+        blur?: Extended<CssLength>)
+    {
+        super( "drop-shadow", [
+            ["x", WellKnownFunc.Length],
+            ["x", WellKnownFunc.Length],
+            ["color", colorToString],
+            ["blur", WellKnownFunc.Length]
+        ]);
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.blur = blur;
+    }
 }
 
 
 
 /**
- * Object representing blur CSS function that can be used for `filter` style property.
+ * Object representing the `hue-rotate()` CSS function that can be used for `filter` style property.
  */
-export interface IFilterHueRotate extends ICssFuncInvocation<"hue-rotate">
+export class FilterHueRotate extends CssFuncInvocation
 {
+    /** Rotation angle */
     a: Extended<CssAngle>;
+
+    constructor( a: Extended<CssAngle>)
+    {
+        super( "hue-rotate", [["a", WellKnownFunc.Angle]]);
+        this.a = a;
+    }
 }
 
 
@@ -433,7 +475,7 @@ export interface IFilterHueRotate extends ICssFuncInvocation<"hue-rotate">
 /**
  * Type representing CSS `<filter>` functions accepted by the `filter` style property
  */
-export type FilterFunc = IFilterPercent | IFilterBlur | IFilterDropShadow | IFilterHueRotate;
+export type FilterFunc = FilterPercent | FilterBlur | FilterDropShadow | FilterHueRotate;
 
 
 
@@ -446,31 +488,59 @@ export type FilterFunc = IFilterPercent | IFilterBlur | IFilterDropShadow | IFil
 /**
  * Object representing matrix CSS function that can be used for `transform` property.
  */
-export interface ITransformMatrix extends ICssFuncInvocation<"matrix">
+export class TransformMatrix extends CssFuncInvocation
 {
     a: Extended<CssNumber>; b: Extended<CssNumber>; c: Extended<CssNumber>; d: Extended<CssNumber>;
     tx: Extended<CssNumber>; ty: Extended<CssNumber>;
+
+    constructor(a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>, d: Extended<CssNumber>,
+        tx: Extended<CssNumber>, ty: Extended<CssNumber>)
+    {
+        super( "matrix", ["a","b","c","d","tx","ty"]),
+        this.a = a; this.b = b; this.c = c; this.d = d;
+        this.tx = tx; this.ty = ty;
+    }
 }
 
 /**
  * Object representing matrix3d CSS function that can be used for `transform` property.
  */
-export interface ITransformMatrix3d extends ICssFuncInvocation<"matrix3d">
+export class TransformMatrix3d extends CssFuncInvocation
 {
     a1: Extended<CssNumber>; b1: Extended<CssNumber>; c1: Extended<CssNumber>; d1: Extended<CssNumber>;
     a2: Extended<CssNumber>; b2: Extended<CssNumber>; c2: Extended<CssNumber>; d2: Extended<CssNumber>;
     a3: Extended<CssNumber>; b3: Extended<CssNumber>; c3: Extended<CssNumber>; d3: Extended<CssNumber>;
     a4: Extended<CssNumber>; b4: Extended<CssNumber>; c4: Extended<CssNumber>; d4: Extended<CssNumber>;
+
+    constructor(
+        a1: Extended<CssNumber>, b1: Extended<CssNumber>, c1: Extended<CssNumber>, d1: Extended<CssNumber>,
+        a2: Extended<CssNumber>, b2: Extended<CssNumber>, c2: Extended<CssNumber>, d2: Extended<CssNumber>,
+        a3: Extended<CssNumber>, b3: Extended<CssNumber>, c3: Extended<CssNumber>, d3: Extended<CssNumber>,
+        a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>)
+    {
+        super( "matrix3d", ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"]);
+        this.a1 = a1; this.b1 = b1; this.c1 = c1; this.d1 = d1;
+        this.a2 = a2; this.b2 = b2; this.c2 = c2; this.d2 = d2;
+        this.a3 = a3; this.b3 = b3; this.c3 = c3; this.d3 = d3;
+        this.a4 = a4; this.b4 = b4; this.c4 = c4; this.d4 = d4;
+    }
 }
 
 
 
 /**
- * Object representing perspective CSS function that can be used for `transform` property.
+ * Object representing `perspective()` CSS function that can be used for `transform` property.
  */
-export interface ITransformPerspective extends ICssFuncInvocation<"perspective">
+export class TransformPerspective extends CssFuncInvocation
 {
+    /** Distance */
     d: Extended<CssLength>;
+
+    constructor( d: Extended<CssLength>)
+    {
+        super( "perspective", [["d", WellKnownFunc.Length]]);
+        this.d = d;
+    }
 }
 
 
@@ -478,97 +548,193 @@ export interface ITransformPerspective extends ICssFuncInvocation<"perspective">
 /**
  * Object representing single-dimensional rotate CSS function that can be used for `transform` property.
  */
-export interface ITransformRotate1d extends ICssFuncInvocation<"rotate" | "rotateX" | "rotateY" | "rotateZ">
+export class TransformRotate1d extends CssFuncInvocation
 {
+    /** Rotation angle */
     a: Extended<CssAngle>;
+
+    constructor( a: Extended<CssAngle>, d?: "X" | "Y" | "Z")
+    {
+        super( `rotate${d ?? ""}`, [["a", WellKnownFunc.Angle]]);
+        this.a = a;
+    }
 }
 
 /**
- * Object representing three-dimensional rotate CSS function that can be used for `transform` property.
+ * Object representing three-dimensional `rotate3d()` CSS function that can be used for `transform` property.
  */
-export interface ITransformRotate3d extends ICssFuncInvocation<"rotate3d">
+export class TransformRotate3d extends CssFuncInvocation
 {
+    /** Rotation axis compnent along the X axis */
     x: Extended<CssNumber>;
-    y: Extended<CssNumber>;
+    /** Rotation axis compnent along the Y axis */
+    y?: Extended<CssNumber>;
+    /** Rotation axis compnent along the Z axis */
     z: Extended<CssNumber>;
+    /** Rotation angle */
     a: Extended<CssAngle>;
+
+    constructor( x: Extended<CssNumber>, y: Extended<CssNumber>, z: Extended<CssNumber>, a: Extended<CssAngle>)
+    {
+        super( "rotate3d", ["x", "y", "z",["a", WellKnownFunc.Angle]]);
+
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.a = a;
+    }
 }
 
 
 
 /**
- * Object representing single-dimensional scale CSS function that can be used for `transform` property.
+ * Object representing single-dimensional `scaleX()` or `scaleY()` or `scaleZ()` CSS function that
+ * can be used for `transform` property.
  */
-export interface ITransformScale1d extends ICssFuncInvocation<"scaleX" | "scaleY" | "scaleZ">
+export class TransformScale1d extends CssFuncInvocation
 {
+    /** Scale factor along one of the axis */
     s: Extended<CssNumber>;
+
+    constructor( s: Extended<CssNumber>, d: "X" | "Y" | "Z")
+    {
+        super( `scale${d}`, ["s"]);
+        this.s = s;
+    }
 }
 
 /**
- * Object representing two-dimensional scale CSS function that can be used for `transform` property.
+ * Object representing two-dimensional `scale()` CSS function that can be used for `transform`
+ * property.
  */
-export interface ITransformScale2d extends ICssFuncInvocation<"scale">
+export class TransformScale2d extends CssFuncInvocation
 {
+    /** Scale factor along the X axis */
     sx: Extended<CssNumber>;
+    /** Scale factor along the Y axis */
     sy?: Extended<CssNumber>;
+
+    constructor( sx: Extended<CssNumber>, sy: Extended<CssNumber>)
+    {
+        super( "scale", ["sx","sy"]);
+        this.sx = sx;
+        this.sy = sy;
+    }
 }
 
 /**
- * Object representing three-dimensional scale CSS function that can be used for `transform` property.
+ * Object representing three-dimensional `scale3d()` CSS function that can be used for `transform`
+ * property.
  */
-export interface ITransformScale3d extends ICssFuncInvocation<"scale3d">
+export class TransformScale3d extends CssFuncInvocation
 {
+    /** Scale factor along the X axis */
     sx: Extended<CssNumber>;
-    sy: Extended<CssNumber>;
+    /** Scale factor along the Y axis */
+    sy?: Extended<CssNumber>;
+    /** Scale factor along the Z axis */
     sz: Extended<CssNumber>;
+
+    constructor( sx: Extended<CssNumber>, sy: Extended<CssNumber>, sz: Extended<CssNumber>)
+    {
+        super( "scale3d", ["sx", "sy", "sz"]);
+        this.sx = sx;
+        this.sy = sy;
+        this.sz = sz;
+    }
 }
 
 
 
 /**
- * Object representing single-dimensional skew CSS function that can be used for `transform` property.
+ * Object representing single-dimensional `skewX()` or `skewY()` CSS function that can be used
+ * for `transform` property.
  */
-export interface ITransformSkew1d extends ICssFuncInvocation<"skewX" | "skewY">
+export class TransformSkew1d extends CssFuncInvocation
 {
+    /** Angle along one of the axis */
     a: Extended<CssAngle>;
+
+    constructor( a: Extended<CssAngle>, d: "X" | "Y")
+    {
+        super( `skew${d}`, [["a", WellKnownFunc.Angle]]);
+        this.a = a;
+    }
 }
 
 /**
- * Object representing two-dimensional skew CSS function that can be used for `transform` property.
+ * Object representing two-dimensional `skew()` CSS function that can be used for `transform` property.
  */
-export interface ITransformSkew2d extends ICssFuncInvocation<"skew">
-{
+ export class TransformSkew2d extends CssFuncInvocation
+ {
+    /** Angle along the X axis */
     ax: Extended<CssAngle>;
+    /** Angle along the Y axis */
     ay?: Extended<CssAngle>;
+
+    constructor( ax: Extended<CssAngle>, ay: Extended<CssAngle>)
+    {
+        super( `skew`, [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]]);
+        this.ax = ax;
+        this.ay = ay;
+    }
 }
 
 
 
 /**
- * Object representing single-dimensional translate CSS function that can be used for `transform` property.
+ * Object representing single-dimensional `translateX()` or `translateY()` or `translateZ()` CSS
+ * function that can be used for `transform` property.
  */
-export interface ITransformTranslate1d extends ICssFuncInvocation<"translateX" | "translateY" | "translateZ">
+export class TransformTranslate1d extends CssFuncInvocation
 {
-    d: Extended<CssLength>;
+    /** Offset along one of the axis */
+    l?: Extended<CssLength>;
+
+    constructor( l: Extended<CssLength>, d: "X" | "Y" | "Z")
+    {
+        super( `translate${d}`, [["l", WellKnownFunc.Length]]);
+        this.l = l;
+    }
 }
 
 /**
- * Object representing two-dimensional translate CSS function that can be used for `transform` property.
+ * Object representing two-dimensional `translate()` CSS function that can be used for `transform` property.
  */
-export interface ITransformTranslate2d extends ICssFuncInvocation<"translate">
+export class TransformTranslate2d extends CssFuncInvocation
 {
+    /** Offset along the X axis */
     x: Extended<CssLength>;
+    /** Offset along the Y axis */
     y?: Extended<CssLength>;
+
+    constructor( x: Extended<CssLength>, y?: Extended<CssLength>)
+    {
+        super( "translate", [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length]]);
+        this.x = x;
+        this.y = y;
+    }
 }
 
 /**
- * Object representing three-dimensional translate CSS function that can be used for `transform` property.
+ * Object representing three-dimensional `translate3d()` CSS function that can be used for `transform` property.
  */
-export interface ITransformTranslate3d extends ICssFuncInvocation<"translate3d">
+export class TransformTranslate3d extends CssFuncInvocation
 {
+    /** Offset along the X axis */
     x: Extended<CssLength>;
-    y: Extended<CssLength>;
+    /** Offset along the Y axis */
+    y?: Extended<CssLength>;
+    /** Offset along the Z axis */
     z: Extended<CssLength>;
+
+    constructor( x: Extended<CssLength>, y: Extended<CssLength>, z: Extended<CssLength>)
+    {
+        super( "translate3d", [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]]);
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 }
 
 
@@ -577,11 +743,11 @@ export interface ITransformTranslate3d extends ICssFuncInvocation<"translate3d">
  * Type representing CSS `<transform>` functions accepted by the `transform` style property
  */
 export type TransformFunc =
-    ITransformMatrix | ITransformMatrix3d | ITransformPerspective |
-    ITransformRotate1d | ITransformRotate3d |
-    ITransformScale1d | ITransformScale2d | ITransformScale3d |
-    ITransformSkew1d | ITransformSkew2d |
-    ITransformTranslate1d | ITransformTranslate2d | ITransformTranslate3d;
+    TransformMatrix | TransformMatrix3d | TransformPerspective |
+    TransformRotate1d | TransformRotate3d |
+    TransformScale1d | TransformScale2d | TransformScale3d |
+    TransformSkew1d | TransformSkew2d |
+    TransformTranslate1d | TransformTranslate2d | TransformTranslate3d;
 
 
 
@@ -665,13 +831,29 @@ export type BasicShape = IBasicShapeProxy | IPathBuilder;
 
 
 /**
- * The IRayFunc function represents an invocation of the CSS `ray()` function.
+ * The RayFunc object represents an invocation of the CSS `ray()` function.
  */
-export interface IRayFunc extends ICssFuncInvocation<"ray">
+export class RayFunc extends CssFuncInvocation
 {
+    /** Ray's angle */
     angle: Extended<CssAngle>;
+    /** Ray's length */
     size?: Extended<ExtentKeyword | CssLength>;
+    /** Ray's contain flag */
     contain?: boolean
+
+    constructor( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>, contain?: boolean)
+    {
+        super( "ray", [
+            ["angle", WellKnownFunc.Angle],
+            ["size", WellKnownFunc.Length],
+            ["contain", (v?: boolean) => v ? "contain" : ""]
+        ], " ");
+
+        this.angle = angle;
+        this.size = size;
+        this.contain = contain;
+    }
 }
 
 
@@ -778,12 +960,23 @@ export interface ISpanProxy extends IGenericProxy<"span"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IUrlFunc interface represents an invocation of the CSS `url()` function.
+ * The UrlFunc class represents an invocation of the CSS `url()` function.
  */
-export interface IUrlFunc extends ICssFuncInvocation<"url">
+export class UrlFunc extends CssFuncInvocation
 {
-    p: Extended<string | IIDRule>;
-};
+    /**
+     * Parameter of the `url()` function. It can be specified as a string or as an [[IIDRule]]
+     * object. In the latter case, the identifier name will be prefixed with the pund sign, for
+     * example: `url(#svgID)`.
+     */
+    public p: Extended<string | IIDRule>;
+
+    constructor( p: Extended<string | IIDRule>)
+    {
+        super("url", ["p"])
+        this.p = p;
+    }
+}
 
 
 
