@@ -1,6 +1,13 @@
-﻿import {CssColor, INamedColors} from "../api/ExtraTypes";
+﻿import {
+    CssColor, INamedColors,
+    FilterPercentFunc, BlurFunc, DropShadowFunc, HueRotateFunc,
+    MatrixFunc, Matrix3dFunc, PerspectiveFunc, RotateFunc, Rotate3dFunc,
+    Scale1dFunc, ScaleFunc, Scale3dFunc, Skew1dFunc, SkewFunc,
+    Translate1dFunc, TranslateFunc, Translate3dFunc,
+    RayFunc, UrlFunc
+} from "../api/ExtraTypes";
 import {Extended, CssAngle} from "../api/CoreTypes"
-import {AngleMath, registerV2SFuncID, v2s, WellKnownFunc} from "./CoreFuncs"
+import {AngleMath, CssFunc, registerV2SFuncID, v2s, WellKnownFunc} from "./CoreFuncs"
 
 
 
@@ -443,45 +450,35 @@ registerV2SFuncID( colorToString, WellKnownFunc.Color);
 
 
 
-// // Transform functions
-// registerV2PFuncs(
-//     ["matrix", ["a","b","c","d","tx","ty"]],
-//     ["matrix3d", ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"]],
-//     // ["perspective", [["d", WellKnownFunc.Length]]],
-//     // [["rotate", "rotateX", "rotateY", "rotateZ"], [["a", WellKnownFunc.Angle]]],
-//     // ["rotate3d", [ "x", "y", "z", ["a", WellKnownFunc.Angle]]],
-//     // [["scaleX", "scaleY", "scaleZ"], ["s"]],
-//     // [["scale", "scale3d"], ["sx", "sy", "sz"]],
-//     // [["skewX", "skewY"], [["a", WellKnownFunc.Angle]]],
-//     // ["skewd", [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]]],
-//     // [["translateX", "translateY", "translateZ"], [["d", WellKnownFunc.Length]]],
-//     // ["translate3d", [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]]],
-// );
+// Filter CSS functions.
+CssFunc.setup( FilterPercentFunc, [["p", WellKnownFunc.Percent]]);
+CssFunc.setup( BlurFunc, [["r", WellKnownFunc.Length]], "blur");
+CssFunc.setup( DropShadowFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length],
+    ["blur", WellKnownFunc.Length], ["color", WellKnownFunc.Color]], "drop-shadow");
+CssFunc.setup( HueRotateFunc, [["a", WellKnownFunc.Angle]], "hue-rotate");
 
 
 
-// // Filter functions
-// registerV2PFuncs(
-//     [["brightness", "contrast", "grayscale", "invert", "opacity", "saturate", "sepia"], [["p", WellKnownFunc.Percent]]],
-//     ["blur", [["r", WellKnownFunc.Length]]],
-//     ["drop-shadow", [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["blur", WellKnownFunc.Length], ["color", colorToString]]],
-//     ["hue-rotate", [["a", WellKnownFunc.Angle]]],
-// );
+// Transform CSS functions.
+CssFunc.setup( MatrixFunc, ["a","b","c","d","tx","ty"], "matrix");
+CssFunc.setup( Matrix3dFunc, ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"], "matrix3d");
+CssFunc.setup( PerspectiveFunc, [["d", WellKnownFunc.Length]], "perspective");
+CssFunc.setup( RotateFunc, [["a", WellKnownFunc.Angle]]);
+CssFunc.setup( Rotate3dFunc, [ "x", "y", "z", ["a", WellKnownFunc.Angle]], "rotate3d");
+CssFunc.setup( Scale1dFunc, ["s"]);
+CssFunc.setup( ScaleFunc, ["sx", "sy"], "scale");
+CssFunc.setup( Scale3dFunc, ["sx", "sy", "sz"], "scale3d");
+CssFunc.setup( Skew1dFunc, [["a", WellKnownFunc.Angle]]);
+CssFunc.setup( SkewFunc, [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]], "skew");
+CssFunc.setup( Translate1dFunc, [["d", WellKnownFunc.Length]]);
+CssFunc.setup( TranslateFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length]], "translate");
+CssFunc.setup( Translate3dFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]], "translate3d");
 
 
 
-// // URL functions
-// registerV2PFuncs(
-//     // ["url", ["p"]],
-//     // [
-//     //     "ray", (v: IRayFunc) => {
-//     //         let angleString = AngleMath.s2s( v.angle);
-//     //         let sizeString = v.size != null ? " " + LengthMath.s2s( v.size) : "";
-//     //         let containString = v.contain ? " contain" : "";
-//     //         return [`ray(${angleString}${sizeString}${containString})`];
-//     //     }
-//     // ],
-// );
+// Miscellaneous CSS functions.
+CssFunc.setup( UrlFunc, ["p"], "url");
+CssFunc.setup( RayFunc, [["angle", WellKnownFunc.Angle], ["size", WellKnownFunc.Length], ["contain", (v?: boolean) => v ? "contain" : ""]], "ray", " ");
 
 
 

@@ -1,12 +1,14 @@
 ﻿import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword, IStringProxy} from "./CoreTypes";
 import {
     CrossFadeParam, CssColor, GradientStopOrHint, IBasicShapeProxy, ICircleProxy, IColorProxy,
-    IConicGradient, IEllipseProxy, FilterBlur, FilterDropShadow, FilterHueRotate,
-    FilterPercent, IImageProxy, IInsetProxy, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
-    IPolygonProxy, IRadialGradient, RayFunc, IRepeatProxy, ISpanProxy, TransformMatrix,
-    TransformMatrix3d, TransformPerspective, TransformRotate1d, TransformRotate3d,
-    TransformScale1d, TransformScale2d, TransformScale3d, TransformSkew1d, TransformSkew2d,
-    TransformTranslate1d, TransformTranslate2d, TransformTranslate3d, UrlFunc, LinearGradAngle, ShapeRadius
+    IConicGradient, IEllipseProxy, LinearGradAngle, ShapeRadius,
+    IImageProxy, IInsetProxy, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
+    IPolygonProxy, IRadialGradient, IRepeatProxy, ISpanProxy,
+    FilterPercentFunc, BlurFunc, DropShadowFunc, HueRotateFunc,
+    MatrixFunc, Matrix3dFunc, PerspectiveFunc, RotateFunc, Rotate3dFunc,
+    Scale1dFunc, ScaleFunc, Scale3dFunc, Skew1dFunc, SkewFunc,
+    Translate1dFunc, TranslateFunc, Translate3dFunc,
+    RayFunc, UrlFunc
 } from "./ExtraTypes";
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {
@@ -391,9 +393,9 @@ function crossFadeParamToString( val: CrossFadeParam): string
 /**
  * Returns an IFilterPercent object representing the `brightness()` CSS function.
  */
-export function brightness( p: Extended<CssPercent>): FilterPercent
+export function brightness( p: Extended<CssPercent>): FilterPercentFunc
 {
-    return new FilterPercent( "brightness", p);
+    return new FilterPercentFunc( "brightness", p);
 }
 
 
@@ -401,9 +403,9 @@ export function brightness( p: Extended<CssPercent>): FilterPercent
 /**
  * Returns an IFilterProxy function representing the `contrast()` CSS function.
  */
-export function contrast( p: Extended<CssPercent>): FilterPercent
+export function contrast( p: Extended<CssPercent>): FilterPercentFunc
 {
-    return new FilterPercent( "contrast", p);
+    return new FilterPercentFunc( "contrast", p);
 }
 
 
@@ -411,9 +413,9 @@ export function contrast( p: Extended<CssPercent>): FilterPercent
 /**
  * Returns an IFilterProxy function representing the `grayscale()` CSS function.
  */
-export function grayscale( p: Extended<CssPercent>): FilterPercent
+export function grayscale( p: Extended<CssPercent>): FilterPercentFunc
 {
-    return new FilterPercent( "grayscale", p);
+    return new FilterPercentFunc( "grayscale", p);
 }
 
 
@@ -421,9 +423,9 @@ export function grayscale( p: Extended<CssPercent>): FilterPercent
 /**
  * Returns an IFilterProxy function representing the `invert()` CSS function.
  */
-export function invert( p: Extended<CssPercent>): FilterPercent
+export function invert( p: Extended<CssPercent>): FilterPercentFunc
 {
-    return new FilterPercent( "invert", p);
+    return new FilterPercentFunc( "invert", p);
 }
 
 
@@ -431,9 +433,9 @@ export function invert( p: Extended<CssPercent>): FilterPercent
 /**
  * Returns an IFilterProxy function representing the `opacity()` CSS function.
  */
-export function opacity( p: Extended<CssPercent>): FilterPercent
+export function opacity( p: Extended<CssPercent>): FilterPercentFunc
 {
-    return new FilterPercent( "opacity", p);
+    return new FilterPercentFunc( "opacity", p);
 }
 
 
@@ -441,9 +443,9 @@ export function opacity( p: Extended<CssPercent>): FilterPercent
 /**
  * Returns an IFilterProxy function representing the `saturate()` CSS function.
  */
-export function saturate( p: Extended<CssPercent>): FilterPercent
+export function saturate( p: Extended<CssPercent>): FilterPercentFunc
 {
-    return new FilterPercent( "saturate", p);
+    return new FilterPercentFunc( "saturate", p);
 }
 
 
@@ -451,9 +453,9 @@ export function saturate( p: Extended<CssPercent>): FilterPercent
 /**
  * Returns an IFilterProxy function representing the `sepia()` CSS function.
  */
-export function sepia( p: Extended<CssPercent>): FilterPercent
+export function sepia( p: Extended<CssPercent>): FilterPercentFunc
 {
-    return new FilterPercent( "sepia", p);
+    return new FilterPercentFunc( "sepia", p);
 }
 
 
@@ -461,9 +463,9 @@ export function sepia( p: Extended<CssPercent>): FilterPercent
 /**
  * Returns an IFilterProxy function representing the `blur()` CSS function.
  */
-export function blur( r: Extended<CssLength>): FilterBlur
+export function blur( r: Extended<CssLength>): BlurFunc
 {
-    return new FilterBlur( r);
+    return new BlurFunc( r);
 }
 
 
@@ -476,9 +478,9 @@ export function blur( r: Extended<CssLength>): FilterBlur
  * @param blur Value of the shadow's blurring. The default value is 1 pixel.
  */
 export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
-    color?: Extended<CssColor>, blur?: Extended<CssLength>): FilterDropShadow
+    color?: Extended<CssColor>, blur?: Extended<CssLength>): DropShadowFunc
 {
-    return new FilterDropShadow( x, y, color, blur);
+    return new DropShadowFunc( x, y, color, blur);
 }
 
 
@@ -486,9 +488,9 @@ export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
 /**
  * Returns an IFilterProxy function representing the `hue-rotate()` CSS function.
  */
-export function hueRotate( a: Extended<CssAngle>): FilterHueRotate
+export function hueRotate( a: Extended<CssAngle>): HueRotateFunc
 {
-    return new FilterHueRotate( a);
+    return new HueRotateFunc( a);
 }
 
 
@@ -503,9 +505,9 @@ export function hueRotate( a: Extended<CssAngle>): FilterHueRotate
  * Returns an ITransformMatrix function representing the `matrix()` CSS function.
  */
 export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
-	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): TransformMatrix
+	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): MatrixFunc
 {
-    return new TransformMatrix(  a, b, c, d, tx, ty);
+    return new MatrixFunc(  a, b, c, d, tx, ty);
 }
 
 
@@ -518,9 +520,9 @@ export function matrix3d(
 		a2: Extended<CssNumber>, b2: Extended<CssNumber>, c2: Extended<CssNumber>, d2: Extended<CssNumber>,
 		a3: Extended<CssNumber>, b3: Extended<CssNumber>, c3: Extended<CssNumber>, d3: Extended<CssNumber>,
 		a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>,
-	): TransformMatrix3d
+	): Matrix3dFunc
 {
-    return new TransformMatrix3d(  a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4);
+    return new Matrix3dFunc(  a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4);
 }
 
 
@@ -528,9 +530,9 @@ export function matrix3d(
 /**
  * Returns an ITransformProxy function representing the `perspective()` CSS function.
  */
-export function perspective( d: Extended<CssLength>): TransformPerspective
+export function perspective( d: Extended<CssLength>): PerspectiveFunc
 {
-    return new TransformPerspective( d);
+    return new PerspectiveFunc( d);
 }
 
 
@@ -538,42 +540,42 @@ export function perspective( d: Extended<CssLength>): TransformPerspective
 /**
  * Returns an ITransformRotate2d object representing the `rotate()` CSS function.
  */
-export function rotate( a: Extended<CssAngle>): TransformRotate1d
+export function rotate( a: Extended<CssAngle>): RotateFunc
 {
-    return new TransformRotate1d( a);
+    return new RotateFunc( a);
 }
 
 /**
  * Returns an ITransformRotate object representing the `rotateX()` CSS function.
  */
-export function rotateX( a: Extended<CssAngle>): TransformRotate1d
+export function rotateX( a: Extended<CssAngle>): RotateFunc
 {
-    return new TransformRotate1d( a, "X");
+    return new RotateFunc( a, "X");
 }
 
 /**
  * Returns an ITransformRotate object representing the `rotateY()` CSS function.
  */
-export function rotateY( a: Extended<CssAngle>): TransformRotate1d
+export function rotateY( a: Extended<CssAngle>): RotateFunc
 {
-    return new TransformRotate1d( a, "Y");
+    return new RotateFunc( a, "Y");
 }
 
 /**
  * Returns an ITransformRotate object representing the `rotateZ()` CSS function.
  */
-export function rotateZ( a: Extended<CssAngle>): TransformRotate1d
+export function rotateZ( a: Extended<CssAngle>): RotateFunc
 {
-    return new TransformRotate1d( a, "Z");
+    return new RotateFunc( a, "Z");
 }
 
 /**
  * Returns an ITransformRotate3d object representing the `rotate3d()` CSS function.
  */
 export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
-    z: Extended<CssNumber>, a: Extended<CssAngle>): TransformRotate3d
+    z: Extended<CssNumber>, a: Extended<CssAngle>): Rotate3dFunc
 {
-    return new TransformRotate3d( x, y, z, a);
+    return new Rotate3dFunc( x, y, z, a);
 }
 
 
@@ -581,42 +583,42 @@ export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
 /**
  * Returns an ITransformScale2d object representing the `scale()` CSS function.
  */
-export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): TransformScale2d
+export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): ScaleFunc
 {
-    return new TransformScale2d( sx, sy);
+    return new ScaleFunc( sx, sy);
 }
 
 /**
  * Returns an ITransformScale object representing the `scaleX()` CSS function.
  */
-export function scaleX( s: Extended<CssNumber>): TransformScale1d
+export function scaleX( s: Extended<CssNumber>): Scale1dFunc
 {
-    return new TransformScale1d( s, "X");
+    return new Scale1dFunc( s, "X");
 }
 
 /**
  * Returns an ITransformScale object representing the `scaleY()` CSS function.
  */
-export function scaleY( s: Extended<CssNumber>): TransformScale1d
+export function scaleY( s: Extended<CssNumber>): Scale1dFunc
 {
-    return new TransformScale1d( s, "Y");
+    return new Scale1dFunc( s, "Y");
 }
 
 /**
  * Returns an ITransformScale object representing the `scaleZ()` CSS function.
  */
-export function scaleZ( s: Extended<CssNumber>): TransformScale1d
+export function scaleZ( s: Extended<CssNumber>): Scale1dFunc
 {
-    return new TransformScale1d( s, "Z");
+    return new Scale1dFunc( s, "Z");
 }
 
 /**
  * Returns an ITransformScale3d object representing the `scale3d()` CSS function.
  */
 export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
-    sz: Extended<CssNumber>): TransformScale3d
+    sz: Extended<CssNumber>): Scale3dFunc
 {
-    return new TransformScale3d( sx, sy, sz);
+    return new Scale3dFunc( sx, sy, sz);
 }
 
 
@@ -624,25 +626,25 @@ export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
 /**
  * Returns an ITransformProxy function representing the `skew()` CSS function.
  */
-export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): TransformSkew2d
+export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): SkewFunc
 {
-    return new TransformSkew2d( ax, ay);
+    return new SkewFunc( ax, ay);
 }
 
 /**
  * Returns an ITransformProxy function representing the `skewX()` CSS function.
  */
-export function skewX( a: Extended<CssAngle>): TransformSkew1d
+export function skewX( a: Extended<CssAngle>): Skew1dFunc
 {
-    return new TransformSkew1d( a, "X");
+    return new Skew1dFunc( a, "X");
 }
 
 /**
  * Returns an ITransformProxy function representing the `skewY()` CSS function.
  */
-export function skewY( a: Extended<CssAngle>): TransformSkew1d
+export function skewY( a: Extended<CssAngle>): Skew1dFunc
 {
-    return new TransformSkew1d( a, "Y");
+    return new Skew1dFunc( a, "Y");
 }
 
 
@@ -650,42 +652,42 @@ export function skewY( a: Extended<CssAngle>): TransformSkew1d
 /**
  * Returns an ITransformTranslate2d object representing the `translate()` CSS function.
  */
-export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): TransformTranslate2d
+export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): TranslateFunc
 {
-    return new TransformTranslate2d( x, y);
+    return new TranslateFunc( x, y);
 }
 
 /**
  * Returns an ITransformTranslate1d object representing the `translateX()` CSS function.
  */
-export function translateX( l: Extended<CssLength>): TransformTranslate1d
+export function translateX( l: Extended<CssLength>): Translate1dFunc
 {
-    return new TransformTranslate1d( l, "X");
+    return new Translate1dFunc( l, "X");
 }
 
 /**
  * Returns an ITransformTranslate1d object representing the `translateY()` CSS function.
  */
-export function translateY( l: Extended<CssLength>): TransformTranslate1d
+export function translateY( l: Extended<CssLength>): Translate1dFunc
 {
-    return new TransformTranslate1d( l, "Y");
+    return new Translate1dFunc( l, "Y");
 }
 
 /**
  * Returns an ITransformTranslate1d object representing the `translateZ()` CSS function.
  */
-export function translateZ( l: Extended<CssLength>): TransformTranslate1d
+export function translateZ( l: Extended<CssLength>): Translate1dFunc
 {
-    return new TransformTranslate1d( l, "Z");
+    return new Translate1dFunc( l, "Z");
 }
 
 /**
  * Returns an ITransformTranslate3d object representing the `translate3d()` CSS function.
  */
 export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
-	z: Extended<CssLength>): TransformTranslate3d
+	z: Extended<CssLength>): Translate3dFunc
 {
-    return new TransformTranslate3d( x, y, z);
+    return new Translate3dFunc( x, y, z);
 }
 
 
@@ -1024,12 +1026,12 @@ export function url( p: Extended<string | IIDRule>): UrlFunc
  * Returns a function representing the invocation of the `var()` CSS function for
  * the given custom CSS property with optional fallbacks.
  */
- export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
- {
-     return () => fallback
-         ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
-         : `var(--${varObj.name})`;
- }
+export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
+{
+    return () => fallback
+        ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
+        : `var(--${varObj.name})`;
+}
 
 
 

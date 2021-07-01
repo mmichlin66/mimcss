@@ -44,7 +44,7 @@ export function camelToDash( camel: string): string
  * symbol because the standard method toString exists on every object and we only want some to
  * explicitly provide this support.
  */
- export let symValueToString = Symbol("symValueToString");
+ export const symValueToString: unique symbol = Symbol();
 
 
 
@@ -682,78 +682,130 @@ export function v2sByFuncID( val: any, funcID: number): string
 
 
 
-// Defines type containing array of either property names or tuples where the first element is
-// the name of a property and the second elemet is either the ID of registered function or the
-// function converting the value of the property to string.
+/**
+ * Defines type containing array of either property names or tuples where the first element is
+ * the name of a property and the second elemet is either the ID of registered function or the
+ * function converting the value of the property to string. Each property is converted according
+ * to the following rules:
+ * - If the array item is just a string, the corresponding value's property is converted using
+ *   the v2s function.
+ * - If the tuple's second element is null or undefined, the corresponding value's property is
+ *   converted using the v2s function.
+ * - If the tuple's second element is a number it is treated as an index of a well-known
+ *   conversion function.
+ * - If the tuple's second element is a function, it is used to convert the value's property.
+ */
 type V2PDef = (string | [string, number | ToStringFunc])[];
 
 
 
 /**
- * Converts the given value representing parameters of a CSS function to array of string
- * representations of these parametersusing the information object instructing how the object's
- * properties should be converted to strings. The info parameter is an array of either strings
- * or two-element tuples. The only string and the first tuple element corresponds to a property
- * expected in the value object to be converted. Each property is converted according to the
- * following rules:
- * - If the array item is just a string, the corresponding value's property is converted using
- *   the val2str function.
- * - If the second element is null or undefined, the corresponding value's property is converted using
- *   the val2str function..
- * - If the second element is a number it is treated as an index of a well-known conversion function.
- * - If the second element is a function, it is used to convert the value's property.
- *
- * Since the elements in the info array constitute parameters for the function, processing stops as
- * soon as an undefined parameter is encountered because undefined parameter indicates that optional
- * parameters started with this one were not passed to the function.
+ * Symbol that can be used on class objects of function invocation classes to specify the delimiter
+ * to separate function arguments. This is optional and is only needed if the delimiter is not a
+ * comma.
  */
-function paramsToStrings( val: any, info: V2PDef): string[]
+const symCssFuncName: unique symbol = Symbol();
+
+/**
+ * Symbol used on class objects of function invocation classes to specify how instances of the
+ * class should be converted to strings. The value must be of type V2PDef, which is an array of
+ * property names along with indications how they are converted to strings.
+ */
+const symCssFuncParamInfo: unique symbol = Symbol();
+
+/**
+ * Symbol that can be used on class objects of function invocation classes to specify the delimiter
+ * to separate function arguments. This is optional and is only needed if the delimiter is not a
+ * comma.
+ */
+const symCssFuncParamDelimiter: unique symbol = Symbol();
+
+
+
+/**
+ * Base class for classes that serve as representations of CSS function invocations.
+ */
+export abstract class CssFunc
 {
-    if (val == null)
-        return [];
+    /**
+     * CSS function name
+     */
+    static [symCssFuncName]?: string;
 
-    let params: string[] = [];
-    for( let nameOrTuple of info)
+    /**
+     * Optional information about function parameters and how they shold be converted to strings
+     */
+    static [symCssFuncParamInfo]?: V2PDef;
+
+    /**
+     * Optional delimiter to separate function parameters. The default is comma.
+     */
+    static [symCssFuncParamDelimiter]?: string;
+
+    constructor()
     {
-        // get the name of the property in the value to be converted and the corresponding value;
-        // if the properties value is not defined, skip it.
-        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
-        let propVal = val[propName];
-        if (propVal == null)
-            break;
-
-        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-        if (!convertor)
-            params.push( v2s( propVal));
-        else if (typeof convertor === "number")
-            params.push( v2sByFuncID( propVal, convertor));
-        else
-            params.push( convertor( propVal));
+        this[symValueToString] = () => `${this.name}(${this.params})`;
     }
 
-	return params;
-}
+    /**
+     * Returns CSS function name. This implementation returns the value of the static
+     * symbol symCssFuncName. It can be overridden in the derived classes.
+     */
+    public get name(): string { return this.constructor[symCssFuncName]; }
 
-
-
-export abstract class CssFuncInvocation
-{
-    private fn: string;
-    private paramInfo?: V2PDef;
-    private delimiter: string;
-
-    constructor( fn: string, paramInfo?: V2PDef, delimiter?: string)
+    /**
+     * Returns the string containing all the CSS function parameters. This implementation
+     * uses parameter information and delimiter optionally set as values of the static
+     * symbols symCssFuncParamInfo and symCssFuncParamDelimiter. It can be overridden in the
+     * derived classes.
+     */
+    public get params(): string
     {
-        this.fn = fn;
-        this.paramInfo = paramInfo;
-        this.delimiter = delimiter ?? ",";
+        let info: V2PDef | undefined = this.constructor[symCssFuncParamInfo];
+        if (info == null)
+            return "";
 
-        this[symValueToString] = () => `${this.fn}(${this.p2s()})`;
+        let params: string[] = [];
+        for( let nameOrTuple of info)
+        {
+            // get the name of the property in the value to be converted and the corresponding value;
+            // if the properties value is not defined, skip it.
+            let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
+            let propVal = this[propName];
+            if (propVal == null)
+                continue;
+
+            let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+            if (!convertor)
+                params.push( v2s( propVal));
+            else if (typeof convertor === "number")
+                params.push( v2sByFuncID( propVal, convertor));
+            else
+                params.push( convertor( propVal));
+        }
+
+        return params.join(this.constructor[symCssFuncParamDelimiter] ?? ",");
     }
 
-    public p2s(): string
+    /**
+     * Sets up the given CssFunc-derived class by specifying how the function parameters are
+     * converted to strings, what function name to use and what delimiter to use to separate
+     * function parameters.
+     * @param cls CssFunc-derived class
+     * @param paramInfo Information about how class properties should be converted to strings
+     * representing function parameters.
+     * @param name Name of the function. This can be left undefined if the class overrides the
+     * `name` property getter. This is usually the case for classes that serve multiple functions.
+     * @param delimiter Optional delimiter string used to separate function parameters. This can
+     * be left undefined if comma should be used.
+     */
+    public static setup<T extends CssFunc>( cls: { new (...args: any[]): T },
+        paramInfo: (keyof T | [keyof T, number | ToStringFunc])[],
+        name?: string, delimiter?: string): void
     {
-        return this.paramInfo ? paramsToStrings( this, this.paramInfo).join(this.delimiter) : "";
+        if (paramInfo) cls[symCssFuncParamInfo] = paramInfo;
+        if (name) cls[symCssFuncName] = name;
+        if (delimiter) cls[symCssFuncParamDelimiter] = delimiter;
     }
 }
 
