@@ -15,7 +15,8 @@ import {
     BorderRadius_StyleType, ExtendedVarValue, FillRule_StyleType, GridLineCountOrName, GridTrack,
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
-import {AngleMath, INumberBaseMathClass, LengthMath, PercentMath, pos2str, symValueToString, v2s } from "../impl/CoreFuncs";
+import {CssFunc} from "./CoreAPI";
+import {AngleMath, INumberBaseMathClass, LengthMath, PercentMath, pos2str, registerV2SFuncID, symValueToString, v2s, WellKnownFunc } from "../impl/CoreFuncs";
 import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
 import {borderRadiusToString, gridTrackToString, stylePropToString} from "../impl/StyleFuncs";
 
@@ -1032,6 +1033,48 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
         ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
         : `var(--${varObj.name})`;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Registration of function converting parameters of CSS functions.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+registerV2SFuncID( colorToString, WellKnownFunc.Color);
+
+
+
+// Filter CSS functions.
+CssFunc.setup( FilterPercentFunc, [["p", WellKnownFunc.Percent]]);
+CssFunc.setup( BlurFunc, [["r", WellKnownFunc.Length]], "blur");
+CssFunc.setup( DropShadowFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length],
+    ["blur", WellKnownFunc.Length], ["color", WellKnownFunc.Color]], "drop-shadow");
+CssFunc.setup( HueRotateFunc, [["a", WellKnownFunc.Angle]], "hue-rotate");
+
+
+
+// Transform CSS functions.
+CssFunc.setup( MatrixFunc, ["a","b","c","d","tx","ty"], "matrix");
+CssFunc.setup( Matrix3dFunc, ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"], "matrix3d");
+CssFunc.setup( PerspectiveFunc, [["d", WellKnownFunc.Length]], "perspective");
+CssFunc.setup( RotateFunc, [["a", WellKnownFunc.Angle]]);
+CssFunc.setup( Rotate3dFunc, [ "x", "y", "z", ["a", WellKnownFunc.Angle]], "rotate3d");
+CssFunc.setup( Scale1dFunc, ["s"]);
+CssFunc.setup( ScaleFunc, ["sx", "sy"], "scale");
+CssFunc.setup( Scale3dFunc, ["sx", "sy", "sz"], "scale3d");
+CssFunc.setup( Skew1dFunc, [["a", WellKnownFunc.Angle]]);
+CssFunc.setup( SkewFunc, [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]], "skew");
+CssFunc.setup( Translate1dFunc, [["d", WellKnownFunc.Length]]);
+CssFunc.setup( TranslateFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length]], "translate");
+CssFunc.setup( Translate3dFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]], "translate3d");
+
+
+
+// Miscellaneous CSS functions.
+CssFunc.setup( UrlFunc, ["p"], "url");
+CssFunc.setup( RayFunc, [["angle", WellKnownFunc.Angle], ["size", WellKnownFunc.Length], ["contain", (v?: boolean) => v ? "contain" : ""]], "ray", " ");
 
 
 

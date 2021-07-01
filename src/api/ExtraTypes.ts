@@ -4,7 +4,7 @@
 } from "./CoreTypes";
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
 import {IIDRule} from "./RuleTypes";
-import {CssFunc} from "../impl/CoreFuncs";
+import {CssFunc} from "./CoreAPI";
 
 
 
