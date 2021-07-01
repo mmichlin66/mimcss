@@ -793,7 +793,7 @@ export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "
 
 
 /**
- * Type representing extent for the [[radial-gradient]] or [[ray]] functions.
+ * Type representing extent for the [[radialGradient]] or [[ray]] functions.
  */
 export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
 

@@ -31,15 +31,15 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 		if (styleset)
 			this.parseInputStyleset( styleset as CombinedStyleset);
-
-        /**
-         * This function allows the object to particpate in "val2str" serialization. Whenever
-         * the StyleRule-derived object is encountered by the `UtilFunc.val2str` function,
-         * the rule's selector will be used.
-         */
-        this[symValueToString] = (): string => this.selectorText;
 	}
 
+
+    /**
+     * This function allows the object to particpate in "val2str" serialization. Whenever
+     * the StyleRule-derived object is encountered by the `UtilFunc.val2str` function,
+     * the rule's selector will be used.
+     */
+    [symValueToString](): string { return this.selectorText; }
 
 
 	/**

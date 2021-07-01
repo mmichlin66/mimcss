@@ -1,6 +1,5 @@
 import {IGridLineRule, IGridAreaRule} from "../api/RuleTypes"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
-import {symValueToString} from "../impl/CoreFuncs";
 
 
 
@@ -18,11 +17,13 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         super();
         this.nameOverride = nameOverride;
         this.isStartEndOrNone = isStartEndOrNone;
-
-        // This function is used when the object is specified as a value of a style property.
-        // We return the line name.
-        this[symValueToString] = (): string => this.name;
 	}
+
+
+    // This function is used when the object is specified as a value of a style property.
+    // We return the line name.
+    public toString(): string { return this.name; }
+
 
 	// Processes the given rule.
 	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
@@ -125,11 +126,11 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
         // create line rules
         this.startLine = new GridLineRule( this, true);
         this.endLine = new GridLineRule( this, false);
-
-        // This function is used when the object is specified as a value of a style property.
-        // We return the are name.
-        this[symValueToString] = (): string => this.name;
 	}
+
+    // This function is used when the object is specified as a value of a style property.
+    // We return the area name.
+    public toString(): string { return this.name; }
 
 	// Processes the given rule.
 	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void

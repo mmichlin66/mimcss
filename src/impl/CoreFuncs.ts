@@ -101,11 +101,6 @@ export function v2s( val: any, options?: IValueConvertOptions): string
 {
    if (!options)
     {
-        // standard processing:
-        // - null/undefined become empty string.
-        // - call [symValueToString] method on objects that have it.
-        // - function: call without parameters - support for proxies.
-        // - everything else: call toString().
         if (val == null)
             return "";
         else if (typeof val === "string")
@@ -149,6 +144,8 @@ export function v2s( val: any, options?: IValueConvertOptions): string
                 func = options.fromObj || options.fromAny;
             else if (typeof val[symValueToString] === "function")
                 return val[symValueToString]();
+            else
+                return val.toString();
         }
         else if (typeof val === "boolean")
             func = options.fromBool || options.fromAny;

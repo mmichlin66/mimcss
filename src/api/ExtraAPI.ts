@@ -15,8 +15,10 @@ import {
     BorderRadius_StyleType, ExtendedVarValue, FillRule_StyleType, GridLineCountOrName, GridTrack,
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
-import {CssFunc} from "./CoreAPI";
-import {AngleMath, INumberBaseMathClass, LengthMath, PercentMath, pos2str, registerV2SFuncID, symValueToString, v2s, WellKnownFunc } from "../impl/CoreFuncs";
+import {
+    AngleMath, INumberBaseMathClass, LengthMath, PercentMath, pos2str, registerV2SFuncID,
+    v2s, WellKnownFunc
+} from "../impl/CoreFuncs";
 import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
 import {borderRadiusToString, gridTrackToString, stylePropToString} from "../impl/StyleFuncs";
 
@@ -851,10 +853,10 @@ class PathBuilder implements IPathBuilder
             this.buf += fillRule + ",";
 
         this.buf += "'";
-
-        // Returns the accumulated string
-        this[symValueToString] = (): string => this.buf + "')";
     }
+
+    // Returns the accumulated string
+    public toString(): string { return this.buf + "')"; }
 
 
 
@@ -1047,34 +1049,34 @@ registerV2SFuncID( colorToString, WellKnownFunc.Color);
 
 
 // Filter CSS functions.
-CssFunc.setup( FilterPercentFunc, [["p", WellKnownFunc.Percent]]);
-CssFunc.setup( BlurFunc, [["r", WellKnownFunc.Length]], "blur");
-CssFunc.setup( DropShadowFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length],
+FilterPercentFunc.setup( [["p", WellKnownFunc.Percent]]);
+BlurFunc.setup( [["r", WellKnownFunc.Length]], "blur");
+DropShadowFunc.setup( [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length],
     ["blur", WellKnownFunc.Length], ["color", WellKnownFunc.Color]], "drop-shadow");
-CssFunc.setup( HueRotateFunc, [["a", WellKnownFunc.Angle]], "hue-rotate");
+HueRotateFunc.setup( [["a", WellKnownFunc.Angle]], "hue-rotate");
 
 
 
 // Transform CSS functions.
-CssFunc.setup( MatrixFunc, ["a","b","c","d","tx","ty"], "matrix");
-CssFunc.setup( Matrix3dFunc, ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"], "matrix3d");
-CssFunc.setup( PerspectiveFunc, [["d", WellKnownFunc.Length]], "perspective");
-CssFunc.setup( RotateFunc, [["a", WellKnownFunc.Angle]]);
-CssFunc.setup( Rotate3dFunc, [ "x", "y", "z", ["a", WellKnownFunc.Angle]], "rotate3d");
-CssFunc.setup( Scale1dFunc, ["s"]);
-CssFunc.setup( ScaleFunc, ["sx", "sy"], "scale");
-CssFunc.setup( Scale3dFunc, ["sx", "sy", "sz"], "scale3d");
-CssFunc.setup( Skew1dFunc, [["a", WellKnownFunc.Angle]]);
-CssFunc.setup( SkewFunc, [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]], "skew");
-CssFunc.setup( Translate1dFunc, [["d", WellKnownFunc.Length]]);
-CssFunc.setup( TranslateFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length]], "translate");
-CssFunc.setup( Translate3dFunc, [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]], "translate3d");
+MatrixFunc.setup( ["a","b","c","d","tx","ty"], "matrix");
+Matrix3dFunc.setup( ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"], "matrix3d");
+PerspectiveFunc.setup( [["d", WellKnownFunc.Length]], "perspective");
+RotateFunc.setup( [["a", WellKnownFunc.Angle]]);
+Rotate3dFunc.setup( [ "x", "y", "z", ["a", WellKnownFunc.Angle]], "rotate3d");
+Scale1dFunc.setup( ["s"]);
+ScaleFunc.setup( ["sx", "sy"], "scale");
+Scale3dFunc.setup( ["sx", "sy", "sz"], "scale3d");
+Skew1dFunc.setup( [["a", WellKnownFunc.Angle]]);
+SkewFunc.setup( [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]], "skew");
+Translate1dFunc.setup( [["d", WellKnownFunc.Length]]);
+TranslateFunc.setup( [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length]], "translate");
+Translate3dFunc.setup( [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]], "translate3d");
 
 
 
 // Miscellaneous CSS functions.
-CssFunc.setup( UrlFunc, ["p"], "url");
-CssFunc.setup( RayFunc, [["angle", WellKnownFunc.Angle], ["size", WellKnownFunc.Length], ["contain", (v?: boolean) => v ? "contain" : ""]], "ray", " ");
+UrlFunc.setup( ["p"], "url");
+RayFunc.setup( [["angle", WellKnownFunc.Angle], ["size", WellKnownFunc.Length], ["contain", (v?: boolean) => v ? "contain" : ""]], "ray", " ");
 
 
 

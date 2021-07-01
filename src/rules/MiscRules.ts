@@ -205,11 +205,11 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 	{
 		super();
 		this.classes = classes;
-
-        // This function is used when the object is specified as a value of a style property.
-        // We return the CSS class name.
-        this[symValueToString] = (): string => this.cssClassName;
 	}
+
+    // This function is used when the object is specified as a value of a style property.
+    // We return the CSS class name.
+    [symValueToString](): string { return this.cssClassName; }
 
 	/** CSS rule selector string */
 	public get selectorText(): string
