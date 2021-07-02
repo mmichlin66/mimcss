@@ -1,12 +1,15 @@
-﻿import * as FontFaceTypes from "../api/FontFaceTypes"
-import {camelToDash, v2s, PercentMath, AngleMath, a2s, obj2str, WellKnownFunc} from "./CoreFuncs";
+﻿import {
+    FontSrc_FontFaceType, FontSrc_Single, FontStretch_FontFaceType, FontStyle_FontFaceType,
+    FontWeight_FontFaceType, IFontFace
+} from "../api/FontFaceTypes"
+import {camelToDash, v2s, AngleMath, a2s, WellKnownFunc} from "./CoreFuncs";
 
 
 
 /**
  * Converts the given font face definition object to the CSS string
  */
-export function fontFaceToString( fontface: FontFaceTypes.IFontFace): string | null
+export function fontFaceToString( fontface: IFontFace): string | null
 {
     if (!fontface || !fontface.fontFamily)
         return null;
@@ -36,17 +39,14 @@ export function fontFaceToString( fontface: FontFaceTypes.IFontFace): string | n
 
 
 
-function fontStretchToString( val: FontFaceTypes.FontStretch_FontFaceType): string
+function fontStretchToString( val: FontStretch_FontFaceType): string
 {
-    return v2s( val, {
-        fromNumber: PercentMath.s2s,
-        arrItemFunc: PercentMath.s2s
-    });
+    return v2s( val, { fromAny: WellKnownFunc.Percent });
 }
 
 
 
-function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
+function fontStyleToString( val: FontStyle_FontFaceType): string
 {
     return v2s( val, {
         fromNumber: v => `oblique ${AngleMath.s2s(v)}`,
@@ -56,16 +56,14 @@ function fontStyleToString( val: FontFaceTypes.FontStyle_FontFaceType): string
 
 
 
-function fontWeightToString( val: FontFaceTypes.FontWeight_FontFaceType): string
+function fontWeightToString( val: FontWeight_FontFaceType): string
 {
-    return v2s( val, {
-        fromAny: WellKnownFunc.Number
-    });
+    return v2s( val, { fromAny: WellKnownFunc.Number });
 }
 
 
 
-function fontSrcToString( val: FontFaceTypes.FontSrc_FontFaceType): string
+function fontSrcToString( val: FontSrc_FontFaceType): string
 {
     return v2s( val, {
         fromAny: fontSingleSrcToString,
@@ -75,18 +73,20 @@ function fontSrcToString( val: FontFaceTypes.FontSrc_FontFaceType): string
 
 
 
-function fontSingleSrcToString( val: FontFaceTypes.FontSrc_Single): string
+function fontSingleSrcToString( val: FontSrc_Single): string
 {
-    return obj2str( val, [
-        ["local", v => `local(${v})`],
-        ["url", v => `url(${v})`],
-        ["format", v => `format(${fontFormatToString(v)})`]
-    ]);
+    return v2s( val, {
+        fromProps: [
+            ["local", v => `local(${v})`],
+            ["url", v => `url(${v})`],
+            ["format", v => `format(${fontFormatToString(v)})`]
+        ]
+    });
 }
 
 
 
-function fontFormatToString( val: FontFaceTypes.FontSrc_Single): string
+function fontFormatToString( val: FontSrc_Single): string
 {
     return v2s( val, {
         fromString: v => `\"${v}\"`,

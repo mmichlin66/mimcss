@@ -552,8 +552,8 @@ export type Filter_StyleType = OneOrMany<Filter_Single>;
 
 
 /** Type for flex style property */
-export type Flex_StyleType = FlexBasis_StyleType | [Extended<number>, Extended<number>] |
-    [Extended<number>, Extended<number>, Extended<FlexBasis_StyleType>];
+export type Flex_StyleType = FlexBasis_StyleType |
+    [Extended<CssNumber>, Extended<CssNumber>, Extended<FlexBasis_StyleType>];
 
 
 

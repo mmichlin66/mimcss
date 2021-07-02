@@ -9,8 +9,8 @@ import {
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
 import {
-    v2s, a2s, LengthMath, AngleMath, camelToDash, dashToCamel, IValueConvertOptions,
-    ToStringFunc, v2sByFuncID, WellKnownFunc, registerV2SFuncID, obj2str
+    v2s, a2s, p2s, LengthMath, AngleMath, camelToDash, dashToCamel, V2SOptions,
+    AnyToStringFunc, WellKnownFunc, registerV2SFuncID, P2SOption, NumberMath,
 } from "./CoreFuncs";
 import {colorToString} from "./ExtraFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -86,23 +86,25 @@ export function pseudoEntityToString( entityName: string, val: any): string
  *   property.
  * - If the second element is a function, it is used to convert the value's property.
  * - If a third element exists in the tuple it is treated as a prefix to be placed before the
- *   converted property value.
+ *   converted property value followed by the separator.
  *
  * The order of the names determines in which order the properties should be added to the string.
- */
+*/
 function styleObj2String( val: any,
-    info: (string | [string, null | string | number | ToStringFunc, string?] )[],
+    info: (string | [string, (V2SOptions | string)?, string?])[],
     separator: string = " "): string
 {
     // call utility function substituting every touple with style property name with function
     // that converts this property value to string
-    return obj2str( val, info.map( nameOrTuple => {
-        let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-        if (typeof convertor === "string")
-            return [nameOrTuple[0], v => stylePropToString( convertor as string, v, true), nameOrTuple[2]];
-        else
-            return nameOrTuple as string | [string, null | number | ToStringFunc, string?];
-    }), separator);
+    return p2s( val, info.map( nameOrTuple =>
+        {
+            let options = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+            if (typeof options === "string")
+                return [nameOrTuple[0], v => stylePropToString( options as string, v, true), nameOrTuple[2]];
+            else
+                return nameOrTuple as P2SOption;
+        }
+    ), separator);
 }
 
 
@@ -247,8 +249,8 @@ function borderImageToString( val: BorderImage_Object): string
     return styleObj2String( valCopy, [
         "source",
         ["slice", "borderImageSlice"],
-        ["width", null, "/"],
-        ["outset", null, "/"],
+        ["width", undefined, "/"],
+        ["outset", undefined, "/"],
         "repeat"
     ]);
 }
@@ -399,10 +401,8 @@ function flexToString( val: Extended<Flex_StyleType>): string
     return v2s( val, {
         fromArray: v =>
         {
-            if (v.length === 2)
-                return v.join( " ");
-            else
-                return v[0] + " " + v[1] + " " + LengthMath.s2s( v[2]);
+            let s = `${NumberMath.s2s(v[0])} ${NumberMath.s2s(v[1])}`;
+            return v.length > 2 ? s +` ${LengthMath.s2s( v[2])}` : s;
         },
         fromAny: WellKnownFunc.Length
     });
@@ -418,7 +418,7 @@ function font_fromObject( val: any): string
         "weight",
         "stretch",
         ["size", WellKnownFunc.Length],
-        ["lineHeight", null, "/"],
+        ["lineHeight", undefined, "/"],
         "family"
     ]);
 }
@@ -733,7 +733,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         return "";
 
     // find information object for the property
-    let info: any = stylePropertyInfos[dashToCamel(propName)];
+    let options: V2SOptions = stylePropertyInfos[dashToCamel(propName)];
 
     // if the property value is an object with the "!" property, then the actual value is the
     // value of this property and we also need to set the "!important" flag
@@ -745,14 +745,7 @@ export function stylePropToString( propName: string, propVal: any, valueOnly?: b
         impFlag = true;
     }
 
-    let stringValue = !info
-        ? v2s( varValue)
-        : typeof info === "object"
-            ? v2s( varValue, info as IValueConvertOptions)
-            : typeof info === "number"
-                ? v2sByFuncID( varValue, info)
-                : (info as ToStringFunc)( varValue);
-
+    let stringValue = v2s( varValue, options);
     if (!stringValue && !valueOnly)
         stringValue = "initial";
 
@@ -810,9 +803,7 @@ export function forAllPropsInStylset( styleset: Styleset,
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-type StylePropertyInfo = WellKnownFunc | ToStringFunc | IValueConvertOptions;
-
-export function s_registerStylePropertyInfo( name: string, toStringFunc: ToStringFunc)
+export function s_registerStylePropertyInfo( name: string, toStringFunc: AnyToStringFunc)
 {
     if (name in stylePropertyInfos)
         return false;
@@ -832,14 +823,11 @@ registerV2SFuncID( gridAxisToString, WellKnownFunc.GridAxis);
 
 
 
-
-
-
 /**
  * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const stylePropertyInfos: { [K in VarTemplateName]?: StylePropertyInfo } =
+const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 {
     animation: {
         fromObj: singleAnimation_fromObject,

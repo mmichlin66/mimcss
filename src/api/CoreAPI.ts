@@ -6,7 +6,7 @@
 } from "./CoreTypes"
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath, FrequencyMath, PercentMath, v2s,
-    templateStringToString, ToStringFunc, v2sByFuncID
+    templateStringToString, AnyToStringFunc, v2sByFuncID
 } from "../impl/CoreFuncs"
 
 
@@ -290,7 +290,7 @@ export function quoted( val: any): IQuotedProxy
  *   conversion function.
  * - If the tuple's second element is a function, it is used to convert the value's property.
  */
-type V2PDef = (string | [string, number | ToStringFunc])[];
+type V2PDef = (string | [string, number | AnyToStringFunc])[];
 
 
 
@@ -394,7 +394,7 @@ export abstract class CssFunc
      * be left undefined if comma should be used.
      */
     public static setup<T extends CssFunc>( this: { new (...args: any[]): T },
-        paramInfo: (keyof T | [keyof T, number | ToStringFunc])[],
+        paramInfo: (keyof T | [keyof T, number | AnyToStringFunc])[],
         name?: string, delimiter?: string): void
     {
         if (paramInfo) this[symCssFuncParamInfo] = paramInfo;
