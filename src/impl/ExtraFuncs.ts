@@ -276,10 +276,6 @@ function alphaToString( a?: Extended<number>): string
     return v2s( a, {
         fromNull: "1",
         fromNumber: a => {
-            // if alpha is null or undefined, set it to 1
-            if (a == null)
-                return "1";
-
             // negative and positive values of alpha are treated identically, so convert to positive
             if (a < 0)
                 a = -a;
@@ -317,6 +313,7 @@ function alphaToString( a?: Extended<number>): string
 export function rgbToString( r: Extended<number>, g: Extended<number>, b: Extended<number>, a?: Extended<number>): string
 {
     return `rgba(${separationToString( r)},${separationToString( g)},${separationToString( b)},${alphaToString( a)})`;
+    // return f2s("rgba", [[r, separationToString], [g, separationToString], [b, separationToString], [a, alphaToString]]);
 }
 
 
@@ -336,7 +333,7 @@ function colorPercentToString( n: Extended<number>): string
             if (n < 0)
                 n = -n;
 
-            // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
+            // convert the input to a number with absolute value less than 1 (if it is not yet). If it
             // is greater than 100, clamp it.
             return (n > 100 ? 100 : Math.round(n <= 1 ? n * 100 : n)).toString() + "%";
         }
@@ -371,7 +368,8 @@ function colorPercentToString( n: Extended<number>): string
  */
 export function hslToString( h: Extended<CssAngle>, s: Extended<number>, l: Extended<number>, a?: Extended<number>): string
 {
-    return `hsla(${AngleMath.s2s(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
+    return `hsla(${AngleMath.v2s(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
+    // return f2s("hsla", [[h, AngleMath.v2s], [s, colorPercentToString], [l, colorPercentToString], [a, alphaToString]]);
 }
 
 

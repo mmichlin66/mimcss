@@ -5,8 +5,8 @@
     GeometryBoxKeyword, IFitContentProxy, ILengthProxy, CssSize, CssAspectRatio
 } from "./CoreTypes"
 import {
-    UrlFunc, BasicShape, CssColor, CssImage, FilterFunc, IMinMaxProxy, IRepeatProxy,
-    ISpanProxy, TransformFunc, RayFunc
+    IUrlFunc, BasicShape, CssColor, CssImage, IMinMaxProxy, IRepeatProxy,
+    ISpanProxy, IFilterProxy, ITransformProxy, IRayFunc, ITimingFunctionFunc, ICursorFunc
 } from "./ExtraTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
@@ -118,17 +118,8 @@ export type AnimationPlayState_StyleType = OneOrMany<AnimationPlayState_Single>;
 /** Type for simple animation timing functions - those that don't have parameters */
 export type TimingFunction_Simple = "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out" | "step-start" | "step-end";
 
-/** Type for step animation timing function position */
-export type TimingFunction_StepPosition = "jump-start" | "jump-end" | "jump-none" | "jump-both" | "start" | "end";
-
-/** Type for step animation timing function */
-export type TimingFunction_Step = number | [Extended<number>, Extended<TimingFunction_StepPosition>?];
-
-/** Type for Bezier animation timing function */
-export type TimingFunction_Bezier = [Extended<number>, Extended<number>, Extended<number>, Extended<number>];
-
 /** Type for single animation timing function */
-export type TimingFunction_Single = TimingFunction_Simple | TimingFunction_Step | TimingFunction_Bezier;
+export type TimingFunction_Single = TimingFunction_Simple | ITimingFunctionFunc;
 
 /** Type for animation-timing-function style property */
 export type AnimationTimingFunction_StyleType = OneOrMany<TimingFunction_Single>;
@@ -424,7 +415,7 @@ export type Clip_StyleType = "auto" | OneOrBox<CssLength>;
 
 
 /** Type for clip-path style property */
-export type ClipPath_StyleType = "none" | UrlFunc | BasicShape | GeometryBoxKeyword |
+export type ClipPath_StyleType = "none" | IUrlFunc | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -469,9 +460,9 @@ export type ColumnSpan_StyleType = "none" | "all";
  * - two variants of two element arrays: one of the elements will be treated as a number of columns
  *   while another as the column width.
  */
-export type Columns_StyleType = "auto" | CssNumber | CssLength |
-    ["auto" | Extended<CssNumber>, "auto" | Exclude<Extended<CssLength>,number>] |
-    ["auto" | Exclude<Extended<CssLength>,number>, "auto" | Extended<CssNumber>];
+export type Columns_StyleType = "auto" | CssNumber | Exclude<CssLength,number> |
+    ["auto" | Extended<CssNumber>, "auto" | Extended<Exclude<CssLength,number>>] |
+    ["auto" | Extended<Exclude<CssLength,number>>, "auto" | Extended<CssNumber>];
 // Note that no special coversion function is required for this property because the number type will
 // always be converted to a unitless number
 
@@ -503,7 +494,7 @@ export type Cursor_Keyword = "auto" | "default" | "none" | "context-menu" | "hel
     "zoom-out" | "grab" | "grabbing";
 
 /** Type for cursor style property single value */
-export type Cursor_Single = Cursor_Keyword | UrlFunc | [UrlFunc, Extended<CssNumber>, Extended<CssNumber>];
+export type Cursor_Single = Cursor_Keyword | IUrlFunc | ICursorFunc;
 
 /** Type for cursor style property */
 export type Cursor_StyleType = OneOrMany<Cursor_Single>;
@@ -544,7 +535,7 @@ export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 /** Type for filter and backdrop-filter style single value */
-export type Filter_Single = UrlFunc | FilterFunc;
+export type Filter_Single = IUrlFunc | IFilterProxy;
 
 /** Type for filter and backdrop-filter style property */
 export type Filter_StyleType = OneOrMany<Filter_Single>;
@@ -558,7 +549,7 @@ export type Flex_StyleType = FlexBasis_StyleType |
 
 
 /** Type for flex-basis style property */
-export type FlexBasis_StyleType = "auto" | "content" | CssLength;
+export type FlexBasis_StyleType = CssLength | "auto" | "content" | "fill" | "max-content" | "min-content" | "fit-content";
 
 
 
@@ -781,7 +772,7 @@ export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_St
 
 
 /** Type for line-style-image style property */
-export type ListStyleImage_StyleType = "none" | UrlFunc;
+export type ListStyleImage_StyleType = "none" | IUrlFunc;
 
 
 
@@ -836,7 +827,7 @@ export type OffsetAnchor_StyleType = "auto" | CssPosition;
 
 
 /** Type for offset-path style property */
-export type OffsetPath_StyleType = "none" | RayFunc | UrlFunc | BasicShape | GeometryBoxKeyword |
+export type OffsetPath_StyleType = "none" | IRayFunc | IUrlFunc | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -978,7 +969,7 @@ export type ScrollSnapType_StyleType = "none" |
 
 
 /** Type for shape-outside style property */
-export type ShapeOutside_StyleType = UrlFunc | BasicShape | GeometryBoxKeyword | CssImage;
+export type ShapeOutside_StyleType = IUrlFunc | BasicShape | GeometryBoxKeyword | CssImage;
 
 
 
@@ -1135,7 +1126,7 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
 
 
 /** Type for transform style property */
-export type Transform_StyleType = "none" | OneOrMany<TransformFunc>;
+export type Transform_StyleType = "none" | OneOrMany<ITransformProxy>;
 
 
 

@@ -1,10 +1,8 @@
 ﻿import {
-    CssAngle, CssLength, CssNumber, CssPercent, CssPosition, Extended, ExtentKeyword,
+    CssAngle, CssLength, CssNumber, CssPosition, Extended, ExtentKeyword,
     IGenericProxy
 } from "./CoreTypes";
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
-import {IIDRule} from "./RuleTypes";
-import {CssFunc} from "./CoreAPI";
 
 
 
@@ -237,6 +235,22 @@ export type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas"
  */
 export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | number | IColorProxy | SystemColors;
 
+/**
+ * Type for CSS color that exclude numeric color representation. Color can be represented using
+ * the following types:
+ * - keywords: any string that is a name of a property in the [[INamedColors]] interface or of the
+ *   [[SystemColors]] type.
+ * - functions: [[rgb]], [[hsl]], [[alpha]] as well as any function that returns the IColorProxy type.
+ *
+ * Non-numeric representation of color is sometimes required where it can conflict with numeric
+ * representations of other style properties. For example, the `border` property allows specifying
+ * border width, style and color in any order. In this case a numeric representation of color could
+ * come into conflict with a numeric representation of width. Therefore, for the `border` property,
+ * only non-numeric color representation is allowed.
+ */
+// export type CssNonNumericColor = Exclude<CssColor,number>;
+export type CssNonNumericColor = "transparent" | "currentcolor" | keyof INamedColors | IColorProxy | SystemColors;
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +274,7 @@ export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | num
   * interface or any of the functions that return the [[IImageProxy]] interface such as
   * [[linearGradient]], [[crossFade]] and others.
   */
- export type CssImage = UrlFunc | IImageProxy;
+ export type CssImage = IUrlFunc | IImageProxy;
 
 
 
@@ -386,371 +400,17 @@ export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Names of filter functions with a single percent parameter */
-export type FilterPercentFuncNames = "brightness" | "contrast" | "grayscale" | "invert" |
-    "opacity" | "saturate" | "sepia";
+export interface IFilterProxy extends IGenericProxy<"filter"> {}
 
-/**
- * Object representing CSS functions that accept a percent value and can be used for `filter`
- * style property.
- */
-export class FilterPercentFunc extends CssFunc
-{
-    /** Function name */
-    fn: FilterPercentFuncNames;
-    /** Percent value */
-    p: Extended<CssPercent>;
 
-    constructor( fn: FilterPercentFuncNames, p: Extended<CssPercent>)
-    {
-        super();
-        this.fn = fn; this.p = p;
-    }
 
-    public get name(): string { return this.fn; }
-}
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Transform CSS functions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-/**
- * Object representing `blur()` CSS function that can be used for `filter` style property.
- */
-export class BlurFunc extends CssFunc
-{
-    /** Blur radius */
-    r: Extended<CssLength>;
-
-    constructor( r: Extended<CssLength>)
-    {
-        super();
-        this.r = r;
-    }
-}
-
-
-
-/**
- * Object representing `drop-shadow()` CSS function that can be used for `filter` style property.
- */
-export class DropShadowFunc extends CssFunc
-{
-    /** Size along the X axis */
-    x: Extended<CssLength>;
-    /** Size along the Y axis */
-    y: Extended<CssLength>;
-    /** Shadow color */
-    color?: Extended<CssColor>;
-    /** Blur radius */
-    blur?: Extended<CssLength>;
-
-    constructor( x: Extended<CssLength>, y: Extended<CssLength>, color?: Extended<CssColor>,
-        blur?: Extended<CssLength>)
-    {
-        super();
-        this.x = x; this.y = y; this.color = color; this.blur = blur;
-    }
-}
-
-
-
-/**
- * Object representing the `hue-rotate()` CSS function that can be used for `filter` style property.
- */
-export class HueRotateFunc extends CssFunc
-{
-    /** Rotation angle */
-    a: Extended<CssAngle>;
-
-    constructor( a: Extended<CssAngle>)
-    {
-        super();
-        this.a = a;
-    }
-}
-
-
-
-/**
- * Type representing CSS `<filter>` functions accepted by the `filter` style property
- */
-export type FilterFunc = FilterPercentFunc | BlurFunc | DropShadowFunc | HueRotateFunc;
-
-
-
- ///////////////////////////////////////////////////////////////////////////////////////////////
- //
- // Transform CSS functions
- //
- ///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Object representing matrix CSS function that can be used for `transform` property.
- */
-export class MatrixFunc extends CssFunc
-{
-    a: Extended<CssNumber>; b: Extended<CssNumber>; c: Extended<CssNumber>; d: Extended<CssNumber>;
-    tx: Extended<CssNumber>; ty: Extended<CssNumber>;
-
-    constructor(a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>, d: Extended<CssNumber>,
-        tx: Extended<CssNumber>, ty: Extended<CssNumber>)
-    {
-        super(),
-        this.a = a; this.b = b; this.c = c; this.d = d; this.tx = tx; this.ty = ty;
-    }
-}
-
-/**
- * Object representing matrix3d CSS function that can be used for `transform` property.
- */
-export class Matrix3dFunc extends CssFunc
-{
-    a1: Extended<CssNumber>; b1: Extended<CssNumber>; c1: Extended<CssNumber>; d1: Extended<CssNumber>;
-    a2: Extended<CssNumber>; b2: Extended<CssNumber>; c2: Extended<CssNumber>; d2: Extended<CssNumber>;
-    a3: Extended<CssNumber>; b3: Extended<CssNumber>; c3: Extended<CssNumber>; d3: Extended<CssNumber>;
-    a4: Extended<CssNumber>; b4: Extended<CssNumber>; c4: Extended<CssNumber>; d4: Extended<CssNumber>;
-
-    constructor(
-        a1: Extended<CssNumber>, b1: Extended<CssNumber>, c1: Extended<CssNumber>, d1: Extended<CssNumber>,
-        a2: Extended<CssNumber>, b2: Extended<CssNumber>, c2: Extended<CssNumber>, d2: Extended<CssNumber>,
-        a3: Extended<CssNumber>, b3: Extended<CssNumber>, c3: Extended<CssNumber>, d3: Extended<CssNumber>,
-        a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>)
-    {
-        super();
-        this.a1 = a1; this.b1 = b1; this.c1 = c1; this.d1 = d1;
-        this.a2 = a2; this.b2 = b2; this.c2 = c2; this.d2 = d2;
-        this.a3 = a3; this.b3 = b3; this.c3 = c3; this.d3 = d3;
-        this.a4 = a4; this.b4 = b4; this.c4 = c4; this.d4 = d4;
-    }
-}
-
-
-
-/**
- * Object representing `perspective()` CSS function that can be used for `transform` property.
- */
-export class PerspectiveFunc extends CssFunc
-{
-    /** Distance */
-    d: Extended<CssLength>;
-
-    constructor( d: Extended<CssLength>)
-    {
-        super();
-        this.d = d;
-    }
-}
-
-
-
-/**
- * Object representing single-dimensional `rotate()` CSS function as well as `rotateX()`,
- * `rotateY()` and `rotateZ()` functions that can be used for `transform` property.
- */
-export class RotateFunc extends CssFunc
-{
-    /** Rotation angle */
-    a: Extended<CssAngle>;
-    /** Direction of rotation determining function name */
-    d?: "X" | "Y" | "Z";
-
-    constructor( a: Extended<CssAngle>, d?: "X" | "Y" | "Z")
-    {
-        super();
-        this.a = a; this.d = d;
-    }
-
-    public get name(): string { return `rotate${this.d ?? ""}`; }
-}
-
-/**
- * Object representing three-dimensional `rotate3d()` CSS function that can be used for `transform` property.
- */
-export class Rotate3dFunc extends CssFunc
-{
-    /** Rotation axis compnent along the X axis */
-    x: Extended<CssNumber>;
-    /** Rotation axis compnent along the Y axis */
-    y?: Extended<CssNumber>;
-    /** Rotation axis compnent along the Z axis */
-    z: Extended<CssNumber>;
-    /** Rotation angle */
-    a: Extended<CssAngle>;
-
-    constructor( x: Extended<CssNumber>, y: Extended<CssNumber>, z: Extended<CssNumber>, a: Extended<CssAngle>)
-    {
-        super();
-        this.x = x; this.y = y; this.z = z; this.a = a;
-    }
-}
-
-
-
-/**
- * Object representing single-dimensional `scaleX()` or `scaleY()` or `scaleZ()` CSS function that
- * can be used for `transform` property.
- */
-export class Scale1dFunc extends CssFunc
-{
-    /** Scale factor along one of the axis */
-    s: Extended<CssNumber>;
-    /** Direction of scaling determining function name */
-    d: "X" | "Y" | "Z";
-
-    constructor( s: Extended<CssNumber>, d: "X" | "Y" | "Z")
-    {
-        super();
-        this.s = s; this.d = d;
-    }
-
-    public get name(): string { return `scale${this.d}`; }
-}
-
-/**
- * Object representing two-dimensional `scale()` CSS function that can be used for `transform`
- * property.
- */
-export class ScaleFunc extends CssFunc
-{
-    /** Scale factor along the X axis */
-    sx: Extended<CssNumber>;
-    /** Scale factor along the Y axis */
-    sy?: Extended<CssNumber>;
-
-    constructor( sx: Extended<CssNumber>, sy: Extended<CssNumber>)
-    {
-        super();
-        this.sx = sx; this.sy = sy;
-    }
-}
-
-/**
- * Object representing three-dimensional `scale3d()` CSS function that can be used for `transform`
- * property.
- */
-export class Scale3dFunc extends CssFunc
-{
-    /** Scale factor along the X axis */
-    sx: Extended<CssNumber>;
-    /** Scale factor along the Y axis */
-    sy?: Extended<CssNumber>;
-    /** Scale factor along the Z axis */
-    sz: Extended<CssNumber>;
-
-    constructor( sx: Extended<CssNumber>, sy: Extended<CssNumber>, sz: Extended<CssNumber>)
-    {
-        super();
-        this.sx = sx; this.sy = sy; this.sz = sz;
-    }
-}
-
-
-
-/**
- * Object representing single-dimensional `skewX()` or `skewY()` CSS function that can be used
- * for `transform` property.
- */
-export class Skew1dFunc extends CssFunc
-{
-    /** Angle along one of the axis */
-    a: Extended<CssAngle>;
-    /** Direction of skewing determining function name */
-    d: "X" | "Y";
-
-    constructor( a: Extended<CssAngle>, d: "X" | "Y")
-    {
-        super();
-        this.a = a; this.d = d;
-    }
-
-    public get name(): string { return `skew${this.d}`; }
-}
-
-/**
- * Object representing two-dimensional `skew()` CSS function that can be used for `transform` property.
- */
- export class SkewFunc extends CssFunc
- {
-    /** Angle along the X axis */
-    ax: Extended<CssAngle>;
-    /** Angle along the Y axis */
-    ay?: Extended<CssAngle>;
-
-    constructor( ax: Extended<CssAngle>, ay: Extended<CssAngle>)
-    {
-        super();
-        this.ax = ax; this.ay = ay;
-    }
-}
-
-
-
-/**
- * Object representing single-dimensional `translateX()` or `translateY()` or `translateZ()` CSS
- * function that can be used for `transform` property.
- */
-export class Translate1dFunc extends CssFunc
-{
-    /** Offset along one of the axis */
-    l?: Extended<CssLength>;
-    /** Direction of translation determining function name */
-    d: "X" | "Y" | "Z";
-
-    constructor( l: Extended<CssLength>, d: "X" | "Y" | "Z")
-    {
-        super();
-        this.l = l; this.d = d;
-    }
-
-    public get name(): string { return `translate${this.d}`; }
-}
-
-/**
- * Object representing two-dimensional `translate()` CSS function that can be used for `transform` property.
- */
-export class TranslateFunc extends CssFunc
-{
-    /** Offset along the X axis */
-    x: Extended<CssLength>;
-    /** Offset along the Y axis */
-    y?: Extended<CssLength>;
-
-    constructor( x: Extended<CssLength>, y?: Extended<CssLength>)
-    {
-        super();
-        this.x = x; this.y = y;
-    }
-}
-
-/**
- * Object representing three-dimensional `translate3d()` CSS function that can be used for `transform` property.
- */
-export class Translate3dFunc extends CssFunc
-{
-    /** Offset along the X axis */
-    x: Extended<CssLength>;
-    /** Offset along the Y axis */
-    y?: Extended<CssLength>;
-    /** Offset along the Z axis */
-    z: Extended<CssLength>;
-
-    constructor( x: Extended<CssLength>, y: Extended<CssLength>, z: Extended<CssLength>)
-    {
-        super();
-        this.x = x; this.y = y; this.z = z;
-    }
-}
-
-
-
-/**
- * Type representing CSS `<transform>` functions accepted by the `transform` style property
- */
-export type TransformFunc =
-    MatrixFunc | Matrix3dFunc | PerspectiveFunc |
-    RotateFunc | Rotate3dFunc |
-    Scale1dFunc | ScaleFunc | Scale3dFunc |
-    Skew1dFunc | SkewFunc |
-    Translate1dFunc | TranslateFunc | Translate3dFunc;
+export interface ITransformProxy extends IGenericProxy<"transform"> {}
 
 
 
@@ -935,44 +595,37 @@ export interface ISpanProxy extends IGenericProxy<"span"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The UrlFunc class represents an invocation of the CSS `url()` function.
+ * The IUrlFunc interface represents an invocation of the CSS `url()` function.
  */
-export class UrlFunc extends CssFunc
-{
-    /**
-     * Parameter of the `url()` function. It can be specified as a string or as an [[IIDRule]]
-     * object. In the latter case, the identifier name will be prefixed with the pund sign, for
-     * example: `url(#svgID)`.
-     */
-    public p: Extended<string | IIDRule>;
-
-    constructor( p: Extended<string | IIDRule>)
-    {
-        super();
-        this.p = p;
-    }
-}
-
-
+export interface IUrlFunc extends IGenericProxy<"url"> {}
 
 /**
- * The RayFunc object represents an invocation of the CSS `ray()` function.
+ * The IRayFunc interface represents an invocation of the CSS `ray()` function.
  */
- export class RayFunc extends CssFunc
- {
-     /** Ray's angle */
-     angle: Extended<CssAngle>;
-     /** Ray's length */
-     size?: Extended<ExtentKeyword | CssLength>;
-     /** Ray's contain flag */
-     contain?: boolean
+export interface IRayFunc extends IGenericProxy<"ray"> {}
 
-     constructor( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>, contain?: boolean)
-     {
-         super();
-         this.angle = angle; this.size = size; this.contain = contain;
-     }
- }
+/**
+ * The ICursorFunc interface represents an invocation of the CSS `url()` function with two optional
+ * numbers indicating the cursor's hotspot.
+ */
+export interface ICursorFunc extends IGenericProxy<"cursor"> {}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Animation and transition timing functions.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Type for step animation timing function jump-term */
+export type TimingFunctionJumpTerm = "jump-start" | "jump-end" | "jump-none" | "jump-both" | "start" | "end";
+
+/**
+ * The ITimingFunctionFunc interface represents an invocation of the CSS `steps()` and
+ * `cubic-bezier()` function.
+ */
+export interface ITimingFunctionFunc extends IGenericProxy<"timing-function"> {}
 
 
 

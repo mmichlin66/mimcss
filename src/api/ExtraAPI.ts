@@ -4,11 +4,7 @@ import {
     IConicGradient, IEllipseProxy, LinearGradAngle, ShapeRadius,
     IImageProxy, IInsetProxy, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
     IPolygonProxy, IRadialGradient, IRepeatProxy, ISpanProxy,
-    FilterPercentFunc, BlurFunc, DropShadowFunc, HueRotateFunc,
-    MatrixFunc, Matrix3dFunc, PerspectiveFunc, RotateFunc, Rotate3dFunc,
-    Scale1dFunc, ScaleFunc, Scale3dFunc, Skew1dFunc, SkewFunc,
-    Translate1dFunc, TranslateFunc, Translate3dFunc,
-    RayFunc, UrlFunc
+    IFilterProxy, ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc, ICursorFunc
 } from "./ExtraTypes";
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {
@@ -16,7 +12,7 @@ import {
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
 import {
-    AngleMath, INumberBaseMathClass, LengthMath, PercentMath, pos2str, registerV2SFuncID,
+    AngleMath, f2s, INumberBaseMathClass, LengthMath, PercentMath, pos2s, registerV2SFuncID,
     v2s, WellKnownFunc
 } from "../impl/CoreFuncs";
 import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
@@ -174,7 +170,7 @@ function linearGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
         if (f.angle)
         {
             angleString = v2s( f.angle, {
-                fromNumber: AngleMath.convertFunc,
+                fromNumber: AngleMath.n2s,
                 fromString: v => /\d+.*/.test(v) ? v : "to " + v
             }) + ",";
         }
@@ -241,8 +237,8 @@ function radialGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
     let f: any = () =>
     {
         let shapeString = f.shape ? f.shape : "";
-        let sizeOrExtentString = f.sizeOrExtent ? LengthMath.ms2s( f.sizeOrExtent, " ") : "";
-        let posString = f.pos ? `at ${pos2str( f.pos)}` : "";
+        let sizeOrExtentString = f.sizeOrExtent ? LengthMath.mv2s( f.sizeOrExtent, " ") : "";
+        let posString = f.pos ? `at ${pos2s( f.pos)}` : "";
         let whatAndWhere = f.shape || sizeOrExtentString || f.pos ? `${shapeString} ${sizeOrExtentString} ${posString},` : "";
         return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, LengthMath)})`;
     }
@@ -312,14 +308,14 @@ function conicGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssAn
 {
     let f: any = () =>
     {
-        let angleString = f.angle ? `from ${AngleMath.s2s( f.angle)}` : "";
-        let posString = f.pos ? `at ${pos2str( f.pos)}` : "";
+        let angleString = f.angle ? `from ${AngleMath.v2s( f.angle)}` : "";
+        let posString = f.pos ? `at ${pos2s( f.pos)}` : "";
         let whatAndWhere = f.angle || f.pos ? `${angleString} ${posString},` : "";
         return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, AngleMath)})`;
     }
         // () => conicGradientToString( name, stopsOrHints, f.angleParam, f.posParam);
 
-    f.from = (angle: LinearGradAngle) => { f.angle = angle; return f; }
+    f.from = (angle: Extended<CssAngle>) => { f.angle = angle; return f; }
 
     f.at = (pos: Extended<CssPosition>) => { f.pos = pos; return f; }
 
@@ -344,11 +340,11 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: IN
             if (v.length === 0)
                 return "";
             else if (v.length === 1)
-                return mathClass.s2s( v[0]);
+                return mathClass.v2s( v[0]);
             else
             {
-                let secondStop = v.length > 2 ? mathClass.s2s( v[2]) : "";
-                return `${colorToString(v[0])} ${mathClass.s2s( v[1])} ${secondStop}`;
+                let secondStop = v.length > 2 ? mathClass.v2s( v[2]) : "";
+                return `${colorToString(v[0])} ${mathClass.v2s( v[1])} ${secondStop}`;
             }
         }
     });
@@ -381,7 +377,7 @@ function crossFadeToString( args: CrossFadeParam[]): string
 function crossFadeParamToString( val: CrossFadeParam): string
 {
     return v2s( val, {
-        fromArray: v => `${v2s(v[0])},${PercentMath.s2s(v[1])}`
+        fromArray: v => `${v2s(v[0])},${PercentMath.v2s(v[1])}`
     });
 }
 
@@ -394,11 +390,21 @@ function crossFadeParamToString( val: CrossFadeParam): string
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an IFilterPercent object representing the `brightness()` CSS function.
+ * Returns an IFilterProxy function representing the `brightness()` CSS function.
  */
-export function brightness( p: Extended<CssPercent>): FilterPercentFunc
+function filterPercent( name: string, p: Extended<CssPercent>): IFilterProxy
 {
-    return new FilterPercentFunc( "brightness", p);
+    return () => f2s( name, [[p, WellKnownFunc.Percent]]);
+}
+
+
+
+/**
+ * Returns an IFilterProxy function representing the `brightness()` CSS function.
+ */
+export function brightness( p: Extended<CssPercent>): IFilterProxy
+{
+    return filterPercent( "brightness", p);
 }
 
 
@@ -406,9 +412,9 @@ export function brightness( p: Extended<CssPercent>): FilterPercentFunc
 /**
  * Returns an IFilterProxy function representing the `contrast()` CSS function.
  */
-export function contrast( p: Extended<CssPercent>): FilterPercentFunc
+export function contrast( p: Extended<CssPercent>): IFilterProxy
 {
-    return new FilterPercentFunc( "contrast", p);
+    return filterPercent( "contrast", p);
 }
 
 
@@ -416,9 +422,9 @@ export function contrast( p: Extended<CssPercent>): FilterPercentFunc
 /**
  * Returns an IFilterProxy function representing the `grayscale()` CSS function.
  */
-export function grayscale( p: Extended<CssPercent>): FilterPercentFunc
+export function grayscale( p: Extended<CssPercent>): IFilterProxy
 {
-    return new FilterPercentFunc( "grayscale", p);
+    return filterPercent( "grayscale", p);
 }
 
 
@@ -426,9 +432,9 @@ export function grayscale( p: Extended<CssPercent>): FilterPercentFunc
 /**
  * Returns an IFilterProxy function representing the `invert()` CSS function.
  */
-export function invert( p: Extended<CssPercent>): FilterPercentFunc
+export function invert( p: Extended<CssPercent>): IFilterProxy
 {
-    return new FilterPercentFunc( "invert", p);
+    return filterPercent( "invert", p);
 }
 
 
@@ -436,9 +442,9 @@ export function invert( p: Extended<CssPercent>): FilterPercentFunc
 /**
  * Returns an IFilterProxy function representing the `opacity()` CSS function.
  */
-export function opacity( p: Extended<CssPercent>): FilterPercentFunc
+export function opacity( p: Extended<CssPercent>): IFilterProxy
 {
-    return new FilterPercentFunc( "opacity", p);
+    return filterPercent( "opacity", p);
 }
 
 
@@ -446,9 +452,9 @@ export function opacity( p: Extended<CssPercent>): FilterPercentFunc
 /**
  * Returns an IFilterProxy function representing the `saturate()` CSS function.
  */
-export function saturate( p: Extended<CssPercent>): FilterPercentFunc
+export function saturate( p: Extended<CssPercent>): IFilterProxy
 {
-    return new FilterPercentFunc( "saturate", p);
+    return filterPercent( "saturate", p);
 }
 
 
@@ -456,9 +462,9 @@ export function saturate( p: Extended<CssPercent>): FilterPercentFunc
 /**
  * Returns an IFilterProxy function representing the `sepia()` CSS function.
  */
-export function sepia( p: Extended<CssPercent>): FilterPercentFunc
+export function sepia( p: Extended<CssPercent>): IFilterProxy
 {
-    return new FilterPercentFunc( "sepia", p);
+    return filterPercent( "sepia", p);
 }
 
 
@@ -466,9 +472,9 @@ export function sepia( p: Extended<CssPercent>): FilterPercentFunc
 /**
  * Returns an IFilterProxy function representing the `blur()` CSS function.
  */
-export function blur( r: Extended<CssLength>): BlurFunc
+export function blur( r: Extended<CssLength>): IFilterProxy
 {
-    return new BlurFunc( r);
+    return () => f2s( "", [[r, WellKnownFunc.Length]]);
 }
 
 
@@ -481,9 +487,10 @@ export function blur( r: Extended<CssLength>): BlurFunc
  * @param blur Value of the shadow's blurring. The default value is 1 pixel.
  */
 export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
-    color?: Extended<CssColor>, blur?: Extended<CssLength>): DropShadowFunc
+    color?: Extended<CssColor>, blur?: Extended<CssLength>): IFilterProxy
 {
-    return new DropShadowFunc( x, y, color, blur);
+    return () => f2s( "drop-shadow", [[x, WellKnownFunc.Length], [y, WellKnownFunc.Length],
+        [color, WellKnownFunc.Color], [blur, WellKnownFunc.Length]]);
 }
 
 
@@ -491,9 +498,9 @@ export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
 /**
  * Returns an IFilterProxy function representing the `hue-rotate()` CSS function.
  */
-export function hueRotate( a: Extended<CssAngle>): HueRotateFunc
+export function hueRotate( a: Extended<CssAngle>): IFilterProxy
 {
-    return new HueRotateFunc( a);
+    return () => f2s( "", [[a, WellKnownFunc.Angle]]);
 }
 
 
@@ -505,12 +512,12 @@ export function hueRotate( a: Extended<CssAngle>): HueRotateFunc
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an ITransformMatrix function representing the `matrix()` CSS function.
+ * Returns an ITransformProxy function representing the `matrix()` CSS function.
  */
 export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
-	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): MatrixFunc
+	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): ITransformProxy
 {
-    return new MatrixFunc(  a, b, c, d, tx, ty);
+    return () => f2s( "matrix", [a, b, c, d, tx, ty]);
 }
 
 
@@ -523,9 +530,9 @@ export function matrix3d(
 		a2: Extended<CssNumber>, b2: Extended<CssNumber>, c2: Extended<CssNumber>, d2: Extended<CssNumber>,
 		a3: Extended<CssNumber>, b3: Extended<CssNumber>, c3: Extended<CssNumber>, d3: Extended<CssNumber>,
 		a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>,
-	): Matrix3dFunc
+	): ITransformProxy
 {
-    return new Matrix3dFunc(  a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4);
+    return () => f2s( "matrix", [a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4]);
 }
 
 
@@ -533,95 +540,111 @@ export function matrix3d(
 /**
  * Returns an ITransformProxy function representing the `perspective()` CSS function.
  */
-export function perspective( d: Extended<CssLength>): PerspectiveFunc
+export function perspective( d: Extended<CssLength>): ITransformProxy
 {
-    return new PerspectiveFunc( d);
+    return () => f2s( "perspective", [[d, WellKnownFunc.Length]]);
 }
 
 
 
 /**
- * Returns an ITransformRotate2d object representing the `rotate()` CSS function.
+ * Returns an ITransformProxy function representing the `rotate()` CSS function.
  */
-export function rotate( a: Extended<CssAngle>): RotateFunc
+function rotate1d( name: string, a: Extended<CssAngle>): ITransformProxy
 {
-    return new RotateFunc( a);
+    return () => f2s( name, [[a, WellKnownFunc.Angle]]);
 }
 
 /**
- * Returns an ITransformRotate object representing the `rotateX()` CSS function.
+ * Returns an ITransformProxy function representing the `rotate()` CSS function.
  */
-export function rotateX( a: Extended<CssAngle>): RotateFunc
+export function rotate( a: Extended<CssAngle>): ITransformProxy
 {
-    return new RotateFunc( a, "X");
+    return rotate1d( "rotate", a);
 }
 
 /**
- * Returns an ITransformRotate object representing the `rotateY()` CSS function.
+ * Returns an ITransformProxy function representing the `rotateX()` CSS function.
  */
-export function rotateY( a: Extended<CssAngle>): RotateFunc
+export function rotateX( a: Extended<CssAngle>): ITransformProxy
 {
-    return new RotateFunc( a, "Y");
+    return rotate1d( "rotateX", a);
 }
 
 /**
- * Returns an ITransformRotate object representing the `rotateZ()` CSS function.
+ * Returns an ITransformProxy function representing the `rotateY()` CSS function.
  */
-export function rotateZ( a: Extended<CssAngle>): RotateFunc
+export function rotateY( a: Extended<CssAngle>): ITransformProxy
 {
-    return new RotateFunc( a, "Z");
+    return rotate1d( "rotateY", a);
 }
 
 /**
- * Returns an ITransformRotate3d object representing the `rotate3d()` CSS function.
+ * Returns an ITransformProxy function representing the `rotateZ()` CSS function.
+ */
+export function rotateZ( a: Extended<CssAngle>): ITransformProxy
+{
+    return rotate1d( "rotateZ", a);
+}
+
+/**
+ * Returns an ITransformProxy function representing the `rotate3d()` CSS function.
  */
 export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
-    z: Extended<CssNumber>, a: Extended<CssAngle>): Rotate3dFunc
+    z: Extended<CssNumber>, a: Extended<CssAngle>): ITransformProxy
 {
-    return new Rotate3dFunc( x, y, z, a);
+    return () => f2s( "rotate3d", [x, y, z, [a, WellKnownFunc.Angle]]);
 }
 
 
 
 /**
- * Returns an ITransformScale2d object representing the `scale()` CSS function.
+ * Returns an ITransformProxy function representing the `scale()` CSS function.
  */
-export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): ScaleFunc
+export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): ITransformProxy
 {
-    return new ScaleFunc( sx, sy);
+    return () => f2s( "scale", [sx, sy]);
 }
 
 /**
- * Returns an ITransformScale object representing the `scaleX()` CSS function.
+ * Returns an ITransformProxy function representing the `scaleX()` CSS function.
  */
-export function scaleX( s: Extended<CssNumber>): Scale1dFunc
+function scale1d( name: string, s: Extended<CssNumber>): ITransformProxy
 {
-    return new Scale1dFunc( s, "X");
+    return () => f2s( name, [s]);
 }
 
 /**
- * Returns an ITransformScale object representing the `scaleY()` CSS function.
+ * Returns an ITransformProxy function representing the `scaleX()` CSS function.
  */
-export function scaleY( s: Extended<CssNumber>): Scale1dFunc
+export function scaleX( s: Extended<CssNumber>): ITransformProxy
 {
-    return new Scale1dFunc( s, "Y");
+    return scale1d( "scaleX", s);
 }
 
 /**
- * Returns an ITransformScale object representing the `scaleZ()` CSS function.
+ * Returns an ITransformProxy function representing the `scaleY()` CSS function.
  */
-export function scaleZ( s: Extended<CssNumber>): Scale1dFunc
+export function scaleY( s: Extended<CssNumber>): ITransformProxy
 {
-    return new Scale1dFunc( s, "Z");
+    return scale1d( "scaleY", s);
 }
 
 /**
- * Returns an ITransformScale3d object representing the `scale3d()` CSS function.
+ * Returns an ITransformProxy function representing the `scaleZ()` CSS function.
+ */
+export function scaleZ( s: Extended<CssNumber>): ITransformProxy
+{
+    return scale1d( "scaleZ", s);
+}
+
+/**
+ * Returns an ITransformProxy function representing the `scale3d()` CSS function.
  */
 export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
-    sz: Extended<CssNumber>): Scale3dFunc
+    sz: Extended<CssNumber>): ITransformProxy
 {
-    return new Scale3dFunc( sx, sy, sz);
+    return () => f2s( "scale3d", [sx, sy, sz]);
 }
 
 
@@ -629,68 +652,84 @@ export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
 /**
  * Returns an ITransformProxy function representing the `skew()` CSS function.
  */
-export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): SkewFunc
+export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransformProxy
 {
-    return new SkewFunc( ax, ay);
+    return () => f2s( "skew", [[ax, WellKnownFunc.Angle], [ay, WellKnownFunc.Angle]]);
 }
 
 /**
  * Returns an ITransformProxy function representing the `skewX()` CSS function.
  */
-export function skewX( a: Extended<CssAngle>): Skew1dFunc
+function skew1d( name: string, a: Extended<CssAngle>): ITransformProxy
 {
-    return new Skew1dFunc( a, "X");
+    return () => f2s( name, [[a, WellKnownFunc.Angle]]);
+}
+
+/**
+ * Returns an ITransformProxy function representing the `skewX()` CSS function.
+ */
+export function skewX( a: Extended<CssAngle>): ITransformProxy
+{
+    return skew1d( "skewX", a);
 }
 
 /**
  * Returns an ITransformProxy function representing the `skewY()` CSS function.
  */
-export function skewY( a: Extended<CssAngle>): Skew1dFunc
+export function skewY( a: Extended<CssAngle>): ITransformProxy
 {
-    return new Skew1dFunc( a, "Y");
+    return skew1d( "skewY", a);
 }
 
 
 
 /**
- * Returns an ITransformTranslate2d object representing the `translate()` CSS function.
+ * Returns an ITransformProxy function representing the `translate()` CSS function.
  */
-export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): TranslateFunc
+export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITransformProxy
 {
-    return new TranslateFunc( x, y);
+    return () => f2s( "translate", [[x, WellKnownFunc.Length], [y, WellKnownFunc.Length]]);
 }
 
 /**
- * Returns an ITransformTranslate1d object representing the `translateX()` CSS function.
+ * Returns an ITransformProxy function representing the `translateX()` CSS function.
  */
-export function translateX( l: Extended<CssLength>): Translate1dFunc
+function translate1d( name: string, d: Extended<CssLength>): ITransformProxy
 {
-    return new Translate1dFunc( l, "X");
+    return () => f2s( name, [[d, WellKnownFunc.Length]]);
 }
 
 /**
- * Returns an ITransformTranslate1d object representing the `translateY()` CSS function.
+ * Returns an ITransformProxy function representing the `translateX()` CSS function.
  */
-export function translateY( l: Extended<CssLength>): Translate1dFunc
+export function translateX( d: Extended<CssLength>): ITransformProxy
 {
-    return new Translate1dFunc( l, "Y");
+    return translate1d( "translateX", d);
 }
 
 /**
- * Returns an ITransformTranslate1d object representing the `translateZ()` CSS function.
+ * Returns an ITransformProxy function representing the `translateY()` CSS function.
  */
-export function translateZ( l: Extended<CssLength>): Translate1dFunc
+export function translateY( d: Extended<CssLength>): ITransformProxy
 {
-    return new Translate1dFunc( l, "Z");
+    return translate1d( "translateY", d);
 }
 
 /**
- * Returns an ITransformTranslate3d object representing the `translate3d()` CSS function.
+ * Returns an ITransformProxy function representing the `translateZ()` CSS function.
+ */
+export function translateZ( d: Extended<CssLength>): ITransformProxy
+{
+    return translate1d( "translateZ", d);
+}
+
+/**
+ * Returns an ITransformProxy function representing the `translate3d()` CSS function.
  */
 export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
-	z: Extended<CssLength>): Translate3dFunc
+	z: Extended<CssLength>): ITransformProxy
 {
-    return new Translate3dFunc( x, y, z);
+    return () => f2s( "translate3d", [[x, WellKnownFunc.Length], [y, WellKnownFunc.Length], [z, WellKnownFunc.Length]]);
 }
 
 
@@ -718,7 +757,7 @@ export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
     let f: any = () =>
     {
         let r = f.radius != null ? " round " + borderRadiusToString( f.radius) : "";
-        return `inset(${LengthMath.ms2s( [o1, o2, o3, o4], " ")}${r})`;
+        return `inset(${LengthMath.mv2s( [o1, o2, o3, o4], " ")}${r})`;
     }
 
     f.round = (radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy => {
@@ -746,8 +785,8 @@ export function circle( radius?: ShapeRadius): ICircleProxy
 {
     let f: any = () =>
     {
-        let rs =  radius != null ? LengthMath.s2s(radius) : "";
-        let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
+        let rs =  radius != null ? LengthMath.v2s(radius) : "";
+        let pos = f.pos != null ? " at " + pos2s( f.pos) : "";
         return `circle(${rs}${pos})`;
     }
 
@@ -773,9 +812,9 @@ export function ellipse( radiusX?: ShapeRadius, radiusY?: ShapeRadius): IEllipse
 {
     let f: any = () =>
     {
-        let rxs =  radiusX != null ? LengthMath.s2s(radiusX) : "";
-        let rys =  radiusY != null ? " " + LengthMath.s2s(radiusY) : "";
-        let pos = f.pos != null ? " at " + pos2str( f.pos) : "";
+        let rxs =  radiusX != null ? LengthMath.v2s(radiusX) : "";
+        let rys =  radiusY != null ? " " + LengthMath.v2s(radiusY) : "";
+        let pos = f.pos != null ? " at " + pos2s( f.pos) : "";
         return `ellipse(${rxs}${rys}${pos})`
     }
 
@@ -805,7 +844,7 @@ export function polygon( ...points: CssPoint[]): IPolygonProxy
         if (f.fillParam)
             s += f.fillParam + ",";
 
-        s += points.map( pt => LengthMath.ms2s( pt, " ")).join(",");
+        s += points.map( pt => LengthMath.mv2s( pt, " ")).join(",");
 
         return s + ")";
     };
@@ -821,10 +860,15 @@ export function polygon( ...points: CssPoint[]): IPolygonProxy
  * Returns an IRayFunc function representing invocation of the `ray()` CSS function.
  */
 export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
-    contain?: boolean): RayFunc
+    contain?: boolean): IRayFunc
 {
-    return new RayFunc( angle, size, contain);
+    return () => f2s( "ray", [[angle, WellKnownFunc.Angle], [size, WellKnownFunc.Length], [contain ? "contain" : undefined]], " ");
 }
+// export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
+//     contain?: boolean): RayFunc
+// {
+//     return new RayFunc( angle, size, contain);
+// }
 
 
 
@@ -931,7 +975,7 @@ class PathBuilder implements IPathBuilder
 export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 {
     return () => {
-        let options = { fromNumber: LengthMath.convertFunc };
+        let options = { fromNumber: LengthMath.n2s };
         return `minmax(${v2s( min, options)},${v2s( max, options)})`;
     }
 }
@@ -1018,9 +1062,25 @@ export function counters( counterObj: Extended<ICounterRule | string>,
  * will be wrapped in a `url()` invocation. The function can also accept the IIDRule object to
  * create url(#element) invocation, which is often used to address SVG elements by their IDs.
  */
-export function url( p: Extended<string | IIDRule>): UrlFunc
+export function url( p: Extended<string | IIDRule>): IUrlFunc
 {
-    return new UrlFunc(p);
+    return () => f2s( "url", ["p"]);
+}
+
+
+
+/**
+ * Returns a function representing the CSS `url()` function followed by two optional numbers
+ * indicating the cursor hotspot.
+ */
+export function cursor( p: string, x?: number, y?: number): ICursorFunc
+{
+    return () => {
+        let s = `url(${p})`;
+        if (x != null)
+            s += ` ${x} ${y != null ? y : x}`;
+        return s;
+    }
 }
 
 
@@ -1040,6 +1100,31 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// Animation and transition timing functions.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a function representing an invocation of the CSS `steps()` function.
+ */
+ export function steps( n: Extended<number>, jumpTerm?: TimingFunctionJumpTerm): ITimingFunctionFunc
+{
+    return () => f2s( "steps", [n, jumpTerm]);
+}
+
+/**
+ * Returns a function representing an invocation of the CSS `cubic-bezier()` function.
+ */
+ export function cubicBezier( n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
+    n4: Extended<number>): ITimingFunctionFunc
+{
+    return () => f2s( "cubic-bezier", [n1, n2, n3, n4]);
+}
+
+
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Registration of function converting parameters of CSS functions.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1047,36 +1132,6 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 registerV2SFuncID( colorToString, WellKnownFunc.Color);
 
 
-
-// Filter CSS functions.
-FilterPercentFunc.setup( [["p", WellKnownFunc.Percent]]);
-BlurFunc.setup( [["r", WellKnownFunc.Length]], "blur");
-DropShadowFunc.setup( [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length],
-    ["blur", WellKnownFunc.Length], ["color", WellKnownFunc.Color]], "drop-shadow");
-HueRotateFunc.setup( [["a", WellKnownFunc.Angle]], "hue-rotate");
-
-
-
-// Transform CSS functions.
-MatrixFunc.setup( ["a","b","c","d","tx","ty"], "matrix");
-Matrix3dFunc.setup( ["a1","b1","c1","d1","a2","b2","c2","d2","a3","b3","c3","d3","a4","b4","c4","d4"], "matrix3d");
-PerspectiveFunc.setup( [["d", WellKnownFunc.Length]], "perspective");
-RotateFunc.setup( [["a", WellKnownFunc.Angle]]);
-Rotate3dFunc.setup( [ "x", "y", "z", ["a", WellKnownFunc.Angle]], "rotate3d");
-Scale1dFunc.setup( ["s"]);
-ScaleFunc.setup( ["sx", "sy"], "scale");
-Scale3dFunc.setup( ["sx", "sy", "sz"], "scale3d");
-Skew1dFunc.setup( [["a", WellKnownFunc.Angle]]);
-SkewFunc.setup( [["ax", WellKnownFunc.Angle], ["ay", WellKnownFunc.Angle]], "skew");
-Translate1dFunc.setup( [["d", WellKnownFunc.Length]]);
-TranslateFunc.setup( [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length]], "translate");
-Translate3dFunc.setup( [["x", WellKnownFunc.Length], ["y", WellKnownFunc.Length], ["z", WellKnownFunc.Length]], "translate3d");
-
-
-
-// Miscellaneous CSS functions.
-UrlFunc.setup( ["p"], "url");
-RayFunc.setup( [["angle", WellKnownFunc.Angle], ["size", WellKnownFunc.Length], ["contain", (v?: boolean) => v ? "contain" : ""]], "ray", " ");
 
 
 

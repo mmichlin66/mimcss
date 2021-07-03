@@ -6,7 +6,7 @@
 } from "./CoreTypes"
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath, FrequencyMath, PercentMath, v2s,
-    templateStringToString, AnyToStringFunc, v2sByFuncID
+    tag2s
 } from "../impl/CoreFuncs"
 
 
@@ -201,7 +201,7 @@ export function khz( n: number): IFrequencyProxy { return () => n + "khz"; }
  */
  export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy
  {
-     return () => templateStringToString( parts, params);
+     return () => tag2s( parts, params);
  }
 
 
@@ -222,7 +222,7 @@ export function khz( n: number): IFrequencyProxy { return () => n + "khz"; }
  */
 export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProxy
 {
-    return () => templateStringToString( parts, params);
+    return () => tag2s( parts, params);
 }
 
 
@@ -232,7 +232,7 @@ export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProx
  */
 export function fitContent( size: Extended<CssLength>): IFitContentProxy
 {
-    return () => `fit-content(${LengthMath.s2s(size)})`;
+    return () => `fit-content(${LengthMath.v2s(size)})`;
 }
 
 
@@ -242,7 +242,7 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
  */
 export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
 {
-    return () => NumberMath.s2s(w) + (h ? "/" + NumberMath.s2s(h) : "");
+    return () => NumberMath.v2s(w) + (h ? "/" + NumberMath.v2s(h) : "");
 }
 
 
@@ -267,140 +267,6 @@ export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrType
 export function quoted( val: any): IQuotedProxy
 {
     return () => `"${v2s(val)}"`;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Base class for CSS function invocations.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Defines type containing array of either property names or tuples where the first element is
- * the name of a property and the second element is either the ID of registered function or the
- * function converting the value of the property to string. Each property is converted according
- * to the following rules:
- * - If the array item is just a string, the corresponding value's property is converted using
- *   the v2s function.
- * - If the tuple's second element is null or undefined, the corresponding value's property is
- *   converted using the v2s function.
- * - If the tuple's second element is a number it is treated as an index of a well-known
- *   conversion function.
- * - If the tuple's second element is a function, it is used to convert the value's property.
- */
-type V2PDef = (string | [string, number | AnyToStringFunc])[];
-
-
-
-/**
- * Symbol that can be used on class objects of function invocation classes to specify the delimiter
- * to separate function arguments. This is optional and is only needed if the delimiter is not a
- * comma.
- */
-const symCssFuncName: unique symbol = Symbol();
-
-/**
- * Symbol used on class objects of function invocation classes to specify how instances of the
- * class should be converted to strings. The value must be of type V2PDef, which is an array of
- * property names along with indications how they are converted to strings.
- */
-const symCssFuncParamInfo: unique symbol = Symbol();
-
-/**
- * Symbol that can be used on class objects of function invocation classes to specify the delimiter
- * to separate function arguments. This is optional and is only needed if the delimiter is not a
- * comma.
- */
-const symCssFuncParamDelimiter: unique symbol = Symbol();
-
-
-
-/**
- * Base class for classes that serve as representations of CSS function invocations.
- */
-export abstract class CssFunc
-{
-    /**
-     * CSS function name
-     */
-    static [symCssFuncName]?: string;
-
-    /**
-     * Optional information about function parameters and how they shold be converted to strings
-     */
-    static [symCssFuncParamInfo]?: V2PDef;
-
-    /**
-     * Optional delimiter to separate function parameters. The default is comma.
-     */
-    static [symCssFuncParamDelimiter]?: string;
-
-    public toString(): string
-    {
-        return `${this.name}(${this.params})`;
-    }
-
-    /**
-     * Returns CSS function name. This implementation returns the value of the static
-     * symbol symCssFuncName. It can be overridden in the derived classes.
-     */
-    public get name(): string { return this.constructor[symCssFuncName]; }
-
-    /**
-     * Returns the string containing all the CSS function parameters. This implementation
-     * uses parameter information and delimiter optionally set as values of the static
-     * symbols symCssFuncParamInfo and symCssFuncParamDelimiter. It can be overridden in the
-     * derived classes.
-     */
-    public get params(): string
-    {
-        let info: V2PDef | undefined = this.constructor[symCssFuncParamInfo];
-        if (info == null)
-            return "";
-
-        let params: string[] = [];
-        for( let nameOrTuple of info)
-        {
-            // get the name of the property in the value to be converted and the corresponding value;
-            // if the properties value is not defined, skip it.
-            let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
-            let propVal = this[propName];
-            if (propVal == null)
-                continue;
-
-            let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-            if (!convertor)
-                params.push( v2s( propVal));
-            else if (typeof convertor === "number")
-                params.push( v2sByFuncID( propVal, convertor));
-            else
-                params.push( convertor( propVal));
-        }
-
-        return params.join(this.constructor[symCssFuncParamDelimiter] ?? ",");
-    }
-
-    /**
-     * Sets up the CssFunc-derived class by specifying how the function parameters are
-     * converted to strings, what function name to use and what delimiter to use to separate
-     * function parameters.
-     * @param paramInfo Information about how class properties should be converted to strings
-     * representing function parameters.
-     * @param name Name of the function. This can be left undefined if the class overrides the
-     * `name` property getter. This is usually the case for classes that serve multiple functions.
-     * @param delimiter Optional delimiter string used to separate function parameters. This can
-     * be left undefined if comma should be used.
-     */
-    public static setup<T extends CssFunc>( this: { new (...args: any[]): T },
-        paramInfo: (keyof T | [keyof T, number | AnyToStringFunc])[],
-        name?: string, delimiter?: string): void
-    {
-        if (paramInfo) this[symCssFuncParamInfo] = paramInfo;
-        if (name) this[symCssFuncName] = name;
-        if (delimiter) this[symCssFuncParamDelimiter] = delimiter;
-    }
 }
 
 

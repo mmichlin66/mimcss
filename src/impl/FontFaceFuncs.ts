@@ -49,8 +49,8 @@ function fontStretchToString( val: FontStretch_FontFaceType): string
 function fontStyleToString( val: FontStyle_FontFaceType): string
 {
     return v2s( val, {
-        fromNumber: v => `oblique ${AngleMath.s2s(v)}`,
-        fromArray: v => `oblique ${a2s( v, AngleMath.s2s)}`
+        fromNumber: v => `oblique ${AngleMath.v2s(v)}`,
+        fromArray: v => `oblique ${a2s( v, AngleMath.v2s)}`
     });
 }
 

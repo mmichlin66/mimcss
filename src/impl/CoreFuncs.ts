@@ -62,7 +62,37 @@ export type NumberToStringFunc = (n: number) => string;
 
 
 
- /**
+/**
+ * Numeric identifiers corresponding to well known functions used to convert style property values
+ * to strings. This is used to reduce the size of the object used for mapping style properties to
+ * conversion functions.
+ */
+ export const enum WellKnownFunc
+ {
+     Number = 1,
+     Percent,
+     Length,
+     Angle,
+     Time,
+     Resolution,
+     Frequency,
+     Position,
+     Color,
+     MultiPositionWithComma,
+     MultiLengthWithSpace,
+     MultiTimeWithComma,
+     OneOrManyWithComma,
+     OneOrManyWithSlash,
+     UnitlessOrPercent,
+     Radius,
+     Border,
+     GridAxis,
+
+ }
+
+
+
+  /**
  * The V2SOptions type defines options on how to convert values of differnt
  * types to strings. A value is converted according to the following rules:
  * - If the option is a number it is treated as an ID of a registered conversion function.
@@ -154,7 +184,10 @@ export function v2s( val: any, options?: V2SOptions): string
             return val.toString();
     }
     else if (typeof options == "number")
-        return v2sByFuncID( val, options);
+    {
+        let func = registeredV2SFuncs.get( options);
+        return func ? func(val) : "";
+    }
     else if (typeof options == "function")
         return options( val);
     else
@@ -186,7 +219,7 @@ export function v2s( val: any, options?: V2SOptions): string
             else if (options.fromProps)
             {
                 let separator = options.propSep != null ? options.propSep : " ";
-                return p2s( val, options.fromProps, separator);
+                return o2s( val, options.fromProps, separator);
             }
             else if (typeof val[symValueToString] === "function")
                 return val[symValueToString]();
@@ -214,7 +247,7 @@ export function a2s( val: any[], options?: V2SOptions, separator: string = " "):
 {
     return !val || val.length === 0
         ? ""
-        : val.filter( v => v != null).map( v => v2s( v, options)).join( separator);
+        : val.map( v => v2s( v, options)).filter( v => !!v).join( separator);
 }
 
 
@@ -226,7 +259,7 @@ export function a2s( val: any[], options?: V2SOptions, separator: string = " "):
  * @param options
  * @param separator
  */
-export function p2s( val: {[p:string]: any}, options: P2SOptions, separator?: string): string
+export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: string): string
 {
     if (val == null)
         return "";
@@ -250,70 +283,60 @@ export function p2s( val: {[p:string]: any}, options: P2SOptions, separator?: st
         params.push( v2s( propVal, options));
     }
 
-    return params.join( separator ?? " ");
+    return params.filter( v => !!v).join( separator ?? " ");
 }
 
 
 
-// /**
-//  * Converts the given value to a CSS string using the info parameter to inform how the object's
-//  * properties should be converted to strings. The info parameter is an array of either strings
-//  * or two- or thre-element tuples. The only string and the first tuple element corresponds to a
-//  * property expected in the value object to be converted. Each property is converted according
-//  * to the following rules:
-//  * - If the array item is just a string, the corresponding value's property is converted using
-//  *   the val2str function.
-//  * - If the second element is null or undefined, the corresponding value's property is converted using
-//  *   the val2str function..
-//  * - If the second element is a function, it is used to convert the value's property.
-//  * - If a third element exists in the tuple it is treated as a prefix to be placed before the
-//  *   converted property value.
-//  *
-//  * The order of the names determines in which order the properties should be added to the string.
-//  */
-//  export function obj2str( val: any,
-//     info: (string | [string, null | number | ToStringFunc, string?] )[],
-//     separator: string = " "): string
-// {
-//     if (val == null)
-//         return "";
-//     else if (typeof val !== "object")
-//         return val.toString();
+/**
+ * Converts the given values according to the specified options.
+ * @param values
+ * @param separator
+ */
+export function mv2s( values: (any | [any, V2SOptions?])[], separator: string = ","): string
+{
+    if (values == null || values.length === 0)
+        return "";
 
-//     let buf: (string)[] = [];
-//     for( let nameOrTuple of info)
-//     {
-//         // get the name of the property in the value to be converted and the corresponding value;
-//         // if the properties value is not defined, skip it.
-//         let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
-//         let propVal = val[propName];
-//         if (propVal == null)
-//             continue;
+    let arr: string[] = [];
+    for( let item of values)
+    {
+        let val: any;
+        let options: V2SOptions | undefined;
+        if (Array.isArray(item))
+        {
+            val = item[0];
+            options = item[1];
+        }
+        else
+            val = item;
 
-//         // check whether we have a prefix
-//         let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
-//         if (prefix)
-//             buf.push( prefix);
+        arr.push( v2s( val, options));
+    }
 
-//         let convertor = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-//         if (!convertor)
-//             buf.push( v2s( propVal));
-//         else if (typeof convertor === "number")
-//             buf.push( v2sByFuncID( propVal, convertor));
-//         else
-//             buf.push( convertor( propVal));
-//     }
-
-// 	return buf.join(separator);
-// }
+    return arr.filter( v => !!v).join( separator);
+}
 
 
 
 /**
- * The templateStringToString is a tag function helper that converts the template string with
+ * Converts the given values as parameters to the given CSS function invocation.
+ * @param name
+ * @param values
+ * @param separator
+ */
+export function f2s( name: string, values: (any | [any, V2SOptions?])[], separator = ",")
+{
+    return `${name}(${mv2s( values, separator)})`;
+}
+
+
+
+/**
+ * The tag2s is a tag function helper that converts the template string with
  * parameters to a string using the given function to convert parameters.
  */
-export function templateStringToString( parts: TemplateStringsArray, params: any[],
+export function tag2s( parts: TemplateStringsArray, params: any[],
     convertFunc?: ( v: any) => string): string
 {
     // number of parameters is always 1 less than the number of string parts
@@ -354,7 +377,7 @@ function numberToString( n: number, intUnit: string = "", floatUint: string = ""
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function numberBasedToString<T>( val: Extended<T>, convertFunc?: NumberToStringFunc): string
+function numberStyleToString<T>( val: Extended<T>, convertFunc?: NumberToStringFunc): string
 {
     return v2s( val, { fromNumber: convertFunc});
 }
@@ -365,12 +388,12 @@ function numberBasedToString<T>( val: Extended<T>, convertFunc?: NumberToStringF
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiStyleToString<T>( val: OneOrMany<T>, convertFunc?: NumberToStringFunc,
+function multiNumberStyleToString<T>( val: OneOrMany<T>, convertFunc?: NumberToStringFunc,
     separator: string = " "): string
 {
     return v2s( val, {
         fromNumber: convertFunc,
-        arrItemFunc: v => numberBasedToString( v, convertFunc),
+        arrItemFunc: v => numberStyleToString( v, convertFunc),
         arrSep: separator
     });
 }
@@ -383,7 +406,7 @@ function multiStyleToString<T>( val: OneOrMany<T>, convertFunc?: NumberToStringF
  */
 function mathFunc<T>( name: string, params: Extended<T>[], convertFunc?: NumberToStringFunc): string
 {
-    return `${name}(${multiStyleToString( params, convertFunc, ",")})`;
+    return `${name}(${multiNumberStyleToString( params, convertFunc, ",")})`;
 }
 
 
@@ -394,7 +417,7 @@ function mathFunc<T>( name: string, params: Extended<T>[], convertFunc?: NumberT
 function calcFunc<T>( parts: TemplateStringsArray, params: Extended<T>[],
     convertFunc?: NumberToStringFunc): string
 {
-    return `calc(${templateStringToString( parts, params, (v: any) => numberBasedToString( v, convertFunc))})`;
+    return `calc(${tag2s( parts, params, (v: any) => numberStyleToString( v, convertFunc))})`;
 }
 
 
@@ -445,11 +468,11 @@ class NumberBaseMath<T = any, U extends string = any, P extends string = any> im
  */
 export interface INumberBaseMathClass<T = any, U extends string = any, P extends string = any>
 {
-    convertFunc( n: number): string;
+    n2s( n: number): string;
 
-    s2s( val: Extended<T>): string;
+    v2s( val: Extended<T>): string;
 
-    ms2s( val: OneOrMany<T>, separator: string): string;
+    mv2s( val: OneOrMany<T>, separator: string): string;
 
     new(): INumberBaseMath<T,U,P>;
 }
@@ -469,15 +492,15 @@ export interface INumberBaseMathClass<T = any, U extends string = any, P extends
  */
 export class NumberMath extends NumberBaseMath<CssNumber, "", NumberType> implements INumberMath
 {
-    public static convertFunc( n: number): string { return n.toString(); }
+    public static n2s( n: number): string { return n.toString(); }
 
-    public static s2s( val: Extended<CssNumber>): string
-        { return numberBasedToString( val, NumberMath.convertFunc); }
+    public static v2s( val: Extended<CssNumber>): string
+        { return numberStyleToString( val, NumberMath.n2s); }
 
-    public static ms2s( val: OneOrMany<CssNumber>, separator: string): string
-        { return multiStyleToString( val, NumberMath.convertFunc, separator); }
+    public static mv2s( val: OneOrMany<CssNumber>, separator: string): string
+        { return multiNumberStyleToString( val, NumberMath.n2s, separator); }
 
-    constructor() { super( NumberMath.convertFunc) }
+    constructor() { super( NumberMath.n2s) }
 }
 
 
@@ -494,16 +517,16 @@ export class NumberMath extends NumberBaseMath<CssNumber, "", NumberType> implem
  */
 export class PercentMath extends NumberBaseMath<CssPercent, PercentUnits, PercentType> implements IPercentMath
 {
-    public static convertFunc( n: number): string
+    public static n2s( n: number): string
         { return (Number.isInteger(n) ? n : Math.round(n * 100)) + "%"; }
 
-    public static s2s( val: Extended<CssPercent>): string
-        { return numberBasedToString( val, PercentMath.convertFunc); }
+    public static v2s( val: Extended<CssPercent>): string
+        { return numberStyleToString( val, PercentMath.n2s); }
 
-    public static ms2s( val: OneOrMany<CssPercent>, separator: string): string
-        { return multiStyleToString( val, PercentMath.convertFunc, separator); }
+    public static mv2s( val: OneOrMany<CssPercent>, separator: string): string
+        { return multiNumberStyleToString( val, PercentMath.n2s, separator); }
 
-    constructor() { super( PercentMath.convertFunc) }
+    constructor() { super( PercentMath.n2s) }
 }
 
 /**
@@ -529,15 +552,15 @@ export function unitlessOrPercentToString( n: number): string
  */
 export class LengthMath extends NumberBaseMath<CssLength, LengthUnits | PercentUnits, LengthType> implements ILengthMath
 {
-    public static convertFunc( n: number): string { return numberToString( n, "px", "em"); }
+    public static n2s( n: number): string { return numberToString( n, "px", "em"); }
 
-    public static s2s( val: Extended<CssLength | string>): string
-        { return numberBasedToString( val, LengthMath.convertFunc); }
+    public static v2s( val: Extended<CssLength | string>): string
+        { return numberStyleToString( val, LengthMath.n2s); }
 
-    public static ms2s( val: OneOrMany<CssLength>, separator: string): string
-        { return multiStyleToString( val, LengthMath.convertFunc, separator); }
+    public static mv2s( val: OneOrMany<CssLength>, separator: string): string
+        { return multiNumberStyleToString( val, LengthMath.n2s, separator); }
 
-    constructor() { super( LengthMath.convertFunc) }
+    constructor() { super( LengthMath.n2s) }
 }
 
 
@@ -554,15 +577,15 @@ export class LengthMath extends NumberBaseMath<CssLength, LengthUnits | PercentU
  */
 export class AngleMath extends NumberBaseMath<CssAngle, AngleUnits | PercentUnits, AngleType> implements IAngleMath
 {
-    public static convertFunc( n: number): string { return numberToString( n, "deg", "turn"); }
+    public static n2s( n: number): string { return numberToString( n, "deg", "turn"); }
 
-    public static s2s( val: Extended<CssAngle>): string
-        { return numberBasedToString( val, AngleMath.convertFunc); }
+    public static v2s( val: Extended<CssAngle>): string
+        { return numberStyleToString( val, AngleMath.n2s); }
 
-    public static ms2s( val: OneOrMany<CssAngle>, separator: string): string
-        { return multiStyleToString( val, AngleMath.convertFunc, separator); }
+    public static mv2s( val: OneOrMany<CssAngle>, separator: string): string
+        { return multiNumberStyleToString( val, AngleMath.n2s, separator); }
 
-    constructor() { super( AngleMath.convertFunc) }
+    constructor() { super( AngleMath.n2s) }
 }
 
 
@@ -579,15 +602,15 @@ export class AngleMath extends NumberBaseMath<CssAngle, AngleUnits | PercentUnit
  */
 export class TimeMath extends NumberBaseMath<CssTime, TimeUnits, TimeType> implements ITimeMath
 {
-    public static convertFunc( n: number): string { return numberToString( n, "ms", "s"); }
+    public static n2s( n: number): string { return numberToString( n, "ms", "s"); }
 
-    public static s2s( val: Extended<CssTime>): string
-        { return numberBasedToString( val, TimeMath.convertFunc); }
+    public static v2s( val: Extended<CssTime>): string
+        { return numberStyleToString( val, TimeMath.n2s); }
 
-    public static ms2s( val: OneOrMany<CssTime>, separator: string): string
-        { return multiStyleToString( val, TimeMath.convertFunc, separator); }
+    public static mv2s( val: OneOrMany<CssTime>, separator: string): string
+        { return multiNumberStyleToString( val, TimeMath.n2s, separator); }
 
-    constructor() { super( TimeMath.convertFunc) }
+    constructor() { super( TimeMath.n2s) }
 }
 
 
@@ -604,15 +627,15 @@ export class TimeMath extends NumberBaseMath<CssTime, TimeUnits, TimeType> imple
  */
 export class ResolutionMath extends NumberBaseMath<CssResolution, ResolutionUnits, ResolutionType> implements IResolutionMath
 {
-    public static convertFunc( n: number): string { return numberToString( n, "dpi", "x"); }
+    public static n2s( n: number): string { return numberToString( n, "dpi", "x"); }
 
-    public static s2s( val: Extended<CssResolution>): string
-        { return numberBasedToString( val, ResolutionMath.convertFunc); }
+    public static v2s( val: Extended<CssResolution>): string
+        { return numberStyleToString( val, ResolutionMath.n2s); }
 
-    public static ms2s( val: OneOrMany<CssResolution>, separator: string): string
-        { return multiStyleToString( val, ResolutionMath.convertFunc, separator); }
+    public static mv2s( val: OneOrMany<CssResolution>, separator: string): string
+        { return multiNumberStyleToString( val, ResolutionMath.n2s, separator); }
 
-    constructor() { super( ResolutionMath.convertFunc) }
+    constructor() { super( ResolutionMath.n2s) }
 }
 
 
@@ -629,15 +652,15 @@ export class ResolutionMath extends NumberBaseMath<CssResolution, ResolutionUnit
  */
 export class FrequencyMath extends NumberBaseMath<CssFrequency, FrequencyUnits, FrequencyType> implements IFrequencyMath
 {
-    public static convertFunc( n: number): string { return numberToString( n, "Hz", "kHz"); }
+    public static n2s( n: number): string { return numberToString( n, "Hz", "kHz"); }
 
-    public static s2s( val: Extended<CssFrequency>): string
-        { return numberBasedToString( val, FrequencyMath.convertFunc); }
+    public static v2s( val: Extended<CssFrequency>): string
+        { return numberStyleToString( val, FrequencyMath.n2s); }
 
-    public static ms2s( val: OneOrMany<CssFrequency>, separator: string): string
-        { return multiStyleToString( val, FrequencyMath.convertFunc, separator); }
+    public static mv2s( val: OneOrMany<CssFrequency>, separator: string): string
+        { return multiNumberStyleToString( val, FrequencyMath.n2s, separator); }
 
-    constructor() { super( FrequencyMath.convertFunc) }
+    constructor() { super( FrequencyMath.n2s) }
 }
 
 
@@ -651,7 +674,7 @@ export class FrequencyMath extends NumberBaseMath<CssFrequency, FrequencyUnits, 
 /**
  * Converts single position style value to the CSS string.
  */
-export function pos2str( val: Extended<CssPosition>): string
+export function pos2s( val: Extended<CssPosition>): string
 {
     return v2s( val, { fromAny: WellKnownFunc.Length });
 }
@@ -659,7 +682,7 @@ export function pos2str( val: Extended<CssPosition>): string
 /**
  * Converts multi-position style value to the CSS string.
  */
-function multiPos2str( val: Extended<OneOrMany<CssPosition>>, separator: string): string
+function mpos2s( val: Extended<OneOrMany<CssPosition>>, separator: string): string
 {
     return v2s( val, {
         arrItemFunc: WellKnownFunc.Position,
@@ -669,51 +692,21 @@ function multiPos2str( val: Extended<OneOrMany<CssPosition>>, separator: string)
 
 
 
-/**
- * Numeric identifiers corresponding to well known functions used to convert style property values
- * to strings. This is used to reduce the size of the object used for mapping style properties to
- * conversion functions.
- */
-export const enum WellKnownFunc
-{
-    Number = 1,
-    Percent,
-    Length,
-    Angle,
-    Time,
-    Resolution,
-    Frequency,
-    Position,
-    Color,
-    MultiPositionWithComman,
-    MultiLengthWithSpace,
-    MultiTimeWithComma,
-    ArrayWithComma,
-    ArrayWithSlash,
-    UnitlessOrPercent,
-    Radius,
-    Border,
-    GridAxis,
-
-}
-
-
-
 // Map of function IDs to functions that convert a value to string
 let registeredV2SFuncs = new Map<number,AnyToStringFunc>([
-    [WellKnownFunc.Number, NumberMath.s2s],
-    [WellKnownFunc.Percent, PercentMath.s2s],
-    [WellKnownFunc.Length, LengthMath.s2s],
-    [WellKnownFunc.Angle, AngleMath.s2s],
-    [WellKnownFunc.Time, TimeMath.s2s],
-    [WellKnownFunc.Resolution, ResolutionMath.s2s],
-    [WellKnownFunc.Frequency, FrequencyMath.s2s],
-    [WellKnownFunc.Position, pos2str],
-    [WellKnownFunc.MultiPositionWithComman, val => multiPos2str( val, ",")],
-    [WellKnownFunc.MultiLengthWithSpace, val => LengthMath.ms2s( val, " ")],
-    [WellKnownFunc.MultiTimeWithComma, val => LengthMath.ms2s( val, ",")],
-    [WellKnownFunc.ArrayWithComma, val => v2s( val, { arrSep: "," })],
-    [WellKnownFunc.ArrayWithSlash, val => v2s( val, { arrSep: "/" })],
+    [WellKnownFunc.Number, NumberMath.v2s],
+    [WellKnownFunc.Percent, PercentMath.v2s],
+    [WellKnownFunc.Length, LengthMath.v2s],
+    [WellKnownFunc.Angle, AngleMath.v2s],
+    [WellKnownFunc.Time, TimeMath.v2s],
+    [WellKnownFunc.Resolution, ResolutionMath.v2s],
+    [WellKnownFunc.Frequency, FrequencyMath.v2s],
+    [WellKnownFunc.Position, pos2s],
+    [WellKnownFunc.MultiPositionWithComma, val => mpos2s( val, ",")],
+    [WellKnownFunc.MultiLengthWithSpace, val => LengthMath.mv2s( val, " ")],
+    [WellKnownFunc.MultiTimeWithComma, val => LengthMath.mv2s( val, ",")],
+    [WellKnownFunc.OneOrManyWithComma, val => v2s( val, { arrSep: "," })],
+    [WellKnownFunc.OneOrManyWithSlash, val => v2s( val, { arrSep: "/" })],
     [WellKnownFunc.UnitlessOrPercent, unitlessOrPercentToString],
 ]);
 
@@ -733,20 +726,6 @@ export function registerV2SFuncID( func: AnyToStringFunc, weelKnownID?: WellKnow
     let funcID = weelKnownID ?? nextRegisteredV2SFuncID++;
     registeredV2SFuncs.set( funcID, func);
     return funcID;
-}
-
-
-
-/**
- * Converts the given value to string using a registered conversion function indicated by the
- * given function ID.
- * @param val Value to convert
- * @param funcID ID of the previously registered conversion function
- */
-export function v2sByFuncID( val: any, funcID: number): string
-{
-    let func = registeredV2SFuncs.get( funcID);
-    return func ? func(val) : "";
 }
 
 

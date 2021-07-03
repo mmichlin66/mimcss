@@ -238,7 +238,7 @@ class RuleContainer implements ITopLevelRuleContainer
 		if (this.vars.length > 0)
 		{
 			this.cssCustomVarStyleRule = Rule.addRuleToDOM( `:root {${this.vars.map( varObj =>
-				varObj.toCssString()).filter( v => v != null).join(";")}}`, parent) as CSSStyleRule;
+				varObj.toCssString()).filter( v => !!v).join(";")}}`, parent) as CSSStyleRule;
 		}
 
 		// insert all other rules
@@ -330,7 +330,7 @@ class RuleContainer implements ITopLevelRuleContainer
 		// serialize our custom variables in a ":root" rule
 		if (this.vars.length > 0)
 		{
-			ctx.addRuleText( `:root {${this.vars.map( varObj => varObj.toCssString()).filter( v => v != null).join(";")}}`);
+			ctx.addRuleText( `:root {${this.vars.map( varObj => varObj.toCssString()).filter( v => !!v).join(";")}}`);
 		}
 
 		// serialize all other rules
