@@ -7,11 +7,12 @@
 
 import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword, IStringProxy} from "./CoreTypes";
 import {
-    CrossFadeParam, CssColor, GradientStopOrHint, IBasicShapeProxy, ICircleProxy, IColorProxy,
-    IConicGradient, IEllipseProxy, LinearGradientAngle, ShapeRadius,
-    IImageProxy, IInsetProxy, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
-    IPolygonProxy, IRadialGradient, IRepeatProxy, ISpanProxy,
-    IFilterProxy, ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc, ICursorFunc, IGradient
+    CrossFadeParam, CssColor, GradientStopOrHint, ICircle, IColorProxy,
+    IConicGradient, IEllipse, LinearGradientAngle, ShapeRadius,
+    IImageProxy, IInset, IGradient, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
+    IPolygon, IRadialGradient, IRepeatProxy, ISpanProxy,
+    IFilterProxy, ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc,
+    ICursorFunc,
 } from "./ExtraTypes";
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {
@@ -398,10 +399,7 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: IN
 }
 
 /**
- * Converts the given linear gradient angle to string. Since the linear gradient angle has the
- * "to" prefix before `side-or-corner` values such as `to right`, but doesn't have it before
- * regular angle values such as `0.25turn`, we must check whether the value contains any digits.
- * We do it via regex test.
+ * Converts the given linear gradient angle to string.
  */
 function linearGradientAngleToString( angle: LinearGradientAngle): string
 {
@@ -409,6 +407,9 @@ function linearGradientAngleToString( angle: LinearGradientAngle): string
     if (!angle)
         return "";
 
+    // Since the linear gradient angle has the "to" prefix before `side-or-corner` values such as
+    // `to right`, but doesn't have it before regular angle values such as `0.25turn`, we must
+    // check whether the value contains any digits. We do it via regex test.
     return v2s( angle, {
         fromNumber: AngleMath.n2s,
         fromString: v => /\d+.*/.test(v) ? v : "to " + v
@@ -815,30 +816,50 @@ export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
  * ```typescript
  * clipPath: inset( css.percent(15))
  *
- * clipPath: inset( css.percent(15)).round( 8)
+ * clipPath: inset( 10, 12, 14, 16).round( 8)
  * ```
  */
 export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
-    o3?: Extended<CssLength>, o4?: Extended<CssLength>): IInsetProxy
+    o3?: Extended<CssLength>, o4?: Extended<CssLength>): IInset
 {
-    let f: any = () =>
+    return new Inset( o1, o2, o3, o4);
+}
+
+// Implementation of inset CSS function
+class Inset implements IInset
+{
+    o1?: Extended<CssLength>;
+    o2?: Extended<CssLength>;
+    o3?: Extended<CssLength>;
+    o4?: Extended<CssLength>;
+    radius?: Extended<BorderRadius_StyleType>;
+
+    constructor( o1?: Extended<CssLength>, o2?: Extended<CssLength>,
+        o3?: Extended<CssLength>, o4?: Extended<CssLength>)
     {
-        let r = f.radius != null ? " round " + borderRadiusToString( f.radius) : "";
-        return `inset(${LengthMath.mv2s( [o1, o2, o3, o4], " ")}${r})`;
+        this.o1 = o1; this.o2 = o2; this.o3 = o3; this.o4 = o4;
     }
 
-    f.round = (radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy => {
-        f.radius = radius;
-        return f;
+    public round( radius?: Extended<BorderRadius_StyleType>): this
+    {
+        this.radius = radius;
+        return this;
     }
 
-    return f;
+    public toString(): string
+    {
+        return f2s( "inset", [
+            [this.o1, WellKnownFunc.Length], [this.o2, WellKnownFunc.Length],
+            [this.o3, WellKnownFunc.Length], [this.o4, WellKnownFunc.Length],
+            [this.radius, this.radius && ((v: Extended<BorderRadius_StyleType>) => mv2s( ["round", borderRadiusToString(v)]))],
+        ], " ");
+    }
 }
 
 
 
 /**
- * Returns an ICircleProxy function representing the `circle()` CSS function.
+ * Returns an ICircle objectn representing the `circle()` CSS function.
  *
  * *Example:*
  *
@@ -848,24 +869,47 @@ export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
  * clipPath: circle( 100).at( ["center", css.percent(30)])
  * ```
  */
-export function circle( radius?: ShapeRadius): ICircleProxy
+export function circle( radius?: ShapeRadius): ICircle
 {
-    let f: any = () =>
+    return new Circle( radius);
+}
+
+// Implementation of the circle CSS function
+class Circle implements ICircle
+{
+    radius?: ShapeRadius;
+    pos?: Extended<CssPosition>;
+
+    constructor( radius?: ShapeRadius)
     {
-        let rs =  radius != null ? LengthMath.v2s(radius) : "";
-        let pos = f.pos != null ? " at " + pos2s( f.pos) : "";
-        return `circle(${rs}${pos})`;
+        this.radius = radius;
     }
 
-    f.at = (pos: Extended<CssPosition>): IBasicShapeProxy => { f.pos = pos; return f; }
+    public at( pos?: Extended<CssPosition>): this { this.pos = pos; return this; }
 
-    return f;
+    public toString(): string
+    {
+        return f2s( "circle", [
+            [this.radius, WellKnownFunc.Length],
+            [this.pos, this.pos && ((v: Extended<CssPosition>) => "at " + pos2s(v))],
+        ], " ");
+    }
 }
 
 
+/**
+ * Returns an IEllipse object representing the `ellipse()` CSS function.
+ *
+ * *Example:*
+ *
+ * ```typescript
+ * clipPath: ellipse().at( ["top", "50%"])
+ * ```
+ */
+export function ellipse(): IEllipse;
 
 /**
- * Returns an IEllipseProxy function representing the `ellipse()` CSS function.
+ * Returns an IEllipse object representing the `ellipse()` CSS function.
  *
  * *Example:*
  *
@@ -875,19 +919,35 @@ export function circle( radius?: ShapeRadius): ICircleProxy
  * clipPath: ellipse( 100, 50).at( ["center", css.percent(30)])
  * ```
  */
-export function ellipse( radiusX?: ShapeRadius, radiusY?: ShapeRadius): IEllipseProxy
+export function ellipse( radiusX: ShapeRadius, radiusY: ShapeRadius): IEllipse;
+
+// implementation
+export function ellipse(): IEllipse
 {
-    let f: any = () =>
+    return new Ellipse( arguments[0], arguments[1]);
+}
+
+// Implementation of the ellipse CSS function
+class Ellipse implements IEllipse
+{
+    radiusX?: ShapeRadius;
+    radiusY?: ShapeRadius;
+    pos?: Extended<CssPosition>;
+
+    constructor( radiusX?: ShapeRadius, radiusY?: ShapeRadius)
     {
-        let rxs =  radiusX != null ? LengthMath.v2s(radiusX) : "";
-        let rys =  radiusY != null ? " " + LengthMath.v2s(radiusY) : "";
-        let pos = f.pos != null ? " at " + pos2s( f.pos) : "";
-        return `ellipse(${rxs}${rys}${pos})`
+        this.radiusX = radiusX; this.radiusY = radiusY;
     }
 
-    f.at = (pos: Extended<CssPosition>): IBasicShapeProxy => { f.pos = pos; return f; }
+    public at( pos?: Extended<CssPosition>): this { this.pos = pos; return this; }
 
-    return f;
+    public toString(): string
+    {
+        return f2s( "ellipse", [
+            [this.radiusX, WellKnownFunc.Length], [this.radiusY, WellKnownFunc.Length],
+            [this.pos, this.pos && ((v: Extended<CssPosition>) => "at " + pos2s(v))],
+        ], " ");
+    }
 }
 
 
@@ -903,39 +963,39 @@ export function ellipse( radiusX?: ShapeRadius, radiusY?: ShapeRadius): IEllipse
  * clipPath: css.polygon( [0,100], [50,0], [100,100]).fill( "evenodd")
  * ```
  */
-export function polygon( ...points: CssPoint[]): IPolygonProxy
+export function polygon( ...points: CssPoint[]): IPolygon
 {
-    let f: any = () =>
+    return new Polygon( points);
+}
+
+// Implementation of the polygon CSS function
+class Polygon implements IPolygon
+{
+    points: CssPoint[];
+    radiusY?: ShapeRadius;
+    rule: FillRule_StyleType;
+
+    constructor( points: CssPoint[])
     {
-        let s = "polygon(";
-        if (f.fillParam)
-            s += f.fillParam + ",";
+        this.points = points ?? [];
+    }
 
-        s += points.map( pt => LengthMath.mv2s( pt, " ")).join(",");
+    public add( ...points: CssPoint[]): this
+    {
+        this.points = this.points.concat( points);
+        return this;
+    }
 
-        return s + ")";
-    };
+    public fill( rule: FillRule_StyleType): this { this.rule = rule; return this; }
 
-    f.fill = (rule: FillRule_StyleType): IBasicShapeProxy => { f.fillParam = rule; return f; };
-
-    return f;
+    public toString(): string
+    {
+        return f2s( "polygon", [
+            this.rule,
+            [this.points, { arrItemFunc: WellKnownFunc.MultiLengthWithSpace, arrSep: ","}],
+        ]);
+    }
 }
-
-
-
-/**
- * Returns an IRayFunc function representing invocation of the `ray()` CSS function.
- */
-export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
-    contain?: boolean): IRayFunc
-{
-    return () => f2s( "ray", [[angle, WellKnownFunc.Angle], [size, WellKnownFunc.Length], [contain ? "contain" : undefined]], " ");
-}
-// export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
-//     contain?: boolean): RayFunc
-// {
-//     return new RayFunc( angle, size, contain);
-// }
 
 
 
@@ -1099,7 +1159,7 @@ export function span( countOrName: Extended<GridLineCountOrName>,
 
 
 /**
- * Returns a function representing the CSS `countesr()` function with the given
+ * Returns a function representing the CSS `counters()` function with the given
  * separator string and additional optional strings added after and/or before the counter.
  */
 export function counters( counterObj: Extended<ICounterRule | string>,
@@ -1148,6 +1208,17 @@ export function cursor( p: string, x?: number, y?: number): ICursorFunc
             s += ` ${x} ${y != null ? y : x}`;
         return s;
     }
+}
+
+
+
+/**
+ * Returns an IRayFunc function representing invocation of the `ray()` CSS function.
+ */
+ export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
+    contain?: boolean): IRayFunc
+{
+    return () => f2s( "ray", [[angle, WellKnownFunc.Angle], [size, WellKnownFunc.Length], [contain ? "contain" : undefined]], " ");
 }
 
 

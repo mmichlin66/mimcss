@@ -266,7 +266,7 @@ export interface INumberBaseMath<T, U extends string, P extends string>
      * {
      *     // min( 200px, 25.5em, 45%)
      *     cls1 = css.$class({
-     *         width: css.min( 200, 25.5, css.percent(45))
+     *         width: css.Len.min( 200, 25.5, css.percent(45))
      *     })
      * }
      * ```
@@ -290,7 +290,7 @@ export interface INumberBaseMath<T, U extends string, P extends string>
      * {
      *     // max( 200px, 25.5em, 45%)
      *     cls1 = css.$class({
-     *         width: css.max( 200, 25.5, css.percent(45))
+     *         width: css.Len.max( 200, 25.5, css.percent(45))
      *     })
      * }
      * ```
@@ -316,7 +316,7 @@ export interface INumberBaseMath<T, U extends string, P extends string>
      * {
      *     // clamp( 200px, 25.5em, 45%)
      *     cls1 = css.$class({
-     *         width: css.clamp( 200, 25.5, css.percent(45))
+     *         width: css.Len.clamp( 200, 25.5, css.percent(45))
      *     })
      * }
      * ```
@@ -345,7 +345,7 @@ export interface INumberBaseMath<T, U extends string, P extends string>
      *
      *     // calc( 200px - (2 * var(--defaultPadding)))
      *     cls1 = css.$class({
-     *         width: css.calc` 200px - (2 * ${this.defaultPadding})`
+     *         width: css.Len.calc` 200px - (2 * ${this.defaultPadding})`
      *     })
      * }
      * ```

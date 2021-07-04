@@ -5,7 +5,7 @@
 
 
 
-import {CssAngle, CssLength, CssNumber, CssPosition, Extended, ExtentKeyword,IGenericProxy} from "./CoreTypes";
+import {CssAngle, CssLength, CssNumber, CssPoint, CssPosition, Extended, ExtentKeyword,IGenericProxy} from "./CoreTypes";
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
 
 
@@ -481,20 +481,20 @@ export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Filter CSS functions
+// Filter and transform CSS functions
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * The IFilterProxy interface represents the result of invoking one of the CSS `<filter>` functions.
+ */
 export interface IFilterProxy extends IGenericProxy<"filter"> {}
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Transform CSS functions
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
+/**ITransformProxy
+ * The IFilterProxy interface represents the result of invoking one of the CSS `<transform>` functions.
+ */
 export interface ITransformProxy extends IGenericProxy<"transform"> {}
 
 
@@ -506,14 +506,14 @@ export interface ITransformProxy extends IGenericProxy<"transform"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IInsetProxy interface represents the CSS inset basic shape. It is the result of invoking
- * the [[inset]] function and it can be directly assigned to a suitable style property (e.g.
+ * The IInset interface represents the CSS `inset` basic shape. It is the result of invoking
+ * the [[ExtraAPI.inset]] function and it can be directly assigned to a suitable style property (e.g.
  * clip-path). In addition it has the `round` method that can be called to specify the radii of
  * the inset rectangle's corners.
  */
-export interface IInsetProxy extends IBasicShapeProxy
+export interface IInset
 {
-    round( radius?: Extended<BorderRadius_StyleType>): IBasicShapeProxy;
+    round( radius?: Extended<BorderRadius_StyleType>): this;
 }
 
 
@@ -526,55 +526,42 @@ export type ShapeRadius = Extended<CssLength | "closest-side" | "farthest-side">
 
 
 /**
- * The ICircleProxy interface represents the CSS circle basic shape. It is the result of invoking
- * the [[circle]] function and it can be directly assigned to a suitable style property (e.g.
+ * The ICircle interface represents the CSS circle basic shape. It is the result of invoking
+ * the [[ExtraAPI.circle]] function and it can be directly assigned to a suitable style property (e.g.
  * clip-path). In addition it has the `at` method that can be called to specify the position of
  * the circle's center.
  */
-export interface ICircleProxy extends IBasicShapeProxy
+export interface ICircle
 {
-    at( pos: Extended<CssPosition>): IBasicShapeProxy;
+    at( pos: Extended<CssPosition>): this;
 }
 
 
 
 /**
- * The IEllipseProxy interface represents the CSS ellipse basic shape. It is the result of invoking
- * the [[ellipse]] function and it can be directly assigned to a suitable style property (e.g.
+ * The IEllipse interface represents the CSS ellipse basic shape. It is the result of invoking
+ * the [[ExtraAPI.ellipse]] function and it can be directly assigned to a suitable style property (e.g.
  * clip-path). In addition it has the `at` method that can be called to specify the position of
  * the ellipse's center.
  */
-export interface IEllipseProxy extends IBasicShapeProxy
+export interface IEllipse
 {
-    at( pos: Extended<CssPosition>): IBasicShapeProxy;
+    at( pos: Extended<CssPosition>): this;
 }
 
 
 
 /**
  * The IPolygonProxy interface represents the CSS polygon basic shape. It is the result of invoking
- * the [[polygon]] function and it can be directly assigned to a suitable style property (e.g.
+ * the [[ExtraAPI.polygon]] function and it can be directly assigned to a suitable style property (e.g.
  * clip-path). In addition it has the `fill` method that can be called to specify the fill
  * rule.
  */
-export interface IPolygonProxy extends IBasicShapeProxy
+export interface IPolygon
 {
-    fill( rule: FillRule_StyleType): IBasicShapeProxy;
+    add( ...points: CssPoint[]): this;
+    fill( rule: FillRule_StyleType): this;
 }
-
-/**
- * The IBasicShapeProxy interface represents an invocation of one the CSS `<basic-shape>`
- * functions, for example, [[circle]], [[polygon]], etc. (except the [[path]] function).
- */
-export interface IBasicShapeProxy extends IGenericProxy<"basic-shape"> {};
-
-
-
-/**
- * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions such as
- * [[circle]], [[polygon]], [[path]], etc.
- */
-export type BasicShape = IBasicShapeProxy | IPathBuilder;
 
 
 
@@ -646,6 +633,14 @@ export interface IPathBuilder
     /** Close-path command. */
     z(): IPathBuilder;
 }
+
+
+
+/**
+ * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions such as
+ * [[circle]], [[polygon]], [[path]], etc.
+ */
+export type BasicShape = IInset | ICircle | IEllipse | IPolygon | IPathBuilder;
 
 
 
