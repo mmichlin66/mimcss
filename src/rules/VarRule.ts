@@ -70,11 +70,10 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	 */
 	public setValue( value: ExtendedVarValue<K>, schedulerType?: number): void
 	{
-        // this.value = value;
         if (this.container)
 		{
             let important = false;
-            if (value != null && typeof value === "object" && "!" in value)
+            if (value != null && typeof value === "object" && "!" in (value as any))
             {
                 important = true;
                 value = value["!"];

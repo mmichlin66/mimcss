@@ -206,6 +206,8 @@ export function v2s( val: any, options?: V2SOptions): string
         {
             if (options.fromArray)
                 newOptions = options.fromArray;
+            else if (val.length === 0)
+                return "";
             else
             {
                 let separator = options.arrSep != null ? options.arrSep : " ";
@@ -293,7 +295,7 @@ export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: st
  * @param values
  * @param separator
  */
-export function mv2s( values: (any | [any, V2SOptions?])[], separator: string = ","): string
+export function mv2s( values: (any | [any, V2SOptions?])[], separator: string = " "): string
 {
     if (values == null || values.length === 0)
         return "";

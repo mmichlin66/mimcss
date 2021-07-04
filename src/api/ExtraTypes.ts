@@ -1,7 +1,11 @@
-﻿import {
-    CssAngle, CssLength, CssNumber, CssPosition, Extended, ExtentKeyword,
-    IGenericProxy
-} from "./CoreTypes";
+﻿/**
+ * This module contains definitions of types and interfaces used to define CSS functions.
+ * @module
+ */
+
+
+
+import {CssAngle, CssLength, CssNumber, CssPosition, Extended, ExtentKeyword,IGenericProxy} from "./CoreTypes";
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
 
 
@@ -274,7 +278,7 @@ export type CssNonNumericColor = "transparent" | "currentcolor" | keyof INamedCo
   * interface or any of the functions that return the [[IImageProxy]] interface such as
   * [[linearGradient]], [[crossFade]] and others.
   */
- export type CssImage = IUrlFunc | IImageProxy;
+ export type CssImage = IUrlFunc | IImageProxy | ILinearGradient | IRadialGradient | IConicGradient;
 
 
 
@@ -285,7 +289,7 @@ export type CssNonNumericColor = "transparent" | "currentcolor" | keyof INamedCo
  * color starts and the optional third item is the distance/angle where the color stops.
  *
  * Hint value is expressed as a single-item array that contains a single CSS numeric value.
- * Although hint is a single number, it must be enclosedin an array to distinguish it from color
+ * Although hint is a single number, it must be enclosed in an array to distinguish it from color
  * values because any numeric values in the gradient functions are interpreted as colors.
  *
  * For linear and radial gradients numeric values are of type [[CssLength]]; for conic gradients,
@@ -311,6 +315,25 @@ export type GradientStopOrHint<T extends (CssLength | CssAngle)> =
 
 
 /**
+ * The IGradient interface represents the common functionality of CSS gradients.
+ * @typeparam T Type of numeric values used for hints and color stops.
+ */
+export interface IGradient<T extends (CssLength | CssAngle)>
+{
+    /** Sets the flag indicating whether the gradient is repeating; the default value is true. */
+    repeating( flag?: boolean): this;
+
+    /**
+     * Adds stops or hints to the gradient definition.
+     * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+     * the gradient definition.
+     */
+    add( ...stopsOrHints: GradientStopOrHint<T>[]): this;
+}
+
+
+
+/**
  * Type that enumerates possible values of the side-or-corner for the [[linearGradient]] function.
  * These values can be specified in lieu of the angle in the [[ILinearGradient.to|to]] method of
  * the [[ILinearGradient]] interface.
@@ -321,7 +344,7 @@ export type GradientStopOrHint<T extends (CssLength | CssAngle)> =
  * linearGradient( Colors.red, Colors.blue).to( "bottom right")
  * ```
  */
-export type LinearGradSideOrCorner = "bottom" | "left" | "top" | "right" |
+export type SideOrCorner = "bottom" | "left" | "top" | "right" |
     "top left" | "top right" | "bottom right" | "bottom left" |
     "left top" | "right top" | "left bottom" | "right bottom";
 
@@ -340,49 +363,111 @@ export type LinearGradSideOrCorner = "bottom" | "left" | "top" | "right" |
  * linearGradient( Colors.red, Colors.blue).to( 45)
  * ```
  */
-export type LinearGradAngle = Extended<CssAngle> | LinearGradSideOrCorner;
+export type LinearGradientAngle = Extended<CssAngle> | SideOrCorner;
 
 
 
 /**
- * The ILinearGradient interface represents a function that produces either `linear-gradient` or
+ * The ILinearGradient interface represents an object that produces either `linear-gradient` or
  * `repeating-linear-gradient` CSS function. It can be directly assigned to a suitable style
  * property (e.g. background-image). In addition it has the `to` method that can be called to
  * specify the angle of the gradiant.
  */
-export interface ILinearGradient extends IImageProxy
+export interface ILinearGradient extends IGradient<CssLength>
 {
-	to( angle: LinearGradAngle): IImageProxy;
+    /**
+     * Sets the angle at which the linear gradient changes colors
+     * @param angle Either an angle value or an indication of side or corner such as `right` or
+     * `top left`.
+     */
+	to( angle: LinearGradientAngle): ILinearGradient;
 }
 
 
 
 /**
- * The IRadialGradient interface represents a function that produces either `radial-gradient` or
+ * The IRadialGradient interface represents an object that produces either `radial-gradient` or
  * `repeating-radial-gradient` CSS function. It can be directly assigned to a suitable style
  * property (e.g. background-image). In addition it has the `circle`, `ellipse`, `extent` and `at`
  * methods that can be called to specify parameters of the gradiant.
  */
-export interface IRadialGradient extends IImageProxy
+export interface IRadialGradient extends IGradient<CssLength>
 {
-	circle( sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>): IRadialGradient;
-	ellipse( sizeOrExtent?: [Extended<CssLength>, Extended<CssLength>] | Extended<ExtentKeyword>): IRadialGradient;
-	extent( extent: Extended<ExtentKeyword>): IRadialGradient;
-	at( pos: Extended<CssPosition>): IRadialGradient;
+    /**
+     * Sets the shape of the gradient to circle.
+     */
+	circle(): this;
+
+    /**
+     * Sets the shape of the gradient to circle with the given size.
+     * @param size Circle radius.
+     */
+	circle( size: Extended<CssLength>): this;
+
+    /**
+     * Sets the shape of the gradient to circle with the given extent.
+     * @param eExtent Circle extent keyword.
+     */
+	circle( extent?: Extended<ExtentKeyword>): this;
+
+    // /**
+    //  * Sets the shape of the gradient to ellipse with the given radius values or extent.
+    //  * @param sizeOrExtent Either a touple of ellipse's two radii or an extent keyword.
+    //  */
+	// ellipse( sizeOrExtent?: [Extended<CssLength>, Extended<CssLength>] | Extended<ExtentKeyword>): this;
+
+    /**
+     * Sets the shape of the gradient to ellipse.
+     */
+    ellipse(): this;
+
+    /**
+     * Sets the shape of the gradient to ellipse with the given radius values or extent.
+     * @param rx Ellipse's X-axis radius.
+     * @param rx Ellipse's Y-axis radius.
+     */
+	ellipse( rx: Extended<CssLength>, ry: Extended<CssLength>): this;
+
+    /**
+     * Sets the shape of the gradient to ellipse with the given radius values or extent.
+     * @param extent Extent keyword.
+     */
+	ellipse( extent: Extended<ExtentKeyword>): this;
+
+    /**
+     * Sets the extent of the gradient.
+     * @param extent Extent keyword.
+     */
+	extent( extent: Extended<ExtentKeyword>): this;
+
+    /**
+     * Sets the position of the gradient's center.
+     * @param pos Position value.
+     */
+    at( pos: Extended<CssPosition>): this;
 }
 
 
 
 /**
- * The IConicGradient interface represents a function that produces either `conic-gradient` or
+ * The IConicGradient interface represents an object that produces either `conic-gradient` or
  * `repeating-conic-gradient` CSS function. It can be directly assigned to a suitable style
  * property (e.g. background-image). In addition it has the `from` and `at` methods that can be
  * called to specify the parameters of the gradiant.
  */
-export interface IConicGradient extends IImageProxy
+export interface IConicGradient extends IGradient<CssAngle>
 {
-	from( angle: Extended<CssAngle>): IConicGradient;
-	at( pos: Extended<CssPosition>): IConicGradient;
+    /**
+     * Sets the angle from which the gradient starts.
+     * @param angle Angle value
+     */
+	from( angle: Extended<CssAngle>): this;
+
+    /**
+     * Sets the position of the gradient's center.
+     * @param pos Position value
+     */
+	at( pos: Extended<CssPosition>): this;
 }
 
 
@@ -434,7 +519,7 @@ export interface IInsetProxy extends IBasicShapeProxy
 
 
 /**
- * Type that is used to specify a radius in [[circle]] and [[ellipse]] functions.
+ * Type that is used to specify a radius in [[ExtraAPI.circle]] and [[ExtraAPI.ellipse]] functions.
  */
 export type ShapeRadius = Extended<CssLength | "closest-side" | "farthest-side">;
 

@@ -1,13 +1,11 @@
 {
-	"mode": "modules",
     "readme": "none",
     "name": "Mimcss Reference",
 	"excludeExternals": true,
-	"excludeNotExported": true,
     "excludePrivate": true,
-    "ignoreCompilerErrors": true,
+    "disableSources": true,
 	"out": "./reference",
-	"inputFiles": [
+	"entryPoints": [
 		"./src/api"
 	]
 }

@@ -1070,7 +1070,7 @@ class VirtHandler implements ProxyHandler<any>
         { return Reflect.deleteProperty( this.target, p); }
     defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
         { return Reflect.defineProperty( this.target, p, attrs); }
-    ownKeys(t: any): PropertyKey[]
+    ownKeys(t: any): ArrayLike<string | symbol>
         { return Reflect.ownKeys( this.target); }
     apply(t: any, thisArg: any, args?: any): any
         { return this.target.apply( this, args); }

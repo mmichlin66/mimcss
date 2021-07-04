@@ -1,10 +1,17 @@
-﻿import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword, IStringProxy} from "./CoreTypes";
+﻿/**
+ * This module contains definitions of functions and classes used to define CSS functions.
+ * @module ExtraAPI
+ */
+
+
+
+import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword, IStringProxy} from "./CoreTypes";
 import {
     CrossFadeParam, CssColor, GradientStopOrHint, IBasicShapeProxy, ICircleProxy, IColorProxy,
-    IConicGradient, IEllipseProxy, LinearGradAngle, ShapeRadius,
+    IConicGradient, IEllipseProxy, LinearGradientAngle, ShapeRadius,
     IImageProxy, IInsetProxy, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
     IPolygonProxy, IRadialGradient, IRepeatProxy, ISpanProxy,
-    IFilterProxy, ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc, ICursorFunc
+    IFilterProxy, ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc, ICursorFunc, IGradient
 } from "./ExtraTypes";
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {
@@ -12,7 +19,7 @@ import {
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
 import {
-    AngleMath, f2s, INumberBaseMathClass, LengthMath, PercentMath, pos2s, registerV2SFuncID,
+    AngleMath, f2s, INumberBaseMathClass, LengthMath, mv2s, PercentMath, pos2s, registerV2SFuncID,
     v2s, WellKnownFunc
 } from "../impl/CoreFuncs";
 import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
@@ -126,64 +133,22 @@ export function alpha( c: number | keyof INamedColors, a: number): IColorProxy
 /**
  * Function returning the ILinearGradient interface representing the `linear-gradient` CSS functions.
  *
- * *Example:*
+ * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+ * the gradient definition.
+ *
+ * *Examples:*
  *
  * ```typescript
  * backgroundImage: linearGradient( "red", "blue")
+ *
+ * backgroundImage: linearGradient( ["red", 30], ["green", 50, 60], ["blue", 80]).repeating()
  *
  * backgroundImage: linearGradient( "red", "blue").to( 45)
  * ```
  */
 export function linearGradient(...stopsOrHints: GradientStopOrHint<CssLength>[]): ILinearGradient
 {
-    return linearGradientFunc( "linear-gradient", stopsOrHints);
-}
-
-
-
-/**
- * Function returning the ILinearGradient interface representing the `repeating-linear-gradient` CSS functions.
- *
- * *Example:*
- *
- * ```typescript
- * backgroundImage: linearGradient( "red", "blue")
- *
- * backgroundImage: linearGradient( "red", "blue").to( 45)
- * ```
- */
-export function repeatingLinearGradient(...stopsOrHints: GradientStopOrHint<CssLength>[]): ILinearGradient
-{
-    return linearGradientFunc( "repeating-linear-gradient", stopsOrHints);
-}
-
-
-
-/**
- * Function returning the ILinearGradient interface for either `linear-gradient` or
- * `repeating-linear-gradient` CSS functions.
- */
-function linearGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssLength>[]): ILinearGradient
-{
-    let f: any = () => {
-        let angleString = "";
-        if (f.angle)
-        {
-            angleString = v2s( f.angle, {
-                fromNumber: AngleMath.n2s,
-                fromString: v => /\d+.*/.test(v) ? v : "to " + v
-            }) + ",";
-        }
-
-        return `${name}(${angleString}${gradientStopsOrHintsToString( stopsOrHints, LengthMath)})`;
-    }
-
-    f.to = (angle: LinearGradAngle) => {
-        f.angle = angle;
-        return f;
-    }
-
-    return f;
+    return new LinearGradient( stopsOrHints);
 }
 
 
@@ -191,75 +156,24 @@ function linearGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
 /**
  * Function returning the IRadialGradient interface representing the `radial-gradient` CSS functions.
  *
- * *Example:*
+ * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+ * the gradient definition.
+ *
+ * *Examples:*
  *
  * ```typescript
  * backgroundImage: radialGradient( "red", "blue")
  *
  * backgroundImage: radialGradient( "red", "blue").circle( css.percent(30)).at( ["center", css.percent(65)])
  *
+ * backgroundImage: radialGradient( "red", "blue").circle( 200).repeating()
+ *
  * backgroundImage: radialGradient( "red", "blue").ellipse( "closest-side")
  * ```
  */
 export function radialGradient(...stopsOrHints: GradientStopOrHint<CssLength>[]): IRadialGradient
 {
-    return radialGradientFunc( "radial-gradient", stopsOrHints);
-}
-
-
-
-/**
- * Function returning the IRadialGradient interface representing the `radial-gradient` CSS functions.
- *
- * *Example:*
- *
- * ```typescript
- * backgroundImage: repeatinGradialGradient( "red", "blue")
- *
- * backgroundImage: repeatinGradialGradient( "red", "blue").circle( css.percent(30)).at( ["center", css.percent(65)])
- *
- * backgroundImage: repeatinGradialGradient( "red", "blue").ellipse( "closest-side")
- * ```
- */
-export function repeatingGradialGradient(...stopsOrHints: GradientStopOrHint<CssLength>[]): IRadialGradient
-{
-    return radialGradientFunc( "repeating-radial-gradient", stopsOrHints);
-}
-
-
-
-/**
- * Function returning the IRadialGradient interface for either `radial-gradient` or
- * `repeating-radial-gradient` CSS functions.
- */
-function radialGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssLength>[]): IRadialGradient
-{
-    let f: any = () =>
-    {
-        let shapeString = f.shape ? f.shape : "";
-        let sizeOrExtentString = f.sizeOrExtent ? LengthMath.mv2s( f.sizeOrExtent, " ") : "";
-        let posString = f.pos ? `at ${pos2s( f.pos)}` : "";
-        let whatAndWhere = f.shape || sizeOrExtentString || f.pos ? `${shapeString} ${sizeOrExtentString} ${posString},` : "";
-        return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, LengthMath)})`;
-    }
-
-    f.circle = (sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>) => {
-        f.shape = "circle";
-        f.sizeOrExtent = sizeOrExtent;
-        return f;
-    }
-
-    f.ellipse = (sizeOrExtent?: [Extended<CssLength>, Extended<CssLength>] | Extended<ExtentKeyword>) => {
-        f.shape = "ellipse";
-        f.sizeOrExtent = sizeOrExtent;
-        return f;
-    }
-
-    f.extent = (extent: Extended<ExtentKeyword>) => { f.sizeOrExtent = extent; return f; }
-
-    f.at = (pos: Extended<CssPosition>) => { f.pos = pos; return f; }
-
-    return f;
+    return new RadialGradient( stopsOrHints);
 }
 
 
@@ -267,59 +181,194 @@ function radialGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssL
 /**
  * Function returning the IConicGradient interface representing the `radial-gradient` CSS functions.
  *
- * *Example:*
+ * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+ * the gradient definition.
+ *
+ * *Examples:*
  *
  * ```typescript
  * backgroundImage: conicGradient( "red", "blue")
+ *
+ * backgroundImage: conicGradient().repeating().add( "red", "blue")
  *
  * backgroundImage: conicGradient( "red", "blue").from( 0.25).at( ["center", css.percent(65)])
  * ```
  */
 export function conicGradient(...stopsOrHints: GradientStopOrHint<CssAngle>[]): IConicGradient
 {
-    return conicGradientFunc( "conic-gradient", stopsOrHints);
+    return new ConicGradient( stopsOrHints);
 }
 
 
 
 /**
- * Function returning the IConicGradient interface representing the `radial-gradient` CSS functions.
- *
- * *Example:*
- *
- * ```typescript
- * backgroundImage: repeatingConicGradient( "red", "blue")
- *
- * backgroundImage: repeatingConicGradient( "red", "blue").from( 0.25).at( ["center", css.percent(65)])
- * ```
+ * Base class for gradient implementation
  */
-export function repeatingConicGradient(...stopsOrHints: GradientStopOrHint<CssAngle>[]): IConicGradient
+abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradient<T>
 {
-    return conicGradientFunc( "repeating-conic-gradient", stopsOrHints);
-}
+    /** Number-based Math class to convert numeric values in stops and hints to strings */
+    protected matchClass: INumberBaseMathClass<T>;
 
+    /** Name of the gradient */
+    protected name: string;
 
+    /** Name of the gradient */
+    protected isRepeating?: boolean;
 
-/**
- * Function returning the IConicGradient interface for either `conic-gradient` or
- * `repeating-conic-gradient` CSS functions.
- */
-function conicGradientFunc( name: string, stopsOrHints: GradientStopOrHint<CssAngle>[]): IConicGradient
-{
-    let f: any = () =>
+    /** Array of stops and hints */
+    protected stopsOrHints: GradientStopOrHint<T>[];
+
+    constructor( matchClass: INumberBaseMathClass<T>, name: string,
+        stopsOrHints: GradientStopOrHint<T>[])
     {
-        let angleString = f.angle ? `from ${AngleMath.v2s( f.angle)}` : "";
-        let posString = f.pos ? `at ${pos2s( f.pos)}` : "";
-        let whatAndWhere = f.angle || f.pos ? `${angleString} ${posString},` : "";
-        return `${name}(${whatAndWhere}${gradientStopsOrHintsToString( stopsOrHints, AngleMath)})`;
+        this.matchClass = matchClass;
+        this.name = name;
+        this.stopsOrHints = stopsOrHints ?? [];
     }
-        // () => conicGradientToString( name, stopsOrHints, f.angleParam, f.posParam);
 
-    f.from = (angle: Extended<CssAngle>) => { f.angle = angle; return f; }
+    /** Flag indicating whether the gradient is repeating; the default value is true. */
+    public repeating( flag?: boolean): this { this.isRepeating = flag == null ? true : flag; return this; }
 
-    f.at = (pos: Extended<CssPosition>) => { f.pos = pos; return f; }
+    /**
+     * Adds stops or hints to the gradient definition.
+     * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+     * the gradient definition.
+     */
+    public add( ...stopsOrHints: GradientStopOrHint<T>[]): this
+    {
+        this.stopsOrHints = this.stopsOrHints.concat( stopsOrHints);
+        return this;
+    }
 
-    return f;
+    // Converts object data to the CSS conic function - this is called when the object is assigned
+    // to a CSS property
+    public toString(): string
+    {
+        return f2s( `${this.isRepeating ? "repeating-" : ""}${this.name}-gradient`, [
+            this.options2s(),
+            [this.stopsOrHints, (v: GradientStopOrHint<T>[]) => gradientStopsOrHintsToString( v, this.matchClass)]
+        ]);
+    }
+
+    // Returns optional parameters that should precede stops and hints in the gradient function
+    protected abstract options2s(): string;
+}
+
+
+
+/**
+ * Implements functionality of linear gradients
+ */
+class LinearGradient extends Gradient<CssLength> implements ILinearGradient
+{
+    protected angle?: LinearGradientAngle;
+
+    constructor( stopsOrHints: GradientStopOrHint<CssLength>[])
+    {
+        super( LengthMath, "linear", stopsOrHints);
+    }
+
+	public to( angle?: LinearGradientAngle): this { this.angle = angle; return this; }
+
+    // Returns optional parameters that should precede stops and hints in the gradient function
+    protected options2s(): string
+    {
+        return mv2s([[this.angle, linearGradientAngleToString]]);
+    }
+}
+
+
+
+/**
+ * Implements functionality of radial gradients
+ */
+class RadialGradient extends Gradient<CssLength> implements IRadialGradient
+{
+    protected shape?: string;
+	protected sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword> | [Extended<CssLength>, Extended<CssLength>];
+    protected pos?: Extended<CssPosition>;
+
+    constructor( stopsOrHints: GradientStopOrHint<CssLength>[])
+    {
+        super( LengthMath, "radial", stopsOrHints);
+    }
+
+	public circle(): this;
+	public circle( size: Extended<CssLength>): this;
+	public circle( extent?: Extended<ExtentKeyword>): this;
+	public circle( sizeOrExtent?: Extended<CssLength> | Extended<ExtentKeyword>): this
+    {
+        this.shape = "circle";
+        this.sizeOrExtent = sizeOrExtent;
+        return this;
+    }
+
+	public ellipse(): this;
+	public ellipse( rx: Extended<CssLength>, ry: Extended<CssLength>): this;
+	public ellipse( extent: Extended<ExtentKeyword>): this;
+	public ellipse( ...params: any[]): this
+    {
+        this.shape = "ellipse";
+        if (params.length === 1)
+            this.sizeOrExtent = params[0] as Extended<ExtentKeyword>;
+        else if (params.length === 2)
+            this.sizeOrExtent = [params[0] as Extended<CssLength>, params[1] as Extended<CssLength>];
+        else
+            this.sizeOrExtent = undefined;
+        return this;
+    }
+
+
+	public extent( extent: Extended<ExtentKeyword>): this
+    {
+        this.sizeOrExtent = extent;
+        return this;
+    }
+
+	public at( pos: Extended<CssPosition>): this
+    {
+        this.pos = pos;
+        return this;
+    }
+
+    // Returns optional parameters that should precede stops and hints in the gradient function
+    protected options2s(): string
+    {
+        return mv2s([
+            this.shape,
+            [this.sizeOrExtent, LengthMath.mv2s],
+            [this.pos, this.pos == null ? undefined: (v: Extended<CssPosition>) => "at " + pos2s(v)],
+        ]);
+    }
+}
+
+
+
+/**
+ * Implements functionality of conic gradients
+ */
+class ConicGradient extends Gradient<CssAngle> implements IConicGradient
+{
+    protected angle?: Extended<CssAngle>;
+    protected pos?: Extended<CssPosition>;
+
+    constructor( stopsOrHints: GradientStopOrHint<CssAngle>[])
+    {
+        super( AngleMath, "conic", stopsOrHints);
+    }
+
+	public from( angle?: Extended<CssAngle>): this { this.angle = angle; return this; }
+
+	public at( pos?: Extended<CssPosition>): this { this.pos = pos; return this; }
+
+    // Returns optional parameters that should precede stops and hints in the gradient function
+    protected options2s(): string
+    {
+        return mv2s([
+            [this.angle, this.angle == null ? undefined : (v: Extended<CssAngle>) => "from " + AngleMath.v2s(v)],
+            [this.pos, this.pos == null ? undefined: (v: Extended<CssPosition>) => "at " + pos2s(v)],
+        ]);
+    }
 }
 
 
@@ -329,8 +378,6 @@ function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[],
 {
     return val.map( v => gradientStopOrHintToString( v, mathClass)).join(",");
 }
-
-
 
 function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: INumberBaseMathClass): string
 {
@@ -349,6 +396,26 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: IN
         }
     });
 }
+
+/**
+ * Converts the given linear gradient angle to string. Since the linear gradient angle has the
+ * "to" prefix before `side-or-corner` values such as `to right`, but doesn't have it before
+ * regular angle values such as `0.25turn`, we must check whether the value contains any digits.
+ * We do it via regex test.
+ */
+function linearGradientAngleToString( angle: LinearGradientAngle): string
+{
+    // if angle value is undefined or is 0, no need to specify it
+    if (!angle)
+        return "";
+
+    return v2s( angle, {
+        fromNumber: AngleMath.n2s,
+        fromString: v => /\d+.*/.test(v) ? v : "to " + v
+    });
+}
+
+
 
 
 
@@ -1064,7 +1131,7 @@ export function counters( counterObj: Extended<ICounterRule | string>,
  */
 export function url( p: Extended<string | IIDRule>): IUrlFunc
 {
-    return () => f2s( "url", ["p"]);
+    return () => f2s( "url", [p]);
 }
 
 
