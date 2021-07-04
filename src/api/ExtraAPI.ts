@@ -20,6 +20,7 @@ import {
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
 import {
+    a2s,
     AngleMath, f2s, INumberBaseMathClass, LengthMath, mv2s, PercentMath, pos2s, registerV2SFuncID,
     v2s, WellKnownFunc
 } from "../impl/CoreFuncs";
@@ -237,7 +238,7 @@ abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradient<T
      */
     public add( ...stopsOrHints: GradientStopOrHint<T>[]): this
     {
-        this.stopsOrHints = this.stopsOrHints.concat( stopsOrHints);
+        this.stopsOrHints.push( ...stopsOrHints);
         return this;
     }
 
@@ -972,7 +973,6 @@ export function polygon( ...points: CssPoint[]): IPolygon
 class Polygon implements IPolygon
 {
     points: CssPoint[];
-    radiusY?: ShapeRadius;
     rule: FillRule_StyleType;
 
     constructor( points: CssPoint[])
@@ -982,7 +982,7 @@ class Polygon implements IPolygon
 
     public add( ...points: CssPoint[]): this
     {
-        this.points = this.points.concat( points);
+        this.points.push( ...points);
         return this;
     }
 
@@ -1009,83 +1009,67 @@ export function path( fillRule?: FillRule_StyleType): IPathBuilder
 
 
 
+type PathCommandParam = number | number[];
+type PathCommand = [string, PathCommandParam[]?];
+
 /**
  * The IPathBuilder interface represents the object that accumulates path commands that are then
  * converted to a string parameter of the CSS `path()` function.
  */
 class PathBuilder implements IPathBuilder
 {
-    private buf: string;
+    rule?: FillRule_StyleType;
+    items: PathCommand[] = [];
 
-    public constructor( fillRule?: FillRule_StyleType)
+    public constructor( rule?: FillRule_StyleType)
     {
-        this.buf = "path(";
-        if (fillRule)
-            this.buf += fillRule + ",";
-
-        this.buf += "'";
+        this.rule = rule;
     }
 
     // Returns the accumulated string
-    public toString(): string { return this.buf + "')"; }
-
-
+    public toString(): string
+    {
+        return f2s( "path", [
+            this.rule,
+            [this.items, (v: PathCommand[]) => `"${a2s(v)}"`]
+        ]);
+    }
 
     // Adds the given command and parameters to the path.
-    private items( command: string, ...items: (number | number[])[]): IPathBuilder
+    private add( command: string, params?: PathCommandParam[]): this
     {
-        this.buf += " " + command;
-
-        for( let item of items)
-        {
-            if (typeof item === "number")
-                this.buf += " " + item;
-            else
-            {
-                for( let subItem of item)
-                    this.buf += " " + subItem;
-            }
-        }
-
+        this.items.push( [command, params]);
         return this;
     }
 
-    public M( first: [number,number], ...next: [number,number][]) { return this.items( "M", first, ...next); }
-    public m( first: [number,number], ...next: [number,number][]) { return this.items( "m", first, ...next); }
+    public M( ...params: [number,number][]): this { return this.add( "M", params); }
+    public m( ...params: [number,number][]): this { return this.add( "m", params); }
 
-    public L( first: [number,number], ...next: [number,number][]) { return this.items( "L", first, ...next); }
-    public l( first: [number,number], ...next: [number,number][]) { return this.items( "l", first, ...next); }
+    public L( ...params: [number,number][]): this { return this.add( "L", params); }
+    public l( ...params: [number,number][]): this { return this.add( "l", params); }
 
-    public H( first: number, ...next: number[]) { return this.items( "H", first, ...next); }
-    public h( first: number, ...next: number[]) { return this.items( "h", first, ...next); }
+    public H( ...params: number[]): this { return this.add( "H", params); }
+    public h( ...params: number[]): this { return this.add( "h", params); }
 
-    public V( first: number, ...next: number[]) { return this.items( "V", first, ...next); }
-    public v( first: number, ...next: number[]) { return this.items( "v", first, ...next); }
+    public V( ...params: number[]): this { return this.add( "V", params); }
+    public v( ...params: number[]): this { return this.add( "v", params); }
 
-    public C( first: [number,number,number,number,number,number],
-        ...next: [number,number,number,number,number,number][]) { return this.items( "C", first, ...next); }
-    public c( first: [number,number,number,number,number,number],
-        ...next: [number,number,number,number,number,number][]) { return this.items( "c", first, ...next); }
+    public C( ...params: [number,number,number,number,number,number][]): this { return this.add( "C", params); }
+    public c( ...params: [number,number,number,number,number,number][]): this { return this.add( "c", params); }
 
-    public S( first: [number,number,number,number],
-        ...next: [number,number,number,number][]) { return this.items( "S", first, ...next); }
-    public s( first: [number,number,number,number],
-        ...next: [number,number,number,number][]) { return this.items( "s", first, ...next); }
+    public S( ...params: [number,number,number,number][]): this { return this.add( "S", params); }
+    public s( ...params: [number,number,number,number][]): this { return this.add( "s", params); }
 
-    public Q( first: [number,number,number,number],
-        ...next: [number,number,number,number][]) { return this.items( "Q", first, ...next); }
-    public q( first: [number,number,number,number],
-        ...next: [number,number,number,number][]) { return this.items( "q", first, ...next); }
+    public Q( ...params: [number,number,number,number][]): this { return this.add( "Q", params); }
+    public q( ...params: [number,number,number,number][]): this { return this.add( "q", params); }
 
-    public T( first: [number,number], ...next: [number,number][]) { return this.items( "T", first, ...next); }
-    public t( first: [number,number], ...next: [number,number][]) { return this.items( "t", first, ...next); }
+    public T( ...params: [number,number][]): this { return this.add( "T", params); }
+    public t( ...params: [number,number][]): this { return this.add( "t", params); }
 
-    public A( first: [number,number,number,0|1,0|1,number,number],
-        ...next: [number,number,number,0|1,0|1,number,number][]) { return this.items( "A", first, ...next); }
-    public a( first: [number,number,number,0|1,0|1,number,number],
-        ...next: [number,number,number,0|1,0|1,number,number][]) { return this.items( "a", first, ...next); }
+    public A( ...params: [number,number,number,0|1,0|1,number,number][]): this { return this.add( "A", params); }
+    public a( ...params: [number,number,number,0|1,0|1,number,number][]): this { return this.add( "a", params); }
 
-    public z() { this.buf += " z"; return this; }
+    public z() { return this.add( "z"); }
 }
 
 

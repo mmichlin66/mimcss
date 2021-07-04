@@ -572,63 +572,62 @@ export interface IPolygon
  */
 export interface IPathBuilder
 {
+    /** Filling rule used to determine the interior of the path */
+    readonly rule?: FillRule_StyleType;
+
     /** Move-to command with absolute coordinates. */
-    M( first: [number,number], ...next: [number,number][]): IPathBuilder;
+    M( ...params: [number,number][]): this;
 
     /** Move-to command with relative coordinates. */
-    m( first: [number,number], ...next: [number,number][]): IPathBuilder;
+    m( ...params: [number,number][]): this;
 
     /** Line-to command with absolute coordinates. */
-    L( first: [number,number], ...next: [number,number][]): IPathBuilder;
+    L( ...params: [number,number][]): this;
 
     /** Line-to command with relative coordinates. */
-    l( first: [number,number], ...next: [number,number][]): IPathBuilder;
+    l( ...params: [number,number][]): this;
 
     /** Horizontal line-to command with absolute coordinates. */
-    H( first: number, ...next: number[]): IPathBuilder;
+    H( ...params: number[]): this;
 
     /** Horizontal line-to command with relative coordinates. */
-    h( first: number, ...next: number[]): IPathBuilder;
+    h( ...params: number[]): this;
 
     /** Vertical line-to command with absolute coordinates. */
-    V( first: number, ...next: number[]): IPathBuilder;
+    V( ...params: number[]): this;
 
     /** Vertical line-to command with relative coordinates. */
-    v( first: number, ...next: number[]): IPathBuilder;
+    v( ...params: number[]): this;
 
     /** Cubic bezier curve command with absolute coordinates. */
-    C( first: [number,number,number,number,number,number],
-        ...next: [number,number,number,number,number,number][]): IPathBuilder;
+    C( ...params: [number,number,number,number,number,number][]): this;
 
     /** Cubic bezier curve command with relative coordinates. */
-    c( first: [number,number,number,number,number,number],
-        ...next: [number,number,number,number,number,number][]): IPathBuilder;
+    c( ...params: [number,number,number,number,number,number][]): this;
 
     /** Smooth cubic bezier curve command with absolute coordinates. */
-    S( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+    S( ...params: [number,number,number,number][]): this;
 
     /** Smooth cubic bezier curve command with relative coordinates. */
-    s( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+    s( ...params: [number,number,number,number][]): this;
 
     /** Quadratic bezier curve command with absolute coordinates. */
-    Q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+    Q( ...params: [number,number,number,number][]): this;
 
     /** Quadratic bezier curve command with relative coordinates. */
-    q( first: [number,number,number,number], ...next: [number,number,number,number][]): IPathBuilder;
+    q( ...params: [number,number,number,number][]): this;
 
     /** Smooth quadratic bezier curve command with absolute coordinates. */
-    T( first: [number,number], ...next: [number,number][]): IPathBuilder;
+    T( ...params: [number,number][]): this;
 
     /** Smooth quadratic bezier curve command with relative coordinates. */
-    t( first: [number,number], ...next: [number,number][]): IPathBuilder;
+    t( ...params: [number,number][]): this;
 
     /** Elliptical arc curve command with absolute coordinates. */
-    A( first: [number,number,number,0|1,0|1,number,number],
-        ...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
+    A( ...params: [number,number,number,0|1,0|1,number,number][]): this;
 
     /** Elliptical arc curve command with relative coordinates. */
-    a( first: [number,number,number,0|1,0|1,number,number],
-        ...next: [number,number,number,0|1,0|1,number,number][]): IPathBuilder;
+    a( ...params: [number,number,number,0|1,0|1,number,number][]): this;
 
     /** Close-path command. */
     z(): IPathBuilder;
