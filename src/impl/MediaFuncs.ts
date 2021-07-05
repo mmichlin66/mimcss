@@ -2,7 +2,7 @@
 import {CssAspectRatio, CssResolution, CssLength} from "../api/CoreTypes";
 import {ExtendedStyleset} from "../api/StyleTypes";
 import {v2s, camelToDash, ResolutionMath, LengthMath} from "./CoreFuncs";
-import {stylePropToString} from "./StyleFuncs";
+import {styleProp2s} from "./StyleFuncs";
 
 
 
@@ -197,7 +197,7 @@ function singleSupportsQueryToString( query: SingleSupportsQuery): string
 
             let not = v.$negate ? "not" : "";
             return  `${not} (${propNames.map( (propName) =>
-                stylePropToString( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
+                styleProp2s( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
         }
     });
 }

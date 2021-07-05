@@ -1656,13 +1656,6 @@ export interface ICssStyleset
 
 
 /**
- * The StringStyleset type maps CSS properties including custom properties to the string values.
- */
-export type StringStyleset = { [K: string]: string | null | undefined }
-
-
-
-/**
  * The ExtendedStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
  * "extended" versions of their types. These extended types are defined by adding basic keywords
  * (e.g. "unset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
@@ -1825,3 +1818,24 @@ export type Styleset = ExtendedStyleset &
 
 
 
+/**
+ * The StringStyleset type maps CSS properties including custom properties to the string values.
+ */
+export type StringStyleset = { [K: string]: string | null | undefined }
+
+
+
+// declare global
+// {
+//     interface ElementCSSInlineStyle
+//     {
+//         setStyleProp<K extends keyof ICssStyleset>( prop: K, val: ExtendedStyleset[K]): void;
+//     }
+// }
+
+
+
+// HTMLElement.prototype.setStyleProp = function( prop: string, value: any)
+// {
+//     this.style[prop] = value;
+// }

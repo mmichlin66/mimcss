@@ -1,5 +1,5 @@
 ﻿import {Styleset, ExtendedStyleset, StringStyleset} from "./StyleTypes"
-import {stylePropToString, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleFuncs"
+import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
 
 
@@ -37,7 +37,7 @@ export function registerStyleProperty( name: string, toStringFunc: (v: any) => s
 export function getStylePropValue<K extends keyof ExtendedStyleset>( stylePropName: K,
 	stylePropValue: ExtendedStyleset[K]): string
 {
-	return stylePropToString( stylePropName, stylePropValue, true);
+	return styleProp2s( stylePropName, stylePropValue, true);
 }
 
 
@@ -45,10 +45,10 @@ export function getStylePropValue<K extends keyof ExtendedStyleset>( stylePropNa
 /**
  * Sets values of the style properties from the given Styleset object to the `style` attribute
  * of the given HTML element.
- * @param elm HTML element whose styles will be set.
+ * @param elm HTML/SVG element whose styles will be set.
  * @param styleset Styleset object which provides values for style properties.
  */
-export function setElementStyle( elm: HTMLElement, styleset: Styleset | null | undefined,
+export function setElementStyle( elm: ElementCSSInlineStyle, styleset: Styleset | null | undefined,
 	schedulerType?: number): void
 {
     setElementStringStyle( elm, styleset ? stylesetToStringStyleset(styleset) : null, schedulerType);
@@ -59,10 +59,10 @@ export function setElementStyle( elm: HTMLElement, styleset: Styleset | null | u
 /**
  * Sets values of the style properties from the given StringStyleset object to the `style` attribute
  * of the given HTML element.
- * @param elm HTML element whose styles will be set.
+ * @param elm HTML/SVG element whose styles will be set.
  * @param styleset StringStyleset object which provides values for style properties.
  */
-export function setElementStringStyle( elm: HTMLElement, styleset: StringStyleset | null | undefined,
+export function setElementStringStyle( elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
 	schedulerType?: number): void
 {
     s_scheduleStylePropertyUpdate( elm, null, styleset, false, schedulerType);

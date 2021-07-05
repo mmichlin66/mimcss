@@ -12,7 +12,7 @@ import {
     v2s, a2s, o2s, LengthMath, AngleMath, camelToDash, dashToCamel, V2SOptions,
     AnyToStringFunc, WellKnownFunc, registerV2SFuncID, P2SOption, NumberMath,
 } from "./CoreFuncs";
-import {colorToString} from "./ExtraFuncs";
+import {color2s} from "./ExtraFuncs";
 import {VarRule} from "../rules/VarRule";
 
 
@@ -42,7 +42,7 @@ function nthTupleToString( val: [number, number?]): string
 /**
  * Returns a string representation of a selector.
  */
-export function selectorToString( val: CssSelector): string
+export function selector2s( val: CssSelector): string
 {
 	return v2s( val, { arrSep: "" });
 }
@@ -52,7 +52,7 @@ export function selectorToString( val: CssSelector): string
 /**
  * Returns a string representation of a parameterized pseudo entity.
  */
-export function pseudoEntityToString( entityName: string, val: any): string
+export function pseudoEntity2s( entityName: string, val: any): string
 {
 	if (!entityName)
 		return "";
@@ -100,7 +100,7 @@ function styleObj2String( val: any,
         {
             let options = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
             if (typeof options === "string")
-                return [nameOrTuple[0], v => stylePropToString( options as string, v, true), nameOrTuple[2]];
+                return [nameOrTuple[0], v => styleProp2s( options as string, v, true), nameOrTuple[2]];
             else
                 return nameOrTuple as P2SOption;
         }
@@ -238,7 +238,7 @@ function singleCornerRadiusToString( val: Extended<CssRadius>): string
 /**
  * Converts border radius style value to the CSS string.
  */
-export function borderRadiusToString( val: Extended<BorderRadius_StyleType>): string
+export function borderRadius2s( val: Extended<BorderRadius_StyleType>): string
 {
     return v2s( val, {
         fromArray: v =>
@@ -279,11 +279,11 @@ function borderToString( val: Extended<Border_StyleType>): string
                 buf.push( v2s(v[1]));
 
             if (v[2] != null)
-                buf.push( colorToString(v[2]));
+                buf.push( color2s(v[2]));
 
             return buf.join(" ");
         },
-        fromAny: colorToString
+        fromAny: color2s
     });
 }
 
@@ -412,7 +412,7 @@ function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definiti
 
 
 
-export function gridTrackToString( val: GridTrack): string
+export function gridTrack2s( val: GridTrack): string
 {
     return v2s( val, {
         fromNumber: WellKnownFunc.Length,
@@ -426,7 +426,7 @@ function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
 {
     return v2s( val, {
         fromNumber: WellKnownFunc.Length,
-        arrItemFunc: gridTrackToString
+        arrItemFunc: gridTrack2s
     });
 }
 
@@ -626,7 +626,7 @@ export function getCustomPropNameAndValue( customVal: CustomVar_StyleType): [str
         value = customVal[2];
     }
 
-    return [varName, stylePropToString( template, value, true)];
+    return [varName, styleProp2s( template, value, true)];
 }
 
 
@@ -635,7 +635,7 @@ export function getCustomPropNameAndValue( customVal: CustomVar_StyleType): [str
  * Converts the given style property to the CSS style string. Property name can be in either
  * dash or camel form.
  */
-export function stylePropToString( propName: string, propVal: any, valueOnly?: boolean): string
+export function styleProp2s( propName: string, propVal: any, valueOnly?: boolean): string
 {
     if (!propName)
         return "";
@@ -698,7 +698,7 @@ export function forAllPropsInStylset( styleset: Styleset,
 		else
 		{
 			// get the string representation of the property
-            forProp( propName, stylePropToString( propName, styleset[propName], true), false);
+            forProp( propName, styleProp2s( propName, styleset[propName], true), false);
 		}
 	}
 }
@@ -804,7 +804,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     borderLeft: WellKnownFunc.Border,
     borderLeftColor: WellKnownFunc.Color,
     borderLeftWidth: WellKnownFunc.Length,
-    borderRadius: borderRadiusToString,
+    borderRadius: borderRadius2s,
     borderRight: WellKnownFunc.Border,
     borderRightColor: WellKnownFunc.Color,
     borderRightWidth: WellKnownFunc.Length,
@@ -832,6 +832,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     columnRuleWidth: WellKnownFunc.MultiLengthWithSpace,
     columns: columnsToString,
     columnWidth: WellKnownFunc.Length,
+    cursor: {
+        arrSep: ","
+    },
 
     fill: WellKnownFunc.Color,
     fillOpacity: WellKnownFunc.Percent,

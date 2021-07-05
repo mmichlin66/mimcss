@@ -6,8 +6,8 @@ import {ExtendedStyleset, Styleset, VarTemplateName, CustomVar_StyleType, Extend
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {v2s, camelToDash, symValueToString} from "../impl/CoreFuncs";
 import {
-    mergeStylesets, stylesetToString, stylePropToString, mergeStylesetCustomProps, selectorToString,
-    pseudoEntityToString
+    mergeStylesets, stylesetToString, styleProp2s, mergeStylesetCustomProps, selector2s,
+    pseudoEntity2s
 } from "../impl/StyleFuncs"
 import {VarRule} from "./VarRule";
 import {s_scheduleStylePropertyUpdate} from "./Scheduling";
@@ -117,7 +117,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				if (tuples.length > 0)
 				{
 					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
-						() => propName + selectorToString( tuple[0]), undefined, tuple[1], this));
+						() => propName + selector2s( tuple[0]), undefined, tuple[1], this));
 				}
 			}
 			else if (propName.endsWith("&"))
@@ -127,7 +127,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				if (tuples.length > 0)
 				{
 					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
-						() => selectorToString( tuple[0]) + propName, undefined, tuple[1], this));
+						() => selector2s( tuple[0]) + propName, undefined, tuple[1], this));
 				}
 			}
 			else
@@ -317,7 +317,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.cssRule)
         {
 		    s_scheduleStylePropertyUpdate( this.cssRule, camelToDash( name),
-                value == null ? null : stylePropToString( name, value, true), important, schedulerType);
+                value == null ? null : styleProp2s( name, value, true), important, schedulerType);
         }
 	}
 
@@ -374,7 +374,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.cssRule)
         {
             s_scheduleStylePropertyUpdate( this.cssRule, varObj.cssName,
-                value == null ? null : stylePropToString( varObj.template, value, true),
+                value == null ? null : styleProp2s( varObj.template, value, true),
                 important, schedulerType);
         }
 	}
@@ -438,12 +438,12 @@ class DependentRule extends StyleRule
 		if (this.selectorParam)
 		{
 			let selector = this.selector as string;
-			return `${parentSelector}${selector}(${pseudoEntityToString( selector, this.selectorParam)})`;
+			return `${parentSelector}${selector}(${pseudoEntity2s( selector, this.selectorParam)})`;
 		}
 		else
 		{
 			// convert selector to string.
-			let selector = selectorToString( this.selector);
+			let selector = selector2s( this.selector);
 
 			// if the selector string doesn't have any occurrences of the ampersand symbol, we
 			// simply append the selector to the parent selector; otherwise, we replace all

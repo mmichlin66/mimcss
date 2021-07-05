@@ -533,6 +533,10 @@ export type ShapeRadius = Extended<CssLength | "closest-side" | "farthest-side">
  */
 export interface ICircle
 {
+    /**
+     * Sets the position of the circle's center.
+     * @param pos Position value.
+     */
     at( pos: Extended<CssPosition>): this;
 }
 
@@ -546,6 +550,10 @@ export interface ICircle
  */
 export interface IEllipse
 {
+    /**
+     * Sets the position of the ellipse's center.
+     * @param pos Position value.
+     */
     at( pos: Extended<CssPosition>): this;
 }
 
@@ -553,13 +561,22 @@ export interface IEllipse
 
 /**
  * The IPolygonProxy interface represents the CSS polygon basic shape. It is the result of invoking
- * the [[ExtraAPI.polygon]] function and it can be directly assigned to a suitable style property (e.g.
+ * the [[ExtraAPI.polygon | polygon]] function and it can be directly assigned to a suitable style property (e.g.
  * clip-path). In addition it has the `fill` method that can be called to specify the fill
  * rule.
  */
 export interface IPolygon
 {
+    /**
+     * Adds the given points to the polygon
+     * @param points
+     */
     add( ...points: CssPoint[]): this;
+
+    /**
+     * Sets the filling rule used to determine the inside part of the polygon
+     * @param rule
+     */
     fill( rule: FillRule_StyleType): this;
 }
 
@@ -568,7 +585,8 @@ export interface IPolygon
 /**
  * The `IPathBuilder` interface represents the object that accumulates path commands that are then
  * converted to a string parameter of the CSS `path()` function. The `IPathBuilder` interface is
- * returned from the [[path]] function.
+ * returned from the [[path]] function. The methods in this interface mimic the SVG path commands
+ * described in MDN: <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands" target="mdn">Path Commands</a>
  */
 export interface IPathBuilder
 {

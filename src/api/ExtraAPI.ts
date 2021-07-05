@@ -7,12 +7,10 @@
 
 import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword, IStringProxy} from "./CoreTypes";
 import {
-    CrossFadeParam, CssColor, GradientStopOrHint, ICircle, IColorProxy,
-    IConicGradient, IEllipse, LinearGradientAngle, ShapeRadius,
-    IImageProxy, IInset, IGradient, ILinearGradient, IMinMaxProxy, INamedColors, IPathBuilder,
-    IPolygon, IRadialGradient, IRepeatProxy, ISpanProxy,
-    IFilterProxy, ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc,
-    ICursorFunc,
+    CrossFadeParam, CssColor, GradientStopOrHint, ICircle, IColorProxy, IConicGradient, IEllipse,
+    LinearGradientAngle, ShapeRadius, IImageProxy, IInset, IGradient, ILinearGradient, IMinMaxProxy,
+    INamedColors, IPathBuilder, IPolygon, IRadialGradient, IRepeatProxy, ISpanProxy, IFilterProxy,
+    ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc, ICursorFunc,
 } from "./ExtraTypes";
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {
@@ -20,12 +18,10 @@ import {
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
 import {
-    a2s,
-    AngleMath, f2s, INumberBaseMathClass, LengthMath, mv2s, PercentMath, pos2s, registerV2SFuncID,
-    v2s, WellKnownFunc
+    a2s, AngleMath, f2s, INumberBaseMathClass, LengthMath, mv2s, PercentMath, pos2s, v2s, WellKnownFunc
 } from "../impl/CoreFuncs";
-import {rgbToString, hslToString, colorWithAlphaToString, getColorsObject, colorToString} from "../impl/ExtraFuncs";
-import {borderRadiusToString, gridTrackToString, stylePropToString} from "../impl/StyleFuncs";
+import {rgb2s, hsl2s, colorWithAlphaToString, getColorsObject, color2s} from "../impl/ExtraFuncs";
+import {borderRadius2s, gridTrack2s, styleProp2s} from "../impl/StyleFuncs";
 
 
 
@@ -68,7 +64,7 @@ export let Colors = getColorsObject();
  */
 export function rgb( r: Extended<number>, g: Extended<number>, b: Extended<number>, a?: Extended<number>): IColorProxy
 {
-    return () => rgbToString( r, g, b, a);
+    return () => rgb2s( r, g, b, a);
 }
 
 
@@ -99,7 +95,7 @@ export function rgb( r: Extended<number>, g: Extended<number>, b: Extended<numbe
  */
 export function hsl( h: Extended<CssAngle>, s: Extended<number>, l: Extended<number>, a?: Extended<number>): IColorProxy
 {
-    return () => hslToString( h, s, l, a);
+    return () => hsl2s( h, s, l, a);
 }
 
 
@@ -384,7 +380,7 @@ function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[],
 function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: INumberBaseMathClass): string
 {
     return v2s( val, {
-        fromNumber: colorToString,
+        fromNumber: color2s,
         fromArray: v => {
             if (v.length === 0)
                 return "";
@@ -393,7 +389,7 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: IN
             else
             {
                 let secondStop = v.length > 2 ? mathClass.v2s( v[2]) : "";
-                return `${colorToString(v[0])} ${mathClass.v2s( v[1])} ${secondStop}`;
+                return `${color2s(v[0])} ${mathClass.v2s( v[1])} ${secondStop}`;
             }
         }
     });
@@ -619,9 +615,9 @@ export function perspective( d: Extended<CssLength>): ITransformProxy
 /**
  * Returns an ITransformProxy function representing the `rotate()` CSS function.
  */
-function rotate1d( name: string, a: Extended<CssAngle>): ITransformProxy
+function rotate1d( axis: string, a: Extended<CssAngle>): ITransformProxy
 {
-    return () => f2s( name, [[a, WellKnownFunc.Angle]]);
+    return () => f2s( `rotate${axis}`, [[a, WellKnownFunc.Angle]]);
 }
 
 /**
@@ -629,7 +625,7 @@ function rotate1d( name: string, a: Extended<CssAngle>): ITransformProxy
  */
 export function rotate( a: Extended<CssAngle>): ITransformProxy
 {
-    return rotate1d( "rotate", a);
+    return rotate1d( "", a);
 }
 
 /**
@@ -637,7 +633,7 @@ export function rotate( a: Extended<CssAngle>): ITransformProxy
  */
 export function rotateX( a: Extended<CssAngle>): ITransformProxy
 {
-    return rotate1d( "rotateX", a);
+    return rotate1d( "X", a);
 }
 
 /**
@@ -645,7 +641,7 @@ export function rotateX( a: Extended<CssAngle>): ITransformProxy
  */
 export function rotateY( a: Extended<CssAngle>): ITransformProxy
 {
-    return rotate1d( "rotateY", a);
+    return rotate1d( "Y", a);
 }
 
 /**
@@ -653,7 +649,7 @@ export function rotateY( a: Extended<CssAngle>): ITransformProxy
  */
 export function rotateZ( a: Extended<CssAngle>): ITransformProxy
 {
-    return rotate1d( "rotateZ", a);
+    return rotate1d( "Z", a);
 }
 
 /**
@@ -678,9 +674,9 @@ export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): ITran
 /**
  * Returns an ITransformProxy function representing the `scaleX()` CSS function.
  */
-function scale1d( name: string, s: Extended<CssNumber>): ITransformProxy
+function scale1d( axis: string, s: Extended<CssNumber>): ITransformProxy
 {
-    return () => f2s( name, [s]);
+    return () => f2s( `scale${axis}`, [s]);
 }
 
 /**
@@ -688,7 +684,7 @@ function scale1d( name: string, s: Extended<CssNumber>): ITransformProxy
  */
 export function scaleX( s: Extended<CssNumber>): ITransformProxy
 {
-    return scale1d( "scaleX", s);
+    return scale1d( "X", s);
 }
 
 /**
@@ -696,7 +692,7 @@ export function scaleX( s: Extended<CssNumber>): ITransformProxy
  */
 export function scaleY( s: Extended<CssNumber>): ITransformProxy
 {
-    return scale1d( "scaleY", s);
+    return scale1d( "Y", s);
 }
 
 /**
@@ -704,7 +700,7 @@ export function scaleY( s: Extended<CssNumber>): ITransformProxy
  */
 export function scaleZ( s: Extended<CssNumber>): ITransformProxy
 {
-    return scale1d( "scaleZ", s);
+    return scale1d( "Z", s);
 }
 
 /**
@@ -729,9 +725,9 @@ export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransfo
 /**
  * Returns an ITransformProxy function representing the `skewX()` CSS function.
  */
-function skew1d( name: string, a: Extended<CssAngle>): ITransformProxy
+function skew1d( axis: string, a: Extended<CssAngle>): ITransformProxy
 {
-    return () => f2s( name, [[a, WellKnownFunc.Angle]]);
+    return () => f2s( `skew${axis}`, [[a, WellKnownFunc.Angle]]);
 }
 
 /**
@@ -739,7 +735,7 @@ function skew1d( name: string, a: Extended<CssAngle>): ITransformProxy
  */
 export function skewX( a: Extended<CssAngle>): ITransformProxy
 {
-    return skew1d( "skewX", a);
+    return skew1d( "X", a);
 }
 
 /**
@@ -747,7 +743,7 @@ export function skewX( a: Extended<CssAngle>): ITransformProxy
  */
 export function skewY( a: Extended<CssAngle>): ITransformProxy
 {
-    return skew1d( "skewY", a);
+    return skew1d( "Y", a);
 }
 
 
@@ -763,9 +759,9 @@ export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITr
 /**
  * Returns an ITransformProxy function representing the `translateX()` CSS function.
  */
-function translate1d( name: string, d: Extended<CssLength>): ITransformProxy
+function translate1d( axis: string, d: Extended<CssLength>): ITransformProxy
 {
-    return () => f2s( name, [[d, WellKnownFunc.Length]]);
+    return () => f2s( `translate${axis}`, [[d, WellKnownFunc.Length]]);
 }
 
 /**
@@ -773,7 +769,7 @@ function translate1d( name: string, d: Extended<CssLength>): ITransformProxy
  */
 export function translateX( d: Extended<CssLength>): ITransformProxy
 {
-    return translate1d( "translateX", d);
+    return translate1d( "X", d);
 }
 
 /**
@@ -781,7 +777,7 @@ export function translateX( d: Extended<CssLength>): ITransformProxy
  */
 export function translateY( d: Extended<CssLength>): ITransformProxy
 {
-    return translate1d( "translateY", d);
+    return translate1d( "Y", d);
 }
 
 /**
@@ -789,7 +785,7 @@ export function translateY( d: Extended<CssLength>): ITransformProxy
  */
 export function translateZ( d: Extended<CssLength>): ITransformProxy
 {
-    return translate1d( "translateZ", d);
+    return translate1d( "Z", d);
 }
 
 /**
@@ -852,7 +848,7 @@ class Inset implements IInset
         return f2s( "inset", [
             [this.o1, WellKnownFunc.Length], [this.o2, WellKnownFunc.Length],
             [this.o3, WellKnownFunc.Length], [this.o4, WellKnownFunc.Length],
-            [this.radius, this.radius && ((v: Extended<BorderRadius_StyleType>) => mv2s( ["round", borderRadiusToString(v)]))],
+            [this.radius, this.radius && ((v: Extended<BorderRadius_StyleType>) => mv2s( ["round", borderRadius2s(v)]))],
         ], " ");
     }
 }
@@ -935,6 +931,8 @@ class Ellipse implements IEllipse
     radiusY?: ShapeRadius;
     pos?: Extended<CssPosition>;
 
+    constructor()
+    constructor( radiusX: ShapeRadius, radiusY: ShapeRadius)
     constructor( radiusX?: ShapeRadius, radiusY?: ShapeRadius)
     {
         this.radiusX = radiusX; this.radiusY = radiusY;
@@ -1080,15 +1078,12 @@ class PathBuilder implements IPathBuilder
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
+ /**
  * Returns an IMinMaxProxy function representing the `minmax()` CSS function.
  */
 export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 {
-    return () => {
-        let options = { fromNumber: LengthMath.n2s };
-        return `minmax(${v2s( min, options)},${v2s( max, options)})`;
-    }
+    return () => f2s( "minmax", [[min, WellKnownFunc.Length], [max, WellKnownFunc.Length]]);
 }
 
 
@@ -1099,7 +1094,10 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
     ...tracks: GridTrack[]): IRepeatProxy
 {
-    return () => `repeat(${v2s(count)},${v2s( tracks, { arrItemFunc: gridTrackToString })})`;
+    return () => f2s( "repeat", [
+        count,
+        [tracks, { arrItemFunc: gridTrack2s}]
+    ]);
 }
 
 
@@ -1112,7 +1110,7 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
 export function span( countOrName: Extended<GridLineCountOrName>,
     nameOrCount?: Extended<GridLineCountOrName>): ISpanProxy
 {
-    return () => `span ${v2s(countOrName)} ${nameOrCount ? v2s( nameOrCount) : ""}`;
+    return () => mv2s( ["span", countOrName, nameOrCount]);
 }
 
 
@@ -1131,13 +1129,11 @@ export function span( countOrName: Extended<GridLineCountOrName>,
 	style?: Extended<ListStyleType_StyleType>,
 	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
 {
-	return () =>
-	{
-		let styleString = style ? `,${v2s( style)}` : "";
-		let before = textBefore ? `"${v2s( textBefore)}"` : "";
-		let after = textAfter ? `"${v2s( textAfter)}"` : "";
-		return `${before} counter(${v2s(counterObj)}${styleString}) ${after}`;
-	}
+    return () => mv2s( [
+        [textBefore, (v: Extended<string>) => v && `"${v2s(v)}"`],
+        f2s( "counter", [counterObj, style]),
+        [textAfter, (v: Extended<string>) => v && `"${v2s(v)}"`],
+    ]);
 }
 
 
@@ -1150,14 +1146,15 @@ export function counters( counterObj: Extended<ICounterRule | string>,
 	separator: Extended<string>, style?: Extended<ListStyleType_StyleType>,
 	textAfter?: Extended<string>, textBefore?: Extended<string>): IStringProxy
 {
-	return () =>
-	{
-		let sepString = separator ? `"${v2s( separator)}"` : `"."`;
-		let styleString = style ? `,${v2s( style)}` : "";
-		let before = textBefore ? `"${v2s( textBefore)}"` : "";
-		let after = textAfter ? `"${v2s( textAfter)}"` : "";
-		return `${before} counters(${v2s(counterObj)},${sepString}${styleString}) ${after}`;
-	}
+    return () => mv2s( [
+        [textBefore, (v: Extended<string>) => v && `"${v2s(v)}"`],
+        f2s( "counters", [
+            counterObj,
+            [separator, (v: Extended<string>) => `"${v2s(v) || "."}"`],
+            style
+        ]),
+        [textAfter, (v: Extended<string>) => v && `"${v2s(v)}"`],
+    ]);
 }
 
 
@@ -1181,17 +1178,20 @@ export function url( p: Extended<string | IIDRule>): IUrlFunc
 
 
 /**
- * Returns a function representing the CSS `url()` function followed by two optional numbers
+ * Returns a function representing the CSS `url()` function.
+ */
+export function cursor( p: Extended<string | IIDRule>): ICursorFunc;
+
+/**
+ * Returns a function representing the CSS `url()` function followed by two numbers
  * indicating the cursor hotspot.
  */
-export function cursor( p: string, x?: number, y?: number): ICursorFunc
+export function cursor( p: Extended<string | IIDRule>, x: number, y: number): ICursorFunc;
+
+// Implementation
+export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): ICursorFunc
 {
-    return () => {
-        let s = `url(${p})`;
-        if (x != null)
-            s += ` ${x} ${y != null ? y : x}`;
-        return s;
-    }
+    return () => mv2s( [url(p), x, y]);
 }
 
 
@@ -1202,7 +1202,11 @@ export function cursor( p: string, x?: number, y?: number): ICursorFunc
  export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
     contain?: boolean): IRayFunc
 {
-    return () => f2s( "ray", [[angle, WellKnownFunc.Angle], [size, WellKnownFunc.Length], [contain ? "contain" : undefined]], " ");
+    return () => f2s( "ray", [
+        [angle, WellKnownFunc.Angle],
+        [size, WellKnownFunc.Length],
+        [contain ? "contain" : undefined]
+    ], " ");
 }
 
 
@@ -1214,7 +1218,7 @@ export function cursor( p: string, x?: number, y?: number): ICursorFunc
 export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
 {
     return () => fallback
-        ? `var(--${varObj.name},${stylePropToString( varObj.template, fallback, true)})`
+        ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback, true)})`
         : `var(--${varObj.name})`;
 }
 
@@ -1242,18 +1246,6 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 {
     return () => f2s( "cubic-bezier", [n1, n2, n3, n4]);
 }
-
-
-
- ///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Registration of function converting parameters of CSS functions.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-registerV2SFuncID( colorToString, WellKnownFunc.Color);
-
-
 
 
 
