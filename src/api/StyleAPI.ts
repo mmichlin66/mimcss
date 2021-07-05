@@ -1,14 +1,14 @@
-﻿import {Styleset, ExtendedStyleset, StringStyleset} from "./StyleTypes"
+﻿import {Styleset, ExtendedStyleset, StringStyleset, ICssStyleset} from "./StyleTypes"
 import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Styleset manipulation
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Registers the given function to be used for converting values of the given style property to
@@ -148,6 +148,65 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
 	}
 
 	return updateVal;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Adding methods to several DOM prototypes using module augmentation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+declare global
+{
+    interface ElementCSSInlineStyle
+    {
+        /**
+         * Set the given value to the given style property of the element.
+         * @param name Property name
+         * @param value New property value to set.
+         * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
+         * will be used.
+         */
+        setStyleProp<K extends keyof ICssStyleset>( name: K, value: ExtendedStyleset[K],
+            schedulerType?: number): void;
+
+        /**
+         * Merges or replaces the element's styles with the given styleset.
+         * @param styleset Styleset to set or replace
+         * @param replace Flag indicating whether the new styleset should completely replace the
+         * existing element styles with the new styles (true) or merge the new styles with the
+         * existing ones (false). The default value is false.
+         * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
+         * will be used.
+         */
+        setStyleset( styleset: Styleset, replace?: boolean, schedulerType?: number): void;
+    }
+}
+
+
+// functions on HTML and SVG element prototypes
+HTMLElement.prototype.setStyleProp = setElementStyleProp;
+SVGElement.prototype.setStyleProp = setElementStyleProp;
+
+HTMLElement.prototype.setStyleset = setElementStyleset;
+SVGElement.prototype.setStyleset = setElementStyleset;
+
+
+
+// Sets style property on HTML or SVG element
+function setElementStyleProp<K extends keyof ICssStyleset>( name: K,
+    value: ExtendedStyleset[K], schedulerType?: number): void
+{
+    s_scheduleStylePropertyUpdate( this, name, styleProp2s( name, value, true), false, schedulerType);
+}
+
+
+
+function setElementStyleset( styleset: Styleset, replace?: boolean, schedulerType?: number): void
+{
+    s_scheduleStylePropertyUpdate( this, null, stylesetToStringStyleset( styleset), false, schedulerType);
 }
 
 

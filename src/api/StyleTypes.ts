@@ -1825,17 +1825,3 @@ export type StringStyleset = { [K: string]: string | null | undefined }
 
 
 
-// declare global
-// {
-//     interface ElementCSSInlineStyle
-//     {
-//         setStyleProp<K extends keyof ICssStyleset>( prop: K, val: ExtendedStyleset[K]): void;
-//     }
-// }
-
-
-
-// HTMLElement.prototype.setStyleProp = function( prop: string, value: any)
-// {
-//     this.style[prop] = value;
-// }
