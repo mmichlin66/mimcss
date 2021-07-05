@@ -1,4 +1,4 @@
-﻿import {Styleset, ExtendedStyleset, StringStyleset, ICssStyleset} from "./StyleTypes"
+﻿import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset} from "./StyleTypes"
 import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleFuncs"
 import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
 
@@ -13,7 +13,7 @@ import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
 /**
  * Registers the given function to be used for converting values of the given style property to
  * string. The `registerStyleProperty` function must be used after adding the property to the
- * [[ICssStyleset]] interface via the module augmentation technique if the conversion to string
+ * [[IBaseStyleset]] interface via the module augmentation technique if the conversion to string
  * requires non-standard operations. This function should not be called for propeties whose
  * values only include numbers, strings, functions returning a string, objects whose `toString`
  * method produces the necessary string or arrays of the above types.
@@ -34,8 +34,8 @@ export function registerStyleProperty( name: string, toStringFunc: (v: any) => s
  * to a CSS compliant string.
  * @param stylePropValue Value to convert.
  */
-export function getStylePropValue<K extends keyof ExtendedStyleset>( stylePropName: K,
-	stylePropValue: ExtendedStyleset[K]): string
+export function getStylePropValue<K extends keyof ExtendedBaseStyleset>( stylePropName: K,
+	stylePropValue: ExtendedBaseStyleset[K]): string
 {
 	return styleProp2s( stylePropName, stylePropValue, true);
 }
@@ -169,7 +169,7 @@ declare global
          * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
          * will be used.
          */
-        setStyleProp<K extends keyof ICssStyleset>( name: K, value: ExtendedStyleset[K],
+        setStyleProp<K extends keyof IBaseStyleset>( name: K, value: ExtendedBaseStyleset[K],
             schedulerType?: number): void;
 
         /**
@@ -196,8 +196,8 @@ SVGElement.prototype.setStyleset = setElementStyleset;
 
 
 // Sets style property on HTML or SVG element
-function setElementStyleProp<K extends keyof ICssStyleset>( name: K,
-    value: ExtendedStyleset[K], schedulerType?: number): void
+function setElementStyleProp<K extends keyof IBaseStyleset>( name: K,
+    value: ExtendedBaseStyleset[K], schedulerType?: number): void
 {
     s_scheduleStylePropertyUpdate( this, name, styleProp2s( name, value, true), false, schedulerType);
 }

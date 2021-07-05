@@ -1,7 +1,7 @@
 ﻿import {
     CssAspectRatio, CssNumber, CssLength, CssResolution, IConstant, IStringProxy
 } from "./CoreTypes";
-import {ExtendedStyleset} from "./StyleTypes";
+import {ExtendedBaseStyleset} from "./StyleTypes";
 
 
 
@@ -123,12 +123,12 @@ export type MediaQuery = string | ExtendedSingleMediaQuery | ExtendedSingleMedia
  * styleset are combined with the "and" operator. The entire styleset can be negated, which will
  * result in placing the "not" operator that will act on all styles in the query.
  *
- * Note that using the `ExtendedStyleset` object doesn't allow for checking whether two or more
+ * Note that using the `ExtendedBaseStyleset` object doesn't allow for checking whether two or more
  * values of a given property are supported. For example, although we can test that the `display`
  * property supports the `flex` value, we cannot check whether both `flex` and `grid` values are
  * supported. To check such criteria you must specify the query as a string.
  */
- export type SingleSupportsQuery = string | ExtendedStyleset & { $negate?: boolean; };
+ export type SingleSupportsQuery = string | ExtendedBaseStyleset & { $negate?: boolean; };
 
 
 

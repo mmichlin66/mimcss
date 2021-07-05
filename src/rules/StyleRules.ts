@@ -2,7 +2,7 @@ import {CssSelector} from "../api/CoreTypes"
 import {
     IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule
 } from "../api/RuleTypes";
-import {ExtendedStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
+import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {v2s, camelToDash, symValueToString} from "../impl/CoreFuncs";
 import {
@@ -304,7 +304,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-    public setProp<K extends keyof ExtendedStyleset>( name: K, value: ExtendedStyleset[K],
+    public setProp<K extends keyof ExtendedBaseStyleset>( name: K, value: ExtendedBaseStyleset[K],
         important?: boolean, schedulerType?: number): void
 	{
 		// first set/remove the value in our internal styleset object

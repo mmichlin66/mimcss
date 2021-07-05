@@ -318,7 +318,7 @@ export function $keyframes( frames?: AnimationFrame[],
  * however, they can be redefined with different values under any style rule.
  *
  * @param template Either a name of a style property (in camel-case) or a name of the property from
- * the [[ICssVarTemplates]] interface. The type corresponding to that property defines the type
+ * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
  * of the second parameter.
  * @param value The value assigned to the property.
  * @param nameOverride String or another `IVarRule` object that determines the name of the
@@ -368,7 +368,7 @@ export function $var<K extends VarTemplateName>( template: K, value?: ExtendedVa
  * value under different style rules.
  *
  * @param template Either a name of a style property (in camel-case) or a name of the property from
- * the [[ICssVarTemplates]] interface. The type corresponding to that property defines the type
+ * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
  * of the second parameter.
  * @param value The value assigned to the constant.
  * @returns The `IConstRule` object that represents the value of the constant. The value is

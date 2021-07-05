@@ -1,6 +1,6 @@
 ﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery, SupportsQuery, SingleSupportsQuery} from "../api/MediaTypes";
 import {CssAspectRatio, CssResolution, CssLength} from "../api/CoreTypes";
-import {ExtendedStyleset} from "../api/StyleTypes";
+import {ExtendedBaseStyleset} from "../api/StyleTypes";
 import {v2s, camelToDash, ResolutionMath, LengthMath} from "./CoreFuncs";
 import {styleProp2s} from "./StyleFuncs";
 
@@ -190,14 +190,14 @@ export function supportsQueryToString( query: SupportsQuery): string
 function singleSupportsQueryToString( query: SingleSupportsQuery): string
 {
     return v2s( query, {
-        fromObj: (v: ExtendedStyleset & { $negate?: boolean; }) => {
+        fromObj: (v: ExtendedBaseStyleset & { $negate?: boolean; }) => {
             let propNames = Object.keys( v).filter( (propName) => propName != "$negate");
             if (propNames.length === 0)
                 return "";
 
             let not = v.$negate ? "not" : "";
             return  `${not} (${propNames.map( (propName) =>
-                styleProp2s( propName as keyof ExtendedStyleset, query[propName])).join( ") and (")})`;
+                styleProp2s( propName as keyof ExtendedBaseStyleset, query[propName])).join( ") and (")})`;
         }
     });
 }

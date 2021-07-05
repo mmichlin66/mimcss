@@ -1161,7 +1161,7 @@ export type Transition_StyleType = OneOrMany<Transition_Single>;
 
 
 /** Type for single transition-property */
-export type TransitionProperty_Single = "none" | "all" | keyof ICssStyleset;
+export type TransitionProperty_Single = "none" | "all" | keyof IBaseStyleset;
 
 /** Type for transition-property style property */
 export type TransitionProperty_StyleType = OneOrMany<TransitionProperty_Single>;
@@ -1211,7 +1211,7 @@ export type WhiteSpace_StyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "p
 
 
 /** Type for will-change style property */
-export type WillChange_StyleType = "auto" | OneOrMany<"scroll-position" | "contents" | Exclude<keyof ICssStyleset,"willChange">>;
+export type WillChange_StyleType = "auto" | OneOrMany<"scroll-position" | "contents" | Exclude<keyof IBaseStyleset,"willChange">>;
 
 
 
@@ -1256,7 +1256,7 @@ export type DefaultStyleType = string;
  * appears in this interface. Also it is possible to add aditional properties via module
  * augmentation technique.
  */
-export interface ICssStyleset
+export interface IBaseStyleset
 {
     all?: DefaultStyleType;
     alignContent?: AlignContent_StyleType;
@@ -1656,24 +1656,24 @@ export interface ICssStyleset
 
 
 /**
- * The ExtendedStyleset type maps all CSS properties defined in the [[ICssStyleset]] interface to the
+ * The ExtendedBaseStyleset type maps all CSS properties defined in the [[IBaseStyleset]] interface to the
  * "extended" versions of their types. These extended types are defined by adding basic keywords
  * (e.g. "unset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
- * is defined in the ICssStyleset interface.
+ * is defined in the IBaseStyleset interface.
  */
-export type ExtendedStyleset = { [K in keyof ICssStyleset]?: ExtendedProp<ICssStyleset[K]> }
+export type ExtendedBaseStyleset = { [K in keyof IBaseStyleset]?: ExtendedProp<IBaseStyleset[K]> }
 
 
 
 /**
- * The ICssVarTemplates interface maps template names to the types, which can be used for
+ * The IVarTemplateStyleset interface maps template names to the types, which can be used for
  * defining custom CSS properties (a.k.a. variables). Normally, variables are defined using the
  * names of the style properties and their type is determined by the type of this property in the
- * ICssStyleset interface. Sometimes, however, there is a need to define variables of some other
- * types, for which there is no suitable style property. The ICssVarTemplates interface provides
+ * IBaseStyleset interface. Sometimes, however, there is a need to define variables of some other
+ * types, for which there is no suitable style property. The IVarTemplateStyleset interface provides
  * many basic types and it can also be extended using the TypeScript's module augmentation.
  */
-export interface ICssVarTemplates extends ICssStyleset
+export interface IVarTemplateStyleset extends IBaseStyleset
 {
     /** Allows having CSS variables and constants that accept value of any type */
     "any"?: any;
@@ -1730,13 +1730,13 @@ export interface ICssVarTemplates extends ICssStyleset
  * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
  * custom CSS properties using the [[$var]] function.
  */
-export type VarTemplateName = keyof ICssVarTemplates;
+export type VarTemplateName = keyof IVarTemplateStyleset;
 
 /**
  * The VarValueType generic type defines the type of the value that can be assigned to the custom
  * CSS property using the generic type K as its template.
  */
-export type VarValue<K extends VarTemplateName> = ICssVarTemplates[K];
+export type VarValue<K extends VarTemplateName> = IVarTemplateStyleset[K];
 
 /**
  * The VarValueType generic type defines the type of the value that can be assigned to the custom
@@ -1747,7 +1747,7 @@ export type ExtendedVarValue<K extends VarTemplateName> = ExtendedProp<VarValue<
 // // The following would be more correct type representation; however, TypeScript produces error
 // // "TS2590: Expression produces a union type that is too complex to represent".
 // export type ExtendedVarValue<K extends VarTemplateName> =
-//     K extends keyof ICssStyleset ? ExtendedProp<VarValue<K>> : Extended<VarValue<K>>;
+//     K extends keyof IBaseStyleset ? ExtendedProp<VarValue<K>> : Extended<VarValue<K>>;
 
 
 
@@ -1807,7 +1807,7 @@ export type CustomVar_StyleType<K extends VarTemplateName = any> =
  * which is an array of [[CustomVar_StyleType]] objects each specifying a value for a single
  * custom property.
  */
-export type Styleset = ExtendedStyleset &
+export type Styleset = ExtendedBaseStyleset &
     {
         /**
          * Special property "--" specifies an array that contains [[CustomVar_StyleType]] objects each
