@@ -10,7 +10,7 @@ import {
     pseudoEntity2s
 } from "../impl/StyleFuncs"
 import {VarRule} from "./VarRule";
-import {s_scheduleStylePropertyUpdate} from "./Scheduling";
+import {scheduleStyleUpdate} from "./Scheduling";
 
 
 
@@ -316,7 +316,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-		    s_scheduleStylePropertyUpdate( this.cssRule, camelToDash( name),
+		    scheduleStyleUpdate( this.cssRule, camelToDash( name),
                 value == null ? null : styleProp2s( name, value, true), important, schedulerType);
         }
 	}
@@ -373,7 +373,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-            s_scheduleStylePropertyUpdate( this.cssRule, varObj.cssName,
+            scheduleStyleUpdate( this.cssRule, varObj.cssName,
                 value == null ? null : styleProp2s( varObj.template, value, true),
                 important, schedulerType);
         }

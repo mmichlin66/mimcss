@@ -1,6 +1,6 @@
 ﻿/**
- * This module describes functions used to create rules within style definition classes and some
- * helper types and functions.
+ * This module describes functions used to create rules within style definition classes.
+ * @module
  */
 
 
@@ -10,7 +10,7 @@ import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
-    IConstRule, ClassPropType, ICssSerializer, IScheduler
+    IConstRule, ClassPropType, ICssSerializer
 } from "./RuleTypes";
 import {MediaQuery, SupportsQuery} from "./MediaTypes"
 import {IFontFace} from "./FontFaceTypes";
@@ -25,10 +25,8 @@ import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {v2s} from "../impl/CoreFuncs";
 import {IRuleSerializationContext} from "../rules/Rule";
-import {
-    IActivator, s_getDefaultSchedulerType, s_registerScheduler, s_scheduleCall,
-    s_setDefaultSchedulerType, s_unregisterScheduler
-} from "../rules/Scheduling";
+import {getActivator} from "../rules/Scheduling";
+export {getDefaultScheduler, setDefaultScheduler,  registerScheduler, unregisterScheduler} from "../rules/Scheduling";
 
 
 
@@ -728,7 +726,7 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
 {
 	let instance = processInstanceOrClass( instanceOrClass) as T;
 	if (instance)
-		s_scheduleCall( (activator: IActivator) => activator.activate( instance), schedulerType);
+        getActivator(schedulerType).activate( instance);
 
 	return instance;
 }
@@ -742,7 +740,7 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
  */
 export function deactivate( instance: StyleDefinition, schedulerType?: number): void
 {
-	s_scheduleCall( (activator: IActivator) => activator.deactivate( instance), schedulerType);
+	getActivator(schedulerType).deactivate( instance);
 }
 
 
@@ -753,7 +751,7 @@ export function deactivate( instance: StyleDefinition, schedulerType?: number): 
  */
 export function forceDOMUpdate( schedulerType?: number): void
 {
-	s_scheduleCall( (activator: IActivator) => activator.forceDOMUpdate(), schedulerType);
+	getActivator(schedulerType).forceDOMUpdate();
 }
 
 
@@ -764,53 +762,53 @@ export function forceDOMUpdate( schedulerType?: number): void
  */
 export function cancelDOMUpdate( schedulerType?: number): void
 {
-	s_scheduleCall( (activator: IActivator) => activator.cancelDOMUpdate(), schedulerType);
+	getActivator(schedulerType).cancelDOMUpdate();
 }
 
 
 
-/**
- * Sets the default scheduler type that is used by activate and deactivate functions that are
- * called without explicitly providing value to the scheduler type parameter. Returns the type of
- * the previous default scheduler or 0 if an error occurs (e.g. the given scheduler type ID is not
- * registered).
- */
-export function setDefaultSchedulerType( schedulerType: number): number
-{
-	return s_setDefaultSchedulerType( schedulerType);
-}
+// /**
+//  * Sets the default scheduler type that is used by activate and deactivate functions that are
+//  * called without explicitly providing value to the scheduler type parameter. Returns the type of
+//  * the previous default scheduler or 0 if an error occurs (e.g. the given scheduler type ID is not
+//  * registered).
+//  */
+// export function setDefaultSchedulerType( schedulerType: number): number
+// {
+// 	return setDefaultScheduler( schedulerType);
+// }
 
 
 
-/**
- * Returns the default scheduler type that is used by activate and deactivate functions that are
- * called without explicitly providing value to the scheduler type parameter.
- */
-export function getDefaultSchedulerType(): number
-{
-	return s_getDefaultSchedulerType();
-}
+// /**
+//  * Returns the default scheduler type that is used by activate and deactivate functions that are
+//  * called without explicitly providing value to the scheduler type parameter.
+//  */
+// export function getDefaultSchedulerType(): number
+// {
+// 	return getDefaultScheduler();
+// }
 
 
 
-/**
- * Registers the given scheduler object and returns the scheduler type identifier, which
- * should be used when calling activate and deactivate functions.
- */
-export function registerScheduler( scheduler: IScheduler): number
-{
-    return s_registerScheduler( scheduler);
-}
+// /**
+//  * Registers the given scheduler object and returns the scheduler type identifier, which
+//  * should be used when calling activate and deactivate functions.
+//  */
+// export function registerScheduler( scheduler: IScheduler): number
+// {
+//     return registerScheduler( scheduler);
+// }
 
 
 
-/**
- * Unregisters a scheduler object with the given scheduler type identifier.
- */
-export function unregisterScheduler( id: number): void
-{
-    return s_unregisterScheduler( id);
-}
+// /**
+//  * Unregisters a scheduler object with the given scheduler type identifier.
+//  */
+// export function unregisterScheduler( id: number): void
+// {
+//     return unregisterScheduler( id);
+// }
 
 
 

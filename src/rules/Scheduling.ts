@@ -26,7 +26,7 @@ export interface IActivator
 	 * Instructs to set the value of either a single property or a set of properties in the given
      * CSS style object.
 	 */
-    setStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    updateStyle( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
         value?: string | StringStyleset | null, important?: boolean): void;
 
 	/**
@@ -107,7 +107,7 @@ class SynchronousActivator implements IActivator
 	 * Instructs to set the value of either a single property or a set of properties in the given
      * CSS style object.
 	 */
-    public setStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    public updateStyle( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
         value?: string | StringStyleset | null, important?: boolean): void
 	{
         updateStyleProperty( ruleOrElm, name, value, important);
@@ -135,7 +135,7 @@ class SynchronousActivator implements IActivator
  * When both name and value properties are null, the style will be set to an empty string
  * effectively removing all styles from the element or the rule.
  */
-interface ScheduledStylePropValue
+interface ScheduledStyleUpdate
 {
 	/**
      * Style object in which to set the property value. The style object can belong to either a
@@ -177,7 +177,7 @@ export class SchedulingActivator implements IActivator
 	private definitions = new Map<StyleDefinition,number>();
 
     // Array of style property values to be set/removed.
-    private props: ScheduledStylePropValue[] = [];
+    private props: ScheduledStyleUpdate[] = [];
 
     // optional scheduler object
     private scheduler?: IScheduler;
@@ -245,7 +245,7 @@ export class SchedulingActivator implements IActivator
 	 * Instructs to set the value of either a single property or a set of properties in the given
      * CSS style object.
 	 */
-    public setStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    public updateStyle( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
         value?: string | StringStyleset | null, important?: boolean): void
 	{
 		if (this.definitions.size === 0 && this.props.length === 0)
@@ -379,24 +379,11 @@ class AnimationFrameScheduler implements IScheduler
 /**
  * Schedules the update of the value of the given CSS property in the given rule.
  */
-export function s_scheduleStylePropertyUpdate( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle,
+export function scheduleStyleUpdate( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle,
     name: string | null, value?: string | StringStyleset | null,
     important?: boolean, schedulerType?: number): void
 {
-	s_scheduleCall( (activator: IActivator) =>
-		activator.setStyleProperty( ruleOrElm, name, value, important), schedulerType);
-}
-
-
-
-/**
- * Schedules calling of the given function using the given scheduler type.
- */
-export function s_scheduleCall( func: (activator: IActivator) => void, schedulerType?: number): void
-{
-	let activator = schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType);
-    if (activator)
-		func( activator);
+	getActivator(schedulerType).updateStyle( ruleOrElm, name, value, important);
 }
 
 
@@ -404,9 +391,22 @@ export function s_scheduleCall( func: (activator: IActivator) => void, scheduler
 /**
  * Returns the current default scheduler type.
  */
-export function s_getDefaultSchedulerType(): number
+export function getDefaultScheduler(): number
 {
 	return s_defaultSchedulerType;
+}
+
+
+
+/**
+ * Returns the activator for the given scheduler type. If scheduler type is not specified returns
+ * the activator currently set as default. If, for some reason, the default activator is not set,
+ * returns the synchronous activator.
+ */
+export function getActivator( schedulerType?: number): IActivator
+{
+	return (schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType))
+        ?? s_synchronousActivator;
 }
 
 
@@ -417,7 +417,7 @@ export function s_getDefaultSchedulerType(): number
  * previous default activator or 0 if an error occurs (e.g. the given scheduler type ID is not
  * registered).
  */
-export function s_setDefaultSchedulerType( schedulerType: number): number
+export function setDefaultScheduler( schedulerType: number): number
 {
     // check that the given number is in our map of registered activators
     let activator = s_registeredActivators.get( schedulerType);
@@ -436,7 +436,7 @@ export function s_setDefaultSchedulerType( schedulerType: number): number
  * Registers the given scheduler object and returns the scheduler type identifier, which
  * should be used when calling activate and deactivate functions.
  */
-export function s_registerScheduler( scheduler: IScheduler): number
+export function registerScheduler( scheduler: IScheduler): number
 {
 	// get the registration ID for this scheduler
 	let id = s_nextCustomSchedulerType++;
@@ -449,7 +449,7 @@ export function s_registerScheduler( scheduler: IScheduler): number
 /**
  * Unregisters a scheduler object with the given scheduler type identifier.
  */
-export function s_unregisterScheduler( id: number): void
+export function unregisterScheduler( id: number): void
 {
 	if (id >= s_firstCustomSchedulerType)
 	{

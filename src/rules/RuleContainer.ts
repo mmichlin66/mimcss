@@ -2,7 +2,7 @@ import {StyleDefinition, IStyleDefinitionClass} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import {s_scheduleStylePropertyUpdate} from "./Scheduling";
+import {scheduleStyleUpdate} from "./Scheduling";
 
 
 
@@ -188,7 +188,7 @@ class RuleContainer implements ITopLevelRuleContainer
 	public setCustomVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
 		if (this.cssCustomVarStyleRule)
-            s_scheduleStylePropertyUpdate( this.cssCustomVarStyleRule, name, value, important, schedulerType);
+            scheduleStyleUpdate( this.cssCustomVarStyleRule, name, value, important, schedulerType);
 	}
 
 

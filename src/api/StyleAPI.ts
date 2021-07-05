@@ -1,6 +1,6 @@
 ﻿import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset} from "./StyleTypes"
 import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleFuncs"
-import {s_scheduleStylePropertyUpdate} from "../rules/Scheduling";
+import {scheduleStyleUpdate} from "../rules/Scheduling";
 
 
 
@@ -65,7 +65,7 @@ export function setElementStyle( elm: ElementCSSInlineStyle, styleset: Styleset 
 export function setElementStringStyle( elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
 	schedulerType?: number): void
 {
-    s_scheduleStylePropertyUpdate( elm, null, styleset, false, schedulerType);
+    scheduleStyleUpdate( elm, null, styleset, false, schedulerType);
 }
 
 
@@ -199,14 +199,14 @@ SVGElement.prototype.setStyleset = setElementStyleset;
 function setElementStyleProp<K extends keyof IBaseStyleset>( name: K,
     value: ExtendedBaseStyleset[K], schedulerType?: number): void
 {
-    s_scheduleStylePropertyUpdate( this, name, styleProp2s( name, value, true), false, schedulerType);
+    scheduleStyleUpdate( this, name, styleProp2s( name, value, true), false, schedulerType);
 }
 
 
 
 function setElementStyleset( styleset: Styleset, replace?: boolean, schedulerType?: number): void
 {
-    s_scheduleStylePropertyUpdate( this, null, stylesetToStringStyleset( styleset), false, schedulerType);
+    scheduleStyleUpdate( this, null, stylesetToStringStyleset( styleset), false, schedulerType);
 }
 
 
