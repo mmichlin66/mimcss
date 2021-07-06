@@ -2,7 +2,8 @@
     INumberMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath,
     IPercentMath, Extended, IStringProxy, AttrTypeKeyword, AttrUnitKeyword, ILengthProxy,
     IPercentProxy, IAngleProxy, ITimeProxy, IResolutionProxy, IFrequencyProxy, IQuotedProxy,
-    CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy, SelectorItem, ISelectorProxy, IGenericProxy
+    CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy, SelectorItem, ISelectorProxy,
+    IGenericProxy
 } from "./CoreTypes"
 import {
 	NumberMath, LengthMath, AngleMath, TimeMath, ResolutionMath, FrequencyMath, PercentMath, v2s,

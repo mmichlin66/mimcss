@@ -18,7 +18,7 @@ import {
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
 import {
-    a2s, AngleMath, f2s, INumberBaseMathClass, LengthMath, mv2s, PercentMath, pos2s, v2s, WellKnownFunc
+    a2s, AngleMath, f2s, INumericMathClass, LengthMath, mv2s, PercentMath, pos2s, v2s, WellKnownFunc
 } from "../impl/CoreFuncs";
 import {rgb2s, hsl2s, colorWithAlphaToString, getColorsObject, color2s} from "../impl/ExtraFuncs";
 import {borderRadius2s, gridTrack2s, styleProp2s} from "../impl/StyleFuncs";
@@ -205,7 +205,7 @@ export function conicGradient(...stopsOrHints: GradientStopOrHint<CssAngle>[]): 
 abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradient<T>
 {
     /** Number-based Math class to convert numeric values in stops and hints to strings */
-    protected matchClass: INumberBaseMathClass<T>;
+    protected matchClass: INumericMathClass<T>;
 
     /** Name of the gradient */
     protected name: string;
@@ -216,7 +216,7 @@ abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradient<T
     /** Array of stops and hints */
     protected stopsOrHints: GradientStopOrHint<T>[];
 
-    constructor( matchClass: INumberBaseMathClass<T>, name: string,
+    constructor( matchClass: INumericMathClass<T>, name: string,
         stopsOrHints: GradientStopOrHint<T>[])
     {
         this.matchClass = matchClass;
@@ -372,12 +372,12 @@ class ConicGradient extends Gradient<CssAngle> implements IConicGradient
 
 
 function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[],
-    mathClass: INumberBaseMathClass): string
+    mathClass: INumericMathClass): string
 {
     return val.map( v => gradientStopOrHintToString( v, mathClass)).join(",");
 }
 
-function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: INumberBaseMathClass): string
+function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: INumericMathClass): string
 {
     return v2s( val, {
         fromNumber: color2s,

@@ -1,8 +1,8 @@
 ﻿import {
-    Extended, INumberBaseMath, IGenericProxy, NumberType, CssNumber,
-    PercentType, IPercentMath, CssPercent, LengthType, ILengthMath, CssLength,
-    AngleType, IAngleMath, CssAngle, TimeType, ITimeMath, CssTime, ResolutionType, IResolutionMath,
-    CssResolution, FrequencyType, IFrequencyMath, CssFrequency, CssPosition, OneOrMany, LengthUnits,
+    Extended, INumericMath, IGenericProxy, CssNumber,
+    IPercentMath, CssPercent, ILengthMath, CssLength,
+    IAngleMath, CssAngle, ITimeMath, CssTime, IResolutionMath,
+    CssResolution, IFrequencyMath, CssFrequency, CssPosition, OneOrMany, LengthUnits,
     PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits, INumberMath
 } from "../api/CoreTypes";
 
@@ -429,46 +429,49 @@ function calcFunc<T>( parts: TemplateStringsArray, params: Extended<T>[],
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
  */
-class NumberBaseMath<T = any, U extends string = any, P extends string = any> implements INumberBaseMath<T,U,P>
+abstract class NumericMath<T = any, U extends string = any> implements INumericMath<T,U>
 {
-    constructor( protected convertFunc: NumberToStringFunc)
+    protected n2s: NumberToStringFunc;
+
+    constructor( n2s: NumberToStringFunc)
     {
+        this.n2s = n2s;
     }
 
     /** Creates CssLength value from the number and the given unit. */
-    public units( n: number, unit: U): IGenericProxy<P>
+    public units( n: number, unit: U): IGenericProxy<U>
     {
         return () => n + unit;
     }
 
-    public min( ...params: Extended<T>[]): IGenericProxy<P>
+    public min( ...params: Extended<T>[]): IGenericProxy<U>
     {
-        return () => mathFunc( "min", params, this.convertFunc);
+        return () => mathFunc( "min", params, this.n2s);
     }
 
-    public max( ...params: Extended<T>[]): IGenericProxy<P>
+    public max( ...params: Extended<T>[]): IGenericProxy<U>
     {
-        return () => mathFunc( "max", params, this.convertFunc);
+        return () => mathFunc( "max", params, this.n2s);
     }
 
-    public clamp( min: Extended<T>, pref: Extended<T>, max: Extended<T>): IGenericProxy<P>
+    public clamp( min: Extended<T>, pref: Extended<T>, max: Extended<T>): IGenericProxy<U>
     {
-        return () => mathFunc( "clamp", [min, pref, max], this.convertFunc);
+        return () => mathFunc( "clamp", [min, pref, max], this.n2s);
     }
 
-    public calc( formulaParts: TemplateStringsArray, ...params: Extended<T>[]): IGenericProxy<P>
+    public calc( formulaParts: TemplateStringsArray, ...params: Extended<T>[]): IGenericProxy<U>
     {
-        return () => calcFunc( formulaParts, params, this.convertFunc);
+        return () => calcFunc( formulaParts, params, this.n2s);
     }
 }
 
 
 
 /**
- * The INumberMathClass interface represents a "static" side of classes derived from the
- * NumberMath class.
+ * The INumericMathClass interface represents a "static" side of classes implementing the
+ * INumericMath interface.
  */
-export interface INumberBaseMathClass<T = any, U extends string = any, P extends string = any>
+export interface INumericMathClass<T = any, U extends string = any>
 {
     n2s( n: number): string;
 
@@ -476,7 +479,7 @@ export interface INumberBaseMathClass<T = any, U extends string = any, P extends
 
     mv2s( val: OneOrMany<T>, separator: string): string;
 
-    new(): INumberBaseMath<T,U,P>;
+    new(): INumericMath<T,U>;
 }
 
 
@@ -492,7 +495,7 @@ export interface INumberBaseMathClass<T = any, U extends string = any, P extends
  * The CssNumberMath class contains methods that implement CSS mathematic functions on the
  * <number> CSS types.
  */
-export class NumberMath extends NumberBaseMath<CssNumber, "", NumberType> implements INumberMath
+export class NumberMath extends NumericMath<CssNumber, ""> implements INumberMath
 {
     public static n2s( n: number): string { return n.toString(); }
 
@@ -517,7 +520,7 @@ export class NumberMath extends NumberBaseMath<CssNumber, "", NumberType> implem
  * The CssPercentMath class contains methods that implement CSS mathematic functions on the
  * <percent> CSS types.
  */
-export class PercentMath extends NumberBaseMath<CssPercent, PercentUnits, PercentType> implements IPercentMath
+export class PercentMath extends NumericMath<CssPercent, PercentUnits> implements IPercentMath
 {
     public static n2s( n: number): string
         { return (Number.isInteger(n) ? n : Math.round(n * 100)) + "%"; }
@@ -534,7 +537,7 @@ export class PercentMath extends NumberBaseMath<CssPercent, PercentUnits, Percen
 /**
  * Converts the given number to string using the following rules:
  * - if the number is between -1 and 1 (non inclusive), multiplies the number and appends "%"
- * - otherwise, converts the number to string without appending any utints.
+ * - otherwise, converts the number to string without appending any units.
  */
 export function unitlessOrPercentToString( n: number): string
 {
@@ -552,7 +555,7 @@ export function unitlessOrPercentToString( n: number): string
  * The CssLengthMath class contains methods that implement CSS mathematic functions on the
  * <length> CSS types.
  */
-export class LengthMath extends NumberBaseMath<CssLength, LengthUnits | PercentUnits, LengthType> implements ILengthMath
+export class LengthMath extends NumericMath<CssLength, LengthUnits | PercentUnits> implements ILengthMath
 {
     public static n2s( n: number): string { return numberToString( n, "px", "em"); }
 
@@ -577,7 +580,7 @@ export class LengthMath extends NumberBaseMath<CssLength, LengthUnits | PercentU
  * The CssAngleMath class contains methods that implement CSS mathematic functions on the
  * <angle> CSS types.
  */
-export class AngleMath extends NumberBaseMath<CssAngle, AngleUnits | PercentUnits, AngleType> implements IAngleMath
+export class AngleMath extends NumericMath<CssAngle, AngleUnits | PercentUnits> implements IAngleMath
 {
     public static n2s( n: number): string { return numberToString( n, "deg", "turn"); }
 
@@ -602,7 +605,7 @@ export class AngleMath extends NumberBaseMath<CssAngle, AngleUnits | PercentUnit
  * The CssTimeMath class contains methods that implement CSS mathematic functions on the
  * <time> CSS types.
  */
-export class TimeMath extends NumberBaseMath<CssTime, TimeUnits, TimeType> implements ITimeMath
+export class TimeMath extends NumericMath<CssTime, TimeUnits> implements ITimeMath
 {
     public static n2s( n: number): string { return numberToString( n, "ms", "s"); }
 
@@ -627,7 +630,7 @@ export class TimeMath extends NumberBaseMath<CssTime, TimeUnits, TimeType> imple
  * The CssResolutionMath class contains methods that implement CSS mathematic functions on the
  * <resolution> CSS types.
  */
-export class ResolutionMath extends NumberBaseMath<CssResolution, ResolutionUnits, ResolutionType> implements IResolutionMath
+export class ResolutionMath extends NumericMath<CssResolution, ResolutionUnits> implements IResolutionMath
 {
     public static n2s( n: number): string { return numberToString( n, "dpi", "x"); }
 
@@ -652,7 +655,7 @@ export class ResolutionMath extends NumberBaseMath<CssResolution, ResolutionUnit
  * The CssFrequencyMath class contains methods that implement CSS mathematic functions on the
  * <frequence> CSS types.
  */
-export class FrequencyMath extends NumberBaseMath<CssFrequency, FrequencyUnits, FrequencyType> implements IFrequencyMath
+export class FrequencyMath extends NumericMath<CssFrequency, FrequencyUnits> implements IFrequencyMath
 {
     public static n2s( n: number): string { return numberToString( n, "Hz", "kHz"); }
 
