@@ -2,7 +2,7 @@
     FontSrc_FontFaceType, FontSrc_Single, FontStretch_FontFaceType, FontStyle_FontFaceType,
     FontWeight_FontFaceType, IFontFace
 } from "../api/FontFaceTypes"
-import {camelToDash, v2s, AngleMath, a2s, WellKnownFunc} from "./CoreFuncs";
+import {camelToDash, v2s, AngleMath, a2s, WKF} from "./CoreFuncs";
 
 
 
@@ -41,7 +41,7 @@ export function fontFaceToString( fontface: IFontFace): string | null
 
 function fontStretchToString( val: FontStretch_FontFaceType): string
 {
-    return v2s( val, { fromAny: WellKnownFunc.Percent });
+    return v2s( val, { fromAny: WKF.Percent });
 }
 
 
@@ -50,7 +50,7 @@ function fontStyleToString( val: FontStyle_FontFaceType): string
 {
     return v2s( val, {
         fromNumber: v => `oblique ${AngleMath.v2s(v)}`,
-        fromArray: v => `oblique ${a2s( v, AngleMath.v2s)}`
+        fromArray: v => `oblique ${a2s( v, WKF.Angle)}`
     });
 }
 
@@ -58,7 +58,7 @@ function fontStyleToString( val: FontStyle_FontFaceType): string
 
 function fontWeightToString( val: FontWeight_FontFaceType): string
 {
-    return v2s( val, { fromAny: WellKnownFunc.Number });
+    return v2s( val, { fromAny: WKF.Number });
 }
 
 

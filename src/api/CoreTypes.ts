@@ -371,7 +371,7 @@ export type CssNumber = number | IGenericProxy<NumberUnits>;
  * The ICssNumberMath interface contains methods that implement CSS mathematic functions on the
  * `<number>` CSS types. This interface is implemented by the [[Num]] object.
  */
-export interface INumberMath extends INumericMath<CssNumber, ""> {}
+export interface INumberMath extends INumericMath<CssNumber,NumberUnits> {}
 
 
 

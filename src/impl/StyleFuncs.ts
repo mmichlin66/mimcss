@@ -10,7 +10,7 @@ import {
 import {IIDRule} from "../api/RuleTypes";
 import {
     v2s, a2s, o2s, LengthMath, AngleMath, camelToDash, dashToCamel, V2SOptions,
-    AnyToStringFunc, WellKnownFunc, registerV2SFuncID, P2SOption, NumberMath,
+    AnyToStringFunc, WKF, wkf, P2SOption,
 } from "./CoreFuncs";
 import {color2s} from "./ExtraFuncs";
 import {VarRule} from "../rules/VarRule";
@@ -118,10 +118,10 @@ function styleObj2String( val: any,
 function singleAnimation_fromObject( val: Animation_Single): string
 {
     return styleObj2String( val, [
-        ["duration", WellKnownFunc.Time],
+        ["duration", WKF.Time],
         "func",
-        ["delay", WellKnownFunc.Time],
-        ["count", WellKnownFunc.Number],
+        ["delay", WKF.Time],
+        ["count", WKF.Number],
         "direction",
         "mode",
         "state",
@@ -141,10 +141,10 @@ function singleAnimation_fromStyle( val: Extended<Animation_Single>): string
 function singleBackground_fromObject( val: Background_Single): string
 {
     return styleObj2String( val, [
-        ["color", WellKnownFunc.Color],
+        ["color", WKF.Color],
         "image",
-        ["position", WellKnownFunc.Position],
-        ["size", WellKnownFunc.MultiLengthWithSpace, "/"],
+        ["position", WKF.Position],
+        ["size", WKF.MultiLengthWithSpace, "/"],
         "repeat",
         "attachment",
         "origin",
@@ -157,7 +157,7 @@ function singleBackground_fromObject( val: Background_Single): string
 function singleBackground_fromStyle( val: Extended<Background_Single>): string
 {
     return v2s( val, {
-        fromNumber: WellKnownFunc.Color,
+        fromNumber: WKF.Color,
         fromObj: singleBackground_fromObject
     });
 }
@@ -166,7 +166,7 @@ function singleBackground_fromStyle( val: Extended<Background_Single>): string
 
 function singleBackgroundSize_fromStyle( val: Extended<BackgroundSize_Single>): string
 {
-    return v2s( val, { fromAny: WellKnownFunc.Length });
+    return v2s( val, { fromAny: WKF.Length });
 }
 
 
@@ -201,10 +201,10 @@ function borderImageToString( val: BorderImage_Object): string
 function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): string
 {
     return v2s( val, {
-        fromNumber: WellKnownFunc.UnitlessOrPercent,
+        fromNumber: WKF.UnitlessOrPercent,
         arrItemFunc: v => v2s( v, {
             fromBool: () => "fill",
-            fromNumber: WellKnownFunc.UnitlessOrPercent,
+            fromNumber: WKF.UnitlessOrPercent,
         })
     });
 }
@@ -215,11 +215,11 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
 {
     return styleObj2String( val, [
         ["inset", v => v ? "inset" : ""],
-        ["x", WellKnownFunc.Length],
-        ["y", WellKnownFunc.Length],
-        ["blur", WellKnownFunc.Length],
-        ["spread", WellKnownFunc.Length],
-        ["color", WellKnownFunc.Color]
+        ["x", WKF.Length],
+        ["y", WKF.Length],
+        ["blur", WKF.Length],
+        ["spread", WKF.Length],
+        ["color", WKF.Color]
     ]);
 }
 
@@ -230,7 +230,7 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
  */
 function singleCornerRadiusToString( val: Extended<CssRadius>): string
 {
-    return v2s( val, { fromAny: WellKnownFunc.Length });
+    return v2s( val, { fromAny: WKF.Length });
 }
 
 
@@ -246,17 +246,17 @@ export function borderRadius2s( val: Extended<BorderRadius_StyleType>): string
             if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = a2s( v[0], WellKnownFunc.Length, " ");
+                let s = a2s( v[0], WKF.Length, " ");
                 s += " / ";
-                return s + a2s( v[1], WellKnownFunc.Length, " ");
+                return s + a2s( v[1], WKF.Length, " ");
             }
             else
             {
                 // single MultiCornerRadius value
-                return a2s( v, WellKnownFunc.Length, " ");
+                return a2s( v, WKF.Length, " ");
             }
         },
-        fromAny: WellKnownFunc.Length
+        fromAny: WKF.Length
     });
 }
 
@@ -268,7 +268,7 @@ export function borderRadius2s( val: Extended<BorderRadius_StyleType>): string
 function borderToString( val: Extended<Border_StyleType>): string
 {
     return v2s( val, {
-        fromNumber: WellKnownFunc.Length,
+        fromNumber: WKF.Length,
         fromArray: v =>
         {
             let buf: string[] = [];
@@ -309,10 +309,10 @@ function flexToString( val: Extended<Flex_StyleType>): string
     return v2s( val, {
         fromArray: v =>
         {
-            let s = `${NumberMath.v2s(v[0])} ${NumberMath.v2s(v[1])}`;
-            return v.length > 2 ? s +` ${LengthMath.v2s( v[2])}` : s;
+            let s = `${wkf[WKF.Number](v[0])} ${wkf[WKF.Number](v[1])}`;
+            return v.length > 2 ? s +` ${wkf[WKF.Length]( v[2])}` : s;
         },
-        fromAny: WellKnownFunc.Length
+        fromAny: WKF.Length
     });
 }
 
@@ -325,7 +325,7 @@ function font_fromObject( val: any): string
         "variant",
         "weight",
         "stretch",
-        ["size", WellKnownFunc.Length],
+        ["size", WKF.Length],
         ["lineHeight", undefined, "/"],
         "family"
     ]);
@@ -415,7 +415,7 @@ function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definiti
 export function gridTrack2s( val: GridTrack): string
 {
     return v2s( val, {
-        fromNumber: WellKnownFunc.Length,
+        fromNumber: WKF.Length,
         fromArray: v => `[${a2s(v)}]`
     });
 }
@@ -425,7 +425,7 @@ export function gridTrack2s( val: GridTrack): string
 function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
 {
     return v2s( val, {
-        fromNumber: WellKnownFunc.Length,
+        fromNumber: WKF.Length,
         arrItemFunc: gridTrack2s
     });
 }
@@ -444,7 +444,7 @@ function markerStyleToString( val: Extended<Marker_StyleType>): string
 function rotateToString( val:Rotate_StyleType): string
 {
     return v2s( val, {
-        fromNumber: WellKnownFunc.Angle,
+        fromNumber: WKF.Angle,
         fromArray: v => {
             if (v.length === 2)
                 return `${v[0]} ${AngleMath.v2s(v[1])}`;
@@ -459,8 +459,8 @@ function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): st
     return styleObj2String( val, [
         "line",
         "style",
-        ["color", WellKnownFunc.Color],
-        ["thickness", WellKnownFunc.Length],
+        ["color", WKF.Color],
+        ["thickness", WKF.Length],
     ]);
 }
 
@@ -470,9 +470,9 @@ function singleTransition_fromObject( val: Extended<Transition_Single>): string
 {
     return styleObj2String( val, [
         ["property", camelToDash],
-        ["duration", WellKnownFunc.Time],
+        ["duration", WKF.Time],
         "func",
-        ["delay", WellKnownFunc.Time]
+        ["delay", WKF.Time]
     ]);
 }
 
@@ -725,9 +725,9 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: AnyToSt
 
 
 // Register frequently used conversion functions
-registerV2SFuncID( singleCornerRadiusToString, WellKnownFunc.Radius);
-registerV2SFuncID( borderToString, WellKnownFunc.Border);
-registerV2SFuncID( gridAxisToString, WellKnownFunc.GridAxis);
+wkf[WKF.Radius] = singleCornerRadiusToString;
+wkf[WKF.Border] = borderToString;
+wkf[WKF.GridAxis] = gridAxisToString;
 
 
 
@@ -742,278 +742,278 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
         fromAny: singleAnimation_fromStyle,
         arrSep: ",",
     },
-    animationDelay: WellKnownFunc.MultiTimeWithComma,
-    animationDuration: WellKnownFunc.MultiTimeWithComma,
-    animationIterationCount: WellKnownFunc.OneOrManyWithComma,
-    animationFillMode: WellKnownFunc.OneOrManyWithComma,
-    animationName: WellKnownFunc.OneOrManyWithComma,
-    animationPlayState: WellKnownFunc.OneOrManyWithComma,
-    animationTimingFunction: WellKnownFunc.OneOrManyWithComma,
+    animationDelay: WKF.MultiTimeWithComma,
+    animationDuration: WKF.MultiTimeWithComma,
+    animationIterationCount: WKF.OneOrManyWithComma,
+    animationFillMode: WKF.OneOrManyWithComma,
+    animationName: WKF.OneOrManyWithComma,
+    animationPlayState: WKF.OneOrManyWithComma,
+    animationTimingFunction: WKF.OneOrManyWithComma,
 
     background: {
-        fromNumber: WellKnownFunc.Color,
+        fromNumber: WKF.Color,
         fromObj: singleBackground_fromObject,
         fromAny: singleBackground_fromStyle,
         arrItemFunc: singleBackground_fromStyle,
         arrSep: ",",
     },
-    backgroundAttachment: WellKnownFunc.OneOrManyWithComma,
-    backgroundBlendMode: WellKnownFunc.OneOrManyWithComma,
-    backgroundClip: WellKnownFunc.OneOrManyWithComma,
-    backgroundColor: WellKnownFunc.Color,
-    backgroundImage: WellKnownFunc.OneOrManyWithComma,
-    backgroundOrigin: WellKnownFunc.OneOrManyWithComma,
-    backgroundPosition: WellKnownFunc.MultiPositionWithComma,
-    backgroundPositionX: WellKnownFunc.MultiPositionWithComma,
-    backgroundPositionY: WellKnownFunc.MultiPositionWithComma,
-    backgroundRepeat: WellKnownFunc.OneOrManyWithComma,
+    backgroundAttachment: WKF.OneOrManyWithComma,
+    backgroundBlendMode: WKF.OneOrManyWithComma,
+    backgroundClip: WKF.OneOrManyWithComma,
+    backgroundColor: WKF.Color,
+    backgroundImage: WKF.OneOrManyWithComma,
+    backgroundOrigin: WKF.OneOrManyWithComma,
+    backgroundPosition: WKF.MultiPositionWithComma,
+    backgroundPositionX: WKF.MultiPositionWithComma,
+    backgroundPositionY: WKF.MultiPositionWithComma,
+    backgroundRepeat: WKF.OneOrManyWithComma,
     backgroundSize: {
-        fromNumber: WellKnownFunc.Length,
+        fromNumber: WKF.Length,
         arrItemFunc: singleBackgroundSize_fromStyle,
         arrSep: ","
     },
-    baselineShift: WellKnownFunc.Length,
-    blockSize: WellKnownFunc.Length,
-    border: WellKnownFunc.Border,
-    borderBlock: WellKnownFunc.Border,
-    borderBlockEnd: WellKnownFunc.Border,
-    borderBlockEndColor: WellKnownFunc.Color,
-    borderBlockEndWidth: WellKnownFunc.Length,
-    borderBlockStart: WellKnownFunc.Border,
-    borderBlockStartColor: WellKnownFunc.Color,
-    borderBlockStartWidth: WellKnownFunc.Length,
-    borderBottom: WellKnownFunc.Border,
-    borderBottomColor: WellKnownFunc.Color,
-    borderBottomLeftRadius: WellKnownFunc.Radius,
-    borderBottomRightRadius: WellKnownFunc.Radius,
-    borderBottomWidth: WellKnownFunc.Length,
+    baselineShift: WKF.Length,
+    blockSize: WKF.Length,
+    border: WKF.Border,
+    borderBlock: WKF.Border,
+    borderBlockEnd: WKF.Border,
+    borderBlockEndColor: WKF.Color,
+    borderBlockEndWidth: WKF.Length,
+    borderBlockStart: WKF.Border,
+    borderBlockStartColor: WKF.Color,
+    borderBlockStartWidth: WKF.Length,
+    borderBottom: WKF.Border,
+    borderBottomColor: WKF.Color,
+    borderBottomLeftRadius: WKF.Radius,
+    borderBottomRightRadius: WKF.Radius,
+    borderBottomWidth: WKF.Length,
     borderColor: {
-        fromAny: WellKnownFunc.Color
+        fromAny: WKF.Color
     },
     borderImage: {
         fromObj: borderImageToString,
     },
     borderImageSlice: borderImageSliceToString,
-    borderInline: WellKnownFunc.Border,
-    borderInlineEnd: WellKnownFunc.Border,
-    borderInlineEndColor: WellKnownFunc.Color,
-    borderInlineEndWidth: WellKnownFunc.Length,
-    borderInlineStart: WellKnownFunc.Border,
-    borderInlineStartColor: WellKnownFunc.Color,
-    borderInlineStartWidth: WellKnownFunc.Length,
-    borderLeft: WellKnownFunc.Border,
-    borderLeftColor: WellKnownFunc.Color,
-    borderLeftWidth: WellKnownFunc.Length,
+    borderInline: WKF.Border,
+    borderInlineEnd: WKF.Border,
+    borderInlineEndColor: WKF.Color,
+    borderInlineEndWidth: WKF.Length,
+    borderInlineStart: WKF.Border,
+    borderInlineStartColor: WKF.Color,
+    borderInlineStartWidth: WKF.Length,
+    borderLeft: WKF.Border,
+    borderLeftColor: WKF.Color,
+    borderLeftWidth: WKF.Length,
     borderRadius: borderRadius2s,
-    borderRight: WellKnownFunc.Border,
-    borderRightColor: WellKnownFunc.Color,
-    borderRightWidth: WellKnownFunc.Length,
-    borderSpacing: WellKnownFunc.MultiLengthWithSpace,
-    borderTop: WellKnownFunc.Border,
-    borderTopColor: WellKnownFunc.Color,
-    borderTopLeftRadius: WellKnownFunc.Radius,
-    borderTopRightRadius: WellKnownFunc.Radius,
-    borderTopWidth: WellKnownFunc.Length,
-    borderWidth: WellKnownFunc.MultiLengthWithSpace,
-    bottom: WellKnownFunc.Length,
+    borderRight: WKF.Border,
+    borderRightColor: WKF.Color,
+    borderRightWidth: WKF.Length,
+    borderSpacing: WKF.MultiLengthWithSpace,
+    borderTop: WKF.Border,
+    borderTopColor: WKF.Color,
+    borderTopLeftRadius: WKF.Radius,
+    borderTopRightRadius: WKF.Radius,
+    borderTopWidth: WKF.Length,
+    borderWidth: WKF.MultiLengthWithSpace,
+    bottom: WKF.Length,
     boxShadow: {
         fromObj: singleBoxShadow_fromObject,
         arrSep: ",",
     },
 
-    caretColor: WellKnownFunc.Color,
+    caretColor: WKF.Color,
     clip:  {
         fromArray: v => `rect(${LengthMath.mv2s(v," ")}`
     },
-    color: WellKnownFunc.Color,
-    columnGap: WellKnownFunc.Length,
-    columnRule: WellKnownFunc.Border,
-    columnRuleColor: WellKnownFunc.Color,
-    columnRuleWidth: WellKnownFunc.MultiLengthWithSpace,
+    color: WKF.Color,
+    columnGap: WKF.Length,
+    columnRule: WKF.Border,
+    columnRuleColor: WKF.Color,
+    columnRuleWidth: WKF.MultiLengthWithSpace,
     columns: columnsToString,
-    columnWidth: WellKnownFunc.Length,
+    columnWidth: WKF.Length,
     cursor: {
         arrSep: ","
     },
 
-    fill: WellKnownFunc.Color,
-    fillOpacity: WellKnownFunc.Percent,
+    fill: WKF.Color,
+    fillOpacity: WKF.Percent,
     flex: flexToString,
-    flexBasis: WellKnownFunc.Length,
-    floodColor: WellKnownFunc.Color,
+    flexBasis: WKF.Length,
+    floodColor: WKF.Color,
     font: {
         fromObj: font_fromObject
     },
-    fontSize: WellKnownFunc.Length,
+    fontSize: WKF.Length,
     fontStyle: fontStyleToString,
 
-    gap: WellKnownFunc.MultiLengthWithSpace,
-    gridColumnGap: WellKnownFunc.Length,
-    gridGap: WellKnownFunc.MultiLengthWithSpace,
-    gridRowGap: WellKnownFunc.Length,
-    gridArea: WellKnownFunc.OneOrManyWithSlash,
-    gridAutoColumns: WellKnownFunc.GridAxis,
-    gridAutoRows: WellKnownFunc.GridAxis,
-    gridColumn: WellKnownFunc.OneOrManyWithSlash,
-    gridRow: WellKnownFunc.OneOrManyWithSlash,
+    gap: WKF.MultiLengthWithSpace,
+    gridColumnGap: WKF.Length,
+    gridGap: WKF.MultiLengthWithSpace,
+    gridRowGap: WKF.Length,
+    gridArea: WKF.OneOrManyWithSlash,
+    gridAutoColumns: WKF.GridAxis,
+    gridAutoRows: WKF.GridAxis,
+    gridColumn: WKF.OneOrManyWithSlash,
+    gridRow: WKF.OneOrManyWithSlash,
     gridTemplateAreas: gridTemplateAreasToString,
-    gridTemplateColumns: WellKnownFunc.GridAxis,
-    gridTemplateRows: WellKnownFunc.GridAxis,
+    gridTemplateColumns: WKF.GridAxis,
+    gridTemplateRows: WKF.GridAxis,
 
-    height: WellKnownFunc.Length,
+    height: WKF.Length,
 
-    inlineSize: WellKnownFunc.Length,
+    inlineSize: WKF.Length,
 
-    left: WellKnownFunc.Length,
-    letterSpacing: WellKnownFunc.Length,
-    lightingColor: WellKnownFunc.Color,
+    left: WKF.Length,
+    letterSpacing: WKF.Length,
+    lightingColor: WKF.Color,
 
-    margin: WellKnownFunc.MultiLengthWithSpace,
-    marginBlock: WellKnownFunc.MultiLengthWithSpace,
-    marginBlockEnd: WellKnownFunc.Length,
-    marginBlockStart: WellKnownFunc.Length,
-    marginBottom: WellKnownFunc.Length,
-    marginInline: WellKnownFunc.MultiLengthWithSpace,
-    marginInlineEnd: WellKnownFunc.Length,
-    marginInlineStart: WellKnownFunc.Length,
-    marginLeft: WellKnownFunc.Length,
-    marginRight: WellKnownFunc.Length,
-    marginTop: WellKnownFunc.Length,
+    margin: WKF.MultiLengthWithSpace,
+    marginBlock: WKF.MultiLengthWithSpace,
+    marginBlockEnd: WKF.Length,
+    marginBlockStart: WKF.Length,
+    marginBottom: WKF.Length,
+    marginInline: WKF.MultiLengthWithSpace,
+    marginInlineEnd: WKF.Length,
+    marginInlineStart: WKF.Length,
+    marginLeft: WKF.Length,
+    marginRight: WKF.Length,
+    marginTop: WKF.Length,
     markerEnd: markerStyleToString,
     markerMid: markerStyleToString,
     markerStart: markerStyleToString,
-    maxBlockSize: WellKnownFunc.Length,
-    maxHeight: WellKnownFunc.Length,
-    maxInlineSize: WellKnownFunc.Length,
-    maxWidth: WellKnownFunc.Length,
-    minBlockSize: WellKnownFunc.Length,
-    minHeight: WellKnownFunc.Length,
-    minInlineSize: WellKnownFunc.Length,
-	minWidth: WellKnownFunc.Length,
+    maxBlockSize: WKF.Length,
+    maxHeight: WKF.Length,
+    maxInlineSize: WKF.Length,
+    maxWidth: WKF.Length,
+    minBlockSize: WKF.Length,
+    minHeight: WKF.Length,
+    minInlineSize: WKF.Length,
+	minWidth: WKF.Length,
 
-    objectPosition: WellKnownFunc.Position,
+    objectPosition: WKF.Position,
     offset: offsetToString,
-    offsetAnchor: WellKnownFunc.Position,
-    offsetDistance: WellKnownFunc.Length,
-    offsetPosition: WellKnownFunc.Position,
+    offsetAnchor: WKF.Position,
+    offsetDistance: WKF.Length,
+    offsetPosition: WKF.Position,
     offsetRotate: {
-        fromAny: WellKnownFunc.Angle
+        fromAny: WKF.Angle
     },
-    outline: WellKnownFunc.Border,
-    outlineColor: WellKnownFunc.Color,
-    outlineOffset: WellKnownFunc.Length,
+    outline: WKF.Border,
+    outlineColor: WKF.Color,
+    outlineOffset: WKF.Length,
 
-    padding: WellKnownFunc.MultiLengthWithSpace,
-    paddingBlock: WellKnownFunc.MultiLengthWithSpace,
-    paddingBlockEnd: WellKnownFunc.Length,
-    paddingBlockStart: WellKnownFunc.Length,
-    paddingBottom: WellKnownFunc.Length,
-    paddingInline: WellKnownFunc.MultiLengthWithSpace,
-    paddingInlineEnd: WellKnownFunc.Length,
-    paddingInlineStart: WellKnownFunc.Length,
-    paddingLeft: WellKnownFunc.Length,
-    paddingRight: WellKnownFunc.Length,
-    paddingTop: WellKnownFunc.Length,
-    perspective: WellKnownFunc.Length,
+    padding: WKF.MultiLengthWithSpace,
+    paddingBlock: WKF.MultiLengthWithSpace,
+    paddingBlockEnd: WKF.Length,
+    paddingBlockStart: WKF.Length,
+    paddingBottom: WKF.Length,
+    paddingInline: WKF.MultiLengthWithSpace,
+    paddingInlineEnd: WKF.Length,
+    paddingInlineStart: WKF.Length,
+    paddingLeft: WKF.Length,
+    paddingRight: WKF.Length,
+    paddingTop: WKF.Length,
+    perspective: WKF.Length,
     perspectiveOrigin: {
-        fromAny: WellKnownFunc.Length
+        fromAny: WKF.Length
     },
 
     quotes: {
         arrItemFunc: v => `"${v}"`
     },
 
-    right: WellKnownFunc.Length,
+    right: WKF.Length,
     rotate: rotateToString,
-    rowGap: WellKnownFunc.Length,
+    rowGap: WKF.Length,
 
     scrollbarColor: {
-        arrItemFunc: WellKnownFunc.Color
+        arrItemFunc: WKF.Color
     },
-    scrollMargin: WellKnownFunc.MultiLengthWithSpace,
-    scrollMarginBlock: WellKnownFunc.MultiLengthWithSpace,
-    scrollMarginBlockEnd: WellKnownFunc.Length,
-    scrollMarginBlockStart: WellKnownFunc.Length,
-    scrollMarginBottom: WellKnownFunc.Length,
-    scrollMarginInline: WellKnownFunc.MultiLengthWithSpace,
-    scrollMarginInlineEnd: WellKnownFunc.Length,
-    scrollMarginInlineStart: WellKnownFunc.Length,
-    scrollMarginLeft: WellKnownFunc.Length,
-    scrollMarginRight: WellKnownFunc.Length,
-    scrollMarginTop: WellKnownFunc.Length,
-    scrollPadding: WellKnownFunc.MultiLengthWithSpace,
-    scrollPaddingBlock: WellKnownFunc.MultiLengthWithSpace,
-    scrollPaddingBlockEnd: WellKnownFunc.Length,
-    scrollPaddingBlockStart: WellKnownFunc.Length,
-    scrollPaddingBottom: WellKnownFunc.Length,
-    scrollPaddingInline: WellKnownFunc.MultiLengthWithSpace,
-    scrollPaddingInlineEnd: WellKnownFunc.Length,
-    scrollPaddingInlineStart: WellKnownFunc.Length,
-    scrollPaddingLeft: WellKnownFunc.Length,
-    scrollPaddingRight: WellKnownFunc.Length,
-    scrollPaddingTop: WellKnownFunc.Length,
-    shapeMargin: WellKnownFunc.Length,
-    stopColor: WellKnownFunc.Color,
-    stroke: WellKnownFunc.Color,
+    scrollMargin: WKF.MultiLengthWithSpace,
+    scrollMarginBlock: WKF.MultiLengthWithSpace,
+    scrollMarginBlockEnd: WKF.Length,
+    scrollMarginBlockStart: WKF.Length,
+    scrollMarginBottom: WKF.Length,
+    scrollMarginInline: WKF.MultiLengthWithSpace,
+    scrollMarginInlineEnd: WKF.Length,
+    scrollMarginInlineStart: WKF.Length,
+    scrollMarginLeft: WKF.Length,
+    scrollMarginRight: WKF.Length,
+    scrollMarginTop: WKF.Length,
+    scrollPadding: WKF.MultiLengthWithSpace,
+    scrollPaddingBlock: WKF.MultiLengthWithSpace,
+    scrollPaddingBlockEnd: WKF.Length,
+    scrollPaddingBlockStart: WKF.Length,
+    scrollPaddingBottom: WKF.Length,
+    scrollPaddingInline: WKF.MultiLengthWithSpace,
+    scrollPaddingInlineEnd: WKF.Length,
+    scrollPaddingInlineStart: WKF.Length,
+    scrollPaddingLeft: WKF.Length,
+    scrollPaddingRight: WKF.Length,
+    scrollPaddingTop: WKF.Length,
+    shapeMargin: WKF.Length,
+    stopColor: WKF.Color,
+    stroke: WKF.Color,
 
-    tabSize: WellKnownFunc.Length,
+    tabSize: WKF.Length,
     textCombineUpright: {
         fromNumber: v => `digits ${v}`
     },
     textDecoration: {
-        fromNumber: WellKnownFunc.Color,
+        fromNumber: WKF.Color,
         fromObj: textDecoration_fromObject
     },
-    textDecorationColor: WellKnownFunc.Color,
-    textDecorationThickness: WellKnownFunc.Length,
+    textDecorationColor: WKF.Color,
+    textDecorationThickness: WKF.Length,
     textEmphasis: {
-        fromAny: WellKnownFunc.Color
+        fromAny: WKF.Color
     },
-    textEmphasisColor: WellKnownFunc.Color,
+    textEmphasisColor: WKF.Color,
     textIndent: {
-        fromAny: WellKnownFunc.Length
+        fromAny: WKF.Length
     },
     textShadow: {
         fromObj: singleBoxShadow_fromObject,
         arrSep: ",",
     },
-    textSizeAdjust: WellKnownFunc.Percent,
-    top: WellKnownFunc.Length,
+    textSizeAdjust: WKF.Percent,
+    top: WKF.Length,
     transformOrigin: {
-        fromAny: WellKnownFunc.Length
+        fromAny: WKF.Length
     },
     transition: {
         fromObj: singleTransition_fromObject,
         fromAny: singleTransition_fromStyle,
         arrSep: ",",
     },
-    transitionDelay: WellKnownFunc.MultiTimeWithComma,
-    transitionDuration: WellKnownFunc.MultiTimeWithComma,
-    transitionTimingFunction: WellKnownFunc.OneOrManyWithComma,
+    transitionDelay: WKF.MultiTimeWithComma,
+    transitionDuration: WKF.MultiTimeWithComma,
+    transitionTimingFunction: WKF.OneOrManyWithComma,
     translate: {
-        fromAny: WellKnownFunc.Length
+        fromAny: WKF.Length
     },
 
-    verticalAlign: WellKnownFunc.Length,
+    verticalAlign: WKF.Length,
 
-    width: WellKnownFunc.Length,
+    width: WKF.Length,
     willChange: {
         fromString: camelToDash
     },
-    wordSpacing: WellKnownFunc.Length,
+    wordSpacing: WKF.Length,
 
-    zoom: WellKnownFunc.Percent,
+    zoom: WKF.Percent,
 
     // special properties for IVarRule types
-    CssLength: WellKnownFunc.Length,
-    CssAngle: WellKnownFunc.Angle,
-    CssTime: WellKnownFunc.Time,
-    CssResolution: WellKnownFunc.Resolution,
-    CssFrequency: WellKnownFunc.Frequency,
-    CssPercent: WellKnownFunc.Percent,
-    CssPosition: WellKnownFunc.Position,
-    CssRadius: WellKnownFunc.Radius,
-    CssColor: WellKnownFunc.Color,
+    CssLength: WKF.Length,
+    CssAngle: WKF.Angle,
+    CssTime: WKF.Time,
+    CssResolution: WKF.Resolution,
+    CssFrequency: WKF.Frequency,
+    CssPercent: WKF.Percent,
+    CssPosition: WKF.Position,
+    CssRadius: WKF.Radius,
+    CssColor: WKF.Color,
 };
 
 

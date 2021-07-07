@@ -1,6 +1,6 @@
 ﻿import {CssColor, INamedColors} from "../api/ExtraTypes";
 import {Extended, CssAngle} from "../api/CoreTypes"
-import {AngleMath, registerV2SFuncID, v2s, WellKnownFunc} from "./CoreFuncs"
+import {AngleMath, wkf, v2s, WKF} from "./CoreFuncs"
 
 
 
@@ -369,7 +369,7 @@ function colorPercentToString( n: Extended<number>): string
 export function hsl2s( h: Extended<CssAngle>, s: Extended<number>, l: Extended<number>, a?: Extended<number>): string
 {
     return `hsla(${AngleMath.v2s(h)},${colorPercentToString(s)},${colorPercentToString(l)},${alphaToString( a)})`;
-    // return f2s("hsla", [[h, AngleMath.v2s], [s, colorPercentToString], [l, colorPercentToString], [a, alphaToString]]);
+    // return f2s("hsla", [[h, WKF.Angle], [s, colorPercentToString], [l, colorPercentToString], [a, alphaToString]]);
 }
 
 
@@ -430,6 +430,6 @@ export function color2s( val: Extended<CssColor>): string
 }
 
 // register color conversion function
-registerV2SFuncID( color2s, WellKnownFunc.Color);
+wkf[WKF.Color] = color2s;
 
 

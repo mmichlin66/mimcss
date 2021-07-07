@@ -1,16 +1,14 @@
 ﻿import {
-    Extended, INumericMath, IGenericProxy, CssNumber,
-    IPercentMath, CssPercent, ILengthMath, CssLength,
-    IAngleMath, CssAngle, ITimeMath, CssTime, IResolutionMath,
-    CssResolution, IFrequencyMath, CssFrequency, CssPosition, OneOrMany, LengthUnits,
-    PercentUnits, AngleUnits, TimeUnits, ResolutionUnits, FrequencyUnits, INumberMath
+    Extended, INumericMath, IGenericProxy, CssLength, CssAngle, CssTime, CssResolution,
+    CssFrequency, CssPosition, OneOrMany, LengthUnits, PercentUnits, AngleUnits, TimeUnits,
+    ResolutionUnits, FrequencyUnits, CssNumber, CssPercent, NumberUnits
 } from "../api/CoreTypes";
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Basics.
+// Case conversions for property names.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -67,32 +65,43 @@ export type NumberToStringFunc = (n: number) => string;
  * to strings. This is used to reduce the size of the object used for mapping style properties to
  * conversion functions.
  */
- export const enum WellKnownFunc
- {
-     Number = 1,
-     Percent,
-     Length,
-     Angle,
-     Time,
-     Resolution,
-     Frequency,
-     Position,
-     Color,
-     MultiPositionWithComma,
-     MultiLengthWithSpace,
-     MultiTimeWithComma,
-     OneOrManyWithComma,
-     OneOrManyWithSlash,
-     UnitlessOrPercent,
-     Radius,
-     Border,
-     GridAxis,
+export const enum WKF
+{
+    Number = 1,
+    Percent,
+    Length,
+    Angle,
+    Time,
+    Resolution,
+    Frequency,
+    Position,
+    AtPosition,
+    Color,
+    MultiPositionWithComma,
+    MultiLengthWithSpace,
+    MultiTimeWithComma,
+    OneOrManyWithComma,
+    OneOrManyWithSlash,
+    UnitlessOrPercent,
+    Radius,
+    Border,
+    GridAxis,
 
- }
+    // indicates the length of the array needed to keep conversion functions
+    Last
+}
 
 
 
-  /**
+/**
+ * Array of well known conversion functions. Indexes are the identifier of well known functions
+ * from the WellKnownFunc enumeration
+ */
+export let wkf: AnyToStringFunc[] = new Array( WKF.Last);
+
+
+
+/**
  * The V2SOptions type defines options on how to convert values of differnt
  * types to strings. A value is converted according to the following rules:
  * - If the option is a number it is treated as an ID of a registered conversion function.
@@ -100,7 +109,7 @@ export type NumberToStringFunc = (n: number) => string;
  * - If the option is an object, then depending on the type of the value, one of the fromXxx
  *   methods defines how the value is converted.
  */
-export type V2SOptions = WellKnownFunc | AnyToStringFunc |
+export type V2SOptions = WKF | AnyToStringFunc |
 {
     // String value to use or function to call if value is null or undefined
     fromNull?: string | ((val?: null) => string);
@@ -112,10 +121,10 @@ export type V2SOptions = WellKnownFunc | AnyToStringFunc |
     fromString?: (val: string) => string;
 
     // Options to use if value is a number
-    fromNumber?: WellKnownFunc | NumberToStringFunc;
+    fromNumber?: WKF | NumberToStringFunc;
 
     // Options to use if value is an array
-    fromArray?: WellKnownFunc | ((val: any[]) => string);
+    fromArray?: WKF | ((val: any[]) => string);
 
     // Options to use if value is an object
     fromObj?: V2SOptions;
@@ -142,23 +151,8 @@ export type V2SOptions = WellKnownFunc | AnyToStringFunc |
     funcArgs?: any[];
 };
 
-
-
-/**
- * The P2SOption type defines a name of a property of an object along with the options of how
- * this property is converted to a string. The type is either a property name or a tuple
- * where the first element is the property name and the second element is the V2SOptions value.
- * If the tuple has a third string element it is placed before the converted property value.
- */
- export type P2SOption = string | [string, V2SOptions?, string?];
-
-/**
- * The P2SOptions type defines names of properties of an object along with the options of how
- * each property is converted to a string. The type is an array of either property names or tuples
- * where the first element is the property name and the second element is the V2SOptions value.
- * If the tuple has a third string element it is placed before the converted property value.
- */
- export type P2SOptions = P2SOption[];
+wkf[WKF.OneOrManyWithComma] = v => v2s( v, { arrSep: "," });
+wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { arrSep: "/" });
 
 
 
@@ -185,7 +179,7 @@ export function v2s( val: any, options?: V2SOptions): string
     }
     else if (typeof options == "number")
     {
-        let func = registeredV2SFuncs.get( options);
+        let func = wkf[options];
         return func ? func(val) : "";
     }
     else if (typeof options == "function")
@@ -255,6 +249,24 @@ export function a2s( val: any[], options?: V2SOptions, separator: string = " "):
 
 
 /**
+ * The P2SOption type defines a name of a property of an object along with the options of how
+ * this property is converted to a string. The type is either a property name or a tuple
+ * where the first element is the property name and the second element is the V2SOptions value.
+ * If the tuple has a third string element it is placed before the converted property value.
+ */
+ export type P2SOption = string | [string, V2SOptions?, string?];
+
+/**
+ * The P2SOptions type defines names of properties of an object along with the options of how
+ * each property is converted to a string. The type is an array of either property names or tuples
+ * where the first element is the property name and the second element is the V2SOptions value.
+ * If the tuple has a third string element it is placed before the converted property value.
+ */
+ export type P2SOptions = P2SOption[];
+
+
+
+/**
  * Converts properties of the given object to string by converting each property from the options
  * array and joining them using the given separator.
  * @param val
@@ -291,7 +303,9 @@ export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: st
 
 
 /**
- * Converts the given values according to the specified options.
+ * Converts the given array of values to a single string according to the specified options and
+ * using the given separator. For each item in the array, the v2s function is called to convert
+ * it to string.
  * @param values
  * @param separator
  */
@@ -385,7 +399,7 @@ function numberStyleToString<T>( val: Extended<T>, convertFunc?: NumberToStringF
 }
 
 /**
- * Converts single CssNumber or array of CssNumber objects to the CSS string.
+ * Converts single numeric style value or array of numericstyle values to the CSS string.
  * @param val Single- or multi-number style value.
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
@@ -425,17 +439,27 @@ function calcFunc<T>( parts: TemplateStringsArray, params: Extended<T>[],
 
 
 /**
- * The NummberBaseMath class contains methods that implement CSS mathematic functions on the
+ * The NumericMath class contains methods that implement CSS mathematic functions on the
  * numeric CSS types. When arguments for these functions are of the number JavaScript type they
  * are converted to strings by calling a function specified in the constructor.
  */
-abstract class NumericMath<T = any, U extends string = any> implements INumericMath<T,U>
+export class NumericMath<T = any, U extends string = any> implements INumericMath<T,U>
 {
-    protected n2s: NumberToStringFunc;
+    public n2s: NumberToStringFunc;
 
     constructor( n2s: NumberToStringFunc)
     {
         this.n2s = n2s;
+    }
+
+    public v2s( val: Extended<T>): string
+    {
+        return numberStyleToString( val, this.n2s);
+    }
+
+    public mv2s( val: OneOrMany<T>, separator: string): string
+    {
+        return multiNumberStyleToString( val, this.n2s, separator);
     }
 
     /** Creates CssLength value from the number and the given unit. */
@@ -468,206 +492,90 @@ abstract class NumericMath<T = any, U extends string = any> implements INumericM
 
 
 /**
- * The INumericMathClass interface represents a "static" side of classes implementing the
- * INumericMath interface.
+ * The NumberMath object contains methods that implement CSS mathematic functions on the `<number>`
+ * CSS type.
  */
-export interface INumericMathClass<T = any, U extends string = any>
-{
-    n2s( n: number): string;
+export let NumberMath = new NumericMath<CssNumber,NumberUnits>( n => n.toString());
 
-    v2s( val: Extended<T>): string;
-
-    mv2s( val: OneOrMany<T>, separator: string): string;
-
-    new(): INumericMath<T,U>;
-}
+wkf[WKF.Number] = v => NumberMath.v2s( v);
 
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Unitless number
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The CssNumberMath class contains methods that implement CSS mathematic functions on the
- * <number> CSS types.
+ * The PercentMath object contains methods that implement CSS mathematic functions on the
+ * `<percentage>` CSS type by appending a "%" unit suffix.
  */
-export class NumberMath extends NumericMath<CssNumber, ""> implements INumberMath
-{
-    public static n2s( n: number): string { return n.toString(); }
+export let PercentMath = new NumericMath<CssPercent,PercentUnits>(
+    n => (Number.isInteger(n) ? n : Math.round(n * 100)) + "%");
 
-    public static v2s( val: Extended<CssNumber>): string
-        { return numberStyleToString( val, NumberMath.n2s); }
-
-    public static mv2s( val: OneOrMany<CssNumber>, separator: string): string
-        { return multiNumberStyleToString( val, NumberMath.n2s, separator); }
-
-    constructor() { super( NumberMath.n2s) }
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Percent
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The CssPercentMath class contains methods that implement CSS mathematic functions on the
- * <percent> CSS types.
- */
-export class PercentMath extends NumericMath<CssPercent, PercentUnits> implements IPercentMath
-{
-    public static n2s( n: number): string
-        { return (Number.isInteger(n) ? n : Math.round(n * 100)) + "%"; }
-
-    public static v2s( val: Extended<CssPercent>): string
-        { return numberStyleToString( val, PercentMath.n2s); }
-
-    public static mv2s( val: OneOrMany<CssPercent>, separator: string): string
-        { return multiNumberStyleToString( val, PercentMath.n2s, separator); }
-
-    constructor() { super( PercentMath.n2s) }
-}
+wkf[WKF.Percent] = v => PercentMath.v2s( v);
 
 /**
  * Converts the given number to string using the following rules:
  * - if the number is between -1 and 1 (non inclusive), multiplies the number and appends "%"
  * - otherwise, converts the number to string without appending any units.
  */
-export function unitlessOrPercentToString( n: number): string
+function unitlessOrPercentToString( n: number): string
 {
     return n >= 1 || n <= -1 ? n.toString() : Math.round(n * 100) + "%";
 }
 
+wkf[WKF.UnitlessOrPercent] = unitlessOrPercentToString;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Length
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 /**
- * The CssLengthMath class contains methods that implement CSS mathematic functions on the
- * <length> CSS types.
+ * The LengthMath object contains methods that implement CSS mathematic functions on the `<length>`
+ * CSS type by appending a length unit suffix.
+ * Integer numbers use "px"; floating point numbers use "em".
  */
-export class LengthMath extends NumericMath<CssLength, LengthUnits | PercentUnits> implements ILengthMath
-{
-    public static n2s( n: number): string { return numberToString( n, "px", "em"); }
+export let LengthMath = new NumericMath<CssLength,LengthUnits>( n => numberToString( n, "px", "em"));
 
-    public static v2s( val: Extended<CssLength | string>): string
-        { return numberStyleToString( val, LengthMath.n2s); }
-
-    public static mv2s( val: OneOrMany<CssLength>, separator: string): string
-        { return multiNumberStyleToString( val, LengthMath.n2s, separator); }
-
-    constructor() { super( LengthMath.n2s) }
-}
+wkf[WKF.Length] = v => LengthMath.v2s( v);
+wkf[WKF.MultiLengthWithSpace] = v => LengthMath.mv2s( v, " ");
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Angle
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The CssAngleMath class contains methods that implement CSS mathematic functions on the
- * <angle> CSS types.
+ * The AngleMath object contains methods that implement CSS mathematic functions on the `<angle>`
+ * CSS type by appending an angle unit suffix.
+ * Integer numbers use "deg"; floating point numbers use "turn".
  */
-export class AngleMath extends NumericMath<CssAngle, AngleUnits | PercentUnits> implements IAngleMath
-{
-    public static n2s( n: number): string { return numberToString( n, "deg", "turn"); }
+export let AngleMath = new NumericMath<CssAngle,AngleUnits>( n => numberToString( n, "deg", "turn"));
 
-    public static v2s( val: Extended<CssAngle>): string
-        { return numberStyleToString( val, AngleMath.n2s); }
-
-    public static mv2s( val: OneOrMany<CssAngle>, separator: string): string
-        { return multiNumberStyleToString( val, AngleMath.n2s, separator); }
-
-    constructor() { super( AngleMath.n2s) }
-}
+wkf[WKF.Angle] = v => AngleMath.v2s( v);
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Time
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The CssTimeMath class contains methods that implement CSS mathematic functions on the
- * <time> CSS types.
+ * The TimeMath object contains methods that implement CSS mathematic functions on the `<time>`
+ * CSS type by appending a time unit suffix.
+ * Integer numbers use "ms"; floating point numbers use "s".
  */
-export class TimeMath extends NumericMath<CssTime, TimeUnits> implements ITimeMath
-{
-    public static n2s( n: number): string { return numberToString( n, "ms", "s"); }
+export let TimeMath = new NumericMath<CssTime,TimeUnits>( n => numberToString( n, "ms", "s"));
 
-    public static v2s( val: Extended<CssTime>): string
-        { return numberStyleToString( val, TimeMath.n2s); }
+wkf[WKF.Time] = v => TimeMath.v2s( v);
+wkf[WKF.MultiTimeWithComma] = v => TimeMath.mv2s( v, ",");
 
-    public static mv2s( val: OneOrMany<CssTime>, separator: string): string
-        { return multiNumberStyleToString( val, TimeMath.n2s, separator); }
-
-    constructor() { super( TimeMath.n2s) }
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Resolution
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The CssResolutionMath class contains methods that implement CSS mathematic functions on the
- * <resolution> CSS types.
+ * The ResolutionMath object contains methods that implement CSS mathematic functions on the
+ * `<resolution>` CSS type by appending a resolution unit suffix.
+ * Integer numbers use "dpi"; floating point numbers use "x".
  */
-export class ResolutionMath extends NumericMath<CssResolution, ResolutionUnits> implements IResolutionMath
-{
-    public static n2s( n: number): string { return numberToString( n, "dpi", "x"); }
+export let ResolutionMath = new NumericMath<CssResolution,ResolutionUnits>( n => numberToString( n, "dpi", "x"));
 
-    public static v2s( val: Extended<CssResolution>): string
-        { return numberStyleToString( val, ResolutionMath.n2s); }
+wkf[WKF.Resolution] = v => ResolutionMath.v2s( v);
 
-    public static mv2s( val: OneOrMany<CssResolution>, separator: string): string
-        { return multiNumberStyleToString( val, ResolutionMath.n2s, separator); }
-
-    constructor() { super( ResolutionMath.n2s) }
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Frequency
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The CssFrequencyMath class contains methods that implement CSS mathematic functions on the
- * <frequence> CSS types.
+ * The FrequencyMath object contains methods that implement CSS mathematic functions on the
+ * `<frequency>` CSS type by appending a frequency unit suffix.
+ * Integer numbers use "Hz"; floating point numbers use "kHz".
  */
-export class FrequencyMath extends NumericMath<CssFrequency, FrequencyUnits> implements IFrequencyMath
-{
-    public static n2s( n: number): string { return numberToString( n, "Hz", "kHz"); }
+export let FrequencyMath = new NumericMath<CssFrequency, FrequencyUnits>( n => numberToString( n, "Hz", "kHz"));
 
-    public static v2s( val: Extended<CssFrequency>): string
-        { return numberStyleToString( val, FrequencyMath.n2s); }
-
-    public static mv2s( val: OneOrMany<CssFrequency>, separator: string): string
-        { return multiNumberStyleToString( val, FrequencyMath.n2s, separator); }
-
-    constructor() { super( FrequencyMath.n2s) }
-}
-
+wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,9 +587,9 @@ export class FrequencyMath extends NumericMath<CssFrequency, FrequencyUnits> imp
 /**
  * Converts single position style value to the CSS string.
  */
-export function pos2s( val: Extended<CssPosition>): string
+function pos2s( val: Extended<CssPosition>): string
 {
-    return v2s( val, { fromAny: WellKnownFunc.Length });
+    return v2s( val, { fromAny: WKF.Length });
 }
 
 /**
@@ -690,48 +598,14 @@ export function pos2s( val: Extended<CssPosition>): string
 function mpos2s( val: Extended<OneOrMany<CssPosition>>, separator: string): string
 {
     return v2s( val, {
-        arrItemFunc: WellKnownFunc.Position,
+        arrItemFunc: pos2s,
         arrSep: separator
     });
 }
 
-
-
-// Map of function IDs to functions that convert a value to string
-let registeredV2SFuncs = new Map<number,AnyToStringFunc>([
-    [WellKnownFunc.Number, NumberMath.v2s],
-    [WellKnownFunc.Percent, PercentMath.v2s],
-    [WellKnownFunc.Length, LengthMath.v2s],
-    [WellKnownFunc.Angle, AngleMath.v2s],
-    [WellKnownFunc.Time, TimeMath.v2s],
-    [WellKnownFunc.Resolution, ResolutionMath.v2s],
-    [WellKnownFunc.Frequency, FrequencyMath.v2s],
-    [WellKnownFunc.Position, pos2s],
-    [WellKnownFunc.MultiPositionWithComma, val => mpos2s( val, ",")],
-    [WellKnownFunc.MultiLengthWithSpace, val => LengthMath.mv2s( val, " ")],
-    [WellKnownFunc.MultiTimeWithComma, val => LengthMath.mv2s( val, ",")],
-    [WellKnownFunc.OneOrManyWithComma, val => v2s( val, { arrSep: "," })],
-    [WellKnownFunc.OneOrManyWithSlash, val => v2s( val, { arrSep: "/" })],
-    [WellKnownFunc.UnitlessOrPercent, unitlessOrPercentToString],
-]);
-
-
-
-// Next identifier for registering a function that converts a value to string.
-let nextRegisteredV2SFuncID = 1000;
-
-
-
-/**
- * Registers the given function so that it can be used for converting a value to string using
- * the v2sByFuncID function.
- */
-export function registerV2SFuncID( func: AnyToStringFunc, weelKnownID?: WellKnownFunc): number
-{
-    let funcID = weelKnownID ?? nextRegisteredV2SFuncID++;
-    registeredV2SFuncs.set( funcID, func);
-    return funcID;
-}
+wkf[WKF.Position] = pos2s;
+wkf[WKF.AtPosition] = v => v == null ? "" : "at " + pos2s(v);
+wkf[WKF.MultiPositionWithComma] = val => mpos2s( val, ",");
 
 
 

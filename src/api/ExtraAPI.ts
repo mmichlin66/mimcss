@@ -17,9 +17,7 @@ import {
     BorderRadius_StyleType, ExtendedVarValue, FillRule_StyleType, GridLineCountOrName, GridTrack,
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
-import {
-    a2s, AngleMath, f2s, INumericMathClass, LengthMath, mv2s, PercentMath, pos2s, v2s, WellKnownFunc
-} from "../impl/CoreFuncs";
+import {a2s, AngleMath, f2s, LengthMath, mv2s, NumericMath, v2s, wkf, WKF} from "../impl/CoreFuncs";
 import {rgb2s, hsl2s, colorWithAlphaToString, getColorsObject, color2s} from "../impl/ExtraFuncs";
 import {borderRadius2s, gridTrack2s, styleProp2s} from "../impl/StyleFuncs";
 
@@ -205,7 +203,7 @@ export function conicGradient(...stopsOrHints: GradientStopOrHint<CssAngle>[]): 
 abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradient<T>
 {
     /** Number-based Math class to convert numeric values in stops and hints to strings */
-    protected matchClass: INumericMathClass<T>;
+    protected math: NumericMath<T>;
 
     /** Name of the gradient */
     protected name: string;
@@ -216,10 +214,10 @@ abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradient<T
     /** Array of stops and hints */
     protected stopsOrHints: GradientStopOrHint<T>[];
 
-    constructor( matchClass: INumericMathClass<T>, name: string,
+    constructor( math: NumericMath<T>, name: string,
         stopsOrHints: GradientStopOrHint<T>[])
     {
-        this.matchClass = matchClass;
+        this.math = math;
         this.name = name;
         this.stopsOrHints = stopsOrHints ?? [];
     }
@@ -244,7 +242,7 @@ abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradient<T
     {
         return f2s( `${this.isRepeating ? "repeating-" : ""}${this.name}-gradient`, [
             this.options2s(),
-            [this.stopsOrHints, (v: GradientStopOrHint<T>[]) => gradientStopsOrHintsToString( v, this.matchClass)]
+            [this.stopsOrHints, (v: GradientStopOrHint<T>[]) => gradientStopsOrHintsToString( v, this.math)]
         ]);
     }
 
@@ -334,8 +332,8 @@ class RadialGradient extends Gradient<CssLength> implements IRadialGradient
     {
         return mv2s([
             this.shape,
-            [this.sizeOrExtent, LengthMath.mv2s],
-            [this.pos, this.pos == null ? undefined: (v: Extended<CssPosition>) => "at " + pos2s(v)],
+            [this.sizeOrExtent, WKF.MultiLengthWithSpace],
+            [this.pos, WKF.AtPosition],
         ]);
     }
 }
@@ -364,20 +362,19 @@ class ConicGradient extends Gradient<CssAngle> implements IConicGradient
     {
         return mv2s([
             [this.angle, this.angle == null ? undefined : (v: Extended<CssAngle>) => "from " + AngleMath.v2s(v)],
-            [this.pos, this.pos == null ? undefined: (v: Extended<CssPosition>) => "at " + pos2s(v)],
+            [this.pos, WKF.AtPosition],
         ]);
     }
 }
 
 
 
-function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[],
-    mathClass: INumericMathClass): string
+function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[], math: NumericMath): string
 {
-    return val.map( v => gradientStopOrHintToString( v, mathClass)).join(",");
+    return val.map( v => gradientStopOrHintToString( v, math)).join(",");
 }
 
-function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: INumericMathClass): string
+function gradientStopOrHintToString( val: GradientStopOrHint<any>, math: NumericMath): string
 {
     return v2s( val, {
         fromNumber: color2s,
@@ -385,11 +382,11 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, mathClass: IN
             if (v.length === 0)
                 return "";
             else if (v.length === 1)
-                return mathClass.v2s( v[0]);
+                return math.v2s( v[0]);
             else
             {
-                let secondStop = v.length > 2 ? mathClass.v2s( v[2]) : "";
-                return `${color2s(v[0])} ${mathClass.v2s( v[1])} ${secondStop}`;
+                let secondStop = v.length > 2 ? math.v2s( v[2]) : "";
+                return `${color2s(v[0])} ${math.v2s( v[1])} ${secondStop}`;
             }
         }
     });
@@ -442,7 +439,7 @@ function crossFadeToString( args: CrossFadeParam[]): string
 function crossFadeParamToString( val: CrossFadeParam): string
 {
     return v2s( val, {
-        fromArray: v => `${v2s(v[0])},${PercentMath.v2s(v[1])}`
+        fromArray: v => `${v2s(v[0])},${wkf[WKF.Percent](v[1])}`
     });
 }
 
@@ -459,7 +456,7 @@ function crossFadeParamToString( val: CrossFadeParam): string
  */
 function filterPercent( name: string, p: Extended<CssPercent>): IFilterProxy
 {
-    return () => f2s( name, [[p, WellKnownFunc.Percent]]);
+    return () => f2s( name, [[p, WKF.Percent]]);
 }
 
 
@@ -539,7 +536,7 @@ export function sepia( p: Extended<CssPercent>): IFilterProxy
  */
 export function blur( r: Extended<CssLength>): IFilterProxy
 {
-    return () => f2s( "", [[r, WellKnownFunc.Length]]);
+    return () => f2s( "", [[r, WKF.Length]]);
 }
 
 
@@ -554,8 +551,8 @@ export function blur( r: Extended<CssLength>): IFilterProxy
 export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
     color?: Extended<CssColor>, blur?: Extended<CssLength>): IFilterProxy
 {
-    return () => f2s( "drop-shadow", [[x, WellKnownFunc.Length], [y, WellKnownFunc.Length],
-        [color, WellKnownFunc.Color], [blur, WellKnownFunc.Length]]);
+    return () => f2s( "drop-shadow", [[x, WKF.Length], [y, WKF.Length],
+        [color, WKF.Color], [blur, WKF.Length]]);
 }
 
 
@@ -565,7 +562,7 @@ export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
  */
 export function hueRotate( a: Extended<CssAngle>): IFilterProxy
 {
-    return () => f2s( "", [[a, WellKnownFunc.Angle]]);
+    return () => f2s( "", [[a, WKF.Angle]]);
 }
 
 
@@ -607,7 +604,7 @@ export function matrix3d(
  */
 export function perspective( d: Extended<CssLength>): ITransformProxy
 {
-    return () => f2s( "perspective", [[d, WellKnownFunc.Length]]);
+    return () => f2s( "perspective", [[d, WKF.Length]]);
 }
 
 
@@ -617,7 +614,7 @@ export function perspective( d: Extended<CssLength>): ITransformProxy
  */
 function rotate1d( axis: string, a: Extended<CssAngle>): ITransformProxy
 {
-    return () => f2s( `rotate${axis}`, [[a, WellKnownFunc.Angle]]);
+    return () => f2s( `rotate${axis}`, [[a, WKF.Angle]]);
 }
 
 /**
@@ -658,7 +655,7 @@ export function rotateZ( a: Extended<CssAngle>): ITransformProxy
 export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
     z: Extended<CssNumber>, a: Extended<CssAngle>): ITransformProxy
 {
-    return () => f2s( "rotate3d", [x, y, z, [a, WellKnownFunc.Angle]]);
+    return () => f2s( "rotate3d", [x, y, z, [a, WKF.Angle]]);
 }
 
 
@@ -719,7 +716,7 @@ export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
  */
 export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransformProxy
 {
-    return () => f2s( "skew", [[ax, WellKnownFunc.Angle], [ay, WellKnownFunc.Angle]]);
+    return () => f2s( "skew", [[ax, WKF.Angle], [ay, WKF.Angle]]);
 }
 
 /**
@@ -727,7 +724,7 @@ export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransfo
  */
 function skew1d( axis: string, a: Extended<CssAngle>): ITransformProxy
 {
-    return () => f2s( `skew${axis}`, [[a, WellKnownFunc.Angle]]);
+    return () => f2s( `skew${axis}`, [[a, WKF.Angle]]);
 }
 
 /**
@@ -753,7 +750,7 @@ export function skewY( a: Extended<CssAngle>): ITransformProxy
  */
 export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITransformProxy
 {
-    return () => f2s( "translate", [[x, WellKnownFunc.Length], [y, WellKnownFunc.Length]]);
+    return () => f2s( "translate", [[x, WKF.Length], [y, WKF.Length]]);
 }
 
 /**
@@ -761,7 +758,7 @@ export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITr
  */
 function translate1d( axis: string, d: Extended<CssLength>): ITransformProxy
 {
-    return () => f2s( `translate${axis}`, [[d, WellKnownFunc.Length]]);
+    return () => f2s( `translate${axis}`, [[d, WKF.Length]]);
 }
 
 /**
@@ -794,7 +791,7 @@ export function translateZ( d: Extended<CssLength>): ITransformProxy
 export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
 	z: Extended<CssLength>): ITransformProxy
 {
-    return () => f2s( "translate3d", [[x, WellKnownFunc.Length], [y, WellKnownFunc.Length], [z, WellKnownFunc.Length]]);
+    return () => f2s( "translate3d", [[x, WKF.Length], [y, WKF.Length], [z, WKF.Length]]);
 }
 
 
@@ -846,8 +843,8 @@ class Inset implements IInset
     public toString(): string
     {
         return f2s( "inset", [
-            [this.o1, WellKnownFunc.Length], [this.o2, WellKnownFunc.Length],
-            [this.o3, WellKnownFunc.Length], [this.o4, WellKnownFunc.Length],
+            [this.o1, WKF.Length], [this.o2, WKF.Length],
+            [this.o3, WKF.Length], [this.o4, WKF.Length],
             [this.radius, this.radius && ((v: Extended<BorderRadius_StyleType>) => mv2s( ["round", borderRadius2s(v)]))],
         ], " ");
     }
@@ -887,8 +884,8 @@ class Circle implements ICircle
     public toString(): string
     {
         return f2s( "circle", [
-            [this.radius, WellKnownFunc.Length],
-            [this.pos, this.pos && ((v: Extended<CssPosition>) => "at " + pos2s(v))],
+            [this.radius, WKF.Length],
+            [this.pos, WKF.AtPosition],
         ], " ");
     }
 }
@@ -943,8 +940,9 @@ class Ellipse implements IEllipse
     public toString(): string
     {
         return f2s( "ellipse", [
-            [this.radiusX, WellKnownFunc.Length], [this.radiusY, WellKnownFunc.Length],
-            [this.pos, this.pos && ((v: Extended<CssPosition>) => "at " + pos2s(v))],
+            [this.radiusX, WKF.Length],
+            [this.radiusY, WKF.Length],
+            [this.pos, WKF.AtPosition],
         ], " ");
     }
 }
@@ -990,7 +988,7 @@ class Polygon implements IPolygon
     {
         return f2s( "polygon", [
             this.rule,
-            [this.points, { arrItemFunc: WellKnownFunc.MultiLengthWithSpace, arrSep: ","}],
+            [this.points, { arrItemFunc: WKF.MultiLengthWithSpace, arrSep: ","}],
         ]);
     }
 }
@@ -1083,7 +1081,7 @@ class PathBuilder implements IPathBuilder
  */
 export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 {
-    return () => f2s( "minmax", [[min, WellKnownFunc.Length], [max, WellKnownFunc.Length]]);
+    return () => f2s( "minmax", [[min, WKF.Length], [max, WKF.Length]]);
 }
 
 
@@ -1203,8 +1201,8 @@ export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): 
     contain?: boolean): IRayFunc
 {
     return () => f2s( "ray", [
-        [angle, WellKnownFunc.Angle],
-        [size, WellKnownFunc.Length],
+        [angle, WKF.Angle],
+        [size, WKF.Length],
         [contain ? "contain" : undefined]
     ], " ");
 }

@@ -1,7 +1,7 @@
 ﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery, SupportsQuery, SingleSupportsQuery} from "../api/MediaTypes";
 import {CssAspectRatio, CssResolution, CssLength} from "../api/CoreTypes";
 import {ExtendedBaseStyleset} from "../api/StyleTypes";
-import {v2s, camelToDash, ResolutionMath, LengthMath} from "./CoreFuncs";
+import {v2s, camelToDash, WKF} from "./CoreFuncs";
 import {styleProp2s} from "./StyleFuncs";
 
 
@@ -16,7 +16,7 @@ function aspectRatioToString( val: CssAspectRatio): string
 function lengthFeatureToString( val: CssLength): string
 {
     return v2s( val, {
-        fromNumber: LengthMath.v2s
+        fromNumber: WKF.Length
     });
 }
 
@@ -25,7 +25,7 @@ function lengthFeatureToString( val: CssLength): string
 function resolutionFeatureToString( val: CssResolution): string
 {
     return v2s( val, {
-        fromNumber: ResolutionMath.v2s
+        fromNumber: WKF.Resolution
     });
 }
 
