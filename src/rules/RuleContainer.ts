@@ -2,7 +2,7 @@ import {StyleDefinition, IStyleDefinitionClass} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import {scheduleStyleUpdate} from "./Scheduling";
+import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 
 
 

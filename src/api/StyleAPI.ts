@@ -1,8 +1,8 @@
-﻿import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes"
-import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
-import {scheduleStyleUpdate} from "../rules/Scheduling";
+﻿import { IStringProxy } from "./CoreTypes";
 import {IVarRule} from "./RuleTypes";
-import {IStringProxy} from "..";
+import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes"
+import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
+import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 
 
 

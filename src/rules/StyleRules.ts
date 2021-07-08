@@ -10,7 +10,7 @@ import {
     pseudoEntity2s
 } from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
-import {scheduleStyleUpdate} from "./Scheduling";
+import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 
 
 

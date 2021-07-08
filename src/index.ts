@@ -7,6 +7,7 @@ export * from "./api/ShapeTypes";
 export * from "./api/FontTypes";
 export * from "./api/MediaTypes";
 export * from "./api/RuleTypes";
+export * from "./api/SchedulingTypes";
 export * from "./api/StyleTypes";
 
 export * from "./api/CoreAPI";
@@ -15,4 +16,5 @@ export * from "./api/ColorAPI";
 export * from "./api/ShapeAPI";
 export * from "./api/MediaAPI";
 export * from "./api/RuleAPI";
+export * from "./api/SchedulingAPI";
 export * from "./api/StyleAPI";

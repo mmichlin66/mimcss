@@ -450,9 +450,9 @@ const symOwner = Symbol("owner");
 export abstract class StyleDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
 {
 	/**
-	 * Style definition classes are created directly only by the *styled components* - that is,
+	 * Style definition instances are created directly only by the *styled components* - that is,
 	 * components that use different styles for each instance. Otherwise, style definition
-	 * class instances are created when either the [[$use]] or [[activate]] function is called.
+	 * instances are created when either the [[$use]], [[$embed]] or [[activate]] function is called.
 	 * @param parent Reference to the parent style definition class
 	 */
 	public constructor( parent?: P)
@@ -466,7 +466,9 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
 	/**
 	 * Refers to the instance of the style definition class which is the parnt of this style
      * definition object in the chain of style definition classes. Through this member, all rules
-     * and other members defined in the parent definition class can be accessed.
+     * and other members defined in the parent definition class can be accessed.For top-level
+     * style definitions, this property is always undefined. This property can also be undefined
+     * if it was not provided to the constructor when creating the style definition class manually.
 	 */
 	public get $parent(): P | undefined { return this[symParent]; }
 
@@ -474,7 +476,9 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
 	 * Refers to the instance of the style definition class which is the owner of
 	 * this style definition object. The owner is the top-level class in the chain of style
 	 * definition classes. Through this member, all rules and other members defined in the owner
-	 * definition class can be accessed.
+	 * definition class can be accessed. For top-level style definitions, this property points
+     * to itself. This property can be undefined if the parent instance was not provided when
+     * creating the style definition class manually.
 	 */
 	public get $owner(): O | undefined { return this[symOwner]; }
 }
@@ -530,64 +534,6 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 {
 	/** SOM media rule */
 	readonly cssRule: CSSMediaRule | null;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Scheduling.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The SchedulerType enumeration provides values used to define how the calls to the
- * activate and deactivate functions schedule the writing of style changes to the DOM.
- */
-export const enum SchedulerType
-{
-	/**
-	 * Synchronous activation - style definitions are written to the DOM upon the activate
-	 * and deactivate calls.
-	 */
-	Sync = 1,
-
-	/**
-	 * Calls to activate and deactivate functions are accumulated until the next animation
-	 * frame and then executed alltogether.
-	 */
-	AnimationFrame,
-
-	/**
-	 * Calls to activate and deactivate functions are accumulated until the call to the
-	 * forceDOMUpdate function and then executed alltogether.
-	 */
-	Manual,
-}
-
-
-
-/**
- * The IScheduler interface should be implemented by custom schedulers. Its methods are invoked
- * by the activation infrastructure.
- */
-export interface IScheduler
-{
-    /**
-     * Initializes the scheduler object and provides the callback that should be invoked when the
-     * scheduler decides to make changes to the DOM.
-     */
-    init( doDOMUpdate: () => void);
-
-	/**
-	 * Is invoked when the scheduler needs to schedule its callback or event.
-	 */
-	scheduleDOMUpdate(): void;
-
-	/**
-	 * Is invoked when the scheduler needs to cancels its scheduled callback or event.
-	 */
-	cancelDOMUpdate(): void;
 }
 
 

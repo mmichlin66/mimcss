@@ -23,10 +23,9 @@ import {CounterRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
-import {v2s} from "../impl/Utils";
 import {IRuleSerializationContext} from "../rules/Rule";
-import {getActivator} from "../rules/Scheduling";
-export {getDefaultScheduler, setDefaultScheduler,  registerScheduler, unregisterScheduler} from "../rules/Scheduling";
+import {getActivator} from "../impl/SchedulingImpl";
+import {v2s} from "../impl/Utils";
 
 
 

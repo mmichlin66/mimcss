@@ -1,5 +1,6 @@
-import {SchedulerType, StyleDefinition, IScheduler} from "../api/RuleTypes";
-import {activateInstance, deactivateInstance} from "./RuleContainer";
+import {StyleDefinition} from "../api/RuleTypes";
+import {SchedulerType, IScheduler} from "../api/SchedulingTypes";
+import {activateInstance, deactivateInstance} from "../rules/RuleContainer";
 import {StringStyleset} from "../api/StyleTypes";
 
 
@@ -37,7 +38,7 @@ export interface IActivator
 	forceDOMUpdate(): void;
 
 	/**
-	 * Cancel activation/deactivation for all style definitions accumulated since the last
+	 * Cancels activation/deactivation for all style definitions accumulated since the last
 	 * activation/deactivation. This method is called when the cancelDOMUpdate function is called
 	 * for this activation mechanism.
 	 */
@@ -121,7 +122,7 @@ class SynchronousActivator implements IActivator
 	public forceDOMUpdate(): void {}
 
 	/**
-	 * Cancel activation/deactivation for all style definitions accumulated since the last
+	 * Cancels activation/deactivation for all style definitions accumulated since the last
 	 * activation/deactivation. This method is called when the cancelDOMUpdate function is called
 	 * for this activation mechanism.
 	 */
@@ -271,7 +272,7 @@ export class SchedulingActivator implements IActivator
 
 
 	/**
-	 * Cancel activation/deactivation for all style definitions accumulated since the last
+	 * Cancels activation/deactivation for all style definitions accumulated since the last
 	 * activation/deactivation.
 	 */
 	public cancelDOMUpdate(): void
@@ -389,16 +390,6 @@ export function scheduleStyleUpdate( ruleOrElm: CSSStyleRule | ElementCSSInlineS
 
 
 /**
- * Returns the current default scheduler type.
- */
-export function getDefaultScheduler(): number
-{
-	return s_defaultSchedulerType;
-}
-
-
-
-/**
  * Returns the activator for the given scheduler type. If scheduler type is not specified returns
  * the activator currently set as default. If, for some reason, the default activator is not set,
  * returns the synchronous activator.
@@ -407,6 +398,16 @@ export function getActivator( schedulerType?: number): IActivator
 {
 	return (schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType))
         ?? s_synchronousActivator;
+}
+
+
+
+/**
+ * Returns the current default scheduler type.
+ */
+export function getDefaultScheduler(): number
+{
+	return s_defaultSchedulerType;
 }
 
 
