@@ -215,7 +215,7 @@ export type CssLength = CssPercent | ILengthProxy |
  * The ICssLengthMath interface contains methods that implement CSS mathematic functions on the
  * `<length>` CSS types. This interface is implemented by the [[Len]] object.
  */
-export interface ILengthMath extends INumericMath<CssLength, LengthUnits>
+export interface ILengthMath extends INumericMath<CssLength, LengthUnits | PercentUnits>
 {
 }
 
