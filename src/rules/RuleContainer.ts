@@ -451,7 +451,7 @@ function generateName( sheetName: string, ruleName: string): string
 {
 	return s_useUniqueStyleNames
 		? generateUniqueName( s_uniqueStyleNamesPrefix)
-		: `${sheetName}_${ruleName}`;
+		: `${sheetName}_${ruleName}_${s_nextUniqueID++}`;
 }
 
 
