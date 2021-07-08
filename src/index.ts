@@ -1,14 +1,18 @@
 // Type definitions for mimcss
 
 export * from "./api/CoreTypes";
-export * from "./api/ExtraTypes";
-export * from "./api/FontFaceTypes";
+export * from "./api/NumericTypes";
+export * from "./api/ColorTypes";
+export * from "./api/ShapeTypes";
+export * from "./api/FontTypes";
 export * from "./api/MediaTypes";
 export * from "./api/RuleTypes";
 export * from "./api/StyleTypes";
 
 export * from "./api/CoreAPI";
-export * from "./api/ExtraAPI";
+export * from "./api/NumericAPI";
+export * from "./api/ColorAPI";
+export * from "./api/ShapeAPI";
 export * from "./api/MediaAPI";
 export * from "./api/RuleAPI";
 export * from "./api/StyleAPI";

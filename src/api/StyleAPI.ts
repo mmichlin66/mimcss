@@ -1,6 +1,8 @@
-﻿import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset} from "./StyleTypes"
-import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleFuncs"
+﻿import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes"
+import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../rules/Scheduling";
+import {IVarRule} from "./RuleTypes";
+import {IStringProxy} from "..";
 
 
 
@@ -148,6 +150,25 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
 	}
 
 	return updateVal;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS functions.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a function representing the invocation of the `var()` CSS function for
+ * the given custom CSS property with optional fallbacks.
+ */
+export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
+{
+    return () => fallback
+        ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback, true)})`
+        : `var(--${varObj.name})`;
 }
 
 

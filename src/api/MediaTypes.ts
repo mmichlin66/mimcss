@@ -1,6 +1,5 @@
-﻿import {
-    CssAspectRatio, CssNumber, CssLength, CssResolution, IConstant, IStringProxy
-} from "./CoreTypes";
+﻿import {IConstant, IStringProxy} from "./CoreTypes";
+import {CssAspectRatio, CssNumber, CssLength, CssResolution} from "./NumericTypes";
 import {ExtendedBaseStyleset} from "./StyleTypes";
 
 

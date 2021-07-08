@@ -1,124 +1,24 @@
 ﻿/**
  * This module contains definitions of functions and classes used to define CSS functions.
- * @module ExtraAPI
+ * @module
  */
 
 
 
-import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, IStringProxy} from "./CoreTypes";
+import {Extended, IStringProxy} from "./CoreTypes";
+import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
+import {CssColor} from "./ColorTypes";
 import {
-    CrossFadeParam, CssColor, GradientStopOrHint, ICircle, IColorProxy, IConicGradient, IEllipse,
+    CrossFadeParam, GradientStopOrHint, ICircle, IConicGradient, IEllipse,
     LinearGradientAngle, ShapeRadius, IImageProxy, IInset, IGradient, ILinearGradient, IMinMaxProxy,
-    INamedColors, IPathBuilder, IPolygon, IRadialGradient, IRepeatProxy, ISpanProxy, IFilterProxy,
+    IPathBuilder, IPolygon, IRadialGradient, IRepeatProxy, ISpanProxy, IFilterProxy,
     ITransformProxy, IUrlProxy, IRayProxy, TimingFunctionJumpTerm, ITimingFunctionProxy, ICursorProxy,
-    ExtentKeyword,
-} from "./ExtraTypes";
-import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
-import {
-    BorderRadius_StyleType, ExtendedVarValue, FillRule_StyleType, GridLineCountOrName, GridTrack,
-    GridTrackSize, ListStyleType_StyleType, VarTemplateName
-} from "./StyleTypes";
-import {AngleMath, LengthMath, NumericMath} from "../impl/CoreFuncs";
-import {rgb2s, hsl2s, colorWithAlphaToString, getColorsObject, color2s} from "../impl/ExtraFuncs";
-import {borderRadius2s, gridTrack2s, styleProp2s} from "../impl/StyleFuncs";
+    ExtentKeyword, AttrTypeKeyword, AttrUnitKeyword, BorderRadius, FillRule,
+} from "./ShapeTypes";
+import {ICounterRule, IIDRule} from "./RuleTypes";
+import {GridLineCountOrName, GridTrack, GridTrackSize, ListStyleType_StyleType} from "./StyleTypes";
+import {AngleMath, LengthMath, NumericMath} from "../impl/NumericImpl";
 import {f2s, mv2s, WKF, v2s, wkf, a2s} from "../impl/Utils";
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Colors.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Object whose property names are names of well-known colors and values correspond to the
- * hexadecimal representation of the RGB separations (without an alpha mask). The properties of
- * this object can be used wherever the [[CssColor]] type can be used. Since the properties are
- * of the `number` type, they can be used for manipulating the color value.
- */
-export let Colors = getColorsObject();
-
-
-
-/**
- * Converts the color specified as red, green, blue separation values and an optional alpha
- * mask to a CSS color representation. Each color separation can be represented as a number with
- * the following meaning:
- *   - Integer number -255 to 255. Numbers beyond this range will be clamped. Negative numbers
- *     will be inverted.
- *   - Floating number -1.0 to 1.0 non-inclusive, which is multiplied by 100 treated as percentage.
- *     Floating numbers beyond this range will be rounded and treated as integer numbers. Negative
- *     numbers will be inverted.
- *
- * The alpha mask can be one of the following:
- *   - Floating number 0 to 1 inclusive.
- *   - Integer or floating number 1 to 100, which is divided by 100. Floating numbers will be
- *     rounded. Numbers beyond this range will be clamped.
- *   - The sign of alpha is ignored; that is, only the absolute value is considered.
- *
- * @param r Red separation value.
- * @param g Green separation value.
- * @param b Blue separation value.
- * @param a Optional alpha mask as a percentage value.
- */
-export function rgb( r: Extended<number>, g: Extended<number>, b: Extended<number>, a?: Extended<number>): IColorProxy
-{
-    return () => rgb2s( r, g, b, a);
-}
-
-
-
-/**
- * Converts the color specified as hue-saturation-lightness components and an optional alpha
- * mask to a CSS color representation. This method should be used when defining CSS color
- * values in styleset properties.
- *
- * The Hue component is treated as the CSS `<angle>` type. Numbers are considered degrees.
- *
- * The Saturation and Lightness components are treated as percentages:
- *   - The sign is ignored; that is, only the absolute value is considered.
- *   - Floating number 0 to 1 inclusive are multiplied by 100 and treated as percentage.
- *   - Integer or floating number 1 to 100 are treated as percentage. Floating numbers will be
- *     rounded. Numbers beyond this range will be clamped to 100.
- *
- * The alpha mask can be one of the following:
- *   - Floating number 0 to 1 inclusive.
- *   - Integer or floating number 1 to 100, which is divided by 100. Floating numbers will be
- *     rounded. Numbers beyond this range will be clamped.
- *   - The sign of alpha is ignored; that is, only the absolute value is considered.
- *
- * @param h Hue component as an angle value.
- * @param s Saturation component as a percentage value.
- * @param l Lightness component as a percentage value.
- * @param a Optional alpha mask as a percentage value.
- */
-export function hsl( h: Extended<CssAngle>, s: Extended<number>, l: Extended<number>, a?: Extended<number>): IColorProxy
-{
-    return () => hsl2s( h, s, l, a);
-}
-
-
-
-/**
- * Converts the given color and the alpha mask to the CSS Color representation. This
- * method should be used when defining CSS color values in styleset properties.
- *
- * The color can be specified as a numeric value or as a string color name.
- *
- * The alpha mask is specified as a number:
- *   - The sign is ignored; that is, only the absolute value is considered.
- *   - Number 0 to 1 inclusive, which is treated as percentage.
- *   - Number 1 to 100 inclusive, which is treated as percentage.
- *   - Numbers greater than 100 are clamped to 100;
- *
- * @param c Color value as either a number or a named color
- * @param a Alpha channel value
- */
-export function alpha( c: number | keyof INamedColors, a: number): IColorProxy
-{
-    return () => colorWithAlphaToString( c, a);
-}
 
 
 
@@ -379,7 +279,7 @@ function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[], math: Num
 function gradientStopOrHintToString( val: GradientStopOrHint<any>, math: NumericMath): string
 {
     return v2s( val, {
-        fromNumber: color2s,
+        fromNumber: WKF.Color,
         fromArray: v => {
             if (v.length === 0)
                 return "";
@@ -388,7 +288,8 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, math: Numeric
             else
             {
                 let secondStop = v.length > 2 ? math.v2s( v[2]) : "";
-                return `${color2s(v[0])} ${math.v2s( v[1])} ${secondStop}`;
+                // return `${color2s(v[0])} ${math.v2s( v[1])} ${secondStop}`;
+                return mv2s( [[v[0], WKF.Color], math.v2s( v[1]), secondStop]);
             }
         }
     });
@@ -828,7 +729,7 @@ class Inset implements IInset
     o2?: Extended<CssLength>;
     o3?: Extended<CssLength>;
     o4?: Extended<CssLength>;
-    radius?: Extended<BorderRadius_StyleType>;
+    radius?: Extended<BorderRadius>;
 
     constructor( o1?: Extended<CssLength>, o2?: Extended<CssLength>,
         o3?: Extended<CssLength>, o4?: Extended<CssLength>)
@@ -836,7 +737,7 @@ class Inset implements IInset
         this.o1 = o1; this.o2 = o2; this.o3 = o3; this.o4 = o4;
     }
 
-    public round( radius?: Extended<BorderRadius_StyleType>): this
+    public round( radius?: Extended<BorderRadius>): this
     {
         this.radius = radius;
         return this;
@@ -847,7 +748,7 @@ class Inset implements IInset
         return f2s( "inset", [
             [this.o1, WKF.Length], [this.o2, WKF.Length],
             [this.o3, WKF.Length], [this.o4, WKF.Length],
-            [this.radius, this.radius && ((v: Extended<BorderRadius_StyleType>) => mv2s( ["round", borderRadius2s(v)]))],
+            [this.radius, this.radius && ((v: Extended<BorderRadius>) =>"round " + wkf[WKF.BorderRadius](v))],
         ], " ");
     }
 }
@@ -971,7 +872,7 @@ export function polygon( ...points: CssPoint[]): IPolygon
 class Polygon implements IPolygon
 {
     points: CssPoint[];
-    rule: FillRule_StyleType;
+    rule: FillRule;
 
     constructor( points: CssPoint[])
     {
@@ -984,7 +885,7 @@ class Polygon implements IPolygon
         return this;
     }
 
-    public fill( rule: FillRule_StyleType): this { this.rule = rule; return this; }
+    public fill( rule: FillRule): this { this.rule = rule; return this; }
 
     public toString(): string
     {
@@ -1000,7 +901,7 @@ class Polygon implements IPolygon
 /**
  * Returns an IPathBuilder interface that allows building a CSS path.
  */
-export function path( fillRule?: FillRule_StyleType): IPathBuilder
+export function path( fillRule?: FillRule): IPathBuilder
 {
     return new PathBuilder( fillRule);
 }
@@ -1016,10 +917,10 @@ type PathCommand = [string, PathCommandParam[]?];
  */
 class PathBuilder implements IPathBuilder
 {
-    rule?: FillRule_StyleType;
+    rule?: FillRule;
     items: PathCommand[] = [];
 
-    public constructor( rule?: FillRule_StyleType)
+    public constructor( rule?: FillRule)
     {
         this.rule = rule;
     }
@@ -1096,7 +997,7 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
 {
     return () => f2s( "repeat", [
         count,
-        [tracks, { arrItemFunc: gridTrack2s}]
+        [tracks, { arrItemFunc: WKF.GridTrack}]
     ]);
 }
 
@@ -1212,14 +1113,16 @@ export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): 
 
 
 /**
- * Returns a function representing the invocation of the `var()` CSS function for
- * the given custom CSS property with optional fallbacks.
+ * Returns a function representing the `attr()` CSS function. It returns IStringProxy
+ * and theoretically can be used in any style property; however, its use by browsers is currently
+ * limited to the `content` property. Also no browser currently support type, units or fallback
+ * values.
  */
-export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
+ export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
+	fallback?: Extended<string>): IStringProxy
 {
-    return () => fallback
-        ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback, true)})`
-        : `var(--${varObj.name})`;
+    // () => `attr(${attrName}${typeOrUnit ? " " + typeOrUnit : ""}${fallback ? "," + fallback : ""})`;
+    return () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit], " "), fallback], ",")})`;
 }
 
 

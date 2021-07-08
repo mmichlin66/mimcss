@@ -8,7 +8,7 @@ import {v2s, camelToDash, symValueToString} from "../impl/Utils";
 import {
     mergeStylesets, stylesetToString, styleProp2s, mergeStylesetCustomProps, selector2s,
     pseudoEntity2s
-} from "../impl/StyleFuncs"
+} from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
 import {scheduleStyleUpdate} from "./Scheduling";
 

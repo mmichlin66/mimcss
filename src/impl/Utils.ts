@@ -77,7 +77,9 @@ export const enum WKF
     UnitlessOrPercent,
     Radius,
     Border,
+    BorderRadius,
     GridAxis,
+    GridTrack,
 
     // indicates the length of the array needed to keep conversion functions
     Last

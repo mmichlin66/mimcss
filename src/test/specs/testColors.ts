@@ -3,7 +3,7 @@ import * as dom from "../utils/dom"
 
 
 // Color augmentation
-declare module "../../api/ExtraTypes"
+declare module "../../api/ColorTypes"
 {
 	interface INamedColors
 	{

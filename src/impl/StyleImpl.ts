@@ -1,15 +1,16 @@
-﻿import {CssSelector, Extended, CssRadius} from "../api/CoreTypes";
+﻿import {CssSelector, Extended} from "../api/CoreTypes";
+import {CssRadius} from "../api/NumericTypes";
+import {BorderRadius} from "../api/ShapeTypes";
 import {
     Animation_Single, Background_Single, BackgroundSize_Single,
-    BorderImage_Object, BorderImageSlice_StyleType, BoxShadow_Single, BorderRadius_StyleType,
+    BorderImage_Object, BorderImageSlice_StyleType, BoxShadow_Single,
     Border_StyleType, Columns_StyleType, Flex_StyleType, Font_StyleType,
     GridTemplateAreas_StyleType, GridTemplateArea_Definition, GridTrack, GridTemplateAxis_StyleType,
     Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType, Transition_Single, Offset_StyleType,
     Styleset, CustomVar_StyleType, VarTemplateName,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
-import {LengthMath, AngleMath} from "./CoreFuncs";
-import {color2s} from "./ExtraFuncs";
+import {LengthMath, AngleMath} from "./NumericImpl";
 import {VarRule} from "../rules/VarRule";
 import {v2s, V2SOptions, o2s, P2SOption, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 
@@ -236,7 +237,7 @@ function singleCornerRadiusToString( val: Extended<CssRadius>): string
 /**
  * Converts border radius style value to the CSS string.
  */
-export function borderRadius2s( val: Extended<BorderRadius_StyleType>): string
+function borderRadius2s( val: Extended<BorderRadius>): string
 {
     return v2s( val, {
         fromArray: v =>
@@ -277,11 +278,11 @@ function borderToString( val: Extended<Border_StyleType>): string
                 buf.push( v2s(v[1]));
 
             if (v[2] != null)
-                buf.push( color2s(v[2]));
+                buf.push( wkf[WKF.Color](v[2]));
 
             return buf.join(" ");
         },
-        fromAny: color2s
+        fromAny: WKF.Color
     });
 }
 
@@ -410,7 +411,7 @@ function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definiti
 
 
 
-export function gridTrack2s( val: GridTrack): string
+function gridTrack2s( val: GridTrack): string
 {
     return v2s( val, {
         fromNumber: WKF.Length,
@@ -725,7 +726,9 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: AnyToSt
 // Register frequently used conversion functions
 wkf[WKF.Radius] = singleCornerRadiusToString;
 wkf[WKF.Border] = borderToString;
+wkf[WKF.BorderRadius] = borderRadius2s;
 wkf[WKF.GridAxis] = gridAxisToString;
+wkf[WKF.GridTrack] = gridTrack2s;
 
 
 

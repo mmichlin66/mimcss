@@ -1,14 +1,15 @@
-﻿import {
-    Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, CssTime, CssLength, CssAngle,
-    CssPercent, CssFrequency, CssResolution, CssRadius, HorizontalPositionKeyword,
-    VerticalPositionKeyword, CssPoint, ExtendedProp, IQuotedProxy,
-    IFitContentProxy, ILengthProxy, CssSize, CssAspectRatio
-} from "./CoreTypes"
+﻿import {Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, IQuotedProxy} from "./CoreTypes"
 import {
-    IUrlProxy, BasicShape, CssColor, CssImage, IMinMaxProxy, IRepeatProxy,
-    ISpanProxy, IFilterProxy, ITransformProxy, IRayProxy, ITimingFunctionProxy, ICursorProxy
-} from "./ExtraTypes";
-import {FontStretch_Single} from "./FontFaceTypes";
+    CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, CssFrequency, CssResolution,
+    CssRadius, HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, IFitContentProxy,
+    ILengthProxy, CssSize, CssAspectRatio
+} from "./NumericTypes"
+import {CssColor} from "./ColorTypes";
+import {
+    IUrlProxy, BasicShape, CssImage, IMinMaxProxy, IRepeatProxy,
+    ISpanProxy, IFilterProxy, ITransformProxy, IRayProxy, ITimingFunctionProxy, ICursorProxy, BorderRadius, FillRule
+} from "./ShapeTypes";
+import {FontStretch_Single} from "./FontTypes";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
 
 
@@ -314,11 +315,6 @@ export type BorderImageWidth_StyleType = OneOrBox<CssNumber | ILengthProxy | "au
 
 
 
-/** Type for border-radius style property */
-export type BorderRadius_StyleType = OneOrPair<OneOrBox<CssLength>>;
-
-
-
 /** Type for border-spacing style property */
 export type BorderSpacing_StyleType = OneOrPair<CssLength>;
 
@@ -532,11 +528,6 @@ export type DominantBaseline_StyleType = "auto" | "text-bottom" | "alphabetic" |
 
 /** Type for empty-cells style property */
 export type EmptyCells_StyleType = "show" | "hide";
-
-
-
-/** Type for fill-rule style property */
-export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 
@@ -1335,7 +1326,7 @@ export interface IBaseStyleset
     borderLeftColor?: CssColor;
     borderLeftStyle?: BorderStyle_Single;
     borderLeftWidth?: BorderWidth_Single;
-    borderRadius?: BorderRadius_StyleType;
+    borderRadius?: BorderRadius;
     borderRight?: Border_StyleType;
     borderRightColor?: CssColor;
     borderRightStyle?: BorderStyle_Single;
@@ -1391,7 +1382,7 @@ export interface IBaseStyleset
 
     fill?: CssColor;
     fillOpacity?: CssPercent;
-    fillRule?: FillRule_StyleType;
+    fillRule?: FillRule;
     filter?: Filter_StyleType;
     flex?: Flex_StyleType;
     flexBasis?: FlexBasis_StyleType;

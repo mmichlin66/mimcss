@@ -1,5 +1,5 @@
 ﻿import {MediaQuery} from "./MediaTypes";
-import {s_mediaQueryToString} from "../impl/MediaFuncs";
+import {s_mediaQueryToString} from "../impl/MediaImpl";
 
 
 

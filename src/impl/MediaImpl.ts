@@ -1,8 +1,8 @@
 ﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery, SupportsQuery, SingleSupportsQuery} from "../api/MediaTypes";
-import {CssAspectRatio, CssResolution, CssLength} from "../api/CoreTypes";
+import {CssAspectRatio, CssResolution, CssLength} from "../api/NumericTypes";
 import {ExtendedBaseStyleset} from "../api/StyleTypes";
 import {v2s, camelToDash, WKF} from "./Utils";
-import {styleProp2s} from "./StyleFuncs";
+import {styleProp2s} from "./StyleImpl";
 
 
 

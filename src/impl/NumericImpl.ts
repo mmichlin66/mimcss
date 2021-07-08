@@ -1,8 +1,9 @@
-﻿import {
-    Extended, INumericMath, IGenericProxy, CssLength, CssAngle, CssTime, CssResolution,
-    CssFrequency, CssPosition, OneOrMany, LengthUnits, PercentUnits, AngleUnits, TimeUnits,
+﻿import {Extended, IGenericProxy, OneOrMany} from "../api/CoreTypes";
+import {
+    INumericMath, CssLength, CssAngle, CssTime, CssResolution,
+    CssFrequency, CssPosition, LengthUnits, PercentUnits, AngleUnits, TimeUnits,
     ResolutionUnits, FrequencyUnits, CssNumber, CssPercent
-} from "../api/CoreTypes";
+} from "../api/NumericTypes";
 import {NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
 
 

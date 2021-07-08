@@ -13,7 +13,7 @@ import {
     IConstRule, ClassPropType, ICssSerializer
 } from "./RuleTypes";
 import {MediaQuery, SupportsQuery} from "./MediaTypes"
-import {IFontFace} from "./FontFaceTypes";
+import {IFontFace} from "./FontTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
 import {processInstanceOrClass, s_enableShortNames, serializeInstance} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"

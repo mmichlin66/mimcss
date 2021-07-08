@@ -1,8 +1,8 @@
 ﻿import {
     FontSrc_FontFaceType, FontSrc_Single, FontStretch_FontFaceType, FontStyle_FontFaceType,
     FontWeight_FontFaceType, IFontFace
-} from "../api/FontFaceTypes"
-import {AngleMath} from "./CoreFuncs";
+} from "../api/FontTypes"
+import {AngleMath} from "./NumericImpl";
 import {camelToDash, v2s, a2s, WKF} from "./Utils";
 
 

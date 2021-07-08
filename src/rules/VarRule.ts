@@ -1,6 +1,6 @@
 import {IVarRule, IConstRule} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue} from "../api/StyleTypes"
-import {styleProp2s} from "../impl/StyleFuncs"
+import {styleProp2s} from "../impl/StyleImpl"
 import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
