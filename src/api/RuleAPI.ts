@@ -13,7 +13,7 @@ import {
     IConstRule, ClassPropType, ICssSerializer
 } from "./RuleTypes";
 import {MediaQuery, SupportsQuery} from "./MediaTypes"
-import {IFontFace} from "./FontTypes";
+import {ExtendedFontFace} from "./FontTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
 import {processInstanceOrClass, s_enableShortNames, serializeInstance} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
@@ -547,7 +547,7 @@ export function $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
  *     });
  * }
  */
-export function $fontface( fontface: IFontFace): IFontFaceRule
+export function $fontface( fontface: ExtendedFontFace): IFontFaceRule
 {
 	return new FontFaceRule( fontface);
 }

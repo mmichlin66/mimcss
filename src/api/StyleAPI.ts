@@ -39,7 +39,7 @@ export function registerStyleProperty( name: string, toStringFunc: (v: any) => s
 export function getStylePropValue<K extends keyof ExtendedBaseStyleset>( stylePropName: K,
 	stylePropValue: ExtendedBaseStyleset[K]): string
 {
-	return styleProp2s( stylePropName, stylePropValue, true);
+	return styleProp2s( stylePropName, stylePropValue);
 }
 
 
@@ -167,7 +167,7 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
 export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
 {
     return () => fallback
-        ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback, true)})`
+        ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback)})`
         : `var(--${varObj.name})`;
 }
 
@@ -241,7 +241,7 @@ SVGElement.prototype.setStyleset = setElementStyleset;
 function setElementStyleProp<K extends keyof IBaseStyleset>( name: K,
     value: ExtendedBaseStyleset[K], schedulerType?: number): void
 {
-    scheduleStyleUpdate( this, name, styleProp2s( name, value, true), false, schedulerType);
+    scheduleStyleUpdate( this, name, styleProp2s( name, value), false, schedulerType);
 }
 
 

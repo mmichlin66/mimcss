@@ -1,6 +1,6 @@
 ﻿import {
     FontSrc_FontFaceType, FontSrc_Single, FontStretch_FontFaceType, FontStyle_FontFaceType,
-    FontWeight_FontFaceType, IFontFace
+    FontWeight_FontFaceType, ExtendedFontFace
 } from "../api/FontTypes"
 import {AngleMath} from "./NumericImpl";
 import {camelToDash, v2s, a2s, WKF} from "./Utils";
@@ -10,7 +10,7 @@ import {camelToDash, v2s, a2s, WKF} from "./Utils";
 /**
  * Converts the given font face definition object to the CSS string
  */
-export function fontFaceToString( fontface: IFontFace): string | null
+export function fontFaceToString( fontface: ExtendedFontFace): string | null
 {
     if (!fontface || !fontface.fontFamily)
         return null;

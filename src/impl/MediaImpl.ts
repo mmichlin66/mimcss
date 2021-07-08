@@ -197,7 +197,7 @@ function singleSupportsQueryToString( query: SingleSupportsQuery): string
 
             let not = v.$negate ? "not" : "";
             return  `${not} (${propNames.map( (propName) =>
-                styleProp2s( propName as keyof ExtendedBaseStyleset, query[propName])).join( ") and (")})`;
+                styleProp2s( propName as keyof ExtendedBaseStyleset, query[propName], true)).join( ") and (")})`;
         }
     });
 }

@@ -317,7 +317,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.cssRule)
         {
 		    scheduleStyleUpdate( this.cssRule, camelToDash( name),
-                value == null ? null : styleProp2s( name, value, true), important, schedulerType);
+                value == null ? null : styleProp2s( name, value), important, schedulerType);
         }
 	}
 
@@ -374,7 +374,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.cssRule)
         {
             scheduleStyleUpdate( this.cssRule, varObj.cssName,
-                value == null ? null : styleProp2s( varObj.template, value, true),
+                value == null ? null : styleProp2s( varObj.template, value),
                 important, schedulerType);
         }
 	}

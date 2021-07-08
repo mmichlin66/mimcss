@@ -99,7 +99,7 @@ function styleObj2String( val: any,
         {
             let options = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
             if (typeof options === "string")
-                return [nameOrTuple[0], v => styleProp2s( options as string, v, true), nameOrTuple[2]];
+                return [nameOrTuple[0], v => styleProp2s( options as string, v), nameOrTuple[2]];
             else
                 return nameOrTuple as P2SOption;
         }
@@ -625,7 +625,7 @@ export function getCustomPropNameAndValue( customVal: CustomVar_StyleType): [str
         value = customVal[2];
     }
 
-    return [varName, styleProp2s( template, value, true)];
+    return [varName, styleProp2s( template, value)];
 }
 
 
@@ -634,32 +634,33 @@ export function getCustomPropNameAndValue( customVal: CustomVar_StyleType): [str
  * Converts the given style property to the CSS style string. Property name can be in either
  * dash or camel form.
  */
-export function styleProp2s( propName: string, propVal: any, valueOnly?: boolean): string
+export function styleProp2s( propName: string, propVal: any, includeName?: boolean): string
 {
     if (!propName)
         return "";
 
-    // find information object for the property
-    let options: V2SOptions = stylePropertyInfos[dashToCamel(propName)];
-
     // if the property value is an object with the "!" property, then the actual value is the
     // value of this property and we also need to set the "!important" flag
-    let varValue = propVal;
+    let value = propVal;
     let impFlag = false;
     if (typeof propVal === "object" && "!" in propVal)
     {
-        varValue = propVal["!"];
+        value = propVal["!"];
         impFlag = true;
     }
 
-    let stringValue = v2s( varValue, options);
-    if (!stringValue && !valueOnly)
+    // convert the value to string based on the information object for the property (if defined)
+    let stringValue = v2s( value, stylePropertyInfos[dashToCamel(propName)]);
+
+    // if the resulting string is empty and the name should be included, then we return
+    // "name: initial"; otherwise we will return an empty string.
+    if (!stringValue && includeName)
         stringValue = "initial";
 
-    if (impFlag)
+    if (stringValue && impFlag)
         stringValue += " !important";
 
-    return valueOnly ? stringValue : `${camelToDash( propName)}:${stringValue}`;
+    return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
 }
 
 
@@ -697,7 +698,7 @@ export function forAllPropsInStylset( styleset: Styleset,
 		else
 		{
 			// get the string representation of the property
-            forProp( propName, styleProp2s( propName, styleset[propName], true), false);
+            forProp( propName, styleProp2s( propName, styleset[propName]), false);
 		}
 	}
 }
@@ -733,7 +734,7 @@ wkf[WKF.GridTrack] = gridTrack2s;
 
 
 /**
- * Map of property names to the StylePropertyInfo objects describing custom actions necessary to
+ * Map of property names to the V2SOptions objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
 const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =

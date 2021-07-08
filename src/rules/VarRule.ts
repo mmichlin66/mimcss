@@ -47,7 +47,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	// Converts the rule to CSS string.
 	public toCssString(): string | null
 	{
-		return this.value == null ? null : `${this.cssName}: ${styleProp2s( this.template, this.value, true)}`;
+		return this.value == null ? null : `${this.cssName}: ${styleProp2s( this.template, this.value)}`;
 	}
 
 
@@ -82,7 +82,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
             this.container.setCustomVarValue( this.cssName,
                 value == null
                     ? null
-                    : styleProp2s( this.template, value, true), important, schedulerType)
+                    : styleProp2s( this.template, value), important, schedulerType)
         }
 	}
 
@@ -146,7 +146,7 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
         super.process( container, ownerContainer, ruleName);
 
         if (!this.cachedValue)
-		    this.cachedValue = styleProp2s( this.template, this.value, true);
+		    this.cachedValue = styleProp2s( this.template, this.value);
 	}
 
 

@@ -1,7 +1,7 @@
 import {PagePseudoClass} from "../api/CoreTypes";
 import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "../api/RuleTypes";
 import {Styleset} from "../api/StyleTypes";
-import {IFontFace} from "../api/FontTypes"
+import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaQuery, SupportsQuery} from "../api/MediaTypes";
 import {fontFaceToString} from "../impl/FontImpl"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
@@ -139,7 +139,7 @@ export class NamespaceRule extends MiscRule<CSSNamespaceRule> implements INamesp
  */
 export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFaceRule
 {
-	public constructor( fontface: IFontFace)
+	public constructor( fontface: ExtendedFontFace)
 	{
 		super();
 
@@ -159,7 +159,7 @@ export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFace
     }
 
 	// Object defining font-face properties.
-	public fontface: IFontFace;
+	public fontface: ExtendedFontFace;
 }
 
 

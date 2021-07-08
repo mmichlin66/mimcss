@@ -1,4 +1,5 @@
 ﻿import {IStringProxy} from "./CoreTypes";
+import { CssPercent } from "./NumericTypes";
 
 
 
@@ -9,13 +10,20 @@ export type FontFaceExtended<T> = T | IStringProxy;
 
 
 
+/**
+ * Type of the ascent-override and descent-override properties.
+ */
+export type FontFaceMetricOverride = "normal" | CssPercent;
+
+
+
 /** Type of font-display property */
 export type FontDisplay_FontFaceType = "auto" | "block" | "swap" | "fallback" | "optional";
 
 
 
 export type FontStretch_Single = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
-    "semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded" | number;
+    "semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded" | CssPercent;
 
 /** Type of font-stretch property */
 export type FontStretch_FontFaceType = FontStretch_Single | [FontStretch_Single, FontStretch_Single];
@@ -52,17 +60,21 @@ export type FontSrc_FontFaceType = FontSrc_Single | FontSrc_Single[];
 /**
  * Interface representing the properties of the @font-face CSS rule.
  */
-export interface ICssFontFace
+export interface IBaseFontFace
 {
-    fontFamily?: string;
+    ascentOverride?: FontFaceMetricOverride;
+    descentOverride?: FontFaceMetricOverride;
     fontDisplay?: FontDisplay_FontFaceType;
+    fontFamily?: string;
+    fontFeatureSettings?: string;
     fontStretch?: FontStretch_FontFaceType;
     fontStyle?: FontStyle_FontFaceType;
-    fontWeight?: FontWeight_FontFaceType;
     fontVariant?: string;
-    fontFeatureSettings?: string;
     fontVariationSettings?: string;
+    fontWeight?: FontWeight_FontFaceType;
+    lineGapOverride?: FontFaceMetricOverride;
     src?: FontSrc_FontFaceType;
+    sizeAdjust?: CssPercent;
     unicodeRange?: string;
 }
 
@@ -74,7 +86,7 @@ export interface ICssFontFace
  * [[FontFaceExtended]] generic type, which adds [[StringProxy]] and [[ICustomVar]] to the type
  * that is defined in the ICssFontFace interface.
  */
-export type IFontFace = { [K in keyof ICssFontFace]: FontFaceExtended<ICssFontFace[K]> }
+export type ExtendedFontFace = { [K in keyof IBaseFontFace]: FontFaceExtended<IBaseFontFace[K]> }
 
 
 
