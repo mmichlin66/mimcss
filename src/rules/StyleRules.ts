@@ -4,7 +4,7 @@ import {
 } from "../api/RuleTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {v2s, camelToDash, symValueToString} from "../impl/CoreFuncs";
+import {v2s, camelToDash, symValueToString} from "../impl/Utils";
 import {
     mergeStylesets, stylesetToString, styleProp2s, mergeStylesetCustomProps, selector2s,
     pseudoEntity2s

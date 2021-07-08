@@ -1,6 +1,7 @@
 ﻿import {CssColor, INamedColors} from "../api/ExtraTypes";
 import {Extended, CssAngle} from "../api/CoreTypes"
-import {AngleMath, wkf, v2s, WKF} from "./CoreFuncs"
+import {AngleMath} from "./CoreFuncs"
+import {v2s, wkf, WKF} from "./Utils";
 
 
 

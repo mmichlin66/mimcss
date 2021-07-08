@@ -1,6 +1,6 @@
 ﻿import {
     ICustomVar, OneOrMany, PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity,
-    IRuleWithSelector, SelectorCombinator, IConstant
+    SelectorCombinator, IConstant, IRuleWithSelector
 } from "./CoreTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, VarValue, ExtendedVarValue} from "./StyleTypes";
 
@@ -108,7 +108,7 @@ export type DependentRules =
 
 
 
-/**
+ /**
  * The IStyleRule interface represents a styling rule in a style sheet. Style rules can be used
  * anywhere where style properties can be defined: class rules, ID rules, selector rules,
  * keyframes, etc. StyleRule defines a styleset and can optionally point to one or more style rules

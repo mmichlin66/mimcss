@@ -358,20 +358,17 @@ export interface INumericMath<T, U extends string>
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** "Units" of unitless numbers */
-export type NumberUnits = "";
-
 /** Proxy interface that represents values of the `<percent>` CSS type */
-export interface INumberProxy extends IGenericProxy<NumberUnits> {};
+export interface INumberProxy extends IGenericProxy<""> {};
 
 /** Type for a value of the `<number>` CSS type */
-export type CssNumber = number | IGenericProxy<NumberUnits>;
+export type CssNumber = number | IGenericProxy<"">;
 
 /**
  * The ICssNumberMath interface contains methods that implement CSS mathematic functions on the
  * `<number>` CSS types. This interface is implemented by the [[Num]] object.
  */
-export interface INumberMath extends INumericMath<CssNumber,NumberUnits> {}
+export interface INumberMath extends INumericMath<CssNumber,""> {}
 
 
 
@@ -649,8 +646,8 @@ export interface IAspectRatioProxy extends IGenericProxy<"aspect-ratio"> {}
  */
 export interface IRuleWithSelector
 {
-	/** CSS rule selector string */
-	readonly selectorText: string;
+    /** CSS rule selector string */
+    readonly selectorText: string;
 }
 
 
@@ -760,27 +757,6 @@ export type SelectorCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" |
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Types used in different style contexts
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Type representing the boundaries of a box
- */
-export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
-    "fill-box" | "stroke-box" | "view-box";
-
-
-
-/**
- * Type representing extent for the [[radialGradient]] or [[ray]] functions.
- */
-export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // attr() function support
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -799,27 +775,6 @@ export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnit
  * The IQuotedProxy function represents a string that will be taken into quotation marks
  */
 export interface IQuotedProxy extends IGenericProxy<"quoted"> {}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Web Namespaces.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The WebNamespaces class contains identifiers for the known Web-related namespaces.
- */
-export abstract class WebNamespaces
-{
-	static readonly HTML = "http://www.w3.org/1999/xhtml";
-	static readonly SVG = "http://www.w3.org/2000/svg";
-	static readonly XLink = "http://www.w3.org/1999/xlink";
-	static readonly XML = "http://www.w3.org/XML/1998/namespace";
-	static readonly XMLNS = "http://www.w3.org/2000/xmlns/";
-	static readonly MathML = "http://www.w3.org/1998/Math/MathML";
-}
 
 
 

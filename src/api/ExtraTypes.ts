@@ -5,7 +5,7 @@
 
 
 
-import {CssAngle, CssLength, CssNumber, CssPoint, CssPosition, Extended, ExtentKeyword,IGenericProxy} from "./CoreTypes";
+import {CssAngle, CssLength, CssNumber, CssPoint, CssPosition, Extended, IGenericProxy} from "./CoreTypes";
 import {BorderRadius_StyleType, FillRule_StyleType} from "./StyleTypes";
 
 
@@ -264,6 +264,13 @@ export type CssNonNumericColor = "transparent" | "currentcolor" | keyof INamedCo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Type representing extent for the [[radialGradient]] or [[ray]] functions.
+ */
+ export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
+
+
+
+ /**
  * The ImageProxy interface represents an invocation of one of CSS functions that are used for
  * specifying images. This interface is returned from functions like [[linearGradient]],
  * [[crossFade]] and others.
@@ -278,7 +285,7 @@ export type CssNonNumericColor = "transparent" | "currentcolor" | keyof INamedCo
   * interface or any of the functions that return the [[IImageProxy]] interface such as
   * [[linearGradient]], [[crossFade]] and others.
   */
- export type CssImage = IUrlFunc | IImageProxy | ILinearGradient | IRadialGradient | IConicGradient;
+ export type CssImage = IUrlProxy | IImageProxy | ILinearGradient | IRadialGradient | IConicGradient;
 
 
 
@@ -694,18 +701,18 @@ export interface ISpanProxy extends IGenericProxy<"span"> {}
 /**
  * The IUrlFunc interface represents an invocation of the CSS `url()` function.
  */
-export interface IUrlFunc extends IGenericProxy<"url"> {}
+export interface IUrlProxy extends IGenericProxy<"url"> {}
 
 /**
  * The IRayFunc interface represents an invocation of the CSS `ray()` function.
  */
-export interface IRayFunc extends IGenericProxy<"ray"> {}
+export interface IRayProxy extends IGenericProxy<"ray"> {}
 
 /**
  * The ICursorFunc interface represents an invocation of the CSS `url()` function with two optional
  * numbers indicating the cursor's hotspot.
  */
-export interface ICursorFunc extends IGenericProxy<"cursor"> {}
+export interface ICursorProxy extends IGenericProxy<"cursor"> {}
 
 
 
@@ -722,7 +729,7 @@ export type TimingFunctionJumpTerm = "jump-start" | "jump-end" | "jump-none" | "
  * The ITimingFunctionFunc interface represents an invocation of the CSS `steps()` and
  * `cubic-bezier()` function.
  */
-export interface ITimingFunctionFunc extends IGenericProxy<"timing-function"> {}
+export interface ITimingFunctionProxy extends IGenericProxy<"timing-function"> {}
 
 
 

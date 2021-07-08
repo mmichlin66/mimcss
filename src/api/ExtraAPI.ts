@@ -5,21 +5,23 @@
 
 
 
-import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, ExtentKeyword, IStringProxy} from "./CoreTypes";
+import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, Extended, IStringProxy} from "./CoreTypes";
 import {
     CrossFadeParam, CssColor, GradientStopOrHint, ICircle, IColorProxy, IConicGradient, IEllipse,
     LinearGradientAngle, ShapeRadius, IImageProxy, IInset, IGradient, ILinearGradient, IMinMaxProxy,
     INamedColors, IPathBuilder, IPolygon, IRadialGradient, IRepeatProxy, ISpanProxy, IFilterProxy,
-    ITransformProxy, IUrlFunc, IRayFunc, TimingFunctionJumpTerm, ITimingFunctionFunc, ICursorFunc,
+    ITransformProxy, IUrlProxy, IRayProxy, TimingFunctionJumpTerm, ITimingFunctionProxy, ICursorProxy,
+    ExtentKeyword,
 } from "./ExtraTypes";
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {
     BorderRadius_StyleType, ExtendedVarValue, FillRule_StyleType, GridLineCountOrName, GridTrack,
     GridTrackSize, ListStyleType_StyleType, VarTemplateName
 } from "./StyleTypes";
-import {a2s, AngleMath, f2s, LengthMath, mv2s, NumericMath, v2s, wkf, WKF} from "../impl/CoreFuncs";
+import {AngleMath, LengthMath, NumericMath} from "../impl/CoreFuncs";
 import {rgb2s, hsl2s, colorWithAlphaToString, getColorsObject, color2s} from "../impl/ExtraFuncs";
 import {borderRadius2s, gridTrack2s, styleProp2s} from "../impl/StyleFuncs";
+import {f2s, mv2s, WKF, v2s, wkf, a2s} from "../impl/Utils";
 
 
 
@@ -1168,7 +1170,7 @@ export function counters( counterObj: Extended<ICounterRule | string>,
  * will be wrapped in a `url()` invocation. The function can also accept the IIDRule object to
  * create url(#element) invocation, which is often used to address SVG elements by their IDs.
  */
-export function url( p: Extended<string | IIDRule>): IUrlFunc
+export function url( p: Extended<string | IIDRule>): IUrlProxy
 {
     return () => f2s( "url", [p]);
 }
@@ -1178,16 +1180,16 @@ export function url( p: Extended<string | IIDRule>): IUrlFunc
 /**
  * Returns a function representing the CSS `url()` function.
  */
-export function cursor( p: Extended<string | IIDRule>): ICursorFunc;
+export function cursor( p: Extended<string | IIDRule>): ICursorProxy;
 
 /**
  * Returns a function representing the CSS `url()` function followed by two numbers
  * indicating the cursor hotspot.
  */
-export function cursor( p: Extended<string | IIDRule>, x: number, y: number): ICursorFunc;
+export function cursor( p: Extended<string | IIDRule>, x: number, y: number): ICursorProxy;
 
 // Implementation
-export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): ICursorFunc
+export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): ICursorProxy
 {
     return () => mv2s( [url(p), x, y]);
 }
@@ -1198,7 +1200,7 @@ export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): 
  * Returns an IRayFunc function representing invocation of the `ray()` CSS function.
  */
  export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
-    contain?: boolean): IRayFunc
+    contain?: boolean): IRayProxy
 {
     return () => f2s( "ray", [
         [angle, WKF.Angle],
@@ -1231,7 +1233,7 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
 /**
  * Returns a function representing an invocation of the CSS `steps()` function.
  */
- export function steps( n: Extended<number>, jumpTerm?: TimingFunctionJumpTerm): ITimingFunctionFunc
+ export function steps( n: Extended<number>, jumpTerm?: TimingFunctionJumpTerm): ITimingFunctionProxy
 {
     return () => f2s( "steps", [n, jumpTerm]);
 }
@@ -1240,7 +1242,7 @@ export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback
  * Returns a function representing an invocation of the CSS `cubic-bezier()` function.
  */
  export function cubicBezier( n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
-    n4: Extended<number>): ITimingFunctionFunc
+    n4: Extended<number>): ITimingFunctionProxy
 {
     return () => f2s( "cubic-bezier", [n1, n2, n3, n4]);
 }

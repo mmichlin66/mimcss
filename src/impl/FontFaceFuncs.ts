@@ -2,7 +2,8 @@
     FontSrc_FontFaceType, FontSrc_Single, FontStretch_FontFaceType, FontStyle_FontFaceType,
     FontWeight_FontFaceType, IFontFace
 } from "../api/FontFaceTypes"
-import {camelToDash, v2s, AngleMath, a2s, WKF} from "./CoreFuncs";
+import {AngleMath} from "./CoreFuncs";
+import {camelToDash, v2s, a2s, WKF} from "./Utils";
 
 
 

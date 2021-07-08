@@ -2,11 +2,11 @@
     Extended, OneOrPair, OneOrBox, OneOrMany, CssNumber, CssPosition, CssTime, CssLength, CssAngle,
     CssPercent, CssFrequency, CssResolution, CssRadius, HorizontalPositionKeyword,
     VerticalPositionKeyword, CssPoint, ExtendedProp, IQuotedProxy,
-    GeometryBoxKeyword, IFitContentProxy, ILengthProxy, CssSize, CssAspectRatio
+    IFitContentProxy, ILengthProxy, CssSize, CssAspectRatio
 } from "./CoreTypes"
 import {
-    IUrlFunc, BasicShape, CssColor, CssImage, IMinMaxProxy, IRepeatProxy,
-    ISpanProxy, IFilterProxy, ITransformProxy, IRayFunc, ITimingFunctionFunc, ICursorFunc
+    IUrlProxy, BasicShape, CssColor, CssImage, IMinMaxProxy, IRepeatProxy,
+    ISpanProxy, IFilterProxy, ITransformProxy, IRayProxy, ITimingFunctionProxy, ICursorProxy
 } from "./ExtraTypes";
 import {FontStretch_Single} from "./FontFaceTypes";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
@@ -119,7 +119,7 @@ export type AnimationPlayState_StyleType = OneOrMany<AnimationPlayState_Single>;
 export type TimingFunction_Simple = "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out" | "step-start" | "step-end";
 
 /** Type for single animation timing function */
-export type TimingFunction_Single = TimingFunction_Simple | ITimingFunctionFunc;
+export type TimingFunction_Single = TimingFunction_Simple | ITimingFunctionProxy;
 
 /** Type for animation-timing-function style property */
 export type AnimationTimingFunction_StyleType = OneOrMany<TimingFunction_Single>;
@@ -414,8 +414,14 @@ export type Clip_StyleType = "auto" | OneOrBox<CssLength>;
 
 
 
+/**
+ * Type representing the boundaries of a box
+ */
+ export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
+ "fill-box" | "stroke-box" | "view-box";
+
 /** Type for clip-path style property */
-export type ClipPath_StyleType = "none" | IUrlFunc | BasicShape | GeometryBoxKeyword |
+export type ClipPath_StyleType = "none" | IUrlProxy | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -494,7 +500,7 @@ export type Cursor_Keyword = "auto" | "default" | "none" | "context-menu" | "hel
     "zoom-out" | "grab" | "grabbing";
 
 /** Type for cursor style property single value */
-export type Cursor_Single = Cursor_Keyword | IUrlFunc | ICursorFunc;
+export type Cursor_Single = Cursor_Keyword | IUrlProxy | ICursorProxy;
 
 /** Type for cursor style property */
 export type Cursor_StyleType = OneOrMany<Cursor_Single>;
@@ -535,7 +541,7 @@ export type FillRule_StyleType = "nonzero" | "evenodd";
 
 
 /** Type for filter and backdrop-filter style single value */
-export type Filter_Single = IUrlFunc | IFilterProxy;
+export type Filter_Single = IUrlProxy | IFilterProxy;
 
 /** Type for filter and backdrop-filter style property */
 export type Filter_StyleType = OneOrMany<Filter_Single>;
@@ -772,7 +778,7 @@ export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_St
 
 
 /** Type for line-style-image style property */
-export type ListStyleImage_StyleType = "none" | IUrlFunc;
+export type ListStyleImage_StyleType = "none" | IUrlProxy;
 
 
 
@@ -827,7 +833,7 @@ export type OffsetAnchor_StyleType = "auto" | CssPosition;
 
 
 /** Type for offset-path style property */
-export type OffsetPath_StyleType = "none" | IRayFunc | IUrlFunc | BasicShape | GeometryBoxKeyword |
+export type OffsetPath_StyleType = "none" | IRayProxy | IUrlProxy | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
 
 
@@ -969,7 +975,7 @@ export type ScrollSnapType_StyleType = "none" |
 
 
 /** Type for shape-outside style property */
-export type ShapeOutside_StyleType = IUrlFunc | BasicShape | GeometryBoxKeyword | CssImage;
+export type ShapeOutside_StyleType = IUrlProxy | BasicShape | GeometryBoxKeyword | CssImage;
 
 
 

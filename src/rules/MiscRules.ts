@@ -7,7 +7,7 @@ import {fontFaceToString} from "../impl/FontFaceFuncs"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 import {s_mediaQueryToString, supportsQueryToString} from "../impl/MediaFuncs";
 import {StyleRule} from "./StyleRules";
-import {symValueToString} from "../impl/CoreFuncs";
+import {symValueToString} from "../impl/Utils";
 
 
 

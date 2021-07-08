@@ -8,12 +8,10 @@ import {
     Styleset, CustomVar_StyleType, VarTemplateName,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
-import {
-    v2s, a2s, o2s, LengthMath, AngleMath, camelToDash, dashToCamel, V2SOptions,
-    AnyToStringFunc, WKF, wkf, P2SOption,
-} from "./CoreFuncs";
+import {LengthMath, AngleMath} from "./CoreFuncs";
 import {color2s} from "./ExtraFuncs";
 import {VarRule} from "../rules/VarRule";
+import {v2s, V2SOptions, o2s, P2SOption, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 
 
 

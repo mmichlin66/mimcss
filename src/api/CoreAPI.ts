@@ -5,10 +5,8 @@
     IGenericProxy, INumberMath, IPercentMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath,
     IFrequencyMath,
 } from "./CoreTypes"
-import {
-    v2s, tag2s, f2s, WKF, mv2s, NumberMath, PercentMath, LengthMath, AngleMath, TimeMath,
-    ResolutionMath, FrequencyMath
-} from "../impl/CoreFuncs"
+import {NumberMath, PercentMath, LengthMath, AngleMath, TimeMath, ResolutionMath, FrequencyMath} from "../impl/CoreFuncs"
+import {tag2s, f2s, WKF, mv2s, v2s} from "../impl/Utils";
 
 
 
