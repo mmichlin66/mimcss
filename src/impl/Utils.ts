@@ -80,6 +80,8 @@ export const enum WKF
     BorderRadius,
     GridAxis,
     GridTrack,
+    Quoted,
+    FontStyle,
 
     // indicates the length of the array needed to keep conversion functions
     Last
@@ -112,7 +114,7 @@ export type V2SOptions = WKF | AnyToStringFunc |
     fromBool?: (val: boolean) => string;
 
     // Options to use if value is a string. This allows transforming one string to another.
-    fromString?: (val: string) => string;
+    fromString?: WKF | ((val: string) => string);
 
     // Options to use if value is a number
     fromNumber?: WKF | NumberToStringFunc;
@@ -147,6 +149,7 @@ export type V2SOptions = WKF | AnyToStringFunc |
 
 wkf[WKF.OneOrManyWithComma] = v => v2s( v, { arrSep: "," });
 wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { arrSep: "/" });
+wkf[WKF.Quoted] = v => `"${v2s(v)}"`;
 
 
 
@@ -217,7 +220,7 @@ export function v2s( val: any, options?: V2SOptions): string
                 return val.toString();
         }
         else if (typeof val === "string")
-            return options.fromString ? options.fromString( val) : val;
+            newOptions = options.fromString || options.fromAny;
         else if (typeof val === "boolean")
             return options.fromBool ? options.fromBool( val) : val.toString();
         else

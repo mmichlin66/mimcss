@@ -2,12 +2,11 @@
 import {CssRadius} from "../api/NumericTypes";
 import {BorderRadius} from "../api/ShapeTypes";
 import {
-    Animation_Single, Background_Single, BackgroundSize_Single,
-    BorderImage_Object, BorderImageSlice_StyleType, BoxShadow_Single,
-    Border_StyleType, Columns_StyleType, Flex_StyleType, Font_StyleType,
-    GridTemplateAreas_StyleType, GridTemplateArea_Definition, GridTrack, GridTemplateAxis_StyleType,
-    Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType, Transition_Single, Offset_StyleType,
-    Styleset, CustomVar_StyleType, VarTemplateName,
+    Animation_Single, Background_Single, BackgroundSize_Single, BorderImage_Object,
+    BorderImageSlice_StyleType, BoxShadow_Single, Border_StyleType,
+    Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateArea_Definition, GridTrack,
+    GridTemplateAxis_StyleType, Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType,
+    Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType, VarTemplateName,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
 import {LengthMath, AngleMath} from "./NumericImpl";
@@ -224,14 +223,8 @@ export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
 
 
 
-/**
- * Converts corner radius style value to the CSS string.
- */
-function singleCornerRadiusToString( val: Extended<CssRadius>): string
-{
-    return v2s( val, { fromAny: WKF.Length });
-}
-
+// Converts corner radius style value to the CSS string.
+wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { fromAny: WKF.Length });
 
 
 /**
@@ -258,6 +251,8 @@ function borderRadius2s( val: Extended<BorderRadius>): string
         fromAny: WKF.Length
     });
 }
+
+wkf[WKF.BorderRadius] = borderRadius2s;
 
 
 
@@ -286,18 +281,7 @@ function borderToString( val: Extended<Border_StyleType>): string
     });
 }
 
-
-
-/**
- * Converts columns style to its CSS string value.
- */
-function columnsToString( val: Extended<Columns_StyleType>): string
-{
-    return v2s( val, {
-        fromArray: v => v[0] + " " + LengthMath.v2s( v[1])
-    });
-}
-
+wkf[WKF.Border] = borderToString;
 
 
 /**
@@ -320,23 +304,14 @@ function flexToString( val: Extended<Flex_StyleType>): string
 function font_fromObject( val: any): string
 {
     return styleObj2String( val, [
-        ["style", fontStyleToString],
+        ["style", WKF.FontStyle],
         "variant",
         "weight",
-        "stretch",
+        ["stretch", WKF.Percent],
         ["size", WKF.Length],
         ["lineHeight", undefined, "/"],
         "family"
     ]);
-}
-
-
-
-function fontStyleToString( val: Extended<Font_StyleType>): string
-{
-    return v2s( val, {
-        fromNumber: v => "oblique " + AngleMath.v2s( v)
-    });
 }
 
 
@@ -411,23 +386,17 @@ function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definiti
 
 
 
-function gridTrack2s( val: GridTrack): string
-{
-    return v2s( val, {
-        fromNumber: WKF.Length,
-        fromArray: v => `[${a2s(v)}]`
-    });
-}
+wkf[WKF.GridTrack] = (v: GridTrack) => v2s( v, {
+    fromNumber: WKF.Length,
+    fromArray: v => `[${a2s(v)}]`
+});
 
 
 
-function gridAxisToString( val: Extended<GridTemplateAxis_StyleType>): string
-{
-    return v2s( val, {
-        fromNumber: WKF.Length,
-        arrItemFunc: gridTrack2s
-    });
-}
+wkf[WKF.GridAxis] = (v: Extended<GridTemplateAxis_StyleType>) => v2s( v, {
+    fromNumber: WKF.Length,
+    arrItemFunc: WKF.GridTrack
+});
 
 
 
@@ -724,15 +693,6 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: AnyToSt
 
 
 
-// Register frequently used conversion functions
-wkf[WKF.Radius] = singleCornerRadiusToString;
-wkf[WKF.Border] = borderToString;
-wkf[WKF.BorderRadius] = borderRadius2s;
-wkf[WKF.GridAxis] = gridAxisToString;
-wkf[WKF.GridTrack] = gridTrack2s;
-
-
-
 /**
  * Map of property names to the V2SOptions objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
@@ -806,7 +766,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     borderLeft: WKF.Border,
     borderLeftColor: WKF.Color,
     borderLeftWidth: WKF.Length,
-    borderRadius: borderRadius2s,
+    borderRadius: WKF.BorderRadius,
     borderRight: WKF.Border,
     borderRightColor: WKF.Color,
     borderRightWidth: WKF.Length,
@@ -832,7 +792,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     columnRule: WKF.Border,
     columnRuleColor: WKF.Color,
     columnRuleWidth: WKF.MultiLengthWithSpace,
-    columns: columnsToString,
     columnWidth: WKF.Length,
     cursor: {
         arrSep: ","
@@ -847,7 +806,8 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
         fromObj: font_fromObject
     },
     fontSize: WKF.Length,
-    fontStyle: fontStyleToString,
+    fontStretch: WKF.Percent,
+    fontStyle: WKF.FontStyle,
 
     gap: WKF.MultiLengthWithSpace,
     gridColumnGap: WKF.Length,

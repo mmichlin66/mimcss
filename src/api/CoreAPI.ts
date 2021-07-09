@@ -1,5 +1,5 @@
 ﻿import {IStringProxy, IQuotedProxy, SelectorItem, ISelectorProxy} from "./CoreTypes"
-import {tag2s, v2s} from "../impl/Utils";
+import {tag2s, WKF, wkf} from "../impl/Utils";
 
 
 
@@ -47,7 +47,7 @@ export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProx
  */
 export function quoted( val: any): IQuotedProxy
 {
-    return () => `"${v2s(val)}"`;
+    return () => wkf[WKF.Quoted](val);
 }
 
 

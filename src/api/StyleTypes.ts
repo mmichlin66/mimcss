@@ -2,14 +2,17 @@
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, CssFrequency, CssResolution,
     CssRadius, HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, IFitContentProxy,
-    ILengthProxy, CssSize, CssAspectRatio
+    ILengthProxy, CssSize, CssAspectRatio, IRectProxy
 } from "./NumericTypes"
 import {CssColor} from "./ColorTypes";
 import {
-    IUrlProxy, BasicShape, CssImage, IMinMaxProxy, IRepeatProxy,
-    ISpanProxy, IFilterProxy, ITransformProxy, IRayProxy, ITimingFunctionProxy, ICursorProxy, BorderRadius, FillRule
+    FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis, FontVariantCaps,
+    FontVariantPosition, FontWeight, SystemFont
+} from "./FontTypes";
+import {
+    IUrlProxy, BasicShape, CssImage, IMinMaxProxy, IRepeatProxy, ISpanProxy, IFilterProxy,
+    ITransformProxy, IRayProxy, ITimingFunctionProxy, ICursorProxy, BorderRadius, FillRule
 } from "./ShapeTypes";
-import {FontStretch_Single} from "./FontTypes";
 import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
 
 
@@ -406,7 +409,7 @@ export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start
 
 
 /** Type for clip style property */
-export type Clip_StyleType = "auto" | OneOrBox<CssLength>;
+export type Clip_StyleType = "auto" | IRectProxy;
 
 
 
@@ -414,7 +417,7 @@ export type Clip_StyleType = "auto" | OneOrBox<CssLength>;
  * Type representing the boundaries of a box
  */
  export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
- "fill-box" | "stroke-box" | "view-box";
+    "fill-box" | "stroke-box" | "view-box";
 
 /** Type for clip-path style property */
 export type ClipPath_StyleType = "none" | IUrlProxy | BasicShape | GeometryBoxKeyword |
@@ -477,8 +480,8 @@ export type Contain_StyleType = "none" | "strict" | "content" | "size" | "layout
 
 
 /** Type for content style property */
-export type Content_StyleType = string | "none" | "normal" | OneOrMany<CssImage |
-    "open-quote" | "close-quote" | "no-open-quote" | "no-close-quote">;
+export type Content_StyleType = string | "none" | "normal" |
+    OneOrMany<CssImage |"open-quote" | "close-quote" | "no-open-quote" | "no-close-quote">;
 
 
 
@@ -571,68 +574,22 @@ export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inli
 
 
 
-/** Keywords for font style property */
-export type Font_SystemKeyword = "caption" | "icon" | "menu" | "message-box" | "small-caption" | "status-bar";
-
 /** Type for font style property */
-export type Font_StyleType = Font_SystemKeyword |
+export type Font_StyleType = SystemFont |
     {
         size: Extended<CssLength>;
         family: Extended<string>;
-        style?: Extended<FontStyle_StyleType>;
+        style?: Extended<FontStyle>;
         variant?: Extended<string>;
         weight?: Extended<FontWeight_StyleType>;
-        stretch?: Extended<Exclude<FontStretch_Single,number>>;
+        stretch?: Extended<FontStretch>;
         lineHeight?: Extended<CssNumber>
     };
 
 
 
-/** Type for font-kerning style property */
-export type FontKerning_StyleType = "auto" | "normal" | "none";
-
-
-
-/** Type for font-optical-sizing style property */
-export type FontOpticalSizing_StyleType = "auto" | "none";
-
-
-
-/** Type for font-size style property */
-export type FontSize_StyleType = "xx-small" | "x-small" | "small" | "medium" | "large" |
-    "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller" | CssLength;
-
-
-
-/** Type for font-stretch style property */
-export type FontStretch_StyleType = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
-"semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded" | CssNumber;
-
-
-
-/** Type for font-style style property */
-export type FontStyle_StyleType = "normal" | "italic" | "oblique" | CssAngle;
-
-
-
-/** Type for font-synthesis style property */
-export type FontSynthesis_StyleType = "none" | "weight" | "style" | "weight style";
-
-
-
-/** Type for font-variant-caps style property */
-export type FontVariantCaps_StyleType = "normal" | "small-caps" | "all-small-caps" |
-    "petite-caps" | "all-petite-caps" | "unicase" | "titling-caps";
-
-
-
-/** Type for font-variant-position style property */
-export type FontVariantPosition_StyleType = "normal" | "sub" | "super";
-
-
-
 /** Type for font-weight style property */
-export type FontWeight_StyleType = "normal" | "bold" | "bolder" | "lighter" | CssNumber;
+export type FontWeight_StyleType = FontWeight | "bolder" | "lighter";
 
 
 
@@ -1397,19 +1354,19 @@ export interface IBaseStyleset
     font?: Font_StyleType;
     fontFamily?: DefaultStyleType;
     fontFeatureSettings?: DefaultStyleType;
-    fontKerning?: FontKerning_StyleType;
-    fontOpticalSizing?: FontOpticalSizing_StyleType;
-    fontSize?: FontSize_StyleType;
+    fontKerning?: FontKerning;
+    fontOpticalSizing?: FontOpticalSizing;
+    fontSize?: FontSize;
     fontSizeAdjust?: CssNumber;
-    fontStretch?: FontStretch_StyleType;
-    fontStyle?: FontStyle_StyleType;
-    fontSynthesis?: FontSynthesis_StyleType;
+    fontStretch?: FontStretch;
+    fontStyle?: FontStyle;
+    fontSynthesis?: FontSynthesis;
     fontVariant?: DefaultStyleType;
-    fontVariantCaps?: FontVariantCaps_StyleType;
+    fontVariantCaps?: FontVariantCaps;
     fontVariantEastAsian?: DefaultStyleType;
     fontVariantLigatures?: DefaultStyleType;
     fontVariantNumeric?: DefaultStyleType;
-    fontVariantPosition?: FontVariantPosition_StyleType;
+    fontVariantPosition?: FontVariantPosition;
     fontVariationSettings?: DefaultStyleType;
     fontWeight?: FontWeight_StyleType;
 

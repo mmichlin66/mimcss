@@ -2,10 +2,10 @@
 import {
     ILengthProxy, IPercentProxy, IAngleProxy, ITimeProxy,
     IResolutionProxy, IFrequencyProxy, CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy,
-    INumberMath, IPercentMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath,
+    INumberMath, IPercentMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath, IRectProxy, RectSide,
 } from "./NumericTypes"
 import {NumberMath, PercentMath, LengthMath, AngleMath, TimeMath, ResolutionMath, FrequencyMath} from "../impl/NumericImpl"
-import {f2s, WKF, mv2s} from "../impl/Utils";
+import {f2s, WKF, mv2s, a2s} from "../impl/Utils";
 
 
 
@@ -307,6 +307,16 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
 export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
 {
     return () => mv2s( [w, h], "/");
+}
+
+
+
+/**
+ * Returns an IAspectRatioProxy function representing the `<ratio>` CSS type.
+ */
+export function rect( top: RectSide, right: RectSide, bottom: RectSide, left: RectSide): IRectProxy
+{
+    return () => `rect(${a2s( [top, right, bottom, left], WKF.Length, ",")})`;
 }
 
 

@@ -422,3 +422,17 @@ export interface IAspectRatioProxy extends IGenericProxy<"aspect-ratio"> {}
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// rect function for clip property
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Type for clip style property */
+export type RectSide = "auto" | CssLength;
+
+/**
+ * The IRectProxy interface represents an invocation of the [[rect]] function.
+ */
+export interface IRectProxy extends IGenericProxy<"rect"> {}
+

@@ -1,5 +1,5 @@
 ﻿import {IStringProxy} from "./CoreTypes";
-import { CssPercent } from "./NumericTypes";
+import { CssAngle, CssLength, CssNumber, CssPercent } from "./NumericTypes";
 
 
 
@@ -17,43 +17,100 @@ export type FontFaceMetricOverride = "normal" | CssPercent;
 
 
 
-/** Type of font-display property */
-export type FontDisplay_FontFaceType = "auto" | "block" | "swap" | "fallback" | "optional";
-
-
-
-export type FontStretch_Single = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
+/**
+ * Type for specfying font stretch properties.
+ */
+export type FontStretch = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
     "semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded" | CssPercent;
 
+
+
+/**
+ * Type for specfying font style properties.
+ */
+export type FontStyle = "normal" | "italic" | "oblique" | CssAngle;
+
+
+
+/**
+ * Type for specfying font weight properties.
+ */
+export type FontWeight = "normal" | "bold" | CssNumber;
+
+
+
+/** Keywords specifying system fonts */
+export type SystemFont = "caption" | "icon" | "menu" | "message-box" | "small-caption" | "status-bar";
+
+
+
+/** Type for font-kerning style property */
+export type FontKerning = "auto" | "normal" | "none";
+
+
+
+/** Type for font-optical-sizing style property */
+export type FontOpticalSizing = "auto" | "none";
+
+
+
+/** Type for font-size style property */
+export type FontSize = "xx-small" | "x-small" | "small" | "medium" | "large" |
+    "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller" | CssLength;
+
+
+
+/** Type for font-synthesis style property */
+export type FontSynthesis = "none" | "weight" | "style" | "weight style";
+
+
+
+/** Type for font-variant-caps style property */
+export type FontVariantCaps = "normal" | "small-caps" | "all-small-caps" |
+    "petite-caps" | "all-petite-caps" | "unicase" | "titling-caps";
+
+
+
+/** Type for font-variant-position style property */
+export type FontVariantPosition = "normal" | "sub" | "super";
+
+
+
+/** Type of font-display property */
+export type FontDisplay = "auto" | "block" | "swap" | "fallback" | "optional";
+
+
+
 /** Type of font-stretch property */
-export type FontStretch_FontFaceType = FontStretch_Single | [FontStretch_Single, FontStretch_Single];
+export type FontStretch_FontFaceType = FontStretch |
+    [FontFaceExtended<FontStretch>, FontFaceExtended<FontStretch>];
 
 
 
 /** Type of font-style property */
-export type FontStyle_FontFaceType = "normal" | "italic" | "oblique" | number |
-    [FontFaceExtended<number>, FontFaceExtended<number>];
+export type FontStyle_FontFaceType = FontStyle |
+    [FontFaceExtended<CssAngle>, FontFaceExtended<CssAngle>];
 
 
 
 /** Type of font-weight property */
-export type FontWeight_FontFaceType = "normal" | "bold" | number |
-    [FontFaceExtended<number>, FontFaceExtended<number>];
+export type FontWeight_FontFaceType = FontWeight |
+    [FontFaceExtended<FontWeight>, FontFaceExtended<FontWeight>];
 
 
 
 /** Possible named values for format part of the src property */
-export type FontSrcFormat_Keyword = "woff" | "woff2" | "truetype" | "opentype" | "embedded-opentype" | "svg";
+export type FontSrcFormat = "woff" | "woff2" | "truetype" | "opentype" | "embedded-opentype" | "svg";
 
 /** Type of a single part of the src property */
-export type FontSrc_Single = string | { local: FontFaceExtended<string> } |
+export type FontSrc = string | { local: FontFaceExtended<string> } |
     {
         url: FontFaceExtended<string>,
-        format?: FontFaceExtended<FontSrcFormat_Keyword | FontSrcFormat_Keyword[]>
+        format?: FontFaceExtended<FontSrcFormat | FontSrcFormat[]>
     };
 
 /** Type of src property */
-export type FontSrc_FontFaceType = FontSrc_Single | FontSrc_Single[];
+export type FontSrc_FontFaceType = FontSrc | FontSrc[];
 
 
 
@@ -64,7 +121,7 @@ export interface IBaseFontFace
 {
     ascentOverride?: FontFaceMetricOverride;
     descentOverride?: FontFaceMetricOverride;
-    fontDisplay?: FontDisplay_FontFaceType;
+    fontDisplay?: FontDisplay;
     fontFamily?: string;
     fontFeatureSettings?: string;
     fontStretch?: FontStretch_FontFaceType;

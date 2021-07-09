@@ -3,7 +3,7 @@ import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, I
 import {Styleset} from "../api/StyleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaQuery, SupportsQuery} from "../api/MediaTypes";
-import {fontFaceToString} from "../impl/FontImpl"
+import {fontFace2s} from "../impl/FontImpl"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 import {s_mediaQueryToString, supportsQueryToString} from "../impl/MediaImpl";
 import {StyleRule} from "./StyleRules";
@@ -155,7 +155,7 @@ export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFace
 	// Returns CSS string for this rule.
     protected getRuleText(): string
     {
-		return `@font-face ${fontFaceToString( this.fontface)}`;
+		return `@font-face {${fontFace2s( this.fontface)}}`;
     }
 
 	// Object defining font-face properties.

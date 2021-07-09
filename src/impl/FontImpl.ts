@@ -1,66 +1,14 @@
 ﻿import {
-    FontSrc_FontFaceType, FontSrc_Single, FontStretch_FontFaceType, FontStyle_FontFaceType,
-    FontWeight_FontFaceType, ExtendedFontFace
+    ExtendedFontFace, FontSrc_FontFaceType, FontSrc, IBaseFontFace
 } from "../api/FontTypes"
-import {AngleMath} from "./NumericImpl";
-import {camelToDash, v2s, a2s, WKF} from "./Utils";
+import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf} from "./Utils";
 
 
 
-/**
- * Converts the given font face definition object to the CSS string
- */
-export function fontFaceToString( fontface: ExtendedFontFace): string | null
-{
-    if (!fontface || !fontface.fontFamily)
-        return null;
-
-    let s = "{";
-
-    for( let propName in fontface)
-    {
-        s += `${camelToDash( propName)}:`;
-        let propVal = fontface[propName];
-        if (propName === "fontStretch")
-            s += fontStretchToString( propVal);
-        else if (propName === "fontStyle")
-            s += fontStyleToString( propVal);
-        else if (propName === "fontWeight")
-            s += fontWeightToString( propVal);
-        else if (propName === "src")
-            s += fontSrcToString( propVal);
-        else
-            s += propVal;
-
-        s += ";"
-    }
-
-    return s + "}";
-}
-
-
-
-function fontStretchToString( val: FontStretch_FontFaceType): string
-{
-    return v2s( val, { fromAny: WKF.Percent });
-}
-
-
-
-function fontStyleToString( val: FontStyle_FontFaceType): string
-{
-    return v2s( val, {
-        fromNumber: v => `oblique ${AngleMath.v2s(v)}`,
-        fromArray: v => `oblique ${a2s( v, WKF.Angle)}`
-    });
-}
-
-
-
-function fontWeightToString( val: FontWeight_FontFaceType): string
-{
-    return v2s( val, { fromAny: WKF.Number });
-}
+wkf[WKF.FontStyle] = v => v2s( v, {
+    fromNumber: v => `oblique ${wkf[WKF.Angle](v)}`,
+    fromArray: v => `oblique ${a2s( v, WKF.Angle)}`
+});
 
 
 
@@ -74,25 +22,76 @@ function fontSrcToString( val: FontSrc_FontFaceType): string
 
 
 
-function fontSingleSrcToString( val: FontSrc_Single): string
+function fontSingleSrcToString( val: FontSrc): string
 {
     return v2s( val, {
         fromProps: [
             ["local", v => `local(${v})`],
             ["url", v => `url(${v})`],
-            ["format", v => `format(${fontFormatToString(v)})`]
+            ["format", {
+                fromAny: v => `format(\"${v}\")`,
+                arrSep: ","
+            }]
         ]
     });
 }
 
 
 
-function fontFormatToString( val: FontSrc_Single): string
+/**
+ * Converts the given style property to the CSS style string. Property name can be in either
+ * dash or camel form.
+ */
+export function fontFace2s( fontface: ExtendedFontFace): string
 {
-    return v2s( val, {
-        fromString: v => `\"${v}\"`,
-        arrSep: ","
-    });
+    if (!fontface)
+        return "";
+
+    let s = "";
+	for( let name in fontface)
+        s += fontFaceProp2s( name, fontface[name], true) + ";";
+
+    return s;
+}
+
+
+
+/**
+ * Converts the given style property to the CSS style string. Property name can be in either
+ * dash or camel form.
+ */
+function fontFaceProp2s( propName: string, propVal: any, includeName?: boolean): string
+{
+    if (!propName)
+        return "";
+
+    // convert the value to string based on the information object for the property (if defined)
+    let stringValue = v2s( propVal, fontFacePropertyInfos[dashToCamel(propName)]);
+
+    // if the resulting string is empty and the name should be included, then we return
+    // "name: initial"; otherwise we will return an empty string.
+    if (!stringValue && includeName)
+        stringValue = "initial";
+
+    return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
+}
+
+
+
+/**
+ * Map of property names to the V2SOptions objects describing custom actions necessary to
+ * convert the property value to the CSS-compliant string.
+ */
+const fontFacePropertyInfos: { [K in keyof IBaseFontFace]?: V2SOptions } =
+{
+    ascentOverride: WKF.Percent,
+    descentOverride: WKF.Percent,
+    fontStretch: { fromAny: WKF.Percent },
+    fontStyle: WKF.FontStyle,
+    fontWeight: { fromAny: WKF.Number },
+    lineGapOverride: WKF.Percent,
+    src: fontSrcToString,
+    sizeAdjust: WKF.Percent,
 }
 
 
