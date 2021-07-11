@@ -1,4 +1,4 @@
-import {StyleDefinition, IStyleDefinitionClass} from "../api/RuleTypes"
+import {StyleDefinition, IStyleDefinitionClass, NameGenerationMethod} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
@@ -416,9 +416,9 @@ class RuleContainer implements ITopLevelRuleContainer
  * @param enable
  * @param prefix
  */
-export function s_enableShortNames( enable: boolean, prefix?: string): void
+export function s_configNames( method: NameGenerationMethod, prefix?: string): void
 {
-	s_useUniqueStyleNames = enable;
+	s_nameGeneratonMethod = method;
 	s_uniqueStyleNamesPrefix = prefix ? prefix : "n";
 }
 
@@ -428,10 +428,10 @@ export function s_enableShortNames( enable: boolean, prefix?: string): void
  * Flag indicating whether to use optimized names for style elements (classes,  animations, etc.)
  * By default this flag is true in the Release build of the library and false in the Debug build.
  */
-let s_useUniqueStyleNames: boolean = true;
+let s_nameGeneratonMethod = NameGenerationMethod.Optimized;
 
 /// #if DEBUG
-s_useUniqueStyleNames = false;
+s_nameGeneratonMethod = NameGenerationMethod.UniqueScoped;
 /// #endif
 
 /**
@@ -449,9 +449,12 @@ let s_nextUniqueID = 1;
  */
 function generateName( sheetName: string, ruleName: string): string
 {
-	return s_useUniqueStyleNames
-		? generateUniqueName( s_uniqueStyleNamesPrefix)
-		: `${sheetName}_${ruleName}_${s_nextUniqueID++}`;
+	switch( s_nameGeneratonMethod)
+    {
+		case NameGenerationMethod.UniqueScoped: return `${sheetName}_${ruleName}_${s_nextUniqueID++}`;
+		case NameGenerationMethod.Optimized:return generateUniqueName( s_uniqueStyleNamesPrefix);
+        case NameGenerationMethod.Scoped:return `${sheetName}_${ruleName}`;
+    }
 }
 
 
@@ -556,7 +559,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
 		let instance = new definitionClass( parent);
 
 		// get the name for our container
-		let name = s_useUniqueStyleNames || !definitionClass.name
+		let name = !definitionClass.name || s_nameGeneratonMethod === NameGenerationMethod.Optimized
 			? generateUniqueName()
 			: definitionClass.name;
 
@@ -588,7 +591,7 @@ function processInstance( instance: StyleDefinition, embeddingContainer?: RuleCo
 
 	// get the name for our container
 	let name = generateUniqueName();
-	if (!s_useUniqueStyleNames)
+	if (!s_nameGeneratonMethod)
 	{
 		let definitionClass = instance.constructor;
 		if (definitionClass.name)

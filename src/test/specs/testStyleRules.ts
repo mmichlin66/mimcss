@@ -4,7 +4,10 @@ import * as dom from "../utils/dom"
 
 describe("style rules:", () =>
 {
-	beforeEach(() =>
+    // switch to Scoped name generation method so that names are predictable
+    css.configNameGeneration( css.NameGenerationMethod.Scoped);
+
+    beforeEach(() =>
 	{
 		dom.removeAllStylesFromHead();
 	})

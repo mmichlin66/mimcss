@@ -1,4 +1,4 @@
-import {CssSelector} from "../api/CoreTypes"
+import {CssDependentSelector, CssSelector} from "../api/CoreTypes"
 import {
     IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule
 } from "../api/RuleTypes";
@@ -412,7 +412,7 @@ class DependentRule extends StyleRule
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, psudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
-	public constructor( selector: CssSelector, selectorParam?: any, style?: CombinedStyleset,
+	public constructor( selector: CssDependentSelector, selectorParam?: any, style?: CombinedStyleset,
 		containingRule?: StyleRule)
 	{
 		super( style);
@@ -458,7 +458,7 @@ class DependentRule extends StyleRule
 
 
 	// Partial selector that should be appended to the parent selector.
-	private selector: CssSelector;
+	private selector: CssDependentSelector;
 
 	// Optional parameters for the selector - used for parameterized pseudo classes and elements.
 	private selectorParam?: any;

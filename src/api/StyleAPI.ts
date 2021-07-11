@@ -44,6 +44,15 @@ export function getStylePropValue<K extends keyof ExtendedBaseStyleset>( stylePr
 
 
 
+// Sets style property on HTML or SVG element
+function setElementStyleProp<K extends keyof IBaseStyleset>( elm: ElementCSSInlineStyle, name: K,
+    value: ExtendedBaseStyleset[K], schedulerType?: number): void
+{
+    scheduleStyleUpdate( elm, name, styleProp2s( name, value), false, schedulerType);
+}
+
+
+
 /**
  * Sets values of the style properties from the given Styleset object to the `style` attribute
  * of the given HTML element.
@@ -98,7 +107,7 @@ export function stylesetToStringStyleset( styleset: Styleset): StringStyleset
  * @param newStyleset
  * @returns StringStyleset object with properties that have different values in the old and new
  * stylesets. Properties that existed in the old but don't exist in the new styleset, will have
- * their values set to undefined. If there is no differences between the two stylesets null is
+ * their values set to `"unset"`. If there is no differences between the two stylesets null is
  * returned.
  */
 export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): StringStyleset | null
@@ -223,32 +232,32 @@ declare global
          * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
          * will be used.
          */
-        setStyleset( styleset: Styleset, replace?: boolean, schedulerType?: number): void;
+        setStyleset( styleset: Styleset, schedulerType?: number): void;
     }
 }
 
 
 // functions on HTML and SVG element prototypes
-HTMLElement.prototype.setStyleProp = setElementStyleProp;
-SVGElement.prototype.setStyleProp = setElementStyleProp;
+HTMLElement.prototype.setStyleProp = setThisElementStyleProp;
+SVGElement.prototype.setStyleProp = setThisElementStyleProp;
 
-HTMLElement.prototype.setStyleset = setElementStyleset;
-SVGElement.prototype.setStyleset = setElementStyleset;
+HTMLElement.prototype.setStyleset = setThisElementStyle;
+SVGElement.prototype.setStyleset = setThisElementStyle;
 
 
 
 // Sets style property on HTML or SVG element
-function setElementStyleProp<K extends keyof IBaseStyleset>( name: K,
+function setThisElementStyleProp<K extends keyof IBaseStyleset>( name: K,
     value: ExtendedBaseStyleset[K], schedulerType?: number): void
 {
-    scheduleStyleUpdate( this, name, styleProp2s( name, value), false, schedulerType);
+    setElementStyleProp( this, name, value, schedulerType);
 }
 
 
 
-function setElementStyleset( styleset: Styleset, replace?: boolean, schedulerType?: number): void
+function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
 {
-    scheduleStyleUpdate( this, null, stylesetToStringStyleset( styleset), false, schedulerType);
+    setElementStyle( this, styleset, schedulerType);
 }
 
 

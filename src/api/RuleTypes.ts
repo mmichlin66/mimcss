@@ -1,6 +1,6 @@
 ﻿import {
-    ICustomVar, OneOrMany, PseudoEntity, CssSelector, PagePseudoClass, IParameterizedPseudoEntity,
-    SelectorCombinator, IConstant, IRuleWithSelector
+    ICustomVar, OneOrMany, PseudoEntity, PagePseudoClass, IParameterizedPseudoEntity,
+    DependentRuleCombinator, IConstant, IRuleWithSelector, CssDependentSelector
 } from "./CoreTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, VarValue, ExtendedVarValue} from "./StyleTypes";
 
@@ -55,7 +55,7 @@ export type CombinedStyleset = Styleset &
 	{ "+"?: OneOrMany<IStyleRule> } &
 	{ [K in PseudoEntity]?: CombinedStyleset } &
 	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset][] } &
-	{ [K in SelectorCombinator]?: [CssSelector, CombinedStyleset][] };
+	{ [K in DependentRuleCombinator]?: [CssDependentSelector, CombinedStyleset][] };
 
 
 
@@ -102,7 +102,7 @@ export interface INamedEntity
  */
 export type DependentRules =
 	{ [K in PseudoEntity]?: IStyleRule } &
-	{ [K in SelectorCombinator]?: IStyleRule[] } &
+	{ [K in DependentRuleCombinator]?: IStyleRule[] } &
 	{ [K in keyof IParameterizedPseudoEntity]?: IStyleRule[] };
 
 
@@ -534,6 +534,87 @@ export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<
 {
 	/** SOM media rule */
 	readonly cssRule: CSSMediaRule | null;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Name generation.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Provides values that identify the method used to generate names of CSS named entities (e.g.
+ * classes, identifiers, counters, animations, custom properties, etc.). The development version
+ * of the Mimcss library uses the `UniqueScoped` method while the production version uses the
+ * `Optimized` method. The [[configNameGeneration]] function can be called to change the default
+ * method.
+ */
+export const enum NameGenerationMethod
+{
+    /**
+     * Names are generated using the name of the style definition class concatenated with the
+     * property name defining the CSS entity and concatenated with a unique number. The unique
+     * number is needed to generate truly unique names even in the presence of identically named
+     * style definition classes and properties. This method produces relatively long names and
+     * should be used during development. Having the names of the class and property defining the
+     * CSS entity allows developers to easily find the place where the entity is defined.
+     *
+     * This method is used by default in the development version of the Mimcss library.
+     *
+     * **Example:**
+     * ```typescript
+     * css.configNameGeneration( NameGenerationMethod.UniqueScoped);
+     *
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // class name will be generated as "MyStyles_red_nnn", where 'nnn' is a unique number.
+     *     red = css.$class({ color: "red"})
+     * }
+     * ```
+     */
+    UniqueScoped = 1,
+
+    /**
+     * Names are generated using a prefix concatenated with a unique number. The default prefix is
+     * `"n"`, which can be changed using the [[configNameGeneration]] function.
+     *
+     * This method is used by default in the production version of the Mimcss library.
+     *
+     * **Example:**
+     * ```typescript
+     * css.configNameGeneration( NameGenerationMethod.Optimized, "my_");
+     *
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // class name will be generated as "my_nnn", where 'nnn' is a unique number.
+     *     red = css.$class({ color: "red"})
+     * }
+     * ```
+     */
+    Optimized,
+
+    /**
+     * Names are generated using the name of the style definition class concatenated with the
+     * property name defining the CSS entity. This method produces predicatable names (since no
+     * unique numbers are involved) and thus is suitable for testing environments where CSS names
+     * are used for identifying elements on the page. Note that if different JavaScript modules
+     * have identically named classes with an identically named property, the generated name
+     * will be identical
+     *
+     * **Example:**
+     * ```typescript
+     * css.configNameGeneration( NameGenerationMethod.Scoped);
+     *
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // class name will be generated as "MyStyles_red".
+     *     red = css.$class({ color: "red"})
+     * }
+     * ```
+     */
+    Scoped,
 }
 
 
