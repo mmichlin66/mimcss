@@ -5,17 +5,17 @@
 
 
 
-import {CssSelector, PagePseudoClass} from "./CoreTypes";
+import {CssSelector, PagePseudoClass, OneOrMany} from "./CoreTypes";
 import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
-    IConstRule, ClassPropType, ICssSerializer, NameGenerationMethod
+    IConstRule, ClassPropType, NameGenerationMethod
 } from "./RuleTypes";
 import {MediaQuery, SupportsQuery} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
-import {processInstanceOrClass, serializeInstance, s_configNames} from "../rules/RuleContainer";
+import {processInstanceOrClass, s_configNames} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
@@ -23,9 +23,7 @@ import {CounterRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
-import {IRuleSerializationContext} from "../rules/Rule";
-import {getActivator} from "../impl/SchedulingImpl";
-import {v2s} from "../impl/Utils";
+import {a2s, v2s} from "../impl/Utils";
 
 
 
@@ -219,17 +217,53 @@ export function $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRul
 
 
 /**
+ * Creates a new style rule for the given HTML or SVG element tags. The `tag` parameter specifies
+ * either a single tag or an array of tags. In addition, an asterisk symbol ('"*"`) can be
+ * specified to target all elements.
+ *
+ * When multiple tags are specified, they will be treated as a selector list; that is, they will
+ * be separated by commas.
+ *
+ * @param tag One or more element tags
+ * @param styleset Styleset that defines style properties for the tags.
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // using string for selecting a single elemenet tag
+ *     tr = css.$tag( "tr", {})
+ *
+ *     // using array for selecting multiple elemenet tags
+ *     header123 = css.$tag( ["h1", "h2", "h3"], {})
+ *
+ *     // using asterisk to address all elements
+ *     all = css.$tag( "*", {})
+ * }
+ */
+export function $tag( tag: "*" | OneOrMany<(keyof HTMLElementTagNameMap) | (keyof SVGElementTagNameMap)>,
+    styleset: CombinedStyleset): IStyleRule
+{
+	return new SelectorRule( Array.isArray(tag) ? a2s( tag, undefined, ",") : tag, styleset);
+}
+
+
+
+/**
  * Creates a new style rule with an arbitrary complex selector. Selectors can be specified as
  * one or array of [[SelectorItem]] objects where each `SelectorItem` is one of the following
  * types:
  * - string - allows any content but lacks type-safety checks.
  * - any style rule, that is a rule that implements the [[IStyleRule]] interface. This allows
- *   using prevously defined class, ID and other style rules as selector items
+ *   using prevously defined tag, class, ID and other style rules as selector items
  * - [[selector]] function - a tag function that allows convenient mixing of free-format strings
  *   and strongly typed style rules.
  *
- * When multiple selector items are specified, they will be treated as the selector list; that is,
- * they will be separated by commas.
+ * When multiple selector items are specified, they will be concatenated into a single string.
+ *
+ * Note that although style rules can be used for selecting element tags, the [[$tag]] function would
+ * be more appropriate because it will catch misspellings of tag names.
  *
  * @param selector One or more [[SelectorItem]] objects
  * @param styleset Styleset that defines style properties for this selector.
@@ -239,20 +273,20 @@ export function $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRul
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     // using string for selecting elemnet type
- *     h1 = css.$style( "h1", {})
- *
- *     // using string for a slightly more complex selector
- *     style1 = css.$style( "*, ::after, ::before", {})
+ *     // using a string
+ *     style1 = css.$style( "li::before", {})
  *
  *     id = css.$id()
  *     cls = css.$class()
  *
- *     // using an array of style rules. The selector will be "#id, .cls"
- *     style1 = css.$style( [this.id, this.cls], {})
+ *     // using an array of style rules. The selector will be "#id.cls"
+ *     style2 = css.$style( [this.id, this.cls], {})
  *
  *     // using the selector function. The selector will be "#id > .cls"
- *     style1 = css.$style( css.selector`[this.id] > [this.cls]`, {})
+ *     style3 = css.$style( css.selector`${this.id} > ${this.cls}`, {})
+ *
+ *     // using a string for selecting element tag.
+ *     h1 = css.$style( "h1", {})
  * }
  */
 export function $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
@@ -711,10 +745,10 @@ export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefini
  * will be created by appending a unique number to the given prefix. If the prefix is not
  * specified, the standard prefix "n" will be used.
  *
- * By default the development version of the liberary (mimcss.dev.js) uses the [[UniqueScoped]]
- * method and the production version uses the [[Optimized]] method. This function can be called to
- * switch to the alternative method of name generation in either the development or the production
- * builds.
+ * By default the development version of the library (mimcss.dev.js) uses the [[UniqueScoped]]
+ * method and the production version (mimcss.js) uses the [[Optimized]] method. This function can
+ * be called to switch to the alternative method of name generation in either the development or
+ * the production builds.
  *
  * @param method Indicates what method to use.
  * @param prefix Optional string that will serve as a prefix to which unique numbers will be added
@@ -771,176 +805,6 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
     }
 
 	return null;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Scheduling.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Activates the given style definition class or instance and inserts all its rules into DOM. If
- * the input object is not an instance but a class, which is not yet associated with an instance,
- * the instance is first created and processed. Note that each style definition instance maintains
- * a reference counter of how many times it was activated and deactivated. The rules are inserted
- * into DOM only upon first activation.
- */
- export function activate<T extends StyleDefinition>(
-	instanceOrClass: T | IStyleDefinitionClass<T>,
-	schedulerType?: number): T | null
-{
-	let instance = processInstanceOrClass( instanceOrClass) as T;
-	if (instance)
-        getActivator(schedulerType).activate( instance);
-
-	return instance;
-}
-
-
-
-/**
- * Deactivates the given style definition instance by removing its rules from DOM. Note that each
- * style definition instance maintains a reference counter of how many times it was activated and
- * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
- */
-export function deactivate( instance: StyleDefinition, schedulerType?: number): void
-{
-	getActivator(schedulerType).deactivate( instance);
-}
-
-
-
-/**
- * Writes to DOM all style changes caused by the calls to the activate and deactivate functions
- * accumulated since the last activation of the given scheduling type.
- */
-export function forceDOMUpdate( schedulerType?: number): void
-{
-	getActivator(schedulerType).forceDOMUpdate();
-}
-
-
-
-/**
- * Removes all scheduled activations caused by the calls to the activate and deactivate functions
- * accumulated since the last activation of the given scheduling type.
- */
-export function cancelDOMUpdate( schedulerType?: number): void
-{
-	getActivator(schedulerType).cancelDOMUpdate();
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Style definition serialization.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Creates a new ICssSerializer object that allows adding style definition classes
- * and instances and serializing them to a string. This can be used for server-side rendering when
- * the resultant string can be set as the content of a `<style>` element.
- */
-export function createCssSerializer(): ICssSerializer
-{
-    return new CssSerializer();
-}
-
-
-
-/**
- * Serializes one or more style definition classes and instances and returns their CSS string
- * representation. This can be used for server-side rendering when the resultant string can be
- * set as the content of a `<style>` element.
- */
-export function serializeToCSS( ...args: (StyleDefinition | IStyleDefinitionClass)[]): string
-{
-    if (!args || args.length === 0)
-        return "";
-
-    let serializer = new CssSerializer();
-    args.forEach( instOrClass => serializer.add( instOrClass));
-    return serializer.serialize();
-}
-
-
-
-/**
- * The StyleSerializer class allows adding style definition classes and objects
- * and serializing them to a single string. This can be used for server-side rendering when
- * the resultant string can be set as the content of a `<style>` element.
- */
-class CssSerializer implements ICssSerializer
-{
-    /**
-     * Adds style definition class or instance.
-     */
-    public add( instOrClass: StyleDefinition | IStyleDefinitionClass): void
-    {
-        let instance = processInstanceOrClass( instOrClass);
-        if (!instance || this.instances.has(instance))
-            return;
-
-        this.instances.add( instance);
-    }
-
-    /**
-     * Returns concatenated string representation of all CSS rules added to the context.
-     */
-    public serialize(): string
-    {
-        if (this.instances.size === 0)
-            return "";
-
-        let ctx = new RuleSerializationContext();
-        this.instances.forEach( instance => ctx.addStyleDefinition( instance));
-        return ctx.topLevelBuf + ctx.nonTopLevelBuf;
-    }
-
-    // Set of style definition instances. This is needed to not add style definitions more than once
-    instances = new Set<StyleDefinition>();
-}
-
-
-
-/**
- * The RuleSerializationContext class implements the IRuleSerializationContext interface and
- * accumulates text of serialized CSS rules.
- */
-class RuleSerializationContext implements IRuleSerializationContext
-{
-    // Adds rule text
-    public addRuleText( s: string, isTopLevelRule?: boolean): void
-    {
-        if (isTopLevelRule)
-            this.topLevelBuf += s + "\n";
-        else
-            this.nonTopLevelBuf += s + "\n";
-    }
-
-    // Adds rule text
-    public addStyleDefinition( instance: StyleDefinition): void
-    {
-        if (!this.instances.has( instance))
-        {
-            this.instances.add( instance);
-            serializeInstance( instance, this);
-        }
-    }
-
-    // String buffer that accumulates top-level rule texts.
-    public topLevelBuf = "";
-
-    // String buffer that accumulates non-top-level rule texts.
-    public nonTopLevelBuf = "";
-
-    // Set of style definition instances that were already serialized in this context.
-    private instances = new Set<StyleDefinition>();
 }
 
 

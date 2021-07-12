@@ -39,11 +39,11 @@ module.exports =
         plugins: [
             new CopyPlugin({
                 patterns: [
-                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine_favicon.png" },
-                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine.css" },
-                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine.js" },
-                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/jasmine-html.js" },
-                    { from: "../../3rdparty/jasmin/lib/jasmine-3.5.0/boot.js" },
+                    { from: "src/test/jasmine/jasmine_favicon.png" },
+                    { from: "src/test/jasmine/jasmine.css" },
+                    { from: "src/test/jasmine/jasmine.js" },
+                    { from: "src/test/jasmine/jasmine-html.js" },
+                    { from: "src/test/jasmine/boot.js" },
                 ],
             })
         ],

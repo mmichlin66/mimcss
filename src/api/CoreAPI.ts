@@ -1,4 +1,4 @@
-﻿import {IStringProxy, IQuotedProxy, SelectorItem, ISelectorProxy, DependentSelectorItem, IDependentSelectorProxy} from "./CoreTypes"
+﻿import {IStringProxy, IQuotedProxy, SelectorItem, ISelectorProxy} from "./CoreTypes"
 import {tag2s, WKF, wkf} from "../impl/Utils";
 
 
@@ -19,16 +19,6 @@ import {tag2s, WKF, wkf} from "../impl/Utils";
      return () => tag2s( parts, params);
  }
 
-/**
- * Returns a string representation of a selector that can be used on dependent rules. This function
- * is a tag function and must be invoked with the template string without parentheses.
- */
- export function dependentSelector( parts: TemplateStringsArray,
-    ...params: DependentSelectorItem[]): IDependentSelectorProxy
- {
-     return () => tag2s( parts, params);
- }
-
 
 
 /**
@@ -39,7 +29,7 @@ import {tag2s, WKF, wkf} from "../impl/Utils";
  * for the style property, the property will not become part of the style rule inserted into the
  * DOM.
  *
- * **Example**
+ * **Example:**
  *
  * ```typescript
  * clip-path: raw`polygon(50% 20%, 90% 80%, 10% 80%)`

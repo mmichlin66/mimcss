@@ -8,7 +8,7 @@
 * [Quick Start](#quick-start)
 * [Examples](#examples)
 
-Mimcss is a TypeScript library that allows authoring CSS styles without creating CSS files. Instead, the styles are created via TypeScript programming. You code your styling rules including CSS tags, classes, animations, media etc. by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
+Mimcss is a TypeScript library that allows authoring CSS styles by writing TypeScript code and without creating CSS files. You code your style rules including CSS tags, classes, animations, media etc. by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
 
 ## Motivation
 The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. There are several distinct areas that Mimcss addresses:
@@ -24,7 +24,7 @@ The goal of the Mimcss library is to support all CSS features in a type-safe and
 - Co-exists with regular CSS files - doesn't require re-writing of all existing styles at once or at all. You can gradually introduce Mimcss into you project.
 - Stylesheets are defined as TypeScript classes.
 - Stylesheets can be dynamically activated (inserted into DOM) and deactivated (removed from DOM).
-- Support for styled components where each component instance gets its individual set of CSS rules isolated from other instances.
+- Styled components are supported where each component instance gets its individual set of CSS rules isolated from other instances.
 - Names of classes, IDs, animations, custom CSS properties, counters and grid lines and areas are auto-generated, while developers use properties that return these names.
 - Stylesheets support inheritance - elegant way to implement theming.
 - All CSS rule types are supported including style rules and at-rules.
@@ -68,16 +68,19 @@ import * as css from "mimcss"
 
 export class MyStyles extends css.StyleDefinition
 {
+    // define a CSS rule for a class
     vbox = css.$class({
         display: "flex",
         flexDirection: "column",
     });
 
+    // define a CSS rule for an element identifier
     importantElement = css.$id({
         color: 0xFFCC88,
         fontWeight: 700,
     });
 
+    // define a CSS rule for another class
     greeting = css.$class({
         padding: 8,
         border: [1, "solid", "blue"],
@@ -88,16 +91,19 @@ export class MyStyles extends css.StyleDefinition
 }
 
 /* MyComponent.tsx */
-import {MyStyles} from "./MyStyles"
 import * as React from "react"
 import * as css from "mimcss"
+import {MyStyles} from "./MyStyles"
 
+// Insert the style rules into the DOM
 let myStyles = css.activate( MyStyles);
 
 export class MyComponent extends React.Component
 {
     render()
     {
+        // use properties of the style definition class instance to refer to class
+        // and identifier names
         return <div className={myStyles.vbox.name}>
             <p id={myStyles.importantElement.name}>Mimcss is easy to use.</p>
             <div className={myStyles.greeting.name}/>Hello!</div>
@@ -305,7 +311,7 @@ p:nth-of-type(odd) {
 **See Also:** [Mimcss Guide: Defining Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html)
 
 ### Complex Related Selectors
-We often define a CSS class (or tag or ID) rule and then define related rules with complex selectors. You can use the `"&"` property to define such rules in Mimcss. Within the selectors, every occurrence of the `"&"` symbol will be replaced with the "parent" selector.
+We often define a CSS class (or tag or ID) rule and then define related rules with complex selectors. You can use the ampersand (`"&"`) property to define such rules in Mimcss. Within the selectors, every occurrence of the `"&"` symbol will be replaced with the "parent" selector.
 
 ```tsx
 class MyStyles extends css.StyleDefinition
@@ -424,9 +430,11 @@ class MyStyles extends css.StyleDefinition
 **See Also:** [Mimcss Reference: Colors](https://mmichlin66.github.io/mimcss/ref/colors.html)
 
 ### Working with Units
-In CSS, values of many properties should be specified with units corresponding to the CSS type of the property. For example, the `<length>` type has units such as "px", "rem", "in", "cm", etc.; the `<angle>` type has units such as "deg", "rad", "turn", etc. For many properties, CSS also allows using percentages - "%".
+In CSS, values of many properties should be specified with units corresponding to the CSS type of the property. For example, the `<length>` type has units such as "px", "rem", "in", "cm", etc.; the `<angle>` type has units such as "deg", "rad", "turn", etc. For many properties, CSS also allows using percents - "%".
 
 Mimcss supports all these CSS types and, for the developer convenience, allows specifying values in three ways: as an integer number, as a floating point number and as a string. For each CSS type, Mimcss defines a default unit to use with the integer number and the default unit to use with the floating point number. For example, for the `<length>` CSS type, Mimcss will treat integer numbers as having the "px" unit and floating point numbers as having the "em" unit. For the `<angle>` type, the default is "deg" for integers and "turn" for floating point numbers.
+
+> Note: in JavaScript, the literals such as `1.0` are not floating point number but rather integers.
 
 Here are several examples:
 
@@ -454,8 +462,6 @@ class MyStyles extends css.StyleDefinition
     })
 }
 ```
-
-> Note: in JavaScript, the literal `1.0` is not a floating point number but rather an integer.
 
 **See Also:** [Mimcss Reference: Numeric Types](https://mmichlin66.github.io/mimcss/ref/numeric-types.html)
 

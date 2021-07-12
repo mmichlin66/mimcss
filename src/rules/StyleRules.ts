@@ -1,10 +1,10 @@
-import {CssDependentSelector, CssSelector} from "../api/CoreTypes"
+import {CssSelector} from "../api/CoreTypes"
 import {
     IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule
 } from "../api/RuleTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {v2s, camelToDash, symValueToString} from "../impl/Utils";
+import {camelToDash, symValueToString} from "../impl/Utils";
 import {
     mergeStylesets, stylesetToString, styleProp2s, mergeStylesetCustomProps, selector2s,
     pseudoEntity2s
@@ -412,7 +412,7 @@ class DependentRule extends StyleRule
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, psudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
-	public constructor( selector: CssDependentSelector, selectorParam?: any, style?: CombinedStyleset,
+	public constructor( selector: CssSelector, selectorParam?: any, style?: CombinedStyleset,
 		containingRule?: StyleRule)
 	{
 		super( style);
@@ -458,7 +458,7 @@ class DependentRule extends StyleRule
 
 
 	// Partial selector that should be appended to the parent selector.
-	private selector: CssDependentSelector;
+	private selector: CssSelector;
 
 	// Optional parameters for the selector - used for parameterized pseudo classes and elements.
 	private selectorParam?: any;
@@ -630,7 +630,7 @@ export class SelectorRule extends StyleRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return v2s( this.selector, { arrSep: ","});
+		return selector2s( this.selector);
 	}
 
 	// selector object for this rule.

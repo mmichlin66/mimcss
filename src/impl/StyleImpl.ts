@@ -1,4 +1,4 @@
-﻿import {CssDependentSelector, Extended} from "../api/CoreTypes";
+﻿import {CssSelector, Extended} from "../api/CoreTypes";
 import {CssRadius} from "../api/NumericTypes";
 import {BorderRadius} from "../api/ShapeTypes";
 import {
@@ -40,7 +40,7 @@ function nthTupleToString( val: [number, number?]): string
 /**
  * Returns a string representation of a selector.
  */
-export function selector2s( val: CssDependentSelector): string
+export function selector2s( val: CssSelector): string
 {
 	return v2s( val, { arrSep: "" });
 }
