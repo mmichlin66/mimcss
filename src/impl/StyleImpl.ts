@@ -2,9 +2,9 @@
 import {CssRadius} from "../api/NumericTypes";
 import {BorderRadius} from "../api/ShapeTypes";
 import {
-    Animation_Single, Background_Single, BackgroundSize_Single, BorderImage_Object,
-    BorderImageSlice_StyleType, BoxShadow_Single, Border_StyleType,
-    Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateArea_Definition, GridTrack,
+    Animation_Single, Background_Single, BackgroundSize, BorderImage_Object,
+    BorderImageSlice_StyleType, BoxShadow, Border_StyleType,
+    Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateAreaDefinition, GridTrack,
     GridTemplateAxis_StyleType, Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType,
     Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType, VarTemplateName,
 } from "../api/StyleTypes";
@@ -162,7 +162,7 @@ function singleBackground_fromStyle( val: Extended<Background_Single>): string
 
 
 
-function singleBackgroundSize_fromStyle( val: Extended<BackgroundSize_Single>): string
+function singleBackgroundSize_fromStyle( val: Extended<BackgroundSize>): string
 {
     return v2s( val, { fromAny: WKF.Length });
 }
@@ -209,7 +209,7 @@ function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): s
 
 
 
-export function singleBoxShadow_fromObject( val: BoxShadow_Single): string
+export function singleBoxShadow_fromObject( val: BoxShadow): string
 {
     return styleObj2String( val, [
         ["inset", v => v ? "inset" : ""],
@@ -337,7 +337,7 @@ function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>):
  * Converts the array of GridTemplateArea_Definition objects to a string that is suitable for
  * the grid-template-areas format.
  */
-function createGridTemplateAreasFromDefinitions( defs: GridTemplateArea_Definition[]): string
+function createGridTemplateAreasFromDefinitions( defs: GridTemplateAreaDefinition[]): string
 {
     // calculate total size of the matrix from the areas' sizes
     let rowCount = 0, colCount = 0;

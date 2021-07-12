@@ -31,9 +31,6 @@ import {f2s, mv2s, WKF, v2s, wkf, a2s} from "../impl/Utils";
 /**
  * Function returning the ILinearGradient interface representing the `linear-gradient` CSS functions.
  *
- * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
- * the gradient definition.
- *
  * *Examples:*
  *
  * ```typescript
@@ -43,6 +40,11 @@ import {f2s, mv2s, WKF, v2s, wkf, a2s} from "../impl/Utils";
  *
  * backgroundImage: linearGradient( "red", "blue").to( 45)
  * ```
+ *
+ * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+ * the gradient definition.
+ *
+ * @category Image
  */
 export function linearGradient(...stopsOrHints: GradientStopOrHint<CssLength>[]): ILinearGradient
 {
@@ -53,9 +55,6 @@ export function linearGradient(...stopsOrHints: GradientStopOrHint<CssLength>[])
 
 /**
  * Function returning the IRadialGradient interface representing the `radial-gradient` CSS functions.
- *
- * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
- * the gradient definition.
  *
  * *Examples:*
  *
@@ -68,6 +67,11 @@ export function linearGradient(...stopsOrHints: GradientStopOrHint<CssLength>[])
  *
  * backgroundImage: radialGradient( "red", "blue").ellipse( "closest-side")
  * ```
+ *
+ * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+ * the gradient definition.
+ *
+ * @category Image
  */
 export function radialGradient(...stopsOrHints: GradientStopOrHint<CssLength>[]): IRadialGradient
 {
@@ -79,9 +83,6 @@ export function radialGradient(...stopsOrHints: GradientStopOrHint<CssLength>[])
 /**
  * Function returning the IConicGradient interface representing the `radial-gradient` CSS functions.
  *
- * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
- * the gradient definition.
- *
  * *Examples:*
  *
  * ```typescript
@@ -91,6 +92,11 @@ export function radialGradient(...stopsOrHints: GradientStopOrHint<CssLength>[])
  *
  * backgroundImage: conicGradient( "red", "blue").from( 0.25).at( ["center", css.percent(65)])
  * ```
+ *
+ * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
+ * the gradient definition.
+ *
+ * @category Image
  */
 export function conicGradient(...stopsOrHints: GradientStopOrHint<CssAngle>[]): IConicGradient
 {
@@ -319,6 +325,8 @@ function linearGradientAngleToString( angle: LinearGradientAngle): string
 
 /**
  * Returns an ImageProxy function representing the `cross-fade()` CSS function.
+ *
+ * @category Image
  */
 export function crossFade( ...args: CrossFadeParam[]): IImageProxy
 {
@@ -366,6 +374,8 @@ function filterPercent( name: string, p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `brightness()` CSS function.
+ *
+ * @category Filter
  */
 export function brightness( p: Extended<CssPercent>): IFilterProxy
 {
@@ -376,6 +386,8 @@ export function brightness( p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `contrast()` CSS function.
+ *
+ * @category Filter
  */
 export function contrast( p: Extended<CssPercent>): IFilterProxy
 {
@@ -386,6 +398,8 @@ export function contrast( p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `grayscale()` CSS function.
+ *
+ * @category Filter
  */
 export function grayscale( p: Extended<CssPercent>): IFilterProxy
 {
@@ -396,6 +410,8 @@ export function grayscale( p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `invert()` CSS function.
+ *
+ * @category Filter
  */
 export function invert( p: Extended<CssPercent>): IFilterProxy
 {
@@ -406,6 +422,8 @@ export function invert( p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `opacity()` CSS function.
+ *
+ * @category Filter
  */
 export function opacity( p: Extended<CssPercent>): IFilterProxy
 {
@@ -416,6 +434,8 @@ export function opacity( p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `saturate()` CSS function.
+ *
+ * @category Filter
  */
 export function saturate( p: Extended<CssPercent>): IFilterProxy
 {
@@ -426,6 +446,8 @@ export function saturate( p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `sepia()` CSS function.
+ *
+ * @category Filter
  */
 export function sepia( p: Extended<CssPercent>): IFilterProxy
 {
@@ -436,6 +458,8 @@ export function sepia( p: Extended<CssPercent>): IFilterProxy
 
 /**
  * Returns an IFilterProxy function representing the `blur()` CSS function.
+ *
+ * @category Filter
  */
 export function blur( r: Extended<CssLength>): IFilterProxy
 {
@@ -450,6 +474,8 @@ export function blur( r: Extended<CssLength>): IFilterProxy
  * @param y Vertical offset of the shadow.
  * @param color Color of the shadow.
  * @param blur Value of the shadow's blurring. The default value is 1 pixel.
+ *
+ * @category Filter
  */
 export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
     color?: Extended<CssColor>, blur?: Extended<CssLength>): IFilterProxy
@@ -462,6 +488,8 @@ export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
 
 /**
  * Returns an IFilterProxy function representing the `hue-rotate()` CSS function.
+ *
+ * @category Filter
  */
 export function hueRotate( a: Extended<CssAngle>): IFilterProxy
 {
@@ -478,6 +506,8 @@ export function hueRotate( a: Extended<CssAngle>): IFilterProxy
 
 /**
  * Returns an ITransformProxy function representing the `matrix()` CSS function.
+ *
+ * @category Transform
  */
 export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
 	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): ITransformProxy
@@ -489,6 +519,8 @@ export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Exten
 
 /**
  * Returns an ITransformProxy function representing the `matrix3d()` CSS function.
+ *
+ * @category Transform
  */
 export function matrix3d(
 		a1: Extended<CssNumber>, b1: Extended<CssNumber>, c1: Extended<CssNumber>, d1: Extended<CssNumber>,
@@ -504,6 +536,8 @@ export function matrix3d(
 
 /**
  * Returns an ITransformProxy function representing the `perspective()` CSS function.
+ *
+ * @category Transform
  */
 export function perspective( d: Extended<CssLength>): ITransformProxy
 {
@@ -522,6 +556,8 @@ function rotate1d( axis: string, a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `rotate()` CSS function.
+ *
+ * @category Transform
  */
 export function rotate( a: Extended<CssAngle>): ITransformProxy
 {
@@ -530,6 +566,8 @@ export function rotate( a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `rotateX()` CSS function.
+ *
+ * @category Transform
  */
 export function rotateX( a: Extended<CssAngle>): ITransformProxy
 {
@@ -538,6 +576,8 @@ export function rotateX( a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `rotateY()` CSS function.
+ *
+ * @category Transform
  */
 export function rotateY( a: Extended<CssAngle>): ITransformProxy
 {
@@ -546,6 +586,8 @@ export function rotateY( a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `rotateZ()` CSS function.
+ *
+ * @category Transform
  */
 export function rotateZ( a: Extended<CssAngle>): ITransformProxy
 {
@@ -554,6 +596,8 @@ export function rotateZ( a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `rotate3d()` CSS function.
+ *
+ * @category Transform
  */
 export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
     z: Extended<CssNumber>, a: Extended<CssAngle>): ITransformProxy
@@ -565,6 +609,8 @@ export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
 
 /**
  * Returns an ITransformProxy function representing the `scale()` CSS function.
+ *
+ * @category Transform
  */
 export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): ITransformProxy
 {
@@ -581,6 +627,8 @@ function scale1d( axis: string, s: Extended<CssNumber>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `scaleX()` CSS function.
+ *
+ * @category Transform
  */
 export function scaleX( s: Extended<CssNumber>): ITransformProxy
 {
@@ -589,6 +637,8 @@ export function scaleX( s: Extended<CssNumber>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `scaleY()` CSS function.
+ *
+ * @category Transform
  */
 export function scaleY( s: Extended<CssNumber>): ITransformProxy
 {
@@ -597,6 +647,8 @@ export function scaleY( s: Extended<CssNumber>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `scaleZ()` CSS function.
+ *
+ * @category Transform
  */
 export function scaleZ( s: Extended<CssNumber>): ITransformProxy
 {
@@ -605,6 +657,8 @@ export function scaleZ( s: Extended<CssNumber>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `scale3d()` CSS function.
+ *
+ * @category Transform
  */
 export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
     sz: Extended<CssNumber>): ITransformProxy
@@ -616,6 +670,8 @@ export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
 
 /**
  * Returns an ITransformProxy function representing the `skew()` CSS function.
+ *
+ * @category Transform
  */
 export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ITransformProxy
 {
@@ -632,6 +688,8 @@ function skew1d( axis: string, a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `skewX()` CSS function.
+ *
+ * @category Transform
  */
 export function skewX( a: Extended<CssAngle>): ITransformProxy
 {
@@ -640,6 +698,8 @@ export function skewX( a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `skewY()` CSS function.
+ *
+ * @category Transform
  */
 export function skewY( a: Extended<CssAngle>): ITransformProxy
 {
@@ -650,6 +710,8 @@ export function skewY( a: Extended<CssAngle>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `translate()` CSS function.
+ *
+ * @category Transform
  */
 export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITransformProxy
 {
@@ -658,6 +720,8 @@ export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITr
 
 /**
  * Returns an ITransformProxy function representing the `translateX()` CSS function.
+ *
+ * @category Transform
  */
 function translate1d( axis: string, d: Extended<CssLength>): ITransformProxy
 {
@@ -666,6 +730,8 @@ function translate1d( axis: string, d: Extended<CssLength>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `translateX()` CSS function.
+ *
+ * @category Transform
  */
 export function translateX( d: Extended<CssLength>): ITransformProxy
 {
@@ -674,6 +740,8 @@ export function translateX( d: Extended<CssLength>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `translateY()` CSS function.
+ *
+ * @category Transform
  */
 export function translateY( d: Extended<CssLength>): ITransformProxy
 {
@@ -682,6 +750,8 @@ export function translateY( d: Extended<CssLength>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `translateZ()` CSS function.
+ *
+ * @category Transform
  */
 export function translateZ( d: Extended<CssLength>): ITransformProxy
 {
@@ -690,6 +760,8 @@ export function translateZ( d: Extended<CssLength>): ITransformProxy
 
 /**
  * Returns an ITransformProxy function representing the `translate3d()` CSS function.
+ *
+ * @category Transform
  */
 export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
 	z: Extended<CssLength>): ITransformProxy
@@ -715,6 +787,8 @@ export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
  *
  * clipPath: inset( 10, 12, 14, 16).round( 8)
  * ```
+ *
+ * @category Basic Shape
  */
 export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
     o3?: Extended<CssLength>, o4?: Extended<CssLength>): IInset
@@ -765,6 +839,8 @@ class Inset implements IInset
  *
  * clipPath: circle( 100).at( ["center", css.percent(30)])
  * ```
+ *
+ * @category Basic Shape
  */
 export function circle( radius?: ShapeRadius): ICircle
 {
@@ -802,6 +878,8 @@ class Circle implements ICircle
  * ```typescript
  * clipPath: ellipse().at( ["top", "50%"])
  * ```
+ *
+ * @category Basic Shape
  */
 export function ellipse(): IEllipse;
 
@@ -815,6 +893,8 @@ export function ellipse(): IEllipse;
  *
  * clipPath: ellipse( 100, 50).at( ["center", css.percent(30)])
  * ```
+ *
+ * @category Basic Shape
  */
 export function ellipse( radiusX: ShapeRadius, radiusY: ShapeRadius): IEllipse;
 
@@ -862,6 +942,8 @@ class Ellipse implements IEllipse
  *
  * clipPath: css.polygon( [0,100], [50,0], [100,100]).fill( "evenodd")
  * ```
+ *
+ * @category Basic Shape
  */
 export function polygon( ...points: CssPoint[]): IPolygon
 {
@@ -900,6 +982,8 @@ class Polygon implements IPolygon
 
 /**
  * Returns an IPathBuilder interface that allows building a CSS path.
+ *
+ * @category Basic Shape
  */
 export function path( fillRule?: FillRule): IPathBuilder
 {
@@ -973,6 +1057,23 @@ class PathBuilder implements IPathBuilder
 
 
 
+/**
+ * Returns an IRayFunc function representing invocation of the `ray()` CSS function.
+ *
+ * @category Basic Shape
+ */
+ export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
+    contain?: boolean): IRayProxy
+{
+    return () => f2s( "ray", [
+        [angle, WKF.Angle],
+        [size, WKF.Length],
+        [contain ? "contain" : undefined]
+    ], " ");
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Grids
@@ -981,6 +1082,8 @@ class PathBuilder implements IPathBuilder
 
  /**
  * Returns an IMinMaxProxy function representing the `minmax()` CSS function.
+ *
+ * @category Grid
  */
 export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 {
@@ -991,6 +1094,8 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxProxy
 
 /**
  * Returns an IRepeatProxy function representing the `repeat()` CSS function.
+ *
+ * @category Grid
  */
 export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
     ...tracks: GridTrack[]): IRepeatProxy
@@ -1007,6 +1112,8 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
  * Returns an ISpanProxy function representing the `span` expression for grid layouts. If the first
  * parameter is a number, the second parameter (if defined) must be a name; if the first parameter
  * is a name, the second parameter (if defined) must be a number.
+ *
+ * @category Grid
  */
 export function span( countOrName: Extended<GridLineCountOrName>,
     nameOrCount?: Extended<GridLineCountOrName>): ISpanProxy
@@ -1025,6 +1132,8 @@ export function span( countOrName: Extended<GridLineCountOrName>,
 /**
  * Returns a function representing the CSS `counter()` function with additional
  * optional strings added after and/or before the counter.
+ *
+ * @category Counter
  */
  export function counter( counterObj: Extended<ICounterRule | string>,
 	style?: Extended<ListStyleType_StyleType>,
@@ -1042,6 +1151,8 @@ export function span( countOrName: Extended<GridLineCountOrName>,
 /**
  * Returns a function representing the CSS `counters()` function with the given
  * separator string and additional optional strings added after and/or before the counter.
+ *
+ * @category Counter
  */
 export function counters( counterObj: Extended<ICounterRule | string>,
 	separator: Extended<string>, style?: Extended<ListStyleType_StyleType>,
@@ -1070,6 +1181,8 @@ export function counters( counterObj: Extended<ICounterRule | string>,
  * Returns a function representing the CSS `url()` function. The string parameter
  * will be wrapped in a `url()` invocation. The function can also accept the IIDRule object to
  * create url(#element) invocation, which is often used to address SVG elements by their IDs.
+ *
+ * @category Miscellaneous
  */
 export function url( p: Extended<string | IIDRule>): IUrlProxy
 {
@@ -1080,12 +1193,16 @@ export function url( p: Extended<string | IIDRule>): IUrlProxy
 
 /**
  * Returns a function representing the CSS `url()` function.
+ *
+ * @category Miscellaneous
  */
 export function cursor( p: Extended<string | IIDRule>): ICursorProxy;
 
 /**
  * Returns a function representing the CSS `url()` function followed by two numbers
  * indicating the cursor hotspot.
+ *
+ * @category Miscellaneous
  */
 export function cursor( p: Extended<string | IIDRule>, x: number, y: number): ICursorProxy;
 
@@ -1098,25 +1215,12 @@ export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): 
 
 
 /**
- * Returns an IRayFunc function representing invocation of the `ray()` CSS function.
- */
- export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
-    contain?: boolean): IRayProxy
-{
-    return () => f2s( "ray", [
-        [angle, WKF.Angle],
-        [size, WKF.Length],
-        [contain ? "contain" : undefined]
-    ], " ");
-}
-
-
-
-/**
  * Returns a function representing the `attr()` CSS function. It returns IStringProxy
  * and theoretically can be used in any style property; however, its use by browsers is currently
  * limited to the `content` property. Also no browser currently support type, units or fallback
  * values.
+ *
+ * @category Miscellaneous
  */
  export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
 	fallback?: Extended<string>): IStringProxy
@@ -1135,6 +1239,8 @@ export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): 
 
 /**
  * Returns a function representing an invocation of the CSS `steps()` function.
+ *
+ * @category Transition and Animation
  */
  export function steps( n: Extended<number>, jumpTerm?: TimingFunctionJumpTerm): ITimingFunctionProxy
 {
@@ -1143,6 +1249,8 @@ export function cursor( p: Extended<string | IIDRule>, x?: number, y?: number): 
 
 /**
  * Returns a function representing an invocation of the CSS `cubic-bezier()` function.
+ *
+ * @category Transition and Animation
  */
  export function cubicBezier( n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
     n4: Extended<number>): ITimingFunctionProxy
