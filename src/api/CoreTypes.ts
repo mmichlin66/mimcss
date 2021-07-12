@@ -336,3 +336,24 @@ export type CssSelector = OneOrMany<SelectorItem>;
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Web Namespaces.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The WebNamespaces enumeration provides identifiers for the known Web-related namespaces.
+ */
+export const enum WebNamespaces
+{
+    HTML = "http://www.w3.org/1999/xhtml",
+    SVG = "http://www.w3.org/2000/svg",
+    XLink = "http://www.w3.org/1999/xlink",
+    XML = "http://www.w3.org/XML/1998/namespace",
+    XMLNS = "http://www.w3.org/2000/xmlns/",
+    MathML = "http://www.w3.org/1998/Math/MathML",
+}
+
+
+

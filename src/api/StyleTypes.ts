@@ -2,7 +2,7 @@
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, CssFrequency, CssResolution,
     CssRadius, HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, IFitContentProxy,
-    ILengthProxy, CssSize, CssAspectRatio, IRectProxy
+    ILengthProxy, CssSize, CssAspectRatio, IRectProxy, CssLengthOrAuto
 } from "./NumericTypes"
 import {CssColor} from "./ColorTypes";
 import {
@@ -13,7 +13,10 @@ import {
     IUrlProxy, BasicShape, CssImage, IMinMaxProxy, IRepeatProxy, ISpanProxy, IFilterProxy,
     ITransformProxy, IRayProxy, ITimingFunctionProxy, ICursorProxy, BorderRadius, FillRule
 } from "./ShapeTypes";
-import {IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule} from "./RuleTypes";
+import {
+    IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, StyleDefinition,
+    IStyleDefinitionClass
+} from "./RuleTypes";
 
 
 
@@ -242,7 +245,7 @@ export type BackgroundRepeat_StyleType = OneOrMany<BackgroundRepeat_Single>;
 
 
 /** Type for background size */
-export type BackgroundSize_Single = "cover" | "contain" | OneOrPair<CssLength | "auto">;
+export type BackgroundSize_Single = "cover" | "contain" | OneOrPair<CssLengthOrAuto>;
 
 /**
  * Type for background-size style property. The background-size style can specify one or more
@@ -549,7 +552,7 @@ export type Flex_StyleType = FlexBasis_StyleType |
 
 
 /** Type for flex-basis style property */
-export type FlexBasis_StyleType = CssLength | "auto" | "content" | "fill" | "max-content" | "min-content" | "fit-content";
+export type FlexBasis_StyleType = CssLengthOrAuto | "content" | "fill" | "max-content" | "min-content" | "fit-content";
 
 
 
@@ -656,7 +659,7 @@ export type GridTrack = GridTrackSize | GridTrackLine;
 export type GridTrackLine = (IGridLineRule | Extended<string>)[];
 
 /** Type for a single template element defining track size in grid template */
-export type GridTrackSize = CssLength | "min-content" | "max-content" | "auto" |
+export type GridTrackSize = CssLengthOrAuto | "min-content" | "max-content" |
     IFitContentProxy | IMinMaxProxy | IRepeatProxy;
 
 
@@ -989,7 +992,7 @@ export type TextDecorationSkipInk_StyleType = "none" | "auto" | "all";
 
 
 /** Type for the text-decoration-thickness style property */
-export type TextDecorationThickness_StyleType = "auto" | "from-font" | CssLength;
+export type TextDecorationThickness_StyleType = "from-font" | CssLengthOrAuto;
 
 
 
@@ -1411,17 +1414,17 @@ export interface IBaseStyleset
     listStylePosition?: ListStylePosition_StyleType;
     listStyleType?: ListStyleType_StyleType;
 
-    margin?: OneOrBox<CssLength | "auto">;
-    marginBlock?: OneOrPair<CssLength | "auto">;
-    marginBlockEnd?: CssLength | "auto";
-    marginBlockStart?: CssLength | "auto";
-    marginBottom?: CssLength | "auto";
-    marginInline?: OneOrPair<CssLength | "auto">;
-    marginInlineEnd?: CssLength | "auto";
-    marginInlineStart?: CssLength | "auto";
-    marginLeft?: CssLength | "auto";
-    marginRight?: CssLength | "auto";
-    marginTop?: CssLength | "auto";
+    margin?: OneOrBox<CssLengthOrAuto>;
+    marginBlock?: OneOrPair<CssLengthOrAuto>;
+    marginBlockEnd?: CssLengthOrAuto;
+    marginBlockStart?: CssLengthOrAuto;
+    marginBottom?: CssLengthOrAuto;
+    marginInline?: OneOrPair<CssLengthOrAuto>;
+    marginInlineEnd?: CssLengthOrAuto;
+    marginInlineStart?: CssLengthOrAuto;
+    marginLeft?: CssLengthOrAuto;
+    marginRight?: CssLengthOrAuto;
+    marginTop?: CssLengthOrAuto;
     marginTrim?: MarginTrim_StyleType;
     marker?: DefaultStyleType;
     markerEnd?: Marker_StyleType;
@@ -1776,6 +1779,32 @@ export type Styleset = ExtendedBaseStyleset &
  * The StringStyleset type maps CSS properties including custom properties to the string values.
  */
 export type StringStyleset = { [K: string]: string | null | undefined }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Serialization.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The ICssSerializer interface allows adding style definition classes and objects
+ * and serializing them to a single string. This can be used for server-side rendering when
+ * the resultant string can be set as the content of a `<style>` element.
+ */
+ export interface ICssSerializer
+ {
+     /**
+      * Adds style definition class or instance.
+      */
+     add( instOrClass: StyleDefinition | IStyleDefinitionClass): void;
+
+     /**
+      * Returns concatenated string representation of all CSS rules added to the context.
+      */
+     serialize(): string;
+ }
 
 
 
