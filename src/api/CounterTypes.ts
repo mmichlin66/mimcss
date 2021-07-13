@@ -16,7 +16,7 @@ export type CounterExtended<T> = T | IStringProxy;
  * Type for specfying counter [[system]] property.
  */
 export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic" | "additive" | "fixed" |
-    number | [ListStyleType_StyleType | ICounterStyleRule | IStringProxy];
+    number | [ListStyleType_StyleType | IStringProxy];
 
 
 
@@ -51,7 +51,7 @@ export type Pad_CounterType = [number, string];
 /**
  * Type for specfying counter [[fallback]] property.
  */
-export type Fallback_CounterType = ListStyleType_StyleType | ICounterStyleRule | IStringProxy;
+export type Fallback_CounterType = ListStyleType_StyleType | IStringProxy;
 
 
 

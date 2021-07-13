@@ -4,7 +4,7 @@ import {ExtendedSingleMediaQuery, IMediaFeatureset, MediaQuery, SingleSupportsQu
 import {ExtendedBaseStyleset} from "../api/StyleTypes";
 import {styleProp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf} from "./Utils";
-import { ExtendedCounterStyleset, IBaseCounterStyleset } from "../api/CounterTypes";
+import {ExtendedCounterStyleset, IBaseCounterStyleset} from "../api/CounterTypes";
 
 
 
@@ -370,7 +370,9 @@ const counterStylePropertyInfos: { [K in keyof IBaseCounterStyleset]?: V2SOption
     },
     prefix: WKF.Quoted,
     suffix: WKF.Quoted,
-    range: WKF.OneOrManyWithComma,
+    range: {
+        fromArray: v => v.length ? Array.isArray(v[0]) ? a2s( v, undefined, ",") : a2s(v) : ""
+    },
     pad: {
         arrItemFunc: WKF.Quoted
     },
@@ -378,10 +380,7 @@ const counterStylePropertyInfos: { [K in keyof IBaseCounterStyleset]?: V2SOption
         arrItemFunc: WKF.Quoted
     },
     additiveSymbols: {
-        arrItemFunc: {
-            arrItemFunc: WKF.Quoted
-        },
-        arrSep: ","
+        fromArray: v => v.length ? Array.isArray(v[0]) ? a2s( v, {arrItemFunc: WKF.Quoted}, ",") : a2s( v, WKF.Quoted) : ""
     },
 }
 
