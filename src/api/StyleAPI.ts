@@ -1,10 +1,12 @@
-﻿import { IStringProxy } from "./CoreTypes";
+﻿import {IStringProxy} from "./CoreTypes";
 import {IStyleDefinitionClass, IVarRule, StyleDefinition} from "./RuleTypes";
 import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName, ExtendedVarValue, ICssSerializer} from "./StyleTypes"
 import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
 import {processInstanceOrClass, serializeInstance} from "../rules/RuleContainer";
+import {MediaQuery, SupportsQuery} from "./MediaTypes";
+import {mediaQuery2s, supportsQuery2s} from "../impl/MiscImpl";
 
 
 
@@ -245,7 +247,35 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Style definition serialization.
+// Media and Support.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the given media query value to the CSS media query string. This function should be used
+ * by libraries that allow specifying the [[MediaQuery]] type for the `media` attribute of elements
+ * such as `<link>`, `<style>` and `<source>`
+ */
+export function mediaQueryToString( query: MediaQuery): string
+{
+    return mediaQuery2s( query);
+}
+
+
+
+/**
+ * Converts the given supports query value to the CSS supports query string.
+ */
+export function supportsQueryToString( query: SupportsQuery): string
+{
+    return supportsQuery2s( query);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Style serialization.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -254,102 +284,102 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
  * and instances and serializing them to a string. This can be used for server-side rendering when
  * the resultant string can be set as the content of a `<style>` element.
  */
- export function createCssSerializer(): ICssSerializer
- {
-     return new CssSerializer();
- }
+export function createCssSerializer(): ICssSerializer
+{
+    return new CssSerializer();
+}
 
 
 
- /**
-  * Serializes one or more style definition classes and instances and returns their CSS string
-  * representation. This can be used for server-side rendering when the resultant string can be
-  * set as the content of a `<style>` element.
-  */
- export function serializeToCSS( ...args: (StyleDefinition | IStyleDefinitionClass)[]): string
- {
-     if (!args || args.length === 0)
-         return "";
+/**
+ * Serializes one or more style definition classes and instances and returns their CSS string
+ * representation. This can be used for server-side rendering when the resultant string can be
+ * set as the content of a `<style>` element.
+ */
+export function serializeToCSS( ...args: (StyleDefinition | IStyleDefinitionClass)[]): string
+{
+    if (!args || args.length === 0)
+        return "";
 
-     let serializer = new CssSerializer();
-     args.forEach( instOrClass => serializer.add( instOrClass));
-     return serializer.serialize();
- }
-
-
-
- /**
-  * The StyleSerializer class allows adding style definition classes and objects
-  * and serializing them to a single string. This can be used for server-side rendering when
-  * the resultant string can be set as the content of a `<style>` element.
-  */
- class CssSerializer implements ICssSerializer
- {
-     /**
-      * Adds style definition class or instance.
-      */
-     public add( instOrClass: StyleDefinition | IStyleDefinitionClass): void
-     {
-         let instance = processInstanceOrClass( instOrClass);
-         if (!instance || this.instances.has(instance))
-             return;
-
-         this.instances.add( instance);
-     }
-
-     /**
-      * Returns concatenated string representation of all CSS rules added to the context.
-      */
-     public serialize(): string
-     {
-         if (this.instances.size === 0)
-             return "";
-
-         let ctx = new RuleSerializationContext();
-         this.instances.forEach( instance => ctx.addStyleDefinition( instance));
-         return ctx.topLevelBuf + ctx.nonTopLevelBuf;
-     }
-
-     // Set of style definition instances. This is needed to not add style definitions more than once
-     instances = new Set<StyleDefinition>();
- }
+    let serializer = new CssSerializer();
+    args.forEach( instOrClass => serializer.add( instOrClass));
+    return serializer.serialize();
+}
 
 
 
- /**
-  * The RuleSerializationContext class implements the IRuleSerializationContext interface and
-  * accumulates text of serialized CSS rules.
-  */
- class RuleSerializationContext implements IRuleSerializationContext
- {
-     // Adds rule text
-     public addRuleText( s: string, isTopLevelRule?: boolean): void
-     {
-         if (isTopLevelRule)
-             this.topLevelBuf += s + "\n";
-         else
-             this.nonTopLevelBuf += s + "\n";
-     }
+/**
+ * The StyleSerializer class allows adding style definition classes and objects
+ * and serializing them to a single string. This can be used for server-side rendering when
+ * the resultant string can be set as the content of a `<style>` element.
+ */
+class CssSerializer implements ICssSerializer
+{
+    /**
+     * Adds style definition class or instance.
+     */
+    public add( instOrClass: StyleDefinition | IStyleDefinitionClass): void
+    {
+        let instance = processInstanceOrClass( instOrClass);
+        if (!instance || this.instances.has(instance))
+            return;
 
-     // Adds rule text
-     public addStyleDefinition( instance: StyleDefinition): void
-     {
-         if (!this.instances.has( instance))
-         {
-             this.instances.add( instance);
-             serializeInstance( instance, this);
-         }
-     }
+        this.instances.add( instance);
+    }
 
-     // String buffer that accumulates top-level rule texts.
-     public topLevelBuf = "";
+    /**
+     * Returns concatenated string representation of all CSS rules added to the context.
+     */
+    public serialize(): string
+    {
+        if (this.instances.size === 0)
+            return "";
 
-     // String buffer that accumulates non-top-level rule texts.
-     public nonTopLevelBuf = "";
+        let ctx = new RuleSerializationContext();
+        this.instances.forEach( instance => ctx.addStyleDefinition( instance));
+        return ctx.topLevelBuf + ctx.nonTopLevelBuf;
+    }
 
-     // Set of style definition instances that were already serialized in this context.
-     private instances = new Set<StyleDefinition>();
- }
+    // Set of style definition instances. This is needed to not add style definitions more than once
+    instances = new Set<StyleDefinition>();
+}
+
+
+
+/**
+ * The RuleSerializationContext class implements the IRuleSerializationContext interface and
+ * accumulates text of serialized CSS rules.
+ */
+class RuleSerializationContext implements IRuleSerializationContext
+{
+    // Adds rule text
+    public addRuleText( s: string, isTopLevelRule?: boolean): void
+    {
+        if (isTopLevelRule)
+            this.topLevelBuf += s + "\n";
+        else
+            this.nonTopLevelBuf += s + "\n";
+    }
+
+    // Adds rule text
+    public addStyleDefinition( instance: StyleDefinition): void
+    {
+        if (!this.instances.has( instance))
+        {
+            this.instances.add( instance);
+            serializeInstance( instance, this);
+        }
+    }
+
+    // String buffer that accumulates top-level rule texts.
+    public topLevelBuf = "";
+
+    // String buffer that accumulates non-top-level rule texts.
+    public nonTopLevelBuf = "";
+
+    // Set of style definition instances that were already serialized in this context.
+    private instances = new Set<StyleDefinition>();
+}
 
 
 

@@ -3,9 +3,9 @@ import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, I
 import {Styleset} from "../api/StyleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaQuery, SupportsQuery} from "../api/MediaTypes";
-import {fontFace2s} from "../impl/FontImpl"
+import {fontFace2s} from "../impl/MiscImpl"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
-import {s_mediaQueryToString, supportsQueryToString} from "../impl/MediaImpl";
+import {mediaQuery2s, supportsQuery2s} from "../impl/MiscImpl";
 import {StyleRule} from "./StyleRules";
 import {symValueToString} from "../impl/Utils";
 
@@ -77,11 +77,11 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 		else
 			url = `url(${this.url})`;
 
-		let supportsQueryString = !this.supportsQuery ? "" : supportsQueryToString( this.supportsQuery);
+		let supportsQueryString = !this.supportsQuery ? "" : supportsQuery2s( this.supportsQuery);
 		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
 		    supportsQueryString = `supports( ${supportsQueryString} )`;
 
-		let mediaQueryString = !this.mediaQuery ? "" : s_mediaQueryToString( this.mediaQuery);
+		let mediaQueryString = !this.mediaQuery ? "" : mediaQuery2s( this.mediaQuery);
 		return `@import ${url} ${supportsQueryString} ${mediaQueryString}`;
     }
 

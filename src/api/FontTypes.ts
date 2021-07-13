@@ -1,5 +1,5 @@
 ﻿import {IStringProxy} from "./CoreTypes";
-import { CssAngle, CssLength, CssNumber, CssPercent } from "./NumericTypes";
+import {CssAngle, CssLength, CssNumber, CssPercent} from "./NumericTypes";
 
 
 
@@ -138,10 +138,10 @@ export interface IBaseFontFace
 
 
 /**
- * The IFontFace type maps all @font-face properties defined in the [[ICssFontFace]] interface to
- * the "extended" versions of their types. These extended types are defined using the
- * [[FontFaceExtended]] generic type, which adds [[StringProxy]] and [[ICustomVar]] to the type
- * that is defined in the ICssFontFace interface.
+ * The ExtendedFontFace type maps all @font-face properties defined in the [[IBaseFontFace]]
+ * interface to the "extended" versions of their types. These extended types are defined using the
+ * [[FontFaceExtended]] generic type, which adds [[IStringProxy]] to the type
+ * that is defined in the IBaseFontFace interface.
  */
 export type ExtendedFontFace = { [K in keyof IBaseFontFace]: FontFaceExtended<IBaseFontFace[K]> }
 

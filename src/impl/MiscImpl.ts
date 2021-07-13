@@ -1,8 +1,29 @@
-﻿import {IMediaFeatureset, MediaQuery, ExtendedSingleMediaQuery, SupportsQuery, SingleSupportsQuery} from "../api/MediaTypes";
-import {CssAspectRatio, CssResolution, CssLength} from "../api/NumericTypes";
+﻿import {CssAspectRatio, CssLength, CssResolution} from "../api/NumericTypes";
+import {ExtendedFontFace, FontSrc_FontFaceType, FontSrc, IBaseFontFace} from "../api/FontTypes"
+import {ExtendedSingleMediaQuery, IMediaFeatureset, MediaQuery, SingleSupportsQuery, SupportsQuery} from "../api/MediaTypes";
 import {ExtendedBaseStyleset} from "../api/StyleTypes";
-import {v2s, camelToDash, WKF} from "./Utils";
 import {styleProp2s} from "./StyleImpl";
+import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf} from "./Utils";
+import { ExtendedCounterStyleset, IBaseCounterStyleset } from "../api/CounterTypes";
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS @media rule.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the given media query object to the CSS media query string
+ */
+export function mediaQuery2s( query: MediaQuery): string
+{
+    return v2s( query, {
+        fromAny: singleMediaQueryToString,
+        arrSep: ","
+    })
+}
 
 
 
@@ -56,19 +77,6 @@ type MediaFeatureInfo<K extends keyof IMediaFeatureset = any> = convertFuncType<
          */
         isRange?: boolean;
     }
-
-
-
-/**
- * Converts the given media query object to the CSS media query string
- */
-export function s_mediaQueryToString( query: MediaQuery): string
-{
-    return v2s( query, {
-        fromAny: singleMediaQueryToString,
-        arrSep: ","
-    })
-}
 
 
 
@@ -171,12 +179,12 @@ let mediaFeatures: { [K in keyof IMediaFeatureset]?: MediaFeatureInfo<K> } =
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// CSS supports query.
+// CSS @supports rule.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Converts the given supports query to its string representation */
-export function supportsQueryToString( query: SupportsQuery): string
+export function supportsQuery2s( query: SupportsQuery): string
 {
     return v2s( query, {
         fromAny: singleSupportsQueryToString,
@@ -200,6 +208,179 @@ function singleSupportsQueryToString( query: SingleSupportsQuery): string
                 styleProp2s( propName as keyof ExtendedBaseStyleset, query[propName], true)).join( ") and (")})`;
         }
     });
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS @font-face rule.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the given font face object to the CSS style string.
+ */
+export function fontFace2s( fontface: ExtendedFontFace): string
+{
+    if (!fontface)
+        return "";
+
+    let s = "";
+	for( let name in fontface)
+        s += fontFacePropToString( name, fontface[name], true) + ";";
+
+    return s;
+}
+
+
+
+/**
+ * Converts the given font face property to the CSS style string. Property name can be in either
+ * dash or camel form.
+ */
+function fontFacePropToString( propName: string, propVal: any, includeName?: boolean): string
+{
+    if (!propName)
+        return "";
+
+    // convert the value to string based on the information object for the property (if defined)
+    let stringValue = v2s( propVal, fontFacePropertyInfos[dashToCamel(propName)]);
+
+    // if the resulting string is empty and the name should be included, then we return
+    // "name: initial"; otherwise we will return an empty string.
+    if (!stringValue && includeName)
+        stringValue = "initial";
+
+    return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
+}
+
+
+
+wkf[WKF.FontStyle] = v => v2s( v, {
+    fromNumber: v => `oblique ${wkf[WKF.Angle](v)}`,
+    fromArray: v => `oblique ${a2s( v, WKF.Angle)}`
+});
+
+
+
+function fontSrcToString( val: FontSrc_FontFaceType): string
+{
+    return v2s( val, {
+        fromAny: fontSingleSrcToString,
+        arrSep: ","
+    });
+}
+
+
+
+function fontSingleSrcToString( val: FontSrc): string
+{
+    return v2s( val, {
+        fromProps: [
+            ["local", v => `local(${v})`],
+            ["url", v => `url(${v})`],
+            ["format", {
+                fromAny: v => `format(\"${v}\")`,
+                arrSep: ","
+            }]
+        ]
+    });
+}
+
+
+
+/**
+ * Map of property names to the V2SOptions objects describing custom actions necessary to
+ * convert the property value to the CSS-compliant string.
+ */
+const fontFacePropertyInfos: { [K in keyof IBaseFontFace]?: V2SOptions } =
+{
+    ascentOverride: WKF.Percent,
+    descentOverride: WKF.Percent,
+    fontStretch: { fromAny: WKF.Percent },
+    fontStyle: WKF.FontStyle,
+    fontWeight: { fromAny: WKF.Number },
+    lineGapOverride: WKF.Percent,
+    src: fontSrcToString,
+    sizeAdjust: WKF.Percent,
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS @counter-style rule.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the given counter styleset object to the CSS media query string
+ */
+ export function counterStyleset2s( counterStyleset: ExtendedCounterStyleset): string
+ {
+    if (!counterStyleset)
+        return "";
+
+    let s = "";
+	for( let name in counterStyleset)
+        s += counterStylesetProp2s( name, counterStyleset[name], true) + ";";
+
+    return s;
+ }
+
+
+
+/**
+ * Converts the given counter styleset property to the CSS style string. Property name can be in
+ * either dash or camel form.
+ */
+ function counterStylesetProp2s( propName: string, propVal: any, includeName?: boolean): string
+ {
+     if (!propName)
+         return "";
+
+     // convert the value to string based on the information object for the property (if defined)
+     let stringValue = v2s( propVal, counterStylePropertyInfos[dashToCamel(propName)]);
+
+     // if the resulting string is empty and the name should be included, then we return
+     // "name:; otherwise we will return an empty string.
+     if (!stringValue && includeName)
+         stringValue = "";
+
+     return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
+ }
+
+
+
+ /**
+ * Map of property names to the V2SOptions objects describing custom actions necessary to
+ * convert the property value to the CSS-compliant string.
+ */
+const counterStylePropertyInfos: { [K in keyof IBaseCounterStyleset]?: V2SOptions } =
+{
+    system: {
+        fromNumber: v => "fixed " + v,
+        fromArray: v => "extends " + v2s(v[0])
+    },
+    negative: {
+        fromAny: WKF.Quoted
+    },
+    prefix: WKF.Quoted,
+    suffix: WKF.Quoted,
+    range: WKF.OneOrManyWithComma,
+    pad: {
+        arrItemFunc: WKF.Quoted
+    },
+    symbols: {
+        arrItemFunc: WKF.Quoted
+    },
+    additiveSymbols: {
+        arrItemFunc: {
+            arrItemFunc: WKF.Quoted
+        },
+        arrSep: ","
+    },
 }
 
 

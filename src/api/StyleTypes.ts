@@ -15,7 +15,8 @@ import {
 } from "./ShapeTypes";
 import {
     IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, StyleDefinition,
-    IStyleDefinitionClass
+    IStyleDefinitionClass,
+    ICounterStyleRule
 } from "./RuleTypes";
 
 
@@ -737,7 +738,8 @@ export type ListStylePosition_StyleType = "inside" | "outside";
 
 
 /** Type for list-style-type style property */
-export type ListStyleType_StyleType = "none" | "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
+export type ListStyleType_StyleType = ICounterStyleRule |
+    "none" | "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
     "cjk-decimal" | "cjk-earthly-branch" | "cjk-heavenly-stem" | "cjk-ideographic" |
     "lower-roman" | "upper-roman" | "lower-greek" | "lower-alpha" | "lower-latin" | "upper-alpha" | "upper-latin" |
     "arabic-indic" | "armenian" | "bengali" | "cambodian" | "devanagari" | "georgian" | "gujarati" | "gurmukhi" | "hebrew" |

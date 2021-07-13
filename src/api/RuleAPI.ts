@@ -10,16 +10,17 @@ import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
-    IConstRule, ClassPropType, NameGenerationMethod
+    IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule
 } from "./RuleTypes";
 import {MediaQuery, SupportsQuery} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
+import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
 import {processInstanceOrClass, s_configNames} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
-import {CounterRule} from "../rules/CounterRules";
+import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
@@ -455,6 +456,36 @@ export function $const<K extends VarTemplateName>( template: K, value?: Extended
 export function $counter( nameOverride?: string | ICounterRule): ICounterRule
 {
 	return new CounterRule( nameOverride);
+}
+
+/**
+ * Creates new counter style rule. The counter style name will be created when the rule is
+ * processed as part of the style definition class. The name can be also overridden by providing
+ * either an explicit name or another counter style rule.
+ *
+ * @param counterStyleset An object that defines counter style features.
+ * @param nameOverride String or another `ICounterStyleRule` object that determines the name of the
+ * counter style. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing counter style.
+ * @returns The `ICounterStyleRule` object that represents the counter style.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     counterStyle = css.$counterStyle({
+ *         system: "cyclic",
+ *         symbols: ["one", "two", "three"],
+ *         suffix: " - "
+ *     })
+ * }
+ */
+export function $counterStyle( counterStyleset?: ExtendedCounterStyleset,
+    nameOverride?: string | ICounterStyleRule): ICounterStyleRule
+{
+	return new CounterStyleRule( counterStyleset, nameOverride);
 }
 
 /**
@@ -964,10 +995,4 @@ class VirtHandler implements ProxyHandler<any>
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Scheduling.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
 

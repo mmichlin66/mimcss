@@ -2,7 +2,7 @@ import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupport
 import {MediaQuery, SupportsQuery} from "../api/MediaTypes";
 import {getContainerFromInstance, processInstanceOrClass} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
-import {s_mediaQueryToString, supportsQueryToString} from "../impl/MediaImpl";
+import {mediaQuery2s, supportsQuery2s} from "../impl/MiscImpl";
 
 
 
@@ -136,7 +136,7 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 	protected getGroupSelectorText(): string | null
 	{
 		// convert the query to its string form
-		let queryString = supportsQueryToString( this.query);
+		let queryString = supportsQuery2s( this.query);
 
 		// determine whether the query is supported and if it is not, don't insert the rule
 		return CSS.supports( queryString) ? `@supports ${queryString}` : null;
@@ -147,7 +147,7 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 	/** Flag indicated whether the browser supports this rule's query */
     public get isSupported(): boolean
     {
-        return  CSS.supports( supportsQueryToString( this.query));
+        return  CSS.supports( supportsQuery2s( this.query));
     }
 
 	/** SOM supports rule */
@@ -184,7 +184,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string | null
 	{
-		return `@media ${s_mediaQueryToString( this.query)}`;
+		return `@media ${mediaQuery2s( this.query)}`;
 	}
 
 

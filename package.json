@@ -47,7 +47,6 @@
 		"lib/api/ShapeTypes.d.ts",
 		"lib/api/ShapeAPI.d.ts",
 		"lib/api/MediaTypes.d.ts",
-		"lib/api/MediaAPI.d.ts",
 		"lib/api/RuleTypes.d.ts",
 		"lib/api/RuleAPI.d.ts",
 		"lib/api/SchedulingTypes.d.ts",

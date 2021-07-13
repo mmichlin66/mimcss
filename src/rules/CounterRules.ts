@@ -1,5 +1,7 @@
-import {ICounterRule} from "../api/RuleTypes"
-import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import { ExtendedCounterStyleset } from "../api/CounterTypes";
+import {ICounterRule, ICounterStyleRule} from "../api/RuleTypes"
+import { counterStyleset2s } from "../impl/MiscImpl";
+import {createNames, IRuleContainer, IRuleSerializationContext, ITopLevelRuleContainer, Rule, RuleLike} from "./Rule";
 
 
 
@@ -53,6 +55,86 @@ export class CounterRule extends RuleLike implements ICounterRule
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
 	private nameOverride?: string | ICounterRule;
+}
+
+
+
+/**
+ * The CounterStyleRule class describes the CSS @nounter-style at-rule.
+ */
+export class CounterStyleRule extends Rule implements ICounterStyleRule
+{
+	public constructor( counterStyleset?: ExtendedCounterStyleset, nameOverride?: string | ICounterStyleRule)
+	{
+        super();
+        this.counterStyleset = counterStyleset ?? {};
+		this.nameOverride = nameOverride;
+	}
+
+
+
+    /** Name of the counter */
+	public get counterStyleName(): string { return this.name; }
+
+
+
+    // This function is used when the object is specified as a value in a style property or in
+    // another counter style rule. We return the counter style name.
+    public toString(): string { return this.name; }
+
+
+	// Processes the given rule.
+	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	{
+        super.process( container, ownerContainer, ruleName);
+		[this.name] = createNames( ownerContainer, ruleName, this.nameOverride);
+	}
+
+	// Creates a copy of the rule.
+	public clone(): CounterStyleRule
+	{
+		return new CounterStyleRule( undefined, this.nameOverride);
+	}
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	{
+		this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent);
+	}
+
+	// Serializes this rule to a string.
+    public serialize( ctx: IRuleSerializationContext): void
+    {
+		ctx.addRuleText( this.toCssString());
+    }
+
+
+
+	// Serializes this rule to a string.
+    private toCssString(): string
+    {
+		return `@counter-style ${this.name} {${counterStyleset2s( this.counterStyleset)}}`;
+    }
+
+
+
+	/** SOM counter-style rule */
+	// public cssRule: CSSCounterStyleRule;
+	public cssRule: CSSRule | null;
+
+    /**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+    // Object defining the counter style rule features.
+    private counterStyleset: ExtendedCounterStyleset;
+
+    // Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	private nameOverride?: string | ICounterStyleRule;
 }
 
 

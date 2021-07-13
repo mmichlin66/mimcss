@@ -147,10 +147,6 @@ export type V2SOptions = WKF | AnyToStringFunc |
     funcArgs?: any[];
 };
 
-wkf[WKF.OneOrManyWithComma] = v => v2s( v, { arrSep: "," });
-wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { arrSep: "/" });
-wkf[WKF.Quoted] = v => `"${v2s(v)}"`;
-
 
 
 /**
@@ -229,6 +225,12 @@ export function v2s( val: any, options?: V2SOptions): string
         return v2s( val, newOptions);
     }
 }
+
+
+
+wkf[WKF.OneOrManyWithComma] = v => v2s( v, { arrSep: "," });
+wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { arrSep: "/" });
+wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
 
 
 
