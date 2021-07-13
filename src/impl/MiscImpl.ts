@@ -87,6 +87,8 @@ function singleMediaQueryToString( query: ExtendedSingleMediaQuery): string
 {
     if (!query)
         return "";
+    else if (typeof query === "string")
+        return query;
 
     let mediaType = query.$mediaType;
     let only = query.$only;
