@@ -2,10 +2,10 @@ import {PagePseudoClass} from "../api/CoreTypes";
 import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "../api/RuleTypes";
 import {Styleset} from "../api/StyleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
-import {MediaQuery, SupportsQuery} from "../api/MediaTypes";
+import {MediaStatement, SupportsStatemnet} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
-import {mediaQuery2s, supportsQuery2s} from "../impl/MiscImpl";
+import {media2s, supports2s} from "../impl/MiscImpl";
 import {StyleRule} from "./StyleRules";
 import {symValueToString} from "../impl/Utils";
 
@@ -52,20 +52,20 @@ abstract class MiscRule<T extends CSSRule> extends Rule
  */
 export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 {
-	public constructor( url: string, mediaQuery?: string | MediaQuery, supportsQuery?: string | SupportsQuery)
+	public constructor( url: string, mediaStatement?: MediaStatement, supportsStatement?: string | SupportsStatemnet)
 	{
         // this is a top-level rule
 		super( true);
 
 		this.url = url;
-		this.mediaQuery = mediaQuery;
-		this.supportsQuery = supportsQuery;
+		this.mediaStatement = mediaStatement;
+		this.supportsStatement = supportsStatement;
 	}
 
 	// Creates a copy of the rule.
 	public clone(): ImportRule
 	{
-		return new ImportRule( this.url, this.mediaQuery, this.supportsQuery);
+		return new ImportRule( this.url, this.mediaStatement, this.supportsStatement);
 	}
 
 	// Returns CSS string for this rule.
@@ -77,11 +77,11 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 		else
 			url = `url(${this.url})`;
 
-		let supportsQueryString = !this.supportsQuery ? "" : supportsQuery2s( this.supportsQuery);
+		let supportsQueryString = !this.supportsStatement ? "" : supports2s( this.supportsStatement);
 		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
 		    supportsQueryString = `supports( ${supportsQueryString} )`;
 
-		let mediaQueryString = !this.mediaQuery ? "" : mediaQuery2s( this.mediaQuery);
+		let mediaQueryString = !this.mediaStatement ? "" : media2s( this.mediaStatement);
 		return `@import ${url} ${supportsQueryString} ${mediaQueryString}`;
     }
 
@@ -89,10 +89,10 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 	public url: string;
 
 	// Optional media query for this rule.
-	public mediaQuery?: string | MediaQuery;
+	public mediaStatement?: MediaStatement;
 
 	// Optional supports query for this rule.
-	public supportsQuery?: string | SupportsQuery;
+	public supportsStatement?: string | SupportsStatemnet;
 }
 
 

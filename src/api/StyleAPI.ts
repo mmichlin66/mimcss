@@ -1,12 +1,16 @@
 ﻿import {IStringProxy} from "./CoreTypes";
 import {IStyleDefinitionClass, IVarRule, StyleDefinition} from "./RuleTypes";
-import {Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName, ExtendedVarValue, ICssSerializer} from "./StyleTypes"
+import {ExtendedMediaFeatureset, IMediaQueryProxy, MediaStatement, SupportsStatemnet} from "./MediaTypes";
+import {
+    Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName,
+    ExtendedVarValue, ICssSerializer
+} from "./StyleTypes"
 import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
 import {processInstanceOrClass, serializeInstance} from "../rules/RuleContainer";
-import {MediaQuery, SupportsQuery} from "./MediaTypes";
-import {mediaQuery2s, supportsQuery2s} from "../impl/MiscImpl";
+import {media2s, supports2s} from "../impl/MiscImpl";
+import { tag2s } from "../impl/Utils";
 
 
 
@@ -245,20 +249,43 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Media and Support.
+// @media and @supports queries.
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts the given media query value to the CSS media query string. This function should be used
- * by libraries that allow specifying the [[MediaQuery]] type for the `media` attribute of elements
+ * Tag function that represents a media query. This function allows expressing media queries in a
+ * natural string form while embedding media feature values in type safe manner. The string can
+ * contain any media expressions while the embedded objects must be of type IMediaFeatureset.
+ * Multiple features in the feature set will be expanded into clauses combined with the "and"
+ * operator.
+ *
+ * **Example:**
+ *
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // screen and (min-width: 400px) and (max-width: 600px) and (orientation: portrait)
+ *     ifNarrowDevice = css.$media(
+ *         css.media`screen and ${{width:[400,600], orientation: "portrait"}}`, ...)
+ * }
+ */
+ export function media( parts: TemplateStringsArray, ...params: ExtendedMediaFeatureset[]): IMediaQueryProxy
+{
+    return () => tag2s( parts, params, v => typeof v === "string" ? v : media2s(v));
+}
+
+
+
+/**
+ * Converts the given media query value to the CSS media query string. This function can be used
+ * by libraries that allow specifying [[MediaStatement]] for the `media` attribute of elements
  * such as `<link>`, `<style>` and `<source>`
  */
-export function mediaQueryToString( query: MediaQuery): string
+export function mediaToString( query: MediaStatement): string
 {
-    return mediaQuery2s( query);
+    return media2s( query);
 }
 
 
@@ -266,9 +293,9 @@ export function mediaQueryToString( query: MediaQuery): string
 /**
  * Converts the given supports query value to the CSS supports query string.
  */
-export function supportsQueryToString( query: SupportsQuery): string
+export function supportsToString( query: SupportsStatemnet): string
 {
-    return supportsQuery2s( query);
+    return supports2s( query);
 }
 
 

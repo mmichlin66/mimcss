@@ -1,6 +1,6 @@
 ﻿import {CssAspectRatio, CssLength, CssResolution} from "../api/NumericTypes";
 import {ExtendedFontFace, FontSrc_FontFaceType, FontSrc, IBaseFontFace} from "../api/FontTypes"
-import {ExtendedSingleMediaQuery, IMediaFeatureset, MediaQuery, SingleSupportsQuery, SupportsQuery} from "../api/MediaTypes";
+import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatemnet} from "../api/MediaTypes";
 import {ExtendedBaseStyleset} from "../api/StyleTypes";
 import {styleProp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf} from "./Utils";
@@ -17,10 +17,10 @@ import {ExtendedCounterStyleset, IBaseCounterStyleset} from "../api/CounterTypes
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function mediaQuery2s( query: MediaQuery): string
+export function media2s( query: MediaStatement): string
 {
     return v2s( query, {
-        fromAny: singleMediaQueryToString,
+        fromAny: mediaQuery2s,
         arrSep: ","
     })
 }
@@ -83,31 +83,23 @@ type MediaFeatureInfo<K extends keyof IMediaFeatureset = any> = convertFuncType<
 /**
  * Converts the given media query object to the CSS media query string
  */
-function singleMediaQueryToString( query: ExtendedSingleMediaQuery): string
+function mediaQuery2s( query: MediaQuery): string
 {
     if (!query)
         return "";
     else if (typeof query === "string")
         return query;
-
-    let mediaType = query.$mediaType;
-    let only = query.$only;
-    let negate = query.$negate;
+    else if (typeof query === "function")
+        return query();
 
     let items: string[] = [];
-    if (mediaType)
-        items.push( (only ? "only " : "") + mediaType);
-
     for( let propName in query)
     {
-        if (propName.startsWith("$"))
-            continue;
-
         if (query[propName])
             items.push( mediaFeatureToString( propName, query[propName]));
     }
 
-    return `${negate ? "not " : ""}${items.join(" and ")}`;
+    return items.join(" and ");
 }
 
 
@@ -186,10 +178,10 @@ let mediaFeatures: { [K in keyof IMediaFeatureset]?: MediaFeatureInfo<K> } =
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Converts the given supports query to its string representation */
-export function supportsQuery2s( query: SupportsQuery): string
+export function supports2s( query: SupportsStatemnet): string
 {
     return v2s( query, {
-        fromAny: singleSupportsQueryToString,
+        fromAny: supportsQuery2s,
         arrSep: " or "
     });
 }
@@ -197,10 +189,10 @@ export function supportsQuery2s( query: SupportsQuery): string
 
 
 /** Converts the given supports query to its string representation */
-function singleSupportsQueryToString( query: SingleSupportsQuery): string
+function supportsQuery2s( query: SupportsQuery): string
 {
     return v2s( query, {
-        fromObj: (v: ExtendedBaseStyleset & { $negate?: boolean; }) => {
+        fromObj: (v: Exclude<SupportsQuery,string>) => {
             let propNames = Object.keys( v).filter( (propName) => propName != "$negate");
             if (propNames.length === 0)
                 return "";

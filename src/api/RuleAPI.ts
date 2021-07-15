@@ -12,7 +12,7 @@ import {
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
     IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule
 } from "./RuleTypes";
-import {MediaQuery, SupportsQuery} from "./MediaTypes"
+import {MediaStatement, SupportsStatemnet} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
@@ -637,8 +637,8 @@ export function $fontface( fontface: ExtendedFontFace): IFontFaceRule
  *     ]
  * }
  */
-export function $import( url: string, mediaQuery?: string | MediaQuery,
-	supportsQuery?: string | SupportsQuery): IImportRule
+export function $import( url: string, mediaQuery?: string | MediaStatement,
+	supportsQuery?: string | SupportsStatemnet): IImportRule
 {
 	return new ImportRule( url, mediaQuery, supportsQuery);
 }
@@ -662,7 +662,7 @@ export function $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPag
 /**
  * Creates a new `@supports` rule.
  */
-export function $supports<T extends StyleDefinition>( query: SupportsQuery,
+export function $supports<T extends StyleDefinition>( query: SupportsStatemnet,
     instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>
 {
 	return new SupportsRule( query, instOrClass);
@@ -671,7 +671,7 @@ export function $supports<T extends StyleDefinition>( query: SupportsQuery,
 /**
  * Creates new media rule.
  */
-export function $media<T extends StyleDefinition>( query: MediaQuery,
+export function $media<T extends StyleDefinition>( query: MediaStatement,
     instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>
 {
 	return new MediaRule( query, instOrClass);

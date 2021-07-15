@@ -1,8 +1,8 @@
 import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
-import {MediaQuery, SupportsQuery} from "../api/MediaTypes";
+import {MediaStatement, SupportsStatemnet} from "../api/MediaTypes";
 import {getContainerFromInstance, processInstanceOrClass} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
-import {mediaQuery2s, supportsQuery2s} from "../impl/MiscImpl";
+import {media2s, supports2s} from "../impl/MiscImpl";
 
 
 
@@ -115,7 +115,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
  */
 export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( query: SupportsQuery, instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( query: SupportsStatemnet, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super( instanceOrClass);
 
@@ -136,7 +136,7 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 	protected getGroupSelectorText(): string | null
 	{
 		// convert the query to its string form
-		let queryString = supportsQuery2s( this.query);
+		let queryString = supports2s( this.query);
 
 		// determine whether the query is supported and if it is not, don't insert the rule
 		return CSS.supports( queryString) ? `@supports ${queryString}` : null;
@@ -147,14 +147,14 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 	/** Flag indicated whether the browser supports this rule's query */
     public get isSupported(): boolean
     {
-        return  CSS.supports( supportsQuery2s( this.query));
+        return  CSS.supports( supports2s( this.query));
     }
 
 	/** SOM supports rule */
 	public cssRule: CSSSupportsRule | null;
 
 	// support query for this rule.
-	private query: SupportsQuery;
+	private query: SupportsStatemnet;
 }
 
 
@@ -164,11 +164,11 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
  */
 export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( query: MediaQuery, instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( statement: MediaStatement, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super( instanceOrClass);
 
-		this.query = query;
+		this.statement = statement;
 	}
 
 
@@ -176,7 +176,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	// Creates a copy of the rule.
 	public clone(): MediaRule<T>
 	{
-		return new MediaRule<T>( this.query, this.instanceOrClass);
+		return new MediaRule<T>( this.statement, this.instanceOrClass);
 	}
 
 
@@ -184,7 +184,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string | null
 	{
-		return `@media ${mediaQuery2s( this.query)}`;
+		return `@media ${media2s( this.statement)}`;
 	}
 
 
@@ -193,7 +193,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	public cssRule: CSSMediaRule | null;
 
 	// media query for this rule.
-	public query: MediaQuery;
+	public statement: MediaStatement;
 }
 
 
