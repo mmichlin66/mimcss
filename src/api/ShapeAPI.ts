@@ -973,7 +973,7 @@ class Polygon implements IPolygon
     {
         return f2s( "polygon", [
             this.rule,
-            [this.points, { arrItemFunc: WKF.MultiLengthWithSpace, arrSep: ","}],
+            [this.points, { item: WKF.MultiLengthWithSpace, sep: ","}],
         ]);
     }
 }
@@ -1102,7 +1102,7 @@ export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
 {
     return () => f2s( "repeat", [
         count,
-        [tracks, { arrItemFunc: WKF.GridTrack}]
+        [tracks, { item: WKF.GridTrack}]
     ]);
 }
 
