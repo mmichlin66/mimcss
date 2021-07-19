@@ -237,7 +237,7 @@ function colorNumberToString( val: number): string
 function separationToString( c: Extended<number>): string
 {
     return v2s( c, {
-        fromNumber: c => {
+        num: c => {
             if (c !== 0 && c > -1 && c < 1)
             {
                 // invert negative value
@@ -277,8 +277,8 @@ function separationToString( c: Extended<number>): string
 function alphaToString( a?: Extended<number>): string
 {
     return v2s( a, {
-        fromNull: "1",
-        fromNumber: a => {
+        nil: "1",
+        num: a => {
             // negative and positive values of alpha are treated identically, so convert to positive
             if (a < 0)
                 a = -a;
@@ -302,7 +302,7 @@ function alphaToString( a?: Extended<number>): string
 function colorPercentToString( n: Extended<number>): string
 {
     return v2s( n, {
-        fromNumber: n => {
+        num: n => {
             // negative and positive values are treated identically, so convert to positive
             if (n < 0)
                 n = -n;
@@ -366,8 +366,8 @@ function colorWithAlphaToString( c: number | keyof INamedColors, a: number): str
 function color2s( val: Extended<CssColor>): string
 {
     return v2s( val, {
-        fromString: v => Colors[v] ? colorNumberToString( Colors[v]) : v,
-        fromNumber: colorNumberToString
+        str: v => Colors[v] ? colorNumberToString( Colors[v]) : v,
+        num: colorNumberToString
     });
 }
 

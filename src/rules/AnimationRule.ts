@@ -140,9 +140,9 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 	public getSelectorString(): string
 	{
 		return v2s( this.waypoint, {
-			fromNumber: v => v + "%",
-			arrItemFunc: v => v2s( v, { fromNumber: v => v + "%" }),
-			arrSep: ","
+			num: v => v + "%",
+			item: v => v2s( v, { num: v => v + "%" }),
+			sep: ","
 		})
 	}
 

@@ -1,9 +1,7 @@
-﻿import {CssAspectRatio, CssLength, CssResolution} from "../api/NumericTypes";
-import {ExtendedFontFace, FontSrc_FontFaceType, FontSrc, IBaseFontFace} from "../api/FontTypes"
+﻿import {ExtendedFontFace, FontSrc, IBaseFontFace} from "../api/FontTypes"
 import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatemnet} from "../api/MediaTypes";
-import {ExtendedBaseStyleset} from "../api/StyleTypes";
 import {styleProp2s} from "./StyleImpl";
-import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf} from "./Utils";
+import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf, propSet2s} from "./Utils";
 import {ExtendedCounterStyleset, IBaseCounterStyleset} from "../api/CounterTypes";
 
 
@@ -20,63 +18,10 @@ import {ExtendedCounterStyleset, IBaseCounterStyleset} from "../api/CounterTypes
 export function media2s( query: MediaStatement): string
 {
     return v2s( query, {
-        fromAny: mediaQuery2s,
-        arrSep: ","
+        any: mediaQuery2s,
+        sep: ","
     })
 }
-
-
-
-function aspectRatioToString( val: CssAspectRatio): string
-{
-    return v2s( val, { arrSep: "/" })
-}
-
-
-
-function lengthFeatureToString( val: CssLength): string
-{
-    return v2s( val, {
-        fromNumber: WKF.Length
-    });
-}
-
-
-
-function resolutionFeatureToString( val: CssResolution): string
-{
-    return v2s( val, {
-        fromNumber: WKF.Resolution
-    });
-}
-
-
-
-/** Type of a function that converts the property-specific type to CSS string */
-type convertFuncType<K extends keyof IMediaFeatureset = any> = (val: IMediaFeatureset[K]) => string;
-
-
-
-/**
- * The MediaFeatureInfo represents information that we keep for style properties
- */
-type MediaFeatureInfo<K extends keyof IMediaFeatureset = any> = convertFuncType<K> | boolean |
-    {
-        /** Function that converts from the property-specific type to CSS string */
-        convert?: convertFuncType<K>;
-
-        /**
-         * If defined, indicates the value, which we will not put into CSS string. This is needed for
-         * media features that can be specified without the value, e.g. color or color-index.
-         */
-        defaultValue?: IMediaFeatureset[K];
-
-        /**
-         * Flag indicating whether the feature is a "range" feature; that is, can be used in an
-         * expression (a <= feature <= b).
-         */
-        isRange?: boolean;
-    }
 
 
 
@@ -85,21 +30,10 @@ type MediaFeatureInfo<K extends keyof IMediaFeatureset = any> = convertFuncType<
  */
 function mediaQuery2s( query: MediaQuery): string
 {
-    if (!query)
-        return "";
-    else if (typeof query === "string")
-        return query;
-    else if (typeof query === "function")
-        return query();
-
-    let items: string[] = [];
-    for( let propName in query)
-    {
-        if (query[propName])
-            items.push( mediaFeatureToString( propName, query[propName]));
-    }
-
-    return items.join(" and ");
+    return propSet2s( query, mediaFeatureInfos, {
+        separator: " and ",
+        propFunc: mediaFeature2s,
+    });
 }
 
 
@@ -107,67 +41,52 @@ function mediaQuery2s( query: MediaQuery): string
 /**
  * Converts the given media feature to the CSS media query string
  */
-function mediaFeatureToString( featureName: string, val: any, valueOnly?: boolean): string
+function mediaFeature2s( dashName: string, camelName: string, val: any, options: V2SOptions): string
 {
-    if (!featureName || val == null)
-        return "()";
-
-    // find information object
-    let info: MediaFeatureInfo = mediaFeatures[featureName];
-
-    let realFeatureName = camelToDash( featureName);
+    if (val == null)
+        return "";
 
     // if defaultValue is defined and the property value is equal to it, no value should be returned.
-    let defaultValue = typeof info === "object" ? info.defaultValue : undefined;
+    let defaultValue = mediaFeatureDefaultValues.get(camelName);
     if (defaultValue !== undefined && val === defaultValue)
-        return valueOnly ? "" : realFeatureName;
+        return dashName;
 
-    let convert = typeof info === "function" ? info : typeof info === "object" ? info.convert : undefined;
-    let isRange = typeof info === "boolean" ? info : typeof info === "object" ? info.isRange : undefined;
-    if (isRange && !valueOnly && Array.isArray( val) && val.length === 2)
+    let isRange = rangeMediaFeatures.has( camelName);
+    if (isRange && Array.isArray( val))
     {
-        let s1 = mediaFeatureSingleValueToString( val[0], convert);
-        let s2 = mediaFeatureSingleValueToString( val[1], convert);
-
-        return `(${"min-" + realFeatureName}:${s1}) and (${"max-" + realFeatureName}:${s2})`;
+        return `(${"min-" + dashName}:${v2s( val[0], options)}) and (${"max-" + dashName}:${v2s( val[1], options)})`;
 
         // this syntax is not widely supported yet
-        // return `${s1} <= ${realFeatureName} <= ${s2}`;
+        // return `${s1} <= ${dashName} <= ${s2}`;
     }
     else
-    {
-        let s = mediaFeatureSingleValueToString( val, convert);
-        return valueOnly ? s : `(${realFeatureName}:${s})`;
-    }
+        return `(${dashName}:${v2s( val, options)})`;
 }
 
 
 
-function mediaFeatureSingleValueToString( val: any, convert?: convertFuncType): string
+let mediaFeatureInfos: { [K in keyof IMediaFeatureset]?: V2SOptions } =
 {
-    return convert ? convert( val) : v2s( val);
-}
-
-
-
-let mediaFeatures: { [K in keyof IMediaFeatureset]?: MediaFeatureInfo<K> } =
-{
-    aspectRatio: { convert: aspectRatioToString, isRange: true },
-    minAspectRatio: aspectRatioToString,
-    maxAspectRatio: aspectRatioToString,
-    color: { defaultValue: 0, isRange: true },
-    colorIndex: { defaultValue: 0, isRange: true },
-    height: { convert: lengthFeatureToString, isRange: true },
-    minHeight: lengthFeatureToString,
-    maxHeight: lengthFeatureToString,
-    monochrome: { defaultValue: 0, isRange: true },
-    resolution: { convert: resolutionFeatureToString, isRange: true },
-    minResolution: resolutionFeatureToString,
-    maxResolution: resolutionFeatureToString,
-    width: { convert: lengthFeatureToString, isRange: true },
-    minWidth: lengthFeatureToString,
-    maxWidth: lengthFeatureToString,
+    height: WKF.Length,
+    minHeight: WKF.Length,
+    maxHeight: WKF.Length,
+    resolution: WKF.Resolution,
+    minResolution: WKF.Resolution,
+    maxResolution: WKF.Resolution,
+    width: WKF.Length,
+    minWidth: WKF.Length,
+    maxWidth: WKF.Length,
 };
+
+// Set of media features that allow range of values
+let rangeMediaFeatures = new Set<string>(["aspectRatio", "color", "colorIndex", "height", "monochrome", "resolution", "width"]);
+
+// Map of media features to default values
+let mediaFeatureDefaultValues = new Map<string,any>([
+    ["color", 0],
+    ["colorIndex", 0],
+    ["monochrome", 0]
+]);
 
 
 
@@ -177,12 +96,12 @@ let mediaFeatures: { [K in keyof IMediaFeatureset]?: MediaFeatureInfo<K> } =
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Converts the given supports query to its string representation */
-export function supports2s( query: SupportsStatemnet): string
+/** Converts the given supports statement to its string representation */
+export function supports2s( statement: SupportsStatemnet): string
 {
-    return v2s( query, {
-        fromAny: supportsQuery2s,
-        arrSep: " or "
+    return v2s( statement, {
+        any: supportsQuery2s,
+        sep: " or "
     });
 }
 
@@ -192,14 +111,13 @@ export function supports2s( query: SupportsStatemnet): string
 function supportsQuery2s( query: SupportsQuery): string
 {
     return v2s( query, {
-        fromObj: (v: Exclude<SupportsQuery,string>) => {
-            let propNames = Object.keys( v).filter( (propName) => propName != "$negate");
+        obj: (v: Exclude<SupportsQuery,string>) => {
+            let propNames = Object.keys( v);
             if (propNames.length === 0)
                 return "";
 
-            let not = v.$negate ? "not" : "";
-            return  `${not} (${propNames.map( (propName) =>
-                styleProp2s( propName as keyof ExtendedBaseStyleset, query[propName], true)).join( ") and (")})`;
+            return `(${propNames.map( (propName) =>
+                styleProp2s( propName, query[propName], true)).join( ") and (")})`;
         }
     });
 }
@@ -217,66 +135,27 @@ function supportsQuery2s( query: SupportsQuery): string
  */
 export function fontFace2s( fontface: ExtendedFontFace): string
 {
-    if (!fontface)
-        return "";
-
-    let s = "";
-	for( let name in fontface)
-        s += fontFacePropToString( name, fontface[name], true) + ";";
-
-    return s;
-}
-
-
-
-/**
- * Converts the given font face property to the CSS style string. Property name can be in either
- * dash or camel form.
- */
-function fontFacePropToString( propName: string, propVal: any, includeName?: boolean): string
-{
-    if (!propName)
-        return "";
-
-    // convert the value to string based on the information object for the property (if defined)
-    let stringValue = v2s( propVal, fontFacePropertyInfos[dashToCamel(propName)]);
-
-    // if the resulting string is empty and the name should be included, then we return
-    // "name: initial"; otherwise we will return an empty string.
-    if (!stringValue && includeName)
-        stringValue = "initial";
-
-    return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
+    return propSet2s( fontface, fontFacePropertyInfos);
 }
 
 
 
 wkf[WKF.FontStyle] = v => v2s( v, {
-    fromNumber: v => `oblique ${wkf[WKF.Angle](v)}`,
-    fromArray: v => `oblique ${a2s( v, WKF.Angle)}`
+    num: v => `oblique ${wkf[WKF.Angle](v)}`,
+    arr: v => `oblique ${a2s( v, WKF.Angle)}`
 });
-
-
-
-function fontSrcToString( val: FontSrc_FontFaceType): string
-{
-    return v2s( val, {
-        fromAny: fontSingleSrcToString,
-        arrSep: ","
-    });
-}
 
 
 
 function fontSingleSrcToString( val: FontSrc): string
 {
     return v2s( val, {
-        fromProps: [
+        props: [
             ["local", v => `local(${v})`],
             ["url", v => `url(${v})`],
             ["format", {
-                fromAny: v => `format(\"${v}\")`,
-                arrSep: ","
+                any: v => `format(\"${v}\")`,
+                sep: ","
             }]
         ]
     });
@@ -292,11 +171,14 @@ const fontFacePropertyInfos: { [K in keyof IBaseFontFace]?: V2SOptions } =
 {
     ascentOverride: WKF.Percent,
     descentOverride: WKF.Percent,
-    fontStretch: { fromAny: WKF.Percent },
+    fontStretch: { any: WKF.Percent },
     fontStyle: WKF.FontStyle,
-    fontWeight: { fromAny: WKF.Number },
+    fontWeight: { any: WKF.Number },
     lineGapOverride: WKF.Percent,
-    src: fontSrcToString,
+    src: {
+        any: fontSingleSrcToString,
+        sep: ","
+    },
     sizeAdjust: WKF.Percent,
 }
 
@@ -354,25 +236,25 @@ const fontFacePropertyInfos: { [K in keyof IBaseFontFace]?: V2SOptions } =
 const counterStylePropertyInfos: { [K in keyof IBaseCounterStyleset]?: V2SOptions } =
 {
     system: {
-        fromNumber: v => "fixed " + v,
-        fromArray: v => "extends " + v2s(v[0])
+        num: v => "fixed " + v,
+        arr: v => "extends " + v2s(v[0])
     },
     negative: {
-        fromAny: WKF.Quoted
+        any: WKF.Quoted
     },
     prefix: WKF.Quoted,
     suffix: WKF.Quoted,
     range: {
-        fromArray: v => v.length ? Array.isArray(v[0]) ? a2s( v, undefined, ",") : a2s(v) : ""
+        arr: v => v.length ? Array.isArray(v[0]) ? a2s( v, undefined, ",") : a2s(v) : ""
     },
     pad: {
-        arrItemFunc: WKF.Quoted
+        item: WKF.Quoted
     },
     symbols: {
-        arrItemFunc: WKF.Quoted
+        item: WKF.Quoted
     },
     additiveSymbols: {
-        fromArray: v => v.length ? Array.isArray(v[0]) ? a2s( v, {arrItemFunc: WKF.Quoted}, ",") : a2s( v, WKF.Quoted) : ""
+        arr: v => v.length ? Array.isArray(v[0]) ? a2s( v, {item: WKF.Quoted}, ",") : a2s( v, WKF.Quoted) : ""
     },
 }
 

@@ -115,11 +115,11 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
  */
 export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( query: SupportsStatemnet, instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( statement: SupportsStatemnet, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super( instanceOrClass);
 
-		this.query = query;
+		this.statement = statement;
 	}
 
 
@@ -127,7 +127,7 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 	// Creates a copy of the rule.
 	public clone(): SupportsRule<T>
 	{
-		return new SupportsRule<T>( this.query, this.instanceOrClass);
+		return new SupportsRule<T>( this.statement, this.instanceOrClass);
 	}
 
 
@@ -136,7 +136,7 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 	protected getGroupSelectorText(): string | null
 	{
 		// convert the query to its string form
-		let queryString = supports2s( this.query);
+		let queryString = supports2s( this.statement);
 
 		// determine whether the query is supported and if it is not, don't insert the rule
 		return CSS.supports( queryString) ? `@supports ${queryString}` : null;
@@ -147,14 +147,14 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 	/** Flag indicated whether the browser supports this rule's query */
     public get isSupported(): boolean
     {
-        return  CSS.supports( supports2s( this.query));
+        return  CSS.supports( supports2s( this.statement));
     }
 
 	/** SOM supports rule */
 	public cssRule: CSSSupportsRule | null;
 
-	// support query for this rule.
-	private query: SupportsStatemnet;
+	// support statement for this rule.
+	private statement: SupportsStatemnet;
 }
 
 
@@ -192,7 +192,7 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 	/** SOM media rule */
 	public cssRule: CSSMediaRule | null;
 
-	// media query for this rule.
+	// media statement for this rule.
 	public statement: MediaStatement;
 }
 

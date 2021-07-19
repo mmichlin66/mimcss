@@ -808,8 +808,8 @@ export function configNameGeneration( method: NameGenerationMethod, prefix?: str
 export function classes( ...classProps: ClassPropType[]): string
 {
 	return v2s( classProps, {
-		fromObj: (v: IClassRule | IClassNameRule) => v.name,
-		arrItemFunc: classes
+		obj: (v: IClassRule | IClassNameRule) => v.name,
+		item: classes
 	});
 }
 

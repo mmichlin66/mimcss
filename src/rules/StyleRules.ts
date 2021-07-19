@@ -6,7 +6,7 @@ import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, Ex
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, symValueToString} from "../impl/Utils";
 import {
-    mergeStylesets, stylesetToString, styleProp2s, mergeStylesetCustomProps, selector2s,
+    mergeStylesets, styleset2s, styleProp2s, mergeStylesetCustomProps, selector2s,
     pseudoEntity2s
 } from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
@@ -202,10 +202,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Converts the rule to CSS string representing the rule.
 	public toCssString(): string
 	{
-		if (this.cachedSelectorString == null)
-			this.cachedSelectorString = this.getSelectorString();
-
-		return `${this.cachedSelectorString} {${stylesetToString( this.styleset)}}`;
+		return this.selectorText + styleset2s( this.styleset);
 	}
 
 
@@ -279,10 +276,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/** CSS rule selector string */
 	public get selectorText(): string
 	{
-		if (this.cachedSelectorString == null)
-			this.cachedSelectorString = this.getSelectorString();
+		if (this.cachedSelector == null)
+			this.cachedSelector = this.getSelectorString();
 
-		return this.cachedSelectorString;
+		return this.cachedSelector;
 	}
 
 
@@ -396,7 +393,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	// Selector string cached after it is first obtained. Needed to not invoke getSelectorString
 	// multiple times in the presence of dependent rules.
-	private cachedSelectorString: string | null = null;
+	private cachedSelector: string | null = null;
 }
 
 

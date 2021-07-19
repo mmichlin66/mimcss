@@ -1,6 +1,6 @@
 ﻿import {IStringProxy} from "./CoreTypes";
 import {IStyleDefinitionClass, IVarRule, StyleDefinition} from "./RuleTypes";
-import {ExtendedMediaFeatureset, IMediaQueryProxy, MediaStatement, SupportsStatemnet} from "./MediaTypes";
+import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatemnet} from "./MediaTypes";
 import {
     Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName,
     ExtendedVarValue, ICssSerializer
@@ -256,8 +256,8 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Tag function that represents a media query. This function allows expressing media queries in a
- * natural string form while embedding media feature values in type safe manner. The string can
+ * Tag function that represents a media query. This function allows expressing media queries in
+ * a natural string form while embedding media feature values in type safe manner. The string can
  * contain any media expressions while the embedded objects must be of type IMediaFeatureset.
  * Multiple features in the feature set will be expanded into clauses combined with the "and"
  * operator.
@@ -286,6 +286,29 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
 export function mediaToString( query: MediaStatement): string
 {
     return media2s( query);
+}
+
+
+
+/**
+ * Tag function that represents a supports query. This function allows expressing supports
+ * queries in a natural string form while embedding media feature values in type safe manner. The
+ * string can contain any supports expressions while the embedded objects must be of type
+ * Styleset. Multiple properties in the styleset will be expanded into clauses combined with the
+ * "or" operator.
+ *
+ * **Example:**
+ *
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // not (transform-origin: 30px 30px 30px)
+ *     ifNoTransformOrigin = css.$supports(
+ *         css.supports`not (${{transform-origin: [30, 30, 30]}})`, ...)
+ * }
+ */
+ export function supports( parts: TemplateStringsArray, ...params: Styleset[]): ISupportsQueryProxy
+{
+    return () => tag2s( parts, params, v => typeof v === "string" ? v : supports2s(v));
 }
 
 

@@ -33,7 +33,7 @@ function numberToString( n: number, intUnit: string = "", floatUint: string = ""
  */
 function numberStyleToString<T>( val: Extended<T>, convertFunc?: NumberToStringFunc): string
 {
-    return v2s( val, { fromNumber: convertFunc});
+    return v2s( val, { num: convertFunc});
 }
 
 /**
@@ -46,9 +46,9 @@ function multiNumberStyleToString<T>( val: OneOrMany<T>, convertFunc?: NumberToS
     separator: string = " "): string
 {
     return v2s( val, {
-        fromNumber: convertFunc,
-        arrItemFunc: v => numberStyleToString( v, convertFunc),
-        arrSep: separator
+        num: convertFunc,
+        item: v => numberStyleToString( v, convertFunc),
+        sep: separator
     });
 }
 
@@ -227,7 +227,7 @@ wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
  */
 function pos2s( val: Extended<CssPosition>): string
 {
-    return v2s( val, { fromAny: WKF.Length });
+    return v2s( val, { any: WKF.Length });
 }
 
 /**
@@ -236,8 +236,8 @@ function pos2s( val: Extended<CssPosition>): string
 function mpos2s( val: Extended<OneOrMany<CssPosition>>, separator: string): string
 {
     return v2s( val, {
-        arrItemFunc: pos2s,
-        arrSep: separator
+        item: pos2s,
+        sep: separator
     });
 }
 

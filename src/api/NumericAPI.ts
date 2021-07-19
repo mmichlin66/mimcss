@@ -6,7 +6,7 @@ import {
     IRectProxy, CssLengthOrAuto,
 } from "./NumericTypes"
 import {NumberMath, PercentMath, LengthMath, AngleMath, TimeMath, ResolutionMath, FrequencyMath} from "../impl/NumericImpl"
-import {f2s, WKF, mv2s, a2s} from "../impl/Utils";
+import {f2s, WKF, a2s} from "../impl/Utils";
 
 
 
@@ -307,7 +307,7 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
  */
 export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
 {
-    return () => mv2s( [w, h], "/");
+    return () => a2s( [w, h], undefined, "/");
 }
 
 

@@ -285,8 +285,8 @@ function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[], math: Num
 function gradientStopOrHintToString( val: GradientStopOrHint<any>, math: NumericMath): string
 {
     return v2s( val, {
-        fromNumber: WKF.Color,
-        fromArray: v => {
+        num: WKF.Color,
+        arr: v => {
             if (v.length === 0)
                 return "";
             else if (v.length === 1)
@@ -314,8 +314,8 @@ function linearGradientAngleToString( angle: LinearGradientAngle): string
     // `to right`, but doesn't have it before regular angle values such as `0.25turn`, we must
     // check whether the value contains any digits. We do it via regex test.
     return v2s( angle, {
-        fromNumber: AngleMath.n2s,
-        fromString: v => /\d+.*/.test(v) ? v : "to " + v
+        num: AngleMath.n2s,
+        str: v => /\d+.*/.test(v) ? v : "to " + v
     });
 }
 
@@ -338,8 +338,8 @@ export function crossFade( ...args: CrossFadeParam[]): IImageProxy
 function crossFadeToString( args: CrossFadeParam[]): string
 {
     let paramsString = v2s( args, {
-        arrItemFunc: crossFadeParamToString,
-        arrSep: ","
+        item: crossFadeParamToString,
+        sep: ","
     })
 
     return `cross-fade(${paramsString})`;
@@ -350,7 +350,7 @@ function crossFadeToString( args: CrossFadeParam[]): string
 function crossFadeParamToString( val: CrossFadeParam): string
 {
     return v2s( val, {
-        fromArray: v => `${v2s(v[0])},${wkf[WKF.Percent](v[1])}`
+        arr: v => `${v2s(v[0])},${wkf[WKF.Percent](v[1])}`
     });
 }
 

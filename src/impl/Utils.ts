@@ -68,6 +68,7 @@ export const enum WKF
     Frequency,
     Position,
     AtPosition,
+    AspectRatio,
     Color,
     MultiPositionWithComma,
     MultiLengthWithSpace,
@@ -90,6 +91,24 @@ export const enum WKF
 
 
 /**
+ * The P2SOption type defines a name of a property of an object along with the options of how
+ * this property is converted to a string. The type is either a property name or a tuple
+ * where the first element is the property name and the second element is the V2SOptions value.
+ * If the tuple has a third string element it is placed before the converted property value.
+ */
+export type P2SOption = string | [string, V2SOptions?, string?];
+
+/**
+ * The P2SOptions type defines names of properties of an object along with the options of how
+ * each property is converted to a string. The type is an array of either property names or tuples
+ * where the first element is the property name and the second element is the V2SOptions value.
+ * If the tuple has a third string element it is placed before the converted property value.
+ */
+export type P2SOptions = P2SOption[];
+
+
+
+/**
  * Array of well known conversion functions. Indexes are the identifier of well known functions
  * from the WellKnownFunc enumeration
  */
@@ -108,43 +127,36 @@ export let wkf: AnyToStringFunc[] = new Array( WKF.Last);
 export type V2SOptions = WKF | AnyToStringFunc |
 {
     // String value to use or function to call if value is null or undefined
-    fromNull?: string | ((val?: null) => string);
+    nil?: string | ((val?: null) => string);
 
     // String value to use or function to call if value is a boolean
-    fromBool?: (val: boolean) => string;
+    bool?: (val: boolean) => string;
 
     // Options to use if value is a string. This allows transforming one string to another.
-    fromString?: WKF | ((val: string) => string);
+    str?: WKF | ((val: string) => string);
 
     // Options to use if value is a number
-    fromNumber?: WKF | NumberToStringFunc;
+    num?: WKF | NumberToStringFunc;
 
     // Options to use if value is an array
-    fromArray?: WKF | ((val: any[]) => string);
+    arr?: WKF | ((val: any[]) => string);
 
     // Options to use if value is an object
-    fromObj?: V2SOptions;
+    obj?: V2SOptions;
 
     // Options to use to convert value's properties if value is an object
-    fromProps?: P2SOptions;
-
-    // Separator for array items (used with arrItemFunc) or object properties (used with
-    // fromProps). If not specified, a single space will be used.
-    propSep?: string;
+    props?: P2SOptions;
 
     // Options to use if type-specific function is not defined except for null and string values.
     // This is also used for array elements if arrItemFunc is not defined.
-    fromAny?: V2SOptions;
+    any?: V2SOptions;
 
     // Options to use to convert each array item - used only if fromArray is not defined
-    arrItemFunc?: V2SOptions;
+    item?: V2SOptions;
 
-    // Separator for array items (used with arrItemFunc) or object properties (used with
-    // fromProps). If not specified, a single space will be used.
-    arrSep?: string;
-
-    // If value is a function, these are arguments to pass when invoking it
-    funcArgs?: any[];
+    // Separator for array items used with the item or props properties. If not specified, a
+    // single space will be used.
+    sep?: string;
 };
 
 
@@ -155,7 +167,8 @@ export type V2SOptions = WKF | AnyToStringFunc |
  */
 export function v2s( val: any, options?: V2SOptions): string
 {
-   if (!options)
+    // if options is not specified, do standard processing
+    if (!options)
     {
         if (typeof val === "string")
             return val;
@@ -170,11 +183,10 @@ export function v2s( val: any, options?: V2SOptions): string
         else
             return val.toString();
     }
-    else if (typeof options == "number")
-    {
-        let func = wkf[options];
-        return func ? func(val) : "";
-    }
+
+    // do different things for different types of options
+    if (typeof options == "number")
+        return wkf[options] ? wkf[options](val) : "";
     else if (typeof options == "function")
         return options( val);
     else
@@ -184,41 +196,35 @@ export function v2s( val: any, options?: V2SOptions): string
         let newOptions: V2SOptions | undefined = undefined;
 
         if (val == null)
-            return options.fromNull ? typeof options.fromNull === "string" ? options.fromNull : options.fromNull( val) : "";
+            return options.nil ? typeof options.nil === "string" ? options.nil : options.nil( val) : "";
         else if (typeof val === "number")
-            newOptions = options.fromNumber || options.fromAny;
+            newOptions = options.num || options.any;
         else if (typeof val === "function")
-            return options.funcArgs ? val( ...options.funcArgs) : val();
+            return v2s( val());
         else if (Array.isArray(val))
         {
-            if (options.fromArray)
-                newOptions = options.fromArray;
+            if (options.arr)
+                newOptions = options.arr;
             else if (val.length === 0)
                 return "";
             else
-            {
-                let separator = options.arrSep != null ? options.arrSep : " ";
-                return a2s( val, options.arrItemFunc || options.fromAny, separator);
-            }
+                return a2s( val, options.item || options.any, options.sep);
         }
         else if (typeof val === "object")
         {
-            if (options.fromObj || options.fromAny)
-                newOptions = options.fromObj || options.fromAny;
-            else if (options.fromProps)
-            {
-                let separator = options.propSep != null ? options.propSep : " ";
-                return o2s( val, options.fromProps, separator);
-            }
+            if (options.obj || options.any)
+                newOptions = options.obj || options.any;
+            else if (options.props)
+                return o2s( val, options.props, options.sep);
             else if (typeof val[symValueToString] === "function")
                 return val[symValueToString]();
             else
                 return val.toString();
         }
         else if (typeof val === "string")
-            newOptions = options.fromString || options.fromAny;
+            newOptions = options.str || options.any;
         else if (typeof val === "boolean")
-            return options.fromBool ? options.fromBool( val) : val.toString();
+            return options.bool ? options.bool( val) : val.toString();
         else
             return "";
 
@@ -228,8 +234,8 @@ export function v2s( val: any, options?: V2SOptions): string
 
 
 
-wkf[WKF.OneOrManyWithComma] = v => v2s( v, { arrSep: "," });
-wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { arrSep: "/" });
+wkf[WKF.OneOrManyWithComma] = v => v2s( v, { sep: "," });
+wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { sep: "/" });
 wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
 
 
@@ -244,24 +250,6 @@ export function a2s( val: any[], options?: V2SOptions, separator: string = " "):
         ? ""
         : val.map( v => v2s( v, options)).filter( v => !!v).join( separator);
 }
-
-
-
-/**
- * The P2SOption type defines a name of a property of an object along with the options of how
- * this property is converted to a string. The type is either a property name or a tuple
- * where the first element is the property name and the second element is the V2SOptions value.
- * If the tuple has a third string element it is placed before the converted property value.
- */
- export type P2SOption = string | [string, V2SOptions?, string?];
-
-/**
- * The P2SOptions type defines names of properties of an object along with the options of how
- * each property is converted to a string. The type is an array of either property names or tuples
- * where the first element is the property name and the second element is the V2SOptions value.
- * If the tuple has a third string element it is placed before the converted property value.
- */
- export type P2SOptions = P2SOption[];
 
 
 
@@ -366,6 +354,56 @@ export function tag2s( parts: TemplateStringsArray, params: any[],
     // add the last part
     return s + parts[paramsLen];
 }
+
+
+
+/**
+ * Object that specifying string serialization options for properties in a property set. Each
+ * property of a property set will be serialized according to the V2SOptions parameter in this
+ * object; if the property does not appear in this object, the v2s function will be called for it.
+ */
+ export type PropSetInfos = { [K: string]: V2SOptions };
+
+ /**
+  * Object that specifying options for string serialization of a property set.
+  */
+ export type PropSet2SOptions = {
+     prefix?: string;
+     suffix?: string;
+     separator?: string;
+     propFunc?: (dashName: string, camelName: string, val: any, options: V2SOptions) => string;
+ };
+
+
+
+ /**
+  * Converts the given font face object to the CSS style string.
+  */
+ export function propSet2s( val: any, infos: PropSetInfos, options?: PropSet2SOptions): string
+ {
+     return v2s( val, {
+         obj: v => {
+             let propNames = Object.keys( v);
+             if (propNames.length === 0)
+                 return "";
+
+             let func = options?.propFunc ?? propInPropSet2s;
+             let arr = propNames.map( (propName) =>
+             {
+                 let dashPropName = camelToDash(propName);
+                 let camelPropName = dashToCamel(propName);
+                 return func( dashPropName, camelPropName, v[propName], infos[camelPropName]);
+             });
+             return (options?.prefix ?? "") + `${arr.join( options?.separator ?? ";")}` + (options?.suffix ?? "");
+         }
+     });
+ }
+
+ // convert the value to string based on the information object for the property (if defined)
+ function propInPropSet2s( dashName: string, camelName: string, val: any, options: V2SOptions): string
+ {
+     return `${dashName}:${ v2s( val, options)}`;
+ }
 
 
 
