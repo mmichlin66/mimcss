@@ -293,9 +293,9 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, math: Numeric
                 return math.v2s( v[0]);
             else
             {
-                let secondStop = v.length > 2 ? math.v2s( v[2]) : "";
-                // return `${color2s(v[0])} ${math.v2s( v[1])} ${secondStop}`;
-                return mv2s( [[v[0], WKF.Color], math.v2s( v[1]), secondStop]);
+                // let secondStop = v.length > 2 ? math.v2s( v[2]) : "";
+                // return mv2s( [[v[0], WKF.Color], math.v2s( v[1]), secondStop]);
+                return mv2s( [[v[0], WKF.Color], math.v2s( v[1]), math.v2s( v[2])]);
             }
         }
     });
@@ -306,16 +306,9 @@ function gradientStopOrHintToString( val: GradientStopOrHint<any>, math: Numeric
  */
 function linearGradientAngleToString( angle: LinearGradientAngle): string
 {
-    // if angle value is undefined or is 0, no need to specify it
-    if (!angle)
-        return "";
-
-    // Since the linear gradient angle has the "to" prefix before `side-or-corner` values such as
-    // `to right`, but doesn't have it before regular angle values such as `0.25turn`, we must
-    // check whether the value contains any digits. We do it via regex test.
     return v2s( angle, {
         num: AngleMath.n2s,
-        str: v => /\d+.*/.test(v) ? v : "to " + v
+        str: v => "to " + v
     });
 }
 
@@ -330,28 +323,7 @@ function linearGradientAngleToString( angle: LinearGradientAngle): string
  */
 export function crossFade( ...args: CrossFadeParam[]): IImageProxy
 {
-    return () => crossFadeToString( args);
-}
-
-
-
-function crossFadeToString( args: CrossFadeParam[]): string
-{
-    let paramsString = v2s( args, {
-        item: crossFadeParamToString,
-        sep: ","
-    })
-
-    return `cross-fade(${paramsString})`;
-}
-
-
-
-function crossFadeParamToString( val: CrossFadeParam): string
-{
-    return v2s( val, {
-        arr: v => `${v2s(v[0])},${wkf[WKF.Percent](v[1])}`
-    });
+    return () => `cross-fade(${a2s( args, v => mv2s( [v[0], [v[1], [WKF.Percent]]], ","))})`;
 }
 
 

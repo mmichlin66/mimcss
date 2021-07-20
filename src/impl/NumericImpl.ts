@@ -2,7 +2,7 @@
 import {
     INumericMath, CssLength, CssAngle, CssTime, CssResolution,
     CssFrequency, CssPosition, LengthUnits, PercentUnits, AngleUnits, TimeUnits,
-    ResolutionUnits, FrequencyUnits, CssNumber, CssPercent
+    ResolutionUnits, FrequencyUnits, CssNumber, CssPercent, CssRadius
 } from "../api/NumericTypes";
 import {NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
 
@@ -218,9 +218,14 @@ wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Position
+// Size, Point, Position, Radius
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Converts corner radius style value to the CSS string.
+wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { any: WKF.Length });
+
+
 
 /**
  * Converts single position style value to the CSS string.

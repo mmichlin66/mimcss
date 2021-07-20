@@ -245,8 +245,8 @@ export type CssColor = "transparent" | "currentcolor" | keyof INamedColors | num
  * come into conflict with a numeric representation of width. Therefore, for the `border` property,
  * only non-numeric color representation is allowed.
  */
-export type CssNonNumericColor = "transparent" | "currentcolor" | keyof INamedColors | IColorProxy | SystemColors;
-// export type CssNonNumericColor = Exclude<CssColor,number>;
+// export type CssNonNumericColor = "transparent" | "currentcolor" | keyof INamedColors | IColorProxy | SystemColors;
+export type CssNonNumericColor = Exclude<CssColor,number>;
 
 
 

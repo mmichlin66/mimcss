@@ -4,7 +4,7 @@ import {
     CssRadius, HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, IFitContentProxy,
     ILengthProxy, CssSize, CssAspectRatio, IRectProxy, CssLengthOrAuto
 } from "./NumericTypes"
-import {CssColor} from "./ColorTypes";
+import {CssColor, CssNonNumericColor} from "./ColorTypes";
 import {
     FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis, FontVariantCaps,
     FontVariantPosition, FontWeight, SystemFont
@@ -343,13 +343,13 @@ export type BorderStyle_StyleType = OneOrBox<BorderStyle>;
 
 
 /** Type for [[border]] style property */
-export type Border_StyleType = BorderWidth | BorderStyle | CssColor |
-    [Extended<BorderWidth>, Extended<BorderStyle>?, Extended<CssColor>?] |
-    [Extended<BorderWidth>, Extended<CssColor>?, Extended<BorderStyle>?] |
-    [Extended<BorderStyle>, Extended<BorderWidth>?, Extended<CssColor>?] |
-    [Extended<BorderStyle>, Extended<CssColor>?, Extended<BorderWidth>?] |
-    [Extended<CssColor>, Extended<BorderWidth>?, Extended<BorderStyle>?] |
-    [Extended<CssColor>, Extended<BorderStyle>?, Extended<BorderWidth>?];
+export type Border_StyleType = BorderWidth | BorderStyle | CssNonNumericColor |
+    [Extended<BorderWidth>, Extended<BorderStyle>, Extended<CssColor>?] |
+    [Extended<BorderWidth>, Extended<CssColor>, Extended<BorderStyle>?] |
+    [Extended<BorderStyle>, Extended<BorderWidth>, Extended<CssColor>?] |
+    [Extended<BorderStyle>, Extended<CssColor>, Extended<BorderWidth>?] |
+    [Extended<CssNonNumericColor>, Extended<BorderWidth>, Extended<BorderStyle>?] |
+    [Extended<CssNonNumericColor>, Extended<BorderStyle>, Extended<BorderWidth>?];
 
 
 
@@ -1222,6 +1222,8 @@ export interface IBaseStyleset
     alignmentBaseline?: AlignmentBaseline_StyleType;
 
     /**
+     * CSS animation property: [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/animation)
+     *
      * **Usage:**
      *
      * ```Typescript

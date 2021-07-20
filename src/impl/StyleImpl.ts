@@ -1,12 +1,10 @@
 ﻿import {CssSelector, Extended} from "../api/CoreTypes";
-import {CssRadius} from "../api/NumericTypes";
 import {BorderRadius} from "../api/ShapeTypes";
 import {
-    Animation_Single, Background_Single, BackgroundSize, BorderImage_Object,
-    BorderImageSlice_StyleType, BoxShadow, Border_StyleType,
-    Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateAreaDefinition, GridTrack,
-    GridTemplateAxis_StyleType, Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType,
-    Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType, VarTemplateName,
+    Animation_Single, Background_Single, BorderImage_Object, BorderImageSlice_StyleType, BoxShadow,
+    Border_StyleType, Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateAreaDefinition,
+    GridTrack, GridTemplateAxis_StyleType, Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType,
+    Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
 import {LengthMath, AngleMath} from "./NumericImpl";
@@ -162,13 +160,6 @@ function singleBackground_fromStyle( val: Extended<Background_Single>): string
 
 
 
-function singleBackgroundSize_fromStyle( val: Extended<BackgroundSize>): string
-{
-    return v2s( val, { any: WKF.Length });
-}
-
-
-
 /**
  * Converts border image style value to the CSS string.
  */
@@ -209,22 +200,19 @@ function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): s
 
 
 
-export function singleBoxShadow_fromObject( val: BoxShadow): string
-{
-    return styleObj2String( val, [
-        ["inset", v => v ? "inset" : ""],
+// Converts corner radius style value to the CSS string.
+wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
+    obj: (v: BoxShadow) => styleObj2String( v, [
+        ["inset", b => b ? "inset" : ""],
         ["x", WKF.Length],
         ["y", WKF.Length],
         ["blur", WKF.Length],
         ["spread", WKF.Length],
         ["color", WKF.Color]
-    ]);
-}
+    ]),
+    sep: ","
+});
 
-
-
-// Converts corner radius style value to the CSS string.
-wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { any: WKF.Length });
 
 
 /**
@@ -238,14 +226,14 @@ function borderRadius2s( val: Extended<BorderRadius>): string
             if (Array.isArray( v[0]))
             {
                 // two MultiCornerRadius values
-                let s = a2s( v[0], WKF.Length, " ");
-                s += " / ";
-                return s + a2s( v[1], WKF.Length, " ");
+                let s = a2s( v[0], WKF.Length);
+                s += "/";
+                return s + a2s( v[1], WKF.Length);
             }
             else
             {
                 // single MultiCornerRadius value
-                return a2s( v, WKF.Length, " ");
+                return a2s( v, WKF.Length);
             }
         },
         any: WKF.Length
@@ -263,21 +251,15 @@ function borderToString( val: Extended<Border_StyleType>): string
 {
     return v2s( val, {
         num: WKF.Length,
-        arr: v =>
-        {
-            let buf: string[] = [];
-            if (v[0] != null)
-                buf.push( LengthMath.v2s( v[0]))
-
-            if (v[1] != null)
-                buf.push( v2s(v[1]));
-
-            if (v[2] != null)
-                buf.push( wkf[WKF.Color](v[2]));
-
-            return buf.join(" ");
+        arr: arr => {
+            let numbersProcessed = 0;
+            return arr.map( item => {
+                if (typeof item === "number")
+                    return numbersProcessed++ ? v2s( item, WKF.Color) : v2s( item, WKF.Length);
+                else
+                    return v2s(item);
+            }).join(" ");
         },
-        any: WKF.Color
     });
 }
 
@@ -717,7 +699,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     backgroundRepeat: WKF.OneOrManyWithComma,
     backgroundSize: {
         num: WKF.Length,
-        item: singleBackgroundSize_fromStyle,
+        item: { any: WKF.Length },
         sep: ","
     },
     baselineShift: WKF.Length,
@@ -764,10 +746,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     borderTopWidth: WKF.Length,
     borderWidth: WKF.MultiLengthWithSpace,
     bottom: WKF.Length,
-    boxShadow: {
-        obj: singleBoxShadow_fromObject,
-        sep: ",",
-    },
+    boxShadow: WKF.BoxShadow,
 
     caretColor: WKF.Color,
     clip:  {
@@ -779,9 +758,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     columnRuleColor: WKF.Color,
     columnRuleWidth: WKF.MultiLengthWithSpace,
     columnWidth: WKF.Length,
-    cursor: {
-        sep: ","
-    },
+    cursor: WKF.OneOrManyWithComma,
 
     fill: WKF.Color,
     fillOpacity: WKF.Percent,
@@ -863,13 +840,12 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     paddingRight: WKF.Length,
     paddingTop: WKF.Length,
     perspective: WKF.Length,
-    perspectiveOrigin: {
-        any: WKF.Length
-    },
+    perspectiveOrigin: WKF.MultiLengthWithSpace,
 
-    quotes: {
-        item: v => `"${v}"`
-    },
+    quotes: WKF.Quoted,
+    // quotes: {
+    //     item: v => `"${v}"`
+    // },
 
     right: WKF.Length,
     rotate: rotateToString,
@@ -918,18 +894,11 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
         any: WKF.Color
     },
     textEmphasisColor: WKF.Color,
-    textIndent: {
-        any: WKF.Length
-    },
-    textShadow: {
-        obj: singleBoxShadow_fromObject,
-        sep: ",",
-    },
+    textIndent: WKF.MultiLengthWithSpace,
+    textShadow: WKF.BoxShadow,
     textSizeAdjust: WKF.Percent,
     top: WKF.Length,
-    transformOrigin: {
-        any: WKF.Length
-    },
+    transformOrigin: WKF.MultiLengthWithSpace,
     transition: {
         obj: singleTransition_fromObject,
         any: singleTransition_fromStyle,
@@ -938,9 +907,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     transitionDelay: WKF.MultiTimeWithComma,
     transitionDuration: WKF.MultiTimeWithComma,
     transitionTimingFunction: WKF.OneOrManyWithComma,
-    translate: {
-        any: WKF.Length
-    },
+    translate: WKF.MultiLengthWithSpace,
 
     verticalAlign: WKF.Length,
 
