@@ -611,6 +611,17 @@ export type BorderWidth_StyleType = OneOrBox<BorderWidth>;
 
 
 
+
+/**
+ * Type for [[boxDecorationBreak]] style property
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
+ * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#box-decoration-break
+ * @category Style Property
+ */
+export type BoxDecorationBreak_StyleType = "slice" | "clone";
+
+
+
 /**
  * Type for single box shadow.
  * @category Style Helper
@@ -2659,6 +2670,12 @@ export interface IBaseStyleset
     bottom?: CssLength;
 
     /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
+     * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#box-decoration-break
+     */
+    boxDecorationBreak?: BoxDecorationBreak_StyleType;
+
+    /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#box-shadow
      */
@@ -2981,6 +2998,12 @@ export interface IBaseStyleset
     fontKerning?: FontKerning;
 
     /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/font-language-override
+     * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#font-language-override
+     */
+     fontLanguageOverride?: DefaultStyleType;
+
+    /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/font-optical-sizing
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#font-optical-sizing
      */
@@ -3178,6 +3201,12 @@ export interface IBaseStyleset
      */
     gridTemplateRows?: GridTemplateAxis_StyleType;
 
+
+    /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/hanging-punctuation
+     * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#hanging-punctuation
+     */
+    hangingPunctuation?: DefaultStyleType;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/height
