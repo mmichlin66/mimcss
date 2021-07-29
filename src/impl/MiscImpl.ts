@@ -1,5 +1,5 @@
 ﻿import {ExtendedFontFace, FontSrc, IBaseFontFace} from "../api/FontTypes"
-import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatemnet} from "../api/MediaTypes";
+import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatement} from "../api/MediaTypes";
 import {styleProp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf, propSet2s} from "./Utils";
 import {ExtendedCounterStyleset, IBaseCounterStyleset} from "../api/CounterTypes";
@@ -97,7 +97,7 @@ let mediaFeatureDefaultValues = new Map<string,any>([
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Converts the given supports statement to its string representation */
-export function supports2s( statement: SupportsStatemnet): string
+export function supports2s( statement: SupportsStatement): string
 {
     return v2s( statement, {
         any: supportsQuery2s,

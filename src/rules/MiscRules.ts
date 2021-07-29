@@ -2,7 +2,7 @@ import {PagePseudoClass} from "../api/CoreTypes";
 import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "../api/RuleTypes";
 import {Styleset} from "../api/StyleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
-import {MediaStatement, SupportsStatemnet} from "../api/MediaTypes";
+import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
@@ -52,7 +52,7 @@ abstract class MiscRule<T extends CSSRule> extends Rule
  */
 export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 {
-	public constructor( url: string, mediaStatement?: MediaStatement, supportsStatement?: string | SupportsStatemnet)
+	public constructor( url: string, mediaStatement?: MediaStatement, supportsStatement?: string | SupportsStatement)
 	{
         // this is a top-level rule
 		super( true);
@@ -92,7 +92,7 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 	public mediaStatement?: MediaStatement;
 
 	// Optional supports query for this rule.
-	public supportsStatement?: string | SupportsStatemnet;
+	public supportsStatement?: string | SupportsStatement;
 }
 
 

@@ -12,7 +12,7 @@ import {
     IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
     IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule
 } from "./RuleTypes";
-import {MediaStatement, SupportsStatemnet} from "./MediaTypes"
+import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
@@ -125,8 +125,9 @@ export function $class( styleset?: CombinedStyleset, nameOverride?: string | ICl
  * more class rules.
  *
  * @param ...classes List of class names specified either as a string or `IClassRule` objects.
- * @returns `IClassNameRule` object whose `name` property contains the combined class name. The
- * `cssClassName` property contains the combined selector, e.g. `.class1.class2`.
+ * @returns `IClassNameRule` object whose `name` property contains the combined class name, e.g.
+ * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
+ * `"".class1.class2"`.
  *
  * **Example:**
  *
@@ -141,9 +142,7 @@ export function $class( styleset?: CombinedStyleset, nameOverride?: string | ICl
  *         flexDirection: "column",
  *         alignItems: "center",
  *         "&": [
- *             [this.spaced, {
- *                 gap: 8
- *             }
+ *             [this.spaced, {gap: 8}]
  *         ]
  *     })
  *
@@ -638,7 +637,7 @@ export function $fontface( fontface: ExtendedFontFace): IFontFaceRule
  * }
  */
 export function $import( url: string, mediaQuery?: string | MediaStatement,
-	supportsQuery?: string | SupportsStatemnet): IImportRule
+	supportsQuery?: string | SupportsStatement): IImportRule
 {
 	return new ImportRule( url, mediaQuery, supportsQuery);
 }
@@ -662,7 +661,7 @@ export function $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPag
 /**
  * Creates a new `@supports` rule.
  */
-export function $supports<T extends StyleDefinition>( query: SupportsStatemnet,
+export function $supports<T extends StyleDefinition>( query: SupportsStatement,
     instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>
 {
 	return new SupportsRule( query, instOrClass);

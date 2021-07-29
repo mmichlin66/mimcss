@@ -19,13 +19,11 @@ export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
  * type of style properties (e.g. `transform`) cannot be assigned to an incompatible style property
  * (e.g. `filter`).
  *
- * All CSS properties should accept string as the type of their value even if normally
- * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
- * color) property. This is because in addition to their normal values any property
- * can use custom CSS property in the form `var(--propname)`. However, if we add string type
- * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
- * Intellisense and it doesn't prompt developers for the possible values. The `IGenericProxy`
- * can be used instead of string and this solves the Intellisense issue.
+ * Developers don't implement this interface directly; instead, the interfaces derived from this
+ * interface are implemented by different Mimcss functions. For example, [[IStringProxy]] interface
+ * is implemented by the [[raw]] function, [[ITransformProxy]] interface is implemented by the
+ * [[scale]], [[translate]] and other functions, [[IFilterProxy]] interface is implemented by
+ * [[opacity]], [[contrast]] and other functions, and so on.
  *
  * @typeParam T String constant that is used to differentiate between proxies used for different
  * purposes. The parameter `p` of this callable interface is of type T but it is not used
@@ -43,23 +41,55 @@ export interface IGenericProxy<T extends string = any>
  * of type definition for all CSS properties - even for those that don't have `string` as part of
  * their type.
  *
+ * All CSS properties should accept string as the type of their value even if normally
+ * they accept other types (e.g a set of string literals as `"red" | "green" | ...` for the
+ * color) property. This is because in addition to their normal values any property
+ * can use custom CSS property in the form `var(--propname)`. However, if we add string type
+ * to the set of string literals (e.g. `"red" | "green" | string`), this throws off the
+ * Intellisense and it doesn't prompt developers for the possible values. The `IStringProxy`
+ * interface is used instead of string and this solves the Intellisense issue.
+ *
  * This function is returned from the [[raw]] function, which allows by-passing the property
  * typing rules and specifying a string directly. This might be useful, when a string value is
  * obtained from some external calculations.
+ *
+ * Developers can create their own functions that return this callable interface and then invoke
+ * these functions to assign values to style properties. Just make sure that the returned string
+ * is the correct CSS string. Mimcss will use the string returned from custom functions without
+ * checking its correctness. If the string is invalid for the property it is assigned to, the
+ * resulting CSS rule will not have that property.
+ *
+ * **Example**
+ * ```typescript
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // using `raw` function
+ *     cls1 = css.$class({ border: css.raw`1px solid brown` })
+ *
+ *     // using custom function
+ *     cls2 = css.$class({ clip-path: randomCircle()})
+ * }
+ *
+ * // create CSS circle function with random radius between 30 and 50 pixels
+ * function randomCircle(): css.IStringProxy
+ * {
+ *     // returns a function that returns a string
+ *     return () => `circle(${Math.floor(Math.random() * 21) + 30})`;
+ * }
+ * ```
  */
 export interface IStringProxy extends IGenericProxy<"string"> {}
 
 
 
 /**
- * The `ICustomVar` interface represents a custom property or a constant with values of the given
- * type. Every style property can accept a custom CSS property value in the form of the `var()` CSS
+ * The `ICustomVar` interface represents a custom property with values of the given type. Every
+ * style property can accept a custom CSS property value in the form of the `var()` CSS
  * function. Mimcss also allows defining "constants", which are a more lightweight way to provide
- * values that are used in other rules and properties.
+ * values that are used in other rules and properties. See the [[IConstant]] interface.
  *
  * The `ICustomVar` interface is extended by the [[IVarRule]] interface that is returned
- * from the [[$var]] function and by the [[IConstRule]] interface that is returned from the
- * [[$const]] function.
+ * from the [[$var]] function.
  *
  * @typeparam T Basic type of the value of the custom CSS variable.
  */
@@ -92,7 +122,7 @@ export interface ICustomVar<T = any>
 export interface IConstant<T = any>
 {
 	/**
-	 * Gets the value of the property.
+	 * Gets the value of the constant.
 	 */
 	getValue(): ExtendedProp<T>;
 }
@@ -101,9 +131,9 @@ export interface IConstant<T = any>
 
 /**
  * Type that extends the given type with the following types:
- * - ICustomVar interface that allows using a CSS custom property rule value.
- * - IConstant interface that allows using a constant rule value.
- * - IStringProxy interface that allows specifying raw string value.
+ * - [[ICustomVar]] interface that allows using a CSS custom property rule value.
+ * - [[IConstant]] interface that allows using a constant rule value.
+ * - [[IStringProxy]] interface that allows specifying raw string value.
  */
 export type Extended<T> = T | ICustomVar<T> | IConstant<T> | IStringProxy | null | undefined;
 
@@ -112,6 +142,18 @@ export type Extended<T> = T | ICustomVar<T> | IConstant<T> | IStringProxy | null
 /**
  * Type that encapsulates the type of property in an object with a single "!" property. This
  * type is used to indicate that the property value must be flagged as "!important".
+ *
+ * **Example**
+ * ```typescript
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // Equivalent to CSS: .cls1 { color: red; background-color: beige !important; }
+ *     cls1 = css.$class({
+ *         color: "red",
+ *         backgroundColor: { "!": "beige" }
+ *     })
+ * }
+ * ```
  */
 export type ImportantProp<T> = { "!": ExtendedProp<T> };
 
@@ -119,8 +161,11 @@ export type ImportantProp<T> = { "!": ExtendedProp<T> };
 
 /**
  * The ExtendedProp extends the given generic type with the following elements:
+ * - [[ICustomVar]] interface that allows using a CSS custom property rule value.
+ * - [[IConstant]] interface that allows using a constant rule value.
+ * - [[IStringProxy]] interface that allows specifying raw string value.
  * - Object with a single property "!", which is used to mark a property as "!important".
- * - Global_StyleType, which allows any property to be assigned the global values such as
+ * - [[Global_StyleType]], which allows any property to be assigned the global values such as
  *   "initial", "inherit", "unset" and "revert".
  */
 export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
@@ -223,7 +268,7 @@ export type OneOrMany<T> = T | Extended<T>[];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IRuleWithSelector interface represents an entity that has a selector string.
+ * The `IRuleWithSelector` interface represents an entity that has a selector string.
  */
 export interface IRuleWithSelector
 {
@@ -240,7 +285,8 @@ export interface IRuleWithSelector
 export interface ISelectorProxy extends IGenericProxy<"selector"> {};
 
 /**
-/** Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules */
+ * Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules
+ */
 export type SelectorCombinator = "," | " " | ">" | "+" | "~";
 
 /** Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules */
@@ -331,7 +377,9 @@ export type SelectorItem = string | IRuleWithSelector | IStringProxy | ISelector
 
 
 
-/** Type for a selector */
+/**
+ * Type for a CSS selector.
+ */
 export type CssSelector = OneOrMany<SelectorItem>;
 
 

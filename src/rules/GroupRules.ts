@@ -1,5 +1,5 @@
 import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
-import {MediaStatement, SupportsStatemnet} from "../api/MediaTypes";
+import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {getContainerFromInstance, processInstanceOrClass} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
 import {media2s, supports2s} from "../impl/MiscImpl";
@@ -75,6 +75,20 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 
 
+	// Condition of this grouping rule.
+	public get condition(): string
+    {
+        if (!this._condition)
+            this._condition = this.getGroupConditionText();
+
+        return this._condition ?? "";
+    }
+
+
+
+	// Returns the condition string of this grouping rule.
+	protected abstract getGroupConditionText(): string | null;
+
 	// Returns the selector string of this grouping rule.
 	protected abstract getGroupSelectorText(): string | null;
 
@@ -106,6 +120,9 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 
 	// Rule container for the definition instance.
 	protected ruleContainer: IRuleContainer;
+
+	// Condition of this grouping rule.
+	private _condition: string | null;
 }
 
 
@@ -115,7 +132,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
  */
 export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( statement: SupportsStatemnet, instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( statement: SupportsStatement, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super( instanceOrClass);
 
@@ -132,29 +149,34 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 
 
 
+	/** Flag indicated whether the browser supports this rule's query */
+    public get isSupported(): boolean
+    {
+        return CSS.supports( this.condition);
+    }
+
+
+
+	// Returns the condition string of this grouping rule.
+	protected getGroupConditionText(): string | null
+    {
+        return supports2s( this.statement);
+    }
+
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string | null
 	{
-		// convert the query to its string form
-		let queryString = supports2s( this.statement);
-
 		// determine whether the query is supported and if it is not, don't insert the rule
-		return CSS.supports( queryString) ? `@supports ${queryString}` : null;
+		return CSS.supports( this.condition) ? `@supports ${this.condition}` : null;
 	}
 
 
 
-	/** Flag indicated whether the browser supports this rule's query */
-    public get isSupported(): boolean
-    {
-        return  CSS.supports( supports2s( this.statement));
-    }
-
-	/** SOM supports rule */
+    /** SOM supports rule */
 	public cssRule: CSSSupportsRule | null;
 
 	// support statement for this rule.
-	private statement: SupportsStatemnet;
+	private statement: SupportsStatement;
 }
 
 
@@ -181,19 +203,42 @@ export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implement
 
 
 
+	// Returns the condition string of this grouping rule.
+	protected getGroupConditionText(): string | null
+    {
+        return media2s( this.statement);
+    }
+
 	// Returns the selector string of this grouping rule.
 	protected getGroupSelectorText(): string | null
 	{
-		return `@media ${media2s( this.statement)}`;
+		return `@media ${this.condition}`;
 	}
 
 
 
-	/** SOM media rule */
+    /**
+     * Returns `MediaQueryList` object that allows programmatic checking whether the document matches
+     * the media statement and also allows listening to its `change` event.
+     */
+    public get mql(): MediaQueryList
+    {
+        if (!this._mql)
+            this._mql = window.matchMedia( this.condition);
+
+        return this._mql;
+    }
+
+
+
+    /** SOM media rule */
 	public cssRule: CSSMediaRule | null;
 
 	// media statement for this rule.
-	public statement: MediaStatement;
+	private statement: MediaStatement;
+
+    // cached MediaQueryList object created for the media statement
+    private _mql: MediaQueryList | null = null;
 }
 
 

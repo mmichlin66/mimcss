@@ -1,6 +1,6 @@
 ﻿import {IStringProxy} from "./CoreTypes";
 import {IStyleDefinitionClass, IVarRule, StyleDefinition} from "./RuleTypes";
-import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatemnet} from "./MediaTypes";
+import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
 import {
     Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName,
     ExtendedVarValue, ICssSerializer
@@ -344,7 +344,7 @@ export function mediaToString( query: MediaStatement): string
 /**
  * Converts the given supports query value to the CSS supports query string.
  */
-export function supportsToString( query: SupportsStatemnet): string
+export function supportsToString( query: SupportsStatement): string
 {
     return supports2s( query);
 }
