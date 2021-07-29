@@ -120,9 +120,6 @@ import {a2s, v2s} from "../impl/Utils";
  * Abstract rules don't have selectors and are not inserted into the DOM. Abstract rules can
  * themselves extend other rules - both abstract and non-abstract.
  *
- * @param styleset Styleset that will be inherited by style rules that extend this abstract rule.
- * @returns `IStyleRule` object that should be used by the derived rules in the `"+"` property.
- *
  * **Example:**
  *
  * ```typescript
@@ -150,6 +147,9 @@ import {a2s, v2s} from "../impl/Utils";
  *     })
  * }
  * ```
+ *
+ * @param styleset Styleset that will be inherited by style rules that extend this abstract rule.
+ * @returns `IStyleRule` object that should be used by the derived rules in the `"+"` property.
  */
 export function $abstract( styleset: CombinedStyleset): IStyleRule
 {
@@ -167,14 +167,6 @@ export function $abstract( styleset: CombinedStyleset): IStyleRule
  *
  * The returned [[IClassRule]] interface has the `name` property that should be used to assign
  * the class to an HTML element
- *
- * @param styleset Styleset that defines style properties of the class.
- * @param nameOverride string or another `IClassRule` object that determines the name of the class.
- * If this optional parameter is defined, the name will override the Mimcss name assignment
- * mechanism. This might be useful if there is a need for the class to match a name of another,
- * probably external, class.
- * @returns `IClassRule` object that should be used for getting the class name and for accessing
- * the style properties if needed.
  *
  * **Example:**
  *
@@ -198,7 +190,15 @@ export function $abstract( styleset: CombinedStyleset): IStyleRule
  *     </div>
  * }
  * ```
-*/
+ *
+ * @param styleset Styleset that defines style properties of the class.
+ * @param nameOverride string or another `IClassRule` object that determines the name of the class.
+ * If this optional parameter is defined, the name will override the Mimcss name assignment
+ * mechanism. This might be useful if there is a need for the class to match a name of another,
+ * probably external, class.
+ * @returns `IClassRule` object that should be used for getting the class name and for accessing
+ * the style properties if needed.
+ */
 export function $class( styleset?: CombinedStyleset, nameOverride?: string | IClassRule): IClassRule
 {
 	return new ClassRule( styleset, nameOverride);
@@ -210,11 +210,6 @@ export function $class( styleset?: CombinedStyleset, nameOverride?: string | ICl
  * Creates a new class name rule, which combines one or more other class names. This creates a
  * "synonym" that is easier to apply to an element's class attribute than an array of two or
  * more class rules.
- *
- * @param ...classes List of class names specified either as a string or `IClassRule` objects.
- * @returns `IClassNameRule` object whose `name` property contains the combined class name, e.g.
- * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
- * `"".class1.class2"`.
  *
  * **Example:**
  *
@@ -247,8 +242,12 @@ export function $class( styleset?: CombinedStyleset, nameOverride?: string | ICl
  *         <span>World!</span>
  *     </div>
  * }
- *
  * ```
+ *
+ * @param ...classes List of class names specified either as a string or `IClassRule` objects.
+ * @returns `IClassNameRule` object whose `name` property contains the combined class name, e.g.
+ * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
+ * `"".class1.class2"`.
  */
 export function $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
 {
@@ -266,13 +265,6 @@ export function $classname( ...classes: (IClassRule | IClassNameRule | string)[]
  *
  * The returned [[IIDRule]] interface has the `name` property that should be used to assign
  * the ID to an HTML element.
- *
- * @param styleset Styleset that defines style properties of the element.
- * @param nameOverride string or another `IIDRule` object that determines the name of the ID.
- * If this optional parameter is defined, the name will override the Mimcss name assignment
- * mechanism. This might be useful if there is a need for the ID to match a name of another ID.
- * @returns `IIDRule` object that should be used for getting the ID name and for accessing
- * the style properties if needed.
  *
  * **Example:**
  *
@@ -295,6 +287,14 @@ export function $classname( ...classes: (IClassRule | IClassNameRule | string)[]
  *         <span>World!</span>
  *     </div>
  * }
+ * ```
+ *
+ * @param styleset Styleset that defines style properties of the element.
+ * @param nameOverride string or another `IIDRule` object that determines the name of the ID.
+ * If this optional parameter is defined, the name will override the Mimcss name assignment
+ * mechanism. This might be useful if there is a need for the ID to match a name of another ID.
+ * @returns `IIDRule` object that should be used for getting the ID name and for accessing
+ * the style properties if needed.
  */
 export function $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
 {
@@ -305,14 +305,11 @@ export function $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRul
 
 /**
  * Creates a new style rule for the given HTML or SVG element tags. The `tag` parameter specifies
- * either a single tag or an array of tags. In addition, an asterisk symbol ('"*"`) can be
+ * either a single tag or an array of tags. In addition, an asterisk symbol (`"*"`) can be
  * specified to target all elements.
  *
  * When multiple tags are specified, they will be treated as a selector list; that is, they will
  * be separated by commas.
- *
- * @param tag One or more element tags
- * @param styleset Styleset that defines style properties for the tags.
  *
  * **Examples:**
  *
@@ -328,6 +325,11 @@ export function $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRul
  *     // using asterisk to address all elements
  *     all = css.$tag( "*", {})
  * }
+ * ```
+ *
+ * @param tag One or more element tags
+ * @param styleset Styleset that defines style properties for the tags.
+ * @returns `IStyleRule` object representing the tag rule.
  */
 export function $tag( tag: "*" | OneOrMany<(keyof HTMLElementTagNameMap) | (keyof SVGElementTagNameMap)>,
     styleset: CombinedStyleset): IStyleRule
@@ -352,9 +354,6 @@ export function $tag( tag: "*" | OneOrMany<(keyof HTMLElementTagNameMap) | (keyo
  * Note that although style rules can be used for selecting element tags, the [[$tag]] function would
  * be more appropriate because it will catch misspellings of tag names.
  *
- * @param selector One or more [[SelectorItem]] objects
- * @param styleset Styleset that defines style properties for this selector.
- *
  * **Examples:**
  *
  * ```typescript
@@ -375,6 +374,11 @@ export function $tag( tag: "*" | OneOrMany<(keyof HTMLElementTagNameMap) | (keyo
  *     // using a string for selecting element tag.
  *     h1 = css.$style( "h1", {})
  * }
+ * ```
+ *
+ * @param selector One or more [[SelectorItem]] objects
+ * @param styleset Styleset that defines style properties for this selector.
+ * @returns `IStyleRule` object representing the style rule.
  */
 export function $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
 {
@@ -393,14 +397,6 @@ export function $style( selector: CssSelector, styleset: CombinedStyleset): ISty
  * The returned [[IAnimationRule]] interface represents an object that should be used when
  * using the keyframes name in the `animation-name` or `animation` style properties.
  *
- * @param frames Array of [[AnimationFrame]] objects. Each animation frame contains a waypoint
- * and a styleset.
- * @param nameOverride String or another `IAnimationRule` object that determines the name of the
- * animation. If this optional parameter is defined, the name will override the Mimcss name
- * assignment mechanism. This might be useful if there is a need for the name to match a name of
- * another animation.
- * @returns `IAnimationRule` object that should be used for getting the animation name.
- *
  * **Example:**
  *
  * ```typescript
@@ -415,6 +411,15 @@ export function $style( selector: CssSelector, styleset: CombinedStyleset): ISty
  *         animation: { name: this.vanish, duration: 2000, count: "infinite", direction: "alternate" }
  *     })
  * }
+ * ```
+ *
+ * @param frames Array of [[AnimationFrame]] objects. Each animation frame contains a waypoint
+ * and a styleset.
+ * @param nameOverride String or another `IAnimationRule` object that determines the name of the
+ * animation. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * another animation.
+ * @returns `IAnimationRule` object that should be used for getting the animation name.
  */
 export function $keyframes( frames?: AnimationFrame[],
 	nameOverride?: string | IAnimationRule): IAnimationRule
@@ -435,17 +440,6 @@ export function $keyframes( frames?: AnimationFrame[],
  * Custom properties defined using the `$var` function are included into the `:root {}` block;
  * however, they can be redefined with different values under any style rule.
  *
- * @param template Either a name of a style property (in camel-case) or a name of the property from
- * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
- * of the second parameter.
- * @param value The value assigned to the property.
- * @param nameOverride String or another `IVarRule` object that determines the name of the
- * custom property. If this optional parameter is defined, the name will override the Mimcss name
- * assignment mechanism. This might be useful if there is a need for the name to match a name of
- * existing property.
- * @returns The `IVarRule` object that represents the custom property. Any usage of this object in
- * style properties or function parameters is substituted by the `var()` CSS function invocation.
- *
  * **Example:**
  *
  * ```typescript
@@ -463,6 +457,18 @@ export function $keyframes( frames?: AnimationFrame[],
  *         "--": [ [this.importantTextColor, "maroon"] ]
  *     })
  * }
+ * ```
+ *
+ * @param template Either a name of a style property (in camel-case) or a name of the property from
+ * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
+ * of the second parameter.
+ * @param value The value assigned to the property.
+ * @param nameOverride String or another `IVarRule` object that determines the name of the
+ * custom property. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing property.
+ * @returns The `IVarRule` object that represents the custom property. Any usage of this object in
+ * style properties or function parameters is substituted by the `var()` CSS function invocation.
  */
 export function $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
 				nameOverride?: string | IVarRule<K>): IVarRule<K>
@@ -485,13 +491,6 @@ export function $var<K extends VarTemplateName>( template: K, value?: ExtendedVa
  * properties unless the intention is to change the variable value at run-time or to redefine its
  * value under different style rules.
  *
- * @param template Either a name of a style property (in camel-case) or a name of the property from
- * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
- * of the second parameter.
- * @param value The value assigned to the constant.
- * @returns The `IConstRule` object that represents the value of the constant. The value is
- * computed once when the style definition is processed.
- *
  * **Example:**
  *
  * ```typescript
@@ -503,6 +502,14 @@ export function $var<K extends VarTemplateName>( template: K, value?: ExtendedVa
  *         color: this.defaultTextColor
  *     })
  * }
+ * ```
+ *
+ * @param template Either a name of a style property (in camel-case) or a name of the property from
+ * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
+ * of the second parameter.
+ * @param value The value assigned to the constant.
+ * @returns The `IConstRule` object that represents the value of the constant. The value is
+ * computed once when the style definition is processed.
  */
 export function $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
 {
@@ -520,12 +527,6 @@ export function $const<K extends VarTemplateName>( template: K, value?: Extended
  * for `counter-reset` and `counter-increment` style properties. Counter rules are usually used
  * in conjunction with the [[counter]] and [[counters]] functions.
  *
- * @param nameOverride String or another `ICounterRule` object that determines the name of the
- * counter. If this optional parameter is defined, the name will override the Mimcss name
- * assignment mechanism. This might be useful if there is a need for the name to match a name of
- * existing counter.
- * @returns The `ICounterRule` object that represents the counter.
- *
  * **Example:**
  *
  * ```typescript
@@ -538,6 +539,13 @@ export function $const<K extends VarTemplateName>( template: K, value?: Extended
  *         "::before": { content: css.counters( this.counter) }
  *     })
  * }
+ * ```
+ *
+ * @param nameOverride String or another `ICounterRule` object that determines the name of the
+ * counter. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing counter.
+ * @returns The `ICounterRule` object that represents the counter.
  */
 export function $counter( nameOverride?: string | ICounterRule): ICounterRule
 {
@@ -548,13 +556,6 @@ export function $counter( nameOverride?: string | ICounterRule): ICounterRule
  * Creates new counter style rule. The counter style name will be created when the rule is
  * processed as part of the style definition class. The name can be also overridden by providing
  * either an explicit name or another counter style rule.
- *
- * @param counterStyleset An object that defines counter style features.
- * @param nameOverride String or another `ICounterStyleRule` object that determines the name of the
- * counter style. If this optional parameter is defined, the name will override the Mimcss name
- * assignment mechanism. This might be useful if there is a need for the name to match a name of
- * existing counter style.
- * @returns The `ICounterStyleRule` object that represents the counter style.
  *
  * **Example:**
  *
@@ -567,6 +568,14 @@ export function $counter( nameOverride?: string | ICounterRule): ICounterRule
  *         suffix: " - "
  *     })
  * }
+ * ```
+ *
+ * @param counterStyleset An object that defines counter style features.
+ * @param nameOverride String or another `ICounterStyleRule` object that determines the name of the
+ * counter style. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing counter style.
+ * @returns The `ICounterStyleRule` object that represents the counter style.
  */
 export function $counterStyle( counterStyleset?: ExtendedCounterStyleset,
     nameOverride?: string | ICounterStyleRule): ICounterStyleRule
@@ -582,15 +591,6 @@ export function $counterStyle( counterStyleset?: ExtendedCounterStyleset,
  *
  * No CSS rule is created for grid lines - these objects are solely used for creating names, which
  * can be type-safely referred to from style rules.
- *
- * @param nameOverride String or another `IGridLineRule` object that determines the name of the
- * line. If this optional parameter is defined, the name will override the Mimcss name
- * assignment mechanism. This might be useful if there is a need for the name to match a name of
- * existing grid line.
- * @param isStartEndOrNone Flag indicating whether the `"-start"` or `"-end"` suffix should be
- * appended to the rule name. If the flag is true, `"-start"` is appended; if the flag is false,
- * `"-end"` is appended; if the flag is undefined, no suffix is appended to the rule name.
- * @returns The `IGridLineRule` object that represents the grid line.
  *
  * **Example:**
  *
@@ -614,6 +614,16 @@ export function $counterStyle( counterStyleset?: ExtendedCounterStyleset,
  *         gridColumnEnd: this.gridLineLast,
  *     })
  * }
+ * ```
+ *
+ * @param nameOverride String or another `IGridLineRule` object that determines the name of the
+ * line. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing grid line.
+ * @param isStartEndOrNone Flag indicating whether the `"-start"` or `"-end"` suffix should be
+ * appended to the rule name. If the flag is true, `"-start"` is appended; if the flag is false,
+ * `"-end"` is appended; if the flag is undefined, no suffix is appended to the rule name.
+ * @returns The `IGridLineRule` object that represents the grid line.
  */
 export function $gridline( nameOverride?: string | IGridLineRule,
     isStartEndOrNone?: boolean): IGridLineRule
@@ -635,12 +645,6 @@ export function $gridline( nameOverride?: string | IGridLineRule,
  *
  * Every grid area defines two grid line rules in each direction, which can be accessed using the
  * [[IGridAreaRule.startLine]] and [[IGridAreaRule.endLine]] properties.
- *
- * @param nameOverride String or another `IGridAreaRule` object that determines the name of the
- * area. If this optional parameter is defined, the name will override the Mimcss name
- * assignment mechanism. This might be useful if there is a need for the name to match a name of
- * existing grid area.
- * @returns The `IGridAreaRule` object that represents the grid area.
  *
  * **Example:**
  *
@@ -670,6 +674,13 @@ export function $gridline( nameOverride?: string | IGridLineRule,
  *         backgroundColor: "lightgrey"
  *     })
  * }
+ * ```
+ *
+ * @param nameOverride String or another `IGridAreaRule` object that determines the name of the
+ * area. If this optional parameter is defined, the name will override the Mimcss name
+ * assignment mechanism. This might be useful if there is a need for the name to match a name of
+ * existing grid area.
+ * @returns The `IGridAreaRule` object that represents the grid area.
  */
 export function $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
 {
@@ -680,10 +691,6 @@ export function $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
 
 /**
  * Creates a new `@font-face` rule.
- *
- * @param fontface Object implementing the `IFontFace` interface defining the parameter of the
- * font to use.
- * @returns The `IFontFaceRule` object that represents the @font-face rule.
  *
  * **Example:**
  *
@@ -697,6 +704,11 @@ export function $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
  *         src: {url: 'roboto.woff', format: 'woff'}
  *     });
  * }
+ * ```
+ *
+ * @param fontface Object implementing the `IFontFace` interface defining the parameter of the
+ * font to use.
+ * @returns The `IFontFaceRule` object that represents the @font-face rule.
  */
 export function $fontface( fontface: ExtendedFontFace): IFontFaceRule
 {
@@ -708,10 +720,6 @@ export function $fontface( fontface: ExtendedFontFace): IFontFaceRule
 /**
  * Creates a new `@import` rule referencing the given CSS file.
  *
- * @param url URL to the CSS file. Relative URLs are resolved relative to the base URL of the
- * page where the Mimcss library is invoked.
- * @returns The `IImportRule` object that represents the `@import` rule.
- *
  * **Example:**
  *
  * ```typescript
@@ -722,6 +730,11 @@ export function $fontface( fontface: ExtendedFontFace): IFontFaceRule
  *         css.$import( "small-screen-3rdparty.css", {maxWidth: 600}),
  *     ]
  * }
+ * ```
+ *
+ * @param url URL to the CSS file. Relative URLs are resolved relative to the base URL of the
+ * page where the Mimcss library is invoked.
+ * @returns The `IImportRule` object that represents the `@import` rule.
  */
 export function $import( url: string, mediaQuery?: string | MediaStatement,
 	supportsQuery?: string | SupportsStatement): IImportRule
@@ -730,7 +743,22 @@ export function $import( url: string, mediaQuery?: string | MediaStatement,
 }
 
 /**
- * Creates new namespace rule.
+ * Creates new `@namespace` rule.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     init = [
+ *         css.$namespace( css.WebNamespaces.SVG, "svg")
+ *     ]
+ * }
+ * ```
+ *
+ * @param namespace Namespace string - use the [[WebNamespaces]] for well-known namespaces.
+ * @param prefix Prefix string to use for the namespace.
+ * @returns The `INamespaceRule` object that represents the namespace rule.
  */
 export function $namespace( namespace: string, prefix?: string): INamespaceRule
 {
@@ -738,7 +766,22 @@ export function $namespace( namespace: string, prefix?: string): INamespaceRule
 }
 
 /**
- * Creates new page rule.
+ * Creates new `@page` rule.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     init = [
+ *         css.$page( ":first", { margin: "auto" })
+ *     ]
+ * }
+ * ```
+ *
+ * @param pseudoClass Optional name of the page pseudo style.
+ * @param styleset Styles to apply.
+ * @returns The `IPageRule` object that represents the page rule.
  */
 export function $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
 {
@@ -747,20 +790,60 @@ export function $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPag
 
 /**
  * Creates a new `@supports` rule.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     cls = css.$class({ color: "red"})
+ *
+ *     ifGridSupported = css.$media( { display: "grid" },
+ *         class extends css.StyleDefinition<MyStyles>
+ *         {
+ *             cls = css.$class({ color: "pink"})
+ *         }
+ *     )
+ * }
+ * ```
+ *
+ * @param statement Supports statement containing one or more supports queries.
+ * @param instOrClass Either style definition class or an instance of a style defintion class.
+ * @returns `ISupportsRule` object representing the supports rule
  */
-export function $supports<T extends StyleDefinition>( query: SupportsStatement,
+export function $supports<T extends StyleDefinition>( statement: SupportsStatement,
     instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>
 {
-	return new SupportsRule( query, instOrClass);
+	return new SupportsRule( statement, instOrClass);
 }
 
 /**
- * Creates new media rule.
+ * Creates new `@media` rule.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     cls = css.$class({ color: "red"})
+ *
+ *     ifNarrowScreen = css.$media( { maxWidth: 800 },
+ *         class extends css.StyleDefinition<MyStyles>
+ *         {
+ *             cls = css.$class({ color: "pink"})
+ *         }
+ *     )
+ * }
+ * ```
+ *
+ * @param statement Media statement containing one or more media queries.
+ * @param instOrClass Either style definition class or an instance of a style defintion class.
+ * @returns `IMediaRule` object representing the media rule
  */
-export function $media<T extends StyleDefinition>( query: MediaStatement,
+export function $media<T extends StyleDefinition>( statement: MediaStatement,
     instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>
 {
-	return new MediaRule( query, instOrClass);
+	return new MediaRule( statement, instOrClass);
 }
 
 
@@ -797,6 +880,10 @@ export function $media<T extends StyleDefinition>( query: MediaStatement,
  * other style definitions: as long as there is at least one referencing style definition that
  * is activated, the rules will be in the DOM; as soon as all referencing style definitions are
  * deactivated, the rules from the referenced definition are removed from the DOM.
+ *
+ * @param instOrClass Either style definition class or an instanc of a style definition class.
+ * @returns An instance of the style definition class, which will be activated and deactivated
+ * along with the enclosing style definition.
  */
 export function $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T | null
 {
@@ -841,6 +928,10 @@ export function $use<T extends StyleDefinition>( instOrClass: T | IStyleDefiniti
  *     return <div className={libStyles.comp1.someClass.name}>...>/div>
  * }
  * ```
+ *
+ * @param instOrClass Either style definition class or an instanc of a style definition class.
+ * @returns An instance of the style definition class, which will be activated and deactivated
+ * along with the enclosing style definition.
  */
 export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T | null
 {
@@ -858,9 +949,9 @@ export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefini
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sets the method uses to generate names of CSS entities. If yes, the names
- * will be created by appending a unique number to the given prefix. If the prefix is not
- * specified, the standard prefix "n" will be used.
+ * Sets the method uses to generate names of CSS entities. If yes, the names will be created by
+ * appending a unique number to the given prefix. If the prefix is not specified, the standard
+ * prefix "n" will be used.
  *
  * By default the development version of the library (mimcss.dev.js) uses the [[UniqueScoped]]
  * method and the production version (mimcss.js) uses the [[Optimized]] method. This function can
@@ -869,7 +960,8 @@ export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefini
  *
  * @param method Indicates what method to use.
  * @param prefix Optional string that will serve as a prefix to which unique numbers will be added
- * to generate optimized names. Ignored if the `method` parameter is anything other than.
+ * to generate optimized names. Ignored if the `method` parameter is anything other than
+ * [[NameGenerationMethod.Optimized]].
  */
 export function configNameGeneration( method: NameGenerationMethod, prefix?: string): void
 {
@@ -888,8 +980,8 @@ export function configNameGeneration( method: NameGenerationMethod, prefix?: str
  * Concatenates the names of the given classes into a single string that can be assigned to a
  * `class` property of an HTML element.
  *
- * *Example*:
  * @param classProps Variable argument list of either class names or class rule objects.
+ * @returns The string that combines all class names (separated with space) from the input array.
  */
 export function classes( ...classProps: ClassPropType[]): string
 {
@@ -902,6 +994,7 @@ export function classes( ...classProps: ClassPropType[]): string
 /**
  * Chooses the first non-null name from the given list of classes.
  * @param classProps
+ * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
 export function chooseClass( ...classProps: ClassPropType[]): string | null
 {
@@ -926,11 +1019,11 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Rule virtualization.
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Decorator that should be applied to a rule if it is defined and used in the same style

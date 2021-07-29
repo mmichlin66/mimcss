@@ -14,7 +14,7 @@ import {v2s, wkf, WKF} from "../impl/Utils";
 
 
 /**
- * Object whose property names are names of well-known colors and values correspond to the
+ * Object whose property names are the well-known Web color names while values correspond to the
  * hexadecimal representation of the RGB separations (without an alpha mask). The properties of
  * this object can be used wherever the [[CssColor]] type can be used. Since the properties are
  * of the `number` type, they can be used for manipulating the color value.
@@ -443,7 +443,8 @@ export function hsl( h: Extended<CssAngle>, s: Extended<number>, l: Extended<num
  * Converts the given color and the alpha mask to the CSS Color representation. This
  * method should be used when defining CSS color values in styleset properties.
  *
- * The color can be specified as a numeric value or as a string color name.
+ * The color can be specified as a numeric value or as a color name from the [[INamedColors]]
+ * interface - include colors added using the module augmentation technique.
  *
  * The alpha mask is specified as a number:
  *   - The sign is ignored; that is, only the absolute value is considered.
@@ -451,6 +452,17 @@ export function hsl( h: Extended<CssAngle>, s: Extended<number>, l: Extended<num
  *   - Number 1 to 100 inclusive, which is treated as percentage.
  *   - Numbers greater than 100 are clamped to 100;
  *
+ * **Examples**
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // applying alpha to a numeric color
+ *     cls1 = css.$class({ color: css.alpha( 0xAA00AA, 0.5) })
+ *
+ *     // applying alpha to a named color
+ *     cls1 = css.$class({ color: css.alpha( "darkolivegreen", 0.5) })
+ * }
+ * ```
  * @param c Color value as either a number or a named color
  * @param a Alpha channel value
  */

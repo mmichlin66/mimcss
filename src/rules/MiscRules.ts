@@ -191,7 +191,7 @@ export class PageRule extends StyleRule implements IPageRule
 	public cssRule: CSSPageRule;
 
 	/** Optional name of the page pseudo style (e.g. "":first") */
-	public pseudoClass: PagePseudoClass | undefined;
+	public pseudoClass?: PagePseudoClass;
 }
 
 

@@ -400,7 +400,7 @@ export interface INamespaceRule extends IRule
 export interface IPageRule extends IStyleRule
 {
 	/** Optional name of the page pseudo style (e.g. "":first") */
-	readonly pseudoClass: PagePseudoClass | undefined;
+	readonly pseudoClass?: PagePseudoClass | undefined;
 
 	/** SOM page rule */
 	readonly cssRule: CSSPageRule | null;
