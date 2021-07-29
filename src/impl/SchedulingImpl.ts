@@ -1,4 +1,4 @@
-import {StyleDefinition} from "../api/RuleTypes";
+import {IStyleDefinition} from "../api/RuleTypes";
 import {SchedulerType, IScheduler} from "../api/SchedulingTypes";
 import {activateInstance, deactivateInstance} from "../rules/RuleContainer";
 import {StringStyleset} from "../api/StyleTypes";
@@ -15,13 +15,13 @@ export interface IActivator
 	 * Instructs to activate the given style definition instance. This method is called when the
 	 * activate function is called for this activation mechanism.
 	 */
-	activate( definition: StyleDefinition): void;
+	activate( definition: IStyleDefinition): void;
 
 	/**
 	 * Instructs to deactivate the given style definition instance. This method is called when the
 	 * deactivate function is called for this activation mechanism.
 	 */
-	deactivate( definition: StyleDefinition): void;
+	deactivate( definition: IStyleDefinition): void;
 
 	/**
 	 * Instructs to set the value of either a single property or a set of properties in the given
@@ -89,7 +89,7 @@ class SynchronousActivator implements IActivator
 	 * activate function is called for this activation mechanism.
 	 * @param definition
 	 */
-	public activate( definition: StyleDefinition): void
+	public activate( definition: IStyleDefinition): void
 	{
 		activateInstance( definition, 1);
 	}
@@ -99,7 +99,7 @@ class SynchronousActivator implements IActivator
 	 * deactivate function is called for this activation mechanism.
 	 * @param definition
 	 */
-	public deactivate( definition: StyleDefinition): void
+	public deactivate( definition: IStyleDefinition): void
 	{
 		deactivateInstance( definition, 1);
 	}
@@ -175,7 +175,7 @@ interface ScheduledStyleUpdate
 export class SchedulingActivator implements IActivator
 {
     // Map of style definition class instances to the reference count of activation/deactivation.
-	private definitions = new Map<StyleDefinition,number>();
+	private definitions = new Map<IStyleDefinition,number>();
 
     // Array of style property values to be set/removed.
     private props: ScheduledStyleUpdate[] = [];
@@ -199,7 +199,7 @@ export class SchedulingActivator implements IActivator
 	/**
 	 * Instructs to activate the given style definition instance.
 	 */
-	public activate( definition: StyleDefinition): void
+	public activate( definition: IStyleDefinition): void
 	{
 		let refCount = this.definitions.get( definition) || 0;
 		if (refCount === -1)
@@ -222,7 +222,7 @@ export class SchedulingActivator implements IActivator
 	/**
 	 * Instructs to deactivate the given style definition instance.
 	 */
-	public deactivate( definition: StyleDefinition): void
+	public deactivate( definition: IStyleDefinition): void
 	{
 		let refCount = this.definitions.get( definition) || 0;
 		if (refCount === 1)
@@ -293,7 +293,7 @@ export class SchedulingActivator implements IActivator
 	private doDOMUpdate(): void
 	{
         // activate/deactivate style definitions
-		this.definitions.forEach( (refCount: number, definition: StyleDefinition) =>
+		this.definitions.forEach( (refCount: number, definition: IStyleDefinition) =>
 		{
 			if (refCount > 0)
 				activateInstance( definition, refCount);

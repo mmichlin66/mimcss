@@ -5,7 +5,7 @@
 
 
 import {IScheduler} from "../api/SchedulingTypes";
-import {IStyleDefinitionClass, StyleDefinition} from "./RuleTypes";
+import {IStyleDefinitionClass, IStyleDefinition} from "./RuleTypes";
 import * as impl from "../impl/SchedulingImpl";
 import {processInstanceOrClass} from "../rules/RuleContainer";
 
@@ -24,7 +24,7 @@ import {processInstanceOrClass} from "../rules/RuleContainer";
  * a reference counter of how many times it was activated and deactivated. The rules are inserted
  * into DOM only upon first activation.
  */
- export function activate<T extends StyleDefinition>(
+ export function activate<T extends IStyleDefinition>(
 	instanceOrClass: T | IStyleDefinitionClass<T>,
 	schedulerType?: number): T | null
 {
@@ -42,7 +42,7 @@ import {processInstanceOrClass} from "../rules/RuleContainer";
  * style definition instance maintains a reference counter of how many times it was activated and
  * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function deactivate( instance: StyleDefinition, schedulerType?: number): void
+export function deactivate( instance: IStyleDefinition, schedulerType?: number): void
 {
 	impl.getActivator(schedulerType).deactivate( instance);
 }

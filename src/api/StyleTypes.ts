@@ -14,9 +14,8 @@ import {
     ITransformProxy, IRayProxy, ITimingFunctionProxy, ICursorProxy, BorderRadius, FillRule
 } from "./ShapeTypes";
 import {
-    IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, StyleDefinition,
-    IStyleDefinitionClass,
-    ICounterStyleRule
+    IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, IStyleDefinition,
+    IStyleDefinitionClass, ICounterStyleRule
 } from "./RuleTypes";
 
 
@@ -4630,7 +4629,7 @@ export type StringStyleset = { [K: string]: string | null | undefined }
      /**
       * Adds style definition class or instance.
       */
-     add( instOrClass: StyleDefinition | IStyleDefinitionClass): void;
+     add( instOrClass: IStyleDefinition | IStyleDefinitionClass): void;
 
      /**
       * Returns concatenated string representation of all CSS rules added to the context.

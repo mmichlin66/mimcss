@@ -1,4 +1,5 @@
-import {StyleDefinition, IStyleDefinitionClass, NameGenerationMethod} from "../api/RuleTypes"
+import {IStyleDefinition, IStyleDefinitionClass, NameGenerationMethod} from "../api/RuleTypes"
+import {StyleDefinition} from "../api/RuleAPI"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
@@ -9,7 +10,7 @@ import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 // Define symbols that are used for keeping important information on the style definition
 // instances that we don't want to be visible to developers.
 
-/** Property on the style definition class pointing to the singlton instance. */
+/** Property on the style definition class pointing to the singleton instance. */
 const symInstance = Symbol("definition");
 
 /**
@@ -177,7 +178,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	/** Returns the instance of the stylesheet definition class */
-	public getDefinitionInstance(): StyleDefinition
+	public getDefinitionInstance(): IStyleDefinition
 	{
 		return this.instance;
 	}
@@ -514,8 +515,8 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
  * it has already been processed. If yes, we just return it back; if no, we assign new unique names
  * to its rules.
  */
-export function processInstanceOrClass( instOrClass: StyleDefinition | IStyleDefinitionClass,
-	parent?: StyleDefinition): StyleDefinition | null
+export function processInstanceOrClass( instOrClass: IStyleDefinition | IStyleDefinitionClass,
+	parent?: IStyleDefinition): IStyleDefinition | null
 {
 	if (!instOrClass)
 		return null;
@@ -608,7 +609,7 @@ function processInstance( instance: StyleDefinition, embeddingContainer?: RuleCo
 /**
  * Returns rule container object associated with the given style definition object.
  */
-export function getContainerFromInstance( instance: StyleDefinition): RuleContainer
+export function getContainerFromInstance( instance: IStyleDefinition): RuleContainer
 {
 	return instance ? instance[symContainer] : null;
 }
@@ -622,7 +623,7 @@ export function getContainerFromInstance( instance: StyleDefinition): RuleContai
  * it was activated and deactivated. The rules are inserted to DOM only when this reference counter
  * goes up to 1.
  */
-export function activateInstance( instance: StyleDefinition, count: number): void
+export function activateInstance( instance: IStyleDefinition, count: number): void
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (ruleContainer)
@@ -639,7 +640,7 @@ export function activateInstance( instance: StyleDefinition, count: number): voi
  * definition object maintains a reference counter of how many times it was activated and
  * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function deactivateInstance( instance: StyleDefinition, count: number): void
+export function deactivateInstance( instance: IStyleDefinition, count: number): void
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (ruleContainer)
@@ -654,7 +655,7 @@ export function deactivateInstance( instance: StyleDefinition, count: number): v
 /**
  * Serializes the given style definition to the given string.
  */
-export function serializeInstance( instance: StyleDefinition, ctx: IRuleSerializationContext): void
+export function serializeInstance( instance: IStyleDefinition, ctx: IRuleSerializationContext): void
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (ruleContainer)

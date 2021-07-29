@@ -113,7 +113,7 @@ export interface INumericMath<T, U extends string>
      * are of the type `Extended<T>`; that is, they can be either of the generic type `T`, or a
      * CSS custom variable or constant of type `T`.
      *
-     * @param formularParts Array of strings, whcih are part of the template string and which are
+     * @param formularParts Array of strings, which are part of the template string and which are
      * not parameters.
      * @param params Array of parameters from the template string.
      * @returns Function implementing the `IGenericProxy<U>` callable interface. This allows the

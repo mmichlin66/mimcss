@@ -448,70 +448,16 @@ export interface IGridAreaRule extends INamedEntity
 
 
 /**
- * Symbol that is used by the `$parent` property in the StyleDefinition class that keeps reference
- * to the parnt style definition class. Developers can use this property to access rules in
- * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
- * property when processing the rules in the style definition object.
- */
-const symParent = Symbol("parent");
-
-
-
-/**
- * Symbol that is used by the `$owner` property in the StyleDefinition class that keeps reference
- * to the top-level style definition class. Developers can use this property to access rules in
- * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$owner`
- * property when processing the rules in the style definition object.
- */
-const symOwner = Symbol("owner");
-
-
-
-/**
- * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
- * Style definition classes are regular TypeScript classes and as such can have any fields and
- * methods - both instance and static. Normally, however, they contain instance properties
- * initialized with functions returning style rules and at-rules, such as [[$class]],
- * [[$tag]], [[$media]], [[$counter]] and others.
- *
- * **Examples**
- *
- * ```typescript
- * // top-level style definition class
- * class MyStyles extends css.StyleDefinition
- * {
- *     cls = css.$class({ color: "red"})
- *
- *     // using style-definition class for @media rule
- *     ifNarrowScreen = css.$media( { maxWidth: 800 },
- *         class extends css.StyleDefinition<MyStyles>
- *         {
- *             cls = css.$class({ color: "pink"})
- *         }
- *     )
- * }
- * ```
+ * The `IStyleDefinition` interface represents a class that contain defininitions of CSS rules.
+ * This interface is implemented by the [[StyleDefinition]] class and is not intended to be
+ * implemented by developers
  *
  * @typeparam P Parent style definition class. Parent of a top-level class is null.
  * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
  * class is its own owner.
  */
-export abstract class StyleDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
+export interface IStyleDefinition<P extends IStyleDefinition = any, O extends IStyleDefinition = any>
 {
-	/**
-	 * Style definition instances are created directly only by the *styled components* - that is,
-	 * components that use different styles for each instance. Otherwise, style definition
-	 * instances are created when either the [[$use]], [[$embed]] or [[activate]] function is called.
-	 * @param parent Reference to the parent style definition class
-	 */
-	public constructor( parent?: P)
-	{
-		this[symParent] = parent;
-
-        // Owner is taken from the parent class; a top-level class is its own owner.
-		this[symOwner] = parent ? parent.$owner : this;
-	}
-
 	/**
 	 * Refers to the instance of the style definition class which is the parnt of this style
      * definition object in the chain of style definition classes. Through this member, all rules
@@ -519,7 +465,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
      * style definitions, this property is always undefined. This property can also be undefined
      * if it was not provided to the constructor when creating the style definition class manually.
 	 */
-	public get $parent(): P | undefined { return this[symParent]; }
+	readonly $parent: P | undefined;
 
 	/**
 	 * Refers to the instance of the style definition class which is the owner of
@@ -528,7 +474,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
 	 * definition class can be accessed. For top-level style definitions, this property points
      * to itself.
 	 */
-	public get $owner(): O | undefined { return this[symOwner]; }
+	readonly $owner: O | undefined;
 }
 
 
@@ -536,8 +482,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
 /**
  * "Constructor" interface defining how style definition classes can be created.
  */
-export interface IStyleDefinitionClass<T extends StyleDefinition<P,O> = any,
-    P extends StyleDefinition = any, O extends StyleDefinition = any>
+export interface IStyleDefinitionClass<T extends IStyleDefinition<P,O> = any,
+    P extends IStyleDefinition = any, O extends IStyleDefinition = any>
 {
 	/** All style definition classes should conform to this constructor */
 	new( parent?: P): T;
@@ -548,7 +494,7 @@ export interface IStyleDefinitionClass<T extends StyleDefinition<P,O> = any,
 /**
  * The IGroupRule interface represents a grouping CSS rule.
  */
-export interface IGroupRule<T extends StyleDefinition = any> extends IRule
+export interface IGroupRule<T extends IStyleDefinition = any> extends IRule
 {
 	// Condition of this grouping rule.
 	readonly condition: string;
@@ -566,7 +512,7 @@ export interface IGroupRule<T extends StyleDefinition = any> extends IRule
  * The ISupportsRule interface represents the CSS @supports rule.
  * Objects implementing this interface are returned from the [[$supports]] function.
  */
-export interface ISupportsRule<T extends StyleDefinition = any> extends IGroupRule<T>
+export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupRule<T>
 {
 	/** Flag indicated whether the browser supports this rule's query */
     readonly isSupported: boolean;
@@ -581,7 +527,7 @@ export interface ISupportsRule<T extends StyleDefinition = any> extends IGroupRu
  * The IMediaRule interface represents the CSS @media rule.
  * Objects implementing this interface are returned from the [[$media]] function.
  */
-export interface IMediaRule<T extends StyleDefinition = any> extends IGroupRule<T>
+export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule<T>
 {
     /**
      * Returns `MediaQueryList` object that allows programmatic checking whether the document matches

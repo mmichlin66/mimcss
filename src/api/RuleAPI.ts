@@ -9,8 +9,8 @@ import {CssSelector, PagePseudoClass, OneOrMany} from "./CoreTypes";
 import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
-    IPageRule, StyleDefinition, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
-    IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule
+    IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
+    IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
@@ -29,6 +29,93 @@ import {a2s, v2s} from "../impl/Utils";
 
 
 /**
+ * Symbol that is used by the `$parent` property in the StyleDefinition class that keeps reference
+ * to the parnt style definition class. Developers can use this property to access rules in
+ * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
+ * property when processing the rules in the style definition object.
+ */
+ const symParent = Symbol("parent");
+
+
+
+ /**
+  * Symbol that is used by the `$owner` property in the StyleDefinition class that keeps reference
+  * to the top-level style definition class. Developers can use this property to access rules in
+  * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$owner`
+  * property when processing the rules in the style definition object.
+  */
+ const symOwner = Symbol("owner");
+
+
+
+ /**
+  * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
+  * Style definition classes are regular TypeScript classes and as such can have any fields and
+  * methods - both instance and static. Normally, however, they contain instance properties
+  * initialized with functions returning style rules and at-rules, such as [[$class]],
+  * [[$tag]], [[$media]], [[$counter]] and others.
+  *
+  * **Examples**
+  *
+  * ```typescript
+  * // top-level style definition class
+  * class MyStyles extends css.StyleDefinition
+  * {
+  *     cls = css.$class({ color: "red"})
+  *
+  *     // using style-definition class for @media rule
+  *     ifNarrowScreen = css.$media( { maxWidth: 800 },
+  *         class extends css.StyleDefinition<MyStyles>
+  *         {
+  *             cls = css.$class({ color: "pink"})
+  *         }
+  *     )
+  * }
+  * ```
+  *
+  * @typeparam P Parent style definition class. Parent of a top-level class is null.
+  * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
+  * class is its own owner.
+  */
+ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
+    implements IStyleDefinition<P,O>
+ {
+     /**
+      * Style definition instances are created directly only by the *styled components* - that is,
+      * components that use different styles for each instance. Otherwise, style definition
+      * instances are created when either the [[$use]], [[$embed]] or [[activate]] function is called.
+      * @param parent Reference to the parent style definition class
+      */
+     public constructor( parent?: P)
+     {
+         this[symParent] = parent;
+
+         // Owner is taken from the parent class; a top-level class is its own owner.
+         this[symOwner] = parent ? parent.$owner : this;
+     }
+
+     /**
+      * Refers to the instance of the style definition class which is the parnt of this style
+      * definition object in the chain of style definition classes. Through this member, all rules
+      * and other members defined in the parent definition class can be accessed. For top-level
+      * style definitions, this property is always undefined. This property can also be undefined
+      * if it was not provided to the constructor when creating the style definition class manually.
+      */
+     public get $parent(): P | undefined { return this[symParent]; }
+
+     /**
+      * Refers to the instance of the style definition class which is the owner of
+      * this style definition object. The owner is the top-level class in the chain of style
+      * definition classes. Through this member, all rules and other members defined in the owner
+      * definition class can be accessed. For top-level style definitions, this property points
+      * to itself.
+      */
+     public get $owner(): O | undefined { return this[symOwner]; }
+ }
+
+
+
+ /**
  * Creates a new abstract rule, which defines a styleset that can be extended by other style rules.
  * Abstract rules don't have selectors and are not inserted into the DOM. Abstract rules can
  * themselves extend other rules - both abstract and non-abstract.

@@ -1,4 +1,4 @@
-import {IRule, INamedEntity, StyleDefinition} from "../api/RuleTypes"
+import {IRule, INamedEntity, IStyleDefinition} from "../api/RuleTypes"
 
 
 
@@ -12,7 +12,7 @@ export interface IRuleSerializationContext
     addRuleText( s: string, isTopLevelRule?: boolean): void;
 
     // Adds rule text
-    addStyleDefinition( instance: StyleDefinition): void;
+    addStyleDefinition( instance: IStyleDefinition): void;
 }
 
 
@@ -24,7 +24,7 @@ export interface IRuleSerializationContext
 export interface IRuleContainer
 {
 	/** Returns the instance of the stylesheet definition class */
-	getDefinitionInstance(): StyleDefinition;
+	getDefinitionInstance(): IStyleDefinition;
 
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
 	insertRules( parent: CSSStyleSheet | CSSGroupingRule): void;

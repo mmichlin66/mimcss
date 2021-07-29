@@ -1,4 +1,4 @@
-import {IStyleDefinitionClass, StyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
+import {IStyleDefinitionClass, IStyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {getContainerFromInstance, processInstanceOrClass} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
@@ -9,7 +9,7 @@ import {media2s, supports2s} from "../impl/MiscImpl";
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends StyleDefinition> extends Rule implements IGroupRule<T>
+export abstract class GroupRule<T extends IStyleDefinition> extends Rule implements IGroupRule<T>
 {
 	public constructor( instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
@@ -116,7 +116,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 	protected instanceOrClass: T | IStyleDefinitionClass;
 
 	// Style definition instance.
-	protected instance: StyleDefinition;
+	protected instance: IStyleDefinition;
 
 	// Rule container for the definition instance.
 	protected ruleContainer: IRuleContainer;
@@ -130,7 +130,7 @@ export abstract class GroupRule<T extends StyleDefinition> extends Rule implemen
 /**
  * The SupportRule class describes a CSS @supports rule.
  */
-export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
+export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
 	public constructor( statement: SupportsStatement, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{
@@ -184,7 +184,7 @@ export class SupportsRule<T extends StyleDefinition> extends GroupRule<T> implem
 /**
  * The MediaRule class describes a CSS @media rule.
  */
-export class MediaRule<T extends StyleDefinition> extends GroupRule<T> implements IMediaRule<T>
+export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
 	public constructor( statement: MediaStatement, instanceOrClass: T | IStyleDefinitionClass<T>)
 	{

@@ -1,5 +1,5 @@
 ﻿import {IStringProxy} from "./CoreTypes";
-import {IStyleDefinitionClass, IVarRule, StyleDefinition} from "./RuleTypes";
+import {IStyleDefinitionClass, IVarRule, IStyleDefinition} from "./RuleTypes";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
 import {
     Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName,
@@ -374,7 +374,7 @@ export function createCssSerializer(): ICssSerializer
  * representation. This can be used for server-side rendering when the resultant string can be
  * set as the content of a `<style>` element.
  */
-export function serializeToCSS( ...args: (StyleDefinition | IStyleDefinitionClass)[]): string
+export function serializeToCSS( ...args: (IStyleDefinition | IStyleDefinitionClass)[]): string
 {
     if (!args || args.length === 0)
         return "";
@@ -396,7 +396,7 @@ class CssSerializer implements ICssSerializer
     /**
      * Adds style definition class or instance.
      */
-    public add( instOrClass: StyleDefinition | IStyleDefinitionClass): void
+    public add( instOrClass: IStyleDefinition | IStyleDefinitionClass): void
     {
         let instance = processInstanceOrClass( instOrClass);
         if (!instance || this.instances.has(instance))
@@ -419,7 +419,7 @@ class CssSerializer implements ICssSerializer
     }
 
     // Set of style definition instances. This is needed to not add style definitions more than once
-    instances = new Set<StyleDefinition>();
+    instances = new Set<IStyleDefinition>();
 }
 
 
@@ -440,7 +440,7 @@ class RuleSerializationContext implements IRuleSerializationContext
     }
 
     // Adds rule text
-    public addStyleDefinition( instance: StyleDefinition): void
+    public addStyleDefinition( instance: IStyleDefinition): void
     {
         if (!this.instances.has( instance))
         {
@@ -456,7 +456,7 @@ class RuleSerializationContext implements IRuleSerializationContext
     public nonTopLevelBuf = "";
 
     // Set of style definition instances that were already serialized in this context.
-    private instances = new Set<StyleDefinition>();
+    private instances = new Set<IStyleDefinition>();
 }
 
 
