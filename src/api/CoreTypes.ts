@@ -267,7 +267,8 @@ export type OneOrMany<T> = T | T[];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The `IRuleWithSelector` interface represents an entity that has a selector string.
+ * The `IRuleWithSelector` interface represents an entity that has a selector string. These include
+ * all style rules ([[IStyleRule]] interface) and class name rule ([[IClassNameRule]] interface).
  */
 export interface IRuleWithSelector
 {
@@ -278,7 +279,7 @@ export interface IRuleWithSelector
 
 
 /**
- * The ISelectorProxy function returns a CSS selector string. This type is returned from the
+ * The `ISelectorProxy` function returns a CSS selector string. This type is returned from the
  * [[selector]] function.
  */
 export interface ISelectorProxy extends IGenericProxy<"selector"> {};
@@ -299,7 +300,7 @@ export type SelectorCombinator = "," | " " | ">" | "+" | "~";
  * easy-to-use combination of a parent selector with the specified selector using the given
  * combinator.
  *
- * ** Example:**
+ * **Example:**
  *
  * ```typescript
  * class MyStyles extends css.StyleDefinition
@@ -332,25 +333,70 @@ export type DependentRuleCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | "
 
 
 
-/** Represents print-related pseudo classes - those that can be specified with the @page CSS rule */
+/**
+ * Represents print-related pseudo classes - those that can be specified with the `@page` CSS rule
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     page = css.$page( ":first", { margin: "auto" })
+ * }
+ * ```
+ */
 export type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
 
 
 
-/** Represents pseudo classes */
+/**
+ * Represents pseudo classes that can be used as properties in the [[CombinedStyleset]] object to
+ * define dependent rules. Note that this type only contains pseudo classes that don't require
+ * parameters. For parameterized pseudo classes, see the [[IParameterizedPseudoClass]] interface.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     class1 = css.$class({
+ *         backgroundColor: "blue",
+ *         ":hover": { opacity: 0.7 },
+ *     })
+ * }
+ * ```
+ */
 export type PseudoClass = PagePseudoClass |
 	":active" | ":any-link" | ":blank" | ":checked" | ":default" | ":defined" | ":disabled" |
 	":empty" | ":enabled" | ":first-child" | ":first-of-type" | ":fullscreen" | ":focus" |
-	":focus-visible" | ":focus-Within" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" |
+	":focus-visible" | ":focus-within" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" |
 	":last-child" | ":last-of-type" | ":link" | ":only-child" | ":only-of-type" | ":optional" |
 	":out-of-range" | ":placeholder-shown" | ":read-only" | ":read-write" | ":required" | ":root" |
 	":scope" | ":target" | ":valid" | ":visited" | ":dir(rtl)" | ":dir(ltr)";
 
 
 
-/** Represents pseudo elements */
-export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | "::firstLetter" |
-	"::firstLine" | "::grammarError" | "::marker" | "::placeholder" | "::selection" | "::spellingError";
+/**
+ * Represents pseudo elements that can be used as properties in the [[CombinedStyleset]] object to
+ * define dependent rules. Note that this type only contains pseudo elements that don't require
+ * parameters. For parameterized pseudo elements, see the [[IParameterizedPseudoElement]] interface.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     exciting = css.$class({
+ *         "::after": {
+ *             content: " <- EXCITING!"
+ *             color: "green"
+ *         },
+ *     })
+ * }
+ * ```
+ */
+export type PseudoElement = "::after" | "::backdrop" | "::before" | "::cue" | "::first-letter" |
+	"::first-line" | "::grammar-error" | "::marker" | "::placeholder" | "::selection" | "::spelling-error";
 
 
 
@@ -360,18 +406,44 @@ export type PseudoEntity = PseudoClass | PseudoElement;
 
 
 /**
- * Type for expression An+B, which is used for parameterized pseudo classes like `nth-child`. It
+ * Type for expression An+B, which is used for parameterized pseudo classes like `:nth-child`. It
  * can be a string, a single number or a tuple with one or two numbers. If it is a single number,
  * the 'n' in An+B will not be used - as in `nth-child(2)`. If it is a tuple, the 'n' will be used
- * even if the second tuple's element is not provided.
+ * even if the tuple's second element is not provided.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     p = css.$tag( "p", {
+ *         ":nth-of-type": [
+ *
+ *             // css: p:nth-of-type(1)
+ *             [1, { color: "red" }],
+ *
+ *             // css: p:nth-of-type(3n)
+ *             [[3], { color: "green" }],
+ *
+ *             // css: p:nth-of-type(2n+1)
+ *             [[2,1], { color: "blue" }],
+ *
+ *             // css: p:nth-of-type(odd)
+ *             ["odd", { color: "yellow" }],
+ *         ],
+ *     })
+ * }
+ * ```
  */
 export type NthChildExpression = "odd" | "even" | number | [number, number?] | string | IStringProxy;
 
 
 
 /**
- * The IParameterizedPseudoClass interface maps names of pseudo classes that require parameters
- * to the type that can be used to specify these parameters.
+ * The `IParameterizedPseudoClass` interface maps names of pseudo classes that require parameters
+ * to the types that are used to specify these parameters. When a parameterized pseudo class is
+ * used as a property in the [[CombinedStyleset]] object, the value should be of the type from
+ * this interface.
  */
 export interface IParameterizedPseudoClass
 {
@@ -391,8 +463,10 @@ export interface IParameterizedPseudoClass
 
 
 /**
- * The IParameterizedPseudoElement interface maps names of pseudo elements that require parameters
- * to the type that can be used to specify these parameters.
+ * The `IParameterizedPseudoElement` interface maps names of pseudo elements that require parameters
+ * to the types that can be used to specify these parameters. When a parameterized pseudo element
+ * is used as a property in the [[CombinedStyleset]] object, the value should be of the type from
+ * this interface.
  */
 export interface IParameterizedPseudoElement
 {
@@ -403,14 +477,16 @@ export interface IParameterizedPseudoElement
 
 
 /**
- * The IParameterizedPseudoEntity interface combines IParameterizedPseudoClass and
- * IParameterizedPseudoElement interfaces.
+ * The `IParameterizedPseudoEntity` interface combines [[IParameterizedPseudoClass]] and
+ * [[IParameterizedPseudoElement]] interfaces.
  */
 export interface IParameterizedPseudoEntity extends IParameterizedPseudoClass, IParameterizedPseudoElement {}
 
 
 
-/** Type for a single selector token that can be used as an argument to the [[selector]] function */
+/**
+ * Type for a single selector token that can be used as an argument to the [[selector]] function
+ */
 export type SelectorItem = string | SelectorCombinator | IRuleWithSelector | IStringProxy | ISelectorProxy;
 
 

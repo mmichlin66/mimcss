@@ -6,7 +6,7 @@ import {ListStyleType_StyleType} from "./StyleTypes";
 
 
 /**
- * Type that extends the given type with the IStringProxy interface that allows specifying raw string value.
+ * Type that extends the given type with the [[IStringProxy]] interface that allows specifying raw string value.
  */
 export type CounterExtended<T> = T | IStringProxy;
 
