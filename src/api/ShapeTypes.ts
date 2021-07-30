@@ -263,7 +263,7 @@ export interface ITransformProxy extends IGenericProxy<"transform"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for border-radius style property */
-export type BorderRadius = OneOrPair<OneOrBox<CssLength>>;
+export type BorderRadius = OneOrPair<OneOrBox<Extended<CssLength>>>;
 
 /**
  * Type that is used to specify a radius in [circle]] and [ellipse]] functions.

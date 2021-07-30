@@ -23,7 +23,7 @@ export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic
 /**
  * Type for specfying counter[[negative]] property.
  */
-export type Negative_CounterType = OneOrPair<string>;
+export type Negative_CounterType = OneOrPair<CounterExtended<string>>;
 
 
 
@@ -37,7 +37,7 @@ export type PrefixSuffix_CounterType = string | CssImage;
 /**
  * Type for specfying counter [[range]] property.
  */
-export type Range_CounterType = "auto" | OneOrMany<["infinite" | number, "infinite" | number]>;
+export type Range_CounterType = "auto" | OneOrMany<CounterExtended<["infinite" | number, "infinite" | number]>>;
 
 
 
@@ -58,14 +58,14 @@ export type Fallback_CounterType = ListStyleType_StyleType | IStringProxy;
 /**
  * Type for specfying counter [[symbols]] property.
  */
-export type Symbols_CounterType = OneOrMany<string>;
+export type Symbols_CounterType = OneOrMany<CounterExtended<string>>;
 
 
 
 /**
  * Type for specfying counter [[additiveSymbols]] property.
  */
-export type AdditiveSymbols_CounterType = OneOrMany<[string | CssImage, number] | [number, string | CssImage]>;
+export type AdditiveSymbols_CounterType = OneOrMany<CounterExtended<[string | CssImage, number] | [number, string | CssImage]>>;
 
 
 

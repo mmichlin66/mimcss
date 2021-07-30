@@ -187,7 +187,7 @@ export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
 /**
  * Type for pair-like properties that can have 1 or 2 values of the given type. This type is used
  * for style properties that can specify values for two dimensions (x and y), but also allow for a
- * single value, in which case it applies to both dimensions. For example, it used by style
+ * single value, in which case it applies to both dimensions. For example, it is used by style
  * properties such as `overflow`, `border-radius`, `background-repeat` and others.
  *
  * @typeparam T Type of the values
@@ -205,13 +205,13 @@ export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
  * }
  * ```
  */
-export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
+export type OneOrPair<T> = T | [T, T?];
 
 /**
  * Type for box-like properties that can have 1 to 4 values of the given type. This type is used
  * for style properties that specify values for the four sides of an element box and have rules how
- * specifying 1, 2 or 3 values determine the values applied to all four sides. For example, it used
- * by style properties such as `margin`, `padding`, `border-color` and others.
+ * specifying 1, 2 or 3 values determine the values applied to all four sides. For example, it is
+ * used by style properties such as `margin`, `padding`, `border-color` and others.
  *
  * @typeparam T Type of the values
  *
@@ -234,7 +234,7 @@ export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
  * }
  * ```
  */
-export type OneOrBox<T> = T | [Extended<T>, Extended<T>?, Extended<T>?, Extended<T>?];
+export type OneOrBox<T> = T | [T, T?, T?, T?];
 
 /**
  * Type for properties that can have 1 or more values of the given type. It is used by many style
@@ -256,7 +256,7 @@ export type OneOrBox<T> = T | [Extended<T>, Extended<T>?, Extended<T>?, Extended
  * }
  * ```
  */
-export type OneOrMany<T> = T | Extended<T>[];
+export type OneOrMany<T> = T | T[];
 
 
 
@@ -419,7 +419,7 @@ export type SelectorItem = string | SelectorCombinator | IRuleWithSelector | ISt
  * Type for a CSS selector. This type is used to produce arbitrary complex selectors used by the
  * [[$style]] function.
  */
-export type CssSelector = OneOrMany<SelectorItem>;
+export type CssSelector = OneOrMany<Extended<SelectorItem>>;
 
 
 

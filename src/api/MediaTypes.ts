@@ -1,4 +1,4 @@
-﻿import {IConstant, IGenericProxy, IStringProxy, OneOrMany} from "./CoreTypes";
+﻿import {IConstant, IGenericProxy, IStringProxy, OneOrMany, OneOrPair} from "./CoreTypes";
 import {CssAspectRatio, CssNumber, CssLength, CssResolution} from "./NumericTypes";
 import {Styleset} from "./StyleTypes";
 
@@ -22,7 +22,7 @@ export type ExtendedFeature<T> = T | IConstant<T> | IStringProxy | null | undefi
  * Type for a media feature that can be specified either as a single value or as a range between
  * two values of the given type.
  */
-export type OneOrRange<T> = T | [ExtendedFeature<T>, ExtendedFeature<T>?];
+export type OneOrRange<T> = OneOrPair<ExtendedFeature<T>>;
 
 
 

@@ -96,7 +96,7 @@ export type Animation_Single =
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation
  * @category Style Property
  */
-export type Animation_StyleType = OneOrMany<Animation_Single>;
+export type Animation_StyleType = OneOrMany<Extended<Animation_Single>>;
 
 
 
@@ -106,7 +106,7 @@ export type Animation_StyleType = OneOrMany<Animation_Single>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-delay
  * @category Style Property
  */
-export type AnimationDelay_StyleType = OneOrMany<CssTime>;
+export type AnimationDelay_StyleType = OneOrMany<Extended<CssTime>>;
 
 
 
@@ -122,7 +122,7 @@ export type AnimationDirection = "normal" | "reverse" | "alternate" | "alternate
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-direction
  * @category Style Property
  */
-export type AnimationDirection_StyleType = OneOrMany<AnimationDirection>;
+export type AnimationDirection_StyleType = OneOrMany<Extended<AnimationDirection>>;
 
 
 
@@ -132,7 +132,7 @@ export type AnimationDirection_StyleType = OneOrMany<AnimationDirection>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-duration
  * @category Style Property
  */
-export type AnimationDuration_StyleType = OneOrMany<CssTime>;
+export type AnimationDuration_StyleType = OneOrMany<Extended<CssTime>>;
 
 
 
@@ -148,7 +148,7 @@ export type AnimationFillMode = "none" | "forwards" | "backwards" | "both";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-fill-mode
  * @category Style Property
  */
-export type AnimationFillMode_StyleType = OneOrMany<AnimationDirection>;
+export type AnimationFillMode_StyleType = OneOrMany<Extended<AnimationDirection>>;
 
 
 
@@ -164,7 +164,7 @@ export type AnimationIterationCount = "infinite" | CssNumber;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-iteration-count
  * @category Style Property
  */
-export type AnimationIterationCount_StyleType = OneOrMany<AnimationIterationCount>;
+export type AnimationIterationCount_StyleType = OneOrMany<Extended<AnimationIterationCount>>;
 
 
 
@@ -180,7 +180,7 @@ export type AnimationName = "none" | string | IAnimationRule;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-name
  * @category Style Property
  */
-export type AnimationName_StyleType = OneOrMany<AnimationName>;
+export type AnimationName_StyleType = OneOrMany<Extended<AnimationName>>;
 
 
 
@@ -196,7 +196,7 @@ export type AnimationPlayState = "paused" | "running";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-play-state
  * @category Style Property
  */
-export type AnimationPlayState_StyleType = OneOrMany<AnimationPlayState>;
+export type AnimationPlayState_StyleType = OneOrMany<Extended<AnimationPlayState>>;
 
 
 
@@ -218,7 +218,7 @@ export type TimingFunction = TimingFunctionKeyword | ITimingFunctionProxy;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-timing-function
  * @category Style Property
  */
-export type AnimationTimingFunction_StyleType = OneOrMany<TimingFunction>;
+export type AnimationTimingFunction_StyleType = OneOrMany<Extended<TimingFunction>>;
 
 
 
@@ -264,7 +264,7 @@ export type Background_Single = CssColor |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background
  * @category Style Property
  */
-export type Background_StyleType = OneOrMany<Background_Single>;
+export type Background_StyleType = OneOrMany<Extended<Background_Single>>;
 
 
 
@@ -280,7 +280,7 @@ export type BackgroundAttachment = "scroll" | "fixed" | "local";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-attachment
  * @category Style Property
  */
-export type BackgroundAttachment_StyleType = OneOrMany<BackgroundAttachment>;
+export type BackgroundAttachment_StyleType = OneOrMany<Extended<BackgroundAttachment>>;
 
 
 
@@ -298,7 +298,7 @@ export type BlendMode = "normal" | "multiply" | "screen" | "overlay" | "darken" 
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-blend-mode
  * @category Style Property
  */
-export type BackgroundBlendMode_StyleType = OneOrMany<BlendMode>;
+export type BackgroundBlendMode_StyleType = OneOrMany<Extended<BlendMode>>;
 
 
 
@@ -314,7 +314,7 @@ export type BackgroundClip = "border-box" | "padding-box" | "content-box" | "tex
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-clip
  * @category Style Property
  */
-export type BackgroundClip_StyleType = OneOrMany<BackgroundClip>;
+export type BackgroundClip_StyleType = OneOrMany<Extended<BackgroundClip>>;
 
 
 
@@ -324,7 +324,7 @@ export type BackgroundClip_StyleType = OneOrMany<BackgroundClip>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-image
  * @category Style Property
  */
-export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
+export type BackgroundImage_StyleType = "none" | OneOrMany<Extended<CssImage>>;
 
 
 
@@ -340,7 +340,7 @@ export type BackgroundOrigin = "border-box" | "padding-box" | "content-box" | "t
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-origin
  * @category Style Property
  */
-export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin>;
+export type BackgroundOrigin_StyleType = OneOrMany<Extended<BackgroundOrigin>>;
 
 
 
@@ -350,7 +350,7 @@ export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-position
  * @category Style Property
  */
-export type BackgroundPosition_StyleType = OneOrMany<CssPosition>;
+export type BackgroundPosition_StyleType = OneOrMany<Extended<CssPosition>>;
 
 
 
@@ -371,7 +371,7 @@ export type BackgroundPositionX = HorizontalPositionKeyword | CssLength |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-position-x
  * @category Style Property
  */
-export type BackgroundPositionX_StyleType = OneOrMany<BackgroundPositionX>;
+export type BackgroundPositionX_StyleType = OneOrMany<Extended<BackgroundPositionX>>;
 
 
 
@@ -392,7 +392,7 @@ export type BackgroundPositionY = VerticalPositionKeyword | CssLength |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-position-y
  * @category Style Property
  */
-export type BackgroundPositionY_StyleType = OneOrMany<BackgroundPositionY>;
+export type BackgroundPositionY_StyleType = OneOrMany<Extended<BackgroundPositionY>>;
 
 
 
@@ -406,7 +406,7 @@ export type BackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat"
  * Type for single background repeat
  * @category Style Helper
  */
-export type BackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeyword>;
+export type BackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<Extended<BackgroundRepeatKeyword>>;
 
 /**
  * Type for [[backgroundRepeat]] style property
@@ -414,7 +414,7 @@ export type BackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRep
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-repeat
  * @category Style Property
  */
-export type BackgroundRepeat_StyleType = OneOrMany<BackgroundRepeat>;
+export type BackgroundRepeat_StyleType = OneOrMany<Extended<BackgroundRepeat>>;
 
 
 
@@ -422,7 +422,7 @@ export type BackgroundRepeat_StyleType = OneOrMany<BackgroundRepeat>;
  * Type for background size
  * @category Style Helper
  */
-export type BackgroundSize = "cover" | "contain" | OneOrPair<CssLengthOrAuto>;
+export type BackgroundSize = "cover" | "contain" | OneOrPair<Extended<CssLengthOrAuto>>;
 
 /**
  * Type for [[backgroundSize]] style property. The background-size style can specify one or more
@@ -440,7 +440,7 @@ export type BackgroundSize = "cover" | "contain" | OneOrPair<CssLengthOrAuto>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#background-size
  * @category Style Property
  */
-export type BackgroundSize_StyleType = OneOrMany<BackgroundSize>;
+export type BackgroundSize_StyleType = OneOrMany<Extended<BackgroundSize>>;
 
 
 
@@ -470,7 +470,7 @@ export type BorderColapse_StyleType = "collapse" | "separate";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-color
  * @category Style Property
  */
-export type BorderColor_StyleType = OneOrBox<CssColor>;
+export type BorderColor_StyleType = OneOrBox<Extended<CssColor>>;
 
 
 
@@ -502,7 +502,7 @@ export type BorderImage_StyleType = CssImage | BorderImage_Object;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-image-outset
  * @category Style Property
  */
-export type BorderImageOutset_StyleType = OneOrBox<CssNumber | ILengthProxy>;
+export type BorderImageOutset_StyleType = OneOrBox<Extended<CssNumber | ILengthProxy>>;
 
 /**
  * Type for border-image-repeat keywords
@@ -516,7 +516,7 @@ export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-image-repeat
  * @category Style Property
  */
-export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeatKeyword>;
+export type BorderImageRepeat_StyleType = OneOrPair<Extended<BorderImageRepeatKeyword>>;
 
 /**
  * Type for [[borderImageSlice]] style property
@@ -524,7 +524,7 @@ export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeatKeyword>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-image-slice
  * @category Style Property
  */
-export type BorderImageSlice_StyleType = OneOrBox<CssPercent> |
+export type BorderImageSlice_StyleType = OneOrBox<Extended<CssPercent>> |
     [Extended<CssPercent>, boolean?] |
     [Extended<CssPercent>, Extended<CssPercent>, boolean?] |
     [Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, boolean?] |
@@ -536,7 +536,7 @@ export type BorderImageSlice_StyleType = OneOrBox<CssPercent> |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-image-source
  * @category Style Property
  */
-export type BorderImageSource_StyleType = OneOrBox<CssImage> | "none";
+export type BorderImageSource_StyleType = OneOrBox<Extended<CssImage>> | "none";
 
 /**
  * Type for [[borderImageWidth]] style property. It is CssNumber and not CssLength because
@@ -545,7 +545,7 @@ export type BorderImageSource_StyleType = OneOrBox<CssImage> | "none";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#
  * @category Style Property
  */
-export type BorderImageWidth_StyleType = OneOrBox<CssNumber | ILengthProxy | "auto">;
+export type BorderImageWidth_StyleType = OneOrBox<Extended<CssNumber | ILengthProxy | "auto">>;
 
 
 
@@ -555,7 +555,7 @@ export type BorderImageWidth_StyleType = OneOrBox<CssNumber | ILengthProxy | "au
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-spacing
  * @category Style Property
  */
-export type BorderSpacing_StyleType = OneOrPair<CssLength>;
+export type BorderSpacing_StyleType = OneOrPair<Extended<CssLength>>;
 
 
 
@@ -574,7 +574,7 @@ export type BorderStyle = "none" | "hidden" | "dotted" | "dashed" | "solid" | "d
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-style
  * @category Style Property
  */
-export type BorderStyle_StyleType = OneOrBox<BorderStyle>;
+export type BorderStyle_StyleType = OneOrBox<Extended<BorderStyle>>;
 
 
 
@@ -606,7 +606,7 @@ export type BorderWidth = "thin" | "medium" | "thick" | CssLength;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#border-width
  * @category Style Property
  */
-export type BorderWidth_StyleType = OneOrBox<BorderWidth>;
+export type BorderWidth_StyleType = OneOrBox<Extended<BorderWidth>>;
 
 
 
@@ -641,7 +641,7 @@ export type BoxShadow = "none" |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#box-shadow
  * @category Style Property
  */
-export type BoxShadow_StyleType = OneOrMany<BoxShadow>;
+export type BoxShadow_StyleType = OneOrMany<Extended<BoxShadow>>;
 
 
 
@@ -846,7 +846,7 @@ export type Contain_StyleType = "none" | "strict" | "content" | "size" | "layout
  * @category Style Property
  */
 export type Content_StyleType = string | "none" | "normal" |
-    OneOrMany<CssImage |"open-quote" | "close-quote" | "no-open-quote" | "no-close-quote">;
+    OneOrMany<Extended<CssImage |"open-quote" | "close-quote" | "no-open-quote" | "no-close-quote">>;
 
 
 
@@ -854,7 +854,7 @@ export type Content_StyleType = string | "none" | "normal" |
  * Type for [[counterIncrement]], [[counterReset]] and [[counterSet]] style properties
  * @category Style Helper
  */
-export type CssCounter = "none" | OneOrMany<ICounterRule | string | [ICounterRule | string, Extended<number>]>;
+export type CssCounter = "none" | OneOrMany<Extended<ICounterRule | string | [ICounterRule | string, Extended<number>]>>;
 
 
 
@@ -875,7 +875,7 @@ export type CursorKeyword = "auto" | "default" | "none" | "context-menu" | "help
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#cursor
  * @category Style Property
  */
-export type Cursor_StyleType = OneOrMany<CursorKeyword | IUrlProxy | ICursorProxy>;
+export type Cursor_StyleType = OneOrMany<Extended<CursorKeyword | IUrlProxy | ICursorProxy>>;
 
 
 
@@ -933,7 +933,7 @@ export type EmptyCells_StyleType = "show" | "hide";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#filter
  * @category Style Property
  */
-export type Filter_StyleType = OneOrMany<IUrlProxy | IFilterProxy>;
+export type Filter_StyleType = OneOrMany<Extended<IUrlProxy | IFilterProxy>>;
 
 
 
@@ -1044,7 +1044,7 @@ export type Gap_StyleType = RowGap_StyleType | [RowGap_StyleType, ColumnGap_Styl
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#grid-auto-columns
  * @category Style Property
  */
-export type GridAutoAxis_StyleType = OneOrMany<GridTrackSize>;
+export type GridAutoAxis_StyleType = OneOrMany<Extended<GridTrackSize>>;
 
 
 
@@ -1082,7 +1082,7 @@ export type GridAxisSide_StyleType = "auto" | GridLineCountOrName | ISpanProxy |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#grid-column
  * @category Style Property
  */
-export type GridAxis_StyleType = OneOrPair<GridAxisSide_StyleType>;
+export type GridAxis_StyleType = OneOrPair<Extended<GridAxisSide_StyleType>>;
 
 
 
@@ -1092,7 +1092,7 @@ export type GridAxis_StyleType = OneOrPair<GridAxisSide_StyleType>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#grid-area
  * @category Style Property
  */
-export type GridArea_StyleType = OneOrBox<GridAxisSide_StyleType>;
+export type GridArea_StyleType = OneOrBox<Extended<GridAxisSide_StyleType>>;
 
 
 
@@ -1120,7 +1120,7 @@ export type GridTemplateAreas_StyleType = "none" | string[] | GridTemplateAreaDe
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#grid-template-columns
  * @category Style Property
  */
-export type GridTemplateAxis_StyleType = "none" | OneOrMany<GridTrack> | "subgrid";
+export type GridTemplateAxis_StyleType = "none" | OneOrMany<Extended<GridTrack>> | "subgrid";
 
 /**
  * Type for a single track element of grid template axis
@@ -1387,7 +1387,7 @@ export type OverflowKeyword = "visible" | "hidden" | "clip" | "scroll" | "auto";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#overflow
  * @category Style Property
  */
-export type Overflow_StyleType = OneOrPair<OverflowKeyword>;
+export type Overflow_StyleType = OneOrPair<Extended<OverflowKeyword>>;
 
 
 
@@ -1423,7 +1423,7 @@ export type OverscrollBehavior = "contain" | "none" | "auto";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#overscroll-behavior
  * @category Style Property
  */
-export type OverscrollBehavior_StyleType = OneOrPair<OverscrollBehavior>;
+export type OverscrollBehavior_StyleType = OneOrPair<Extended<OverscrollBehavior>>;
 
 
 
@@ -1605,7 +1605,7 @@ export type ScrollBehavior_StyleType = "auto" | "smooth";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#scroll-snap-align
  * @category Style Property
  */
-export type ScrollSnapAlign_StyleType = OneOrPair<"none" | "start" | "end" | "center">;
+export type ScrollSnapAlign_StyleType = OneOrPair<Extended<"none" | "start" | "end" | "center">>;
 
 
 
@@ -1725,7 +1725,7 @@ export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecora
  * @category Style Property
  */
 export type TextDecorationLine_StyleType = "none" | "spelling-error" | "grammar-error" |
-    OneOrMany<"underline" | "overline" | "line-through">;
+    OneOrMany<Extended<"underline" | "overline" | "line-through">>;
 
 
 
@@ -1810,7 +1810,7 @@ export type TextEmphasisStyle_StyleType = "none" | TextEmphasisFill | TextEmphas
  * @category Style Property
  */
 export type TextIndent_StyleType = CssLength |
-    [Extended<CssLength>, Extended<OneOrMany<"each-line" | "hanging" | "each-line hanging">>];
+    [Extended<CssLength>, OneOrMany<Extended<"each-line" | "hanging" | "each-line hanging">>];
 
 
 
@@ -1840,7 +1840,7 @@ export type TextOrientation_StyleType = "mixed" | "upright" | "sideways";
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#text-overflow
  * @category Style Property
  */
-export type TextOverflow_StyleType = OneOrPair<"clip" | "ellipsis" | "fade" | string>;
+export type TextOverflow_StyleType = OneOrPair<Extended<"clip" | "ellipsis" | "fade" | string>>;
 
 
 
@@ -1862,7 +1862,7 @@ export type TextShadow = "none" |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#text-shadow
  * @category Style Property
  */
-export type TextShadow_StyleType = OneOrMany<TextShadow>;
+export type TextShadow_StyleType = OneOrMany<Extended<TextShadow>>;
 
 
 
@@ -1920,7 +1920,7 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#transform
  * @category Style Property
  */
-export type Transform_StyleType = "none" | OneOrMany<ITransformProxy>;
+export type Transform_StyleType = "none" | OneOrMany<Extended<ITransformProxy>>;
 
 
 
@@ -1973,7 +1973,7 @@ export type Transition_Single = string |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#transition
  * @category Style Property
  */
-export type Transition_StyleType = OneOrMany<Transition_Single>;
+export type Transition_StyleType = OneOrMany<Extended<Transition_Single>>;
 
 
 
@@ -1989,7 +1989,7 @@ export type TransitionProperty = "none" | "all" | keyof IBaseStyleset;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#transition-property
  * @category Style Property
  */
-export type TransitionProperty_StyleType = OneOrMany<TransitionProperty>;
+export type TransitionProperty_StyleType = OneOrMany<Extended<TransitionProperty>>;
 
 
 
@@ -1999,7 +1999,7 @@ export type TransitionProperty_StyleType = OneOrMany<TransitionProperty>;
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#transition-timing-function
  * @category Style Property
  */
-export type TransitionTimingFunction_StyleType = OneOrMany<TimingFunction>;
+export type TransitionTimingFunction_StyleType = OneOrMany<Extended<TimingFunction>>;
 
 
 
@@ -2081,7 +2081,7 @@ export type WhiteSpace_StyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "p
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#will-change
  * @category Style Property
  */
-export type WillChange_StyleType = "auto" | OneOrMany<"scroll-position" | "contents" | Exclude<keyof IBaseStyleset,"willChange">>;
+export type WillChange_StyleType = "auto" | OneOrMany<Extended<"scroll-position" | "contents" | Exclude<keyof IBaseStyleset,"willChange">>>;
 
 
 
@@ -3316,13 +3316,13 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#margin
      */
-    margin?: OneOrBox<CssLengthOrAuto>;
+    margin?: OneOrBox<Extended<CssLengthOrAuto>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#margin-block
      */
-    marginBlock?: OneOrPair<CssLengthOrAuto>;
+    marginBlock?: OneOrPair<Extended<CssLengthOrAuto>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-end
@@ -3346,7 +3346,7 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#margin-inline
      */
-    marginInline?: OneOrPair<CssLengthOrAuto>;
+    marginInline?: OneOrPair<Extended<CssLengthOrAuto>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-end
@@ -3678,13 +3678,13 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/padding
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#padding
      */
-    padding?: OneOrBox<CssLength>;
+    padding?: OneOrBox<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-block
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#padding-block
      */
-    paddingBlock?: OneOrPair<CssLength>;
+    paddingBlock?: OneOrPair<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/paddingB-bock-end
@@ -3708,7 +3708,7 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-inline
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#padding-inline
      */
-    paddingInline?: OneOrPair<CssLength>;
+    paddingInline?: OneOrPair<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-inline-end
@@ -3885,13 +3885,13 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-margin
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#scroll-margin
      */
-    scrollMargin?: OneOrBox<CssLength>;
+    scrollMargin?: OneOrBox<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-margin-block
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#scroll-margin-block
      */
-    scrollMarginBlock?: OneOrPair<CssLength>;
+    scrollMarginBlock?: OneOrPair<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-margin-block-end
@@ -3915,7 +3915,7 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-margin-inline
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#scroll-margin-inline
      */
-    scrollMarginInline?: OneOrPair<CssLength>;
+    scrollMarginInline?: OneOrPair<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-margin-inline-end
@@ -3951,13 +3951,13 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-padding
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#scroll-padding
      */
-    scrollPadding?: OneOrBox<CssLength>;
+    scrollPadding?: OneOrBox<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-padding-block
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#scroll-padding-block
      */
-    scrollPaddingBlock?: OneOrPair<CssLength>;
+    scrollPaddingBlock?: OneOrPair<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-padding-block-end
@@ -3981,7 +3981,7 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-padding-inline
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#scroll-padding-inline
      */
-    scrollPaddingInline?: OneOrPair<CssLength>;
+    scrollPaddingInline?: OneOrPair<Extended<CssLength>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-padding-inline-end
@@ -4318,13 +4318,13 @@ export interface IBaseStyleset
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#transition-delay
      */
-    transitionDelay?: OneOrMany<CssTime>;
+    transitionDelay?: OneOrMany<Extended<CssTime>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#transition-duration
      */
-    transitionDuration?: OneOrMany<CssTime>;
+    transitionDuration?: OneOrMany<Extended<CssTime>>;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property

@@ -42,7 +42,7 @@ function numberStyleToString<T>( val: Extended<T>, convertFunc?: NumberToStringF
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiNumberStyleToString<T>( val: OneOrMany<T>, convertFunc?: NumberToStringFunc,
+function multiNumberStyleToString<T>( val: OneOrMany<Extended<T>>, convertFunc?: NumberToStringFunc,
     separator: string = " "): string
 {
     return v2s( val, {
@@ -95,7 +95,7 @@ export class NumericMath<T = any, U extends string = any> implements INumericMat
         return numberStyleToString( val, this.n2s);
     }
 
-    public mv2s( val: OneOrMany<T>, separator: string): string
+    public mv2s( val: OneOrMany<Extended<T>>, separator: string): string
     {
         return multiNumberStyleToString( val, this.n2s, separator);
     }
@@ -238,7 +238,7 @@ function pos2s( val: Extended<CssPosition>): string
 /**
  * Converts multi-position style value to the CSS string.
  */
-function mpos2s( val: Extended<OneOrMany<CssPosition>>, separator: string): string
+function mpos2s( val: OneOrMany<Extended<CssPosition>>, separator: string): string
 {
     return v2s( val, {
         item: pos2s,

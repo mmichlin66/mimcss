@@ -375,7 +375,7 @@ export type CssPosition = SimpleCssPosition |
 
 
 /** Type for a single corner radius */
-export type CssRadius = OneOrPair<CssLength>;
+export type CssRadius = OneOrPair<Extended<CssLength>>;
 
 
 
