@@ -133,7 +133,10 @@ export interface IConstant<T = any>
  * Type that extends the given type with the following types:
  * - [[ICustomVar]] interface that allows using a CSS custom property rule value.
  * - [[IConstant]] interface that allows using a constant rule value.
- * - [[IStringProxy]] interface that allows specifying raw string value.
+ * - [[IStringProxy]] interface that allows specifying a function that returns a raw string value.
+ *
+ * Developers don't usually use this type directly - it is used by Mimcss to define style property
+ * types as well as function parameter types.
  */
 export type Extended<T> = T | ICustomVar<T> | IConstant<T> | IStringProxy | null | undefined;
 
@@ -167,6 +170,9 @@ export type ImportantProp<T> = { "!": ExtendedProp<T> };
  * - Object with a single property "!", which is used to mark a property as "!important".
  * - [[Global_StyleType]], which allows any property to be assigned the global values such as
  *   "initial", "inherit", "unset" and "revert".
+ *
+ *  Developers don't usually use this type directly - it is used by Mimcss to define types
+ * of properties in the [[Styleset]] interface.
  */
 export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
 
@@ -215,7 +221,7 @@ export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
  * class MyStyles extends css.StyleDefinition
  * {
  *     // single value
- *     cls1 = css.$class({ margin: "auto" })
+ *     cls1 = css.$class({ margin: 4 })
  *
  *     // two values
  *     cls2 = css.$class({ margin: [0, 8] })
@@ -278,11 +284,50 @@ export interface IRuleWithSelector
 export interface ISelectorProxy extends IGenericProxy<"selector"> {};
 
 /**
- * Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules
+ * Represents CSS selector combinators used when creating complex CSS selectors.
  */
 export type SelectorCombinator = "," | " " | ">" | "+" | "~";
 
-/** Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules */
+/**
+ * Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules.
+ * Property values are defined as arrays of two-element tuples each defining a selector and a
+ * styleset corresponding to this selector. Selectors can use the ampersand symbol to refer to the
+ * parent style selector. If the ampersand symbol is not used, the selector will be simply appended
+ * to the parent selector.
+ *
+ * The ampersand symbol can be either preceeded or folowed by a combinator character, which allows
+ * easy-to-use combination of a parent selector with the specified selector using the given
+ * combinator.
+ *
+ * ** Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // class that doesn't define its own styles and is only used in combinations
+ *     class1 = css.$class()
+ *
+ *     // "parent class"
+ *     class2 = css.$class({
+ *
+ *         // css: .class2 { backgroundColor: white; }
+ *         backgroundColor: "white",
+ *
+ *         // css: li .class2:hover { backgroundColor: yellow; }
+ *         "&":  [ ["li &:hover", { backgroundColor: "yellow" }] ],
+ *
+ *         // css: .class2.class1 { backgroundColor: cyan; }
+ *         "&":  [ [this.class1, { backgroundColor: "cyan" }] ],
+ *
+ *         // css: .class2 > .class1 { backgroundColor: green; }
+ *         "&>": [ [this.class1, { backgroundColor: "green" }] ],
+ *
+ *         // css: .class1 + .class2 { backgroundColor: orange; }
+ *         "+&": [ [this.class1, { backgroundColor: "orange" }] ],
+ *     })
+ * }
+ * ```
+ */
 export type DependentRuleCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | ",&" | " &" | ">&" | "+&" | "~&";
 
 
@@ -366,12 +411,13 @@ export interface IParameterizedPseudoEntity extends IParameterizedPseudoClass, I
 
 
 /** Type for a single selector token that can be used as an argument to the [[selector]] function */
-export type SelectorItem = string | IRuleWithSelector | IStringProxy | ISelectorProxy;
+export type SelectorItem = string | SelectorCombinator | IRuleWithSelector | IStringProxy | ISelectorProxy;
 
 
 
 /**
- * Type for a CSS selector.
+ * Type for a CSS selector. This type is used to produce arbitrary complex selectors used by the
+ * [[$style]] function.
  */
 export type CssSelector = OneOrMany<SelectorItem>;
 
