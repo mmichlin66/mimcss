@@ -1,9 +1,3 @@
-/**
- * @module
- */
-
-
-
 import {IScheduler} from "../api/SchedulingTypes";
 import {IStyleDefinitionClass, IStyleDefinition} from "./RuleTypes";
 import * as impl from "../impl/SchedulingImpl";

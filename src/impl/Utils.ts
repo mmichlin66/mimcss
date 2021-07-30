@@ -237,7 +237,7 @@ export function v2s( val: any, options?: V2SOptions): string
 
 wkf[WKF.OneOrManyWithComma] = v => v2s( v, { sep: "," });
 wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { sep: "/" });
-wkf[WKF.Quoted] = v => `"${v2s(v)}"`;
+wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
 
 
 

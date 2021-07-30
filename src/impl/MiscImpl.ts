@@ -147,7 +147,7 @@ wkf[WKF.FontStyle] = v => v2s( v, {
 
 
 
-function fontSingleSrcToString( val: FontSrc): string
+function fontSingleSrc2s( val: FontSrc): string
 {
     return v2s( val, {
         props: [
@@ -176,7 +176,7 @@ const fontFacePropertyInfos: { [K in keyof IBaseFontFace]?: V2SOptions } =
     fontWeight: { any: WKF.Number },
     lineGapOverride: WKF.Percent,
     src: {
-        any: fontSingleSrcToString,
+        any: fontSingleSrc2s,
         sep: ","
     },
     sizeAdjust: WKF.Percent,

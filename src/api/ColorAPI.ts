@@ -1,11 +1,4 @@
-﻿/**
- * This module contains definitions of functions and classes used to define CSS Color functions.
- * @module
- */
-
-
-
-import {Extended} from "./CoreTypes";
+﻿import {Extended} from "./CoreTypes";
 import {CssAngle} from "./NumericTypes";
 import {CssColor, IColorProxy, INamedColors} from "./ColorTypes";
 import {AngleMath} from "../impl/NumericImpl";

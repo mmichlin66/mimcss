@@ -300,13 +300,13 @@ function font_fromObject( val: any): string
 
 function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>): string
 {
-    // val can be array of functions (IQuotedProxy[]) or arrays (GridTemplateArea_Definition[])
+    // val can be array of strings or GridTemplateArea_Definition touples
     return v2s( val, {
         arr: v => {
             if (v.length === 0)
                 return "";
-            else if (typeof v[0] === "function")
-                return a2s( v);
+            else if (typeof v[0] === "string")
+                return a2s( v, WKF.Quoted);
             else
                 return createGridTemplateAreasFromDefinitions(v);
         }

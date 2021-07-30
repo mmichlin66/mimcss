@@ -1,4 +1,4 @@
-﻿import {Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, IQuotedProxy, Global_StyleType} from "./CoreTypes"
+﻿import {Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, Global_StyleType} from "./CoreTypes"
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, CssFrequency, CssResolution,
     CssRadius, HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, IFitContentProxy,
@@ -1110,8 +1110,7 @@ export type GridTemplateAreaDefinition = [IGridAreaRule | Extended<string>,
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#grid-template-areas
  * @category Style Property
  */
-export type GridTemplateAreas_StyleType = "none" | OneOrMany<IQuotedProxy> |
-    GridTemplateAreaDefinition[];
+export type GridTemplateAreas_StyleType = "none" | string[] | GridTemplateAreaDefinition[];
 
 
 

@@ -1,11 +1,4 @@
-﻿/**
- * This module contains definitions of types and interfaces used to define CSS functions.
- * @module
- */
-
-
-
-import {Extended, IGenericProxy, OneOrBox, OneOrPair} from "./CoreTypes";
+﻿import {Extended, IGenericProxy, OneOrBox, OneOrPair} from "./CoreTypes";
 import {
     AngleUnits, CssAngle, CssLength, CssNumber, CssPoint, CssPosition, FrequencyUnits, LengthUnits,
     PercentUnits, ResolutionUnits, TimeUnits

@@ -1,10 +1,4 @@
 /**
- * @module
- */
-
-
-
-/**
  * The SchedulerType enumeration provides values used to define how the calls to the
  * activate and deactivate functions schedule the writing of style changes to the DOM.
  */

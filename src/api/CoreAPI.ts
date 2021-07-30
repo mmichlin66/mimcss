@@ -1,5 +1,5 @@
-﻿import {IStringProxy, IQuotedProxy, SelectorItem, ISelectorProxy} from "./CoreTypes"
-import {tag2s, WKF, wkf} from "../impl/Utils";
+﻿import {IStringProxy, SelectorItem, ISelectorProxy} from "./CoreTypes"
+import {tag2s} from "../impl/Utils";
 
 
 
@@ -32,22 +32,12 @@ import {tag2s, WKF, wkf} from "../impl/Utils";
  * **Example:**
  *
  * ```typescript
- * clip-path: raw`polygon(50% 20%, 90% 80%, 10% 80%)`
+ * clipPath: css.raw`polygon(50% 20%, 90% 80%, 10% 80%)`
  * ```
  */
 export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProxy
 {
     return () => tag2s( parts, params);
-}
-
-
-
-/**
- * Returns a function representing a string in quotation marks.
- */
-export function quoted( val: any): IQuotedProxy
-{
-    return () => wkf[WKF.Quoted](val);
 }
 
 

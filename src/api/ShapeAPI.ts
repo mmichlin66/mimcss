@@ -1,11 +1,4 @@
-﻿/**
- * This module contains definitions of functions and classes used to define CSS functions.
- * @module
- */
-
-
-
-import {Extended, IStringProxy} from "./CoreTypes";
+﻿import {Extended, IStringProxy} from "./CoreTypes";
 import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {

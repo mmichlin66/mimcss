@@ -1,11 +1,4 @@
-﻿/**
- * This modules describes numeric types as a basis for handling CSS types such as `<number>`, `<length>`, `<angle>`, etc.
- * @module
- */
-
-
-
-import {Extended, IGenericProxy, OneOrPair} from "./CoreTypes";
+﻿import {Extended, IGenericProxy, OneOrPair} from "./CoreTypes";
 
 
 
