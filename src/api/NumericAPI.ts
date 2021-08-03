@@ -1,9 +1,8 @@
 ﻿import {Extended, IGenericProxy} from "./CoreTypes"
 import {
-    ILengthProxy, IPercentProxy, IAngleProxy, ITimeProxy,
-    IResolutionProxy, IFrequencyProxy, CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy,
-    INumberMath, IPercentMath, ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath,
-    IRectProxy, CssLengthOrAuto,
+    ILengthProxy, IPercentProxy, IAngleProxy, ITimeProxy, IResolutionProxy, IFrequencyProxy,
+    CssLength, IFitContentProxy, CssNumber, IAspectRatioProxy, INumberMath, IPercentMath,
+    ILengthMath, IAngleMath, ITimeMath, IResolutionMath, IFrequencyMath, IRectProxy,
 } from "./NumericTypes"
 import {NumberMath, PercentMath, LengthMath, AngleMath, TimeMath, ResolutionMath, FrequencyMath} from "../impl/NumericImpl"
 import {f2s, WKF, a2s} from "../impl/Utils";
@@ -17,7 +16,7 @@ function toUnitsProxy( n: number, unit: string): IGenericProxy { return () => n 
 
 
 /**
- * The Num object contains methods that implement CSS mathematic functions on the `<number>`
+ * The `Num` object contains methods that implement CSS mathematic functions on the `<number>`
  * CSS type.
  */
 export let Num: INumberMath = NumberMath;
@@ -25,8 +24,8 @@ export let Num: INumberMath = NumberMath;
 
 
 /**
- * The Percent object contains methods that implement CSS mathematic functions on the
- * `<percentage>` CSS type by appending a "%" unit suffix.
+ * The `Percent` object contains methods that implement CSS mathematic functions on the
+ * `<percentage>` CSS type by appending a `"%"` unit suffix.
  */
  export let Percent: IPercentMath = PercentMath;
 
@@ -40,9 +39,9 @@ export function percent( n: number): IPercentProxy { return toUnitsProxy( n, "%"
 
 
 /**
- * The Len object contains methods that implement CSS mathematic functions on the `<length>`
+ * The `Len` object contains methods that implement CSS mathematic functions on the `<length>`
  * CSS type by appending a length unit suffix.
- * Integer numbers use "px"; floating point numbers use "em".
+ * Integer numbers use `"px"`; floating point numbers use `"em"`.
  */
  export let Len: ILengthMath = LengthMath;
 
@@ -53,7 +52,7 @@ export function percent( n: number): IPercentProxy { return toUnitsProxy( n, "%"
 export function Q( n: number): ILengthProxy { return toUnitsProxy( n, "Q"); }
 
 /**
- * Creates length value in ch units, which is equal to the used advance measure of the “0” (ZERO,
+ * Creates length value in ch units, which is equal to the used advance measure of the `“0”` (ZERO,
  * U+0030) glyph found in the font used to render it. (The advance measure of a glyph is its
  * advance width or height, whichever is in the inline axis of the element.)
  * @category Units
@@ -179,9 +178,9 @@ export function fr( n: number): ILengthProxy { return toUnitsProxy( n, "fr"); }
 
 
 /**
- * The AngleMath object contains methods that implement CSS mathematic functions on the `<angle>`
+ * The `Angle` object contains methods that implement CSS mathematic functions on the `<angle>`
  * CSS type by appending an angle unit suffix.
- * Integer numbers use "deg"; floating point numbers use "turn".
+ * Integer numbers use `"deg"`; floating point numbers use `"turn"`.
  */
 export let Angle: IAngleMath = AngleMath;
 
@@ -212,9 +211,9 @@ export function turn( n: number): IAngleProxy { return toUnitsProxy( n, "turn");
 
 
 /**
- * The Time object contains methods that implement CSS mathematic functions on the `<time>`
+ * The T`ime object contains methods that implement CSS mathematic functions on the `<time>`
  * CSS type by appending a time unit suffix.
- * Integer numbers use "ms"; floating point numbers use "s".
+ * Integer numbers use `"ms"`; floating point numbers use `"s"`.
  */
  export let Time: ITimeMath = TimeMath;
 
@@ -233,9 +232,9 @@ export function s( n: number): ITimeProxy { return toUnitsProxy( n, "s"); }
 
 
 /**
- * The Resolution object contains methods that implement CSS mathematic functions on the
+ * The `Resolution` object contains methods that implement CSS mathematic functions on the
  * `<resolution>` CSS type by appending a resolution unit suffix.
- * Integer numbers use "dpi"; floating point numbers use "dpcm".
+ * Integer numbers use `"dpi"`; floating point numbers use `"dpcm"`.
  */
  export let Resolution: IResolutionMath = ResolutionMath;
 
@@ -266,9 +265,9 @@ export function x( n: number): IResolutionProxy { return toUnitsProxy( n, "x"); 
 
 
 /**
- * The Frequency object contains methods that implement CSS mathematic functions on the
+ * The `Frequency` object contains methods that implement CSS mathematic functions on the
  * `<frequency>` CSS type by appending a frequency unit suffix.
- * Integer numbers use "Hz"; floating point numbers use "kHz".
+ * Integer numbers use `"Hz"`; floating point numbers use `"kHz"`.
  */
  export let Frequency: IFrequencyMath = FrequencyMath;
 
@@ -293,7 +292,8 @@ export function khz( n: number): IFrequencyProxy { return toUnitsProxy( n, "khz"
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an IFitContentProxy function representing the `fit-content()` CSS function.
+ * Returns an `IFitContentProxy` function representing the `fit-content()` CSS function
+ * ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content())).
  */
 export function fitContent( size: Extended<CssLength>): IFitContentProxy
 {
@@ -303,7 +303,7 @@ export function fitContent( size: Extended<CssLength>): IFitContentProxy
 
 
 /**
- * Returns an IAspectRatioProxy function representing the `<ratio>` CSS type.
+ * Returns an `IAspectRatioProxy` function representing the `<ratio>` CSS type.
  */
 export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
 {
@@ -313,10 +313,11 @@ export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
 
 
 /**
- * Returns an IAspectRatioProxy function representing the `<ratio>` CSS type.
+ * Returns an `IRectProxy` function representing the `rect()` CSS function used for the `clip`
+ * style property.
+ * @deprecated The CSS `clip` property and `rect()` function are deprecated.
  */
-export function rect( top: CssLengthOrAuto, right: CssLengthOrAuto,
-    bottom: CssLengthOrAuto, left: CssLengthOrAuto): IRectProxy
+export function rect( top: CssLength, right: CssLength, bottom: CssLength, left: CssLength): IRectProxy
 {
     return () => `rect(${a2s( [top, right, bottom, left], WKF.Length, ",")})`;
 }

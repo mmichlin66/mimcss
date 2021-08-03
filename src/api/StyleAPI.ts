@@ -2,7 +2,7 @@
 import {IStyleDefinitionClass, IVarRule, IStyleDefinition} from "./RuleTypes";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
 import {
-    Styleset, ExtendedBaseStyleset, StringStyleset, IBaseStyleset, VarTemplateName,
+    Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset, VarTemplateName,
     ExtendedVarValue, ICssSerializer
 } from "./StyleTypes"
 import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
@@ -23,7 +23,7 @@ import { tag2s } from "../impl/Utils";
 /**
  * Registers the given function to be used for converting values of the given style property to
  * string. The `registerStyleProperty` function must be used after adding the property to the
- * [[IBaseStyleset]] interface via the module augmentation technique if the conversion to string
+ * [[IStyleset]] interface via the module augmentation technique if the conversion to string
  * requires non-standard operations. This function should not be called for propeties whose
  * values only include numbers, strings, functions returning a string, objects whose `toString`
  * method produces the necessary string or arrays of the above types.
@@ -53,7 +53,7 @@ export function getStylePropValue<K extends keyof ExtendedBaseStyleset>( stylePr
 
 
 // Sets style property on HTML or SVG element
-function setElementStyleProp<K extends keyof IBaseStyleset>( elm: ElementCSSInlineStyle, name: K,
+function setElementStyleProp<K extends keyof IStyleset>( elm: ElementCSSInlineStyle, name: K,
     value: ExtendedBaseStyleset[K], schedulerType?: number): void
 {
     scheduleStyleUpdate( elm, name, styleProp2s( name, value), false, schedulerType);
@@ -183,7 +183,7 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
  * in style rules, it is enough to just refer to the style definition property created using the
  * [[$var]] function; however, if you want to provide a fallback value, you must use this function.
  *
- * ** Example:**
+ * **Example:**
  *
  * ```typescript
  * class MyStyles extends StyleDefinition
@@ -231,7 +231,7 @@ declare global
          * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
          * will be used.
          */
-        setStyleProp<K extends keyof IBaseStyleset>( name: K, value: ExtendedBaseStyleset[K],
+        setStyleProp<K extends keyof IStyleset>( name: K, value: ExtendedBaseStyleset[K],
             schedulerType?: number): void;
 
         /**
@@ -258,7 +258,7 @@ SVGElement.prototype.setStyleset = setThisElementStyle;
 
 
 // Sets style property on HTML or SVG element
-function setThisElementStyleProp<K extends keyof IBaseStyleset>( name: K,
+function setThisElementStyleProp<K extends keyof IStyleset>( name: K,
     value: ExtendedBaseStyleset[K], schedulerType?: number): void
 {
     setElementStyleProp( this, name, value, schedulerType);

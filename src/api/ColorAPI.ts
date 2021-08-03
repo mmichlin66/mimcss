@@ -437,7 +437,7 @@ export function hsl( h: Extended<CssAngle>, s: Extended<number>, l: Extended<num
  * method should be used when defining CSS color values in styleset properties.
  *
  * The color can be specified as a numeric value or as a color name from the [[INamedColors]]
- * interface - include colors added using the module augmentation technique.
+ * interface - including colors added using the module augmentation technique.
  *
  * The alpha mask is specified as a number:
  *   - The sign is ignored; that is, only the absolute value is considered.

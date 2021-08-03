@@ -1,8 +1,8 @@
-﻿import {ExtendedFontFace, FontSrc, IBaseFontFace} from "../api/FontTypes"
+﻿import {ExtendedFontFace, FontSrc, IFontFace} from "../api/FontTypes"
 import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatement} from "../api/MediaTypes";
 import {styleProp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf, propSet2s} from "./Utils";
-import {ExtendedCounterStyleset, IBaseCounterStyleset} from "../api/CounterTypes";
+import {ExtendedCounterStyleset, ICounterStyleset} from "../api/CounterTypes";
 
 
 
@@ -15,9 +15,9 @@ import {ExtendedCounterStyleset, IBaseCounterStyleset} from "../api/CounterTypes
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function media2s( query: MediaStatement): string
+export function media2s( statement: MediaStatement): string
 {
-    return v2s( query, {
+    return v2s( statement, {
         any: mediaQuery2s,
         sep: ","
     })
@@ -167,7 +167,7 @@ function fontSingleSrc2s( val: FontSrc): string
  * Map of property names to the V2SOptions objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const fontFacePropertyInfos: { [K in keyof IBaseFontFace]?: V2SOptions } =
+const fontFacePropertyInfos: { [K in keyof IFontFace]?: V2SOptions } =
 {
     ascentOverride: WKF.Percent,
     descentOverride: WKF.Percent,
@@ -233,7 +233,7 @@ const fontFacePropertyInfos: { [K in keyof IBaseFontFace]?: V2SOptions } =
  * Map of property names to the V2SOptions objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const counterStylePropertyInfos: { [K in keyof IBaseCounterStyleset]?: V2SOptions } =
+const counterStylePropertyInfos: { [K in keyof ICounterStyleset]?: V2SOptions } =
 {
     system: {
         num: v => "fixed " + v,
