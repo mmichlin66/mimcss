@@ -10,7 +10,7 @@ import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
 import {processInstanceOrClass, serializeInstance} from "../rules/RuleContainer";
 import {media2s, supports2s} from "../impl/MiscImpl";
-import { tag2s } from "../impl/Utils";
+import {tag2s} from "../impl/Utils";
 
 
 

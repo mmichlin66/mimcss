@@ -1,6 +1,6 @@
-﻿import {Extended, IGenericProxy, OneOrBox, OneOrPair} from "./CoreTypes";
+﻿import {Extended, IGenericProxy} from "./CoreTypes";
 import {
-    AngleUnits, CssAngle, CssLength, CssNumber, CssPoint, CssPosition, FrequencyUnits, LengthUnits,
+    AngleUnits, BorderRadius, CssAngle, CssLength, CssNumber, CssPoint, CssPosition, FrequencyUnits, LengthUnits,
     PercentUnits, ResolutionUnits, TimeUnits
 } from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
@@ -261,9 +261,6 @@ export interface ITransformProxy extends IGenericProxy<"transform"> {}
 // Basic shape CSS functions
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-
-/** Type for border-radius style property */
-export type BorderRadius = OneOrPair<OneOrBox<Extended<CssLength>>>;
 
 /**
  * Type that is used to specify a radius in [circle]] and [ellipse]] functions.

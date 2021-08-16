@@ -117,7 +117,7 @@ function supportsQuery2s( query: SupportsQuery): string
                 return "";
 
             return `(${propNames.map( (propName) =>
-                styleProp2s( propName, query[propName], true)).join( ") and (")})`;
+                `${camelToDash(propName)}:${styleProp2s( propName, query[propName])}`).join( ") and (")})`;
         }
     });
 }

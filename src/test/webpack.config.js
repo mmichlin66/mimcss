@@ -12,6 +12,8 @@ module.exports =
             "./lib/test/specs/testCounters.js",
             "./lib/test/specs/testPropsLength.js",
             "./lib/test/specs/testPropsBorderImage.js",
+            "./lib/test/specs/testPropsPosition.js",
+            "./lib/test/specs/testPropsRadius.js",
         ],
 
         output:

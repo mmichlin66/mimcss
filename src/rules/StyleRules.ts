@@ -35,9 +35,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
     /**
-     * This function allows the object to particpate in "val2str" serialization. Whenever
-     * the StyleRule-derived object is encountered by the `UtilFunc.val2str` function,
-     * the rule's selector will be used.
+     * This function allows the object to particpate in "v2s" serialization. Whenever the
+     * StyleRule-derived object is encountered by the `v2s` function, the rule's selector will be
+     * used.
      */
     [symValueToString](): string { return this.selectorText; }
 

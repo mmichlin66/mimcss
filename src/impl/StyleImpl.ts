@@ -1,10 +1,9 @@
 ﻿import {CssSelector, Extended} from "../api/CoreTypes";
-import {BorderRadius} from "../api/ShapeTypes";
 import {
     Animation_Single, Background_Single, BorderImage_Object, BorderImageSlice_StyleType, BoxShadow,
     Border_StyleType, Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateAreaDefinition,
     GridTrack, GridTemplateAxis_StyleType, Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType,
-    Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType,
+    Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType, IStyleset,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
 import {LengthMath, AngleMath} from "./NumericImpl";
@@ -160,9 +159,6 @@ function singleBackground_fromStyle( val: Extended<Background_Single>): string
 
 
 
-/**
- * Converts border image style value to the CSS string.
- */
 function borderImageToString( val: BorderImage_Object): string
 {
     // if width is specified, but slice is not, we need to set slice to the default 100% value;
@@ -184,9 +180,6 @@ function borderImageToString( val: BorderImage_Object): string
 
 
 
-/**
- * Converts border image slice style value to the CSS string.
- */
 function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): string
 {
     return v2s( val, {
@@ -200,7 +193,6 @@ function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): s
 
 
 
-// Converts corner radius style value to the CSS string.
 wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
     obj: (v: BoxShadow) => styleObj2String( v, [
         ["inset", b => b ? "inset" : ""],
@@ -215,38 +207,6 @@ wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
 
 
 
-/**
- * Converts border radius style value to the CSS string.
- */
-function borderRadius2s( val: Extended<BorderRadius>): string
-{
-    return v2s( val, {
-        arr: v =>
-        {
-            if (Array.isArray( v[0]))
-            {
-                // two MultiCornerRadius values
-                let s = a2s( v[0], WKF.Length);
-                s += "/";
-                return s + a2s( v[1], WKF.Length);
-            }
-            else
-            {
-                // single MultiCornerRadius value
-                return a2s( v, WKF.Length);
-            }
-        },
-        any: WKF.Length
-    });
-}
-
-wkf[WKF.BorderRadius] = borderRadius2s;
-
-
-
-/**
- * Converts border side style value to the CSS string.
- */
 function borderToString( val: Extended<Border_StyleType>): string
 {
     return v2s( val, {
@@ -266,9 +226,7 @@ function borderToString( val: Extended<Border_StyleType>): string
 wkf[WKF.Border] = borderToString;
 
 
-/**
- * Converts flex style value to the CSS string.
- */
+
 function flexToString( val: Extended<Flex_StyleType>): string
 {
     return v2s( val, {
@@ -516,12 +474,14 @@ export function mergeStylesetCustomProps( target: Styleset, source: Styleset): v
 export function styleset2s( styleset: Styleset): string
 {
     if (!styleset)
-        return "";
+        return "{}";
 
     let s = "{";
 
 	forAllPropsInStylset( styleset, (name: string, value: string, isCustom: boolean): void => {
-        s += `${isCustom ? name : camelToDash(name)}:${value};`;
+        s += isCustom
+            ? `${name}:${value};`
+            : getVendorPrefixVariants( name as keyof IStyleset, value) + `${camelToDash(name)}:${value};`;
     });
 
     return s + "}";
@@ -571,7 +531,7 @@ function getCustomPropNameAndValue( customVal: CustomVar_StyleType): [string?,st
  * Converts the given style property to the CSS style string. Property name can be in either
  * dash or camel form.
  */
-export function styleProp2s( propName: string, propVal: any, includeName?: boolean): string
+export function styleProp2s( propName: string, propVal: any): string
 {
     if (!propName)
         return "";
@@ -589,15 +549,13 @@ export function styleProp2s( propName: string, propVal: any, includeName?: boole
     // convert the value to string based on the information object for the property (if defined)
     let stringValue = v2s( value, stylePropertyInfos[dashToCamel(propName)]);
 
-    // if the resulting string is empty and the name should be included, then we return
-    // "name: initial"; otherwise we will return an empty string.
-    if (!stringValue && includeName)
-        stringValue = "initial";
+    if (!stringValue)
+        return "";
 
-    if (stringValue && impFlag)
+    if (impFlag)
         stringValue += " !important";
 
-    return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
+    return stringValue;
 }
 
 
@@ -693,9 +651,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     backgroundColor: WKF.Color,
     backgroundImage: WKF.OneOrManyWithComma,
     backgroundOrigin: WKF.OneOrManyWithComma,
-    backgroundPosition: WKF.MultiPositionWithComma,
-    backgroundPositionX: WKF.MultiPositionWithComma,
-    backgroundPositionY: WKF.MultiPositionWithComma,
+    backgroundPosition: WKF.MultiPosition,
+    backgroundPositionX: WKF.MultiPosition,
+    backgroundPositionY: WKF.MultiPosition,
     backgroundRepeat: WKF.OneOrManyWithComma,
     backgroundSize: {
         num: WKF.Length,
@@ -807,6 +765,18 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     markerEnd: markerStyleToString,
     markerMid: markerStyleToString,
     markerStart: markerStyleToString,
+    maskClip: WKF.OneOrManyWithComma,
+    maskComposite: WKF.OneOrManyWithComma,
+    maskImage: WKF.OneOrManyWithComma,
+    maskMode: WKF.OneOrManyWithComma,
+    maskOrigin: WKF.OneOrManyWithComma,
+    maskPosition: WKF.MultiPosition,
+    maskRepeat: WKF.OneOrManyWithComma,
+    maskSize: {
+        num: WKF.Length,
+        item: { any: WKF.Length },
+        sep: ","
+    },
     maxBlockSize: WKF.Length,
     maxHeight: WKF.Length,
     maxInlineSize: WKF.Length,
@@ -927,9 +897,91 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     CssFrequency: WKF.Frequency,
     CssPercent: WKF.Percent,
     CssPosition: WKF.Position,
+    CssMultiPosition: WKF.MultiPosition,
     CssRadius: WKF.Radius,
     CssColor: WKF.Color,
 };
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Vendor prefix support
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+const enum VendorPrefix
+{
+    Webkit = 0,
+    Moz = 1,
+}
+
+// Vendor prefixes with indexes from the VendorPrefix enumeration
+const vendorPrefixStrings = ["-webkit-", "-moz-"];
+
+
+
+/**
+ * The tuple contains the following fields:
+ * - prefix index from the VendorPrefix enumeration
+ * - optional list of strings that are searched for in the property value to be replaced by their
+ *   vendor-prefixws variants
+ * - optional flag indicating that only the given values of the property will be searched for
+ *   replacements by vendor-prefixed values. The property itself will not be replaced.
+ */
+type PropVendorPrefixInfo = [VendorPrefix, string[]?, boolean?];
+type PropVendorPrefixInfos = PropVendorPrefixInfo[];
+
+
+
+/**
+ * Returns a string with serializations of property-name pairs with vendor prefixes for the given
+ * style property. For the majority of properties it returns an empty string.
+ * @param name Property name
+ * @param value Strings-erialized property value
+ * @returns String with zero or more serialized property-value names containing variants with
+ * vendor-prefixed names.
+ */
+function getVendorPrefixVariants( name: keyof IStyleset, value: string): string
+{
+    let infos = propVendorPrefixInfos[name];
+    if (!infos)
+        return "";
+
+    let s = "";
+    for( let info of infos)
+    {
+        let prefixString = vendorPrefixStrings[info[0]];
+        let newValue: string | undefined;
+        if (info[1])
+        {
+            for( let valueToSearch of info[1])
+            {
+                if (value.indexOf( valueToSearch) >= 0)
+                    newValue = value.replace( valueToSearch, prefixString + valueToSearch)
+            }
+        }
+
+        // we create a prefixed pair only if the property name itself should be prefixed or if the
+        // value contains the strings that should be prefixed (indicated by the newValue not being
+        // empty)
+        if (!info[2] || newValue)
+        {
+            let dashName = camelToDash(name);
+            s += `${info[2] ? dashName : prefixString + dashName}:${newValue ?? value};`;
+        }
+    }
+
+    return s;
+}
+
+
+
+const propVendorPrefixInfos: { [K in keyof IStyleset]?: PropVendorPrefixInfos} =
+{
+    // scrollbarColor: [ [VendorPrefix.Webkit], [VendorPrefix.Moz] ],
+    minWidth: [ [VendorPrefix.Webkit, ["fit-content"], true] ],
+}
 
 
 

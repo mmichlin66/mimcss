@@ -1,12 +1,12 @@
 ﻿import {Extended, IStringProxy} from "./CoreTypes";
-import {CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
+import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {
     CrossFadeParam, GradientStopOrHint, ICircle, IConicGradient, IEllipse,
     LinearGradientAngle, ShapeRadius, IImageProxy, IInset, IGradient, ILinearGradient, IMinMaxProxy,
     IPathBuilder, IPolygon, IRadialGradient, IRepeatProxy, ISpanProxy, IFilterProxy,
     ITransformProxy, IUrlProxy, IRayProxy, TimingFunctionJumpTerm, ITimingFunctionProxy, ICursorProxy,
-    ExtentKeyword, AttrTypeKeyword, AttrUnitKeyword, BorderRadius, FillRule,
+    ExtentKeyword, AttrTypeKeyword, AttrUnitKeyword, FillRule,
 } from "./ShapeTypes";
 import {ICounterRule, IIDRule} from "./RuleTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize, ListStyleType_StyleType} from "./StyleTypes";
@@ -795,7 +795,7 @@ class Inset implements IInset
 
 
 /**
- * Returns an ICircle objectn representing the `circle()` CSS function.
+ * Returns an ICircle object representing the `circle()` CSS function.
  *
  * *Example:*
  *

@@ -2,9 +2,9 @@
 import {
     INumericMath, CssLength, CssAngle, CssTime, CssResolution,
     CssFrequency, CssPosition, LengthUnits, PercentUnits, AngleUnits, TimeUnits,
-    ResolutionUnits, FrequencyUnits, CssNumber, CssPercent, CssRadius
+    ResolutionUnits, FrequencyUnits, CssNumber, CssPercent, CssRadius, BorderRadius
 } from "../api/NumericTypes";
-import {NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
+import {a2s, NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
 
 
 
@@ -222,14 +222,7 @@ wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Converts corner radius style value to the CSS string.
-wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { any: WKF.Length });
-
-
-
-/**
- * Converts single position style value to the CSS string.
- */
+// Converts single position style value to the CSS string.
 function pos2s( val: Extended<CssPosition>): string
 {
     return v2s( val, { any: WKF.Length });
@@ -238,17 +231,50 @@ function pos2s( val: Extended<CssPosition>): string
 /**
  * Converts multi-position style value to the CSS string.
  */
-function mpos2s( val: OneOrMany<Extended<CssPosition>>, separator: string): string
+function mpos2s( val: OneOrMany<Extended<CssPosition>>): string
 {
     return v2s( val, {
-        item: pos2s,
-        sep: separator
+        arr: (v: any[]) => {
+            if (v.length === 0)
+                return "";
+            else if (Array.isArray(v[0]))
+                return a2s( v, { any: pos2s }, ",");
+            else
+                return pos2s(v as CssPosition);
+        },
+        any: pos2s
     });
 }
 
 wkf[WKF.Position] = pos2s;
-wkf[WKF.AtPosition] = v => v == null ? "" : "at " + pos2s(v);
-wkf[WKF.MultiPositionWithComma] = val => mpos2s( val, ",");
+wkf[WKF.AtPosition] = (v: Extended<CssPosition>) => v == null ? "" : "at " + pos2s(v);
+wkf[WKF.MultiPosition] = mpos2s;
+
+
+
+// Converts corner radius style value to the CSS string.
+wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { any: WKF.Length });
+
+
+
+/**
+ * Converts border radius style value to the CSS string.
+ */
+ function borderRadius2s( val: Extended<BorderRadius>): string
+ {
+     return v2s( val, {
+         arr: v =>
+         {
+             if (Array.isArray( v[0]))
+                return a2s( v, {any: WKF.Length}, "/");
+             else
+                 return a2s( v, WKF.Length);
+         },
+         any: WKF.Length
+     });
+ }
+
+ wkf[WKF.BorderRadius] = borderRadius2s;
 
 
 

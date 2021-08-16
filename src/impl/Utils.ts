@@ -70,7 +70,7 @@ export const enum WKF
     AtPosition,
     AspectRatio,
     Color,
-    MultiPositionWithComma,
+    MultiPosition,
     MultiLengthWithSpace,
     MultiTimeWithComma,
     OneOrManyWithComma,
