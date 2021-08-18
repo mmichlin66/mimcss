@@ -202,6 +202,18 @@ export type AnimationPlayState_StyleType = OneOrMany<Extended<AnimationPlayState
 
 
 /**
+ * Type for [[appearance]] style property
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/appearance
+ * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#appearance
+ * @category Style Property
+ */
+export type Appearance_StyleType = "none" | "auto" | "textfield" | "menulist-button" |
+    "searchfield" | "textarea" | "push-button" | "slider-horizontal" | "checkbox" | "radio" |
+    "square-button" | "menulist" | "listbox" | "meter" | "progress-bar" | "button";
+
+
+
+/**
  * Type for simple animation timing functions - those that don't have parameters
  * @category Style Helper
  */
@@ -2119,6 +2131,7 @@ export type ZIndex_StyleType = "auto" | CssNumber;
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/zoom
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#zoom
  * @category Style Property
+ * @deprecated
  */
 export type Zoom_StyleType = "normal" | "reset" | CssPercent;
 
@@ -2228,6 +2241,12 @@ export interface IStyleset
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#animation-timing-function
      */
     animationTimingFunction?: AnimationTimingFunction_StyleType;
+
+    /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/appearance
+     * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#appearance
+     */
+     appearance?: Appearance_StyleType;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
@@ -4438,6 +4457,7 @@ export interface IStyleset
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/zoom
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#zoom
+     * @deprecated
      */
     zoom?: Zoom_StyleType;
 }

@@ -137,7 +137,7 @@ class MyStyles extends css.StyleDefinition
 
     // arbitrary selectors
     all = css.$style( "*", { boxSizing: "border-box" })
-    h1 = css.$style( "h1", { fontSize: 24, fontWeight: 700 })
+    h1 = css.$tag( "h1", { fontSize: 24, fontWeight: 700 })
     li = css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" })
 
     // custom CSS variables (with style-property-specific value types)
@@ -172,7 +172,7 @@ class MyStyles extends css.StyleDefinition
     ifSmallDevice = css.$media( { maxWidth: 600 },
         class extends css.StyleDefinition<MyStyles>
         {
-            h1 = css.$style( "h1", { fontSize: 20 });
+            h1 = css.$tag( "h1", { fontSize: 20 });
         }
     )
 
@@ -180,7 +180,7 @@ class MyStyles extends css.StyleDefinition
     ifGridSupported = css.$supports( {display: "grid"},
         class extends css.StyleDefinition<MyStyles>
         {
-            gridLayout =css.$class({ display: "grid" })
+            gridLayout = css.$class({ display: "grid" })
         }
     )
 }
@@ -194,7 +194,7 @@ class MyStyles extends css.StyleDefinition
     unnamed =
     [
         css.$style( "*", { boxSizing: "border-box" }),
-        css.$style( "h1", { fontSize: 24, fontWeight: 700 }),
+        css.$tag( "h1", { fontSize: 24, fontWeight: 700 }),
         css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" }),
         ...
     ]
@@ -251,7 +251,7 @@ This is equivalent to the following CSS:
 }
 ```
 
-**See Also:** [Mimcss Guide: Defining Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html)
+**See Also:** [Mimcss Guide: Reusing Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#reusing-styles)
 
 ### Pseudo Classes and Pseudo Elements
 While pseudo classes and pseudo elements can be defined using regular style rules (via the `$style` function), there is an easier way to define them:
@@ -278,7 +278,7 @@ This is equivalent to the following CSS:
 }
 ```
 
-**See Also:** [Mimcss Guide: Defining Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html)
+**See Also:** [Mimcss Guide: Dependent Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#dependent-styles)
 
 ### Pseudo Classes with Parameters
 Some pseudo classes require parameters, e.g. `:nth-child(2n+1)`. This is how it is expressed in Mimcss:
@@ -286,11 +286,11 @@ Some pseudo classes require parameters, e.g. `:nth-child(2n+1)`. This is how it 
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    row = css.$style( "tr", {
+    row = css.$tag( "tr", {
         ":nth-child": [ [2,1], { backgroundColor: 0xF8F8F8 } ]
     })
 
-    cell = css.$style( "p", {
+    cell = css.$tag( "p", {
         ":nth-of-type": [ "odd", { backgroundColor: "cyan" } ]
     })
 }
@@ -308,7 +308,7 @@ p:nth-of-type(odd) {
 }
 ```
 
-**See Also:** [Mimcss Guide: Defining Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html)
+**See Also:** [Mimcss Guide: Dependent Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#dependent-styles)
 
 ### Complex Related Selectors
 We often define a CSS class (or tag or ID) rule and then define related rules with complex selectors. You can use the ampersand (`"&"`) property to define such rules in Mimcss. Within the selectors, every occurrence of the `"&"` symbol will be replaced with the "parent" selector.
@@ -316,7 +316,7 @@ We often define a CSS class (or tag or ID) rule and then define related rules wi
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    ul = css.$style( "ul", {
+    ul = css.$tag( "ul", {
         color: "brown",
         "&": [
             [ "& > li:first-child, & > li > a", { color: "red" } ],
@@ -342,7 +342,7 @@ td > ul:hover {
 }
 ```
 
-**See Also:** [Mimcss Guide: Defining Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html)
+**See Also:** [Mimcss Guide: Dependent Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#dependent-styles)
 
 ### Custom CSS Properties
 Although custom CSS properties by themselves are not CSS rules, in Mimcss they are defined using the same notation as the rules.
@@ -355,13 +355,13 @@ class MyStyles extends css.StyleDefinition
     defaultBgColor = css.$var( "color", "white")
 
     // use the custom properties by referring to the previously defined objects
-    div = css.$style( "div", {
+    div = css.$tag( "div", {
         color: this.defaultColor,
         backgroundColor: this.defaultBgColor,
     })
 
     // overriding the values of the custom properties
-    footer = css.$style( "footer", {
+    footer = css.$tag( "footer", {
         "--": [
             [this.defaultColor, "yellow"],
             [this.defaultBgColor, "blue"]
@@ -423,11 +423,11 @@ css.Colors.myFavColor = 0x123456;
 // Use it just as any other named color
 class MyStyles extends css.StyleDefinition
 {
-    anchor = css.$style( "a", { color: "myColor" })
+    anchor = css.$tag( "a", { color: "myColor" })
 }
 ```
 
-**See Also:** [Mimcss Reference: Colors](https://mmichlin66.github.io/mimcss/ref/colors.html)
+**See Also:** [Mimcss Guide: Working with Colors](https://mmichlin66.github.io/mimcss/guide/style-property-types.html#working-with-colors)
 
 ### Working with Units
 In CSS, values of many properties should be specified with units corresponding to the CSS type of the property. For example, the `<length>` type has units such as "px", "rem", "in", "cm", etc.; the `<angle>` type has units such as "deg", "rad", "turn", etc. For many properties, CSS also allows using percents - "%".
@@ -463,10 +463,10 @@ class MyStyles extends css.StyleDefinition
 }
 ```
 
-**See Also:** [Mimcss Reference: Numeric Types](https://mmichlin66.github.io/mimcss/ref/numeric-types.html)
+**See Also:** [Mimcss Guide: Numeric Types](https://mmichlin66.github.io/mimcss/guide/style-property-types.html#numeric-types)
 
 ## Conclusion
-We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/guide/introduction.html) to find more information.
+We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/guide/introduction.html) to find more information. Also check out the [Playground](https://mmichlin66.github.io/demo/mimcss/playground.html), where you can write TypeScript code using Mimcss features and immediately see the results.
 
 
 

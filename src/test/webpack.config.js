@@ -14,6 +14,7 @@ module.exports =
             "./lib/test/specs/testPropsBorderImage.js",
             "./lib/test/specs/testPropsPosition.js",
             "./lib/test/specs/testPropsRadius.js",
+            "./lib/test/specs/testVendorPrefixes.js",
         ],
 
         output:

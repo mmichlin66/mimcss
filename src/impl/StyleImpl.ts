@@ -478,10 +478,10 @@ export function styleset2s( styleset: Styleset): string
 
     let s = "{";
 
-	forAllPropsInStylset( styleset, (name: string, value: string, isCustom: boolean): void => {
+	forAllPropsInStylset( styleset, (name: string, value: string, isCustom: boolean, isPrefixed: boolean): void => {
         s += isCustom
             ? `${name}:${value};`
-            : getVendorPrefixVariants( name as keyof IStyleset, value) + `${camelToDash(name)}:${value};`;
+            : `${isPrefixed ? "-" : ""}${camelToDash(name)}:${value};`;
     });
 
     return s + "}";
@@ -564,10 +564,10 @@ export function styleProp2s( propName: string, propVal: any): string
  * For each property - regular and custom - in the given styleset invokes the appropriate
  * function that gets the property name and the value converted to string.
  * @param styleset
- * @param forProp
+ * @param forPropFunc
  */
 export function forAllPropsInStylset( styleset: Styleset,
-    forProp: (name: string, val: string, isCustom: boolean) => void)
+    forPropFunc: (name: string, val: string, isCustom: boolean, isPrefixed: boolean) => void)
 {
 	for( let propName in styleset)
 	{
@@ -587,14 +587,40 @@ export function forAllPropsInStylset( styleset: Styleset,
 				if (varValue == null)
 					varValue = "";
 
-				forProp( varName, varValue, true);
+				forPropFunc( varName, varValue, true, false);
 			}
 		}
 		else
 		{
-			// get the string representation of the property
-            forProp( propName, styleProp2s( propName, styleset[propName]), false);
-		}
+            // prepare map of property names to tuples where the first element is the value and
+            // the second element is the flag whether the property name is a prefixed one.
+            let map: { [p: string]: [string, boolean] } = {};
+
+            // get the string representation of the property
+            let propValue = styleProp2s( propName, styleset[propName]);
+            map[propName] = [propValue, false];
+
+            let variants = getPrefixedVariants( propName as keyof IStyleset, propValue);
+            if (variants)
+            {
+                for( let variant of variants)
+                {
+                    let newPropName = variant[1]
+                        ? dashToCamel( `${vendorPrefixStrings[variant[0]]}-${propName}`)
+                        : propName;
+
+                    // this can override property name already in the map if the property name
+                    // is not prefixed (only the value is in this case)
+                    map[newPropName] = [variant[2], variant[1] ? true : false];
+                }
+            }
+
+            for( let name in map)
+            {
+                let tuple = map[name];
+                forPropFunc( name, tuple[0], false, tuple[1]);
+            }
+        }
 	}
 }
 
@@ -917,70 +943,110 @@ const enum VendorPrefix
 }
 
 // Vendor prefixes with indexes from the VendorPrefix enumeration
-const vendorPrefixStrings = ["-webkit-", "-moz-"];
+const vendorPrefixStrings = ["webkit", "moz"];
+
+
+// Mode indicating to what entity the prefix should be added if a certain value is found in the
+// property.
+const enum VendorPrefixMode
+{
+    // Both the value and the property name are prefixed.
+    Both = 0,
+
+    // Only the value is prefixed
+    ValueOnly = 1,
+
+    // Only the property name is prefixed
+    PropertyOnly = 2,
+}
 
 
 
 /**
  * The tuple contains the following fields:
  * - prefix index from the VendorPrefix enumeration
- * - optional list of strings that are searched for in the property value to be replaced by their
- *   vendor-prefixws variants
- * - optional flag indicating that only the given values of the property will be searched for
- *   replacements by vendor-prefixed values. The property itself will not be replaced.
+ * - optional flag indicating whether the property name should always be prefixed (true) or only
+ *   when it contains the specified values (false). The default value is true.
+ * - optional list of two-element tuples containing strings that are searched for in the property
+ *   value to be replaced by their vendor-prefixed variants and an optional flag indicating whether
+ *   the value or the property name or both should be prefixed. The default value of the flag is
+ *   Both.
  */
-type PropVendorPrefixInfo = [VendorPrefix, string[]?, boolean?];
+type PropValueVendorPrefixInfo = [string, VendorPrefixMode?];
+type PropVendorPrefixInfo = [VendorPrefix, boolean?, PropValueVendorPrefixInfo[]?];
 type PropVendorPrefixInfos = PropVendorPrefixInfo[];
 
 
 
 /**
- * Returns a string with serializations of property-name pairs with vendor prefixes for the given
- * style property. For the majority of properties it returns an empty string.
- * @param name Property name
- * @param value Strings-erialized property value
- * @returns String with zero or more serialized property-value names containing variants with
- * vendor-prefixed names.
+ * The tuple that contains the result of applying vendor prefixing on a property.
+ * - vendor prefix indicator.
+ * - flag indicating whether the property name should be changed.
+ * - value for the property (that may or may not have prefixed items)
  */
-function getVendorPrefixVariants( name: keyof IStyleset, value: string): string
+type PropVendorVariant = [VendorPrefix, boolean, string];
+
+
+function getPrefixedVariants( name: keyof IStyleset, value: string): PropVendorVariant[] | null
 {
     let infos = propVendorPrefixInfos[name];
     if (!infos)
-        return "";
+        return null;
 
-    let s = "";
+    let variants: PropVendorVariant[] = [];
     for( let info of infos)
     {
+        let variant: PropVendorVariant = [ info[0], false, value ];
         let prefixString = vendorPrefixStrings[info[0]];
-        let newValue: string | undefined;
-        if (info[1])
+        let shouldPrefixProperty = info[1] !== undefined ? info[1] : true;
+        let prefixedValue: string | undefined = undefined;
+        if (info[2])
         {
-            for( let valueToSearch of info[1])
+            for( let valueInfo of info[2])
             {
+                let valueToSearch = valueInfo[0];
                 if (value.indexOf( valueToSearch) >= 0)
-                    newValue = value.replace( valueToSearch, prefixString + valueToSearch)
+                {
+                    let mode = valueInfo[1];
+                    if (!mode || mode === VendorPrefixMode.ValueOnly)
+                    {
+                        prefixedValue = value.replace( valueToSearch, prefixString + valueToSearch);
+                        value = prefixedValue;
+                    }
+
+                    if (!mode || mode === VendorPrefixMode.PropertyOnly)
+                        shouldPrefixProperty = true;
+                }
             }
         }
 
-        // we create a prefixed pair only if the property name itself should be prefixed or if the
-        // value contains the strings that should be prefixed (indicated by the newValue not being
-        // empty)
-        if (!info[2] || newValue)
+        if (shouldPrefixProperty || prefixedValue)
         {
-            let dashName = camelToDash(name);
-            s += `${info[2] ? dashName : prefixString + dashName}:${newValue ?? value};`;
+            variant[1] = shouldPrefixProperty;
+            if (prefixedValue)
+                variant[2] = prefixedValue;
+
+            variants.push( variant);
         }
     }
 
-    return s;
+    return variants.length > 0 ? variants : null;
 }
+
+
+
+// Prefix information for properties that accept "fit-content" value
+const fitContentPrefixInfos: PropVendorPrefixInfos = [ [VendorPrefix.Webkit, false, [["fit-content", VendorPrefixMode.ValueOnly]]] ];
 
 
 
 const propVendorPrefixInfos: { [K in keyof IStyleset]?: PropVendorPrefixInfos} =
 {
+    appearance: [ [VendorPrefix.Webkit], [VendorPrefix.Moz] ],
+    backgroundClip: [ [VendorPrefix.Webkit, false, [["text", VendorPrefixMode.PropertyOnly]]] ],
+    boxDecorationBreak: [ [VendorPrefix.Webkit] ],
     // scrollbarColor: [ [VendorPrefix.Webkit], [VendorPrefix.Moz] ],
-    minWidth: [ [VendorPrefix.Webkit, ["fit-content"], true] ],
+    minWidth: fitContentPrefixInfos,
 }
 
 
