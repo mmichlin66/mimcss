@@ -720,6 +720,16 @@ export type ClipRule_StyleType = "nonzero" | "evenodd";
 
 
 /**
+ * Type for [[colorAdjust]] and color-adjust style property
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color-adjust
+ * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#color-adjust
+ * @category Style Property
+ */
+export type ColorAdjust_StyleType = "economy" | "exact";
+
+
+
+/**
  * Type for [[colorInterpolation]] and color-interpolation-filters style properties
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color-interpolation
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#color-interpolation
@@ -2760,6 +2770,12 @@ export interface IStyleset
      * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#color
      */
     color?: CssColor;
+
+    /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color-adjust
+     * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#color-adjust
+     */
+    colorAdjust?: ColorAdjust_StyleType;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color-interpolation

@@ -29,6 +29,12 @@ describe("vendor prefixes", () =>
             let s = styleset2s( {boxDecorationBreak: "slice"});
             expect(s).toEqual( "{box-decoration-break:slice;-webkit-box-decoration-break:slice;}");
         })
+
+        it("color-adjust", () =>
+        {
+            let s = styleset2s( {colorAdjust: "economy"});
+            expect(s).toEqual( "{color-adjust:economy;-webkit-print-color-adjust:economy;}");
+        })
     })
 
     describe("converting to StringStyleset", () =>
@@ -60,6 +66,13 @@ describe("vendor prefixes", () =>
             let ss = css.stylesetToStringStyleset( {boxDecorationBreak: "slice"});
             expect(ss.boxDecorationBreak).toEqual( "slice");
             expect(ss["webkitBoxDecorationBreak"]).toEqual( "slice");
+        })
+
+        it("color-adjust", () =>
+        {
+            let ss = css.stylesetToStringStyleset( {colorAdjust: "economy"});
+            expect(ss.colorAdjust).toEqual( "economy");
+            expect(ss["webkitPrintColorAdjust"]).toEqual( "economy");
         })
     })
 })
