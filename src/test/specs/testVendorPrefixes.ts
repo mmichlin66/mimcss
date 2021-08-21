@@ -35,6 +35,12 @@ describe("vendor prefixes", () =>
             let s = styleset2s( {colorAdjust: "economy"});
             expect(s).toEqual( "{color-adjust:economy;-webkit-print-color-adjust:economy;}");
         })
+
+        it("size: stretch", () =>
+        {
+            let s = styleset2s( {width: "stretch"});
+            expect(s).toEqual( "{width:-webkit-fill-available;}");
+        })
     })
 
     describe("converting to StringStyleset", () =>
@@ -73,6 +79,12 @@ describe("vendor prefixes", () =>
             let ss = css.stylesetToStringStyleset( {colorAdjust: "economy"});
             expect(ss.colorAdjust).toEqual( "economy");
             expect(ss["webkitPrintColorAdjust"]).toEqual( "economy");
+        })
+
+        it("size: stretch", () =>
+        {
+            let ss = css.stylesetToStringStyleset( {width: "stretch"});
+            expect(ss.width).toEqual( "-webkit-fill-available");
         })
     })
 })

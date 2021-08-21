@@ -875,7 +875,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     stopColor: WKF.Color,
     stroke: WKF.Color,
 
-    tabSize: WKF.Length,
     textCombineUpright: {
         num: v => `digits ${v}`
     },
@@ -889,9 +888,12 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
         any: WKF.Color
     },
     textEmphasisColor: WKF.Color,
+    textFillColor: WKF.Color,
     textIndent: WKF.MultiLengthWithSpace,
     textShadow: WKF.BoxShadow,
     textSizeAdjust: WKF.Percent,
+    textStrokeColor: WKF.Color,
+    textStrokeWidth: WKF.Length,
     top: WKF.Length,
     transformOrigin: WKF.MultiLengthWithSpace,
     transition: {
@@ -937,12 +939,13 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
 const enum VendorPrefix
 {
-    Webkit = 0,
-    Moz = 1,
+    webkit = 0,
+    moz = 1,
+    ms = 2,
 }
 
 // Vendor prefixes with indexes from the VendorPrefix enumeration
-const vendorPrefixStrings = ["webkit", "moz"];
+const vendorPrefixStrings = ["webkit", "moz", "ms"];
 
 
 // Mode indicating to what entity the prefix should be added if a certain value is found in the
@@ -1061,23 +1064,69 @@ function getPrefixVariants( name: keyof IStyleset, value: string): PropPrefixVar
 
 
 
-// Prefix information for properties that accept "fit-content" value
-const fitContentPrefixInfos: PropPrefixInfo[] = [
-    {prefix: VendorPrefix.Webkit, valsOnly: true, vals: [{val: "fit-content", mode: ValuePrefixMode.ValueOnly}]}
+// Prefix information requiring adding the appropriate prefix
+const webkitInfo = {prefix: VendorPrefix.webkit};
+const mozInfo = {prefix: VendorPrefix.moz};
+const msInfo = {prefix: VendorPrefix.ms};
+
+// Prefix information requiring adding the -webkit- prefix and not any other prefix
+const webkitInfoOnly = [webkitInfo];
+
+// Prefix information for size-like properties that accept "stretch" value
+const sizePrefixInfos: PropPrefixInfo[] = [
+    {prefix: VendorPrefix.webkit, valsOnly: true, vals: [{val: "stretch", mode: ValuePrefixMode.ValueOnly, alt: "-webkit-fill-available"}]},
 ];
 
 
 
 const propPrefixInfos: { [K in keyof IStyleset]?: PropPrefixInfo[]} =
 {
-    appearance: [ {prefix: VendorPrefix.Webkit}, {prefix: VendorPrefix.Moz} ],
+    appearance: [ webkitInfo, mozInfo ],
     backgroundClip: [
-        {prefix: VendorPrefix.Webkit, valsOnly: true, vals: [{val: "text", mode: ValuePrefixMode.PropertyOnly}]}
+        {prefix: VendorPrefix.webkit, valsOnly: true, vals: [{val: "text", mode: ValuePrefixMode.PropertyOnly}]}
     ],
-    boxDecorationBreak: [ {prefix: VendorPrefix.Webkit} ],
-    colorAdjust: [ {prefix: VendorPrefix.Webkit, alt: "webkitPrintColorAdjust"} ],
-    // scrollbarColor: [ [VendorPrefix.Webkit], [VendorPrefix.Moz] ],
-    minWidth: fitContentPrefixInfos,
+    blockSize: sizePrefixInfos,
+    boxDecorationBreak: webkitInfoOnly,
+    colorAdjust: [ {prefix: VendorPrefix.webkit, alt: "webkitPrintColorAdjust"} ],
+    clipPath: webkitInfoOnly,
+    height: sizePrefixInfos,
+    hyphens: [ webkitInfo, mozInfo, msInfo ],
+    initialLetter: webkitInfoOnly,
+    inlineSize: sizePrefixInfos,
+    lineClamp: webkitInfoOnly,
+    mask: webkitInfoOnly,
+    maskClip: webkitInfoOnly,
+    maskComposite: webkitInfoOnly,
+    maskImage: webkitInfoOnly,
+    maskMode: webkitInfoOnly,
+    maskOrigin: webkitInfoOnly,
+    maskPosition: webkitInfoOnly,
+    maskRepeat: webkitInfoOnly,
+    maskSize: webkitInfoOnly,
+    maskType: webkitInfoOnly,
+    maxBlockSize: sizePrefixInfos,
+    maxHeight: sizePrefixInfos,
+    maxInlineSize: sizePrefixInfos,
+    maxWidth: sizePrefixInfos,
+    minBlockSize: sizePrefixInfos,
+    minHeight: sizePrefixInfos,
+    minInlineSize: sizePrefixInfos,
+    minWidth: sizePrefixInfos,
+    scrollbarColor: webkitInfoOnly,
+    scrollbarWidth: webkitInfoOnly,
+    textEmphasis: webkitInfoOnly,
+    textEmphasisColor: webkitInfoOnly,
+    textEmphasisPosition: webkitInfoOnly,
+    textEmphasisStyle: webkitInfoOnly,
+    textFillColor: webkitInfoOnly,
+    textSizeAdjust: [ webkitInfo, mozInfo, msInfo ],
+    textStroke: webkitInfoOnly,
+    textStrokeColor: webkitInfoOnly,
+    textStrokeWidth: webkitInfoOnly,
+    userSelect: [
+        {prefix: VendorPrefix.webkit, vals: [{val: "none", mode: ValuePrefixMode.PropertyOnly}]}
+    ],
+    width: sizePrefixInfos,
 }
 
 

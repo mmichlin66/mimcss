@@ -345,7 +345,8 @@ export interface IFrequencyMath extends INumericMath<CssFrequency, FrequencyUnit
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for `width`, `height`, `block-size` and `inline-size` style properties */
-export type CssSize = CssLength | "auto" | "max-content" | "min-content" | "fit-content" | IFitContentProxy;
+export type CssSize = "auto" | "max-content" | "min-content" | "fit-content" | "stretch" |
+    CssLength | IFitContentProxy;
 
 /**
  * The IFitContentProxy interface represents an invocation of the CSS `fit-content()` function. It
