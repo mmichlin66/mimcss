@@ -127,31 +127,33 @@ describe("activation:", () =>
 
 
 
-	it("should not create <style> elements for embedded definitions", () =>
+	it("should create single <style> element for multiple embedded definitions", () =>
 	{
+        @css.embedded("A")
 		class EmbeddedStyles1 extends css.StyleDefinition
 		{
 			red = css.$class({ color: "red" })
 		}
 
+        @css.embedded("A")
 		class EmbeddedStyles2 extends css.StyleDefinition
 		{
-			embedded = css.$embed( EmbeddedStyles1)
 			green = css.$class({ color: "green" })
 		}
 
-		class MyStyles extends css.StyleDefinition
-		{
-			embedded = css.$embed( EmbeddedStyles2)
-			blue = css.$class({ color: "blue" })
-		}
-
-		let myStyles1 = css.activate( MyStyles);
-
+		let styles1 = css.activate( EmbeddedStyles1);
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-		css.deactivate( myStyles1!);
+		let styles2 = css.activate( EmbeddedStyles2);
+		elms = dom.getAllStylesFromHead();
+		expect(elms.length).toEqual(1);
+
+        css.deactivate( styles1!);
+		elms = dom.getAllStylesFromHead();
+		expect(elms.length).toEqual(1);
+
+        css.deactivate( styles2!);
 		dom.expectNoStylesInHead();
 	})
 
@@ -159,23 +161,26 @@ describe("activation:", () =>
 
 	it("should create different unique names for same-named rules for embedded definitions", () =>
 	{
-		class EmbeddedStyles extends css.StyleDefinition
+        @css.embedded("B")
+		class EmbeddedStyles1 extends css.StyleDefinition
 		{
 			red = css.$class({ color: "red" })
 		}
 
-		class MyStyles extends css.StyleDefinition
+        @css.embedded("B")
+		class EmbeddedStyles2 extends css.StyleDefinition
 		{
-			embedded = css.$embed( EmbeddedStyles)
-			red = css.$class({ color: "darkred" })
+			red = css.$class({ color: "red" })
 		}
 
-		let myStyles1 = css.activate( MyStyles);
+		let styles1 = css.activate( EmbeddedStyles1);
+		let styles2 = css.activate( EmbeddedStyles2);
 
 		let elms = dom.getAllStylesFromHead();
 		expect((elms[0].sheet as CSSStyleSheet).cssRules.length).toEqual(2);
 
-		css.deactivate( myStyles1!);
+		css.deactivate( styles1!);
+		css.deactivate( styles2!);
 		dom.expectNoStylesInHead();
 	})
 })

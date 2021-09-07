@@ -603,8 +603,8 @@ export const enum NameGenerationMethod
      * property name defining the CSS entity. This method produces predicatable names (since no
      * unique numbers are involved) and thus is suitable for testing environments where CSS names
      * are used for identifying elements on the page. Note that if different JavaScript modules
-     * have identically named classes with an identically named property, the generated name
-     * will be identical
+     * have identically named classes with identically named properties, the generated names
+     * will be identical.
      *
      * **Example:**
      * ```typescript

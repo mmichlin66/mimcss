@@ -9,7 +9,7 @@ import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
-import {processInstanceOrClass, s_configNames} from "../rules/RuleContainer";
+import {embeddedDecorator, processInstanceOrClass, s_configNames} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
@@ -76,7 +76,7 @@ import {a2s, v2s} from "../impl/Utils";
      /**
       * Style definition instances are created directly only by the *styled components* - that is,
       * components that use different styles for each instance. Otherwise, style definition
-      * instances are created when either the [[$use]], [[$embed]] or [[activate]] function is called.
+      * instances are created when either the [[$use]] or [[activate]] function is called.
       * @param parent Reference to the parent style definition class
       */
      public constructor( parent?: P)
@@ -874,7 +874,7 @@ export function $media<T extends StyleDefinition>( statement: MediaStatement,
  * is activated, the rules will be in the DOM; as soon as all referencing style definitions are
  * deactivated, the rules from the referenced definition are removed from the DOM.
  *
- * @param instOrClass Either style definition class or an instanc of a style definition class.
+ * @param instOrClass Either style definition class or an instance of a style definition class.
  * @returns An instance of the style definition class, which will be activated and deactivated
  * along with the enclosing style definition.
  */
@@ -886,51 +886,23 @@ export function $use<T extends StyleDefinition>( instOrClass: T | IStyleDefiniti
 
 
 /**
- * Embeds the given style definition class into another style definition object. When activated,
- * the embedded object doesn't create its own `<style>` element but uses that of its owner. This
- * allows creating many small style definition classes instead of one huge one without incurring
- * the overhead of many `<style>` elements. For example, when developing a library of components,
- * every component can define their own style definition class; however, they all can be embedded
- * into a single style definion class for the entire library.
- *
- * Embedded styles should not be activated separately - they are activated when the embedding
- * style definition class is activated.
- *
- * Note that as opposed to the [[$use]] function, the `$embed` function always creates a new instance of
- * the given class and doesn't associate the class with the created instance. That means that if
- * a class is embedded into more than one "owner", two separate instances of each CSS rule will be
- * created with different unique names.
+ * Decorator function for style definition classes that will be embedded into an embedding
+ * container for the given category. All style definitions for a given category will be activated
+ * and deactivated together and their rules will be inserted into a single `<style>` element.
  *
  * **Example:**
  * ```typescript
- * class Comp1Styles extends css.StyleDefinition { ... }
- * class Comp2Styles extends css.StyleDefinition { ... }
- * class Comp3Styles extends css.StyleDefinition { ... }
+ * @css.embedded("widgets")
+ * class FirstWidgetStyles extends css.StyleDefinition {...}
  *
- * class LibraryStyles extends css.StyleDefinition
- * {
- *     comp1 = css.$embed( Comp1Styles)
- *     comp2 = css.$embed( Comp2Styles)
- *     comp3 = css.$embed( Comp3Styles)
- * }
- *
- * let libStyles = css.activate( LibraryStyles);
- *
- * render()
- * {
- *     return <div className={libStyles.comp1.someClass.name}>...>/div>
- * }
+ * @css.embedded("widgets")
+ * class SecondWidgetStyles extends css.StyleDefinition {...}
  * ```
- *
- * @param instOrClass Either style definition class or an instanc of a style definition class.
- * @returns An instance of the style definition class, which will be activated and deactivated
- * along with the enclosing style definition.
  */
-export function $embed<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T | null
+export function embedded( category: string): ClassDecorator
 {
-	// return definition instance without processing it. This is the indication that the defintion
-	// will be embedded into another definition.
-	return instOrClass instanceof StyleDefinition ? instOrClass : new instOrClass();
+    // we return the function that is the actual decorator.
+    return embeddedDecorator.bind( undefined, category);
 }
 
 
@@ -1032,7 +1004,7 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
  * rule, the first rule will see the overridden value of the rule when accessed in the
  * post-constructor code.
  */
-export function virtual( target: any, name: string)
+export function virtual( target: any, name: string): void
 {
     // symbol to keep the proxy handler value
     let sym = Symbol(name + "_proxy_handler");

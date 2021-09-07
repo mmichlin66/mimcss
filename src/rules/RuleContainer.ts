@@ -3,7 +3,7 @@ import {StyleDefinition} from "../api/RuleAPI"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
+import {getActivator, scheduleStyleUpdate} from "../impl/SchedulingImpl";
 
 
 
@@ -11,13 +11,13 @@ import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 // instances that we don't want to be visible to developers.
 
 /** Property on the style definition class pointing to the singleton instance. */
-const symInstance = Symbol("definition");
+const symInstance = Symbol("symInstance");
 
 /**
  * Property on the style definition instance pointing to the RuleContainer object that is
  * responsible for processing rules.
  */
-const symContainer = Symbol("container");
+const symContainer = Symbol("symContainer");
 
 
 
@@ -30,15 +30,15 @@ const symContainer = Symbol("container");
  */
 class RuleContainer implements ITopLevelRuleContainer
 {
-	constructor( instance: StyleDefinition, name: string, embeddingContainer?: RuleContainer)
+	constructor( instance: StyleDefinition, name: string)
 	{
 		this.instance = instance;
 		this.name = name;
-		this.embeddingContainer = embeddingContainer;
 
         this.definitionClass = instance.constructor as IStyleDefinitionClass;
         this.parent = instance.$parent;
 		this.owner = instance.$owner;
+		this.embeddingContainer = this.definitionClass[symEmbeddingContainer];
 
 		this.activationRefCount = 0;
 		this.domStyleElm = null;
@@ -100,10 +100,8 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Processes reference to another style definition created by the $use function.
 	private processReference( ref: StyleDefinition): void
 	{
-		// if the instance has not already been processed, process it and indicate that it is
-		// embedded into our container because only definitions created with the $embed function
-		// are not processed.
-		processInstance( ref, this);
+		// if the instance has not already been processed, process it now.
+		processInstance( ref);
 		this.refs.push( ref);
 	}
 
@@ -275,14 +273,17 @@ class RuleContainer implements ITopLevelRuleContainer
 		if (++this.activationRefCount === 1)
 		{
 			// only the top-level not-embedded style definitions create the `<style>` element
-			if (this.embeddingContainer)
-				this.domStyleElm = this.embeddingContainer.domStyleElm;
-			else if (this.isTopLevel)
+			if (this.isTopLevel)
 			{
-				this.domStyleElm = document.createElement( "style");
-				this.domStyleElm.id = this.name;
-				document.head.appendChild( this.domStyleElm);
-			}
+                if (this.embeddingContainer)
+                    this.domStyleElm = this.embeddingContainer.domStyleElm;
+                else
+                {
+                    this.domStyleElm = document.createElement( "style");
+                    this.domStyleElm.id = this.name;
+                    document.head.appendChild( this.domStyleElm);
+                }
+            }
 			else
 				this.domStyleElm = this.topLevelContainer.domStyleElm;
 
@@ -303,8 +304,8 @@ class RuleContainer implements ITopLevelRuleContainer
 		{
 			this.clearRules();
 
-			// only the top-level style defiition creates the `<style>` element
-			if (this.isTopLevel)
+			// only the top-level not-embedded style defiitions create the `<style>` element
+			if (this.isTopLevel && !this.embeddingContainer)
 				this.domStyleElm!.remove();
 
 			this.domStyleElm = null;
@@ -349,11 +350,16 @@ class RuleContainer implements ITopLevelRuleContainer
 	public instance: StyleDefinition;
 
 	// Style definition class that this container creates an instance of.
-	private definitionClass: IStyleDefinitionClass
+	public definitionClass: IStyleDefinitionClass
 
 	// Name of this container, which, depending on the mode, is either taken from the class
 	// definition name or generated uniquely.
-	private name: string
+	public name: string
+
+	// Container that is embedding our instance (that is, the instance corresponding to our
+    // container). If defined, this container's `<style>` element is used to insert CSS rules
+    // into instead of topLevelContainer.
+	public embeddingContainer?: EmbeddingContainer;
 
 	// Instance of the parent style definition class in the chain of grouping rules that
 	// lead to this rule container. For top-level style definitions, this is undefined.
@@ -371,11 +377,6 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Rule container that belongs to the owner style defintion. If our container is top-level,
 	// this property points to `this`. Names for named rules are created using this container.
 	private topLevelContainer: RuleContainer;
-
-	// Container corresponding to the style definition instance that is embedding our instance
-	// (that is, the instance corresponding to our container). If defined, this container's
-	// `<style>` element is used to insert CSS rules into instead of topLevelContainer.
-	private embeddingContainer?: RuleContainer;
 
 	// List of references to other style definitions creaed via the $use function.
 	private refs: StyleDefinition[];
@@ -582,7 +583,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-function processInstance( instance: StyleDefinition, embeddingContainer?: RuleContainer): void
+function processInstance( instance: StyleDefinition): void
 {
 	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.
@@ -591,9 +592,12 @@ function processInstance( instance: StyleDefinition, embeddingContainer?: RuleCo
 		return;
 
 	// get the name for our container
-	let name = generateUniqueName();
-	if (!s_nameGeneratonMethod)
+	let name : string;
+	if (s_nameGeneratonMethod === NameGenerationMethod.Optimized)
+        name = generateUniqueName();
+    else
 	{
+        name = generateUniqueName();
 		let definitionClass = instance.constructor;
 		if (definitionClass.name)
 			name += "_" + definitionClass.name;
@@ -601,7 +605,7 @@ function processInstance( instance: StyleDefinition, embeddingContainer?: RuleCo
 
 	// create container - this will associate the new container with the instance and process
 	// the rules.
-	new RuleContainer( instance, name, embeddingContainer);
+	new RuleContainer( instance, name);
 }
 
 
@@ -621,16 +625,19 @@ export function getContainerFromInstance( instance: IStyleDefinition): RuleConta
  * not a style definition but a style definition class, obtain style definition by calling the $use
  * function. Note that each style definition object maintains a reference counter of how many times
  * it was activated and deactivated. The rules are inserted to DOM only when this reference counter
- * goes up to 1.
+ * goes from 0 to 1.
  */
 export function activateInstance( instance: IStyleDefinition, count: number): void
 {
 	let ruleContainer = getContainerFromInstance( instance);
-	if (ruleContainer)
-	{
-		for( let i = 0; i < count; i++)
-			ruleContainer.activate();
-	}
+	if (!ruleContainer)
+        return;
+
+    // if this container has an embedding container, activate the embedding container; otherwise,
+    // activate the rule container itself.
+    let whatToActivate = ruleContainer.embeddingContainer ?? ruleContainer;
+    for( let i = 0; i < count; i++)
+        whatToActivate.activate();
 }
 
 
@@ -638,16 +645,19 @@ export function activateInstance( instance: IStyleDefinition, count: number): vo
 /**
  * Deactivates the given style definition by removing its rules from DOM. Note that each style
  * definition object maintains a reference counter of how many times it was activated and
- * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
+ * deactivated. The rules are removed from DOM only when this reference counter goes from 1 to 0.
  */
 export function deactivateInstance( instance: IStyleDefinition, count: number): void
 {
 	let ruleContainer = getContainerFromInstance( instance);
-	if (ruleContainer)
-	{
-		for( let i = 0; i < count; i++)
-			ruleContainer.deactivate();
-	}
+	if (!ruleContainer)
+        return;
+
+    // if this container has an embedding container, deactivate the embedding container; otherwise,
+    // deactivate the rule container itself.
+    let whatToActivate = ruleContainer.embeddingContainer ?? ruleContainer;
+    for( let i = 0; i < count; i++)
+        whatToActivate.deactivate();
 }
 
 
@@ -660,6 +670,157 @@ export function serializeInstance( instance: IStyleDefinition, ctx: IRuleSeriali
 	let ruleContainer = getContainerFromInstance( instance);
 	if (ruleContainer)
 	    ruleContainer.serializeRules( ctx);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Embedding
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Symbol used in style definition classes to point to an embedding container */
+let symEmbeddingContainer = Symbol("symEmbeddingContainer");
+
+
+
+/**
+ * The EmbeddingContainer class contains multiple style definition classes, which are activated and
+ * deactivated together under a single `<style>` node. Style definition classes are added to the
+ * embedding container by being decorated with the `@embedded` decorator.
+ */
+class EmbeddingContainer
+{
+    /** ID to use for the `<style>` element */
+    private id: string;
+
+    /**
+     * Number of activated style definitions belonging to this container. This number is
+     * incremented upon activation and decremented upon deactivation of style definitions. When
+     * this number goes from 0 to 1, the `<style>` element is created and all rules from all
+     * style definitions are inserted into it. When this number goes from 1 to 0, the `<style>`
+     * element is removed.
+     */
+     private refCount: number;
+
+    /** Collection of style definition classes "embedded" in this container */
+    private definitionClasses: Set<IStyleDefinitionClass>;
+
+	// DOM style elemnt
+	public domStyleElm: HTMLStyleElement | null;
+
+
+
+    public constructor( id: string)
+    {
+        this.id = id;
+        this.refCount = 0;
+        this.definitionClasses = new Set<IStyleDefinitionClass>();
+    }
+
+
+
+    /**
+     * Adds the given style definition class to the list of embedded classes. If the container is
+     * currently activated, the class will be activated too.
+     */
+    public add( cls: IStyleDefinitionClass): void
+    {
+        // add our class to the container
+        this.definitionClasses.add( cls);
+
+        // set the symbol on our class to point to the container
+        cls[symEmbeddingContainer] = this;
+
+        // if the embedding container is currently activated, we need to activate the added
+        // style definition class using the currently default activator
+        if (this.refCount > 0)
+            getActivator().activate( processClass( cls)!);
+        }
+
+	/**
+     * Inserts all stylesheets in this container into DOM.
+     */
+	public activate(): void
+	{
+        // only if this is the first activation call, create the style element and insert all
+        // rules from all the style definition classes.
+		if (++this.refCount === 1)
+		{
+            this.domStyleElm = document.createElement( "style");
+            this.domStyleElm.id = this.id;
+            document.head.appendChild( this.domStyleElm);
+
+            for( let cls of this.definitionClasses)
+            {
+                // definition class may be already associated with an instance; if not -
+                // process it now.
+                let instance = cls.hasOwnProperty(symInstance)
+                    ? cls[symInstance]
+                    : processClass(cls);
+
+            	let ruleContainer = instance[symContainer] as RuleContainer;
+                ruleContainer.activate();
+            }
+		}
+	}
+
+	/**
+     * Removes all stylesheets in this container into DOM.
+     */
+	public deactivate(): void
+	{
+        // only if this is the last deactivation call, remove the style element and remove all
+        // rules from all the style definition classes.
+		if (--this.refCount === 0)
+		{
+            this.domStyleElm?.remove();
+            this.domStyleElm = null;
+
+            for( let cls of this.definitionClasses)
+            {
+                // definition class must be already associated with an instance
+                if (!cls.hasOwnProperty(symInstance))
+                    continue;
+
+                let instance = cls[symInstance];
+            	let ruleContainer = instance[symContainer] as RuleContainer;
+                ruleContainer.deactivate();
+            }
+		}
+	}
+}
+
+
+
+/**
+ * Map of category names to embedding container objects containing style definitions for the given
+ * category.
+ */
+let embeddingContainers = new Map<string,EmbeddingContainer>();
+
+
+
+/**
+ * Decorator function for style definition classes that will be embedded into an embedding
+ * container for the given category. All style definitions for a given category will be activated
+ * and deactivated together and their rules will be inserted into a single `<style>` element.
+ */
+export function embeddedDecorator( category: string, target: IStyleDefinitionClass): any
+{
+    // check whether we already have container for this category; if not, add it
+    let embeddingContainer = embeddingContainers.get( category);
+    if (!embeddingContainer)
+    {
+        // generate unique ID for our container, which will be the ID of the `<style>` element
+        let id = `${category}_${s_nextUniqueID++}`;
+        embeddingContainer = new EmbeddingContainer( id);
+        embeddingContainers.set( category, embeddingContainer);
+    }
+
+    // add our class to the container
+    embeddingContainer.add( target);
 }
 
 
