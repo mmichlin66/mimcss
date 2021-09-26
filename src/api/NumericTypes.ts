@@ -81,7 +81,7 @@ export interface INumericMath<T, U extends string>
      *
      * @param min Lower bound for the return value.
      * @param pref Preferred value.
-     * @param min Upper bound for the return value.
+     * @param max Upper bound for the return value.
      * @returns Function implementing the `IGenericProxy<U>` callable interface. This allows the
      * result of the `clamp` method to be assigned only to the properties of a compatible numeric
      * type.

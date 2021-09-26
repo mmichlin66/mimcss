@@ -328,7 +328,7 @@ export function crossFade( ...args: CrossFadeParam[]): IImageProxy
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an IFilterProxy function representing the `brightness()` CSS function.
+ * Returns an IFilterProxy function representing one of the filter CSS function.
  */
 function filterPercent( name: string, p: Extended<CssPercent>): IFilterProxy
 {
@@ -338,8 +338,25 @@ function filterPercent( name: string, p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `brightness()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `brightness()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: brightness(150%)
+ *     bright = css.$class({ filter: css.brightness(150)})
+ *
+ *     // filter: brightness(50%)
+ *     dim = css.$class({ filter: css.brightness(0.5)})
+ * }
+ * ```
+ *
+ * @param p Value interpreted as percentage. Integer number is used as is while  floating point
+ * numbers are multiplied by 100.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function brightness( p: Extended<CssPercent>): IFilterProxy
@@ -350,8 +367,25 @@ export function brightness( p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `contrast()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `contrast()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: contrast(150%)
+ *     highContrast = css.$class({ filter: css.contrast(150)})
+ *
+ *     // filter: contrast(50%)
+ *     lowContrast = css.$class({ filter: css.contrast(0.5)})
+ * }
+ * ```
+ *
+ * @param p Value interpreted as percentage. Integer number is used as is while  floating point
+ * numbers are multiplied by 100.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function contrast( p: Extended<CssPercent>): IFilterProxy
@@ -362,8 +396,25 @@ export function contrast( p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `grayscale()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `grayscale()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: grayscale(100%)
+ *     gray = css.$class({ filter: css.grayscale(100)})
+ *
+ *     // filter: grayscale(50%)
+ *     halfColor = css.$class({ filter: css.grayscale(0.5)})
+ * }
+ * ```
+ *
+ * @param p Value interpreted as percentage. Integer number is used as is while  floating point
+ * numbers are multiplied by 100.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function grayscale( p: Extended<CssPercent>): IFilterProxy
@@ -374,8 +425,28 @@ export function grayscale( p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `invert()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `invert()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: invert(100%)
+ *     inverted = css.$class({ filter: css.invert(100)})
+ *
+ *     // filter: invert(75%)
+ *     somewhatnverted = css.$class({ filter: css.invert(0.75)})
+ *
+ *     // filter: invert(50%)
+ *     gray = css.$class({ filter: css.invert(0.5)})
+ * }
+ * ```
+ *
+ * @param p Value interpreted as percentage. Integer number is used as is while  floating point
+ * numbers are multiplied by 100.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function invert( p: Extended<CssPercent>): IFilterProxy
@@ -386,8 +457,22 @@ export function invert( p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `opacity()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `opacity()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: opacity(50%)
+ *     halfTransparent = css.$class({ filter: css.opacity(0.5)})
+ * }
+ * ```
+ *
+ * @param p Value interpreted as percentage. Integer number is used as is while  floating point
+ * numbers are multiplied by 100.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function opacity( p: Extended<CssPercent>): IFilterProxy
@@ -398,8 +483,25 @@ export function opacity( p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `saturate()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `saturate()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: saturate(150%)
+ *     superSaturated = css.$class({ filter: css.saturate(150)})
+ *
+ *     // filter: saturate(50%)
+ *     underSaturated = css.$class({ filter: css.saturate(0.5)})
+ * }
+ * ```
+ *
+ * @param p Value interpreted as percentage. Integer number is used as is while  floating point
+ * numbers are multiplied by 100.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function saturate( p: Extended<CssPercent>): IFilterProxy
@@ -410,8 +512,22 @@ export function saturate( p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `sepia()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `sepia()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: sepia(100%)
+ *     vintage = css.$class({ filter: css.sepia(100)})
+ * }
+ * ```
+ *
+ * @param p Value interpreted as percentage. Integer number is used as is while  floating point
+ * numbers are multiplied by 100.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function sepia( p: Extended<CssPercent>): IFilterProxy
@@ -422,23 +538,62 @@ export function sepia( p: Extended<CssPercent>): IFilterProxy
 
 
 /**
- * Returns an IFilterProxy function representing the `blur()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `blur()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: blur(0)
+ *     sharp = css.$class({ filter: css.blur(0)})
+ *
+ *     // filter: blur(2px)
+ *     blurred = css.$class({ filter: css.blur(2)})
+ *
+ *     // filter: blur(1.5em)
+ *     superBlurred = css.$class({ filter: css.blur(1.5)})
+ * }
+ * ```
+ *
+ * @param r Radius of the blur.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function blur( r: Extended<CssLength>): IFilterProxy
 {
-    return () => f2s( "", [[r, WKF.Length]]);
+    return () => f2s( "blur", [[r, WKF.Length]]);
 }
 
 
 
 /**
- * Returns an IFilterProxy function representing the `dropShadow()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `dropShadow()` CSS function.
+ *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: drop-shadow(30px 10px 4px blue)
+ *     blurredShadow = css.$class({ filter: css.dropShadow( 30, 10, "blue", 4)})
+ *
+ *     // filter: drop-shadow(2.5em -1.5em green)
+ *     sharpShadow = css.$class({ filter: css.dropShadow( 2.5, -1.5, "green")})
+ *
+ *     // filter: drop-shadow(0 0 20px orange)
+ *     haloShadow = css.$class({ filter: css.dropShadow( 0, 0, "orange", 20px)})
+ * }
+ * ```
+ *
  * @param x Horizontal offset of the shadow.
  * @param y Vertical offset of the shadow.
- * @param color Color of the shadow.
- * @param blur Value of the shadow's blurring. The default value is 1 pixel.
+ * @param color Color of the shadow. If undefined, the color of the shadow is taken from the color
+ * property.
+ * @param blur Value of the shadow's blurring. If undefined, the shadow will be sharp (not blurred).
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  *
  * @category Filter
  */
@@ -446,19 +601,35 @@ export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
     color?: Extended<CssColor>, blur?: Extended<CssLength>): IFilterProxy
 {
     return () => f2s( "drop-shadow", [[x, WKF.Length], [y, WKF.Length],
-        [color, WKF.Color], [blur, WKF.Length]]);
+        [color, WKF.Color], [blur, WKF.Length]], " ");
 }
 
 
 
 /**
- * Returns an IFilterProxy function representing the `hue-rotate()` CSS function.
+ * Returns an [[IFilterProxy]] function representing the `hue-rotate()` CSS function.
  *
+ * **Example**
+ *
+ * ```tsx
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // filter: hue-rotate(90deg)
+ *     toTheRight = css.$class({ filter: css.hueRotate(90)})
+ *
+ *     // filter: hue-rotate(-0.25turn)
+ *     toTheLeft = css.$class({ filter: css.blur(-0.25)})
+ * }
+ * ```
+ *
+ * @param a The relative change in hue of the input sample.
+ * @returns The `IFilterProxy` callable interface that distinguishes filter functions from other
+ * CSS functions
  * @category Filter
  */
 export function hueRotate( a: Extended<CssAngle>): IFilterProxy
 {
-    return () => f2s( "", [[a, WKF.Angle]]);
+    return () => f2s( "hue-rotate", [[a, WKF.Angle]]);
 }
 
 
