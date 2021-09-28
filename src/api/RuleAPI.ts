@@ -3,7 +3,7 @@ import {
     CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule,
     IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule,
-    IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition
+    IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, CombinedClassStyleset
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
@@ -192,7 +192,7 @@ export function $abstract( styleset: CombinedStyleset): IStyleRule
  * @returns `IClassRule` object that should be used for getting the class name and for accessing
  * the style properties if needed.
  */
-export function $class( styleset?: CombinedStyleset, nameOverride?: string | IClassRule): IClassRule
+export function $class( styleset?: CombinedClassStyleset, nameOverride?: string | IClassRule): IClassRule
 {
 	return new ClassRule( styleset, nameOverride);
 }

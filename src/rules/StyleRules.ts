@@ -1,8 +1,8 @@
-import {CssSelector} from "../api/CoreTypes"
 import {
-    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule
+    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IClassNameRule
 } from "../api/RuleTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
+import {CssSelector, OneOrMany} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, symValueToString} from "../impl/Utils";
 import {
@@ -130,7 +130,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 						() => selector2s( tuple[0]) + propName, undefined, tuple[1], this));
 				}
 			}
-			else
+			else if (this.processStylesetProp( propName, propVal))
 			{
 				// this is a regular CSS property: copy the property value to our internal styleset
 				this.styleset[propName] = propVal;
@@ -290,6 +290,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	// Returns the selector part of the style rule.
 	protected abstract getSelectorString(): string;
+
+    // Allows the derived classes to process style properties that the StyleRule doesn't know about.
+    // If false is returned, the property with the given name will not be added to the styleset.
+	protected processStylesetProp( propName: string, propVal: any): boolean { return true; }
 
 
 
@@ -472,11 +476,6 @@ class DependentRule extends StyleRule
  */
 export class AbstractRule extends StyleRule
 {
-	public constructor( style?: CombinedStyleset)
-	{
-		super( style);
-	}
-
 	// Creates a copy of the rule.
 	public cloneObject(): AbstractRule
 	{
@@ -560,9 +559,33 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
  */
 export class ClassRule extends NamedStyleRule implements IClassRule
 {
-	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
+    // Allows the derived classes to process style properties that the StyleRule doesn't know about.
+    // If returns false, the property with the given name will not be added to the styleset.
+	protected processStylesetProp( propName: string, propVal: any): boolean
+    {
+        if (propName == "++")
+        {
+            let rules = propVal as OneOrMany<IClassRule | IClassNameRule | string>;
+            if (rules)
+                this.derivedClassRules = Array.isArray(rules) ? rules : [rules];
+
+                return false;
+        }
+        else
+            return super.processStylesetProp( propName, propVal);
+    }
+
+	// Post-processes the given rule.
+	public postProcess(): void
 	{
-		super( style, nameOverride);
+        // by now our name and cssName properties have been set to reflect a single name. Now
+        // look at the "++" property and if defined, take names from the referenced class rules
+        // and append them to the name.
+        if (this.derivedClassRules)
+        {
+            this.name += " " + this.derivedClassRules.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
+            this.cssName += "." + this.derivedClassRules.map( cls => typeof cls === "string" ? cls : cls.name).join(".");
+        }
 	}
 
 	/** Name of the class prefixed with "." */
@@ -577,6 +600,9 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 	// Returns prefix that is put before the entity name to create a CSS name used in style rule
 	// selectors.
 	protected get cssPrefix(): string { return "."; }
+
+    // remembered value of the "++" property of the input styleset
+    private derivedClassRules?: (IClassRule | IClassNameRule | string)[];
 }
 
 
@@ -586,11 +612,6 @@ export class ClassRule extends NamedStyleRule implements IClassRule
  */
 export class IDRule extends NamedStyleRule implements IIDRule
 {
-	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
-	{
-		super( style, nameOverride);
-	}
-
 	/** Name of the element ID prefixed with "#" */
 	public get cssIDName(): string { return this.cssName; }
 

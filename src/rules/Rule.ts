@@ -69,6 +69,13 @@ export abstract class RuleLike
 		this.ruleName = ruleName;
 	}
 
+	// Ppost-processes the rule. This method is invoked after all rules in the style definition
+    // have been processed. This allows rules depend on other rules within the same style
+    // definition file irregardless of the rules order. By the time this method is invoked, the
+    // process method has been invoked for all rules and all the named rules have been assigned
+    // their names.
+	public postProcess(): void {}
+
 	// Creates a copy of the rule.
 	public abstract clone(): RuleLike;
 

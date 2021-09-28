@@ -61,6 +61,63 @@ export type CombinedStyleset = Styleset &
 
 
 /**
+ * The `CombinedClassStyleset` type extends the CombinedStyleset type with the "++" property, which
+ * allows combining multiple class rules. Note that the "+" (single plus) property allows deriving
+ * from any base style rules (not necessarily classes) and the style properties from the base rules
+ * are simply copied to the new rule. Additionally, even if class rules were among the base rules,
+ * the names of the base classes are lost.
+ *
+ * The "++" (double plus) property is different and it only applies to class rules and only allows
+ * deriving from class rules. The style properties from the base classes are not copied to the new
+ * rule; instead, the name of the new class becomes a concatenation of the new rule name and the
+ * names of all base classes.
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     redFG = css.$class({ color: "red" })
+ *     whiteBG = css.$class({ backgroundColor: "white" })
+ *
+ *     emphasized = css.$class({
+ *         "++": [this.redFG, this.whiteBG],
+ *         fontWeight: 700
+ *     })
+ * }
+ * ```
+ *
+ * This will translate to the following CSS (in reality, class names are auto-generated):
+ *
+ * ```css
+ * .redFG { color: red; }
+ * .whiteBG { backgroundColor: white; }
+ * .emphasized.redFG.whiteBG { fontWeight: 700; }
+ * ```
+ *
+ * Note that when the MyStyles is activated and the emphasized property is applied to an element,
+ * the class name will be not just "emphasized", but "emphasized redFG whiteBG". That is, the
+ * following rendering function
+ *
+ * ```typescript
+ * let styles = css.activate(MyStyles);
+ * render()
+ * {
+ *     return <div className={styles.emphasized.name}>Important stuff</div>
+ * }
+ * ```
+ *
+ * will generate the following HTML:
+ *
+ * ```html
+ * <div className="emphasized redFG whiteBG">Important stuff</div>
+```
+ */
+export type CombinedClassStyleset = CombinedStyleset &
+    { "++"?: OneOrMany<IClassRule | IClassNameRule | string> };
+
+
+
+
+/**
  * The AnimationStyleset type defines an object containing style properties for an animation frame.
  * Stylesets for keyframes allow custom properties (via "--") but don't allow dependent rules
  * (because dependent rules are actually separate CSS rules). Animation styleset can extend other
@@ -75,7 +132,7 @@ export type CombinedStyleset = Styleset &
  */
 export interface IRule
 {
-	/** SOM rule */
+	/** CSSOM rule */
 	readonly cssRule: CSSRule | null;
 }
 
@@ -117,7 +174,7 @@ export type DependentRules =
  */
 export interface IStyleRule extends IRule, IRuleWithSelector
 {
-	/** SOM style rule */
+	/** CSSOM style rule */
 	readonly cssRule: CSSStyleRule | null;
 
 	/**
@@ -236,7 +293,7 @@ export type AnimationFrame = [AnimationWaypoint, AnimationStyleset];
  */
 export interface IAnimationRule extends IRule, INamedEntity
 {
-	/** SOM keyframes rule */
+	/** CSSOM keyframes rule */
 	readonly cssRule: CSSKeyframesRule | null;
 
 	/** List of style rules representing animation frames */
@@ -251,7 +308,7 @@ export interface IAnimationFrameRule extends IStyleRule
 	/** Identifier of the waypoint */
 	readonly waypoint: AnimationWaypoint;
 
-	/** SOM keyframe rule */
+	/** CSSOM keyframe rule */
 	readonly cssKeyframeRule: CSSKeyframeRule;
 }
 
@@ -336,9 +393,9 @@ export interface ICounterRule extends INamedEntity
  */
 export interface ICounterStyleRule extends IRule, INamedEntity
 {
-	/** SOM counter-style rule */
-	// readonly cssRule: CSSCounterStyleRule | null;
+	/** CSSOM counter-style rule */
 	readonly cssRule: CSSRule | null;
+	// readonly cssRule: CSSCounterStyleRule | null;
 
     /**
      * Name of the counter style - this property returns the same value as the `name` property
@@ -357,7 +414,7 @@ export interface ICounterStyleRule extends IRule, INamedEntity
  */
 export interface IImportRule extends IRule
 {
-	/** SOM import rule */
+	/** CSSOM import rule */
 	readonly cssRule: CSSImportRule | null;
 }
 
@@ -369,7 +426,7 @@ export interface IImportRule extends IRule
  */
 export interface IFontFaceRule extends IRule
 {
-	/** SOM font-face rule */
+	/** CSSOM font-face rule */
 	readonly cssRule: CSSFontFaceRule | null;
 }
 
@@ -387,7 +444,7 @@ export interface INamespaceRule extends IRule
 	/** Optional prefix for the rule */
 	readonly prefix: string | undefined;
 
-	/** SOM namespace rule */
+	/** CSSOM namespace rule */
 	readonly cssRule: CSSNamespaceRule | null;
 }
 
@@ -402,7 +459,7 @@ export interface IPageRule extends IStyleRule
 	/** Optional name of the page pseudo style (e.g. "":first") */
 	readonly pseudoClass?: PagePseudoClass | undefined;
 
-	/** SOM page rule */
+	/** CSSOM page rule */
 	readonly cssRule: CSSPageRule | null;
 }
 
@@ -502,7 +559,7 @@ export interface IGroupRule<T extends IStyleDefinition = any> extends IRule
 	// Instance of the style definition class defining the rules under this grouping rule
 	readonly rules: T;
 
-	/** SOM supports rule */
+	/** CSSOM grouping rule */
 	readonly cssRule: CSSGroupingRule | null;
 }
 
@@ -517,7 +574,7 @@ export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupR
 	/** Flag indicated whether the browser supports this rule's query */
     readonly isSupported: boolean;
 
-	/** SOM supports rule */
+	/** CSSOM supports rule */
 	readonly cssRule: CSSSupportsRule | null;
 }
 
@@ -535,7 +592,7 @@ export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule
      */
     readonly mql: MediaQueryList;
 
-    /** SOM media rule */
+    /** CSSOM media rule */
 	readonly cssRule: CSSMediaRule | null;
 }
 

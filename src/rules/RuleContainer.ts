@@ -71,10 +71,24 @@ class RuleContainer implements ITopLevelRuleContainer
 		this.vars = [];
 		this.refs = [];
 		this.otherRules = [];
+		this.ruleLikes = [];
 
 		// loop over the properties of the definition object and process them.
 		for( let propName in this.instance)
 			this.processProperty( propName, this.instance[propName]);
+
+        // loop over rules and rule-like objects and call the postProcess method, which allows
+        // them to connect to other rules.
+        for( let rule of this.imports)
+            rule.postProcess();
+        for( let rule of this.namespaces)
+            rule.postProcess();
+        for( let rule of this.vars)
+            rule.postProcess();
+        for( let rule of this.otherRules)
+            rule.postProcess();
+        for( let rule of this.ruleLikes)
+            rule.postProcess();
 	}
 
 
@@ -130,6 +144,7 @@ class RuleContainer implements ITopLevelRuleContainer
             ruleLike = ruleLike.clone();
 
         ruleLike.process( this, this.topLevelContainer, propName);
+		this.ruleLikes.push( ruleLike);
 	}
 
 
@@ -392,6 +407,9 @@ class RuleContainer implements ITopLevelRuleContainer
 
 	// List of rules that are not imports, namespaces, custom vars, references or grouping rules.
 	private otherRules: Rule[];
+
+	// List of rule-like objects.
+	private ruleLikes: RuleLike[];
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
 	private cssCustomVarStyleRule: CSSStyleRule | null;
