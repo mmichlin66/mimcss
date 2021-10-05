@@ -1,7 +1,7 @@
 import { ExtendedCounterStyleset } from "../api/CounterTypes";
 import {ICounterRule, ICounterStyleRule} from "../api/RuleTypes"
 import { counterStyleset2s } from "../impl/MiscImpl";
-import {createNames, IRuleContainer, IRuleSerializationContext, ITopLevelRuleContainer, Rule, RuleLike} from "./Rule";
+import {createName, IRuleContainer, IRuleSerializationContext, ITopLevelRuleContainer, Rule, RuleLike} from "./Rule";
 
 
 
@@ -29,7 +29,7 @@ export class CounterRule extends RuleLike implements ICounterRule
 	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
         super.process( container, ownerContainer, ruleName);
-		[this.name] = createNames( ownerContainer, ruleName, this.nameOverride);
+		this.name = createName( ownerContainer, ruleName, this.nameOverride);
 	}
 
 
@@ -87,7 +87,7 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
         super.process( container, ownerContainer, ruleName);
-		[this.name] = createNames( ownerContainer, ruleName, this.nameOverride);
+		this.name = createName( ownerContainer, ruleName, this.nameOverride);
 	}
 
 	// Creates a copy of the rule.

@@ -3,7 +3,7 @@ import {
 } from "../api/RuleTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {CssSelector, OneOrMany} from "../api/CoreTypes"
-import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule";
+import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, symValueToString} from "../impl/Utils";
 import {
     mergeStylesets, styleset2s, styleProp2s, mergeStylesetCustomProps, selector2s,
@@ -514,7 +514,8 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 	{
 		super.process( container, ownerContainer, ruleName);
 
-		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride, this.cssPrefix);
+		this.name = createName( ownerContainer, ruleName, this.nameOverride);
+        this.cssName = this.cssPrefix + this.name.replace( / /g, this.cssPrefix);
 	}
 
 	// Returns the selector part of the style rule.
@@ -569,7 +570,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
             if (rules)
                 this.derivedClassRules = Array.isArray(rules) ? rules : [rules];
 
-                return false;
+            return false;
         }
         else
             return super.processStylesetProp( propName, propVal);
@@ -584,7 +585,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         if (this.derivedClassRules)
         {
             this.name += " " + this.derivedClassRules.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
-            this.cssName += "." + this.derivedClassRules.map( cls => typeof cls === "string" ? cls : cls.name).join(".");
+            this.cssName = "." + this.name.replace( / /g, ".");
         }
 	}
 

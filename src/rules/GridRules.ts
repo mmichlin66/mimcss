@@ -1,5 +1,5 @@
 import {IGridLineRule, IGridAreaRule} from "../api/RuleTypes"
-import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import {createName, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
 
@@ -44,7 +44,7 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
         else
         {
-            [this.name] = createNames( ownerContainer, ruleName, this.nameOverride);
+            this.name = createName( ownerContainer, ruleName, this.nameOverride);
 
             // if the obtained name doesn't have "-start" or "-end" but the isStartEndOrNone flag is
             // defined (that is, it is either start or end line), we need to append the suffix. If the
@@ -137,7 +137,7 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
 	{
         super.process( container, ownerContainer, ruleName);
 
-        [this.name] = createNames( ownerContainer, ruleName, this.nameOverride);
+        this.name = createName( ownerContainer, ruleName, this.nameOverride);
 
         // process line rules
         this.startLine.process( container, ownerContainer, null);

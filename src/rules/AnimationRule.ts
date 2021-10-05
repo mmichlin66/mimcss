@@ -1,5 +1,5 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "../api/RuleTypes"
-import {Rule, ITopLevelRuleContainer, createNames, IRuleContainer, IRuleSerializationContext} from "./Rule"
+import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule"
 import {StyleRule} from "./StyleRules";
 import {v2s} from "../impl/Utils";
 
@@ -30,7 +30,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 	{
 		super.process( container, ownerContainer, ruleName);
 
-		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride);
+		this.name = createName( ownerContainer, ruleName, this.nameOverride);
 
 		for( let keyframeRule of this.frameRules)
 			keyframeRule.process( container, ownerContainer, ruleName);
@@ -101,13 +101,6 @@ export class AnimationRule extends Rule implements IAnimationRule
 	 * properties (--).
 	 */
 	public name: string;
-
-	/**
-	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
-	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
-	 * `name` property.
-	 */
-	public cssName: string;
 
 	/** List of style rules representing animation frames */
 	public frameRules: AnimationFrameRule[];

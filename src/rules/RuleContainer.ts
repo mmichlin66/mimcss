@@ -1,5 +1,5 @@
 import {IStyleDefinition, IStyleDefinitionClass, NameGenerationMethod} from "../api/RuleTypes"
-import {StyleDefinition} from "../api/RuleAPI"
+import {StyleDefinition, ThemeDefinition} from "../api/RuleAPI"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
@@ -18,6 +18,14 @@ const symInstance = Symbol("symInstance");
  * responsible for processing rules.
  */
 const symContainer = Symbol("symContainer");
+
+
+
+/**
+ * Element that is created at the top of the "<head>" element before any theme is activated. When
+ * themes are activated, their '<style>' elements are created before this element.
+ */
+let themePlaceholderElement: Element;
 
 
 
@@ -234,29 +242,29 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
-	public insertRules( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insertRules( container: CSSStyleSheet | CSSGroupingRule): void
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
-		if (parent instanceof CSSStyleSheet)
+		if (container instanceof CSSStyleSheet)
 		{
-			this.imports && this.imports.forEach( rule => rule.insert( parent));
-			this.namespaces && this.namespaces.forEach( rule => rule.insert( parent));
+			this.imports && this.imports.forEach( rule => rule.insert( container));
+			this.namespaces && this.namespaces.forEach( rule => rule.insert( container));
 		}
 
 		// activate referenced style definitions
 		for( let ref of this.refs)
-			ref[symContainer].activate();
+			ref[symContainer].activate( this.domStyleElm);
 
-		// isert our custom variables in a ":root" rule
+		// insert our custom variables in a ":root" rule
 		if (this.vars.length > 0)
 		{
 			this.cssCustomVarStyleRule = Rule.addRuleToDOM( `:root {${this.vars.map( varObj =>
-				varObj.toCssString()).filter( v => !!v).join(";")}}`, parent) as CSSStyleRule;
+				varObj.toCssString()).filter( v => !!v).join(";")}}`, container) as CSSStyleRule;
 		}
 
 		// insert all other rules
-		this.otherRules.forEach( rule => rule.insert( parent));
+		this.otherRules.forEach( rule => rule.insert( container));
 	}
 
 
@@ -282,38 +290,65 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 
-	/** Inserts this stylesheet into DOM. */
-	public activate(): void
+    /**
+     * Inserts this stylesheet into DOM.
+     *
+     * @param insertBefore Optional HTML element before which the new '<style>' element should be
+     * inserted. If not specified, the new element will be inserted as the last element under the
+     * '<head>' element.
+     */
+	public activate( insertBefore: Element | null = null): void
 	{
-		if (++this.activationRefCount === 1)
-		{
-			// only the top-level not-embedded style definitions create the `<style>` element
-			if (this.isTopLevel)
-			{
-                if (this.embeddingContainer)
-                    this.domStyleElm = this.embeddingContainer.domStyleElm;
-                else
-                {
-                    this.domStyleElm = document.createElement( "style");
-                    this.domStyleElm.id = this.name;
-                    document.head.appendChild( this.domStyleElm);
-                }
-            }
-			else
-				this.domStyleElm = this.topLevelContainer.domStyleElm;
+		if (++this.activationRefCount > 1)
+            return;
 
-			this.insertRules( this.domStyleElm!.sheet as CSSStyleSheet);
-		}
-	}
+        // only the top-level not-embedded style definitions create the `<style>` element
+        if (this.isTopLevel)
+        {
+            if (this.embeddingContainer)
+                this.domStyleElm = this.embeddingContainer.domStyleElm;
+            else
+            {
+                // themes are inserted before the special placeholder element, which is created
+                // at the top of the '<head>' element
+                if (this.instance instanceof ThemeDefinition)
+                {
+                    if (!themePlaceholderElement)
+                    {
+                        themePlaceholderElement = document.createElement( "style");
+                        themePlaceholderElement.id = generateUniqueName( "themePlaceholderElement_");
+                        document.head.insertBefore( themePlaceholderElement, document.head.firstElementChild);
+                    }
+
+                    insertBefore = themePlaceholderElement;
+                }
+
+                this.domStyleElm = document.createElement( "style");
+                this.domStyleElm.id = generateUniqueName( this.name + "_");
+                document.head.insertBefore( this.domStyleElm, insertBefore);
+            }
+        }
+        else
+            this.domStyleElm = this.topLevelContainer.domStyleElm;
+
+        this.insertRules( this.domStyleElm!.sheet as CSSStyleSheet);
+    }
 
 
 
 	/** Removes this stylesheet from DOM. */
 	public deactivate(): void
 	{
-		// guard from extra deactivate calls
+
+        // guard from extra deactivate calls
 		if (this.activationRefCount === 0)
+        {
+            /// #if DEBUG
+                console.error( `Extra call to deactivate() for style definition class '${this.name}'`);
+            /// #endif
+
 			return;
+        }
 
 		if (--this.activationRefCount === 0)
 		{
@@ -357,7 +392,8 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Flag indicating whether this container is for the top-level style definition.
-	private get isTopLevel(): boolean { return this.owner === null || this.owner === this.instance }
+	// private get isTopLevel(): boolean { return this.owner === null || this.owner === this.instance; }
+	private get isTopLevel(): boolean { return !this.parent; }
 
 
 
@@ -499,7 +535,7 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
 
 	// loop over prototypes
     for( let baseClass = Object.getPrototypeOf( definitionClass);
-            baseClass !== StyleDefinition;
+            baseClass !== StyleDefinition && baseClass !== ThemeDefinition;
                 baseClass = Object.getPrototypeOf( baseClass))
 	{
 		// check if the base class already has an associated instance; if yes, check whether
@@ -570,7 +606,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
     // for these classes because derived classes will have all the rules from all the base classes
     // as their own and so these rules will be activated as part of the derived class.
     let baseClass = Object.getPrototypeOf( definitionClass);
-    if (baseClass !== StyleDefinition)
+    if (baseClass !== StyleDefinition && baseClass !== ThemeDefinition)
 		processClass( baseClass, parent);
 
 	try

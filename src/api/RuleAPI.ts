@@ -27,88 +27,88 @@ import {a2s, v2s} from "../impl/Utils";
  * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
  * property when processing the rules in the style definition object.
  */
- const symParent = Symbol("parent");
+const symParent = Symbol("parent");
 
 
 
- /**
-  * Symbol that is used by the `$owner` property in the StyleDefinition class that keeps reference
-  * to the top-level style definition class. Developers can use this property to access rules in
-  * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$owner`
-  * property when processing the rules in the style definition object.
-  */
- const symOwner = Symbol("owner");
+/**
+ * Symbol that is used by the `$owner` property in the StyleDefinition class that keeps reference
+ * to the top-level style definition class. Developers can use this property to access rules in
+ * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$owner`
+ * property when processing the rules in the style definition object.
+ */
+const symOwner = Symbol("owner");
 
 
 
- /**
-  * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
-  * Style definition classes are regular TypeScript classes and as such can have any fields and
-  * methods - both instance and static. Normally, however, they contain instance properties
-  * initialized with functions returning style rules and at-rules, such as [[$class]],
-  * [[$tag]], [[$media]], [[$counter]] and others.
-  *
-  * **Examples**
-  *
-  * ```typescript
-  * // top-level style definition class
-  * class MyStyles extends css.StyleDefinition
-  * {
-  *     cls = css.$class({ color: "red"})
-  *
-  *     // using style-definition class for @media rule
-  *     ifNarrowScreen = css.$media( { maxWidth: 800 },
-  *         class extends css.StyleDefinition<MyStyles>
-  *         {
-  *             cls = css.$class({ color: "pink"})
-  *         }
-  *     )
-  * }
-  * ```
-  *
-  * @typeparam P Parent style definition class. Parent of a top-level class is null.
-  * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
-  * class is its own owner.
-  */
- export abstract class StyleDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
+/**
+ * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
+ * Style definition classes are regular TypeScript classes and as such can have any fields and
+ * methods - both instance and static. Normally, however, they contain instance properties
+ * initialized with functions returning style rules and at-rules, such as [[$class]],
+ * [[$tag]], [[$media]], [[$counter]] and others.
+ *
+ * **Examples**
+ *
+ * ```typescript
+ * // top-level style definition class
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     cls = css.$class({ color: "red"})
+ *
+ *     // using style-definition class for @media rule
+ *     ifNarrowScreen = css.$media( { maxWidth: 800 },
+ *         class extends css.StyleDefinition<MyStyles>
+ *         {
+ *             cls = css.$class({ color: "pink"})
+ *         }
+ *     )
+ * }
+ * ```
+ *
+ * @typeparam P Parent style definition class. Parent of a top-level class is null.
+ * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
+ * class is its own owner.
+ */
+export abstract class StyleDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
     implements IStyleDefinition<P,O>
- {
-     /**
-      * Style definition instances are created directly only by the *styled components* - that is,
-      * components that use different styles for each instance. Otherwise, style definition
-      * instances are created when either the [[$use]] or [[activate]] function is called.
-      * @param parent Reference to the parent style definition class
-      */
-     public constructor( parent?: P)
-     {
-         this[symParent] = parent;
+{
+    /**
+     * Style definition instances are created directly only by the *styled components* - that is,
+     * components that use different styles for each instance. Otherwise, style definition
+     * instances are created when either the [[$use]] or [[activate]] function is called.
+     * @param parent Reference to the parent style definition class
+     */
+    public constructor( parent?: P)
+    {
+        this[symParent] = parent;
 
-         // Owner is taken from the parent class; a top-level class is its own owner.
-         this[symOwner] = parent ? parent.$owner : this;
-     }
+        // Owner is taken from the parent class; a top-level class is its own owner.
+        this[symOwner] = parent ? parent.$owner : this;
+    }
 
-     /**
-      * Refers to the instance of the style definition class which is the parnt of this style
-      * definition object in the chain of style definition classes. Through this member, all rules
-      * and other members defined in the parent definition class can be accessed. For top-level
-      * style definitions, this property is always undefined. This property can also be undefined
-      * if it was not provided to the constructor when creating the style definition class manually.
-      */
-     public get $parent(): P | undefined { return this[symParent]; }
+    /**
+     * Refers to the instance of the style definition class which is the parnt of this style
+     * definition object in the chain of style definition classes. Through this member, all rules
+     * and other members defined in the parent definition class can be accessed. For top-level
+     * style definitions, this property is always undefined. This property can also be undefined
+     * if it was not provided to the constructor when creating the style definition class manually.
+     */
+    public get $parent(): P | undefined { return this[symParent]; }
 
-     /**
-      * Refers to the instance of the style definition class which is the owner of
-      * this style definition object. The owner is the top-level class in the chain of style
-      * definition classes. Through this member, all rules and other members defined in the owner
-      * definition class can be accessed. For top-level style definitions, this property points
-      * to itself.
-      */
-     public get $owner(): O | undefined { return this[symOwner]; }
- }
+    /**
+     * Refers to the instance of the style definition class which is the owner of
+     * this style definition object. The owner is the top-level class in the chain of style
+     * definition classes. Through this member, all rules and other members defined in the owner
+     * definition class can be accessed. For top-level style definitions, this property points
+     * to itself.
+     */
+    public get $owner(): O | undefined { return this[symOwner]; }
+}
 
 
 
- /**
+/**
  * Creates a new abstract rule, which defines a styleset that can be extended by other style rules.
  * Abstract rules don't have selectors and are not inserted into the DOM. Abstract rules can
  * themselves extend other rules - both abstract and non-abstract.
@@ -210,15 +210,11 @@ export function $class( styleset?: CombinedClassStyleset, nameOverride?: string 
  * class MyStyles extends css.StyleDefinition
  * {
  *     // declare class - just to be used later
- *     spaced = css.class()
+ *     spaced = css.class({gap: 8})
  *
  *     vbox = css.$class({
  *         display: "flex",
- *         flexDirection: "column",
- *         alignItems: "center",
- *         "&": [
- *             [this.spaced, {gap: 8}]
- *         ]
+ *         flexDirection: "column"
  *     })
  *
  *     // use $classname rule to combine the names of classes vbox and spaced
@@ -237,10 +233,11 @@ export function $class( styleset?: CombinedClassStyleset, nameOverride?: string 
  * }
  * ```
  *
- * @param ...classes List of class names specified either as a string or `IClassRule` objects.
+ * @param ...classes List of class names specified either as a string or [[IClassRule]] or
+ * [[IClassNameRule]] objects.
  * @returns `IClassNameRule` object whose `name` property contains the combined class name, e.g.
  * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
- * `"".class1.class2"`.
+ * `".class1.class2"`.
  */
 export function $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
 {
@@ -1007,9 +1004,9 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
 export function virtual( target: any, name: string): void
 {
     // symbol to keep the proxy handler value
-    let sym = Symbol(name + "_proxy_handler");
+    let sym = Symbol(name);
 
-    Object.defineProperty( target, name, {
+    Object.defineProperty( target.constructor.prototype, name, {
         enumerable: true,
         get()
         {
@@ -1037,7 +1034,7 @@ export function virtual( target: any, name: string): void
             if (!handler)
             {
                 this[sym] = handler = new VirtHandler();
-                handler.proxy = newTarget == null ? {} : new Proxy( newTarget, handler);
+                handler.proxy = new Proxy( newTarget == null ? {} : newTarget, handler);
             }
 
             // set the new vaules to the handler so that it will use it from now on
@@ -1071,7 +1068,7 @@ function getProxiableObject( v: any): [any, boolean]
         return [new Boolean(v), true];
     else if (typeof v === "symbol")
         return [new Object(v), true];
-    else if (typeof v === "object" && (v instanceof Map || v instanceof Set))
+    else if (v instanceof Map || v instanceof Set || v instanceof Array)
         return [v, true];
     else
         return [v, false];
@@ -1136,6 +1133,61 @@ class VirtHandler implements ProxyHandler<any>
         { return this.target.apply( this, args); }
     construct(t: any, args: any, newTarget?: any): object
         { return Reflect.construct( this.target, args, newTarget); }
+}
+
+
+
+/**
+ * Symbol used in the ThemeDefinition classes for the array that collects names of properties,
+ * which are considered "own" properties of the class.
+ */
+let symKeys = Symbol("keys");
+
+
+
+/**
+ * The `ThemeDefinition` class is a base for all classes that define themes. In addition to
+ * being a style definition class, themes provide some extra capabilities related to style
+ * inheritance and theme activation.
+ *
+ * @typeparam P Parent style definition class. Parent of a top-level class is null.
+ * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
+ * class is its own owner.
+ */
+export abstract class ThemeDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
+    extends StyleDefinition<P,O>
+{
+    constructor( parent?: P)
+    {
+        super(parent);
+        this[symKeys] = [];
+
+        // instead of returning an instance of our class, the constructor returns a proxy where
+        // both the target and the handler are our own instance. This allows creating proxies for
+        // all properties defined in the class, which is needed for proper use and overriding.
+        return new Proxy<ThemeDefinition<P,O>>( this, this);
+    }
+
+    set( t: any, p: PropertyKey, v: any, r: any): boolean
+    {
+        if (typeof p === "symbol" || typeof p === "number" || t[p] !== undefined)
+            return Reflect.set( t, p, v, r);
+        else
+        {
+            if (!Array.isArray(v))
+                virtual( t, p);
+
+            t[p] = v;
+            this[symKeys].push(p);
+            return true;
+        }
+    }
+
+    ownKeys(t: any): ArrayLike<string | symbol>
+    {
+        // return Reflect.ownKeys( t.constructor.prototype).filter( n => n !== "constructor");
+        return this[symKeys];
+    }
 }
 
 

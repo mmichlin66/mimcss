@@ -1,7 +1,7 @@
 import {IVarRule, IConstRule} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue} from "../api/StyleTypes"
 import {styleProp2s} from "../impl/StyleImpl"
-import {createNames, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import {createName, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
 
@@ -31,7 +31,8 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
 		super.process( container, ownerContainer, ruleName);
-		[this.name, this.cssName] = createNames( ownerContainer, ruleName, this.nameOverride, "--");
+		this.name = createName( ownerContainer, ruleName, this.nameOverride);
+        this.cssName = "--" + this.name;
 	}
 
 
