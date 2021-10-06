@@ -20,9 +20,9 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string)
 	{
-		super.process( container, ownerContainer, ruleName);
+		super.process( container, topLevelContainer, ruleName);
 
         // container to which our groupng rule belongs becomes the parent container for the
         // style definition instance

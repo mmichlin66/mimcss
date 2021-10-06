@@ -32,16 +32,6 @@ const symParent = Symbol("parent");
 
 
 /**
- * Symbol that is used by the `$owner` property in the StyleDefinition class that keeps reference
- * to the top-level style definition class. Developers can use this property to access rules in
- * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$owner`
- * property when processing the rules in the style definition object.
- */
-const symOwner = Symbol("owner");
-
-
-
-/**
  * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
  * Style definition classes are regular TypeScript classes and as such can have any fields and
  * methods - both instance and static. Normally, however, they contain instance properties
@@ -67,11 +57,8 @@ const symOwner = Symbol("owner");
  * ```
  *
  * @typeparam P Parent style definition class. Parent of a top-level class is null.
- * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
- * class is its own owner.
  */
-export abstract class StyleDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
-    implements IStyleDefinition<P,O>
+export abstract class StyleDefinition<P extends StyleDefinition = any> implements IStyleDefinition<P>
 {
     /**
      * Style definition instances are created directly only by the *styled components* - that is,
@@ -82,9 +69,6 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
     public constructor( parent?: P)
     {
         this[symParent] = parent;
-
-        // Owner is taken from the parent class; a top-level class is its own owner.
-        this[symOwner] = parent ? parent.$owner : this;
     }
 
     /**
@@ -95,15 +79,6 @@ export abstract class StyleDefinition<P extends StyleDefinition = any, O extends
      * if it was not provided to the constructor when creating the style definition class manually.
      */
     public get $parent(): P | undefined { return this[symParent]; }
-
-    /**
-     * Refers to the instance of the style definition class which is the owner of
-     * this style definition object. The owner is the top-level class in the chain of style
-     * definition classes. Through this member, all rules and other members defined in the owner
-     * definition class can be accessed. For top-level style definitions, this property points
-     * to itself.
-     */
-    public get $owner(): O | undefined { return this[symOwner]; }
 }
 
 
@@ -1151,11 +1126,8 @@ let symKeys = Symbol("keys");
  * inheritance and theme activation.
  *
  * @typeparam P Parent style definition class. Parent of a top-level class is null.
- * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
- * class is its own owner.
  */
-export abstract class ThemeDefinition<P extends StyleDefinition = any, O extends StyleDefinition = any>
-    extends StyleDefinition<P,O>
+export abstract class ThemeDefinition<P extends StyleDefinition = any> extends StyleDefinition<P>
 {
     constructor( parent?: P)
     {
@@ -1165,7 +1137,7 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any, O extends
         // instead of returning an instance of our class, the constructor returns a proxy where
         // both the target and the handler are our own instance. This allows creating proxies for
         // all properties defined in the class, which is needed for proper use and overriding.
-        return new Proxy<ThemeDefinition<P,O>>( this, this);
+        return new Proxy<ThemeDefinition<P>>( this, this);
     }
 
     set( t: any, p: PropertyKey, v: any, r: any): boolean

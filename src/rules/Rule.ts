@@ -62,10 +62,10 @@ export interface ITopLevelRuleContainer extends IRuleContainer
 export abstract class RuleLike
 {
 	// Processes the rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
         this.container = container;
-		this.ownerContainer = ownerContainer;
+		this.topLevelContainer = topLevelContainer;
 		this.ruleName = ruleName;
 	}
 
@@ -79,15 +79,17 @@ export abstract class RuleLike
 	// Creates a copy of the rule.
 	public abstract clone(): RuleLike;
 
+
+
+	// Rule container to which this rule belongs.
+	public container: IRuleContainer;
+
 	// Container at the top of the chain of containers to which this rule belongs.
-	public ownerContainer: ITopLevelRuleContainer;
+	public topLevelContainer: ITopLevelRuleContainer;
 
 	// Name of the property of the stylesheet definition to which this rule was assigned. This can
 	// be null for rules not created via assignment to style definition properties.
 	public ruleName: string | null;
-
-	// Rule container to which this rule belongs.
-	public container: IRuleContainer;
 }
 
 
@@ -140,13 +142,14 @@ export abstract class Rule extends RuleLike implements IRule
 
 
 /** Creates scoped names based on the given parameters */
-export function createName( ownerContainer: ITopLevelRuleContainer, ruleName: string | null, nameOverride?: string | INamedEntity): string
+export function createName( topLevelContainer: ITopLevelRuleContainer, ruleName: string | null,
+    nameOverride?: string | INamedEntity): string
 {
 	if (!ruleName && !nameOverride)
 		return "";
 
 	return !nameOverride
-		? ownerContainer.getScopedRuleName( ruleName!)
+		? topLevelContainer.getScopedRuleName( ruleName!)
 		: typeof nameOverride === "string"
 			? nameOverride
 			: nameOverride.name;

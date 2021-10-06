@@ -224,9 +224,9 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, ownerContainer, ruleName);
+        super.process( container, topLevelContainer, ruleName);
 
         this.name = this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
         this.cssClassName = "." + this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(".");

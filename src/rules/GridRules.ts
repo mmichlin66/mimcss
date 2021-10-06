@@ -26,9 +26,9 @@ export class GridLineRule extends RuleLike implements IGridLineRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, ownerContainer, ruleName);
+        super.process( container, topLevelContainer, ruleName);
 
         let nameOverride = this.nameOverride;
         if (nameOverride instanceof GridLineRule)
@@ -44,7 +44,7 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
         else
         {
-            this.name = createName( ownerContainer, ruleName, this.nameOverride);
+            this.name = createName( topLevelContainer, ruleName, this.nameOverride);
 
             // if the obtained name doesn't have "-start" or "-end" but the isStartEndOrNone flag is
             // defined (that is, it is either start or end line), we need to append the suffix. If the
@@ -133,15 +133,15 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
     public toString(): string { return this.name; }
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, ownerContainer, ruleName);
+        super.process( container, topLevelContainer, ruleName);
 
-        this.name = createName( ownerContainer, ruleName, this.nameOverride);
+        this.name = createName( topLevelContainer, ruleName, this.nameOverride);
 
         // process line rules
-        this.startLine.process( container, ownerContainer, null);
-        this.endLine.process( container, ownerContainer, null);
+        this.startLine.process( container, topLevelContainer, null);
+        this.endLine.process( container, topLevelContainer, null);
 	}
 
 	// Creates a copy of the rule.

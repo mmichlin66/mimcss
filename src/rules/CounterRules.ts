@@ -26,10 +26,10 @@ export class CounterRule extends RuleLike implements ICounterRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, ownerContainer, ruleName);
-		this.name = createName( ownerContainer, ruleName, this.nameOverride);
+        super.process( container, topLevelContainer, ruleName);
+		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
 	}
 
 
@@ -84,10 +84,10 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, ownerContainer, ruleName);
-		this.name = createName( ownerContainer, ruleName, this.nameOverride);
+        super.process( container, topLevelContainer, ruleName);
+		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
 	}
 
 	// Creates a copy of the rule.

@@ -45,7 +45,6 @@ class RuleContainer implements ITopLevelRuleContainer
 
         this.definitionClass = instance.constructor as IStyleDefinitionClass;
         this.parent = instance.$parent;
-		this.owner = instance.$owner;
 		this.embeddingContainer = this.definitionClass[symEmbeddingContainer];
 
 		this.activationRefCount = 0;
@@ -63,12 +62,14 @@ class RuleContainer implements ITopLevelRuleContainer
 		// put reference to this container in the symbol property of the definition instance.
 		this.instance[symContainer] = this;
 
-		// get containers for the parent and owner style definition
+		// get parent and top level containers
         if (this.parent)
+        {
             this.parentContainer = this.parent[symContainer];
-
-		if (this.owner)
-			this.topLevelContainer = this.owner[symContainer];
+            this.topLevelContainer = this.parentContainer!.topLevelContainer;
+        }
+        else
+            this.topLevelContainer = this;
 
 		// if our container has parent container, prefix our name with the upper one
 		if (this.parentContainer)
@@ -162,7 +163,7 @@ class RuleContainer implements ITopLevelRuleContainer
 	{
 		// if the rule object is already processed as part of another instance, we create a clone
 		// of the rule and set it to our instance.
-		if (rule.ownerContainer)
+		if (rule.topLevelContainer)
 		{
 			if (propName)
 				this.instance[propName] = rule = rule.clone();
@@ -324,7 +325,7 @@ class RuleContainer implements ITopLevelRuleContainer
                 }
 
                 this.domStyleElm = document.createElement( "style");
-                this.domStyleElm.id = generateUniqueName( this.name + "_");
+                this.domStyleElm.id = this.name;
                 document.head.insertBefore( this.domStyleElm, insertBefore);
             }
         }
@@ -392,7 +393,6 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Flag indicating whether this container is for the top-level style definition.
-	// private get isTopLevel(): boolean { return this.owner === null || this.owner === this.instance; }
 	private get isTopLevel(): boolean { return !this.parent; }
 
 
@@ -419,11 +419,6 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Rule container that belongs to the parent style defintion. If our container is top-level,
 	// this property is undefined.
 	private parentContainer?: RuleContainer;
-
-	// Instance of the top-level style definition class in the chain of grouping rules that
-	// lead to this rule container. For top-level style definitions, this points to the same
-	// singleton definition instance as the 'instance' property.
-	private owner: StyleDefinition;
 
 	// Rule container that belongs to the owner style defintion. If our container is top-level,
 	// this property points to `this`. Names for named rules are created using this container.

@@ -7,6 +7,7 @@ describe("activation:", () =>
 	beforeEach(() =>
 	{
 		dom.removeAllStylesFromHead();
+        css.configNameGeneration( css.NameGenerationMethod.Scoped);
 	})
 
 

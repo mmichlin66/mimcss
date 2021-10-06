@@ -141,18 +141,18 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		super.process( container, ownerContainer, ruleName);
+		super.process( container, topLevelContainer, ruleName);
 
 		// if dependent rules exist, process them under the same container
 		for( let propName in this.dependentRules)
 		{
 			let propVal = this.dependentRules[propName];
 			if (Array.isArray(propVal) && propVal.length > 0)
-				propVal.forEach( (depRule: DependentRule) => depRule.process( container, ownerContainer, null));
+				propVal.forEach( (depRule: DependentRule) => depRule.process( container, topLevelContainer, null));
 			else
-				(propVal as DependentRule).process( container, ownerContainer, null);
+				(propVal as DependentRule).process( container, topLevelContainer, null);
 		}
 	}
 
@@ -510,11 +510,11 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string): void
 	{
-		super.process( container, ownerContainer, ruleName);
+		super.process( container, topLevelContainer, ruleName);
 
-		this.name = createName( ownerContainer, ruleName, this.nameOverride);
+		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
         this.cssName = this.cssPrefix + this.name.replace( / /g, this.cssPrefix);
 	}
 

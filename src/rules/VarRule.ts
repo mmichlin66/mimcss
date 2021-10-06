@@ -28,10 +28,10 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-		super.process( container, ownerContainer, ruleName);
-		this.name = createName( ownerContainer, ruleName, this.nameOverride);
+		super.process( container, topLevelContainer, ruleName);
+		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
         this.cssName = "--" + this.name;
 	}
 
@@ -142,9 +142,9 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ownerContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, ownerContainer, ruleName);
+        super.process( container, topLevelContainer, ruleName);
 
         if (!this.cachedValue)
 		    this.cachedValue = styleProp2s( this.template, this.value);

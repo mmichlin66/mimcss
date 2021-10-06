@@ -510,10 +510,8 @@ export interface IGridAreaRule extends INamedEntity
  * implemented by developers
  *
  * @typeparam P Parent style definition class. Parent of a top-level class is null.
- * @typeparam O Top-level style definition class, which is the owner of this class. The top-level
- * class is its own owner.
  */
-export interface IStyleDefinition<P extends IStyleDefinition = any, O extends IStyleDefinition = any>
+export interface IStyleDefinition<P extends IStyleDefinition = any>
 {
 	/**
 	 * Refers to the instance of the style definition class which is the parnt of this style
@@ -523,15 +521,6 @@ export interface IStyleDefinition<P extends IStyleDefinition = any, O extends IS
      * if it was not provided to the constructor when creating the style definition class manually.
 	 */
 	readonly $parent: P | undefined;
-
-	/**
-	 * Refers to the instance of the style definition class which is the owner of
-	 * this style definition object. The owner is the top-level class in the chain of style
-	 * definition classes. Through this member, all rules and other members defined in the owner
-	 * definition class can be accessed. For top-level style definitions, this property points
-     * to itself.
-	 */
-	readonly $owner: O | undefined;
 }
 
 
@@ -539,8 +528,8 @@ export interface IStyleDefinition<P extends IStyleDefinition = any, O extends IS
 /**
  * "Constructor" interface defining how style definition classes can be created.
  */
-export interface IStyleDefinitionClass<T extends IStyleDefinition<P,O> = any,
-    P extends IStyleDefinition = any, O extends IStyleDefinition = any>
+export interface IStyleDefinitionClass<T extends IStyleDefinition<P> = any,
+    P extends IStyleDefinition = any>
 {
 	/** All style definition classes should conform to this constructor */
 	new( parent?: P): T;
