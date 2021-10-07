@@ -64,10 +64,10 @@ export interface IGenericProxy<T extends string = any>
  * class MyStyles extends StyleDefinition
  * {
  *     // using `raw` function
- *     cls1 = css.$class({ border: css.raw`1px solid brown` })
+ *     cls1 = this.$class({ border: css.raw`1px solid brown` })
  *
  *     // using custom function
- *     cls2 = css.$class({ clip-path: randomCircle()})
+ *     cls2 = this.$class({ clip-path: randomCircle()})
  * }
  *
  * // create CSS circle function with random radius between 30 and 50 pixels
@@ -151,7 +151,7 @@ export type Extended<T> = T | ICustomVar<T> | IConstant<T> | IStringProxy | null
  * class MyStyles extends StyleDefinition
  * {
  *     // Equivalent to CSS: .cls1 { color: red; background-color: beige !important; }
- *     cls1 = css.$class({
+ *     cls1 = this.$class({
  *         color: "red",
  *         backgroundColor: { "!": "beige" }
  *     })
@@ -198,10 +198,10 @@ export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
  * class MyStyles extends css.StyleDefinition
  * {
  *     // single value
- *     cls1 = css.$class({ overflow: "auto" })
+ *     cls1 = this.$class({ overflow: "auto" })
 
  *     // two values
- *     cls2 = css.$class({ overflow: ["scroll", "hidden"] })
+ *     cls2 = this.$class({ overflow: ["scroll", "hidden"] })
  * }
  * ```
  */
@@ -221,16 +221,16 @@ export type OneOrPair<T> = T | [T, T?];
  * class MyStyles extends css.StyleDefinition
  * {
  *     // single value
- *     cls1 = css.$class({ margin: 4 })
+ *     cls1 = this.$class({ margin: 4 })
  *
  *     // two values
- *     cls2 = css.$class({ margin: [0, 8] })
+ *     cls2 = this.$class({ margin: [0, 8] })
  *
  *     // three values
- *     cls3 = css.$class({ margin: [6, 6, 8] })
+ *     cls3 = this.$class({ margin: [6, 6, 8] })
  *
  *     // four values
- *     cls4 = css.$class({ margin: [4, 6, 8, 12] })
+ *     cls4 = this.$class({ margin: [4, 6, 8, 12] })
  * }
  * ```
  */
@@ -249,10 +249,10 @@ export type OneOrBox<T> = T | [T, T?, T?, T?];
  * class MyStyles extends css.StyleDefinition
  * {
  *     // single value
- *     cls1 = css.$class({ transform: scale(0.5) })
+ *     cls1 = this.$class({ transform: scale(0.5) })
  *
  *     // several values
- *     cls2 = css.$class({ transform: [scale(0.5, rotate(90), translateX(200))] })
+ *     cls2 = this.$class({ transform: [scale(0.5, rotate(90), translateX(200))] })
  * }
  * ```
  */
@@ -306,10 +306,10 @@ export type SelectorCombinator = "," | " " | ">" | "+" | "~";
  * class MyStyles extends css.StyleDefinition
  * {
  *     // class that doesn't define its own styles and is only used in combinations
- *     class1 = css.$class()
+ *     class1 = this.$class()
  *
  *     // "parent class"
- *     class2 = css.$class({
+ *     class2 = this.$class({
  *
  *         // css: .class2 { backgroundColor: white; }
  *         backgroundColor: "white",
@@ -341,7 +341,7 @@ export type DependentRuleCombinator = "&" | "&," | "& " | "&>" | "&+" | "&~" | "
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     page = css.$page( ":first", { margin: "auto" })
+ *     page = this.$page( ":first", { margin: "auto" })
  * }
  * ```
  */
@@ -359,7 +359,7 @@ export type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     class1 = css.$class({
+ *     class1 = this.$class({
  *         backgroundColor: "blue",
  *         ":hover": { opacity: 0.7 },
  *     })
@@ -386,7 +386,7 @@ export type PseudoClass = PagePseudoClass |
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     exciting = css.$class({
+ *     exciting = this.$class({
  *         "::after": {
  *             content: " <- EXCITING!"
  *             color: "green"
@@ -416,7 +416,7 @@ export type PseudoEntity = PseudoClass | PseudoElement;
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     p = css.$tag( "p", {
+ *     p = this.$tag( "p", {
  *         ":nth-of-type": [
  *
  *             // css: p:nth-of-type(1)

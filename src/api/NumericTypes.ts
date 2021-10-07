@@ -42,7 +42,7 @@ export interface INumericMath<T, U extends string>
      * class MyStyles extends css.StyleDefinition
      * {
      *     // min( 200px, 25.5em, 45%)
-     *     cls1 = css.$class({
+     *     cls1 = this.$class({
      *         width: css.Len.min( 200, 25.5, css.percent(45))
      *     })
      * }
@@ -66,7 +66,7 @@ export interface INumericMath<T, U extends string>
      * class MyStyles extends css.StyleDefinition
      * {
      *     // max( 200px, 25.5em, 45%)
-     *     cls1 = css.$class({
+     *     cls1 = this.$class({
      *         width: css.Len.max( 200, 25.5, css.percent(45))
      *     })
      * }
@@ -92,7 +92,7 @@ export interface INumericMath<T, U extends string>
      * class MyStyles extends css.StyleDefinition
      * {
      *     // clamp( 200px, 25.5em, 45%)
-     *     cls1 = css.$class({
+     *     cls1 = this.$class({
      *         width: css.Len.clamp( 200, 25.5, css.percent(45))
      *     })
      * }
@@ -121,7 +121,7 @@ export interface INumericMath<T, U extends string>
      *     defaultPadding = css.var( "CssLength", 8)
      *
      *     // calc( 200px - (2 * var(--defaultPadding)))
-     *     cls1 = css.$class({
+     *     cls1 = this.$class({
      *         width: css.Len.calc` 200px - (2 * ${this.defaultPadding})`
      *     })
      * }
@@ -456,17 +456,17 @@ export interface IAspectRatioProxy extends IGenericProxy<"aspect-ratio"> {}
  * class MyStyles extends css.StyleDefinition
  * {
  *     // using string value
- *     mediaRule1 = css.$media( {aspectRatio: "4/3"}, ...)
+ *     mediaRule1 = this.$media( {aspectRatio: "4/3"}, ...)
  *
  *     // using the `ratio()` function
- *     mediaRule2 = css.$media( {aspectRatio: css.ratio( 4, 3)}, ...)
+ *     mediaRule2 = this.$media( {aspectRatio: css.ratio( 4, 3)}, ...)
  *
  *     // using a single number (not widely supported yet)
- *     mediaRule3 = css.$media( {aspectRatio: 1.33}, ...)
+ *     mediaRule3 = this.$media( {aspectRatio: 1.33}, ...)
  *
  *     // using a tuple to specify range; this will result in the following media condition:
  *     // (min-aspect-ratio: 4/3) and (max-aspect-ratio:16/9)
- *     mediaRule4 = css.$media( {aspectRatio: ["4/3","16/9"]}, ...)
+ *     mediaRule4 = this.$media( {aspectRatio: ["4/3","16/9"]}, ...)
  * }
  * ```
  */

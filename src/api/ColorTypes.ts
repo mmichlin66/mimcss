@@ -196,31 +196,31 @@ export type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas"
  * class MyStyles extends css.StyleDefinition
  * {
  *     // using string value and numeric value of Web colors
- *     cls1 = css.$class({ color: "red", backgroundColor: css.Colors.yellow })
+ *     cls1 = this.$class({ color: "red", backgroundColor: css.Colors.yellow })
  *
  *     // using string value of a system color
- *     cls2 = css.$class({ color: "LinkText" })
+ *     cls2 = this.$class({ color: "LinkText" })
  *
  *     // using numeric value
- *     cls3 = css.$class({ color: 0xCCCCCC })
+ *     cls3 = this.$class({ color: 0xCCCCCC })
  *
  *     // using numeric value with fractional part for alpha
- *     cls4 = css.$class({ color: 0x123456 + 0.4 })
+ *     cls4 = this.$class({ color: 0x123456 + 0.4 })
  *
  *     // using negative numeric value for inverted color
- *     cls5 = css.$class({ color: -0x123456 })
+ *     cls5 = this.$class({ color: -0x123456 })
  *
  *     // using negative numeric value with fractional part for inverted color with alpha
- *     cls6 = css.$class({ color: -(0x123456 + 0.4) })
+ *     cls6 = this.$class({ color: -(0x123456 + 0.4) })
  *
  *     // using the `alpha()` function with named color
- *     cls7 = css.$class({ color: css.alpha( "red", 0.4) })
+ *     cls7 = this.$class({ color: css.alpha( "red", 0.4) })
  *
  *     // using the `rgb()` function
- *     cls8 = css.$class({ color: css.rgb( 256, 0, 128) })
+ *     cls8 = this.$class({ color: css.rgb( 256, 0, 128) })
  *
  *     // using the `hsl()` function
- *     cls9 = css.$class({ color: css.hsl( 200, 90, 52) })
+ *     cls9 = this.$class({ color: css.hsl( 200, 90, 52) })
  * }
  * ```
  */

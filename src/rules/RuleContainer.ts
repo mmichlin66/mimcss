@@ -38,7 +38,7 @@ let themePlaceholderElement: Element;
  */
 class RuleContainer implements ITopLevelRuleContainer
 {
-	constructor( instance: StyleDefinition, name: string)
+	constructor( instance: IStyleDefinition, name: string)
 	{
 		this.instance = instance;
 		this.name = name;
@@ -398,7 +398,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Instance of the style definition class that this container processed.
-	public instance: StyleDefinition;
+	public instance: IStyleDefinition;
 
 	// Style definition class that this container creates an instance of.
 	public definitionClass: IStyleDefinitionClass
@@ -414,7 +414,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 	// Instance of the parent style definition class in the chain of grouping rules that
 	// lead to this rule container. For top-level style definitions, this is undefined.
-	private parent?: StyleDefinition;
+	private parent?: IStyleDefinition;
 
 	// Rule container that belongs to the parent style defintion. If our container is top-level,
 	// this property is undefined.
@@ -566,11 +566,8 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
  * to its rules.
  */
 export function processInstanceOrClass( instOrClass: IStyleDefinition | IStyleDefinitionClass,
-	parent?: IStyleDefinition): IStyleDefinition | null
+	parent?: IStyleDefinition): IStyleDefinition
 {
-	if (!instOrClass)
-		return null;
-
 	// instOrClass has type "object" if it is an instance and "function" if it is a class
 	if (typeof instOrClass === "object")
 	{
@@ -591,11 +588,11 @@ export function processInstanceOrClass( instOrClass: IStyleDefinition | IStyleDe
  * that defines rules within nested grouping rules).
  */
 function processClass( definitionClass: IStyleDefinitionClass,
-	parent?: StyleDefinition): StyleDefinition | null
+	parent?: IStyleDefinition): IStyleDefinition
 {
     // check whether this definition class is already associated with an instance
     if (definitionClass.hasOwnProperty(symInstance))
-        return definitionClass[symInstance]
+        return definitionClass[symInstance];
 
     // recursively process all base classes so that rule names are generated. We don't activate styles
     // for these classes because derived classes will have all the rules from all the base classes
@@ -604,25 +601,17 @@ function processClass( definitionClass: IStyleDefinitionClass,
     if (baseClass !== StyleDefinition && baseClass !== ThemeDefinition)
 		processClass( baseClass, parent);
 
-	try
-	{
-		// create the instance of the definition class
-		let instance = new definitionClass( parent);
+    // create the instance of the definition class
+    let instance = new definitionClass( parent);
 
-		// get the name for our container
-		let name = !definitionClass.name || s_nameGeneratonMethod === NameGenerationMethod.Optimized
-			? generateUniqueName()
-			: definitionClass.name;
+    // get the name for our container
+    let name = !definitionClass.name || s_nameGeneratonMethod === NameGenerationMethod.Optimized
+        ? generateUniqueName()
+        : definitionClass.name;
 
-		new RuleContainer( instance, name);
-		definitionClass[symInstance] = instance;
-		return instance;
-	}
-	catch( err)
-	{
-		console.error( `Error instantiating Style Definition Class '${definitionClass.name}'`, err);
-		return null;
-	}
+    new RuleContainer( instance, name);
+    definitionClass[symInstance] = instance;
+    return instance;
 }
 
 
@@ -632,7 +621,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-function processInstance( instance: StyleDefinition): void
+function processInstance( instance: IStyleDefinition): void
 {
 	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.

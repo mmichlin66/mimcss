@@ -18,10 +18,10 @@ describe("style rules:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			cls = css.$class()
-			id = css.$id()
-			tag = css.$style( "h1", {})
-			selector = css.$style( "div > span", {})
+			cls = this.$class()
+			id = this.$id()
+			tag = this.$style( "h1", {})
+			selector = this.$style( "div > span", {})
 		}
 
 		let a = css.activate( A);
@@ -39,10 +39,10 @@ describe("style rules:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			cls = css.$class({ color: "red" })
-			id = css.$id({ color: "red" })
-			tag = css.$style( "h1", { color: "red" })
-			selector = css.$style( "div > span", { color: "red" })
+			cls = this.$class({ color: "red" })
+			id = this.$id({ color: "red" })
+			tag = this.$style( "h1", { color: "red" })
+			selector = this.$style( "div > span", { color: "red" })
 		}
 
 		let a = css.activate( A);
@@ -64,10 +64,10 @@ describe("style rules:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			cls = css.$class({ color: "red" })
-			id = css.$id({ color: "red" })
-			tag = css.$style( "h1", { color: "red" })
-			selector = css.$style( "div > span", { color: "red" })
+			cls = this.$class({ color: "red" })
+			id = this.$id({ color: "red" })
+			tag = this.$style( "h1", { color: "red" })
+			selector = this.$style( "div > span", { color: "red" })
 		}
 
 		let a = css.activate( A);
@@ -85,7 +85,7 @@ describe("style rules:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			cls = css.$class({
+			cls = this.$class({
 				color: "red",
 				":hover": {
 					color: "pink",
@@ -113,8 +113,8 @@ describe("style rules:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			cls1 = css.$class({})
-			cls2 = css.$class({
+			cls1 = this.$class({})
+			cls2 = this.$class({
 				"&>": [ [ this.cls1, { color: "pink" } ]],
 				"+&": [ [ this.cls1, { color: "pink" } ]]
 			})
@@ -138,9 +138,9 @@ describe("style rules:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			cls1 = css.$class({ color: "black" })
+			cls1 = this.$class({ color: "black" })
 
-			cls = css.$class({
+			cls = this.$class({
 				color: "red",
 				"&": [
 					[ "&.other, .other& div > span", { color: "brown" } ],
@@ -169,7 +169,7 @@ describe("style rules:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			cls = css.$class({
+			cls = this.$class({
 				color: "red",
 				"&": [
 					[ "&.other, .other& div > span", { color: "brown" } ],
@@ -177,7 +177,7 @@ describe("style rules:", () =>
 				]
 			})
 
-			clsCopy = css.$class({ "+": this.cls })
+			clsCopy = this.$class({ "+": this.cls })
 		}
 
 		let a = css.activate( A);

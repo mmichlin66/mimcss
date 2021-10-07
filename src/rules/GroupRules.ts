@@ -113,7 +113,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	public cssRule: CSSGroupingRule | null;
 
 	// Style definition class that defines rules under this grouping rule.
-	protected instanceOrClass: T | IStyleDefinitionClass;
+	protected instanceOrClass: T | IStyleDefinitionClass<T>;
 
 	// Style definition instance.
 	protected instance: IStyleDefinition;

@@ -80,7 +80,7 @@ export function testLonghandProp<K extends keyof Styleset>( propName: K, propVal
 {
 	class A extends css.StyleDefinition
 	{
-		c = css.$class( { [propName]: propVal })
+		c = this.$class( { [propName]: propVal })
 	}
 
 	let a = css.activate( A);
@@ -97,7 +97,7 @@ export function testShorthandProp<K extends keyof Styleset>( propName: K, propVa
 {
 	class A extends css.StyleDefinition
 	{
-		c = css.$class( { [propName]: propVal })
+		c = this.$class( { [propName]: propVal })
 	}
 
 	let a = css.activate( A);
@@ -113,7 +113,7 @@ export function testPropPriority<K extends keyof Styleset>( propName: K, propVal
 {
 	class A extends css.StyleDefinition
 	{
-		c = css.$class( { [propName]: propVal })
+		c = this.$class( { [propName]: propVal })
 	}
 
 	let a = css.activate( A);

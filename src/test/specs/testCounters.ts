@@ -14,13 +14,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { counterReset: this.counter })
+				counter = this.$counter();
+				c = this.$class( { counterReset: this.counter })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyPropValue( a!.c, "counterReset", "A_counter 0");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -28,13 +28,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { counterReset: [this.counter, 2] })
+				counter = this.$counter();
+				c = this.$class( { counterReset: [this.counter, 2] })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyPropValue( a!.c, "counterReset", "A_counter 2");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -42,13 +42,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter( "cntr");
-				c = css.$class( { counterIncrement: ["cntr", 1] })
+				counter = this.$counter( "cntr");
+				c = this.$class( { counterIncrement: ["cntr", 1] })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyPropValue( a!.c, "counterIncrement", "cntr 1");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -56,14 +56,14 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter1 = css.$counter();
-				counter2 = css.$counter();
-				c = css.$class( { counterIncrement: [ this.counter1, [this.counter2, 2]] })
+				counter1 = this.$counter();
+				counter2 = this.$counter();
+				c = this.$class( { counterIncrement: [ this.counter1, [this.counter2, 2]] })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyPropValue( a!.c, "counterIncrement", "A_counter1 1 A_counter2 2");
-		
+
 			css.deactivate( a!);
 		})
 	})
@@ -76,13 +76,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counter( this.counter) } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counter( this.counter) } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "counter(A_counter)");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -90,13 +90,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counter( this.counter, "circle") } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counter( this.counter, "circle") } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "counter(A_counter, circle)");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -104,13 +104,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counter( this.counter, undefined, " - ") } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counter( this.counter, undefined, " - ") } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "counter(A_counter) \" - \"");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -118,13 +118,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counter( this.counter, "disc", " - ", "...") } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counter( this.counter, "disc", " - ", "...") } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "\"...\" counter(A_counter, disc) \" - \"");
-		
+
 			css.deactivate( a!);
 		})
 	})
@@ -137,13 +137,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counters( this.counter, ".") } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counters( this.counter, ".") } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "counters(A_counter, \".\")");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -151,13 +151,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counters( this.counter, ".", "circle") } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counters( this.counter, ".", "circle") } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "counters(A_counter, \".\", circle)");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -165,13 +165,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counters( this.counter, ".", undefined, " - ") } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counters( this.counter, ".", undefined, " - ") } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "counters(A_counter, \".\") \" - \"");
-		
+
 			css.deactivate( a!);
 		})
 
@@ -179,13 +179,13 @@ describe("counters", () =>
 		{
 			class A extends css.StyleDefinition
 			{
-				counter = css.$counter();
-				c = css.$class( { "::before": { content: css.counters( this.counter, ".", "disc", " - ", "...") } })
+				counter = this.$counter();
+				c = this.$class( { "::before": { content: css.counters( this.counter, ".", "disc", " - ", "...") } })
 			}
-		
+
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "\"...\" counters(A_counter, \".\", disc) \" - \"");
-		
+
 			css.deactivate( a!);
 		})
 	})

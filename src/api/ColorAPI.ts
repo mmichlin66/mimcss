@@ -450,10 +450,10 @@ export function hsl( h: Extended<CssAngle>, s: Extended<number>, l: Extended<num
  * class MyStyles extends css.StyleDefinition
  * {
  *     // applying alpha to a numeric color
- *     cls1 = css.$class({ color: css.alpha( 0xAA00AA, 0.5) })
+ *     cls1 = this.$class({ color: css.alpha( 0xAA00AA, 0.5) })
  *
  *     // applying alpha to a named color
- *     cls1 = css.$class({ color: css.alpha( "darkolivegreen", 0.5) })
+ *     cls1 = this.$class({ color: css.alpha( "darkolivegreen", 0.5) })
  * }
  * ```
  * @param c Color value as either a number or a named color

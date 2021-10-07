@@ -70,19 +70,19 @@ import * as css from "mimcss"
 export class MyStyles extends css.StyleDefinition
 {
     // define a CSS rule for a class
-    vbox = css.$class({
+    vbox = this.$class({
         display: "flex",
         flexDirection: "column",
     });
 
     // define a CSS rule for an element identifier
-    importantElement = css.$id({
+    importantElement = this.$id({
         color: 0xFFCC88,
         fontWeight: 700,
     });
 
     // define a CSS rule for another class
-    greeting = css.$class({
+    greeting = this.$class({
         padding: 8,
         border: [1, "solid", "blue"],
         boxShadow: { blur: 4, color: "cyan" },
@@ -131,57 +131,57 @@ Mimcss supports all types of CSS rules (except @charset):
 class MyStyles extends css.StyleDefinition
 {
     // class
-    redClass = css.$class({ color: "red" })
+    redClass = this.$class({ color: "red" })
 
     // element ID
-    redElm = css.$id({ color: "red" })
+    redElm = this.$id({ color: "red" })
 
     // arbitrary selectors
-    all = css.$style( "*", { boxSizing: "border-box" })
-    h1 = css.$tag( "h1", { fontSize: 24, fontWeight: 700 })
-    li = css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" })
+    all = this.$style( "*", { boxSizing: "border-box" })
+    h1 = this.$tag( "h1", { fontSize: 24, fontWeight: 700 })
+    li = this.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" })
 
     // custom CSS variables (with style-property-specific value types)
-    defaultColor = css.$var( "color", "black")
-    defaultPadding = css.$var( "padding", [4,6])
+    defaultColor = this.$var( "color", "black")
+    defaultPadding = this.$var( "padding", [4,6])
 
     // @font-face
-    font = css.$fontface( {
+    font = this.$fontface( {
         fontFamily: "Roboto",
         fontWeight: 400,
         src: [{ url: 'roboto.woff', format: 'woff' }]
     });
 
     // @import (with @media and @supports queries)
-    external = css.$import( "external.css",
+    external = this.$import( "external.css",
         { width: [200, 400] }, { justifySelf: "baseline" })
 
     // @keyframes
-    move = css.$keyframes( [
+    move = this.$keyframes( [
         [ "from", { top: 0 } ],
         [ 50, { top: 150 } ],
         [ "to", { top: "100%" } ]
     ])
 
     // @page
-    firstPage = css.$page( ":first", { margin: "auto" })
+    firstPage = this.$page( ":first", { margin: "auto" })
 
     // @namespace
-    svgNamespcae = css.$namespace( css.WebNamespaces.SVG, "svg")
+    svgNamespcae = this.$namespace( css.WebNamespaces.SVG, "svg")
 
     // @media
-    ifSmallDevice = css.$media( { maxWidth: 600 },
+    ifSmallDevice = this.$media( { maxWidth: 600 },
         class extends css.StyleDefinition<MyStyles>
         {
-            h1 = css.$tag( "h1", { fontSize: 20 });
+            h1 = this.$tag( "h1", { fontSize: 20 });
         }
     )
 
     // @supports
-    ifGridSupported = css.$supports( {display: "grid"},
+    ifGridSupported = this.$supports( {display: "grid"},
         class extends css.StyleDefinition<MyStyles>
         {
-            gridLayout = css.$class({ display: "grid" })
+            gridLayout = this.$class({ display: "grid" })
         }
     )
 }
@@ -194,9 +194,9 @@ class MyStyles extends css.StyleDefinition
 {
     unnamed =
     [
-        css.$style( "*", { boxSizing: "border-box" }),
-        css.$tag( "h1", { fontSize: 24, fontWeight: 700 }),
-        css.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" }),
+        this.$style( "*", { boxSizing: "border-box" }),
+        this.$tag( "h1", { fontSize: 24, fontWeight: 700 }),
+        this.$style( css.selector`article > ${this.redClass} > ul > li`, { color: "brown" }),
         ...
     ]
 }
@@ -210,19 +210,19 @@ The `"+"` property allows specifying one or more style rules you want your style
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    red = css.$class({ color: "red" })
+    red = this.$class({ color: "red" })
 
-    bold = css.$class({ fontWeight: 700 })
+    bold = this.$class({ fontWeight: 700 })
 
     // extending one style rule
-    important = css.$class(
+    important = this.$class(
     {
         "+": this.red,
         fontSize: 16
     })
 
     // extending multiple style rules
-    superImportant = css.$class(
+    superImportant = this.$class(
     {
         "+": [this.important, this.bold]
     })
@@ -260,7 +260,7 @@ While pseudo classes and pseudo elements can be defined using regular style rule
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    link = css.$class({
+    link = this.$class({
         color: "blue",
         ":hover": { color: "navy" }
     })
@@ -287,11 +287,11 @@ Some pseudo classes require parameters, e.g. `:nth-child(2n+1)`. This is how it 
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    row = css.$tag( "tr", {
+    row = this.$tag( "tr", {
         ":nth-child": [ [2,1], { backgroundColor: 0xF8F8F8 } ]
     })
 
-    cell = css.$tag( "p", {
+    cell = this.$tag( "p", {
         ":nth-of-type": [ "odd", { backgroundColor: "cyan" } ]
     })
 }
@@ -317,7 +317,7 @@ We often define a CSS class (or tag or ID) rule and then define related rules wi
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    ul = css.$tag( "ul", {
+    ul = this.$tag( "ul", {
         color: "brown",
         "&": [
             [ "& > li:first-child, & > li > a", { color: "red" } ],
@@ -352,17 +352,17 @@ Although custom CSS properties by themselves are not CSS rules, in Mimcss they a
 class MyStyles extends css.StyleDefinition
 {
     // define custom properties at the root level
-    defaultColor = css.$var( "color", "black")
-    defaultBgColor = css.$var( "color", "white")
+    defaultColor = this.$var( "color", "black")
+    defaultBgColor = this.$var( "color", "white")
 
     // use the custom properties by referring to the previously defined objects
-    div = css.$tag( "div", {
+    div = this.$tag( "div", {
         color: this.defaultColor,
         backgroundColor: this.defaultBgColor,
     })
 
     // overriding the values of the custom properties
-    footer = css.$tag( "footer", {
+    footer = this.$tag( "footer", {
         "--": [
             [this.defaultColor, "yellow"],
             [this.defaultBgColor, "blue"]
@@ -424,7 +424,7 @@ css.Colors.myFavColor = 0x123456;
 // Use it just as any other named color
 class MyStyles extends css.StyleDefinition
 {
-    anchor = css.$tag( "a", { color: "myColor" })
+    anchor = this.$tag( "a", { color: "myColor" })
 }
 ```
 
@@ -443,22 +443,22 @@ Here are several examples:
 class MyStyles extends css.StyleDefinition
 {
     // top and bottom padding will be set to 0.5em, while left and right - to 8px.
-    cls1 = css.$class({ padding: [0.5, 8] })
+    cls1 = this.$class({ padding: [0.5, 8] })
 
     // width is 80%, min-width is 1.5em and max-width is 500px.
-    cls2 = css.$class({
+    cls2 = this.$class({
         width: css.percent(80),
         minWidth: 1.5,
         maxWidth: 500
     })
 
     // initial angle for the conic gradient will be 45deg.
-    cls3 = css.$class({
+    cls3 = this.$class({
         backgroundImage: css.conicGradient( "red", "blue").from(45)
     })
 
     // initial angle for the conic gradient will be 0.25turn.
-    cls4 = css.$class({
+    cls4 = this.$class({
         backgroundImage: css.conicGradient( "red", "blue").from(0.25)
     })
 }

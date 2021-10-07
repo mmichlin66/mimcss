@@ -346,10 +346,10 @@ function filterPercent( name: string, p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: brightness(150%)
- *     bright = css.$class({ filter: css.brightness(150)})
+ *     bright = this.$class({ filter: css.brightness(150)})
  *
  *     // filter: brightness(50%)
- *     dim = css.$class({ filter: css.brightness(0.5)})
+ *     dim = this.$class({ filter: css.brightness(0.5)})
  * }
  * ```
  *
@@ -375,10 +375,10 @@ export function brightness( p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: contrast(150%)
- *     highContrast = css.$class({ filter: css.contrast(150)})
+ *     highContrast = this.$class({ filter: css.contrast(150)})
  *
  *     // filter: contrast(50%)
- *     lowContrast = css.$class({ filter: css.contrast(0.5)})
+ *     lowContrast = this.$class({ filter: css.contrast(0.5)})
  * }
  * ```
  *
@@ -404,10 +404,10 @@ export function contrast( p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: grayscale(100%)
- *     gray = css.$class({ filter: css.grayscale(100)})
+ *     gray = this.$class({ filter: css.grayscale(100)})
  *
  *     // filter: grayscale(50%)
- *     halfColor = css.$class({ filter: css.grayscale(0.5)})
+ *     halfColor = this.$class({ filter: css.grayscale(0.5)})
  * }
  * ```
  *
@@ -433,13 +433,13 @@ export function grayscale( p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: invert(100%)
- *     inverted = css.$class({ filter: css.invert(100)})
+ *     inverted = this.$class({ filter: css.invert(100)})
  *
  *     // filter: invert(75%)
- *     somewhatnverted = css.$class({ filter: css.invert(0.75)})
+ *     somewhatnverted = this.$class({ filter: css.invert(0.75)})
  *
  *     // filter: invert(50%)
- *     gray = css.$class({ filter: css.invert(0.5)})
+ *     gray = this.$class({ filter: css.invert(0.5)})
  * }
  * ```
  *
@@ -465,7 +465,7 @@ export function invert( p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: opacity(50%)
- *     halfTransparent = css.$class({ filter: css.opacity(0.5)})
+ *     halfTransparent = this.$class({ filter: css.opacity(0.5)})
  * }
  * ```
  *
@@ -491,10 +491,10 @@ export function opacity( p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: saturate(150%)
- *     superSaturated = css.$class({ filter: css.saturate(150)})
+ *     superSaturated = this.$class({ filter: css.saturate(150)})
  *
  *     // filter: saturate(50%)
- *     underSaturated = css.$class({ filter: css.saturate(0.5)})
+ *     underSaturated = this.$class({ filter: css.saturate(0.5)})
  * }
  * ```
  *
@@ -520,7 +520,7 @@ export function saturate( p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: sepia(100%)
- *     vintage = css.$class({ filter: css.sepia(100)})
+ *     vintage = this.$class({ filter: css.sepia(100)})
  * }
  * ```
  *
@@ -546,13 +546,13 @@ export function sepia( p: Extended<CssPercent>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: blur(0)
- *     sharp = css.$class({ filter: css.blur(0)})
+ *     sharp = this.$class({ filter: css.blur(0)})
  *
  *     // filter: blur(2px)
- *     blurred = css.$class({ filter: css.blur(2)})
+ *     blurred = this.$class({ filter: css.blur(2)})
  *
  *     // filter: blur(1.5em)
- *     superBlurred = css.$class({ filter: css.blur(1.5)})
+ *     superBlurred = this.$class({ filter: css.blur(1.5)})
  * }
  * ```
  *
@@ -577,13 +577,13 @@ export function blur( r: Extended<CssLength>): IFilterProxy
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: drop-shadow(30px 10px 4px blue)
- *     blurredShadow = css.$class({ filter: css.dropShadow( 30, 10, "blue", 4)})
+ *     blurredShadow = this.$class({ filter: css.dropShadow( 30, 10, "blue", 4)})
  *
  *     // filter: drop-shadow(2.5em -1.5em green)
- *     sharpShadow = css.$class({ filter: css.dropShadow( 2.5, -1.5, "green")})
+ *     sharpShadow = this.$class({ filter: css.dropShadow( 2.5, -1.5, "green")})
  *
  *     // filter: drop-shadow(0 0 20px orange)
- *     haloShadow = css.$class({ filter: css.dropShadow( 0, 0, "orange", 20px)})
+ *     haloShadow = this.$class({ filter: css.dropShadow( 0, 0, "orange", 20px)})
  * }
  * ```
  *
@@ -615,10 +615,10 @@ export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
  * class MyStyles extends css.StyleDefinition
  * {
  *     // filter: hue-rotate(90deg)
- *     toTheRight = css.$class({ filter: css.hueRotate(90)})
+ *     toTheRight = this.$class({ filter: css.hueRotate(90)})
  *
  *     // filter: hue-rotate(-0.25turn)
- *     toTheLeft = css.$class({ filter: css.blur(-0.25)})
+ *     toTheLeft = this.$class({ filter: css.blur(-0.25)})
  * }
  * ```
  *

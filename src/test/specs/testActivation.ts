@@ -16,7 +16,7 @@ describe("activation:", () =>
 	{
 		class MyStyles extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
 		let myStyles = css.activate( MyStyles);
@@ -34,7 +34,7 @@ describe("activation:", () =>
 	{
 		class MyStyles extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
 		let myStyles1 = css.activate( MyStyles);
@@ -56,13 +56,13 @@ describe("activation:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
 		class B extends css.StyleDefinition
 		{
-			a = css.$use(A)
-			blue = css.$class({ color: "blue" })
+			a = this.$use(A)
+			blue = this.$class({ color: "blue" })
 		}
 
 		let b = css.activate( B);
@@ -79,19 +79,19 @@ describe("activation:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
 		class B extends css.StyleDefinition
 		{
-			a = css.$use(A)
-			blue = css.$class({ color: "blue" })
+			a = this.$use(A)
+			blue = this.$class({ color: "blue" })
 		}
 
 		class C extends css.StyleDefinition
 		{
-			a = css.$use(A)
-			green = css.$class({ color: "green" })
+			a = this.$use(A)
+			green = this.$class({ color: "green" })
 		}
 
 		let b = css.activate( B);
@@ -110,12 +110,12 @@ describe("activation:", () =>
 	{
 		class A extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
 		class B extends A
 		{
-			blue = css.$class({ color: "blue" })
+			blue = this.$class({ color: "blue" })
 		}
 
 		let b = css.activate( B);
@@ -133,13 +133,13 @@ describe("activation:", () =>
         @css.embedded("A")
 		class EmbeddedStyles1 extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
         @css.embedded("A")
 		class EmbeddedStyles2 extends css.StyleDefinition
 		{
-			green = css.$class({ color: "green" })
+			green = this.$class({ color: "green" })
 		}
 
 		let styles1 = css.activate( EmbeddedStyles1);
@@ -165,13 +165,13 @@ describe("activation:", () =>
         @css.embedded("B")
 		class EmbeddedStyles1 extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
         @css.embedded("B")
 		class EmbeddedStyles2 extends css.StyleDefinition
 		{
-			red = css.$class({ color: "red" })
+			red = this.$class({ color: "red" })
 		}
 
 		let styles1 = css.activate( EmbeddedStyles1);
