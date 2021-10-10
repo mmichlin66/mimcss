@@ -1,5 +1,6 @@
 import {
-    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IClassNameRule
+    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IClassNameRule,
+    ElementTagName, AttrSelectorOperation, AttrsDef
 } from "../api/RuleTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {CssSelector, OneOrMany} from "../api/CoreTypes"
@@ -627,13 +628,77 @@ export class IDRule extends NamedStyleRule implements IIDRule
 
 
 /**
+ * The AttrRule type describes a styleset that applies to elements identified by a attribute selector.
+ */
+export class AttrRule extends StyleRule
+{
+	/** Name of the element whose attribute is part of the selector */
+	public tag: ElementTagName | IClassRule | IIDRule;
+
+    /** Array of attribute conditions */
+	readonly attrs: (string | AttrsDef)[];
+
+    // overloaded constructors
+	public constructor( tag: ElementTagName | IClassRule | IIDRule,
+        attrs: OneOrMany<string | AttrsDef>, styleset?: CombinedStyleset)
+	{
+		super( styleset);
+		this.tag = tag;
+		this.attrs = Array.isArray(attrs) ? attrs : [attrs];
+	}
+
+	// Creates a copy of the rule.
+	public cloneObject(): AttrRule
+	{
+		return new AttrRule( this.tag, this.attrs);
+	}
+
+	// Returns the selector part of the style rule.
+	public getSelectorString(): string
+	{
+        let s = typeof this.tag === "string" ? this.tag : this.tag.selectorText;
+        for( let attr of this.attrs)
+        {
+            if (typeof attr === "string")
+                s += `[${attr}]`;
+            else
+            {
+                for( let name in attr)
+                {
+                    let valueOrOptions = attr[name];
+                    if (typeof valueOrOptions === "object")
+                    {
+                        s += "[";
+                        if (valueOrOptions.ns)
+                            s += valueOrOptions.ns + "|";
+
+                        s += `${name}${valueOrOptions.op ?? AttrSelectorOperation.Equal}"${valueOrOptions.value}"`
+
+                        if (valueOrOptions.ci)
+                            s += " i";
+
+                        s += "]"
+                    }
+                    else
+                        s += `[${name}="${valueOrOptions}"]`
+                }
+            }
+        }
+
+		return s;
+	}
+}
+
+
+
+/**
  * The SelectorRule type describes a styleset that applies to elements identified by a CSS selector.
  */
 export class SelectorRule extends StyleRule
 {
-	public constructor( selector: CssSelector, style?: CombinedStyleset)
+	public constructor( selector: CssSelector, styleset?: CombinedStyleset)
 	{
-		super( style);
+		super( styleset);
 		this.selector = selector;
 	}
 
