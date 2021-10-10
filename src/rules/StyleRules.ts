@@ -5,10 +5,7 @@ import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, Ex
 import {CssSelector, OneOrMany} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, symValueToString} from "../impl/Utils";
-import {
-    mergeStylesets, styleset2s, styleProp2s, mergeStylesetCustomProps, selector2s,
-    pseudoEntity2s
-} from "../impl/StyleImpl"
+import {mergeStylesets, styleset2s, styleProp2s, mergeCustomProps, selector2s, pseudoEntity2s} from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 
@@ -63,16 +60,16 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			// If we have parent rules, copy stylesets and dependent rules from them.
 			if (parentRules && parentRules.length > 0)
 			{
-				parentRules.forEach( parent =>
+				for( let parent of parentRules)
 				{
 					this.styleset = mergeStylesets( this.styleset, parent.styleset);
 					this.copyDependentRulesFrom( parent);
-				});
+				}
 			}
 		}
 
 		// merge custom  properties
-		mergeStylesetCustomProps( this.styleset, inputStyleset);
+		mergeCustomProps( this.styleset, inputStyleset);
 
 		for( let propName in inputStyleset)
 		{
@@ -130,7 +127,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 						() => selector2s( tuple[0]) + propName, undefined, tuple[1], this));
 				}
 			}
-			else if (this.processStylesetProp( propName, propVal))
+			else if (this.parseStylesetProp( propName, propVal))
 			{
 				// this is a regular CSS property: copy the property value to our internal styleset
 				this.styleset[propName] = propVal;
@@ -293,7 +290,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If false is returned, the property with the given name will not be added to the styleset.
-	protected processStylesetProp( propName: string, propVal: any): boolean { return true; }
+	protected parseStylesetProp( propName: string, propVal: any): boolean { return true; }
 
 
 
@@ -562,7 +559,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 {
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If returns false, the property with the given name will not be added to the styleset.
-	protected processStylesetProp( propName: string, propVal: any): boolean
+	protected parseStylesetProp( propName: string, propVal: any): boolean
     {
         if (propName == "++")
         {
@@ -573,7 +570,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
             return false;
         }
         else
-            return super.processStylesetProp( propName, propVal);
+            return super.parseStylesetProp( propName, propVal);
     }
 
 	// Post-processes the given rule.

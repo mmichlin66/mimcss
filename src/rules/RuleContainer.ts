@@ -435,6 +435,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 	// List of custom variable rules.
 	private vars: VarRule[];
+    public getVars(): VarRule[] { return this.vars; }
 
 	// List of rules that are not imports, namespaces, custom vars, references or grouping rules.
 	private otherRules: Rule[];
@@ -644,6 +645,23 @@ function processInstance( instance: IStyleDefinition): void
 	// create container - this will associate the new container with the instance and process
 	// the rules.
 	new RuleContainer( instance, name);
+}
+
+
+
+/**
+ * Processes the given style definition instance and assigns names to its rules. If the
+ * instance has already been processed, we do nothing; otherwise, we assign new unique names
+ * to its rules.
+ */
+export function getVarsFromSTyleDefinition( instOrClass: IStyleDefinition | IStyleDefinitionClass): VarRule[]
+{
+    let instance = processInstanceOrClass( instOrClass);
+    if (!instance)
+        return [];
+
+	let ruleContainer = instance[symContainer] as RuleContainer;
+    return ruleContainer.getVars();
 }
 
 

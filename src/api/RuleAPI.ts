@@ -118,7 +118,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that will be inherited by style rules that extend this abstract rule.
      * @returns `IStyleRule` object that should be used by the derived rules in the `"+"` property.
      */
-    public $abstract( styleset: CombinedStyleset): IStyleRule
+    protected $abstract( styleset: CombinedStyleset): IStyleRule
     {
         return new AbstractRule( styleset);
     }
@@ -166,7 +166,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IClassRule` object that should be used for getting the class name and for accessing
      * the style properties if needed.
      */
-    public $class( styleset?: CombinedClassStyleset, nameOverride?: string | IClassRule): IClassRule
+    protected $class( styleset?: CombinedClassStyleset, nameOverride?: string | IClassRule): IClassRule
     {
         return new ClassRule( styleset, nameOverride);
     }
@@ -213,7 +213,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
      * `".class1.class2"`.
      */
-    public $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
+    protected $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
     {
         return new ClassNameRule( classes);
     }
@@ -260,7 +260,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IIDRule` object that should be used for getting the ID name and for accessing
      * the style properties if needed.
      */
-    public $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
+    protected $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
     {
         return new IDRule( styleset, nameOverride);
     }
@@ -295,7 +295,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that defines style properties for the tags.
      * @returns `IStyleRule` object representing the tag rule.
      */
-    public $tag( tag: "*" | OneOrMany<(keyof HTMLElementTagNameMap) | (keyof SVGElementTagNameMap)>,
+    protected $tag( tag: "*" | OneOrMany<(keyof HTMLElementTagNameMap) | (keyof SVGElementTagNameMap)>,
         styleset: CombinedStyleset): IStyleRule
     {
         return new SelectorRule( Array.isArray(tag) ? a2s( tag, undefined, ",") : tag, styleset);
@@ -344,7 +344,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that defines style properties for this selector.
      * @returns `IStyleRule` object representing the style rule.
      */
-    public $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
+    protected $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
     {
         return new SelectorRule( selector, styleset);
     }
@@ -385,7 +385,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * another animation.
      * @returns `IAnimationRule` object that should be used for getting the animation name.
      */
-    public $keyframes( frames?: AnimationFrame[],
+    protected $keyframes( frames?: AnimationFrame[],
         nameOverride?: string | IAnimationRule): IAnimationRule
     {
         return new AnimationRule( frames, nameOverride);
@@ -434,7 +434,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns The `IVarRule` object that represents the custom property. Any usage of this object in
      * style properties or function parameters is substituted by the `var()` CSS function invocation.
      */
-    public $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
+    protected $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
                     nameOverride?: string | IVarRule<K>): IVarRule<K>
     {
         return new VarRule( template, value, nameOverride);
@@ -475,7 +475,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns The `IConstRule` object that represents the value of the constant. The value is
      * computed once when the style definition is processed.
      */
-    public $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
+    protected $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
     {
         return new ConstRule( template, value);
     }
@@ -511,7 +511,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * existing counter.
      * @returns The `ICounterRule` object that represents the counter.
      */
-    public $counter( nameOverride?: string | ICounterRule): ICounterRule
+    protected $counter( nameOverride?: string | ICounterRule): ICounterRule
     {
         return new CounterRule( nameOverride);
     }
@@ -541,7 +541,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * existing counter style.
      * @returns The `ICounterStyleRule` object that represents the counter style.
      */
-    public $counterStyle( counterStyleset?: ExtendedCounterStyleset,
+    protected $counterStyle( counterStyleset?: ExtendedCounterStyleset,
         nameOverride?: string | ICounterStyleRule): ICounterStyleRule
     {
         return new CounterStyleRule( counterStyleset, nameOverride);
@@ -589,7 +589,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * `"-end"` is appended; if the flag is undefined, no suffix is appended to the rule name.
      * @returns The `IGridLineRule` object that represents the grid line.
      */
-    public $gridline( nameOverride?: string | IGridLineRule,
+    protected $gridline( nameOverride?: string | IGridLineRule,
         isStartEndOrNone?: boolean): IGridLineRule
     {
         return new GridLineRule( nameOverride, isStartEndOrNone);
@@ -646,7 +646,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * existing grid area.
      * @returns The `IGridAreaRule` object that represents the grid area.
      */
-    public $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
+    protected $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
     {
         return new GridAreaRule( nameOverride);
     }
@@ -674,7 +674,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * font to use.
      * @returns The `IFontFaceRule` object that represents the @font-face rule.
      */
-    public $fontface( fontface: ExtendedFontFace): IFontFaceRule
+    protected $fontface( fontface: ExtendedFontFace): IFontFaceRule
     {
         return new FontFaceRule( fontface);
     }
@@ -700,7 +700,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * page where the Mimcss library is invoked.
      * @returns The `IImportRule` object that represents the `@import` rule.
      */
-    public $import( url: string, mediaQuery?: string | MediaStatement,
+    protected $import( url: string, mediaQuery?: string | MediaStatement,
         supportsQuery?: string | SupportsStatement): IImportRule
     {
         return new ImportRule( url, mediaQuery, supportsQuery);
@@ -724,7 +724,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param prefix Prefix string to use for the namespace.
      * @returns The `INamespaceRule` object that represents the namespace rule.
      */
-    public $namespace( namespace: string, prefix?: string): INamespaceRule
+    protected $namespace( namespace: string, prefix?: string): INamespaceRule
     {
         return new NamespaceRule( namespace, prefix);
     }
@@ -747,7 +747,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styles to apply.
      * @returns The `IPageRule` object that represents the page rule.
      */
-    public $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
+    protected $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
     {
         return new PageRule( pseudoClass, styleset);
     }
@@ -775,7 +775,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param instOrClass Either style definition class or an instance of a style defintion class.
      * @returns `ISupportsRule` object representing the supports rule
      */
-    public $supports( statement: SupportsStatement,
+    protected $supports( statement: SupportsStatement,
         instOrClass: StyleDefinition<StyleDefinition<P>> | IStyleDefinitionClass<StyleDefinition<StyleDefinition<P>>>
         ): ISupportsRule<StyleDefinition<StyleDefinition<P>>>
     {
@@ -805,7 +805,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param instOrClass Either style definition class or an instance of a style defintion class.
      * @returns `IMediaRule` object representing the media rule
      */
-     public $media( statement: MediaStatement,
+    protected $media( statement: MediaStatement,
         instOrClass: StyleDefinition<StyleDefinition<P>> | IStyleDefinitionClass<StyleDefinition<StyleDefinition<P>>>
         ): IMediaRule<StyleDefinition<StyleDefinition<P>>>
     {
@@ -851,7 +851,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns An instance of the style definition class, which will be activated and deactivated
      * along with the enclosing style definition.
      */
-    public $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T
+    protected $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T
     {
         return processInstanceOrClass( instOrClass) as T;
     }
@@ -1114,14 +1114,6 @@ class VirtHandler implements ProxyHandler<any>
 
 
 /**
- * Symbol used in the ThemeDefinition classes for the array that collects names of properties,
- * which are considered "own" properties of the class.
- */
-let symKeys = Symbol("keys");
-
-
-
-/**
  * The `ThemeDefinition` class is a base for all classes that define themes. In addition to
  * being a style definition class, themes provide some extra capabilities related to style
  * inheritance and theme activation.
@@ -1133,15 +1125,24 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
     constructor( parent?: P)
     {
         super(parent);
-        this[symKeys] = [];
 
         // instead of returning an instance of our class, the constructor returns a proxy where
         // both the target and the handler are our own instance. This allows creating proxies for
         // all properties defined in the class, which is needed for proper use and overriding.
-        return new Proxy<ThemeDefinition<P>>( this, this);
+        return new Proxy<ThemeDefinition<P>>( this, new ThemeDefinitionHandler());
     }
+}
 
-    set( t: any, p: PropertyKey, v: any, r: any): boolean
+
+
+/**
+ * The `ThemeDefinitionHandler` class serves as a proxy handler for Proxy(ThemeDefinition).
+ */
+class ThemeDefinitionHandler implements ProxyHandler<ThemeDefinition>
+{
+    keys: string[] = [];
+
+    set( t: ThemeDefinition, p: PropertyKey, v: any, r: any): boolean
     {
         if (typeof p === "symbol" || typeof p === "number" || t[p] !== undefined)
             return Reflect.set( t, p, v, r);
@@ -1151,15 +1152,14 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
                 virtual( t, p);
 
             t[p] = v;
-            this[symKeys].push(p);
+            this.keys.push(p);
             return true;
         }
     }
 
-    ownKeys(t: any): ArrayLike<string | symbol>
+    ownKeys(t: ThemeDefinition): ArrayLike<string | symbol>
     {
-        // return Reflect.ownKeys( t.constructor.prototype).filter( n => n !== "constructor");
-        return this[symKeys];
+        return this.keys;
     }
 }
 

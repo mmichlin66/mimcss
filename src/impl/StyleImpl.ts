@@ -9,6 +9,7 @@ import {IIDRule} from "../api/RuleTypes";
 import {LengthMath, AngleMath} from "./NumericImpl";
 import {VarRule} from "../rules/VarRule";
 import {v2s, V2SOptions, o2s, P2SOption, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
+import {getVarsFromSTyleDefinition} from "../rules/RuleContainer";
 
 
 
@@ -440,7 +441,7 @@ export function mergeStylesets( target: Styleset | undefined | null,
 	for( let propName in source)
 	{
         if (propName === "--")
-            mergeStylesetCustomProps( target, source);
+            mergeCustomProps( target, source);
         else
             target[propName] = source[propName];
 	}
@@ -453,7 +454,7 @@ export function mergeStylesets( target: Styleset | undefined | null,
 /**
  * Merges "--" property from the source styleset to the target styleset.
  */
-export function mergeStylesetCustomProps( target: Styleset, source: Styleset): void
+export function mergeCustomProps( target: Styleset, source: Styleset): void
 {
     // check whether custom properties and important properties are defined
     let sourceCustomProps = source["--"];
@@ -493,36 +494,44 @@ export function styleset2s( styleset: Styleset): string
  * Extracts name and string values from the given custom CSS property definition.
  * @param customVal
  */
-function getCustomPropNameAndValue( customVal: CustomVar_StyleType): [string?,string?]
+function getCustomPropNamesAndValues( customVal: CustomVar_StyleType): [string,string?][]
 {
     if (!customVal)
         return [];
 
-    let varName: string;
-    let template: string;
-    let value: any;
-    if (customVal.length === 2)
+    if (Array.isArray(customVal))
     {
-        varName = (customVal[0] as VarRule).cssName;
-        template = customVal[0].template;
-        value = customVal[1]
+        let varName: string;
+        let template: string;
+        let value: any;
+        if (customVal.length === 2)
+        {
+            varName = (customVal[0] as VarRule).cssName;
+            template = customVal[0].template;
+            value = customVal[1]
+        }
+        else
+        {
+            varName = customVal[0];
+            if (!varName)
+                return [];
+            else if (!varName.startsWith("--"))
+                varName = "--" + varName;
+
+            template = customVal[1];
+            if (!varName || !template)
+                return [];
+
+            value = customVal[2];
+        }
+
+        return [[varName, styleProp2s( template, value)]];
     }
     else
     {
-        varName = customVal[0];
-        if (!varName)
-            return [];
-        else if (!varName.startsWith("--"))
-            varName = "--" + varName;
-
-        template = customVal[1];
-        if (!varName || !template)
-            return [];
-
-        value = customVal[2];
+        let vars = getVarsFromSTyleDefinition(customVal);
+        return vars.map( varRule => [varRule.cssName, styleProp2s( varRule.template, varRule.getValue())]);
     }
-
-    return [varName, styleProp2s( template, value)];
 }
 
 
@@ -581,13 +590,15 @@ export function forAllPropsInStylset( styleset: Styleset,
 				if (!customVal)
 					continue;
 
-				let [varName, varValue] = getCustomPropNameAndValue( customVal);
-				if (!varName)
-					continue;
-				if (varValue == null)
-					varValue = "";
+				let tuples: [string, string?][] = getCustomPropNamesAndValues( customVal);
+                for( let tuple of tuples)
+                {
+                    if (!tuple[0])
+                        continue;
 
-				forPropFunc( varName, varValue, true, false);
+                    let varValue = tuple[1] == null ? "" : tuple[1];
+                    forPropFunc( tuple[0], varValue, true, false);
+                }
 			}
 		}
 		else
