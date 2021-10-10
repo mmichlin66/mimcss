@@ -76,9 +76,6 @@ export abstract class RuleLike
     // their names.
 	public postProcess(): void {}
 
-	// Creates a copy of the rule.
-	public abstract clone(): RuleLike;
-
 
 
 	// Rule container to which this rule belongs.
@@ -101,9 +98,6 @@ export abstract class RuleLike
  */
 export abstract class Rule extends RuleLike implements IRule
 {
-	// Creates a copy of the rule.
-	public abstract clone(): Rule;
-
 	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
 	// style definition class, to which this rule belongs, is activated.
 	public abstract insert( parent: CSSStyleSheet | CSSGroupingRule): void;

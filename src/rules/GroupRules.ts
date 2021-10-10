@@ -141,14 +141,6 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 
 
 
-	// Creates a copy of the rule.
-	public clone(): SupportsRule<T>
-	{
-		return new SupportsRule<T>( this.statement, this.instanceOrClass);
-	}
-
-
-
 	/** Flag indicated whether the browser supports this rule's query */
     public get isSupported(): boolean
     {
@@ -191,14 +183,6 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
 		super( instanceOrClass);
 
 		this.statement = statement;
-	}
-
-
-
-	// Creates a copy of the rule.
-	public clone(): MediaRule<T>
-	{
-		return new MediaRule<T>( this.statement, this.instanceOrClass);
 	}
 
 

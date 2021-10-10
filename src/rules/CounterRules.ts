@@ -34,14 +34,6 @@ export class CounterRule extends RuleLike implements ICounterRule
 
 
 
-	// Creates a copy of the rule.
-	public clone(): CounterRule
-	{
-		return new CounterRule( this.nameOverride);
-	}
-
-
-
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
@@ -88,12 +80,6 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	{
         super.process( container, topLevelContainer, ruleName);
 		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
-	}
-
-	// Creates a copy of the rule.
-	public clone(): CounterStyleRule
-	{
-		return new CounterStyleRule( undefined, this.nameOverride);
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.

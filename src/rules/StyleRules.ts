@@ -156,19 +156,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
-	// Copies internal data from another rule object.
-	protected copyFrom( src: StyleRule): void
-	{
-		// this method is called on a newly created object so we don't have any properties in
-		// our own styleset yet
-		this.styleset = mergeStylesets( this.styleset, src.styleset);
-		this.copyDependentRulesFrom( src);
-	}
-
-
-
 	// Copies dependent rules from another style rule object.
-	private copyDependentRulesFrom( src: StyleRule): void
+	protected copyDependentRulesFrom( src: StyleRule): void
 	{
 		for( let propName in src.dependentRules)
 		{
@@ -201,16 +190,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public toCssString(): string
 	{
 		return this.selectorText + styleset2s( this.styleset);
-	}
-
-
-
-	// Creates a copy of the rule.
-	public clone(): StyleRule
-	{
-		let newRule = this.cloneObject();
-		newRule.copyFrom( this);
-		return newRule;
 	}
 
 
@@ -281,10 +260,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	}
 
 
-
-	// Creates a new style rule object of the proper type, but without the styleset and dependent
-	// rules.
-	protected abstract cloneObject(): StyleRule;
 
 	// Returns the selector part of the style rule.
 	protected abstract getSelectorString(): string;
@@ -391,7 +366,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public dependentRules: DependentRules;
 
 	// Resultant object defining properties to be inserted into DOM.
-	private styleset: Styleset;
+	protected styleset: Styleset;
 
 	// Selector string cached after it is first obtained. Needed to not invoke getSelectorString
 	// multiple times in the presence of dependent rules.
@@ -423,9 +398,16 @@ class DependentRule extends StyleRule
 
 
 	// Creates a copy of the rule.
-	public cloneObject(): DependentRule
+	public clone(): DependentRule
 	{
-		return new DependentRule( this.selector, this.selectorParam);
+		let newRule = new DependentRule( this.selector, this.selectorParam);
+
+        // this method is called on a newly created object so we don't have any properties in
+		// our own styleset yet
+		newRule.styleset = mergeStylesets( newRule.styleset, this.styleset);
+		newRule.copyDependentRulesFrom( this);
+
+        return newRule;
 	}
 
 
@@ -474,12 +456,6 @@ class DependentRule extends StyleRule
  */
 export class AbstractRule extends StyleRule
 {
-	// Creates a copy of the rule.
-	public cloneObject(): AbstractRule
-	{
-		return new AbstractRule();
-	}
-
 	// Overrides the StyleRule's implementation to do nothing. No CSSStyleRule is created for
 	// abstract rules.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
@@ -590,12 +566,6 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 	/** Name of the class prefixed with "." */
 	public get cssClassName(): string { return this.cssName; }
 
-	// Creates a copy of the rule object.
-	public cloneObject(): ClassRule
-	{
-		return new ClassRule( undefined, this.nameOverride);
-	}
-
 	// Returns prefix that is put before the entity name to create a CSS name used in style rule
 	// selectors.
 	protected get cssPrefix(): string { return "."; }
@@ -613,12 +583,6 @@ export class IDRule extends NamedStyleRule implements IIDRule
 {
 	/** Name of the element ID prefixed with "#" */
 	public get cssIDName(): string { return this.cssName; }
-
-	// Creates a copy of the rule object.
-	public cloneObject(): IDRule
-	{
-		return new IDRule( undefined, this.nameOverride);
-	}
 
 	// Returns prefix that is put before the entity name to create a CSS name used in style rule
 	// selectors.
@@ -645,12 +609,6 @@ export class AttrRule extends StyleRule
 		super( styleset);
 		this.tag = tag;
 		this.attrs = Array.isArray(attrs) ? attrs : [attrs];
-	}
-
-	// Creates a copy of the rule.
-	public cloneObject(): AttrRule
-	{
-		return new AttrRule( this.tag, this.attrs);
 	}
 
 	// Returns the selector part of the style rule.
@@ -700,12 +658,6 @@ export class SelectorRule extends StyleRule
 	{
 		super( styleset);
 		this.selector = selector;
-	}
-
-	// Creates a copy of the rule.
-	public cloneObject(): SelectorRule
-	{
-		return new SelectorRule( this.selector);
 	}
 
 	// Returns the selector part of the style rule.

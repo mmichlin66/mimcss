@@ -76,12 +76,6 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
 	}
 
-	// Creates a copy of the rule.
-	public clone(): GridLineRule
-	{
-		return new GridLineRule( this.nameOverride, this.isStartEndOrNone);
-	}
-
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
@@ -142,12 +136,6 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
         // process line rules
         this.startLine.process( container, topLevelContainer, null);
         this.endLine.process( container, topLevelContainer, null);
-	}
-
-	// Creates a copy of the rule.
-	public clone(): GridAreaRule
-	{
-		return new GridAreaRule( this.nameOverride);
 	}
 
 	/**

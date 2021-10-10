@@ -62,12 +62,6 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 		this.supportsStatement = supportsStatement;
 	}
 
-	// Creates a copy of the rule.
-	public clone(): ImportRule
-	{
-		return new ImportRule( this.url, this.mediaStatement, this.supportsStatement);
-	}
-
 	// Returns CSS string for this rule.
     protected getRuleText(): string
     {
@@ -111,12 +105,6 @@ export class NamespaceRule extends MiscRule<CSSNamespaceRule> implements INamesp
 		this.prefix = prefix;
 	}
 
-	// Creates a copy of the rule.
-	public clone(): NamespaceRule
-	{
-		return new NamespaceRule( this.namespace, this.prefix);
-	}
-
 	// Returns CSS string for this rule.
     protected getRuleText(): string
     {
@@ -146,12 +134,6 @@ export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFace
 		this.fontface = fontface;
 	}
 
-	// Creates a copy of the rule.
-	public clone(): FontFaceRule
-	{
-		return new FontFaceRule( this.fontface);
-	}
-
 	// Returns CSS string for this rule.
     protected getRuleText(): string
     {
@@ -173,12 +155,6 @@ export class PageRule extends StyleRule implements IPageRule
 	{
 		super( style);
 		this.pseudoClass = pseudoClass;
-	}
-
-	// Creates a copy of the rule.
-	public cloneObject(): PageRule
-	{
-		return new PageRule( this.pseudoClass);
 	}
 
 	// Returns the selector part of the style rule.
@@ -215,12 +191,6 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 	public get selectorText(): string
 	{
 		return this.cssClassName;
-	}
-
-	// Creates a copy of the rule.
-	public clone(): ClassNameRule
-	{
-		return new ClassNameRule( this.classes);
 	}
 
 	// Processes the given rule.

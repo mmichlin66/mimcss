@@ -133,13 +133,11 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Processes custom CSS property.
 	private processVarRule( propName: string | null, varObj: VarRule): void
 	{
-		// if the object is already assigned to a stylesheet, we create a clone of the
-		// rule and assign it to our stylesheet.
-		if (varObj.container)
-			varObj = varObj.clone();
+		// we only process rules once
+		if (!varObj.container)
+			varObj.process( this, this.topLevelContainer, propName);
 
-		varObj.process( this, this.topLevelContainer, propName);
-		this.vars.push( varObj);
+        this.vars.push( varObj);
 	}
 
 
@@ -147,12 +145,10 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Processes counter object.
 	private processRuleLike( propName: string | null, ruleLike: RuleLike): void
 	{
-		// if the object is already assigned to a stylesheet, we create a clone of the
-		// rule and assign it to our stylesheet.
-		if (ruleLike.container)
-            ruleLike = ruleLike.clone();
+		// we only process rules once
+		if (!ruleLike.container)
+            ruleLike.process( this, this.topLevelContainer, propName);
 
-        ruleLike.process( this, this.topLevelContainer, propName);
 		this.ruleLikes.push( ruleLike);
 	}
 
@@ -161,20 +157,9 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Processes the given Rule-derived object.
 	private processRule( propName: string | null, rule: Rule): void
 	{
-		// if the rule object is already processed as part of another instance, we create a clone
-		// of the rule and set it to our instance.
-		if (rule.topLevelContainer)
-		{
-			if (propName)
-				this.instance[propName] = rule = rule.clone();
-			else
-			{
-				// TODO: support already used rules in an array
-				return;
-			}
-		}
-
-		rule.process( this, this.topLevelContainer, propName);
+		// we only process rules once
+		if (!rule.container)
+		    rule.process( this, this.topLevelContainer, propName);
 
 		if (rule instanceof ImportRule)
 			this.imports.push( rule);

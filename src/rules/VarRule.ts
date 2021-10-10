@@ -37,14 +37,6 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 
 
 
-	// Creates a copy of the rule.
-	public clone(): VarRule<K>
-	{
-		return new VarRule<K>(this.template, this.value, this.nameOverride);
-	}
-
-
-
 	// Converts the rule to CSS string.
 	public toCssString(): string | null
 	{
@@ -148,14 +140,6 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 
         if (!this.cachedValue)
 		    this.cachedValue = styleProp2s( this.template, this.value);
-	}
-
-
-
-	// Creates a copy of the rule.
-	public clone(): ConstRule<K>
-	{
-		return new ConstRule<K>(this.template, this.value, this.cachedValue);
 	}
 
 

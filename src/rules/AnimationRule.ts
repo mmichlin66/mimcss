@@ -38,18 +38,6 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 
-	// Creates a copy of the rule.
-	public clone(): AnimationRule
-	{
-		let newRule = new AnimationRule(undefined, this.nameOverride);
-		if (this.frameRules)
-			newRule.frameRules = this.frameRules.map( frameRule => frameRule.clone() as AnimationFrameRule);
-		newRule.nameOverride = this.nameOverride;
-		return newRule;
-	}
-
-
-
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
@@ -121,12 +109,6 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 	{
 		super( styleset);
 		this.waypoint = waypoint;
-	}
-
-	// Creates a copy of the rule.
-	public cloneObject(): AnimationFrameRule
-	{
-		return new AnimationFrameRule( this.waypoint);
 	}
 
 	// Returns the selector part of the style rule.
