@@ -1,4 +1,10 @@
 # 0.11.1
+## Non-breaking changes
+
+1. Allow referencing theme definition classes under the `"--"` styleset property.
+
+
+# 0.11.1
 ## Breaking changes
 
 1. Instead of global `$...` functions (e.g. `$class`) use methods of the `StyleDefinition` class.
