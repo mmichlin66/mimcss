@@ -9,7 +9,7 @@ import {StringStyleset} from "../api/StyleTypes";
  * The IActivator interface represents an object responsible for a certain type of activation
  * mechanism.
  */
-export interface IActivator
+export interface IStyleActivator
 {
 	/**
 	 * Instructs to activate the given style definition instance. This method is called when the
@@ -82,7 +82,7 @@ function updateStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, n
  * The SynchronousActivator class represents the synchronous activation mechanism, which writes
  * style changes to the DOM when the activate and deactivate functions are called.
  */
-class SynchronousActivator implements IActivator
+class SynchronousActivator implements IStyleActivator
 {
 	/**
 	 * Instructs to activate the given style definition instance. This method is called when the
@@ -172,7 +172,7 @@ interface ScheduledStyleUpdate
  * method is called The style definition will be either activated or deactivated based on whether
  * the reference count is positive or negative.
  */
-export class SchedulingActivator implements IActivator
+export class SchedulingActivator implements IStyleActivator
 {
     // Map of style definition class instances to the reference count of activation/deactivation.
 	private definitions = new Map<IStyleDefinition,number>();
@@ -205,13 +205,13 @@ export class SchedulingActivator implements IActivator
 		if (refCount === -1)
 		{
 			this.definitions.delete( definition);
-			if (this.definitions.size === 0 && this.props.length === 0)
-				this.scheduler && this.scheduler.cancelDOMUpdate();
+			if (this.isSchedulingNeeded)
+				this.scheduler!.cancelDOMUpdate();
 		}
 		else
 		{
-			if (this.definitions.size === 0 && this.props.length === 0)
-                this.scheduler && this.scheduler.scheduleDOMUpdate();
+			if (this.isSchedulingNeeded)
+                this.scheduler!.scheduleDOMUpdate();
 
 			this.definitions.set( definition, ++refCount);
 		}
@@ -228,13 +228,13 @@ export class SchedulingActivator implements IActivator
 		if (refCount === 1)
 		{
 			this.definitions.delete( definition);
-			if (this.definitions.size === 0 && this.props.length === 0)
-                this.scheduler && this.scheduler.cancelDOMUpdate();
+			if (this.isSchedulingNeeded)
+                this.scheduler!.cancelDOMUpdate();
 		}
 		else
 		{
-			if (this.definitions.size === 0 && this.props.length === 0)
-                this.scheduler && this.scheduler.scheduleDOMUpdate();
+			if (this.isSchedulingNeeded)
+                this.scheduler!.scheduleDOMUpdate();
 
 			this.definitions.set( definition, --refCount);
 		}
@@ -249,8 +249,8 @@ export class SchedulingActivator implements IActivator
     public updateStyle( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
         value?: string | StringStyleset | null, important?: boolean): void
 	{
-		if (this.definitions.size === 0 && this.props.length === 0)
-            this.scheduler && this.scheduler.scheduleDOMUpdate();
+		if (this.isSchedulingNeeded)
+            this.scheduler!.scheduleDOMUpdate();
 
 		this.props.push({ ruleOrElm, name, value, important });
 	}
@@ -286,7 +286,14 @@ export class SchedulingActivator implements IActivator
 
 
 
-	/**
+	private get isSchedulingNeeded(): boolean
+    {
+		return !!this.scheduler && !this.definitions.size && !this.props.length;
+    }
+
+
+
+    /**
 	 * Performs activation/deactivation and property set operations accumulated internally. This
      * method should be used by the derived classes when scheduled activations should be performed.
 	 */
@@ -394,7 +401,7 @@ export function scheduleStyleUpdate( ruleOrElm: CSSStyleRule | ElementCSSInlineS
  * the activator currently set as default. If, for some reason, the default activator is not set,
  * returns the synchronous activator.
  */
-export function getActivator( schedulerType?: number): IActivator
+export function getActivator( schedulerType?: number): IStyleActivator
 {
 	return (schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType))
         ?? s_synchronousActivator;
@@ -482,7 +489,7 @@ let s_synchronousActivator = new SynchronousActivator();
  * Current default activator. This activator will be used if scheduler type is not explicitly
  * specified in calls such as activate or IStyleRule.setProp.
  */
-let s_defaultActivator: IActivator = s_synchronousActivator;
+let s_defaultActivator: IStyleActivator = s_synchronousActivator;
 
 /**
  * Scheduler type identifier to be assigned to the first custom scheduler to be registered.
@@ -500,7 +507,7 @@ let s_nextCustomSchedulerType: number = s_firstCustomSchedulerType;
 /**
  * Map of registered built-in and custom activators.
  */
-let s_registeredActivators = new Map<number,IActivator>();
+let s_registeredActivators = new Map<number,IStyleActivator>();
 
 /**
  * Register built-in and custom activators.

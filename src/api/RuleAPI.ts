@@ -9,7 +9,7 @@ import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
-import {embeddedDecorator, processInstanceOrClass, s_configNames} from "../rules/RuleContainer";
+import {embeddedDecorator, getCurrentThemeInstance, processInstanceOrClass, s_configureNames} from "../rules/RuleContainer";
 import {AbstractRule, AttrRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
@@ -18,6 +18,7 @@ import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {a2s, v2s} from "../impl/Utils";
+import {getActivator} from "../impl/SchedulingImpl";
 
 
 
@@ -960,7 +961,7 @@ export function embedded( category: string): ClassDecorator
  */
 export function configNameGeneration( method: NameGenerationMethod, prefix?: string): void
 {
-	return s_configNames( method, prefix);
+	return s_configureNames( method, prefix);
 }
 
 
@@ -1016,7 +1017,7 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Rule virtualization.
+// Rule virtualization and theming.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1219,6 +1220,57 @@ class ThemeDefinitionHandler implements ProxyHandler<ThemeDefinition>
         return this.keys;
     }
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Activation.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Activates the given style definition class or instance and inserts all its rules into DOM. If
+ * the input object is not an instance but a class, which is not yet associated with an instance,
+ * the instance is first created and processed. Note that each style definition instance maintains
+ * a reference counter of how many times it was activated and deactivated. The rules are inserted
+ * into DOM only upon first activation.
+ */
+ export function activate<T extends IStyleDefinition>(
+	instOrClass: T | IStyleDefinitionClass<T>,
+	schedulerType?: number): T | null
+{
+	let instance = processInstanceOrClass( instOrClass) as T;
+	if (instance)
+        getActivator(schedulerType).activate( instance);
+
+	return instance;
+}
+
+
+
+/**
+ * Deactivates the given style definition instance by removing its rules from DOM. Note that each
+ * style definition instance maintains a reference counter of how many times it was activated and
+ * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
+ */
+export function deactivate( instance: IStyleDefinition, schedulerType?: number): void
+{
+	getActivator(schedulerType).deactivate( instance);
+}
+
+
+
+/**
+ * Returns the theme definition object, which is currently active for the given theme.
+ * @param themeClass Theme definition class
+ * @returns Theme instance, which is currently active for the given theme class or undefined
+ * if no instance is currently active.
+ */
+ export function getActiveThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined
+ {
+     return getCurrentThemeInstance( themeClass);
+ }
 
 
 

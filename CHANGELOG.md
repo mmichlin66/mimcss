@@ -1,7 +1,8 @@
-# 0.11.1
+# 0.12.1
 ## Non-breaking changes
 
 1. Allow referencing theme definition classes under the `"--"` styleset property.
+1. Add `$attr` method to the `StyleDefinition` class to create attribute selectors.
 
 
 # 0.11.1

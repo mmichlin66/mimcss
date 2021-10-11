@@ -10,14 +10,20 @@ import {getActivator, scheduleStyleUpdate} from "../impl/SchedulingImpl";
 // Define symbols that are used for keeping important information on the style definition
 // instances that we don't want to be visible to developers.
 
-/** Property on the style definition class pointing to the singleton instance. */
+/** Symbol on the style definition class pointing to the singleton instance. */
 const symInstance = Symbol("symInstance");
 
 /**
- * Property on the style definition instance pointing to the RuleContainer object that is
+ * Symbol on the style definition instance pointing to the RuleContainer object that is
  * responsible for processing rules.
  */
 const symContainer = Symbol("symContainer");
+
+/**
+ * Symbol on the style definition instance pointing to the StyleDefinition class for which
+ * this instance was created.
+ */
+const symClass = Symbol("symClass");
 
 
 
@@ -49,19 +55,14 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		this.activationRefCount = 0;
 		this.domStyleElm = null;
-
-		this.process();
 	}
 
 
 
 	// Processes the properties of the style definition instance. This creates names for classes,
 	// IDs, animations and custom variables.
-	private process(): void
+	public process(): void
 	{
-		// put reference to this container in the symbol property of the definition instance.
-		this.instance[symContainer] = this;
-
 		// get parent and top level containers
         if (this.parent)
         {
@@ -317,6 +318,25 @@ class RuleContainer implements ITopLevelRuleContainer
         else
             this.domStyleElm = this.topLevelContainer.domStyleElm;
 
+        // if this is a theme class activation, check whether the instance is set as the current
+        // one for its theme base class. If no, then deactivate the theme instance currently set
+        // as active. In any case, set our new instance as the currently active one.
+        if (this.instance instanceof ThemeDefinition)
+        {
+            let themeClass = this.instance[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
+            if (themeClass)
+            {
+                let currInstance = getCurrentThemeInstance( themeClass);
+                if (currInstance && currInstance !== this.instance)
+                {
+                    let currContainer = currInstance[symContainer] as RuleContainer;
+                    currContainer.deactivate();
+                }
+
+                setCurrentThemeInstance( this.instance);
+            }
+        }
+
         this.insertRules( this.domStyleElm!.sheet as CSSStyleSheet);
     }
 
@@ -336,16 +356,29 @@ class RuleContainer implements ITopLevelRuleContainer
 			return;
         }
 
-		if (--this.activationRefCount === 0)
-		{
-			this.clearRules();
+		if (--this.activationRefCount > 0)
+            return;
 
-			// only the top-level not-embedded style defiitions create the `<style>` element
-			if (this.isTopLevel && !this.embeddingContainer)
-				this.domStyleElm!.remove();
+        this.clearRules();
 
-			this.domStyleElm = null;
-		}
+        // only the top-level not-embedded style defiitions create the `<style>` element
+        if (this.isTopLevel && !this.embeddingContainer)
+            this.domStyleElm!.remove();
+
+        this.domStyleElm = null;
+
+        // if this is a theme class deactivation, check whether the instance is set as the current
+        // one for its theme base class. If yes, remove it as the currently active one.
+        if (this.instance instanceof ThemeDefinition)
+        {
+            let themeClass = this.instance[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
+            if (themeClass)
+            {
+                let currInstance = getCurrentThemeInstance( themeClass);
+                if (currInstance === this.instance)
+                    removeCurrentThemeInstance( themeClass);
+            }
+        }
 	}
 
 
@@ -453,7 +486,7 @@ class RuleContainer implements ITopLevelRuleContainer
  * @param enable
  * @param prefix
  */
-export function s_configNames( method: NameGenerationMethod, prefix?: string): void
+export function s_configureNames( method: NameGenerationMethod, prefix?: string): void
 {
 	s_nameGeneratonMethod = method;
 	s_uniqueStyleNamesPrefix = prefix ? prefix : "n";
@@ -587,15 +620,22 @@ function processClass( definitionClass: IStyleDefinitionClass,
     if (baseClass !== StyleDefinition && baseClass !== ThemeDefinition)
 		processClass( baseClass, parent);
 
-    // create the instance of the definition class
+    // create the instance of the definition class and mark it as the instance created for it
     let instance = new definitionClass( parent);
+    instance[symClass] = definitionClass;
 
     // get the name for our container
     let name = !definitionClass.name || s_nameGeneratonMethod === NameGenerationMethod.Optimized
         ? generateUniqueName()
         : definitionClass.name;
 
-    new RuleContainer( instance, name);
+    // create rule container, put reference to this container in the symbol property of the
+    // definition instance and process the container rules.
+    let container = new RuleContainer( instance, name);
+    instance[symContainer] = container;
+    container.process();
+
+    // associate the definition class with the created definition instance
     definitionClass[symInstance] = instance;
     return instance;
 }
@@ -611,25 +651,24 @@ function processInstance( instance: IStyleDefinition): void
 {
 	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.
-	let ruleContainer = instance[symContainer] as RuleContainer;
-	if (ruleContainer)
+	let container = instance[symContainer] as RuleContainer;
+	if (container)
 		return;
 
 	// get the name for our container
-	let name : string;
-	if (s_nameGeneratonMethod === NameGenerationMethod.Optimized)
-        name = generateUniqueName();
-    else
+	let name = generateUniqueName();
+	if (s_nameGeneratonMethod !== NameGenerationMethod.Optimized)
 	{
-        name = generateUniqueName();
 		let definitionClass = instance.constructor;
 		if (definitionClass.name)
 			name += "_" + definitionClass.name;
 	}
 
-	// create container - this will associate the new container with the instance and process
-	// the rules.
-	new RuleContainer( instance, name);
+    // create rule container, put reference to this container in the symbol property of the
+    // definition instance and process the container rules.
+    container = new RuleContainer( instance, name);
+    instance[symContainer] = container;
+    container.process();
 }
 
 
@@ -862,6 +901,81 @@ export function embeddedDecorator( category: string, target: IStyleDefinitionCla
 
     // add our class to the container
     embeddingContainer.add( target);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Theming support.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Map of them definition classes to the instances that are currently active for these classes.
+ */
+let themeInstanceMap = new Map<IStyleDefinitionClass<ThemeDefinition>,ThemeDefinition>();
+
+
+
+/**
+ * Returns the theme base class for the given theme class.
+ * @param themeClass ThemeDefinition-derived class
+ * @returns Theme base class.
+ */
+function getThemeBaseClass( themeClass: IStyleDefinitionClass<ThemeDefinition>): IStyleDefinitionClass<ThemeDefinition> | undefined
+{
+    // make sure we are not passed the ThemeDefinition class itself
+    if (themeClass === ThemeDefinition)
+        return undefined;
+
+    // loop over prototypes until we find the class, which derives directly from ThemeDefinition.
+    // This is the theme base class
+    let themeBaseClass = themeClass;
+    for( let cls = Object.getPrototypeOf( themeClass); cls !== ThemeDefinition; cls = Object.getPrototypeOf( cls))
+        themeBaseClass = cls;
+
+    return themeBaseClass;
+}
+
+
+
+/**
+ * Returns the theme definition object, which is currently activated for the given theme.
+ * @param themeClass Theme definition class
+ * @returns Theme instance, which is currently activated for the given theme class or null
+ * if no istance is currently activated.
+ */
+export function getCurrentThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined
+{
+    let themeBaseClass = getThemeBaseClass(themeClass)
+    return themeBaseClass && themeInstanceMap.get( themeBaseClass);
+}
+
+
+
+/**
+ * Sets the theme definition object as the instance that is currently activated for the
+ * corresponding base theme class.
+ * @param theme theme instance to set as current for the corresponding base theme class
+ */
+function setCurrentThemeInstance( theme: ThemeDefinition): void
+{
+    let themeBaseClass = getThemeBaseClass( theme.constructor as IStyleDefinitionClass<ThemeDefinition>);
+    themeBaseClass && themeInstanceMap.set( themeBaseClass, theme);
+}
+
+
+
+/**
+ * Removes a theme definition object set as the instance that is currently activated for the
+ * corresponding base theme class.
+ * @param themeClass Theme definition class
+ */
+function removeCurrentThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): void
+{
+    let themeBaseClass = getThemeBaseClass( themeClass);
+    themeBaseClass && themeInstanceMap.delete( themeBaseClass);
 }
 
 
