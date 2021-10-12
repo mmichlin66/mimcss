@@ -1236,7 +1236,7 @@ class ThemeDefinitionHandler implements ProxyHandler<ThemeDefinition>
  * a reference counter of how many times it was activated and deactivated. The rules are inserted
  * into DOM only upon first activation.
  */
- export function activate<T extends IStyleDefinition>(
+export function activate<T extends IStyleDefinition>(
 	instOrClass: T | IStyleDefinitionClass<T>,
 	schedulerType?: number): T | null
 {
@@ -1267,10 +1267,10 @@ export function deactivate( instance: IStyleDefinition, schedulerType?: number):
  * @returns Theme instance, which is currently active for the given theme class or undefined
  * if no instance is currently active.
  */
- export function getActiveThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined
- {
-     return getCurrentThemeInstance( themeClass);
- }
+export function getActiveThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined
+{
+    return getCurrentThemeInstance( themeClass);
+}
 
 
 

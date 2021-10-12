@@ -1,57 +1,57 @@
 {
-	"name": "mimcss",
-	"version": "0.11.1",
-	"description": "Authoring CSS in TypeScript",
-	"homepage": "https://mmichlin66.github.io/mimcss/guide/introduction.html",
-	"repository": "github:mmichlin66/mimcss",
-	"main": "./lib/mimcss.js",
-	"module": "./lib/mimcss.js",
-	"types": "./lib/index.d.ts",
-	"scripts": {
-		"build": "tsc -b && webpack",
-		"build-tests": "tsc -b && webpack --config src/test/webpack.config.js",
-		"typedoc": "typedoc"
-	},
-	"author": {
-		"name": "Michael Michlin",
-		"email": "mmulya@outlook.com",
-		"url": "https://mmichlin66.github.io"
-	},
-	"keywords": [
-		"css",
-		"css-in-js",
-		"typescript",
-		"styled-components"
-	],
-	"license": "MIT",
-	"devDependencies": {
-		"@types/jasmine": "^3.8.1",
-		"copy-webpack-plugin": "^9.0.1",
-		"ifdef-loader": "^2.3.0",
-		"source-map-loader": "^3.0.0",
-		"typescript": "^4.3.5",
-		"webpack": "^5.44.0",
-		"webpack-cli": "^4.7.2"
-	},
-	"files": [
-		"lib/mimcss.js",
-		"lib/mimcss.dev.js",
-		"lib/index.d.ts",
-		"lib/api/CoreTypes.d.ts",
-		"lib/api/CoreAPI.d.ts",
-		"lib/api/NumericTypes.d.ts",
-		"lib/api/NumericAPI.d.ts",
-		"lib/api/ColorTypes.d.ts",
-		"lib/api/ColorAPI.d.ts",
-		"lib/api/FontTypes.d.ts",
-		"lib/api/ShapeTypes.d.ts",
-		"lib/api/ShapeAPI.d.ts",
-		"lib/api/MediaTypes.d.ts",
-		"lib/api/RuleTypes.d.ts",
-		"lib/api/RuleAPI.d.ts",
-		"lib/api/SchedulingTypes.d.ts",
-		"lib/api/SchedulingAPI.d.ts",
-		"lib/api/StyleTypes.d.ts",
-		"lib/api/StyleAPI.d.ts"
-	]
+    "name": "mimcss",
+    "version": "0.11.2",
+    "description": "Authoring CSS in TypeScript",
+    "homepage": "https://mmichlin66.github.io/mimcss/guide/introduction.html",
+    "repository": "github:mmichlin66/mimcss",
+    "main": "./lib/mimcss.js",
+    "module": "./lib/mimcss.js",
+    "types": "./lib/index.d.ts",
+    "scripts": {
+        "build": "tsc -b && webpack",
+        "build-tests": "tsc -b && webpack --config src/test/webpack.config.js",
+        "typedoc": "typedoc"
+    },
+    "author": {
+        "name": "Michael Michlin",
+        "email": "mmulya@outlook.com",
+        "url": "https://mmichlin66.github.io"
+    },
+    "keywords": [
+        "css",
+        "css-in-js",
+        "typescript",
+        "styled-components"
+    ],
+    "license": "MIT",
+    "devDependencies": {
+        "@types/jasmine": "^3.8.1",
+        "copy-webpack-plugin": "^9.0.1",
+        "ifdef-loader": "^2.3.0",
+        "source-map-loader": "^3.0.0",
+        "typescript": "^4.3.5",
+        "webpack": "^5.44.0",
+        "webpack-cli": "^4.7.2"
+    },
+    "files": [
+        "lib/mimcss.js",
+        "lib/mimcss.dev.js",
+        "lib/index.d.ts",
+        "lib/api/CoreTypes.d.ts",
+        "lib/api/CoreAPI.d.ts",
+        "lib/api/NumericTypes.d.ts",
+        "lib/api/NumericAPI.d.ts",
+        "lib/api/ColorTypes.d.ts",
+        "lib/api/ColorAPI.d.ts",
+        "lib/api/FontTypes.d.ts",
+        "lib/api/ShapeTypes.d.ts",
+        "lib/api/ShapeAPI.d.ts",
+        "lib/api/MediaTypes.d.ts",
+        "lib/api/RuleTypes.d.ts",
+        "lib/api/RuleAPI.d.ts",
+        "lib/api/SchedulingTypes.d.ts",
+        "lib/api/SchedulingAPI.d.ts",
+        "lib/api/StyleTypes.d.ts",
+        "lib/api/StyleAPI.d.ts"
+    ]
 }

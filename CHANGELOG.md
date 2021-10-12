@@ -1,4 +1,4 @@
-# 0.12.1
+# 0.11.2
 ## Non-breaking changes
 
 1. Allow referencing theme definition classes under the `"--"` styleset property.
