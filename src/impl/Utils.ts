@@ -4,6 +4,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+import { ICssFuncObject } from "../api/CoreTypes";
+
 /**
  * Converts dashe-case to camelCase, e.g. font-size to fontSize.
  * @param dash
@@ -53,7 +55,7 @@ export type NumberToStringFunc = (n: number) => string;
 
 
 /**
- * Numeric identifiers corresponding to well known functions used to convert style property values
+ * Numeric identifiers corresponding to Well Known Functions used to convert style property values
  * to strings. This is used to reduce the size of the object used for mapping style properties to
  * conversion functions.
  */
@@ -163,7 +165,27 @@ export type V2SOptions = WKF | AnyToStringFunc |
 
 
 /**
- * Converts a value of an arbitrary type to a single string. The optional options parameter
+ * Converts the given value to a string using the following rules:
+ *   - if this is an object with the symValueToString symbol, whcih is a function - call this
+ *     function.
+ *   - if this is an object with the `fn` property, whcih is a string - treat it as Function
+ *     Definition object and call fdo2s.
+ *   - for everything else, call val.toString().
+ *
+ * Note that the input value cannot be null or undefined.
+ */
+function singleObjectToString( val: any): string
+{
+    if (typeof val[symValueToString] === "function")
+        return val[symValueToString]();
+    else if (typeof val.fn === "string")
+        return fdo2s( val);
+    else
+        return val.toString();
+}
+
+/**
+ * Converts a value of an arbitrary type to a single string. The options parameter
  * can define how specific types are converted.
  */
 export function v2s( val: any, options?: V2SOptions): string
@@ -179,10 +201,8 @@ export function v2s( val: any, options?: V2SOptions): string
             return v2s(val());
         else if (val == null)
             return "";
-        else if (typeof val[symValueToString] === "function")
-            return val[symValueToString]();
         else
-            return val.toString();
+            return singleObjectToString(val);
     }
 
     // do different things for different types of options
@@ -193,13 +213,13 @@ export function v2s( val: any, options?: V2SOptions): string
     else
     {
         // processing with options. For all types except null and string, if the type-specific
-        // function is not defined, call fromAny if defined.
+        // property is not defined, use options.any if defined.
         let newOptions: V2SOptions | undefined = undefined;
 
         if (val == null)
             return options.nil ? typeof options.nil === "string" ? options.nil : options.nil( val) : "";
         else if (typeof val === "number")
-            newOptions = options.num || options.any;
+            newOptions = options.num ?? options.any;
         else if (typeof val === "function")
             return v2s( val());
         else if (Array.isArray(val))
@@ -209,21 +229,19 @@ export function v2s( val: any, options?: V2SOptions): string
             else if (val.length === 0)
                 return "";
             else
-                return a2s( val, options.item || options.any, options.sep);
+                return a2s( val, options.item ?? options.any, options.sep);
         }
         else if (typeof val === "object")
         {
             if (options.obj || options.any)
-                newOptions = options.obj || options.any;
+                newOptions = options.obj ?? options.any;
             else if (options.props)
                 return o2s( val, options.props, options.sep);
-            else if (typeof val[symValueToString] === "function")
-                return val[symValueToString]();
             else
-                return val.toString();
+                return singleObjectToString(val);
         }
         else if (typeof val === "string")
-            newOptions = options.str || options.any;
+            newOptions = options.str ?? options.any;
         else if (typeof val === "boolean")
             return options.bool ? options.bool( val) : val.toString();
         else
@@ -290,6 +308,12 @@ export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: st
 
 
 
+// Type representing an array of values or two-item tuples where the item is a value and the
+// second item is the V2SOptions object determining how this value should be serialized.
+export type ParamListWithOptions = (any | [any, V2SOptions?])[];
+
+
+
 /**
  * Converts the given array of values to a single string according to the specified options and
  * using the given separator. For each item in the array, the v2s function is called to convert
@@ -297,7 +321,7 @@ export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: st
  * @param values
  * @param separator
  */
-export function mv2s( values: (any | [any, V2SOptions?])[], separator: string = " "): string
+export function mv2s( values: ParamListWithOptions, separator: string = " "): string
 {
     if (values == null || values.length === 0)
         return "";
@@ -329,7 +353,7 @@ export function mv2s( values: (any | [any, V2SOptions?])[], separator: string = 
  * @param values
  * @param separator
  */
-export function f2s( name: string, values: (any | [any, V2SOptions?])[], separator = ",")
+export function f2s( name: string, values: ParamListWithOptions, separator = ",")
 {
     return `${name}(${mv2s( values, separator)})`;
 }
@@ -363,48 +387,130 @@ export function tag2s( parts: TemplateStringsArray, params: any[],
  * property of a property set will be serialized according to the V2SOptions parameter in this
  * object; if the property does not appear in this object, the v2s function will be called for it.
  */
- export type PropSetInfos = { [K: string]: V2SOptions };
+export type PropSetInfos = { [K: string]: V2SOptions };
 
- /**
-  * Object that specifying options for string serialization of a property set.
-  */
- export type PropSet2SOptions = {
-     prefix?: string;
-     suffix?: string;
-     separator?: string;
-     propFunc?: (dashName: string, camelName: string, val: any, options: V2SOptions) => string;
- };
+/**
+ * Object that specifies options for string serialization of a property set.
+ */
+export type PropSet2SOptions = {
+    prefix?: string;
+    suffix?: string;
+    separator?: string;
+    propFunc?: (dashName: string, camelName: string, val: any, options: V2SOptions) => string;
+};
 
 
 
- /**
-  * Converts the given font face object to the CSS style string.
-  */
- export function propSet2s( val: any, infos: PropSetInfos, options?: PropSet2SOptions): string
- {
-     return v2s( val, {
-         obj: v => {
-             let propNames = Object.keys( v);
-             if (propNames.length === 0)
-                 return "";
+/**
+ * Converts the given property set object to the CSS style string.
+ */
+export function propSet2s( val: any, infos: PropSetInfos, options?: PropSet2SOptions): string
+{
+    return v2s( val, {
+        obj: v => {
+            let propNames = Object.keys( v);
+            if (propNames.length === 0)
+                return "";
 
-             let func = options?.propFunc ?? propInPropSet2s;
-             let arr = propNames.map( (propName) =>
-             {
-                 let dashPropName = camelToDash(propName);
-                 let camelPropName = dashToCamel(propName);
-                 return func( dashPropName, camelPropName, v[propName], infos[camelPropName]);
-             });
-             return (options?.prefix ?? "") + `${arr.join( options?.separator ?? ";")}` + (options?.suffix ?? "");
-         }
-     });
- }
+            let func = options?.propFunc ?? propInPropSet2s;
+            let arr = propNames.map( (propName) =>
+            {
+                let dashPropName = camelToDash(propName);
+                let camelPropName = dashToCamel(propName);
+                return func( dashPropName, camelPropName, v[propName], infos[camelPropName]);
+            });
+            return (options?.prefix ?? "") + `${arr.join( options?.separator ?? ";")}` + (options?.suffix ?? "");
+        }
+    });
+}
 
- // convert the value to string based on the information object for the property (if defined)
- function propInPropSet2s( dashName: string, camelName: string, val: any, options: V2SOptions): string
- {
-     return `${dashName}:${ v2s( val, options)}`;
- }
+// convert the value to string based on the information object for the property (if defined)
+function propInPropSet2s( dashName: string, camelName: string, val: any, options: V2SOptions): string
+{
+    return `${dashName}:${ v2s( val, options)}`;
+}
+
+
+
+/**
+ * Type that defines how to serialize a value for an entry in the function definitions object.
+ * The value can be of one of the following types with each corresponding to a certain way of
+ * string serialization:
+ *   - function - the function is invoked.
+ *   - number - all object properties except "fn" are converted using the corresponding function
+ *     from the WKF enumeration.
+ *   - string - all object properties except "fn" are concatenated using the string as a separator.
+ *   - tuple with the first item as number and the second optional as string - all object
+ *     properties except "fn" are converted using the corresponding function from the WKF
+ *     enumeration and concatenated using the string as a separator (default is ",").
+ *   - array of P2SOption types - o2s is ivoked
+ *   - object - may have the following properties:
+ *     - optional "fn" - replaces function name.
+ *     - mandatory "params" - array of P2SOption types.
+ *     - oprtional "sep" for separator (default is ",").
+ */
+type FdoOptions = AnyToStringFunc | number | string | P2SOptions |
+    {
+        fn?: string,
+        params: P2SOptions,
+        sep?: string,
+    }
+
+
+
+// This object is filled in in the XxxAPI files where the functions corresponding to CSS functions
+// are defined.
+export const fdo: { [fn: string]: FdoOptions } = {};
+
+
+/**
+ * Converts the given function definition object to string. Conversion is performed according
+ * to the type found in the "fdo" object for the property name equal to the "fn" property of
+ * the given value. If no such property exist in the "fdo" object, all object's properties except
+ * "fn" will be converted to strings using v2s and concatenated with comma.
+ *
+ * @param val Function definition object that has the "fn" property defining the function name.
+ * @returns String representation of CSS function invocation.
+ */
+export function fdo2s( val: ICssFuncObject): string
+{
+    let options = fdo[val.fn];
+    if (!options)
+        return goOverProps(val);
+    else if (typeof options === "number")
+        return goOverProps( val, options);
+    else if (typeof options === "string")
+        return goOverProps( val, undefined, options);
+    else if (typeof options === "function")
+        return options( val);
+    else if (Array.isArray(options))
+        return `${val.fn}(${o2s( val, options, ",")})`;
+    else
+        return `${options.fn ?? val.fn}(${o2s( val, options.params, options.sep)})`;
+}
+
+
+
+/**
+ * Helper function that goes over the props of the given object except the "fn" property,
+ * serializes all the props using the given options and concatenates them with the given
+ * separator (comma by default).
+ * @param val
+ * @param options
+ * @param sep
+ * @returns
+ */
+function goOverProps( val: ICssFuncObject, options?: V2SOptions, sep?: string): string
+{
+    let buf: string[] = [];
+    for( let p in val)
+    {
+        if (p !== "fn")
+            buf.push( v2s( val[p], options));
+    }
+
+    return `${val.fn}(${buf.join( sep ?? ",")})`;
+}
 
 
 

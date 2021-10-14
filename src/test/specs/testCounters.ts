@@ -99,34 +99,6 @@ describe("counters", () =>
 
 			css.deactivate( a!);
 		})
-
-		it("counter() with CounterRule and 'after' string", () =>
-		{
-			class A extends css.StyleDefinition
-			{
-				counter = this.$counter();
-				c = this.$class( { "::before": { content: css.counter( this.counter, undefined, " - ") } })
-			}
-
-			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "counter(A_counter) \" - \"");
-
-			css.deactivate( a!);
-		})
-
-		it("counter() with CounterRule, style, 'after' and 'before' strings", () =>
-		{
-			class A extends css.StyleDefinition
-			{
-				counter = this.$counter();
-				c = this.$class( { "::before": { content: css.counter( this.counter, "disc", " - ", "...") } })
-			}
-
-			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "\"...\" counter(A_counter, disc) \" - \"");
-
-			css.deactivate( a!);
-		})
 	})
 
 
@@ -157,34 +129,6 @@ describe("counters", () =>
 
 			let a = css.activate( A);
 			dom.verifyDependentPropValue( a!.c, "::before", "content", "counters(A_counter, \".\", circle)");
-
-			css.deactivate( a!);
-		})
-
-		it("counters() with CounterRule, separator and 'after' string", () =>
-		{
-			class A extends css.StyleDefinition
-			{
-				counter = this.$counter();
-				c = this.$class( { "::before": { content: css.counters( this.counter, ".", undefined, " - ") } })
-			}
-
-			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "counters(A_counter, \".\") \" - \"");
-
-			css.deactivate( a!);
-		})
-
-		it("counters() with CounterRule, separator, style, 'after' and 'before' strings", () =>
-		{
-			class A extends css.StyleDefinition
-			{
-				counter = this.$counter();
-				c = this.$class( { "::before": { content: css.counters( this.counter, ".", "disc", " - ", "...") } })
-			}
-
-			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "\"...\" counters(A_counter, \".\", disc) \" - \"");
 
 			css.deactivate( a!);
 		})

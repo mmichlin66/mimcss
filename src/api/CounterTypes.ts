@@ -13,7 +13,7 @@ export type CounterExtended<T> = T | IStringProxy;
 
 
 /**
- * Type for specfying counter [[system]] property.
+ * Type for specifying counter [[system]] property.
  */
 export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic" | "additive" | "fixed" |
     number | [ListStyleType_StyleType | IStringProxy];
@@ -21,56 +21,56 @@ export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic
 
 
 /**
- * Type for specfying counter[[negative]] property.
+ * Type for specifying counter[[negative]] property.
  */
 export type Negative_CounterType = OneOrPair<CounterExtended<string>>;
 
 
 
 /**
- * Type for specfying counter [[prefix]] and [[suffix]] properties.
+ * Type for specifying counter [[prefix]] and [[suffix]] properties.
  */
 export type PrefixSuffix_CounterType = string | CssImage;
 
 
 
 /**
- * Type for specfying counter [[range]] property.
+ * Type for specifying counter [[range]] property.
  */
 export type Range_CounterType = "auto" | OneOrMany<CounterExtended<["infinite" | number, "infinite" | number]>>;
 
 
 
 /**
- * Type for specfying counter [[pad]] property.
+ * Type for specifying counter [[pad]] property.
  */
 export type Pad_CounterType = [number, string];
 
 
 
 /**
- * Type for specfying counter [[fallback]] property.
+ * Type for specifying counter [[fallback]] property.
  */
 export type Fallback_CounterType = ListStyleType_StyleType;
 
 
 
 /**
- * Type for specfying counter [[symbols]] property.
+ * Type for specifying counter [[symbols]] property.
  */
 export type Symbols_CounterType = OneOrMany<CounterExtended<string>>;
 
 
 
 /**
- * Type for specfying counter [[additiveSymbols]] property.
+ * Type for specifying counter [[additiveSymbols]] property.
  */
 export type AdditiveSymbols_CounterType = OneOrMany<CounterExtended<[string | CssImage, number] | [number, string | CssImage]>>;
 
 
 
 /**
- * Type for specfying counter [[speakAs]] property.
+ * Type for specifying counter [[speakAs]] property.
  */
 export type SpeakAs_CounterType = "auto" | "bullets" | "numbers" | "words" | "spell-out" | ICounterStyleRule;
 

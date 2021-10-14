@@ -1,9 +1,11 @@
-﻿import {Extended, IGenericProxy} from "./CoreTypes";
+﻿import {Extended, ICssFuncObject, IGenericProxy} from "./CoreTypes";
 import {
-    AngleUnits, BorderRadius, CssAngle, CssLength, CssNumber, CssPoint, CssPosition, FrequencyUnits, LengthUnits,
+    AngleUnits, BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, FrequencyUnits, LengthUnits,
     PercentUnits, ResolutionUnits, TimeUnits
 } from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
+import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
+import {IIDRule} from "./RuleTypes";
 
 
 
@@ -35,7 +37,7 @@ import {CssColor} from "./ColorTypes";
   * interface or any of the functions that return the [[IImageProxy]] interface such as
   * [[linearGradient]], [[crossFade]] and others.
   */
- export type CssImage = IUrlProxy | IImageProxy | ILinearGradient | IRadialGradient | IConicGradient;
+ export type CssImage = IUrlFunc | IImageProxy | ILinearGradientFunc | IRadialGradientFunc | IConicGradientFunc;
 
 
 
@@ -72,25 +74,6 @@ export type GradientStopOrHint<T extends (CssLength | CssAngle)> =
 
 
 /**
- * The IGradient interface represents the common functionality of CSS gradients.
- * @typeparam T Type of numeric values used for hints and color stops.
- */
-export interface IGradient<T extends (CssLength | CssAngle)>
-{
-    /** Sets the flag indicating whether the gradient is repeating; the default value is true. */
-    repeating( flag?: boolean): this;
-
-    /**
-     * Adds stops or hints to the gradient definition.
-     * @param stopsOrHints Variable argument list specifying stops or hints that will be added to
-     * the gradient definition.
-     */
-    add( ...stopsOrHints: GradientStopOrHint<T>[]): this;
-}
-
-
-
-/**
  * Type that enumerates possible values of the side-or-corner for the [[linearGradient]] function.
  * These values can be specified in lieu of the angle in the [[ILinearGradient.to|to]] method of
  * the [[ILinearGradient]] interface.
@@ -104,6 +87,8 @@ export interface IGradient<T extends (CssLength | CssAngle)>
 export type SideOrCorner = "bottom" | "left" | "top" | "right" |
     "top left" | "top right" | "bottom right" | "bottom left" |
     "left top" | "right top" | "left bottom" | "right bottom";
+
+
 
 /**
  * Type that represents the angle of the [[linearGradient]] CSS function. These values can be
@@ -125,31 +110,117 @@ export type LinearGradientAngle = Extended<CssAngle> | SideOrCorner;
 
 
 /**
- * The ILinearGradient interface represents an object that produces either `linear-gradient` or
- * `repeating-linear-gradient` CSS function. It can be directly assigned to a suitable style
- * property (e.g. background-image). In addition it has the `to` method that can be called to
- * specify the angle of the gradiant.
+ * Base class for gradients
+ * @typeparam T Type of numeric values used for hints and color stops.
+ * @category Image
  */
-export interface ILinearGradient extends IGradient<CssLength>
+export interface IGradientFunc<T extends (CssLength | CssAngle)> extends ICssFuncObject
 {
-    /**
-     * Sets the angle at which the linear gradient changes colors
-     * @param angle Either an angle value or an indication of side or corner such as `right` or
-     * `top left`.
-     */
-	to( angle: LinearGradientAngle): ILinearGradient;
+    /** flag indicating whether the gradient is repeating */
+    repeat?: boolean;
+
+    /** Array of stops and hints */
+    stops: GradientStopOrHint<T>[];
 }
 
 
 
 /**
- * The IRadialGradient interface represents an object that produces either `radial-gradient` or
+ * Base class for gradient builders.
+ * @typeparam T Type of numeric values used for hints and color stops.
+ * @category Image
+ */
+export interface IGradientBuilder<T extends (CssLength | CssAngle)> extends IGradientFunc<T>
+{
+    /**
+     * Sets the flag indicating whether the gradient is repeating.
+     * @param repeatFflag indicating whether to set the gradient as repeating; the default value
+     * is true.
+     */
+    repeating( repeat?: boolean): this;
+
+    /**
+     * Adds stops or hints to the gradient definition.
+     * @param stops Variable argument list specifying stops or hints that will be added to
+     * the gradient definition.
+     */
+    add( ...stops: GradientStopOrHint<T>[]): this;
+}
+
+
+
+/**
+ * Represents an object that produces either `linear-gradient` or
+ * `repeating-linear-gradient` CSS function. It can be directly assigned to a suitable style
+ * property (e.g. background-image). Objects implementing this interface can be used whereever
+ * gradients are used.
+ * @category Image
+ */
+export interface ILinearGradientFunc extends IGradientFunc<CssLength>
+{
+    fn: "linear-gradient";
+
+    /** Gradient angle */
+	angle?: LinearGradientAngle;
+}
+
+
+
+/**
+ * Represents an object that produces either `linear-gradient`
+ * or `repeating-linear-gradient` CSS function. It can be directly assigned to a suitable style
+ * property (e.g. background-image). In addition it has the `to` method that can be called to
+ * specify the angle of the gradient.
+ * @category Image
+ */
+export interface ILinearGradientBuilder extends ILinearGradientFunc, IGradientBuilder<CssLength>
+{
+    fn: "linear-gradient";
+
+    /**
+     * Sets the angle at which the linear gradient changes colors
+     * @param angle Either an angle value or an indication of side or corner such as `right` or
+     * `top left`.
+     */
+	to( angle: LinearGradientAngle): this;
+}
+
+
+
+/**
+ * Represents an object that produces either `radial-gradient` or
+ * `repeating-radial-gradient` CSS function. It can be directly assigned to a suitable style
+ * property (e.g. background-image). Objects implementing this interface can be used whereever
+ * gradients are used.
+ * @category Image
+ */
+export interface IRadialGradientFunc extends IGradientFunc<CssLength>
+{
+    fn: "radial-gradient";
+
+    /** Gradient's ending shape */
+    shape?: "circle" | "ellipse";
+
+    /** Size of the gradient's ending shape */
+	size?: Extended<CssLength> | Extended<ExtentKeyword> | [Extended<CssLength>, Extended<CssLength>];
+
+    /** Gradient's position */
+    pos?: Extended<CssPosition>;
+}
+
+
+
+/**
+ * Represents an object that produces either `radial-gradient` or
  * `repeating-radial-gradient` CSS function. It can be directly assigned to a suitable style
  * property (e.g. background-image). In addition it has the `circle`, `ellipse`, `extent` and `at`
- * methods that can be called to specify parameters of the gradiant.
+ * methods that can be called to specify parameters of the gradient.
+ * @category Image
  */
-export interface IRadialGradient extends IGradient<CssLength>
+export interface IRadialGradientBuilder extends IRadialGradientFunc, IGradientBuilder<CssLength>
 {
+    fn: "radial-gradient";
+
     /**
      * Sets the shape of the gradient to circle.
      */
@@ -207,13 +278,36 @@ export interface IRadialGradient extends IGradient<CssLength>
 
 
 /**
- * The IConicGradient interface represents an object that produces either `conic-gradient` or
+ * Represents an object that produces either `conic-gradient` or
+ * `repeating-conic-gradient` CSS function. It can be directly assigned to a suitable style
+ * property (e.g. background-image). Objects implementing this interface can be used whereever
+ * gradients are used.
+ * @category Image
+ */
+export interface IConicGradientFunc extends IGradientFunc<CssAngle>
+{
+    fn: "conic-gradient";
+
+    /** Gradient's rotation angle */
+    angle?: Extended<CssAngle>;
+
+    /** Gradient's position */
+    pos?: Extended<CssPosition>;
+}
+
+
+
+/**
+ * Represents an object that produces either `conic-gradient` or
  * `repeating-conic-gradient` CSS function. It can be directly assigned to a suitable style
  * property (e.g. background-image). In addition it has the `from` and `at` methods that can be
- * called to specify the parameters of the gradiant.
+ * called to specify the starting angle and center of the gradient.
+ * @category Image
  */
-export interface IConicGradient extends IGradient<CssAngle>
+export interface IConicGradientBuilder extends IConicGradientFunc, IGradientBuilder<CssAngle>
 {
+    fn: "conic-gradient";
+
     /**
      * Sets the angle from which the gradient starts.
      * @param angle Angle value
@@ -236,31 +330,330 @@ export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Filter and transform CSS functions
+// Filter CSS functions
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IFilterProxy interface represents the result of invoking one of the CSS `<filter>` functions.
+ * The PercentFilterNames type represents the names of the percentage-based filter functions.
  */
-export interface IFilterProxy extends IGenericProxy<"filter"> {}
+export type PercentFilterNames = "brightness" | "contrast" | "grayscale" | "invert" |
+    "opacity" | "saturate" | "sepia";
 
-
-
-/**ITransformProxy
- * The IFilterProxy interface represents the result of invoking one of the CSS `<transform>` functions.
+/**
+ * The IPercentFilterFunc interface represents the parameter of percentage-based filter. It can
+ * be directly assigned to a style property that accepts filter values (e.g. filter).
+ * @category Filter
  */
-export interface ITransformProxy extends IGenericProxy<"transform"> {}
+ export interface IPercentFilterFunc extends ICssFuncObject
+{
+    fn: PercentFilterNames;
+
+    /** Percentage value */
+    p: Extended<CssPercent>;
+}
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * The IBlurFunc interface represents the parameters of the `blur()` CSS function. It can
+ * be directly assigned to a style property that accepts filter values (e.g. filter). It is
+ * returned from the [[blur]] function.
+ * @category Filter
+ */
+ export interface IBlurFunc extends ICssFuncObject
+{
+    fn: "blur";
+
+    /** Blur radius */
+    r: Extended<CssLength>;
+}
+
+
+
+/**
+ * The IDropShadowFunc interface represents the parameters of the `drop-shadow()` CSS function.
+ * It can be directly assigned to a style property that accepts filter values (e.g. filter). It is
+ * returned from the [[dropShadow]] function.
+ * @category Filter
+ */
+ export interface IDropShadowFunc extends ICssFuncObject
+{
+    fn: "drop-shadow";
+
+    /** X-axis offset of the shadow */
+    x: Extended<CssLength>;
+
+    /** Y-axis offset of the shadow */
+    y: Extended<CssLength>;
+
+    /** Shadow color */
+    color?: Extended<CssColor>;
+
+    /** Blur radius */
+    blur?: Extended<CssLength>;
+}
+
+
+
+/**
+ * The IHueRotateFunc interface represents the parameters of the `hue-rotate()` CSS function.
+ * It can be directly assigned to a style property that accepts filter values (e.g. filter). It is
+ * returned from the [[hueRotate]] function.
+ * @category Filter
+ */
+ export interface IHueRotateFunc extends ICssFuncObject
+{
+    fn: "hue-rotate";
+
+    /** Hue rotation angle */
+    a: Extended<CssAngle>;
+}
+
+
+
+/**
+ * The FilterFuncs interface represents the result of invoking one of the CSS `<filter>` functions.
+ */
+export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHueRotateFunc;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Transform CSS functions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The IMatrixFunc interface represents the parameters of the `matrix()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[matrix]] function.
+ * @category Transform
+ */
+ export interface IMatrixFunc extends ICssFuncObject
+{
+    fn: "matrix";
+
+    a: Extended<CssNumber>;
+    b: Extended<CssNumber>;
+    c: Extended<CssNumber>;
+	d: Extended<CssNumber>;
+    tx: Extended<CssNumber>;
+    ty: Extended<CssNumber>;
+}
+
+
+
+/**
+ * The IMatrix3dFunc interface represents the parameters of the `matrix3d()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[matrix3d]] function.
+ * @category Transform
+ */
+ export interface IMatrix3dFunc extends ICssFuncObject
+{
+    fn: "matrix3d";
+
+    a1: Extended<CssNumber>; b1: Extended<CssNumber>; c1: Extended<CssNumber>; d1: Extended<CssNumber>;
+    a2: Extended<CssNumber>; b2: Extended<CssNumber>; c2: Extended<CssNumber>; d2: Extended<CssNumber>;
+    a3: Extended<CssNumber>; b3: Extended<CssNumber>; c3: Extended<CssNumber>; d3: Extended<CssNumber>;
+    a4: Extended<CssNumber>; b4: Extended<CssNumber>; c4: Extended<CssNumber>; d4: Extended<CssNumber>;
+}
+
+
+
+/**
+ * The IPerspectiveFunc interface represents the parameters of the `perspective()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[perspective]] function.
+ * @category Transform
+ */
+ export interface IPerspectiveFunc extends ICssFuncObject
+{
+    fn: "perspective";
+
+    d: Extended<CssLength>;
+}
+
+
+
+/**
+ * The IRotateFunc interface represents the parameters of the `rotate()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[rotate]] function.
+ * @category Transform
+ */
+ export interface IRotateFunc extends ICssFuncObject
+{
+    fn: "rotate" | "rotateX" | "rotateY" | "rotateZ";
+
+    a: Extended<CssAngle>;
+}
+
+
+
+/**
+ * The IRotate3dFunc interface represents the parameters of the `rotate3d()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[rotate3d]] function.
+ * @category Transform
+ */
+ export interface IRotate3dFunc extends ICssFuncObject
+{
+    fn: "rotate3d";
+
+    x: Extended<CssNumber>;
+    y: Extended<CssNumber>;
+    z: Extended<CssNumber>;
+    a: Extended<CssAngle>;
+}
+
+
+
+/**
+ * The IScale1dFunc interface represents the parameters of the `scaleX()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[scaleX]] function.
+ * @category Transform
+ */
+ export interface IScale1dFunc extends ICssFuncObject
+{
+    fn: "scaleX" | "scaleY" | "scaleZ";
+
+    s: Extended<CssNumber>;
+}
+
+
+
+/**
+ * The IScaleFunc interface represents the parameters of the `scale()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[scale]] function.
+ * @category Transform
+ */
+ export interface IScaleFunc extends ICssFuncObject
+{
+    fn: "scale";
+
+    sx: Extended<CssNumber>;
+    sy?: Extended<CssNumber>;
+}
+
+
+
+/**
+ * The IScale3dFunc interface represents the parameters of the `scale3d()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[scale3d]] function.
+ * @category Transform
+ */
+ export interface IScale3dFunc extends ICssFuncObject
+{
+    fn: "scale3d";
+
+    sx: Extended<CssNumber>;
+    sy: Extended<CssNumber>;
+    sz: Extended<CssNumber>;
+}
+
+
+
+/**
+ * The ISkew1dFunc interface represents the parameters of the `skewX()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[skewX]] function.
+ * @category Transform
+ */
+ export interface ISkew1dFunc extends ICssFuncObject
+{
+    fn: "skewX" | "skewY";
+
+    a: Extended<CssAngle>;
+}
+
+
+
+/**
+ * The ISkewFunc interface represents the parameters of the `skew()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[skew]] function.
+ * @category Transform
+ */
+ export interface ISkewFunc extends ICssFuncObject
+{
+    fn: "skew";
+
+    ax: Extended<CssAngle>;
+    ay?: Extended<CssAngle>;
+}
+
+
+
+/**
+ * The ITranslate1dFunc interface represents the parameters of the `translateX()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[translateX]] function.
+ * @category Transform
+ */
+ export interface ITranslate1dFunc extends ICssFuncObject
+{
+    fn: "translateX" | "translateY" | "translateZ";
+
+    d: Extended<CssLength>;
+}
+
+
+
+/**
+ * The ITranslateFunc interface represents the parameters of the `translate()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[translate]] function.
+ * @category Transform
+ */
+ export interface ITranslateFunc extends ICssFuncObject
+{
+    fn: "translate";
+
+    x: Extended<CssLength>;
+    y?: Extended<CssLength>;
+}
+
+
+
+/**
+ * The ITranslate3dFunc interface represents the parameters of the `translate3d()` CSS function. It can
+ * be directly assigned to a style property that accepts transform values (e.g. transform). It is
+ * returned from the [[translate3d]] function.
+ * @category Transform
+ */
+ export interface ITranslate3dFunc extends ICssFuncObject
+{
+    fn: "translate3d";
+
+    x: Extended<CssLength>;
+    y: Extended<CssLength>;
+    z: Extended<CssLength>;
+}
+
+
+
+/**
+ * The TransformFuncs interface represents the result of invoking one of the CSS `<transform>` functions.
+ */
+export type TransformFuncs = IMatrixFunc | IMatrix3dFunc | IPerspectiveFunc |
+    IRotateFunc | IRotate3dFunc | IScale1dFunc | IScaleFunc | IScale3dFunc |
+    ISkew1dFunc | ISkewFunc | ITranslate1dFunc | ITranslateFunc | ITranslate3dFunc;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Basic shape CSS functions
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Type that is used to specify a radius in [circle]] and [ellipse]] functions.
@@ -273,42 +666,100 @@ export type FillRule = "nonzero" | "evenodd";
 
 
 /**
- * The IInset interface represents the CSS `inset` basic shape. It is the result of invoking
- * the [inset]] function and it can be directly assigned to a suitable style property (e.g.
- * clip-path). In addition it has the `round` method that can be called to specify the radii of
- * the inset rectangle's corners.
+ * The IInsetFunc interface represents the data of the CSS inset basic shape. It can be directly
+ * assigned to any style property that accepts values of the [[BasicShape]] type (e.g. clip-path).
+ * @category Basic Shape
  */
-export interface IInset
+ export interface IInsetFunc extends ICssFuncObject
 {
-    round( radius?: Extended<BorderRadius>): this;
+    fn: "inset";
+
+    /** First offset value */
+    o1: Extended<CssLength>;
+
+    /** First offset value */
+    o2?: Extended<CssLength>;
+
+    /** First offset value */
+    o3?: Extended<CssLength>;
+
+    /** First offset value */
+    o4?: Extended<CssLength>;
+
+    /** Border radius value */
+    r?: Extended<BorderRadius>;
+}
+
+/**
+ * The IInsetBuilder interface extends the [[IInsetFunc]] interface and adds the `round` method that
+ * can be called to specify the border radius of the inset rectangle. It is the result of invoking
+ * the [[inset]] function.
+ * @category Basic Shape
+ */
+ export interface IInsetBuilder extends IInsetFunc
+{
+    /** Sets the border radius */
+    round( r?: Extended<BorderRadius>): this;
 }
 
 
 
 /**
- * The ICircle interface represents the CSS circle basic shape. It is the result of invoking
- * the [circle]] function and it can be directly assigned to a suitable style property (e.g.
- * clip-path). In addition it has the `at` method that can be called to specify the position of
- * the circle's center.
+ * The ICircleFunc interface represents the data of the CSS circle basic shape. It can be directly
+ * assigned to any style property that accepts values of the [[BasicShape]] type (e.g. clip-path).
+ * @category Basic Shape
  */
-export interface ICircle
+export interface ICircleFunc extends ICssFuncObject
 {
-    /**
-     * Sets the position of the circle's center.
-     * @param pos Position value.
-     */
+    fn: "circle";
+
+    /** Circle's radius. */
+    r?: ShapeRadius;
+
+    /** Position of the circle's center. */
+    pos?: Extended<CssPosition>;
+}
+
+/**
+ * The ICircleBuilder interface extends the [[ICircleFunc]] interface and adds the `at` method that
+ * can be called to specify the position of the circle's center. It is the result of invoking
+ * the [[circle]] function.
+ * @category Basic Shape
+ */
+export interface ICircleBuilder extends ICircleFunc
+{
+    /** Sets the position of the circle's center. */
     at( pos: Extended<CssPosition>): this;
 }
 
 
 
 /**
- * The IEllipse interface represents the CSS ellipse basic shape. It is the result of invoking
- * the [ellipse]] function and it can be directly assigned to a suitable style property (e.g.
- * clip-path). In addition it has the `at` method that can be called to specify the position of
- * the ellipse's center.
+ * The IEllipseFunc interface represents the data of the CSS ellipse basic shape. It can be directly
+ * assigned to any style property that accepts values of the [[BasicShape]] type (e.g. clip-path).
+ * @category Basic Shape
  */
-export interface IEllipse
+ export interface IEllipseFunc extends ICssFuncObject
+{
+    fn: "ellipse";
+
+    /** Ellipses's X-axis radius. */
+    rx?: ShapeRadius;
+
+    /** Ellipses's Y-axis radius. */
+    ry?: ShapeRadius;
+
+    /** Position of the ellipse's center. */
+    pos?: Extended<CssPosition>;
+}
+
+/**
+ * The IEllipseBuilder interface extends the [[IEllipseFunc]] interface and adds the `at` method that
+ * can be called to specify the position of the ellipse's center. It is the result of invoking
+ * the [[ellipse]] function.
+ * @category Basic Shape
+ */
+ export interface IEllipseBuilder extends IEllipseFunc
 {
     /**
      * Sets the position of the ellipse's center.
@@ -320,12 +771,27 @@ export interface IEllipse
 
 
 /**
- * The IPolygonProxy interface represents the CSS polygon basic shape. It is the result of invoking
- * the [polygon | polygon]] function and it can be directly assigned to a suitable style property (e.g.
- * clip-path). In addition it has the `fill` method that can be called to specify the fill
- * rule.
+ * The IPolygonFunc interface represents the data of the CSS polygon basic shape. It can be directly
+ * assigned to any style property that accepts values of the [[BasicShape]] type (e.g. clip-path).
+ * @category Basic Shape
  */
-export interface IPolygon
+ export interface IPolygonFunc extends ICssFuncObject
+{
+    fn: "polygon";
+
+    /** Polygon points */
+    points: CssPoint[];
+
+    /** Poligon filling rule */
+    rule?: FillRule;
+}
+
+/**
+ * The IPolygonBuilder interface extends the [[IPolygonFunc]] interface and adds several methods that
+ * allow changing the polygon parameters. It is the result of invoking the [[polygon]] function.
+ * @category Basic Shape
+ */
+ export interface IPolygonBuilder extends IPolygonFunc
 {
     /**
      * Adds the given points to the polygon
@@ -343,15 +809,43 @@ export interface IPolygon
 
 
 /**
- * The `IPathBuilder` interface represents the object that accumulates path commands that are then
- * converted to a string parameter of the CSS `path()` function. The `IPathBuilder` interface is
- * returned from the [[path]] function. The methods in this interface mimic the SVG path commands
- * described in MDN: <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands" target="mdn">Path Commands</a>
+ * Defines type of path command parameters, which could be either a single number or an array
+ * of numbers.
  */
-export interface IPathBuilder
+export type PathCommandParam = number | number[];
+
+/**
+ * Defines type used to store a path command. This includes the command name and its parameters.
+ */
+export type PathCommand = [string, PathCommandParam[]?];
+
+/**
+ * The IPathFunc interface represents the data of the CSS path basic shape. It can be directly
+ * assigned to any style property that accepts values of the [[BasicShape]] type (e.g. clip-path).
+ * @category Basic Shape
+ */
+export interface IPathFunc extends ICssFuncObject
 {
-    /** Filling rule used to determine the interior of the path */
-    readonly rule?: FillRule;
+    fn: "path";
+
+    /** Path filling rule */
+    rule?: FillRule;
+
+    /** Array of path commands */
+    items: PathCommand[];
+}
+
+/**
+ * The IPathBuilder interface extends the [[IPathFunc]] interface and adds several methods that allow
+ * adding path commands. It is the result of invoking the [[path]] function. The methods in this
+ * interface mimic the SVG path commands described in MDN:
+ * <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands" target="mdn">Path Commands</a>
+ * @category Basic Shape
+ */
+export interface IPathBuilder extends IPathFunc
+{
+    // Adds the given command and parameters to the path.
+    add( command: string, params?: PathCommandParam[]): this
 
     /** Move-to command with absolute coordinates. */
     M( ...params: [number,number][]): this;
@@ -408,16 +902,37 @@ export interface IPathBuilder
     a( ...params: [number,number,number,0|1,0|1,number,number][]): this;
 
     /** Close-path command. */
-    z(): IPathBuilder;
+    z(): this;
 }
 
 
 
 /**
  * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions such as
- * [[circle]], [[polygon]], [[path]], etc.
+ * [[inset]], [[circle]], [[ellipse]], [[polygon]], [[path]].
  */
-export type BasicShape = IInset | ICircle | IEllipse | IPolygon | IPathBuilder;
+export type BasicShape = IInsetFunc | ICircleFunc | IEllipseFunc | IPolygonFunc | IPathBuilder;
+
+
+
+/**
+ * The IRayFunc interface represents the data of the CSS ray function. It can be directly
+ * assigned to any style property that accepts the suitable type (e.g. offset-path).
+ * @category Basic Shape
+*/
+export interface IRayFunc extends ICssFuncObject
+{
+    fn: "ray";
+
+    /** Ray's angle. */
+    angle: Extended<CssAngle>;
+
+    /** Ray's size */
+    size?: Extended<ExtentKeyword | CssLength>;
+
+    /** Flag determining the presence of the keyword "contain" */
+    contain?: boolean;
+}
 
 
 
@@ -428,20 +943,54 @@ export type BasicShape = IInset | ICircle | IEllipse | IPolygon | IPathBuilder;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IMinMaxProxy interface represents an invocation of the [[minmax]] function.
+ * The IMinMaxFunc interface represents an invocation of the [[minmax]] function.
+ * @category Grid
  */
-export interface IMinMaxProxy extends IGenericProxy<"minmax"> {}
+export interface IMinMaxFunc extends ICssFuncObject
+{
+    fn: "minmax";
+
+    /** Minimum track size */
+    min: GridTrackSize;
+
+    /** Minimum track size */
+    max: GridTrackSize;
+}
+
+
 
 /**
- * The IRepeatProxy interface represents an invocation of the [[repeat]] function.
+ * The IRepeatFunc interface represents an invocation of the [[repeat]] function.
+ * @category Grid
  */
-export interface IRepeatProxy extends IGenericProxy<"repeat"> {}
+export interface IRepeatFunc extends ICssFuncObject
+{
+    fn: "repeat";
+
+    /** Number of repetitions */
+    count: Extended<CssNumber> | "auto-fill" | "auto-fit";
+
+    /** Array of track definitions */
+    tracks: GridTrack[];
+}
+
+
 
 /**
- * The ISpanProxy interface produces the span expression for grid layouts. It is returned from
+ * The IGridSpanFunc interface represents a span expression for grid layouts. It is returned from
  * the [[span]] function.
+ * @category Grid
  */
-export interface ISpanProxy extends IGenericProxy<"span"> {}
+export interface IGridSpanFunc extends ICssFuncObject
+{
+    fn: "span";
+
+    /** First span argument */
+    p1: Extended<GridLineCountOrName>;
+
+    /** Second span argument */
+    p2?: Extended<GridLineCountOrName>;
+}
 
 
 
@@ -452,25 +1001,46 @@ export interface ISpanProxy extends IGenericProxy<"span"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IUrlFunc interface represents an invocation of the CSS `url()` function.
+ * The IUrlFunc interface represents an invocation of the CSS `url()` function. It is returned from
+ * the [[url]] function.
+ * @category Miscellaneous
  */
-export interface IUrlProxy extends IGenericProxy<"url"> {}
+export interface IUrlFunc extends ICssFuncObject
+{
+    fn: "url";
 
-/**
- * The IRayFunc interface represents an invocation of the CSS `ray()` function.
- */
-export interface IRayProxy extends IGenericProxy<"ray"> {}
+    /** URL or reference to the ID rule identifying an SVG element */
+    p: Extended<string | IIDRule>;
+}
+
+
 
 /**
  * The ICursorFunc interface represents an invocation of the CSS `url()` function with two optional
  * numbers indicating the cursor's hotspot.
+ * @category Miscellaneous
  */
-export interface ICursorProxy extends IGenericProxy<"cursor"> {}
+export interface ICursorFunc extends ICssFuncObject
+{
+    fn: "cursor";
+
+    /** Cursor URL or reference to the ID rule identifying an SVG element */
+    url: Extended<string | IIDRule>;
+
+    /** X-coordinate of the cursor hotspot */
+    x?: number;
+
+    /** Y-coordinate of the cursor hotspot */
+    y?: number;
+}
+
+
 
 /**
  * Type representing keywords used to define a type used in the CSS `attr()` function.
  */
- export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" | "angle" | "time" | "frequency";
+ export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" |
+    "angle" | "time" | "frequency";
 
  /**
   * Type representing keywords used to define a unit used in the CSS `attr()` function.
@@ -486,13 +1056,41 @@ export interface ICursorProxy extends IGenericProxy<"cursor"> {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Type for step animation timing function jump-term */
-export type TimingFunctionJumpTerm = "jump-start" | "jump-end" | "jump-none" | "jump-both" | "start" | "end";
+export type TimingFunctionJumpTerm = "jump-start" | "jump-end" | "jump-none" | "jump-both" |
+    "start" | "end";
 
 /**
- * The ITimingFunctionFunc interface represents an invocation of the CSS `steps()` and
- * `cubic-bezier()` function.
+ * The IStepsFunc interface represents an invocation of the CSS `steps()` function. It is returned
+ * from the [[steps]] function.
+ * @category Transition and Animation
  */
-export interface ITimingFunctionProxy extends IGenericProxy<"timing-function"> {}
+export interface IStepsFunc extends ICssFuncObject
+{
+    fn: "steps";
+
+    /** Number of stops */
+    n: Extended<number>;
+
+    /** Jump term */
+    j?: TimingFunctionJumpTerm;
+}
+
+
+
+/**
+ * The ICubicBezierFunc interface represents an invocation of the CSS `cubic-bezier()` function.
+ * It is returned from the [[cubicBezier]] function.
+ * @category Transition and Animation
+ */
+export interface ICubicBezierFunc extends ICssFuncObject
+{
+    fn: "cubic-bezier";
+
+    n1: Extended<number>;
+    n2: Extended<number>;
+    n3: Extended<number>,
+    n4: Extended<number>;
+}
 
 
 

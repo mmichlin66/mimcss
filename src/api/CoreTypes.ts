@@ -37,6 +37,18 @@ export interface IGenericProxy<T extends string = any>
 
 
 /**
+ * The ICssFuncObject interface is a base for all interfaces representing objects that describe
+ * calls to a CSS function. Every such interface gives a unique value (or a unique set of values)
+ * to the `fn` member.
+ */
+export interface ICssFuncObject
+{
+    fn: string;
+}
+
+
+
+/**
  * The `IStringProxy` interface represents a function that returns a string. This function is part
  * of type definition for all CSS properties - even for those that don't have `string` as part of
  * their type.
