@@ -7,17 +7,17 @@ declare module "../../api/ColorTypes"
 {
 	interface INamedColors
 	{
-		positiveColor?: number;
-		positiveColorWithAlpha?: number;
-		negativeColor?: number;
-		negativeColorWithAlpha?: number;
+		readonly positiveColor?: number;
+		readonly positiveColorWithAlpha?: number;
+		readonly negativeColor?: number;
+		readonly negativeColorWithAlpha?: number;
 	}
 }
 
-css.Colors.positiveColor = 0x123456;
-css.Colors.positiveColorWithAlpha = 0x123456 + 0.25;
-css.Colors.negativeColor = -0x123456;
-css.Colors.negativeColorWithAlpha = -0x123456 - 0.25;
+css.registerColor( "positiveColor", 0x123456);
+css.registerColor( "positiveColorWithAlpha", 0x123456 + 0.25);
+css.registerColor( "negativeColor", -0x123456);
+css.registerColor( "negativeColorWithAlpha", -0x123456 - 0.25);
 
 
 
@@ -34,24 +34,9 @@ describe("Colors", () =>
 			dom.testLonghandProp( "color", "red", "red");
 		})
 
-		it("numeric color corresponding to named color", () =>
-		{
-			dom.testLonghandProp( "color", 0xFF0000, "red");
-		})
-
-		it("named color from the Colors object", () =>
-		{
-			dom.testLonghandProp( "color", css.Colors.rebeccapurple, "rebeccapurple");
-		})
-
 		it("named color with alpha function", () =>
 		{
 			dom.testLonghandProp( "color", css.alpha( "red", 0.5), "rgba(255, 0, 0, 0.5)");
-		})
-
-		it("negative color number corresponding to named color", () =>
-		{
-			dom.testLonghandProp( "color", -css.Colors.red, "cyan");
 		})
 	})
 
@@ -94,24 +79,29 @@ describe("Colors", () =>
 
 	describe("rgb()", () =>
 	{
-		it("rgb() with positive values", () =>
+		it("rgb() with integer values and no alpha", () =>
 		{
 			dom.testLonghandProp( "color", css.rgb(18, 52, 86), "rgb(18, 52, 86)");
 		})
 
-		it("rgb() with positive values and alpha", () =>
+		it("rgb() with floating point values and no alpha", () =>
+		{
+			dom.testLonghandProp( "color", css.rgb(0.18, 0.52, 0.86), 'rgb(46, 133, 219)');
+		})
+
+		it("rgb() with floating point alpha", () =>
 		{
 			dom.testLonghandProp( "color", css.rgb(18, 52, 86, 0.3), "rgba(18, 52, 86, 0.3)");
 		})
 
-		it("rgb() with negative values", () =>
+		it("rgb() with integer alpha", () =>
 		{
-			dom.testLonghandProp( "color", css.rgb(-18, -52, -86), "rgb(237, 203, 169)");
+			dom.testLonghandProp( "color", css.rgb(18, 52, 86, 30), "rgba(18, 52, 86, 0.3)");
 		})
 
-		it("rgb() with negative values and alpha", () =>
+		it("rgb() with percent string alpha", () =>
 		{
-			dom.testLonghandProp( "color", css.rgb(-18, -52, -86, 0.7), "rgba(237, 203, 169, 0.7)");
+			dom.testLonghandProp( "color", css.rgb(18, 52, 86, "30%"), "rgba(18, 52, 86, 0.3)");
 		})
 	})
 

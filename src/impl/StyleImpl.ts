@@ -1,4 +1,4 @@
-﻿import {CssSelector, Extended} from "../api/CoreTypes";
+﻿import {CssSelector, Extended, ICssFuncObject} from "../api/CoreTypes";
 import {
     Animation_Single, Background_Single, BorderImage_Object, BorderImageSlice_StyleType, BoxShadow,
     Border_StyleType, Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateAreaDefinition,
@@ -8,7 +8,7 @@ import {
 import {IIDRule} from "../api/RuleTypes";
 import {LengthMath, AngleMath} from "./NumericImpl";
 import {VarRule} from "../rules/VarRule";
-import {v2s, V2SOptions, o2s, P2SOption, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
+import {v2s, V2SOptions, o2s, P2SOption, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc, fdo2s} from "./Utils";
 import {getVarsFromSTyleDefinition} from "../rules/RuleContainer";
 
 
@@ -127,25 +127,21 @@ function singleAnimation_fromObject( val: Animation_Single): string
 
 
 
-function singleAnimation_fromStyle( val: Extended<Animation_Single>): string
+function singleBackground_fromObject( val: Background_Single | ICssFuncObject): string
 {
-    return v2s( val, { obj: singleAnimation_fromObject });
-}
-
-
-
-function singleBackground_fromObject( val: Background_Single): string
-{
-    return styleObj2String( val, [
-        ["color", WKF.Color],
-        "image",
-        ["position", WKF.Position],
-        ["size", WKF.MultiLengthWithSpace, "/"],
-        "repeat",
-        "attachment",
-        "origin",
-        "clip"
-    ]);
+    // if (val["fn"])
+    //     return fdo2s( val as ICssFuncObject);
+    // else
+        return styleObj2String( val, [
+            ["color", WKF.Color],
+            "image",
+            ["position", WKF.Position],
+            ["size", WKF.MultiLengthWithSpace, "/"],
+            "repeat",
+            "attachment",
+            "origin",
+            "clip"
+        ]);
 }
 
 
@@ -208,23 +204,19 @@ wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
 
 
 
-function borderToString( val: Extended<Border_StyleType>): string
-{
-    return v2s( val, {
-        num: WKF.Length,
-        arr: arr => {
-            let numbersProcessed = 0;
-            return arr.map( item => {
-                if (typeof item === "number")
-                    return numbersProcessed++ ? v2s( item, WKF.Color) : v2s( item, WKF.Length);
-                else
-                    return v2s(item);
-            }).join(" ");
-        },
-    });
-}
+wkf[WKF.Border] = (val: Extended<Border_StyleType>): string => v2s( val, {
+    num: WKF.Length,
+    arr: arr => {
+        let numbersProcessed = 0;
+        return arr.map( item => {
+            if (typeof item === "number")
+                return numbersProcessed++ ? v2s( item, WKF.Color) : v2s( item, WKF.Length);
+            else
+                return v2s(item);
+        }).join(" ");
+    },
+});
 
-wkf[WKF.Border] = borderToString;
 
 
 
@@ -387,15 +379,6 @@ function singleTransition_fromObject( val: Extended<Transition_Single>): string
 
 
 
-function singleTransition_fromStyle( val: Extended<Transition_Single>): string
-{
-    return v2s( val, {
-        obj: singleTransition_fromObject
-    });
-}
-
-
-
 function offsetToString( val: Offset_StyleType): string
 {
     return styleObj2String( val, [
@@ -456,17 +439,12 @@ export function mergeStylesets( target: Styleset | undefined | null,
  */
 export function mergeCustomProps( target: Styleset, source: Styleset): void
 {
-    // check whether custom properties and important properties are defined
-    let sourceCustomProps = source["--"];
-    if (!sourceCustomProps)
+    let sourceItems = source["--"];
+    if (!sourceItems)
         return;
 
-    // merge custom properties
-    if (sourceCustomProps)
-    {
-        let targetCustomProps = target["--"];
-        target["--"] = !targetCustomProps ? sourceCustomProps.slice() : targetCustomProps.concat( sourceCustomProps);
-    }
+    let targetItems = target["--"];
+    target["--"] = !targetItems ? sourceItems.slice() : targetItems.concat( sourceItems);
 }
 
 
@@ -663,7 +641,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 {
     animation: {
         obj: singleAnimation_fromObject,
-        any: singleAnimation_fromStyle,
+        any: { obj: singleAnimation_fromObject },
         sep: ",",
     },
     animationDelay: WKF.MultiTimeWithComma,
@@ -909,7 +887,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     transformOrigin: WKF.MultiLengthWithSpace,
     transition: {
         obj: singleTransition_fromObject,
-        any: singleTransition_fromStyle,
+        any: {
+            obj: singleTransition_fromObject
+        },
         sep: ",",
     },
     transitionDelay: WKF.MultiTimeWithComma,

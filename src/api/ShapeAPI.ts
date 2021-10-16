@@ -10,7 +10,7 @@ import {
     IMatrix3dFunc, IPerspectiveFunc, IRotateFunc, IRotate3dFunc, IScale1dFunc, IScaleFunc, IScale3dFunc,
     ISkewFunc, ISkew1dFunc, ITranslate1dFunc, ITranslate3dFunc, ITranslateFunc, ILinearGradientBuilder,
     ILinearGradientFunc, IRadialGradientBuilder, IRadialGradientFunc, IConicGradientBuilder,
-    IConicGradientFunc, IGradientBuilder,
+    IConicGradientFunc, IGradientBuilder, IGradientFunc,
 } from "./ShapeTypes";
 import {ICounterRule, IIDRule} from "./RuleTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize, ListStyleType_StyleType} from "./StyleTypes";
@@ -48,7 +48,7 @@ export function linearGradient(...stops: GradientStopOrHint<CssLength>[]): ILine
     return new LinearGradient( stops);
 }
 
-fdo["linear-gradient"] = (v: ILinearGradientFunc) => f2s( `${v.repeat ? "repeating-" : ""}${v.fn}`, [
+fdo["linear-gradient"] = (v: ILinearGradientFunc) => f2s( gradientNameToString(v), [
     linearGradientAngleToString(v.angle),
     gradientStopsOrHintsToString( v.stops, LengthMath)
 ]);
@@ -80,7 +80,7 @@ export function radialGradient(...stops: GradientStopOrHint<CssLength>[]): IRadi
     return new RadialGradient( stops);
 }
 
-fdo["radial-gradient"] = (v: IRadialGradientFunc) => f2s( `${v.repeat ? "repeating-" : ""}${v.fn}`, [
+fdo["radial-gradient"] = (v: IRadialGradientFunc) => f2s( gradientNameToString(v), [
     mv2s([ v.shape, [v.size, WKF.MultiLengthWithSpace], [v.pos, WKF.AtPosition] ]),
     gradientStopsOrHintsToString( v.stops, LengthMath)
 ]);
@@ -110,11 +110,8 @@ export function conicGradient(...stops: GradientStopOrHint<CssAngle>[]): IConicG
     return new ConicGradient( stops);
 }
 
-fdo["conic-gradient"] = (v: IConicGradientFunc) => f2s( `${v.repeat ? "repeating-" : ""}${v.fn}`, [
-    mv2s([
-        [v.angle, v.angle == null ? undefined : (v: Extended<CssAngle>) => "from " + AngleMath.v2s(v)],
-        [v.pos, WKF.AtPosition],
-    ]),
+fdo["conic-gradient"] = (v: IConicGradientFunc) => f2s( gradientNameToString(v), [
+    mv2s([ v.angle == null ? undefined : "from " + AngleMath.v2s(v.angle), [v.pos, WKF.AtPosition] ]),
     gradientStopsOrHintsToString( v.stops, AngleMath)
 ]);
 
@@ -216,6 +213,11 @@ class ConicGradient extends Gradient<CssAngle> implements IConicGradientBuilder
 
 
 
+function gradientNameToString( val: IGradientFunc<any>): string
+{
+    return `${val.repeat ? "repeating-" : ""}${val.fn}`;
+}
+
 function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[], math: NumericMath): string
 {
     return !val ? "" : val.map( v => gradientStopOrHintToString( v, math)).join(",");
@@ -276,9 +278,6 @@ function filterPercent( fn: PercentFilterNames, p: Extended<CssPercent>): IPerce
 {
     return { fn, p };
 }
-
-fdo.brightness = fdo.contrast = fdo.grayscale = fdo.invert = fdo.opacity = fdo.saturate =
-    fdo.sepia = WKF.Percent;
 
 
 
@@ -473,6 +472,9 @@ export function sepia( p: Extended<CssPercent>): IPercentFilterFunc
     return filterPercent( "sepia", p);
 }
 
+fdo.brightness = fdo.contrast = fdo.grayscale = fdo.invert = fdo.opacity = fdo.saturate =
+    fdo.sepia = WKF.Percent;
+
 
 
 /**
@@ -542,8 +544,9 @@ export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
 }
 
 fdo["drop-shadow"] = {
-    params: [ ["x", WKF.Length], ["y", WKF.Length], ["color", WKF.Color], ["blur", WKF.Length] ],
-    sep: " "
+    p: [ "x", "y", ["color", WKF.Color], "blur" ],
+    do: WKF.Length,
+    s: " "
 }
 
 
@@ -594,6 +597,8 @@ export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Exten
     return { fn: "matrix", a, b, c, d, tx, ty };
 }
 
+fdo.matrix = [ "a", "b", "c", "d", "tx", "ty" ];
+
 
 
 /**
@@ -610,6 +615,8 @@ export function matrix3d(
 {
     return { fn: "matrix3d", a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4 };
 }
+
+fdo.matrix = [ "a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2", "a3", "b3", "c3", "d3", "a4", "b4", "c4", "d4" ];
 
 
 
@@ -696,6 +703,8 @@ export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): IScal
     return { fn: "scale", sx, sy };
 }
 
+fdo.scale = ["sx", "sy"]
+
 /**
  * Returns an IScale1dFunc function representing the `scaleX()` CSS function.
  *
@@ -737,6 +746,8 @@ export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
     return { fn: "scale3d", sx, sy, sz };
 }
 
+fdo.scale3d = ["sx", "sy", "sz"]
+
 
 
 /**
@@ -748,6 +759,8 @@ export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ISkewFun
 {
     return { fn: "skew", ax, ay };
 }
+
+fdo.scale3d = ["ax", "ay"]
 
 /**
  * Returns an ISkew1dFunc function representing the `skewX()` CSS function.
@@ -783,6 +796,11 @@ export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITr
     return { fn: "translate", x, y };
 }
 
+fdo.translate = {
+    p: ["x", "y"],
+    do: WKF.Length
+}
+
 /**
  * Returns an ITranslate1dFunc function representing the `translateX()` CSS function.
  *
@@ -813,6 +831,8 @@ export function translateZ( d: Extended<CssLength>): ITranslate1dFunc
     return { fn: "translateZ", d };
 }
 
+fdo.translateX = fdo.translateY = fdo.translateZ = WKF.Length;
+
 /**
  * Returns an ITranslate3dFunc function representing the `translate3d()` CSS function.
  *
@@ -824,7 +844,10 @@ export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
     return { fn: "translate3d", x, y, z };
 }
 
-fdo.translate = fdo.translateX = fdo.translateY = fdo.translateZ = fdo.translate3d = WKF.Length;
+fdo.translate3d = {
+    p: ["x", "y", "z"],
+    do: WKF.Length
+}
 
 
 
@@ -857,11 +880,9 @@ export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
 }
 
 fdo.inset = {
-    params: [
-        ["o1", WKF.Length], ["o2", WKF.Length], ["o3", WKF.Length], ["o4", WKF.Length],
-        ["r", v => "round " + wkf[WKF.BorderRadius](v)],
-    ],
-    sep: " "
+    p: [ "o1", "o2", "o3", "o4", ["r", v => "round " + wkf[WKF.BorderRadius](v)] ],
+    do: WKF.Length,
+    s: " "
 }
 
 
@@ -888,8 +909,8 @@ export function circle( r?: ShapeRadius): ICircleBuilder
 }
 
 fdo.circle = {
-    params: [ ["r", WKF.Length], ["pos", WKF.AtPosition] ],
-    sep: " "
+    p: [ ["r", WKF.Length], ["pos", WKF.AtPosition] ],
+    s: " "
 }
 
 
@@ -932,8 +953,9 @@ export function ellipse(): IEllipseBuilder
 }
 
 fdo.ellipse = {
-    params: [ ["rx", WKF.Length], ["ry", WKF.Length], ["pos", WKF.AtPosition] ],
-    sep: " "
+    p: [ "rx", "ry", ["pos", WKF.AtPosition] ],
+    do: WKF.Length,
+    s: " "
 }
 
 
@@ -1046,12 +1068,12 @@ fdo.path = [ "rule", ["items", (v: PathCommand[]) => `"${a2s(v)}"`] ]
 }
 
 fdo.ray = {
-    params: [
+    p: [
         ["angle", WKF.Angle],
         ["size", WKF.Length],
         ["contain", (v: boolean) => (v ? "contain" : "")]
     ],
-    sep: " "
+    s: " "
 }
 
 
@@ -1072,7 +1094,7 @@ export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxFunc
     return { fn: "minmax", min, max };
 }
 
-fdo.minmax = WKF.Length
+fdo.minmax = [ ["min", WKF.Length], ["max", WKF.Length] ]
 
 
 
@@ -1197,7 +1219,7 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
  export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
 	fallback?: Extended<string>): IStringProxy
 {
-    return () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit], " "), fallback], ",")})`;
+    return () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit]), fallback], ",")})`;
 }
 
 
@@ -1213,10 +1235,12 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
  *
  * @category Transition and Animation
  */
- export function steps( n: Extended<number>, j?: TimingFunctionJumpTerm): IStepsFunc
+export function steps( n: Extended<number>, j?: TimingFunctionJumpTerm): IStepsFunc
 {
     return  { fn: "steps", n, j };
 }
+
+fdo.steps = ["n", "j"]
 
 
 
@@ -1225,11 +1249,13 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
  *
  * @category Transition and Animation
  */
- export function cubicBezier( n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
+export function cubicBezier( n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
     n4: Extended<number>): ICubicBezierFunc
 {
     return { fn: "cubic-bezier", n1, n2, n3, n4 };
 }
+
+fdo["cubic-bezier"] = { p: ["n1", "n2", "n3", "n4"] }
 
 
 

@@ -86,10 +86,19 @@ export const enum WKF
     Quoted,
     FontStyle,
     BoxShadow,
+    AlwaysPercent,
+    ColorSeparation,
 
-    // indicates the length of the array needed to keep conversion functions
+    // indicates the length of the array needed to keep conversion functions. This is used when
+    // we create this array below. Any new enumeration members must be added before this.
     Last
 }
+
+/**
+ * Array of well known conversion functions. Indexes are the identifier of well known functions
+ * from the WellKnownFunc enumeration
+ */
+export let wkf: AnyToStringFunc[] = new Array( WKF.Last);
 
 
 
@@ -108,14 +117,6 @@ export type P2SOption = string | [string, V2SOptions?, string?];
  * If the tuple has a third string element it is placed before the converted property value.
  */
 export type P2SOptions = P2SOption[];
-
-
-
-/**
- * Array of well known conversion functions. Indexes are the identifier of well known functions
- * from the WellKnownFunc enumeration
- */
-export let wkf: AnyToStringFunc[] = new Array( WKF.Last);
 
 
 
@@ -233,7 +234,11 @@ export function v2s( val: any, options?: V2SOptions): string
         }
         else if (typeof val === "object")
         {
-            if (options.obj || options.any)
+            if (typeof val[symValueToString] === "function")
+                return val[symValueToString]();
+            else if (typeof val.fn === "string")
+                return fdo2s( val);
+            else if (options.obj || options.any)
                 newOptions = options.obj ?? options.any;
             else if (options.props)
                 return o2s( val, options.props, options.sep);
@@ -275,11 +280,17 @@ export function a2s( val: any[], options?: V2SOptions, separator: string = " "):
 /**
  * Converts properties of the given object to string by converting each property from the options
  * array and joining them using the given separator.
- * @param val
- * @param options
- * @param separator
+ * @param val Object to convert to string
+ * @param options array of property names or tuples with property names, options and prefixes.
+ * @param separator Separator character.
+ * @param defaultOptions - V2SOptions for those properties in the "params" array that don't
+ * define their own. This should be used in the case when all function parameters are of the
+ * same type
+ * @param defaultPrefix - prefix to use for those properties in the "params" array that don't
+ * define their own prefix
  */
-export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: string): string
+export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: string,
+    defaultOptions?: V2SOptions, defaultPrefix?: string): string
 {
     if (val == null)
         return "";
@@ -295,11 +306,11 @@ export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: st
             continue;
 
         // check whether we have a prefix
-        let prefix = typeof nameOrTuple === "string" ? undefined : nameOrTuple[2];
+        let prefix = typeof nameOrTuple === "string" ? defaultPrefix : nameOrTuple[2];
         if (prefix)
             params.push( prefix);
 
-        let options = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
+        let options = typeof nameOrTuple === "string" ? defaultOptions : nameOrTuple[1];
         params.push( v2s( propVal, options));
     }
 
@@ -438,22 +449,26 @@ function propInPropSet2s( dashName: string, camelName: string, val: any, options
  * string serialization:
  *   - function - the function is invoked.
  *   - number - all object properties except "fn" are converted using the corresponding function
- *     from the WKF enumeration.
- *   - string - all object properties except "fn" are concatenated using the string as a separator.
- *   - tuple with the first item as number and the second optional as string - all object
- *     properties except "fn" are converted using the corresponding function from the WKF
- *     enumeration and concatenated using the string as a separator (default is ",").
+ *     from the WKF enumeration. Since the enumerating order of the properties is indeterminate,
+ *     this option is only good for functions with a single parameter.
  *   - array of P2SOption types - o2s is ivoked
  *   - object - may have the following properties:
  *     - optional "fn" - replaces function name.
  *     - mandatory "params" - array of P2SOption types.
- *     - oprtional "sep" for separator (default is ",").
+ *     - optional "sep" for separator (default is ",").
+ *     - optional "do" - defines V2SOptions for those properties in the "params" array that don't
+ *       define their own. This should be used in the case when all function parameters are of the
+ *       same type
+ *     - optional "dp" - default prefix to use for those properties in the "params" array that
+ *       don't define their own prefix
  */
-type FdoOptions = AnyToStringFunc | number | string | P2SOptions |
+type FdoOptions = AnyToStringFunc | number | P2SOptions |
     {
-        fn?: string,
-        params: P2SOptions,
-        sep?: string,
+        fn?: string | AnyToStringFunc,
+        p: P2SOptions,
+        s?: string,
+        do?: V2SOptions,
+        dp?: string
     }
 
 
@@ -479,14 +494,16 @@ export function fdo2s( val: ICssFuncObject): string
         return goOverProps(val);
     else if (typeof options === "number")
         return goOverProps( val, options);
-    else if (typeof options === "string")
-        return goOverProps( val, undefined, options);
     else if (typeof options === "function")
         return options( val);
     else if (Array.isArray(options))
         return `${val.fn}(${o2s( val, options, ",")})`;
     else
-        return `${options.fn ?? val.fn}(${o2s( val, options.params, options.sep)})`;
+    {
+        let fn = options.fn;
+        fn = !fn ? val.fn : typeof fn === "string" ? fn : fn(val);
+        return `${fn}(${o2s( val, options.p, options.s ?? ",", options.do, options.dp)})`;
+    }
 }
 
 

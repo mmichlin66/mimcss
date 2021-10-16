@@ -155,10 +155,12 @@ wkf[WKF.Percent] = v => PercentMath.v2s( v);
  */
 function unitlessOrPercentToString( n: number): string
 {
-    return n >= 1 || n <= -1 ? n.toString() : Math.round(n * 100) + "%";
+    return n >= 1 || n <= -1 ? n.toString() : (Math.round(n * 100) + "%");
 }
 
+wkf[WKF.Percent] = v => PercentMath.v2s( v);
 wkf[WKF.UnitlessOrPercent] = unitlessOrPercentToString;
+wkf[WKF.AlwaysPercent] = v => v + "%";
 
 
 
