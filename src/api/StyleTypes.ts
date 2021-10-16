@@ -78,7 +78,7 @@ export type AlignmentBaseline_StyleType = "auto" | "baseline" | "before-edge" | 
  * Type for single animation. Used by [[Animation_StyleType]].
  * @category Style Helper
  */
-export type Animation_Single =
+export type Animation_Single = string |
     {
         name?: Extended<AnimationName>;
         duration?: Extended<CssTime>;

@@ -63,98 +63,9 @@ export function pseudoEntity2s( entityName: string, val: any): string
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Utility functions for converting values to strings.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Converts the given value to a CSS string using the info parameter to inform how the object's
- * properties should be converted to strings. The info parameter is an array of either strings
- * or two- or thre-element tuples. The only string and the first tuple element corresponds to a
- * property expected in the value object to be converted. Each property is converted according
- * to the following rules:
- * - If the array item is just a string, the corresponding value's property is converted using
- *   the val2str function.
- * - If the second element is null or undefined, the corresponding value's property is converted using
- *   the val2str function..
- * - If the second element is a string it is treated as a name of a longhand style property. The
- *   value's property is converted using the stylePropToString function for this longhand style
- *   property.
- * - If the second element is a function, it is used to convert the value's property.
- * - If a third element exists in the tuple it is treated as a prefix to be placed before the
- *   converted property value followed by the separator.
- *
- * The order of the names determines in which order the properties should be added to the string.
-*/
-function styleObj2String( val: any,
-    info: (string | [string, (V2SOptions | string)?, string?])[],
-    separator: string = " "): string
-{
-    // call utility function substituting every touple with style property name with function
-    // that converts this property value to string
-    return o2s( val, info.map( nameOrTuple =>
-        {
-            let options = typeof nameOrTuple === "string" ? undefined : nameOrTuple[1];
-            if (typeof options === "string")
-                return [nameOrTuple[0], v => styleProp2s( options as string, v), nameOrTuple[2]];
-            else
-                return nameOrTuple as P2SOption;
-        }
-    ), separator);
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // Functions for converting CSS property types to strings.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-function singleAnimation_fromObject( val: Animation_Single): string
-{
-    return styleObj2String( val, [
-        ["duration", WKF.Time],
-        "func",
-        ["delay", WKF.Time],
-        ["count", WKF.Number],
-        "direction",
-        "mode",
-        "state",
-        "name"
-    ]);
-}
-
-
-
-function singleBackground_fromObject( val: Background_Single | ICssFuncObject): string
-{
-    // if (val["fn"])
-    //     return fdo2s( val as ICssFuncObject);
-    // else
-        return styleObj2String( val, [
-            ["color", WKF.Color],
-            "image",
-            ["position", WKF.Position],
-            ["size", WKF.MultiLengthWithSpace, "/"],
-            "repeat",
-            "attachment",
-            "origin",
-            "clip"
-        ]);
-}
-
-
-
-function singleBackground_fromStyle( val: Extended<Background_Single>): string
-{
-    return v2s( val, {
-        num: WKF.Color,
-        obj: singleBackground_fromObject
-    });
-}
-
-
 
 function borderImageToString( val: BorderImage_Object): string
 {
@@ -166,9 +77,9 @@ function borderImageToString( val: BorderImage_Object): string
     if (val.width == null && val.outset != null)
         valCopy.width = 1;
 
-    return styleObj2String( valCopy, [
+    return o2s( valCopy, [
         "source",
-        ["slice", "borderImageSlice"],
+        ["slice", borderImageSliceToString],
         ["width", undefined, "/"],
         ["outset", undefined, "/"],
         "repeat"
@@ -177,28 +88,30 @@ function borderImageToString( val: BorderImage_Object): string
 
 
 
-function borderImageSliceToString( val: Extended<BorderImageSlice_StyleType>): string
+function borderImageSliceToString( val: BorderImageSlice_StyleType)
 {
     return v2s( val, {
         num: WKF.UnitlessOrPercent,
-        item: v => v2s( v, {
+        item: {
             bool: () => "fill",
             num: WKF.UnitlessOrPercent,
-        })
+        }
     });
 }
 
 
 
 wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
-    obj: (v: BoxShadow) => styleObj2String( v, [
-        ["inset", b => b ? "inset" : ""],
-        ["x", WKF.Length],
-        ["y", WKF.Length],
-        ["blur", WKF.Length],
-        ["spread", WKF.Length],
-        ["color", WKF.Color]
-    ]),
+    obj: (v: BoxShadow) => v2s( v, {
+        props: [
+            ["inset", b => b ? "inset" : ""],
+            ["x", WKF.Length],
+            ["y", WKF.Length],
+            ["blur", WKF.Length],
+            ["spread", WKF.Length],
+            ["color", WKF.Color]
+        ]
+    }),
     sep: ","
 });
 
@@ -217,35 +130,6 @@ wkf[WKF.Border] = (val: Extended<Border_StyleType>): string => v2s( val, {
     },
 });
 
-
-
-
-function flexToString( val: Extended<Flex_StyleType>): string
-{
-    return v2s( val, {
-        arr: v =>
-        {
-            let s = `${wkf[WKF.Number](v[0])} ${wkf[WKF.Number](v[1])}`;
-            return v.length > 2 ? s +` ${wkf[WKF.Length]( v[2])}` : s;
-        },
-        any: WKF.Length
-    });
-}
-
-
-
-function font_fromObject( val: any): string
-{
-    return styleObj2String( val, [
-        ["style", WKF.FontStyle],
-        "variant",
-        "weight",
-        ["stretch", WKF.Percent],
-        ["size", WKF.Length],
-        ["lineHeight", undefined, "/"],
-        "family"
-    ]);
-}
 
 
 
@@ -333,61 +217,11 @@ wkf[WKF.GridAxis] = (v: Extended<GridTemplateAxis_StyleType>) => v2s( v, {
 
 
 
-function markerStyleToString( val: Extended<Marker_StyleType>): string
+wkf[WKF.Marker] = (val: Extended<Marker_StyleType>): string =>
 {
     return v2s( val, {
         obj: v => `url(#${(v as IIDRule).name})`
     });
-}
-
-
-
-function rotateToString( val:Rotate_StyleType): string
-{
-    return v2s( val, {
-        num: WKF.Angle,
-        arr: v => {
-            if (v.length === 2)
-                return `${v[0]} ${AngleMath.v2s(v[1])}`;
-            else
-                return `${v[0]} ${v[1]} ${v[2]} ${AngleMath.v2s(v[3])}`;
-        }
-    });
-}
-
-function textDecoration_fromObject( val: Extended<TextDecoration_StyleType>): string
-{
-    return styleObj2String( val, [
-        "line",
-        "style",
-        ["color", WKF.Color],
-        ["thickness", WKF.Length],
-    ]);
-}
-
-
-
-function singleTransition_fromObject( val: Extended<Transition_Single>): string
-{
-    return styleObj2String( val, [
-        ["property", camelToDash],
-        ["duration", WKF.Time],
-        "func",
-        ["delay", WKF.Time]
-    ]);
-}
-
-
-
-function offsetToString( val: Offset_StyleType): string
-{
-    return styleObj2String( val, [
-        ["position", "offsetPosition"],
-        ["path", "offsetPath"],
-        ["distance", "offsetDistance"],
-        ["rotate", "offsetRotate"],
-        ["anchor", "offsetAnchor", "/"],
-    ]);
 }
 
 
@@ -640,8 +474,18 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: AnyToSt
 const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 {
     animation: {
-        obj: singleAnimation_fromObject,
-        any: { obj: singleAnimation_fromObject },
+        // any: singleAnimation_fromObject,
+        // any: { obj: singleAnimation_fromObject },
+        any: { props: [
+            ["duration", WKF.Time],
+            "func",
+            ["delay", WKF.Time],
+            ["count", WKF.Number],
+            "direction",
+            "mode",
+            "state",
+            "name"
+        ]},
         sep: ",",
     },
     animationDelay: WKF.MultiTimeWithComma,
@@ -654,9 +498,22 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
     background: {
         num: WKF.Color,
-        obj: singleBackground_fromObject,
-        any: singleBackground_fromStyle,
-        item: singleBackground_fromStyle,
+        // obj: singleBackground_fromObject,
+        // any: singleBackground_fromStyle,
+        // item: singleBackground_fromStyle,
+        any: {
+            num: WKF.Color,
+            props: [
+                ["color", WKF.Color],
+                "image",
+                ["position", WKF.Position],
+                ["size", WKF.MultiLengthWithSpace, "/"],
+                "repeat",
+                "attachment",
+                "origin",
+                "clip"
+            ]
+        },
         sep: ",",
     },
     backgroundAttachment: WKF.OneOrManyWithComma,
@@ -734,11 +591,26 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
     fill: WKF.Color,
     fillOpacity: WKF.Percent,
-    flex: flexToString,
+    flex: {
+        num: WKF.Length,
+        arr: v =>
+        {
+            let s = `${wkf[WKF.Number](v[0])} ${wkf[WKF.Number](v[1])}`;
+            return v.length > 2 ? s +` ${wkf[WKF.Length]( v[2])}` : s;
+        }
+    },
     flexBasis: WKF.Length,
     floodColor: WKF.Color,
     font: {
-        obj: font_fromObject
+        props: [
+            ["style", WKF.FontStyle],
+            "variant",
+            "weight",
+            ["stretch", WKF.Percent],
+            ["size", WKF.Length],
+            ["lineHeight", undefined, "/"],
+            "family"
+        ]
     },
     fontSize: WKF.Length,
     fontStretch: WKF.Percent,
@@ -776,9 +648,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     marginLeft: WKF.Length,
     marginRight: WKF.Length,
     marginTop: WKF.Length,
-    markerEnd: markerStyleToString,
-    markerMid: markerStyleToString,
-    markerStart: markerStyleToString,
+    markerEnd: WKF.Marker,
+    markerMid: WKF.Marker,
+    markerStart: WKF.Marker,
     maskClip: WKF.OneOrManyWithComma,
     maskComposite: WKF.OneOrManyWithComma,
     maskImage: WKF.OneOrManyWithComma,
@@ -801,7 +673,15 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 	minWidth: WKF.Length,
 
     objectPosition: WKF.Position,
-    offset: offsetToString,
+    offset: {
+        props: [
+            ["position", WKF.Position],
+            "path",
+            ["distance", WKF.Length],
+            ["rotate", { any: WKF.Angle }],
+            ["anchor", WKF.Position, "/"],
+        ]
+    },
     offsetAnchor: WKF.Position,
     offsetDistance: WKF.Length,
     offsetPosition: WKF.Position,
@@ -827,12 +707,17 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     perspectiveOrigin: WKF.MultiLengthWithSpace,
 
     quotes: WKF.Quoted,
-    // quotes: {
-    //     item: v => `"${v}"`
-    // },
 
     right: WKF.Length,
-    rotate: rotateToString,
+    rotate: {
+        num: WKF.Angle,
+        arr: v => {
+            if (v.length === 2)
+                return `${v[0]} ${AngleMath.v2s(v[1])}`;
+            else
+                return `${v[0]} ${v[1]} ${v[2]} ${AngleMath.v2s(v[3])}`;
+        }
+    },
     rowGap: WKF.Length,
 
     scrollbarColor: {
@@ -869,7 +754,12 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     },
     textDecoration: {
         num: WKF.Color,
-        obj: textDecoration_fromObject
+        props: [
+            "line",
+            "style",
+            ["color", WKF.Color],
+            ["thickness", WKF.Length],
+        ]
     },
     textDecorationColor: WKF.Color,
     textDecorationThickness: WKF.Length,
@@ -886,10 +776,14 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     top: WKF.Length,
     transformOrigin: WKF.MultiLengthWithSpace,
     transition: {
-        obj: singleTransition_fromObject,
-        any: {
-            obj: singleTransition_fromObject
-        },
+        // any: singleTransition_fromObject,
+        // any: { obj: singleTransition_fromObject },
+        any: { props: [
+            ["property", camelToDash],
+            ["duration", WKF.Time],
+            "func",
+            ["delay", WKF.Time]
+        ]},
         sep: ",",
     },
     transitionDelay: WKF.MultiTimeWithComma,

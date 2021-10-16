@@ -88,6 +88,7 @@ export const enum WKF
     BoxShadow,
     AlwaysPercent,
     ColorSeparation,
+    Marker,
 
     // indicates the length of the array needed to keep conversion functions. This is used when
     // we create this array below. Any new enumeration members must be added before this.
@@ -166,26 +167,6 @@ export type V2SOptions = WKF | AnyToStringFunc |
 
 
 /**
- * Converts the given value to a string using the following rules:
- *   - if this is an object with the symValueToString symbol, whcih is a function - call this
- *     function.
- *   - if this is an object with the `fn` property, whcih is a string - treat it as Function
- *     Definition object and call fdo2s.
- *   - for everything else, call val.toString().
- *
- * Note that the input value cannot be null or undefined.
- */
-function singleObjectToString( val: any): string
-{
-    if (typeof val[symValueToString] === "function")
-        return val[symValueToString]();
-    else if (typeof val.fn === "string")
-        return fdo2s( val);
-    else
-        return val.toString();
-}
-
-/**
  * Converts a value of an arbitrary type to a single string. The options parameter
  * can define how specific types are converted.
  */
@@ -202,8 +183,12 @@ export function v2s( val: any, options?: V2SOptions): string
             return v2s(val());
         else if (val == null)
             return "";
+        else if (typeof val[symValueToString] === "function")
+            return val[symValueToString]();
+        else if (typeof val.fn === "string")
+            return fdo2s( val);
         else
-            return singleObjectToString(val);
+            return val.toString();
     }
 
     // do different things for different types of options
@@ -243,7 +228,7 @@ export function v2s( val: any, options?: V2SOptions): string
             else if (options.props)
                 return o2s( val, options.props, options.sep);
             else
-                return singleObjectToString(val);
+                return val.toString();
         }
         else if (typeof val === "string")
             newOptions = options.str ?? options.any;
