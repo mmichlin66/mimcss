@@ -1,16 +1,16 @@
-﻿import {IStringProxy} from "./CoreTypes";
-import {IStyleDefinitionClass, IVarRule, IStyleDefinition} from "./RuleTypes";
+﻿import {Extended, IRawProxy, IStringProxy} from "./CoreTypes";
+import {IStyleDefinitionClass, IVarRule, IStyleDefinition, ICounterRule} from "./RuleTypes";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
 import {
     Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset, VarTemplateName,
-    ExtendedVarValue, ICssSerializer
+    ExtendedVarValue, ICssSerializer, AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType
 } from "./StyleTypes"
 import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
 import {processInstanceOrClass, serializeInstance} from "../rules/RuleContainer";
 import {media2s, supports2s} from "../impl/MiscImpl";
-import {tag2s} from "../impl/Utils";
+import {f2s, mv2s, tag2s, WKF} from "../impl/Utils";
 
 
 
@@ -178,6 +178,55 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Returns a function representing the `attr()` CSS function. It returns IStringProxy and
+ * theoretically can be used in any style property wherever the CSS `<string>` type is accepted;
+ * however, its use by browsers is currently limited to the `content` property. Also not all
+ * browsers currently support type, units or fallback values.
+ *
+ * @category Miscellaneous
+ */
+ export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
+	fallback?: Extended<string>): IStringProxy
+{
+    return () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit]), fallback], ",")})`;
+}
+
+
+
+/**
+ * Returns a representation of the CSS `counter()` function with an optional counter style.
+ *
+ * @param c Counter name or counter rule object
+ * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
+ * @category Miscellaneous
+ */
+ export function counter( counterObj: Extended<ICounterRule | string>,
+	style?: Extended<ListStyleType_StyleType>): IStringProxy
+{
+    return () => f2s( "counter", [counterObj, style]);
+}
+
+
+
+/**
+ * Returns a representation of the CSS `counters()` function with the given separator and
+ * an optional counter style.
+ *
+ * @param counterObj Counter name or counter rule object
+ * @param sep Separator string between multiple counters
+ * @param style Counter style
+ * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
+ * @category Miscellaneous
+ */
+export function counters( counterObj: Extended<ICounterRule | string>,
+	sep: Extended<string>, style?: Extended<ListStyleType_StyleType>): IStringProxy
+{
+    return () => f2s( "counters", [counterObj, [sep, WKF.Quoted], style]);
+}
+
+
+
+/**
  * Returns a function representing the invocation of the `var()` CSS function for the given custom
  * CSS property with optional fallbacks. Usually, when you want to refer to a custom CSS property
  * in style rules, it is enough to just refer to the style definition property created using the
@@ -203,13 +252,20 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
  * custom CSS property and of the fallback value.
  * @param varObj Custom CSS property object created using the [[$var]] function.
  * @param fallback Fallback value that will be used if the custom CSS property isnt set.
- * @returns
+ * @returns The `IRawProxy` callable interface, whcih allows the `usevar` function to be called
+ * in any context.
+ * @category Miscellaneous
  */
-export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IStringProxy
+export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy
 {
-    return () => fallback
-        ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback)})`
-        : `var(--${varObj.name})`;
+    // return () => fallback
+    //     ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback)})`
+    //     : `var(--${varObj.name})`;
+
+    return () => f2s( "var", [
+        "--" + varObj.name,
+        [fallback, (v: ExtendedVarValue<K>) => styleProp2s( varObj.template, v)]
+    ]);
 }
 
 

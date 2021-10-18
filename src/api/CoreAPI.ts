@@ -1,4 +1,4 @@
-﻿import {IStringProxy, SelectorItem, ISelectorProxy} from "./CoreTypes"
+﻿import {SelectorItem, ISelectorProxy, IRawProxy} from "./CoreTypes"
 import {tag2s} from "../impl/Utils";
 
 
@@ -56,7 +56,7 @@ import {tag2s} from "../impl/Utils";
  * }
  * ```
  */
-export function raw( parts: TemplateStringsArray, ...params: any[]): IStringProxy
+export function raw( parts: TemplateStringsArray, ...params: any[]): IRawProxy
 {
     return () => tag2s( parts, params);
 }

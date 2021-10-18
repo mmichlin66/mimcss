@@ -1,20 +1,19 @@
-﻿import {Extended, IStringProxy} from "./CoreTypes";
+﻿import {Extended} from "./CoreTypes";
 import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {
     CrossFadeParam, GradientStopOrHint, LinearGradientAngle, ShapeRadius, IImageProxy, IMinMaxFunc,
     IPathBuilder, IRepeatFunc, IGridSpanFunc, IUrlFunc, TimingFunctionJumpTerm, ICursorFunc,
-    ExtentKeyword, AttrTypeKeyword, AttrUnitKeyword, FillRule, ICircleBuilder, IEllipseBuilder,
+    ExtentKeyword, FillRule, ICircleBuilder, IEllipseBuilder,
     IInsetBuilder, IPolygonBuilder, PathCommand, PathCommandParam, IRayFunc, IStepsFunc, ICubicBezierFunc,
     PercentFilterNames, IPercentFilterFunc, IBlurFunc, IDropShadowFunc, IHueRotateFunc, IMatrixFunc,
     IMatrix3dFunc, IPerspectiveFunc, IRotateFunc, IRotate3dFunc, IScale1dFunc, IScaleFunc, IScale3dFunc,
     ISkewFunc, ISkew1dFunc, ITranslate1dFunc, ITranslate3dFunc, ITranslateFunc, ILinearGradientBuilder,
     ILinearGradientFunc, IRadialGradientBuilder, IRadialGradientFunc, IConicGradientBuilder,
-    IConicGradientFunc, IGradientBuilder, IGradientFunc,
+    IConicGradientFunc, IGradientBuilder, IGradientFunc
 } from "./ShapeTypes";
-import {ICounterRule, IIDRule} from "./RuleTypes";
-import {GridLineCountOrName, GridTrack, GridTrackSize, ListStyleType_StyleType} from "./StyleTypes";
-import {AngleMath, LengthMath, NumericMath} from "../impl/NumericImpl";
+import {IIDRule} from "./RuleTypes";
+import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
 import {f2s, mv2s, WKF, v2s, wkf, a2s, fdo} from "../impl/Utils";
 
 
@@ -48,10 +47,13 @@ export function linearGradient(...stops: GradientStopOrHint<CssLength>[]): ILine
     return new LinearGradient( stops);
 }
 
-fdo["linear-gradient"] = (v: ILinearGradientFunc) => f2s( gradientNameToString(v), [
-    linearGradientAngleToString(v.angle),
-    gradientStopsOrHintsToString( v.stops, LengthMath)
-]);
+fdo["linear-gradient"] = {
+    fn: gradientNameToString,
+    f: (val: ILinearGradientFunc) => mv2s([
+        v2s( val.angle, {num: WKF.Angle, str: v => "to " + v}),
+        gradientStopsOrHintsToString( val.stops, WKF.Length)
+    ], ",")
+}
 
 
 
@@ -80,10 +82,13 @@ export function radialGradient(...stops: GradientStopOrHint<CssLength>[]): IRadi
     return new RadialGradient( stops);
 }
 
-fdo["radial-gradient"] = (v: IRadialGradientFunc) => f2s( gradientNameToString(v), [
-    mv2s([ v.shape, [v.size, WKF.MultiLengthWithSpace], [v.pos, WKF.AtPosition] ]),
-    gradientStopsOrHintsToString( v.stops, LengthMath)
-]);
+fdo["radial-gradient"] = {
+    fn: gradientNameToString,
+    f: (val: IRadialGradientFunc) => mv2s([
+        mv2s([ val.shape, [val.size, WKF.MultiLengthWithSpace], [val.pos, WKF.AtPosition] ]),
+        gradientStopsOrHintsToString( val.stops, WKF.Length)
+    ], ",")
+};
 
 
 
@@ -110,10 +115,13 @@ export function conicGradient(...stops: GradientStopOrHint<CssAngle>[]): IConicG
     return new ConicGradient( stops);
 }
 
-fdo["conic-gradient"] = (v: IConicGradientFunc) => f2s( gradientNameToString(v), [
-    mv2s([ v.angle == null ? undefined : "from " + AngleMath.v2s(v.angle), [v.pos, WKF.AtPosition] ]),
-    gradientStopsOrHintsToString( v.stops, AngleMath)
-]);
+fdo["conic-gradient"] = {
+    fn: gradientNameToString,
+    f: (val: IConicGradientFunc) => mv2s([
+        mv2s([ [val.angle, (v: Extended<CssAngle>) => "from " + v2s( v, WKF.Angle)], [val.pos, WKF.AtPosition] ]),
+        gradientStopsOrHintsToString( val.stops, WKF.Angle)
+    ], ",")
+};
 
 
 
@@ -218,34 +226,21 @@ function gradientNameToString( val: IGradientFunc<any>): string
     return `${val.repeat ? "repeating-" : ""}${val.fn}`;
 }
 
-function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[], math: NumericMath): string
-{
-    return !val ? "" : val.map( v => gradientStopOrHintToString( v, math)).join(",");
-}
-
-function gradientStopOrHintToString( val: GradientStopOrHint<any>, math: NumericMath): string
+function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[], math: WKF.Length | WKF.Angle): string
 {
     return v2s( val, {
-        num: WKF.Color,
-        arr: v => {
-            if (v.length === 0)
-                return "";
-            else if (v.length === 1)
-                return math.v2s( v[0]);
-            else
-                return mv2s( [[v[0], WKF.Color], math.v2s( v[1]), math.v2s( v[2])]);
-        }
-    });
-}
-
-/**
- * Converts the given linear gradient angle to string.
- */
-function linearGradientAngleToString( angle: LinearGradientAngle): string
-{
-    return v2s( angle, {
-        num: AngleMath.n2s,
-        str: v => "to " + v
+        item: {
+            num: WKF.Color,
+            arr: v => {
+                if (v.length === 0)
+                    return "";
+                else if (v.length === 1)
+                    return v2s( v[0], math);
+                else
+                    return mv2s( [[v[0], WKF.Color], [v[1], math], [v[2], math] ]);
+            }
+        },
+        sep: ","
     });
 }
 
@@ -1129,40 +1124,6 @@ fdo.span = (v: IGridSpanFunc) => mv2s( ["span", v.p1, v.p2])
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Counters
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a representation of the CSS `counter()` function with additional optional strings
- * added after and/or before the counter.
- *
- * @category Counter
- */
- export function counter( counterObj: Extended<ICounterRule | string>,
-	style?: Extended<ListStyleType_StyleType>): IStringProxy
-{
-    return () => f2s( "counter", [counterObj, style]);
-}
-
-
-
-/**
- * Returns a representation of the CSS `counters()` function with the given separator string
- * and additional optional strings added after and/or before the counter.
- *
- * @category Counter
- */
-export function counters( counterObj: Extended<ICounterRule | string>,
-	sep: Extended<string>, style?: Extended<ListStyleType_StyleType>): IStringProxy
-{
-    return () => f2s( "counters", [counterObj, `"${v2s(sep) || "."}"`, style]);
-}
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous functions.
@@ -1205,22 +1166,6 @@ export function cursor( url: Extended<string | IIDRule>, x?: number, y?: number)
 }
 
 fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
-
-
-
-/**
- * Returns a function representing the `attr()` CSS function. It returns IStringProxy
- * and theoretically can be used in any style property; however, its use by browsers is currently
- * limited to the `content` property. Also no browser currently support type, units or fallback
- * values.
- *
- * @category Miscellaneous
- */
- export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
-	fallback?: Extended<string>): IStringProxy
-{
-    return () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit]), fallback], ",")})`;
-}
 
 
 

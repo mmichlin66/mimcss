@@ -1,13 +1,14 @@
-﻿import {Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, Global_StyleType} from "./CoreTypes"
+﻿import {Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, Global_StyleType, CssString} from "./CoreTypes"
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, CssFrequency, CssResolution,
     CssRadius, HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, IFitContentProxy,
     ILengthProxy, CssSize, CssAspectRatio, IRectProxy, CssLengthOrAuto, CssMultiPosition,
-    CssMultiPositionX, CssMultiPositionY, BorderRadius
+    CssMultiPositionX, CssMultiPositionY, BorderRadius, AngleUnits, FrequencyUnits, LengthUnits,
+    PercentUnits, ResolutionUnits, TimeUnits
 } from "./NumericTypes"
 import {CssColor, CssNonNumericColor} from "./ColorTypes";
 import {
-    FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis, FontVariantCaps,
+    FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStretchKeyword, FontStyle, FontSynthesis, FontVariantCaps,
     FontVariantPosition, FontWeight, SystemFont
 } from "./FontTypes";
 import {
@@ -18,6 +19,19 @@ import {
     IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, IStyleDefinition,
     IStyleDefinitionClass, ICounterStyleRule
 } from "./RuleTypes";
+
+
+
+/**
+ * Type representing keywords used to define a type used in the CSS `attr()` function.
+ */
+ export type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" |
+    "angle" | "time" | "frequency";
+
+ /**
+  * Type representing keywords used to define a unit used in the CSS `attr()` function.
+  */
+ export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnits | ResolutionUnits | FrequencyUnits;
 
 
 
@@ -818,8 +832,16 @@ export type Contain_StyleType = "none" | "strict" | "content" | "size" | "layout
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#content
  * @category Style Property
  */
-export type Content_StyleType = string | "none" | "normal" |
-    OneOrMany<Extended<CssImage | "open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" | string>>;
+export type ContentItem = "open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" |
+    CssString | CssImage;
+
+/**
+ * Type for [[content]] style property
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/content
+ * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#content
+ * @category Style Property
+ */
+export type Content_StyleType = string | "none" | "normal" | OneOrMany<Extended<ContentItem>>;
 
 
 
@@ -978,14 +1000,14 @@ export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inli
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#font
  * @category Style Property
  */
-export type Font_StyleType = SystemFont |
+export type Font_StyleType = SystemFont | [string, CssLength] | [CssLength, string] |
     {
-        size: Extended<CssLength>;
         family: Extended<string>;
+        size: Extended<CssLength>;
         style?: Extended<FontStyle>;
         variant?: Extended<string>;
         weight?: Extended<FontWeight_StyleType>;
-        stretch?: Extended<FontStretch>;
+        stretch?: Extended<FontStretchKeyword>;
         lineHeight?: Extended<CssNumber>
     };
 
@@ -1554,7 +1576,7 @@ export type Position_StyleType = "static" | "relative" | "absolute" | "sticky" |
  * - Mimcss usage: https://mmichlin66.github.io/mimcss/ref/style-properties.html#quotes
  * @category Style Property
  */
-export type Quotes_StyleType = "none" | "auto" | Extended<string>[];
+export type Quotes_StyleType = "none" | "auto" | OneOrMany<[Extended<CssString>,Extended<CssString>]>;
 
 
 

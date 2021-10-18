@@ -1,12 +1,12 @@
-﻿import {IStringProxy} from "./CoreTypes";
+﻿import {IRawProxy} from "./CoreTypes";
 import {CssAngle, CssLength, CssNumber, CssPercent} from "./NumericTypes";
 
 
 
 /**
- * Type that extends the given type with the [[IStringProxy]] interface that allows specifying raw string value.
+ * Type that extends the given type with the [[IRawProxy]] interface that allows specifying raw string value.
  */
-export type FontFaceExtended<T> = T | IStringProxy;
+export type FontFaceExtended<T> = T | IRawProxy;
 
 
 
@@ -18,10 +18,15 @@ export type FontFaceMetricOverride = "normal" | CssPercent;
 
 
 /**
+ * Type for specfying keywords [[IStyleset.fontStretch]] properties.
+ */
+export type FontStretchKeyword = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
+    "semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded";
+
+/**
  * Type for specfying [[IStyleset.fontStretch]] properties.
  */
-export type FontStretch = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
-    "semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded" | CssPercent;
+export type FontStretch = FontStretchKeyword | CssPercent;
 
 
 
@@ -197,7 +202,7 @@ export interface IFontFace
 /**
  * The `ExtendedFontFace` type maps all @font-face properties defined in the [[IFontFace]]
  * interface to the "extended" versions of their types. These extended types are defined using the
- * [[FontFaceExtended]] generic type, which adds [[IStringProxy]] to the type
+ * [[FontFaceExtended]] generic type, which adds [[IRawProxy]] to the type
  * that is defined in the [[IFontFace]] interface.
  */
 export type ExtendedFontFace = { [K in keyof IFontFace]: FontFaceExtended<IFontFace[K]> }

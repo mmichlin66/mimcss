@@ -335,7 +335,8 @@ export function mv2s( values: ParamListWithOptions, separator: string = " "): st
         else
             val = item;
 
-        arr.push( v2s( val, options));
+        if (val || (options && (options as any).nil))
+            arr.push( v2s( val, options));
     }
 
     return arr.filter( v => !!v).join( separator);
@@ -439,7 +440,9 @@ function propInPropSet2s( dashName: string, camelName: string, val: any, options
  *   - array of P2SOption types - o2s is ivoked
  *   - object - may have the following properties:
  *     - optional "fn" - replaces function name.
- *     - mandatory "params" - array of P2SOption types.
+ *     - optional "p" - array of P2SOption types, for which o2s is invoked.
+ *     - optional "f" - function that returns the list of parameters.
+ *     - either "p" or "f" must be present and "p" has precedence.
  *     - optional "sep" for separator (default is ",").
  *     - optional "do" - defines V2SOptions for those properties in the "params" array that don't
  *       define their own. This should be used in the case when all function parameters are of the
@@ -450,7 +453,8 @@ function propInPropSet2s( dashName: string, camelName: string, val: any, options
 type FdoOptions = AnyToStringFunc | number | P2SOptions |
     {
         fn?: string | AnyToStringFunc,
-        p: P2SOptions,
+        p?: P2SOptions,
+        f?: AnyToStringFunc,
         s?: string,
         do?: V2SOptions,
         dp?: string
@@ -487,7 +491,11 @@ export function fdo2s( val: ICssFuncObject): string
     {
         let fn = options.fn;
         fn = !fn ? val.fn : typeof fn === "string" ? fn : fn(val);
-        return `${fn}(${o2s( val, options.p, options.s ?? ",", options.do, options.dp)})`;
+        return options.p
+            ? `${fn}(${o2s( val, options.p, options.s ?? ",", options.do, options.dp)})`
+            : options.f
+                ? `${fn}(${options.f(val)})`
+                : "";
     }
 }
 

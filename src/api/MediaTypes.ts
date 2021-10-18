@@ -1,4 +1,4 @@
-﻿import {IConstant, IGenericProxy, IStringProxy, OneOrMany, OneOrPair} from "./CoreTypes";
+﻿import {IConstant, IGenericProxy, IRawProxy, OneOrMany, OneOrPair} from "./CoreTypes";
 import {CssAspectRatio, CssNumber, CssLength, CssResolution} from "./NumericTypes";
 import {Styleset} from "./StyleTypes";
 
@@ -12,9 +12,9 @@ export type MediaType = "all" | "print" | "screen" | "speech";
 /**
  * Type that extends the given type with the following types:
  * - [[IConstant]] interface that allows using a constant value.
- * - [[IStringProxy]] interface that allows specifying raw string value.
+ * - [[IRawProxy]] interface that allows specifying raw string value.
  */
-export type ExtendedFeature<T> = T | IConstant<T> | IStringProxy | null | undefined;
+export type ExtendedFeature<T> = T | IConstant<T> | IRawProxy | null | undefined;
 
 
 

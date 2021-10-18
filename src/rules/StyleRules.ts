@@ -5,8 +5,8 @@ import {
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
 import {CssSelector, OneOrMany} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {camelToDash, symValueToString} from "../impl/Utils";
-import {mergeStylesets, styleset2s, styleProp2s, mergeCustomProps, selector2s, pseudoEntity2s} from "../impl/StyleImpl"
+import {camelToDash, symValueToString, v2s} from "../impl/Utils";
+import {mergeStylesets, styleset2s, styleProp2s, mergeCustomProps, selector2s} from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 
@@ -417,10 +417,7 @@ class DependentRule extends StyleRule
 	{
 		let parentSelector = this.containingRule!.selectorText;
 		if (this.selectorParam)
-		{
-			let selector = this.selector as string;
-			return `${parentSelector}${selector}(${pseudoEntity2s( selector, this.selectorParam)})`;
-		}
+			return `${parentSelector}${this.selector}(${pseudoEntity2s( this.selector as string, this.selectorParam)})`;
 		else
 		{
 			// convert selector to string.
@@ -668,6 +665,35 @@ export class SelectorRule extends StyleRule
 
 	// selector object for this rule.
 	private selector: CssSelector;
+}
+
+
+
+/**
+ * Returns a string representation of a parameterized pseudo entity.
+ */
+ function pseudoEntity2s( entityName: string, val: any): string
+ {
+     if (!entityName)
+         return "";
+
+     if (entityName.startsWith( ":nth"))
+         return v2s( val, { arr: nthTupleToString });
+     else
+         return v2s(val);
+ }
+
+
+
+ /**
+ * Converts the given two-number tuple to a string in the form An+B.
+ */
+function nthTupleToString( val: [number, number?]): string
+{
+	let v1 = val[1];
+
+	// the '!v1n' expression covers null, undefined and 0.
+	return `${val[0]}n${!v1 ? "" : v1 > 0 ? "+" + v1 : "-" + -v1}`;
 }
 
 

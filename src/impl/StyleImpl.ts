@@ -1,14 +1,13 @@
-﻿import {CssSelector, Extended, ICssFuncObject} from "../api/CoreTypes";
+﻿import {CssSelector, Extended} from "../api/CoreTypes";
 import {
-    Animation_Single, Background_Single, BorderImage_Object, BorderImageSlice_StyleType, BoxShadow,
-    Border_StyleType, Flex_StyleType, GridTemplateAreas_StyleType, GridTemplateAreaDefinition,
-    GridTrack, GridTemplateAxis_StyleType, Marker_StyleType, Rotate_StyleType, TextDecoration_StyleType,
-    Transition_Single, Offset_StyleType, Styleset, CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType, IStyleset,
+    BorderImage_Object, BorderImageSlice_StyleType, Border_StyleType, GridTemplateAreas_StyleType,
+    GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType, Styleset,
+    CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType, IStyleset,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
 import {LengthMath, AngleMath} from "./NumericImpl";
 import {VarRule} from "../rules/VarRule";
-import {v2s, V2SOptions, o2s, P2SOption, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc, fdo2s} from "./Utils";
+import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc, mv2s} from "./Utils";
 import {getVarsFromSTyleDefinition} from "../rules/RuleContainer";
 
 
@@ -20,43 +19,11 @@ import {getVarsFromSTyleDefinition} from "../rules/RuleContainer";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts the given two-number tuple to a string in the form An+B.
- */
-function nthTupleToString( val: [number, number?]): string
-{
-	let v0 = v2s( val[0]);
-	let v1n = val[1];
-
-	// the '!v1n' expression covers null, undefined and 0.
-	let v1 = !v1n ? "" : v1n > 0 ? "+" + v2s( v1n) : "-" + v2s( -v1n);
-
-	return `${v0}n${v1}`;
-}
-
-
-
-/**
  * Returns a string representation of a selector.
  */
 export function selector2s( val: CssSelector): string
 {
 	return v2s( val, { sep: "" });
-}
-
-
-
-/**
- * Returns a string representation of a parameterized pseudo entity.
- */
-export function pseudoEntity2s( entityName: string, val: any): string
-{
-	if (!entityName)
-		return "";
-
-	if (entityName.startsWith( ":nth"))
-		return v2s( val, { arr: nthTupleToString });
-	else
-		return v2s(val);
 }
 
 
@@ -102,16 +69,16 @@ function borderImageSliceToString( val: BorderImageSlice_StyleType)
 
 
 wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
-    obj: (v: BoxShadow) => v2s( v, {
+    obj: {
         props: [
-            ["inset", b => b ? "inset" : ""],
+            ["inset", (v: boolean) => v ? "inset" : ""],
             ["x", WKF.Length],
             ["y", WKF.Length],
             ["blur", WKF.Length],
             ["spread", WKF.Length],
             ["color", WKF.Color]
         ]
-    }),
+    },
     sep: ","
 });
 
@@ -359,17 +326,15 @@ export function styleProp2s( propName: string, propVal: any): string
 
     // if the property value is an object with the "!" property, then the actual value is the
     // value of this property and we also need to set the "!important" flag
-    let value = propVal;
     let impFlag = false;
     if (typeof propVal === "object" && "!" in propVal)
     {
-        value = propVal["!"];
+        propVal = propVal["!"];
         impFlag = true;
     }
 
     // convert the value to string based on the information object for the property (if defined)
-    let stringValue = v2s( value, stylePropertyInfos[dashToCamel(propName)]);
-
+    let stringValue = v2s( propVal, stylePropertyInfos[dashToCamel(propName)]);
     if (!stringValue)
         return "";
 
@@ -474,8 +439,6 @@ export function s_registerStylePropertyInfo( name: string, toStringFunc: AnyToSt
 const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 {
     animation: {
-        // any: singleAnimation_fromObject,
-        // any: { obj: singleAnimation_fromObject },
         any: { props: [
             ["duration", WKF.Time],
             "func",
@@ -498,9 +461,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
     background: {
         num: WKF.Color,
-        // obj: singleBackground_fromObject,
-        // any: singleBackground_fromStyle,
-        // item: singleBackground_fromStyle,
         any: {
             num: WKF.Color,
             props: [
@@ -602,11 +562,12 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     flexBasis: WKF.Length,
     floodColor: WKF.Color,
     font: {
+        item: WKF.Length,
         props: [
             ["style", WKF.FontStyle],
             "variant",
             "weight",
-            ["stretch", WKF.Percent],
+            "stretch",
             ["size", WKF.Length],
             ["lineHeight", undefined, "/"],
             "family"
@@ -706,16 +667,20 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     perspective: WKF.Length,
     perspectiveOrigin: WKF.MultiLengthWithSpace,
 
-    quotes: WKF.Quoted,
+    quotes: {
+        item: {
+            str: WKF.Quoted,
+            item: WKF.Quoted,
+        }
+    },
 
     right: WKF.Length,
     rotate: {
         num: WKF.Angle,
         arr: v => {
-            if (v.length === 2)
-                return `${v[0]} ${AngleMath.v2s(v[1])}`;
-            else
-                return `${v[0]} ${v[1]} ${v[2]} ${AngleMath.v2s(v[3])}`;
+            return v.length === 2
+                ? mv2s( [ v[0], [v[1], WKF.Angle] ])
+                : mv2s( [ v[0], v[1], v[2], [v[3], WKF.Angle] ]);
         }
     },
     rowGap: WKF.Length,
@@ -776,8 +741,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     top: WKF.Length,
     transformOrigin: WKF.MultiLengthWithSpace,
     transition: {
-        // any: singleTransition_fromObject,
-        // any: { obj: singleTransition_fromObject },
         any: { props: [
             ["property", camelToDash],
             ["duration", WKF.Time],
