@@ -11,10 +11,10 @@ import {media2s, supports2s} from "../impl/MiscImpl";
  */
 export abstract class GroupRule<T extends IStyleDefinition> extends Rule implements IGroupRule<T>
 {
-	public constructor( instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( instOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super();
-		this.instanceOrClass = instanceOrClass;
+		this.instOrClass = instOrClass;
 	}
 
 
@@ -26,7 +26,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
         // container to which our groupng rule belongs becomes the parent container for the
         // style definition instance
-		let instance = processInstanceOrClass( this.instanceOrClass, container.getDefinitionInstance());
+		let instance = processInstanceOrClass( this.instOrClass, container.getDefinitionInstance());
 		if (!instance)
 			return;
 
@@ -42,7 +42,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		if (!this.ruleContainer)
 			return;
 
-		let selector = this.getGroupSelectorText();
+		let selector = this.getSelectorText();
 		if (!selector)
 			return;
 
@@ -61,7 +61,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		if (!this.ruleContainer)
 			return;
 
-		let selector = this.getGroupSelectorText();
+		let selector = this.getSelectorText();
 		if (!selector)
 			return;
 
@@ -79,7 +79,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	public get condition(): string
     {
         if (!this._condition)
-            this._condition = this.getGroupConditionText();
+            this._condition = this.getConditionText();
 
         return this._condition ?? "";
     }
@@ -87,10 +87,10 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
 
 	// Returns the condition string of this grouping rule.
-	protected abstract getGroupConditionText(): string | null;
+	protected abstract getConditionText(): string | null;
 
 	// Returns the selector string of this grouping rule.
-	protected abstract getGroupSelectorText(): string | null;
+	protected abstract getSelectorText(): string | null;
 
 
 
@@ -113,7 +113,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	public cssRule: CSSGroupingRule | null;
 
 	// Style definition class that defines rules under this grouping rule.
-	protected instanceOrClass: T | IStyleDefinitionClass<T>;
+	protected instOrClass: T | IStyleDefinitionClass<T>;
 
 	// Style definition instance.
 	protected instance: IStyleDefinition;
@@ -132,9 +132,9 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
  */
 export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( statement: SupportsStatement, instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( statement: SupportsStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
-		super( instanceOrClass);
+		super( instOrClass);
 
 		this.statement = statement;
 	}
@@ -150,13 +150,13 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 
 
 	// Returns the condition string of this grouping rule.
-	protected getGroupConditionText(): string | null
+	protected getConditionText(): string | null
     {
         return supports2s( this.statement);
     }
 
 	// Returns the selector string of this grouping rule.
-	protected getGroupSelectorText(): string | null
+	protected getSelectorText(): string | null
 	{
 		// determine whether the query is supported and if it is not, don't insert the rule
 		return CSS.supports( this.condition) ? `@supports ${this.condition}` : null;
@@ -178,9 +178,9 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
  */
 export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( statement: MediaStatement, instanceOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( statement: MediaStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
-		super( instanceOrClass);
+		super( instOrClass);
 
 		this.statement = statement;
 	}
@@ -188,13 +188,13 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
 
 
 	// Returns the condition string of this grouping rule.
-	protected getGroupConditionText(): string | null
+	protected getConditionText(): string | null
     {
         return media2s( this.statement);
     }
 
 	// Returns the selector string of this grouping rule.
-	protected getGroupSelectorText(): string | null
+	protected getSelectorText(): string | null
 	{
 		return `@media ${this.condition}`;
 	}

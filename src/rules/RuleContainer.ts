@@ -486,7 +486,7 @@ class RuleContainer implements ITopLevelRuleContainer
  * @param enable
  * @param prefix
  */
-export function s_configureNames( method: NameGenerationMethod, prefix?: string): void
+export const s_configureNames = (method: NameGenerationMethod, prefix?: string): void =>
 {
 	s_nameGeneratonMethod = method;
 	s_uniqueStyleNamesPrefix = prefix ? prefix : "n";
@@ -533,16 +533,14 @@ function generateName( sheetName: string, ruleName: string): string
  * Generates a unique name, which can be used either for style element's ID or or class,
  * identifier or animation name. Names are generated using a simple incrementing number.
  */
-function generateUniqueName( prefix?: string): string
-{
-	return (prefix ? prefix : s_uniqueStyleNamesPrefix) + s_nextUniqueID++;
-}
+const generateUniqueName = (prefix?: string): string =>
+	(prefix ? prefix : s_uniqueStyleNamesPrefix) + s_nextUniqueID++;
 
 
 
 // Looks up a property with the given name in the prototype chain of the given style definition
 // class. If found and if the property is a rule, then returns the name assigned for it.
-function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass, ruleName: string)
+const findNameForRuleInPrototypeChain = (definitionClass: IStyleDefinitionClass, ruleName: string) =>
 {
 	if (!definitionClass)
 		return null;
@@ -584,18 +582,12 @@ function findNameForRuleInPrototypeChain( definitionClass: IStyleDefinitionClass
  * it has already been processed. If yes, we just return it back; if no, we assign new unique names
  * to its rules.
  */
-export function processInstanceOrClass( instOrClass: IStyleDefinition | IStyleDefinitionClass,
-	parent?: IStyleDefinition): IStyleDefinition
-{
+export const processInstanceOrClass = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
+	parent?: IStyleDefinition): IStyleDefinition =>
 	// instOrClass has type "object" if it is an instance and "function" if it is a class
-	if (typeof instOrClass === "object")
-	{
-		processInstance( instOrClass);
-		return instOrClass;
-	}
-	else
-		return processClass( instOrClass, parent);
-}
+	typeof instOrClass === "object"
+        ? (processInstance( instOrClass), instOrClass)
+        : processClass( instOrClass, parent);
 
 
 
@@ -606,8 +598,8 @@ export function processInstanceOrClass( instOrClass: IStyleDefinition | IStyleDe
  * object or null if the given class is itself a top-level class (that is, is not a class
  * that defines rules within nested grouping rules).
  */
-function processClass( definitionClass: IStyleDefinitionClass,
-	parent?: IStyleDefinition): IStyleDefinition
+const processClass = (definitionClass: IStyleDefinitionClass,
+	parent?: IStyleDefinition): IStyleDefinition =>
 {
     // check whether this definition class is already associated with an instance
     if (definitionClass.hasOwnProperty(symInstance))
@@ -647,7 +639,7 @@ function processClass( definitionClass: IStyleDefinitionClass,
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-function processInstance( instance: IStyleDefinition): void
+const processInstance = (instance: IStyleDefinition): void =>
 {
 	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.
@@ -678,7 +670,7 @@ function processInstance( instance: IStyleDefinition): void
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-export function getVarsFromSTyleDefinition( instOrClass: IStyleDefinition | IStyleDefinitionClass): VarRule[]
+export const getVarsFromSTyleDefinition = (instOrClass: IStyleDefinition | IStyleDefinitionClass): VarRule[] =>
 {
     let instance = processInstanceOrClass( instOrClass);
     if (!instance)
@@ -693,10 +685,8 @@ export function getVarsFromSTyleDefinition( instOrClass: IStyleDefinition | ISty
 /**
  * Returns rule container object associated with the given style definition object.
  */
-export function getContainerFromInstance( instance: IStyleDefinition): RuleContainer
-{
-	return instance ? instance[symContainer] : null;
-}
+export const getContainerFromInstance = (instance: IStyleDefinition): RuleContainer =>
+	instance ? instance[symContainer] : null;
 
 
 
@@ -707,7 +697,7 @@ export function getContainerFromInstance( instance: IStyleDefinition): RuleConta
  * it was activated and deactivated. The rules are inserted to DOM only when this reference counter
  * goes from 0 to 1.
  */
-export function activateInstance( instance: IStyleDefinition, count: number): void
+export const activateInstance = (instance: IStyleDefinition, count: number): void =>
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (!ruleContainer)
@@ -727,7 +717,7 @@ export function activateInstance( instance: IStyleDefinition, count: number): vo
  * definition object maintains a reference counter of how many times it was activated and
  * deactivated. The rules are removed from DOM only when this reference counter goes from 1 to 0.
  */
-export function deactivateInstance( instance: IStyleDefinition, count: number): void
+export const deactivateInstance = (instance: IStyleDefinition, count: number): void =>
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (!ruleContainer)
@@ -745,7 +735,7 @@ export function deactivateInstance( instance: IStyleDefinition, count: number): 
 /**
  * Serializes the given style definition to the given string.
  */
-export function serializeInstance( instance: IStyleDefinition, ctx: IRuleSerializationContext): void
+export const serializeInstance = (instance: IStyleDefinition, ctx: IRuleSerializationContext): void =>
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (ruleContainer)
@@ -887,7 +877,7 @@ let embeddingContainers = new Map<string,EmbeddingContainer>();
  * container for the given category. All style definitions for a given category will be activated
  * and deactivated together and their rules will be inserted into a single `<style>` element.
  */
-export function embeddedDecorator( category: string, target: IStyleDefinitionClass): any
+export const embeddedDecorator = (category: string, target: IStyleDefinitionClass): any =>
 {
     // check whether we already have container for this category; if not, add it
     let embeddingContainer = embeddingContainers.get( category);
@@ -923,7 +913,7 @@ let themeInstanceMap = new Map<IStyleDefinitionClass<ThemeDefinition>,ThemeDefin
  * @param themeClass ThemeDefinition-derived class
  * @returns Theme base class.
  */
-function getThemeBaseClass( themeClass: IStyleDefinitionClass<ThemeDefinition>): IStyleDefinitionClass<ThemeDefinition> | undefined
+const getThemeBaseClass = (themeClass: IStyleDefinitionClass<ThemeDefinition>): IStyleDefinitionClass<ThemeDefinition> | undefined =>
 {
     // make sure we are not passed the ThemeDefinition class itself
     if (themeClass === ThemeDefinition)
@@ -946,7 +936,7 @@ function getThemeBaseClass( themeClass: IStyleDefinitionClass<ThemeDefinition>):
  * @returns Theme instance, which is currently activated for the given theme class or null
  * if no istance is currently activated.
  */
-export function getCurrentThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined
+export const getCurrentThemeInstance = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
 {
     let themeBaseClass = getThemeBaseClass(themeClass)
     return themeBaseClass && themeInstanceMap.get( themeBaseClass);
@@ -959,7 +949,7 @@ export function getCurrentThemeInstance( themeClass: IStyleDefinitionClass<Theme
  * corresponding base theme class.
  * @param theme theme instance to set as current for the corresponding base theme class
  */
-function setCurrentThemeInstance( theme: ThemeDefinition): void
+const setCurrentThemeInstance = (theme: ThemeDefinition): void =>
 {
     let themeBaseClass = getThemeBaseClass( theme.constructor as IStyleDefinitionClass<ThemeDefinition>);
     themeBaseClass && themeInstanceMap.set( themeBaseClass, theme);
@@ -972,7 +962,7 @@ function setCurrentThemeInstance( theme: ThemeDefinition): void
  * corresponding base theme class.
  * @param themeClass Theme definition class
  */
-function removeCurrentThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): void
+const removeCurrentThemeInstance = (themeClass: IStyleDefinitionClass<ThemeDefinition>): void =>
 {
     let themeBaseClass = getThemeBaseClass( themeClass);
     themeBaseClass && themeInstanceMap.delete( themeBaseClass);

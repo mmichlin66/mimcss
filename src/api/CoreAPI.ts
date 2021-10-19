@@ -30,10 +30,8 @@ import {tag2s} from "../impl/Utils";
  * }
  * ```
  */
- export function selector( parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy
- {
-     return () => tag2s( parts, params);
- }
+ export const selector = (parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy =>
+    () => tag2s( parts, params);
 
 
 
@@ -56,10 +54,8 @@ import {tag2s} from "../impl/Utils";
  * }
  * ```
  */
-export function raw( parts: TemplateStringsArray, ...params: any[]): IRawProxy
-{
-    return () => tag2s( parts, params);
-}
+export const raw = (parts: TemplateStringsArray, ...params: any[]): IRawProxy =>
+    () => tag2s( parts, params);
 
 
 

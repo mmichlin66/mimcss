@@ -10,13 +10,8 @@ import { ICssFuncObject } from "../api/CoreTypes";
  * Converts dashe-case to camelCase, e.g. font-size to fontSize.
  * @param dash
  */
-export function dashToCamel( dash: string): string
-{
-	if (!dash)
-		return dash;
-
-	return dash.replace( /-([a-zA-Z])/g, (x, $1) => $1.toUpperCase());
-}
+export const dashToCamel = (dash: string): string =>
+	!dash ? dash : dash.replace( /-([a-zA-Z])/g, (x, $1) => $1.toUpperCase());
 
 
 
@@ -24,10 +19,8 @@ export function dashToCamel( dash: string): string
  * Converts camelCase to dash-case, e.g. fontSize to font-size.
  * @param camel
  */
-export function camelToDash( camel: string): string
-{
-  return camel.replace( /([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
-}
+export const camelToDash = (camel: string): string =>
+    camel.replace( /([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
 
 
 
@@ -170,7 +163,7 @@ export type V2SOptions = WKF | AnyToStringFunc |
  * Converts a value of an arbitrary type to a single string. The options parameter
  * can define how specific types are converted.
  */
-export function v2s( val: any, options?: V2SOptions): string
+export const v2s = (val: any, options?: V2SOptions): string =>
 {
     // if options is not specified, do standard processing
     if (!options)
@@ -253,12 +246,8 @@ wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
  * Converts the given array to a single string by converting every item using the given otions
  * and joining the results with the given delimiter.
  */
-export function a2s( val: any[], options?: V2SOptions, separator: string = " "): string
-{
-    return !val || val.length === 0
-        ? ""
-        : val.map( v => v2s( v, options)).filter( v => !!v).join( separator);
-}
+export const a2s = (val: any[], options?: V2SOptions, separator: string = " "): string =>
+    !val || val.length === 0 ? "" : val.map( v => v2s( v, options)).filter( v => !!v).join( separator);
 
 
 
@@ -274,8 +263,8 @@ export function a2s( val: any[], options?: V2SOptions, separator: string = " "):
  * @param defaultPrefix - prefix to use for those properties in the "params" array that don't
  * define their own prefix
  */
-export function o2s( val: {[p:string]: any}, options: P2SOptions, separator?: string,
-    defaultOptions?: V2SOptions, defaultPrefix?: string): string
+export const o2s = (val: {[p:string]: any}, options: P2SOptions, separator?: string,
+    defaultOptions?: V2SOptions, defaultPrefix?: string): string =>
 {
     if (val == null)
         return "";
@@ -317,7 +306,7 @@ export type ParamListWithOptions = (any | [any, V2SOptions?])[];
  * @param values
  * @param separator
  */
-export function mv2s( values: ParamListWithOptions, separator: string = " "): string
+export const mv2s = (values: ParamListWithOptions, separator: string = " "): string =>
 {
     if (values == null || values.length === 0)
         return "";
@@ -350,10 +339,8 @@ export function mv2s( values: ParamListWithOptions, separator: string = " "): st
  * @param values
  * @param separator
  */
-export function f2s( name: string, values: ParamListWithOptions, separator = ",")
-{
-    return `${name}(${mv2s( values, separator)})`;
-}
+export const f2s = (name: string, values: ParamListWithOptions, separator = ",") =>
+    `${name}(${mv2s( values, separator)})`;
 
 
 
@@ -361,8 +348,7 @@ export function f2s( name: string, values: ParamListWithOptions, separator = ","
  * The tag2s is a tag function helper that converts the template string with
  * parameters to a string using the given function to convert parameters.
  */
-export function tag2s( parts: TemplateStringsArray, params: any[],
-    convertFunc?: ( v: any) => string): string
+export const tag2s = (parts: TemplateStringsArray, params: any[], convertFunc?: ( v: any) => string): string =>
 {
     // number of parameters is always 1 less than the number of string parts
     let paramsLen = params.length;
@@ -401,9 +387,8 @@ export type PropSet2SOptions = {
 /**
  * Converts the given property set object to the CSS style string.
  */
-export function propSet2s( val: any, infos: PropSetInfos, options?: PropSet2SOptions): string
-{
-    return v2s( val, {
+export const propSet2s = (val: any, infos: PropSetInfos, options?: PropSet2SOptions): string =>
+    v2s( val, {
         obj: v => {
             let propNames = Object.keys( v);
             if (propNames.length === 0)
@@ -419,13 +404,10 @@ export function propSet2s( val: any, infos: PropSetInfos, options?: PropSet2SOpt
             return (options?.prefix ?? "") + `${arr.join( options?.separator ?? ";")}` + (options?.suffix ?? "");
         }
     });
-}
 
 // convert the value to string based on the information object for the property (if defined)
-function propInPropSet2s( dashName: string, camelName: string, val: any, options: V2SOptions): string
-{
-    return `${dashName}:${ v2s( val, options)}`;
-}
+const propInPropSet2s = (dashName: string, camelName: string, val: any, options: V2SOptions): string =>
+    `${dashName}:${ v2s( val, options)}`;
 
 
 
@@ -476,7 +458,7 @@ export const fdo: { [fn: string]: FdoOptions } = {};
  * @param val Function definition object that has the "fn" property defining the function name.
  * @returns String representation of CSS function invocation.
  */
-export function fdo2s( val: ICssFuncObject): string
+export const fdo2s = (val: ICssFuncObject): string =>
 {
     let options = fdo[val.fn];
     if (!options)
@@ -510,7 +492,7 @@ export function fdo2s( val: ICssFuncObject): string
  * @param sep
  * @returns
  */
-function goOverProps( val: ICssFuncObject, options?: V2SOptions, sep?: string): string
+const goOverProps = (val: ICssFuncObject, options?: V2SOptions, sep?: string): string =>
 {
     let buf: string[] = [];
     for( let p in val)

@@ -51,8 +51,8 @@ export interface IStyleActivator
  * Set the value of either a single property or a set of properties in the given
  * CSS style object.
  */
-function updateStyleProperty( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
-    value?: string | StringStyleset | null, important?: boolean): void
+const updateStyleProperty = (ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    value?: string | StringStyleset | null, important?: boolean): void =>
 {
     if (!name && value == null)
     {
@@ -311,7 +311,9 @@ export class SchedulingActivator implements IStyleActivator
 		this.definitions.clear();
 
         // update style properties
-		this.props.forEach( prop => updateStyleProperty( prop.ruleOrElm, prop.name, prop.value, prop.important));
+        for( let prop of this.props)
+    		updateStyleProperty( prop.ruleOrElm, prop.name, prop.value, prop.important);
+
 		this.props = [];
     }
 
@@ -387,12 +389,10 @@ class AnimationFrameScheduler implements IScheduler
 /**
  * Schedules the update of the value of the given CSS property in the given rule.
  */
-export function scheduleStyleUpdate( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle,
+export const scheduleStyleUpdate = (ruleOrElm: CSSStyleRule | ElementCSSInlineStyle,
     name: string | null, value?: string | StringStyleset | null,
-    important?: boolean, schedulerType?: number): void
-{
-	getActivator(schedulerType).updateStyle( ruleOrElm, name, value, important);
-}
+    important?: boolean, schedulerType?: number)
+    : void => getActivator(schedulerType).updateStyle( ruleOrElm, name, value, important);
 
 
 
@@ -401,21 +401,15 @@ export function scheduleStyleUpdate( ruleOrElm: CSSStyleRule | ElementCSSInlineS
  * the activator currently set as default. If, for some reason, the default activator is not set,
  * returns the synchronous activator.
  */
-export function getActivator( schedulerType?: number): IStyleActivator
-{
-	return (schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType))
-        ?? s_synchronousActivator;
-}
+export const getActivator = (schedulerType?: number): IStyleActivator =>
+	(schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType)) ?? s_synchronousActivator;
 
 
 
 /**
  * Returns the current default scheduler type.
  */
-export function getDefaultScheduler(): number
-{
-	return s_defaultSchedulerType;
-}
+export const getDefaultScheduler = (): number => s_defaultSchedulerType;
 
 
 
@@ -425,7 +419,7 @@ export function getDefaultScheduler(): number
  * previous default activator or 0 if an error occurs (e.g. the given scheduler type ID is not
  * registered).
  */
-export function setDefaultScheduler( schedulerType: number): number
+export const setDefaultScheduler = (schedulerType: number): number =>
 {
     // check that the given number is in our map of registered activators
     let activator = s_registeredActivators.get( schedulerType);
@@ -444,7 +438,7 @@ export function setDefaultScheduler( schedulerType: number): number
  * Registers the given scheduler object and returns the scheduler type identifier, which
  * should be used when calling activate and deactivate functions.
  */
-export function registerScheduler( scheduler: IScheduler): number
+export const registerScheduler = (scheduler: IScheduler): number =>
 {
 	// get the registration ID for this scheduler
 	let id = s_nextCustomSchedulerType++;
@@ -457,7 +451,7 @@ export function registerScheduler( scheduler: IScheduler): number
 /**
  * Unregisters a scheduler object with the given scheduler type identifier.
  */
-export function unregisterScheduler( id: number): void
+export const unregisterScheduler = (id: number): void =>
 {
 	if (id >= s_firstCustomSchedulerType)
 	{
@@ -483,7 +477,7 @@ let s_defaultSchedulerType: number = SchedulerType.Sync;
 /**
  * Synchronous activator instance.
  */
-let s_synchronousActivator = new SynchronousActivator();
+const s_synchronousActivator = new SynchronousActivator();
 
 /**
  * Current default activator. This activator will be used if scheduler type is not explicitly
@@ -507,7 +501,7 @@ let s_nextCustomSchedulerType: number = s_firstCustomSchedulerType;
 /**
  * Map of registered built-in and custom activators.
  */
-let s_registeredActivators = new Map<number,IStyleActivator>();
+const s_registeredActivators = new Map<number,IStyleActivator>();
 
 /**
  * Register built-in and custom activators.

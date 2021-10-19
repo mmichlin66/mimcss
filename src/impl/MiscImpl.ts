@@ -15,33 +15,25 @@ import {ExtendedCounterStyleset, ICounterStyleset} from "../api/CounterTypes";
 /**
  * Converts the given media query object to the CSS media query string
  */
-export function media2s( statement: MediaStatement): string
-{
-    return v2s( statement, {
+export const media2s = (statement: MediaStatement): string =>
+    v2s( statement, {
         any: mediaQuery2s,
         sep: ","
     })
-}
-
-
 
 /**
  * Converts the given media query object to the CSS media query string
  */
-function mediaQuery2s( query: MediaQuery): string
-{
-    return propSet2s( query, mediaFeatureInfos, {
+const mediaQuery2s = (query: MediaQuery): string =>
+    propSet2s( query, mediaFeatureInfos, {
         separator: " and ",
         propFunc: mediaFeature2s,
     });
-}
-
-
 
 /**
  * Converts the given media feature to the CSS media query string
  */
-function mediaFeature2s( dashName: string, camelName: string, val: any, options: V2SOptions): string
+const mediaFeature2s = (dashName: string, camelName: string, val: any, options: V2SOptions): string =>
 {
     if (val == null)
         return "";
@@ -65,7 +57,7 @@ function mediaFeature2s( dashName: string, camelName: string, val: any, options:
 
 
 
-let mediaFeatureInfos: { [K in keyof IMediaFeatureset]?: V2SOptions } =
+const mediaFeatureInfos: { [K in keyof IMediaFeatureset]?: V2SOptions } =
 {
     height: WKF.Length,
     minHeight: WKF.Length,
@@ -79,10 +71,10 @@ let mediaFeatureInfos: { [K in keyof IMediaFeatureset]?: V2SOptions } =
 };
 
 // Set of media features that allow range of values
-let rangeMediaFeatures = new Set<string>(["aspectRatio", "color", "colorIndex", "height", "monochrome", "resolution", "width"]);
+const rangeMediaFeatures = new Set<string>(["aspectRatio", "color", "colorIndex", "height", "monochrome", "resolution", "width"]);
 
 // Map of media features to default values
-let mediaFeatureDefaultValues = new Map<string,any>([
+const mediaFeatureDefaultValues = new Map<string,any>([
     ["color", 0],
     ["colorIndex", 0],
     ["monochrome", 0]
@@ -97,20 +89,15 @@ let mediaFeatureDefaultValues = new Map<string,any>([
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Converts the given supports statement to its string representation */
-export function supports2s( statement: SupportsStatement): string
-{
-    return v2s( statement, {
+export const supports2s = (statement: SupportsStatement): string =>
+    v2s( statement, {
         any: supportsQuery2s,
         sep: " or "
     });
-}
-
-
 
 /** Converts the given supports query to its string representation */
-function supportsQuery2s( query: SupportsQuery): string
-{
-    return v2s( query, {
+const supportsQuery2s = (query: SupportsQuery): string =>
+    v2s( query, {
         obj: (v: Exclude<SupportsQuery,string>) => {
             let propNames = Object.keys( v);
             if (propNames.length === 0)
@@ -120,7 +107,6 @@ function supportsQuery2s( query: SupportsQuery): string
                 `${camelToDash(propName)}:${styleProp2s( propName, query[propName])}`).join( ") and (")})`;
         }
     });
-}
 
 
 
@@ -130,26 +116,8 @@ function supportsQuery2s( query: SupportsQuery): string
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Converts the given font face object to the CSS style string.
- */
-export function fontFace2s( fontface: ExtendedFontFace): string
-{
-    return propSet2s( fontface, fontFacePropertyInfos);
-}
-
-
-
-wkf[WKF.FontStyle] = v => v2s( v, {
-    num: v => `oblique ${wkf[WKF.Angle](v)}`,
-    arr: v => `oblique ${a2s( v, WKF.Angle)}`
-});
-
-
-
-function fontSingleSrc2s( val: FontSrc): string
-{
-    return v2s( val, {
+const fontSingleSrc2s = (val: FontSrc): string =>
+    v2s( val, {
         props: [
             ["local", v => `local(${v})`],
             ["url", v => `url(${v})`],
@@ -159,7 +127,16 @@ function fontSingleSrc2s( val: FontSrc): string
             }]
         ]
     });
-}
+
+/**
+ * Converts the given font face object to the CSS style string.
+ */
+export const fontFace2s = (fontface: ExtendedFontFace): string => propSet2s( fontface, fontFacePropertyInfos);
+
+wkf[WKF.FontStyle] = v => v2s( v, {
+    num: v => `oblique ${wkf[WKF.Angle](v)}`,
+    arr: v => `oblique ${a2s( v, WKF.Angle)}`
+});
 
 
 
@@ -191,27 +168,10 @@ const fontFacePropertyInfos: { [K in keyof IFontFace]?: V2SOptions } =
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts the given counter styleset object to the CSS media query string
- */
- export function counterStyleset2s( counterStyleset: ExtendedCounterStyleset): string
- {
-    if (!counterStyleset)
-        return "";
-
-    let s = "";
-	for( let name in counterStyleset)
-        s += counterStylesetProp2s( name, counterStyleset[name], true) + ";";
-
-    return s;
- }
-
-
-
-/**
  * Converts the given counter styleset property to the CSS style string. Property name can be in
  * either dash or camel form.
  */
- function counterStylesetProp2s( propName: string, propVal: any, includeName?: boolean): string
+ const counterStylesetProp2s = (propName: string, propVal: any, includeName?: boolean): string =>
  {
      if (!propName)
          return "";
@@ -226,6 +186,23 @@ const fontFacePropertyInfos: { [K in keyof IFontFace]?: V2SOptions } =
 
      return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
  }
+
+/**
+ * Converts the given counter styleset object to the CSS media query string
+ */
+ export const counterStyleset2s = (counterStyleset: ExtendedCounterStyleset): string =>
+ {
+    if (!counterStyleset)
+        return "";
+
+    let s = "";
+	for( let name in counterStyleset)
+        s += counterStylesetProp2s( name, counterStyleset[name], true) + ";";
+
+    return s;
+ }
+
+
 
 
 

@@ -13,10 +13,8 @@ import * as impl from "../impl/SchedulingImpl";
  * Writes to DOM all style changes caused by the calls to the activate and deactivate functions
  * accumulated since the last activation of the given scheduling type.
  */
-export function forceDOMUpdate( schedulerType?: number): void
-{
+export const forceDOMUpdate = (schedulerType?: number): void =>
 	impl.getActivator(schedulerType).forceDOMUpdate();
-}
 
 
 
@@ -24,20 +22,16 @@ export function forceDOMUpdate( schedulerType?: number): void
  * Removes all scheduled activations caused by the calls to the activate and deactivate functions
  * accumulated since the last activation of the given scheduling type.
  */
-export function cancelDOMUpdate( schedulerType?: number): void
-{
+export const cancelDOMUpdate = (schedulerType?: number): void =>
 	impl.getActivator(schedulerType).cancelDOMUpdate();
-}
 
 
 
 /**
  * Returns the current default scheduler type.
  */
-export function getDefaultScheduler(): number
-{
-    return impl.getDefaultScheduler();
-}
+export const getDefaultScheduler = (): number =>
+    impl.getDefaultScheduler();
 
 
 
@@ -47,10 +41,8 @@ export function getDefaultScheduler(): number
  * previous default activator or 0 if an error occurs (e.g. the given scheduler type ID is not
  * registered).
  */
-export function setDefaultScheduler( schedulerType: number): number
-{
-    return impl.setDefaultScheduler( schedulerType);
-}
+export const setDefaultScheduler = (schedulerType: number): number =>
+    impl.setDefaultScheduler( schedulerType);
 
 
 
@@ -58,20 +50,16 @@ export function setDefaultScheduler( schedulerType: number): number
  * Registers the given scheduler object and returns the scheduler type identifier, which
  * should be used when calling activate and deactivate functions.
  */
-export function registerScheduler( scheduler: IScheduler): number
-{
-    return impl.registerScheduler( scheduler);
-}
+export const registerScheduler = (scheduler: IScheduler): number =>
+    impl.registerScheduler( scheduler);
 
 
 
 /**
  * Unregisters a scheduler object with the given scheduler type identifier.
  */
-export function unregisterScheduler( schedulerType: number): void
-{
-    return impl.unregisterScheduler( schedulerType);
-}
+export const unregisterScheduler = (schedulerType: number): void =>
+    impl.unregisterScheduler( schedulerType);
 
 
 

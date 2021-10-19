@@ -31,10 +31,8 @@ import {f2s, mv2s, tag2s, WKF} from "../impl/Utils";
  * This function can be used for style properties that are not yet supported by Mimcss. This is
  * also the way to support properties with vendor prefixes.
  */
-export function registerStyleProperty( name: string, toStringFunc: (v: any) => string): boolean
-{
-    return s_registerStylePropertyInfo( name, toStringFunc);
-}
+export const registerStyleProperty = (name: string, toStringFunc: (v: any) => string): boolean =>
+    s_registerStylePropertyInfo( name, toStringFunc);
 
 
 
@@ -44,20 +42,15 @@ export function registerStyleProperty( name: string, toStringFunc: (v: any) => s
  * to a CSS compliant string.
  * @param stylePropValue Value to convert.
  */
-export function getStylePropValue<K extends keyof ExtendedBaseStyleset>( stylePropName: K,
-	stylePropValue: ExtendedBaseStyleset[K]): string
-{
-	return styleProp2s( stylePropName, stylePropValue);
-}
+export const getStylePropValue = <K extends keyof ExtendedBaseStyleset>( stylePropName: K,
+	stylePropValue: ExtendedBaseStyleset[K]): string => styleProp2s( stylePropName, stylePropValue);
 
 
 
 // Sets style property on HTML or SVG element
-function setElementStyleProp<K extends keyof IStyleset>( elm: ElementCSSInlineStyle, name: K,
-    value: ExtendedBaseStyleset[K], schedulerType?: number): void
-{
+const setElementStyleProp = <K extends keyof IStyleset>( elm: ElementCSSInlineStyle, name: K,
+    value: ExtendedBaseStyleset[K], schedulerType?: number): void =>
     scheduleStyleUpdate( elm, name, styleProp2s( name, value), false, schedulerType);
-}
 
 
 
@@ -67,11 +60,9 @@ function setElementStyleProp<K extends keyof IStyleset>( elm: ElementCSSInlineSt
  * @param elm HTML/SVG element whose styles will be set.
  * @param styleset Styleset object which provides values for style properties.
  */
-export function setElementStyle( elm: ElementCSSInlineStyle, styleset: Styleset | null | undefined,
-	schedulerType?: number): void
-{
+export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset | null | undefined,
+	schedulerType?: number): void =>
     setElementStringStyle( elm, styleset ? stylesetToStringStyleset(styleset) : null, schedulerType);
-}
 
 
 
@@ -81,11 +72,9 @@ export function setElementStyle( elm: ElementCSSInlineStyle, styleset: Styleset 
  * @param elm HTML/SVG element whose styles will be set.
  * @param styleset [[StringStyleset]] object which provides values for style properties.
  */
-export function setElementStringStyle( elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
-	schedulerType?: number): void
-{
+export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
+	schedulerType?: number): void =>
     scheduleStyleUpdate( elm, null, styleset, false, schedulerType);
-}
 
 
 
@@ -94,7 +83,7 @@ export function setElementStringStyle( elm: ElementCSSInlineStyle, styleset: Str
  * converted to its string value.
  * @param styleset
  */
-export function stylesetToStringStyleset( styleset: Styleset): StringStyleset
+export const stylesetToStringStyleset = (styleset: Styleset): StringStyleset =>
 {
 	let res: StringStyleset = {};
 
@@ -118,7 +107,7 @@ export function stylesetToStringStyleset( styleset: Styleset): StringStyleset
  * their values set to `"unset"`. If there is no differences between the two stylesets null is
  * returned.
  */
-export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): StringStyleset | null
+export const diffStylesets = (oldStyleset: Styleset, newStyleset: Styleset): StringStyleset | null =>
 {
 	if (!oldStyleset && !newStyleset)
 		return null;
@@ -185,11 +174,9 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
  *
  * @category Miscellaneous
  */
- export function attr( attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
-	fallback?: Extended<string>): IStringProxy
-{
-    return () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit]), fallback], ",")})`;
-}
+ export const attr = (attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
+	fallback?: Extended<string>): IStringProxy =>
+    () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit]), fallback], ",")})`;
 
 
 
@@ -200,11 +187,9 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
  * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
  * @category Miscellaneous
  */
- export function counter( counterObj: Extended<ICounterRule | string>,
-	style?: Extended<ListStyleType_StyleType>): IStringProxy
-{
-    return () => f2s( "counter", [counterObj, style]);
-}
+ export const counter = (counterObj: Extended<ICounterRule | string>,
+	style?: Extended<ListStyleType_StyleType>): IStringProxy =>
+    () => f2s( "counter", [counterObj, style]);
 
 
 
@@ -218,11 +203,9 @@ export function diffStylesets( oldStyleset: Styleset, newStyleset: Styleset): St
  * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
  * @category Miscellaneous
  */
-export function counters( counterObj: Extended<ICounterRule | string>,
-	sep: Extended<string>, style?: Extended<ListStyleType_StyleType>): IStringProxy
-{
-    return () => f2s( "counters", [counterObj, [sep, WKF.Quoted], style]);
-}
+export const counters = (counterObj: Extended<ICounterRule | string>,
+	sep: Extended<string>, style?: Extended<ListStyleType_StyleType>): IStringProxy =>
+    () => f2s( "counters", [counterObj, [sep, WKF.Quoted], style]);
 
 
 
@@ -256,17 +239,11 @@ export function counters( counterObj: Extended<ICounterRule | string>,
  * in any context.
  * @category Miscellaneous
  */
-export function usevar<K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy
-{
-    // return () => fallback
-    //     ? `var(--${varObj.name},${styleProp2s( varObj.template, fallback)})`
-    //     : `var(--${varObj.name})`;
-
-    return () => f2s( "var", [
+export const usevar = <K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy =>
+    () => f2s( "var", [
         "--" + varObj.name,
         [fallback, (v: ExtendedVarValue<K>) => styleProp2s( varObj.template, v)]
     ]);
-}
 
 
 
@@ -353,10 +330,8 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
  * }
  * ```
  */
- export function media( parts: TemplateStringsArray, ...params: ExtendedMediaFeatureset[]): IMediaQueryProxy
-{
-    return () => tag2s( parts, params, v => typeof v === "string" ? v : media2s(v));
-}
+ export const media = (parts: TemplateStringsArray, ...params: ExtendedMediaFeatureset[]): IMediaQueryProxy =>
+    () => tag2s( parts, params, v => typeof v === "string" ? v : media2s(v));
 
 
 
@@ -365,10 +340,7 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
  * by libraries that allow specifying [[MediaStatement]] for the `media` attribute of elements
  * such as `<link>`, `<style>` and `<source>`
  */
-export function mediaToString( query: MediaStatement): string
-{
-    return media2s( query);
-}
+export const mediaToString = (query: MediaStatement): string => media2s( query);
 
 
 
@@ -390,20 +362,15 @@ export function mediaToString( query: MediaStatement): string
  * }
  * ```
  */
- export function supports( parts: TemplateStringsArray, ...params: Styleset[]): ISupportsQueryProxy
-{
-    return () => tag2s( parts, params, v => typeof v === "string" ? v : supports2s(v));
-}
+ export const supports = (parts: TemplateStringsArray, ...params: Styleset[]): ISupportsQueryProxy =>
+    () => tag2s( parts, params, v => typeof v === "string" ? v : supports2s(v));
 
 
 
 /**
  * Converts the given supports query value to the CSS supports query string.
  */
-export function supportsToString( query: SupportsStatement): string
-{
-    return supports2s( query);
-}
+export const supportsToString = (query: SupportsStatement): string => supports2s( query);
 
 
 
@@ -418,10 +385,7 @@ export function supportsToString( query: SupportsStatement): string
  * and instances and serializing them to a string. This can be used for server-side rendering when
  * the resultant string can be set as the content of a `<style>` element.
  */
-export function createCssSerializer(): ICssSerializer
-{
-    return new CssSerializer();
-}
+export const createCssSerializer = (): ICssSerializer => new CssSerializer();
 
 
 
@@ -430,7 +394,7 @@ export function createCssSerializer(): ICssSerializer
  * representation. This can be used for server-side rendering when the resultant string can be
  * set as the content of a `<style>` element.
  */
-export function serializeToCSS( ...args: (IStyleDefinition | IStyleDefinitionClass)[]): string
+export const serializeToCSS = (...args: (IStyleDefinition | IStyleDefinitionClass)[]): string =>
 {
     if (!args || args.length === 0)
         return "";

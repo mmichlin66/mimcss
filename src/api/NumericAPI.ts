@@ -36,7 +36,7 @@ function toUnitsProxy( n: number, unit: string): IGenericProxy { return () => n 
  * }
  * ```
  */
-export let Num: INumberMath = NumberMath;
+export const Num: INumberMath = NumberMath;
 
 
 
@@ -60,14 +60,14 @@ export let Num: INumberMath = NumberMath;
  * }
  * ```
  */
- export let Percent: IPercentMath = PercentMath;
+export const Percent: IPercentMath = PercentMath;
 
 /**
  * Creates percent value by appenfing the `"%"` sign to the given number. This function should be
  * used whenever a `<percentage>` CSS type is used for a style property or value.
  * @category Units
  */
-export function percent( n: number): IPercentProxy { return toUnitsProxy( n, "%"); }
+export const percent = (n: number): IPercentProxy => toUnitsProxy( n, "%");
 
 
 
@@ -91,13 +91,13 @@ export function percent( n: number): IPercentProxy { return toUnitsProxy( n, "%"
  * }
  * ```
  */
- export let Len: ILengthMath = LengthMath;
+export const Len: ILengthMath = LengthMath;
 
 /**
  * Creates length value in quarters of an inch.
  * @category Units
  */
-export function Q( n: number): ILengthProxy { return toUnitsProxy( n, "Q"); }
+export const Q = (n: number): ILengthProxy => toUnitsProxy( n, "Q");
 
 /**
  * Creates length value in ch units, which is equal to the used advance measure of the `“0”` (ZERO,
@@ -105,123 +105,123 @@ export function Q( n: number): ILengthProxy { return toUnitsProxy( n, "Q"); }
  * advance width or height, whichever is in the inline axis of the element.)
  * @category Units
  */
-export function ch( n: number): ILengthProxy { return toUnitsProxy( n, "ch"); }
+export const ch = (n: number): ILengthProxy => toUnitsProxy( n, "ch");
 
 /**
  * Creates length value in cantimeters.
  * @category Units
  */
-export function cm( n: number): ILengthProxy { return toUnitsProxy( n, "cm"); }
+export const cm = (n: number): ILengthProxy => toUnitsProxy( n, "cm");
 
 /**
  * Creates length value in calculated font-sizes of the element.
  * @category Units
  */
-export function em( n: number): ILengthProxy { return toUnitsProxy( n, "em"); }
+export const em = (n: number): ILengthProxy => toUnitsProxy( n, "em");
 
 /**
  * Creates length value in heights of lowercase letter 'x' in the font.
  * @category Units
  */
-export function ex( n: number): ILengthProxy { return toUnitsProxy( n, "ex"); }
+export const ex = (n: number): ILengthProxy => toUnitsProxy( n, "ex");
 
 /**
  * Creates length value in ic units.
  * @category Units
  */
-export function ic( n: number): ILengthProxy { return toUnitsProxy( n, "ic"); }
+export const ic = (n: number): ILengthProxy => toUnitsProxy( n, "ic");
 
 /**
  * Creates length value in inches.
  * @category Units
  */
-export function inch( n: number): ILengthProxy { return toUnitsProxy( n, "in"); }
+export const inch = (n: number): ILengthProxy => toUnitsProxy( n, "in");
 
 /**
  * Creates length value in line-heights of the element.
  * @category Units
  */
-export function lh( n: number): ILengthProxy { return toUnitsProxy( n, "lh"); }
+export const lh = (n: number): ILengthProxy => toUnitsProxy( n, "lh");
 
 /**
  * Creates length value in millimeters.
  * @category Units
  */
-export function mm( n: number): ILengthProxy { return toUnitsProxy( n, "mm"); }
+export const mm = (n: number): ILengthProxy => toUnitsProxy( n, "mm");
 
 /**
  * Creates length value in picas.
  * @category Units
  */
-export function pc( n: number): ILengthProxy { return toUnitsProxy( n, "pc"); }
+export const pc = (n: number): ILengthProxy => toUnitsProxy( n, "pc");
 
 /**
  * Creates length value in points.
  * @category Units
  */
-export function pt( n: number): ILengthProxy { return toUnitsProxy( n, "pt"); }
+export const pt = (n: number): ILengthProxy => toUnitsProxy( n, "pt");
 
 /**
  * Creates length value in pixels.
  * @category Units
  */
-export function px( n: number): ILengthProxy { return toUnitsProxy( n, "px"); }
+export const px = (n: number): ILengthProxy => toUnitsProxy( n, "px");
 
 /**
  * Creates length value in 1% of the size of the initial containing block, in the direction
  * of the root element’s block axis.
  * @category Units
  */
-export function vb( n: number): ILengthProxy { return toUnitsProxy( n, "vb"); }
+export const vb = (n: number): ILengthProxy => toUnitsProxy( n, "vb");
 
 /**
  * Creates length value in 1% of the height of the viewport's initial containing block.
  * @category Units
  */
-export function vh( n: number): ILengthProxy { return toUnitsProxy( n, "vh"); }
+export const vh = (n: number): ILengthProxy => toUnitsProxy( n, "vh");
 
 /**
  * Creates length value in 1% of the size of the initial containing block, in the direction
  * of the root element’s inline axis.
  * @category Units
  */
-export function vi( n: number): ILengthProxy { return toUnitsProxy( n, "vi"); }
+export const vi = (n: number): ILengthProxy => toUnitsProxy( n, "vi");
 
 /**
  * Creates length value in 1% of the width of the viewport's initial containing block.
  * @category Units
  */
-export function vw( n: number): ILengthProxy { return toUnitsProxy( n, "vw"); }
+export const vw = (n: number): ILengthProxy => toUnitsProxy( n, "vw");
 
 /**
  * Creates length value in font-sizes of the root element (<html>).
  * @category Units
  */
-export function rem( n: number): ILengthProxy { return toUnitsProxy( n, "rem"); }
+export const rem = (n: number): ILengthProxy => toUnitsProxy( n, "rem");
 
 /**
  * Creates length value in line-heights of the root element (<html>).
  * @category Units
  */
-export function rlh( n: number): ILengthProxy { return toUnitsProxy( n, "rlh"); }
+export const rlh = (n: number): ILengthProxy => toUnitsProxy( n, "rlh");
 
 /**
  * Creates length value in the units which are a smaller value between vw and vh.
  * @category Units
  */
-export function vmin( n: number): ILengthProxy { return toUnitsProxy( n, "vmin"); }
+export const vmin = (n: number): ILengthProxy => toUnitsProxy( n, "vmin");
 
 /**
  * Creates length value in the units which are a larger value between vw and vh.
  * @category Units
  */
-export function vmax( n: number): ILengthProxy { return toUnitsProxy( n, "vmax"); }
+export const vmax = (n: number): ILengthProxy => toUnitsProxy( n, "vmax");
 
 /**
  * Creates length value for flex.
  * @category Units
  */
-export function fr( n: number): ILengthProxy { return toUnitsProxy( n, "fr"); }
+export const fr = (n: number): ILengthProxy => toUnitsProxy( n, "fr");
 
 
 
@@ -231,31 +231,31 @@ export function fr( n: number): ILengthProxy { return toUnitsProxy( n, "fr"); }
  * allows using the methods such as [[min]], [[max]], [[calc]] and [[clamp]] with parameters
  * of the [[CssAngle]] type.
  */
-export let Angle: IAngleMath = AngleMath;
+export const Angle: IAngleMath = AngleMath;
 
 /**
  * Creates angle value in degrees.
  * @category Units
  */
-export function deg( n: number): IAngleProxy { return toUnitsProxy( n, "deg"); }
+export const deg = (n: number): IAngleProxy => toUnitsProxy( n, "deg");
 
 /**
  * Creates angle value in radians.
  * @category Units
  */
-export function rad( n: number): IAngleProxy { return toUnitsProxy( n, "rad"); }
+export const rad = (n: number): IAngleProxy => toUnitsProxy( n, "rad");
 
 /**
  * Creates angle value in gradians.
  * @category Units
  */
-export function grad( n: number): IAngleProxy { return toUnitsProxy( n, "grad"); }
+export const grad = (n: number): IAngleProxy => toUnitsProxy( n, "grad");
 
 /**
  * Creates angle value in turns.
  * @category Units
  */
-export function turn( n: number): IAngleProxy { return toUnitsProxy( n, "turn"); }
+export const turn = (n: number): IAngleProxy => toUnitsProxy( n, "turn");
 
 
 
@@ -264,19 +264,19 @@ export function turn( n: number): IAngleProxy { return toUnitsProxy( n, "turn");
  * CSS type. It implements the [[INumericMath]] interface and thus allows using the methods such
  * as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the [[CssTime]] type.
  */
- export let Time: ITimeMath = TimeMath;
+ export const Time: ITimeMath = TimeMath;
 
  /**
  * Creates time value in milliseconds.
  * @category Units
  */
-export function ms( n: number): ITimeProxy { return toUnitsProxy( n, "ms"); }
+export const ms = (n: number): ITimeProxy => toUnitsProxy( n, "ms");
 
 /**
  * Creates time value in seconds.
  * @category Units
  */
-export function s( n: number): ITimeProxy { return toUnitsProxy( n, "s"); }
+export const s = (n: number): ITimeProxy => toUnitsProxy( n, "s");
 
 
 
@@ -286,31 +286,31 @@ export function s( n: number): ITimeProxy { return toUnitsProxy( n, "s"); }
  * the methods such as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the
  * [[CssResolution]] type.
  */
- export let Resolution: IResolutionMath = ResolutionMath;
+ export const Resolution: IResolutionMath = ResolutionMath;
 
  /**
  * Creates resolution value in DPI.
  * @category Units
  */
-export function dpi( n: number): IResolutionProxy { return toUnitsProxy( n, "dpi"); }
+export const dpi = (n: number): IResolutionProxy => toUnitsProxy( n, "dpi");
 
 /**
  * Creates resolution value in DPCM.
  * @category Units
  */
-export function dpcm( n: number): IResolutionProxy { return toUnitsProxy( n, "dpcm"); }
+export const dpcm = (n: number): IResolutionProxy => toUnitsProxy( n, "dpcm");
 
 /**
  * Creates resolution value in DPPX.
  * @category Units
  */
-export function dppx( n: number): IResolutionProxy { return toUnitsProxy( n, "dppx"); }
+export const dppx = (n: number): IResolutionProxy => toUnitsProxy( n, "dppx");
 
 /**
  * Creates resolution value in X.
  * @category Units
  */
-export function x( n: number): IResolutionProxy { return toUnitsProxy( n, "x"); }
+export const x = (n: number): IResolutionProxy => toUnitsProxy( n, "x");
 
 
 
@@ -319,19 +319,19 @@ export function x( n: number): IResolutionProxy { return toUnitsProxy( n, "x"); 
  * CSS type. It implements the [[INumericMath]] interface and thus allows using the methods such
  * as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the [[CssFrequency]] type.
  */
- export let Frequency: IFrequencyMath = FrequencyMath;
+ export const Frequency: IFrequencyMath = FrequencyMath;
 
  /**
  * Creates frequency value in Hertz.
  * @category Units
  */
-export function hz( n: number): IFrequencyProxy { return toUnitsProxy( n, "hz"); }
+export const hz = (n: number): IFrequencyProxy => toUnitsProxy( n, "hz");
 
 /**
  * Creates frequency value in Kilo-Hertz.
  * @category Units
  */
-export function khz( n: number): IFrequencyProxy { return toUnitsProxy( n, "khz"); }
+export const khz = (n: number): IFrequencyProxy => toUnitsProxy( n, "khz");
 
 
 

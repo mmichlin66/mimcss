@@ -21,20 +21,16 @@ import {a2s, NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
  * @param intUnit Units to append if the number is integer.
  * @param floatUnit Units to append if the number is floating point.
  */
-function numberToString( n: number, intUnit: string = "", floatUint: string = ""): string
-{
-    return Number.isInteger(n) ?  n + intUnit : n + floatUint;
-}
+const numberToString = (n: number, intUnit: string = "", floatUint: string = ""): string =>
+    Number.isInteger(n) ?  n + intUnit : n + floatUint;
 
 /**
  * Converts a single number-based style value to the CSS string.
  * @param val Number as a style property type.
  * @param convertFunc Function that converts a number to a string.
  */
-function numberStyleToString<T>( val: Extended<T>, convertFunc?: NumberToStringFunc): string
-{
-    return v2s( val, { num: convertFunc});
-}
+const numberStyle2s = <T>( val: Extended<T>, convertFunc?: NumberToStringFunc): string =>
+    v2s( val, { num: convertFunc});
 
 /**
  * Converts single numeric style value or array of numericstyle values to the CSS string.
@@ -42,15 +38,13 @@ function numberStyleToString<T>( val: Extended<T>, convertFunc?: NumberToStringF
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-function multiNumberStyleToString<T>( val: OneOrMany<Extended<T>>, convertFunc?: NumberToStringFunc,
-    separator: string = " "): string
-{
-    return v2s( val, {
+const multiNumberStyle2s = <T>( val: OneOrMany<Extended<T>>, convertFunc?: NumberToStringFunc,
+    separator: string = " "): string =>
+    v2s( val, {
         num: convertFunc,
-        item: v => numberStyleToString( v, convertFunc),
+        item: v => numberStyle2s( v, convertFunc),
         sep: separator
     });
-}
 
 
 
@@ -58,21 +52,17 @@ function multiNumberStyleToString<T>( val: OneOrMany<Extended<T>>, convertFunc?:
  * The mathFunc function returns one of the mathematic CSS function that accepts one or more
  * parameters whose type is derived from NumberBase<T>.
  */
-function mathFunc<T>( name: string, params: Extended<T>[], convertFunc?: NumberToStringFunc): string
-{
-    return `${name}(${multiNumberStyleToString( params, convertFunc, ",")})`;
-}
+const mathFunc = <T>( name: string, params: Extended<T>[], convertFunc?: NumberToStringFunc): string =>
+    `${name}(${multiNumberStyle2s( params, convertFunc, ",")})`;
 
 
 
 /**
  * The calcFunc function returns the string representation of the calc() CSS function.
  */
-function calcFunc<T>( parts: TemplateStringsArray, params: Extended<T>[],
-    convertFunc?: NumberToStringFunc): string
-{
-    return `calc(${tag2s( parts, params, (v: any) => numberStyleToString( v, convertFunc))})`;
-}
+const calcFunc = <T>( parts: TemplateStringsArray, params: Extended<T>[],
+    convertFunc?: NumberToStringFunc): string =>
+    `calc(${tag2s( parts, params, (v: any) => numberStyle2s( v, convertFunc))})`;
 
 
 
@@ -92,12 +82,12 @@ export class NumericMath<T = any, U extends string = any> implements INumericMat
 
     public v2s( val: Extended<T>): string
     {
-        return numberStyleToString( val, this.n2s);
+        return numberStyle2s( val, this.n2s);
     }
 
     public mv2s( val: OneOrMany<Extended<T>>, separator: string): string
     {
-        return multiNumberStyleToString( val, this.n2s, separator);
+        return multiNumberStyle2s( val, this.n2s, separator);
     }
 
     /** Creates CssLength value from the number and the given unit. */
@@ -133,7 +123,7 @@ export class NumericMath<T = any, U extends string = any> implements INumericMat
  * The NumberMath object contains methods that implement CSS mathematic functions on the `<number>`
  * CSS type.
  */
-export let NumberMath = new NumericMath<CssNumber,"">( n => n.toString());
+export const NumberMath = new NumericMath<CssNumber,"">( n => n.toString());
 
 wkf[WKF.Number] = v => NumberMath.v2s( v);
 
@@ -143,7 +133,7 @@ wkf[WKF.Number] = v => NumberMath.v2s( v);
  * The PercentMath object contains methods that implement CSS mathematic functions on the
  * `<percentage>` CSS type by appending a "%" unit suffix.
  */
-export let PercentMath = new NumericMath<CssPercent,PercentUnits>(
+export const PercentMath = new NumericMath<CssPercent,PercentUnits>(
     n => (Number.isInteger(n) ? n : Math.round(n * 100)) + "%");
 
 wkf[WKF.Percent] = v => PercentMath.v2s( v);
@@ -153,10 +143,7 @@ wkf[WKF.Percent] = v => PercentMath.v2s( v);
  * - if the number is between -1 and 1 (non inclusive), multiplies the number and appends "%"
  * - otherwise, converts the number to string without appending any units.
  */
-function unitlessOrPercentToString( n: number): string
-{
-    return n >= 1 || n <= -1 ? n.toString() : (Math.round(n * 100) + "%");
-}
+const unitlessOrPercentToString = (n: number): string => n >= 1 || n <= -1 ? n.toString() : (Math.round(n * 100) + "%");
 
 wkf[WKF.Percent] = v => PercentMath.v2s( v);
 wkf[WKF.UnitlessOrPercent] = unitlessOrPercentToString;
@@ -169,7 +156,7 @@ wkf[WKF.AlwaysPercent] = v => v + "%";
  * CSS type by appending a length unit suffix.
  * Integer numbers use "px"; floating point numbers use "em".
  */
-export let LengthMath = new NumericMath<CssLength,LengthUnits>( n => numberToString( n, "px", "em"));
+export const LengthMath = new NumericMath<CssLength,LengthUnits>( n => numberToString( n, "px", "em"));
 
 wkf[WKF.Length] = v => LengthMath.v2s( v);
 wkf[WKF.MultiLengthWithSpace] = v => LengthMath.mv2s( v, " ");
@@ -181,7 +168,7 @@ wkf[WKF.MultiLengthWithSpace] = v => LengthMath.mv2s( v, " ");
  * CSS type by appending an angle unit suffix.
  * Integer numbers use "deg"; floating point numbers use "turn".
  */
-export let AngleMath = new NumericMath<CssAngle,AngleUnits>( n => numberToString( n, "deg", "turn"));
+export const AngleMath = new NumericMath<CssAngle,AngleUnits>( n => numberToString( n, "deg", "turn"));
 
 wkf[WKF.Angle] = v => AngleMath.v2s( v);
 
@@ -192,7 +179,7 @@ wkf[WKF.Angle] = v => AngleMath.v2s( v);
  * CSS type by appending a time unit suffix.
  * Integer numbers use "ms"; floating point numbers use "s".
  */
-export let TimeMath = new NumericMath<CssTime,TimeUnits>( n => numberToString( n, "ms", "s"));
+export const TimeMath = new NumericMath<CssTime,TimeUnits>( n => numberToString( n, "ms", "s"));
 
 wkf[WKF.Time] = v => TimeMath.v2s( v);
 wkf[WKF.MultiTimeWithComma] = v => TimeMath.mv2s( v, ",");
@@ -203,7 +190,7 @@ wkf[WKF.MultiTimeWithComma] = v => TimeMath.mv2s( v, ",");
  * `<resolution>` CSS type by appending a resolution unit suffix.
  * Integer numbers use "dpi"; floating point numbers use "x".
  */
-export let ResolutionMath = new NumericMath<CssResolution,ResolutionUnits>( n => numberToString( n, "dpi", "x"));
+export const ResolutionMath = new NumericMath<CssResolution,ResolutionUnits>( n => numberToString( n, "dpi", "x"));
 
 wkf[WKF.Resolution] = v => ResolutionMath.v2s( v);
 
@@ -213,7 +200,7 @@ wkf[WKF.Resolution] = v => ResolutionMath.v2s( v);
  * `<frequency>` CSS type by appending a frequency unit suffix.
  * Integer numbers use "Hz"; floating point numbers use "kHz".
  */
-export let FrequencyMath = new NumericMath<CssFrequency, FrequencyUnits>( n => numberToString( n, "Hz", "kHz"));
+export const FrequencyMath = new NumericMath<CssFrequency, FrequencyUnits>( n => numberToString( n, "Hz", "kHz"));
 
 wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 
@@ -225,17 +212,14 @@ wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Converts single position style value to the CSS string.
-function pos2s( val: Extended<CssPosition>): string
-{
-    return v2s( val, { any: WKF.Length });
-}
+const pos2s = (val: Extended<CssPosition>): string =>
+    v2s( val, { any: WKF.Length });
 
 /**
  * Converts multi-position style value to the CSS string.
  */
-function mpos2s( val: OneOrMany<Extended<CssPosition>>): string
-{
-    return v2s( val, {
+const mpos2s = (val: OneOrMany<Extended<CssPosition>>): string =>
+    v2s( val, {
         arr: (v: any[]) => {
             if (v.length === 0)
                 return "";
@@ -246,7 +230,6 @@ function mpos2s( val: OneOrMany<Extended<CssPosition>>): string
         },
         any: pos2s
     });
-}
 
 wkf[WKF.Position] = pos2s;
 wkf[WKF.AtPosition] = (v: Extended<CssPosition>) => v == null ? "" : "at " + pos2s(v);
@@ -262,19 +245,17 @@ wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { any: WKF.Length });
 /**
  * Converts border radius style value to the CSS string.
  */
- function borderRadius2s( val: Extended<BorderRadius>): string
- {
-     return v2s( val, {
-         arr: v =>
-         {
-             if (Array.isArray( v[0]))
-                return a2s( v, {any: WKF.Length}, "/");
-             else
-                 return a2s( v, WKF.Length);
-         },
-         any: WKF.Length
-     });
- }
+const borderRadius2s = (val: Extended<BorderRadius>): string =>
+    v2s( val, {
+        arr: v =>
+        {
+            if (Array.isArray( v[0]))
+            return a2s( v, {any: WKF.Length}, "/");
+            else
+                return a2s( v, WKF.Length);
+        },
+        any: WKF.Length
+    });
 
  wkf[WKF.BorderRadius] = borderRadius2s;
 

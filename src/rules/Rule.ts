@@ -136,18 +136,12 @@ export abstract class Rule extends RuleLike implements IRule
 
 
 /** Creates scoped names based on the given parameters */
-export function createName( topLevelContainer: ITopLevelRuleContainer, ruleName: string | null,
-    nameOverride?: string | INamedEntity): string
-{
-	if (!ruleName && !nameOverride)
-		return "";
-
-	return !nameOverride
-		? topLevelContainer.getScopedRuleName( ruleName!)
-		: typeof nameOverride === "string"
-			? nameOverride
-			: nameOverride.name;
-}
+export const createName = (topLevelContainer: ITopLevelRuleContainer, ruleName: string | null,
+    nameOverride?: string | INamedEntity): string =>
+	(!ruleName && !nameOverride) ? "" :
+	    !nameOverride ? topLevelContainer.getScopedRuleName( ruleName!) :
+        typeof nameOverride === "string" ? nameOverride :
+        nameOverride.name;
 
 
 

@@ -560,7 +560,7 @@ export interface IGridLineRule extends INamedEntity
      * Name of the grid area of which the line is either a start or an end line. It is defined
      * only if the line name ends with "-start" or "-end".
      */
-    readonly areaName: string;
+    readonly areaName?: string;
 }
 
 

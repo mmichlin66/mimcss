@@ -30,50 +30,57 @@ export class GridLineRule extends RuleLike implements IGridLineRule
 	{
         super.process( container, topLevelContainer, ruleName);
 
+        let name: string;
+        let areaName: string | undefined;
+        let isStartEndOrNone: boolean | undefined = this.isStartEndOrNone;
         let nameOverride = this.nameOverride;
         if (nameOverride instanceof GridLineRule)
         {
-            this.name = nameOverride.name;
+            name = nameOverride.name;
             this.isStartEndOrNone = nameOverride.isStartEndOrNone;
-            this.areaName = nameOverride.areaName;
+            areaName = nameOverride.areaName;
         }
         else if (nameOverride instanceof GridAreaRule)
         {
-            this.name = nameOverride.name + (this.isStartEndOrNone === true ? "-start" : this.isStartEndOrNone === false ? "-end" : "");
-            this.areaName = nameOverride.name;
+            name = nameOverride.name + (isStartEndOrNone === true ? "-start" : isStartEndOrNone === false ? "-end" : "");
+            areaName = nameOverride.name;
         }
         else
         {
-            this.name = createName( topLevelContainer, ruleName, this.nameOverride);
+            name = createName( topLevelContainer, ruleName, nameOverride);
 
             // if the obtained name doesn't have "-start" or "-end" but the isStartEndOrNone flag is
             // defined (that is, it is either start or end line), we need to append the suffix. If the
             // obtained name already has "-start" or "-end" and the isStartEndOrNone flag is not
             // defined, we set this flag to either true or false depending on the suffix. Note that if
             // the nameOverride is an area rule object, the isStartEndOrNone flag is always defined.
-            let nameHasStart = this.name.endsWith("-start");
-            let nameHasEnd = this.name.endsWith("-end");
+            let nameHasStart = name.endsWith("-start");
+            let nameHasEnd = name.endsWith("-end");
             if (nameHasStart)
             {
                 this.isStartEndOrNone = true;
-                this.areaName = this.name.substr( 0, this.name.length - "-start".length);
+                areaName = name.substr( 0, name.length - 6 /* "-start".length */);
             }
             else if (nameHasEnd)
             {
-                this.isStartEndOrNone = false;
-                this.areaName = this.name.substr( 0, this.name.length - "-end".length);
+                isStartEndOrNone = false;
+                areaName = name.substr( 0, name.length - 4 /* "-end".length */);
             }
-            else if (this.isStartEndOrNone === true)
+            else if (isStartEndOrNone === true)
             {
-                this.areaName = this.name;
-                this.name += "-start";
+                areaName = name;
+                name += "-start";
             }
-            else if (this.isStartEndOrNone === false)
+            else if (isStartEndOrNone === false)
             {
-                this.areaName = this.name;
-                this.name += "-end";
+                areaName = name;
+                name += "-end";
             }
         }
+
+        this.name = name;
+        this.areaName = areaName;
+        this.isStartEndOrNone = isStartEndOrNone;
 	}
 
 	/**
@@ -94,7 +101,7 @@ export class GridLineRule extends RuleLike implements IGridLineRule
      * Name of the grid area of which the line is either a start or an end line. It is defined
      * only if the line name ends with "-start" or "-end".
      */
-	public areaName: string;
+	public areaName?: string;
 
     // Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

@@ -24,6 +24,26 @@ import {f2s, mv2s, WKF, v2s, wkf, a2s, fdo} from "../impl/Utils";
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+const gradientNameToString = (val: IGradientFunc<any>): string => `${val.repeat ? "repeating-" : ""}${val.fn}`;
+
+const gradientStopsOrHintsToString = (val: GradientStopOrHint<any>[], math: WKF.Length | WKF.Angle): string =>
+    v2s( val, {
+        item: {
+            num: WKF.Color,
+            arr: v => {
+                if (v.length === 0)
+                    return "";
+                else if (v.length === 1)
+                    return v2s( v[0], math);
+                else
+                    return mv2s( [[v[0], WKF.Color], [v[1], math], [v[2], math] ]);
+            }
+        },
+        sep: ","
+    });
+
+
+
 /**
  * Function returning the ILinearGradientBuilder interface representing the `linear-gradient` CSS functions.
  *
@@ -42,10 +62,7 @@ import {f2s, mv2s, WKF, v2s, wkf, a2s, fdo} from "../impl/Utils";
  *
  * @category Image
  */
-export function linearGradient(...stops: GradientStopOrHint<CssLength>[]): ILinearGradientBuilder
-{
-    return new LinearGradient( stops);
-}
+export const linearGradient = (...stops: GradientStopOrHint<CssLength>[]): ILinearGradientBuilder => new LinearGradient( stops);
 
 fdo["linear-gradient"] = {
     fn: gradientNameToString,
@@ -77,10 +94,7 @@ fdo["linear-gradient"] = {
  *
  * @category Image
  */
-export function radialGradient(...stops: GradientStopOrHint<CssLength>[]): IRadialGradientBuilder
-{
-    return new RadialGradient( stops);
-}
+export const radialGradient = (...stops: GradientStopOrHint<CssLength>[]): IRadialGradientBuilder => new RadialGradient( stops);
 
 fdo["radial-gradient"] = {
     fn: gradientNameToString,
@@ -110,10 +124,7 @@ fdo["radial-gradient"] = {
  *
  * @category Image
  */
-export function conicGradient(...stops: GradientStopOrHint<CssAngle>[]): IConicGradientBuilder
-{
-    return new ConicGradient( stops);
-}
+export const conicGradient = (...stops: GradientStopOrHint<CssAngle>[]): IConicGradientBuilder => new ConicGradient( stops);
 
 fdo["conic-gradient"] = {
     fn: gradientNameToString,
@@ -221,42 +232,13 @@ class ConicGradient extends Gradient<CssAngle> implements IConicGradientBuilder
 
 
 
-function gradientNameToString( val: IGradientFunc<any>): string
-{
-    return `${val.repeat ? "repeating-" : ""}${val.fn}`;
-}
-
-function gradientStopsOrHintsToString( val: GradientStopOrHint<any>[], math: WKF.Length | WKF.Angle): string
-{
-    return v2s( val, {
-        item: {
-            num: WKF.Color,
-            arr: v => {
-                if (v.length === 0)
-                    return "";
-                else if (v.length === 1)
-                    return v2s( v[0], math);
-                else
-                    return mv2s( [[v[0], WKF.Color], [v[1], math], [v[2], math] ]);
-            }
-        },
-        sep: ","
-    });
-}
-
-
-
-
-
 /**
  * Returns an ImageProxy function representing the `cross-fade()` CSS function.
  *
  * @category Image
  */
-export function crossFade( ...args: CrossFadeParam[]): IImageProxy
-{
-    return () => `cross-fade(${a2s( args, v => mv2s( [v[0], [v[1], [WKF.Percent]]], ","))})`;
-}
+export const crossFade = (...args: CrossFadeParam[]): IImageProxy =>
+    () => `cross-fade(${a2s( args, v => mv2s( [v[0], [v[1], [WKF.Percent]]], ","))})`;
 
 
 
@@ -269,10 +251,7 @@ export function crossFade( ...args: CrossFadeParam[]): IImageProxy
 /**
  * Returns an IFilterProxy function representing one of the filter CSS function.
  */
-function filterPercent( fn: PercentFilterNames, p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return { fn, p };
-}
+const filterPercent = (fn: PercentFilterNames, p: Extended<CssPercent>): IPercentFilterFunc => ({ fn, p });
 
 
 
@@ -297,10 +276,7 @@ function filterPercent( fn: PercentFilterNames, p: Extended<CssPercent>): IPerce
  * @returns The `IPercentFilterFunc` interface containing percentage value
  * @category Filter
  */
-export function brightness( p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return filterPercent( "brightness", p);
-}
+export const brightness = (p: Extended<CssPercent>): IPercentFilterFunc => filterPercent( "brightness", p);
 
 
 
@@ -325,10 +301,7 @@ export function brightness( p: Extended<CssPercent>): IPercentFilterFunc
  * @returns The `IPercentFilterFunc` interface containing percentage value
  * @category Filter
  */
-export function contrast( p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return filterPercent( "contrast", p);
-}
+export const contrast = (p: Extended<CssPercent>): IPercentFilterFunc => filterPercent( "contrast", p);
 
 
 
@@ -353,10 +326,7 @@ export function contrast( p: Extended<CssPercent>): IPercentFilterFunc
  * @returns The `IPercentFilterFunc` interface containing percentage value
  * @category Filter
  */
-export function grayscale( p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return filterPercent( "grayscale", p);
-}
+export const grayscale = (p: Extended<CssPercent>): IPercentFilterFunc => filterPercent( "grayscale", p);
 
 
 
@@ -384,10 +354,7 @@ export function grayscale( p: Extended<CssPercent>): IPercentFilterFunc
  * @returns The `IPercentFilterFunc` interface containing percentage value
  * @category Filter
  */
-export function invert( p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return filterPercent( "invert", p);
-}
+export const invert = (p: Extended<CssPercent>): IPercentFilterFunc => filterPercent( "invert", p);
 
 
 
@@ -409,10 +376,7 @@ export function invert( p: Extended<CssPercent>): IPercentFilterFunc
  * @returns The `IPercentFilterFunc` interface containing percentage value
  * @category Filter
  */
-export function opacity( p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return filterPercent( "opacity", p);
-}
+export const opacity = (p: Extended<CssPercent>): IPercentFilterFunc => filterPercent( "opacity", p);
 
 
 
@@ -437,10 +401,7 @@ export function opacity( p: Extended<CssPercent>): IPercentFilterFunc
  * @returns The `IPercentFilterFunc` interface containing percentage value
  * @category Filter
  */
-export function saturate( p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return filterPercent( "saturate", p);
-}
+export const saturate = (p: Extended<CssPercent>): IPercentFilterFunc => filterPercent( "saturate", p);
 
 
 
@@ -462,10 +423,7 @@ export function saturate( p: Extended<CssPercent>): IPercentFilterFunc
  * @returns The `IPercentFilterFunc` interface containing percentage value
  * @category Filter
  */
-export function sepia( p: Extended<CssPercent>): IPercentFilterFunc
-{
-    return filterPercent( "sepia", p);
-}
+export const sepia = (p: Extended<CssPercent>): IPercentFilterFunc => filterPercent( "sepia", p);
 
 fdo.brightness = fdo.contrast = fdo.grayscale = fdo.invert = fdo.opacity = fdo.saturate =
     fdo.sepia = WKF.Percent;
@@ -495,10 +453,7 @@ fdo.brightness = fdo.contrast = fdo.grayscale = fdo.invert = fdo.opacity = fdo.s
  * @returns The `IBlurFunc` interface containing the blur radius
  * @category Filter
  */
-export function blur( r: Extended<CssLength>): IBlurFunc
-{
-    return { fn: "blur", r };
-}
+export const blur = ( r: Extended<CssLength>): IBlurFunc => ({ fn: "blur", r });
 
 fdo.blur = WKF.Length;
 
@@ -532,11 +487,8 @@ fdo.blur = WKF.Length;
  *
  * @category Filter
  */
-export function dropShadow( x: Extended<CssLength>, y: Extended<CssLength>,
-    color?: Extended<CssColor>, blur?: Extended<CssLength>): IDropShadowFunc
-{
-    return { fn: "drop-shadow", x, y, color, blur };
-}
+export const dropShadow = (x: Extended<CssLength>, y: Extended<CssLength>,
+    color?: Extended<CssColor>, blur?: Extended<CssLength>): IDropShadowFunc => ({ fn: "drop-shadow", x, y, color, blur });
 
 fdo["drop-shadow"] = {
     p: [ "x", "y", ["color", WKF.Color], "blur" ],
@@ -566,10 +518,7 @@ fdo["drop-shadow"] = {
  * @returns The `IHueRotateFunc` interface containing the hue rotation angle
  * @category Filter
  */
-export function hueRotate( a: Extended<CssAngle>): IHueRotateFunc
-{
-    return { fn: "hue-rotate", a };
-}
+export const hueRotate = (a: Extended<CssAngle>): IHueRotateFunc => ({ fn: "hue-rotate", a });
 
 fdo["hue-rotate"] = WKF.Angle
 
@@ -586,11 +535,9 @@ fdo["hue-rotate"] = WKF.Angle
  *
  * @category Transform
  */
-export function matrix( a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
-	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): IMatrixFunc
-{
-    return { fn: "matrix", a, b, c, d, tx, ty };
-}
+export const matrix = (a: Extended<CssNumber>, b: Extended<CssNumber>, c: Extended<CssNumber>,
+	d: Extended<CssNumber>, tx: Extended<CssNumber>, ty: Extended<CssNumber>): IMatrixFunc =>
+    ({fn: "matrix", a, b, c, d, tx, ty });
 
 fdo.matrix = [ "a", "b", "c", "d", "tx", "ty" ];
 
@@ -601,15 +548,12 @@ fdo.matrix = [ "a", "b", "c", "d", "tx", "ty" ];
  *
  * @category Transform
  */
-export function matrix3d(
+export const matrix3d = (
 		a1: Extended<CssNumber>, b1: Extended<CssNumber>, c1: Extended<CssNumber>, d1: Extended<CssNumber>,
 		a2: Extended<CssNumber>, b2: Extended<CssNumber>, c2: Extended<CssNumber>, d2: Extended<CssNumber>,
 		a3: Extended<CssNumber>, b3: Extended<CssNumber>, c3: Extended<CssNumber>, d3: Extended<CssNumber>,
 		a4: Extended<CssNumber>, b4: Extended<CssNumber>, c4: Extended<CssNumber>, d4: Extended<CssNumber>,
-	): IMatrix3dFunc
-{
-    return { fn: "matrix3d", a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4 };
-}
+	): IMatrix3dFunc => ({ fn: "matrix3d", a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4 });
 
 fdo.matrix = [ "a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2", "a3", "b3", "c3", "d3", "a4", "b4", "c4", "d4" ];
 
@@ -620,10 +564,7 @@ fdo.matrix = [ "a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2", "a3", "b3", "c3",
  *
  * @category Transform
  */
-export function perspective( d: Extended<CssLength>): IPerspectiveFunc
-{
-    return { fn: "perspective", d };
-}
+export const perspective = (d: Extended<CssLength>): IPerspectiveFunc => ({ fn: "perspective", d });
 
 fdo.perspective = WKF.Length;
 
@@ -634,40 +575,28 @@ fdo.perspective = WKF.Length;
  *
  * @category Transform
  */
-export function rotate( a: Extended<CssAngle>): IRotateFunc
-{
-    return { fn: "rotate", a };
-}
+export const rotate = (a: Extended<CssAngle>): IRotateFunc => ({ fn: "rotate", a });
 
 /**
  * Returns an ITransformProxy function representing the `rotateX()` CSS function.
  *
  * @category Transform
  */
-export function rotateX( a: Extended<CssAngle>): IRotateFunc
-{
-    return { fn: "rotateX", a };
-}
+export const rotateX = (a: Extended<CssAngle>): IRotateFunc => ({ fn: "rotateX", a });
 
 /**
  * Returns an ITransformProxy function representing the `rotateY()` CSS function.
  *
  * @category Transform
  */
-export function rotateY( a: Extended<CssAngle>): IRotateFunc
-{
-    return { fn: "rotateY", a };
-}
+export const rotateY = (a: Extended<CssAngle>): IRotateFunc => ({ fn: "rotateY", a });
 
 /**
  * Returns an ITransformProxy function representing the `rotateZ()` CSS function.
  *
  * @category Transform
  */
-export function rotateZ( a: Extended<CssAngle>): IRotateFunc
-{
-    return { fn: "rotateZ", a };
-}
+export const rotateZ = (a: Extended<CssAngle>): IRotateFunc => ({ fn: "rotateZ", a });
 
 fdo.rotate = fdo.rotateX = fdo.rotateY = fdo.rotateZ = WKF.Angle;
 
@@ -678,11 +607,8 @@ fdo.rotate = fdo.rotateX = fdo.rotateY = fdo.rotateZ = WKF.Angle;
  *
  * @category Transform
  */
-export function rotate3d( x: Extended<CssNumber>, y: Extended<CssNumber>,
-    z: Extended<CssNumber>, a: Extended<CssAngle>): IRotate3dFunc
-{
-    return { fn: "rotate3d", x, y, z, a };
-}
+export const rotate3d = (x: Extended<CssNumber>, y: Extended<CssNumber>,
+    z: Extended<CssNumber>, a: Extended<CssAngle>): IRotate3dFunc => ({ fn: "rotate3d", x, y, z, a });
 
 fdo.rotate3d = [ "x", "y", "z", ["a", WKF.Angle] ];
 
@@ -693,10 +619,7 @@ fdo.rotate3d = [ "x", "y", "z", ["a", WKF.Angle] ];
  *
  * @category Transform
  */
-export function scale( sx: Extended<CssNumber>, sy?: Extended<CssNumber>): IScaleFunc
-{
-    return { fn: "scale", sx, sy };
-}
+export const scale = (sx: Extended<CssNumber>, sy?: Extended<CssNumber>): IScaleFunc => ({ fn: "scale", sx, sy });
 
 fdo.scale = ["sx", "sy"]
 
@@ -705,41 +628,29 @@ fdo.scale = ["sx", "sy"]
  *
  * @category Transform
  */
-export function scaleX( s: Extended<CssNumber>): IScale1dFunc
-{
-    return { fn: "scaleX", s };
-}
+export const scaleX = (s: Extended<CssNumber>): IScale1dFunc => ({ fn: "scaleX", s });
 
 /**
  * Returns an IScale1dFunc function representing the `scaleY()` CSS function.
  *
  * @category Transform
  */
-export function scaleY( s: Extended<CssNumber>): IScale1dFunc
-{
-    return { fn: "scaleY", s };
-}
+export const scaleY = (s: Extended<CssNumber>): IScale1dFunc => ({ fn: "scaleY", s });
 
 /**
  * Returns an IScale1dFunc function representing the `scaleZ()` CSS function.
  *
  * @category Transform
  */
-export function scaleZ( s: Extended<CssNumber>): IScale1dFunc
-{
-    return { fn: "scaleZ", s };
-}
+export const scaleZ = (s: Extended<CssNumber>): IScale1dFunc => ({ fn: "scaleZ", s });
 
 /**
  * Returns an IScale3dFunc function representing the `scale3d()` CSS function.
  *
  * @category Transform
  */
-export function scale3d( sx: Extended<CssNumber>, sy: Extended<CssNumber>,
-    sz: Extended<CssNumber>): IScale3dFunc
-{
-    return { fn: "scale3d", sx, sy, sz };
-}
+export const scale3d = (sx: Extended<CssNumber>, sy: Extended<CssNumber>,
+    sz: Extended<CssNumber>): IScale3dFunc => ({ fn: "scale3d", sx, sy, sz });
 
 fdo.scale3d = ["sx", "sy", "sz"]
 
@@ -750,10 +661,7 @@ fdo.scale3d = ["sx", "sy", "sz"]
  *
  * @category Transform
  */
-export function skew( ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ISkewFunc
-{
-    return { fn: "skew", ax, ay };
-}
+export const skew = (ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ISkewFunc => ({ fn: "skew", ax, ay });
 
 fdo.scale3d = ["ax", "ay"]
 
@@ -762,20 +670,14 @@ fdo.scale3d = ["ax", "ay"]
  *
  * @category Transform
  */
-export function skewX( a: Extended<CssAngle>): ISkew1dFunc
-{
-    return { fn: "skewX", a };
-}
+export const skewX = (a: Extended<CssAngle>): ISkew1dFunc => ({ fn: "skewX", a });
 
 /**
  * Returns an ISkew1dFunc function representing the `skewY()` CSS function.
  *
  * @category Transform
  */
-export function skewY( a: Extended<CssAngle>): ISkew1dFunc
-{
-    return { fn: "skewY", a };
-}
+export const skewY = (a: Extended<CssAngle>): ISkew1dFunc => ({ fn: "skewY", a });
 
 fdo.scew = fdo.skewX = fdo.skewY = WKF.Angle;
 
@@ -786,10 +688,7 @@ fdo.scew = fdo.skewX = fdo.skewY = WKF.Angle;
  *
  * @category Transform
  */
-export function translate( x: Extended<CssLength>, y?: Extended<CssLength>): ITranslateFunc
-{
-    return { fn: "translate", x, y };
-}
+export const translate = (x: Extended<CssLength>, y?: Extended<CssLength>): ITranslateFunc => ({ fn: "translate", x, y });
 
 fdo.translate = {
     p: ["x", "y"],
@@ -801,30 +700,21 @@ fdo.translate = {
  *
  * @category Transform
  */
-export function translateX( d: Extended<CssLength>): ITranslate1dFunc
-{
-    return { fn: "translateX", d };
-}
+export const translateX = (d: Extended<CssLength>): ITranslate1dFunc => ({ fn: "translateX", d });
 
 /**
  * Returns an ITranslate1dFunc function representing the `translateY()` CSS function.
  *
  * @category Transform
  */
-export function translateY( d: Extended<CssLength>): ITranslate1dFunc
-{
-    return { fn: "translateY", d };
-}
+export const translateY = (d: Extended<CssLength>): ITranslate1dFunc => ({ fn: "translateY", d });
 
 /**
  * Returns an ITranslate1dFunc function representing the `translateZ()` CSS function.
  *
  * @category Transform
  */
-export function translateZ( d: Extended<CssLength>): ITranslate1dFunc
-{
-    return { fn: "translateZ", d };
-}
+export const translateZ = (d: Extended<CssLength>): ITranslate1dFunc => ({ fn: "translateZ", d });
 
 fdo.translateX = fdo.translateY = fdo.translateZ = WKF.Length;
 
@@ -833,11 +723,8 @@ fdo.translateX = fdo.translateY = fdo.translateZ = WKF.Length;
  *
  * @category Transform
  */
-export function translate3d( x: Extended<CssLength>, y: Extended<CssLength>,
-	z: Extended<CssLength>): ITranslate3dFunc
-{
-    return { fn: "translate3d", x, y, z };
-}
+export const translate3d = (x: Extended<CssLength>, y: Extended<CssLength>,
+	z: Extended<CssLength>): ITranslate3dFunc => ({ fn: "translate3d", x, y, z });
 
 fdo.translate3d = {
     p: ["x", "y", "z"],
@@ -865,14 +752,12 @@ fdo.translate3d = {
  *
  * @category Basic Shape
  */
-export function inset( o1: Extended<CssLength>, o2?: Extended<CssLength>,
-    o3?: Extended<CssLength>, o4?: Extended<CssLength>): IInsetBuilder
-{
-    return {
+export const inset = (o1: Extended<CssLength>, o2?: Extended<CssLength>,
+    o3?: Extended<CssLength>, o4?: Extended<CssLength>): IInsetBuilder =>
+    ({
         fn: "inset", o1, o2, o3, o4,
         round( r: Extended<BorderRadius>) { this.r = r; return this; }
-    };
-}
+    });
 
 fdo.inset = {
     p: [ "o1", "o2", "o3", "o4", ["r", v => "round " + wkf[WKF.BorderRadius](v)] ],
@@ -895,13 +780,11 @@ fdo.inset = {
  *
  * @category Basic Shape
  */
-export function circle( r?: ShapeRadius): ICircleBuilder
-{
-    return {
+export const circle = (r?: ShapeRadius): ICircleBuilder =>
+    ({
         fn: "circle", r,
         at( pos: Extended<CssPosition>) { this.pos = pos; return this; }
-    }
-}
+    });
 
 fdo.circle = {
     p: [ ["r", WKF.Length], ["pos", WKF.AtPosition] ],
@@ -967,14 +850,12 @@ fdo.ellipse = {
  *
  * @category Basic Shape
  */
-export function polygon( ...points: CssPoint[]): IPolygonBuilder
-{
-    return {
+export const polygon = (...points: CssPoint[]): IPolygonBuilder =>
+    ({
         fn: "polygon", points: points ?? [],
         add( ...points: CssPoint[]) { this.points.push( ...points); return this; },
         fill( rule: FillRule) { this.rule = rule; return this; }
-    };
-}
+    });
 
 fdo.polygon = [
     "rule",
@@ -988,10 +869,7 @@ fdo.polygon = [
  *
  * @category Basic Shape
  */
-export function path( fillRule?: FillRule): IPathBuilder
-{
-    return new PathBuilder( fillRule);
-}
+export const path = (fillRule?: FillRule): IPathBuilder => new PathBuilder( fillRule);
 
 
 
@@ -1056,11 +934,8 @@ fdo.path = [ "rule", ["items", (v: PathCommand[]) => `"${a2s(v)}"`] ]
  *
  * @category Basic Shape
  */
- export function ray( angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
-    contain?: boolean): IRayFunc
-{
-    return { fn: "ray", angle, size, contain }
-}
+ export const ray = (angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
+    contain?: boolean): IRayFunc => ({ fn: "ray", angle, size, contain });
 
 fdo.ray = {
     p: [
@@ -1084,10 +959,8 @@ fdo.ray = {
  *
  * @category Grid
  */
-export function minmax( min: GridTrackSize, max: GridTrackSize): IMinMaxFunc
-{
-    return { fn: "minmax", min, max };
-}
+export const minmax = (min: GridTrackSize, max: GridTrackSize): IMinMaxFunc =>
+    ({ fn: "minmax", min, max });
 
 fdo.minmax = [ ["min", WKF.Length], ["max", WKF.Length] ]
 
@@ -1098,11 +971,8 @@ fdo.minmax = [ ["min", WKF.Length], ["max", WKF.Length] ]
  *
  * @category Grid
  */
-export function repeat( count: Extended<CssNumber> | "auto-fill" | "auto-fit",
-    ...tracks: GridTrack[]): IRepeatFunc
-{
-    return { fn: "repeat", count, tracks }
-}
+export const repeat = (count: Extended<CssNumber> | "auto-fill" | "auto-fit",
+    ...tracks: GridTrack[]): IRepeatFunc => ({ fn: "repeat", count, tracks });
 
 fdo.repeat = [ "count", ["tracks", { item: WKF.GridTrack }] ]
 
@@ -1115,10 +985,8 @@ fdo.repeat = [ "count", ["tracks", { item: WKF.GridTrack }] ]
  *
  * @category Grid
  */
-export function span( p1: Extended<GridLineCountOrName>, p2?: Extended<GridLineCountOrName>): IGridSpanFunc
-{
-    return { fn: "span", p1, p2 }
-}
+export const span = (p1: Extended<GridLineCountOrName>, p2?: Extended<GridLineCountOrName>): IGridSpanFunc =>
+    ({ fn: "span", p1, p2 });
 
 fdo.span = (v: IGridSpanFunc) => mv2s( ["span", v.p1, v.p2])
 
@@ -1137,10 +1005,7 @@ fdo.span = (v: IGridSpanFunc) => mv2s( ["span", v.p1, v.p2])
  *
  * @category Miscellaneous
  */
-export function url( p: Extended<string | IIDRule>): IUrlFunc
-{
-    return { fn: "url", p };
-}
+export const url = (p: Extended<string | IIDRule>): IUrlFunc => ({ fn: "url", p });
 
 
 
@@ -1180,10 +1045,8 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
  *
  * @category Transition and Animation
  */
-export function steps( n: Extended<number>, j?: TimingFunctionJumpTerm): IStepsFunc
-{
-    return  { fn: "steps", n, j };
-}
+export const steps = (n: Extended<number>, j?: TimingFunctionJumpTerm): IStepsFunc =>
+    ({ fn: "steps", n, j });
 
 fdo.steps = ["n", "j"]
 
@@ -1194,11 +1057,8 @@ fdo.steps = ["n", "j"]
  *
  * @category Transition and Animation
  */
-export function cubicBezier( n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
-    n4: Extended<number>): ICubicBezierFunc
-{
-    return { fn: "cubic-bezier", n1, n2, n3, n4 };
-}
+export const cubicBezier = (n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
+    n4: Extended<number>): ICubicBezierFunc => ({ fn: "cubic-bezier", n1, n2, n3, n4 });
 
 fdo["cubic-bezier"] = { p: ["n1", "n2", "n3", "n4"] }
 

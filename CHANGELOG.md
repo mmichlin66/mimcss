@@ -1,3 +1,17 @@
+# 0.11.3
+## Non-breaking changes
+
+1. Add `IRawProxy` interface.
+1. `raw()` tag function returns `IRawProxy` instead of `IStringProxy` interface.
+1. Add `CssString` type.
+
+
+## Bug fixes
+
+1. Serialization of the `quotes` style property.
+2. Allow only keywords for the `font-stretch` part of the shorthand `font` property.
+
+
 # 0.11.2
 ## Non-breaking changes
 

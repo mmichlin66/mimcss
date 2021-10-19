@@ -179,7 +179,7 @@ const customColors: { [P: string]: number } = {};
  * @param value
  * @returns
  */
-export function registerColor( name: keyof INamedColors, value: number): boolean
+export const registerColor = ( name: keyof INamedColors, value: number): boolean =>
 {
     if (!name || value == null)
         return false;
@@ -204,7 +204,7 @@ export function registerColor( name: keyof INamedColors, value: number): boolean
 /**
  * Converts color value from the numeric representation to the CSS color string.
  */
-function colorNumber2s( val: number): string
+let  colorNumber2s = (val: number): string =>
 {
     // if the number is negative, remember that fact and get the positive number
     let isNegative = val < 0;
@@ -236,13 +236,11 @@ function colorNumber2s( val: number): string
  * color name added via INamedColors module augmentation. For numeric values, we check if this is
  * one of the predefined colors and return its string representation
  */
- function color2s( val: Extended<CssColor>): string
- {
-     return v2s( val, {
-         str: v => v in customColors ? colorNumber2s( customColors[v]) : v,
-         num: colorNumber2s
-     });
- }
+const color2s = (val: Extended<CssColor>): string =>
+    v2s( val, {
+        str: v => v in customColors ? colorNumber2s( customColors[v]) : v,
+        num: colorNumber2s
+    });
 
  // register color conversion function
  wkf[WKF.Color] = color2s;
@@ -252,15 +250,13 @@ function colorNumber2s( val: number): string
  /**
  * Converts the color separation value to a CSS string.
  */
-function separationToString( c: Extended<number>): string
-{
-    return v2s( c, {
+const separationToString = (c: Extended<number>): string =>
+    v2s( c, {
         num: c => {
             c = c < 0 ? -c : c;
             return (c === 0 || c >= 1) ? "" + c : (Math.round( c * 100) + "%");
         }
     })
-}
 
 wkf[WKF.ColorSeparation] = separationToString;
 
@@ -288,8 +284,8 @@ wkf[WKF.ColorSeparation] = separationToString;
  * @param a Optional alpha mask as a percentage value.
  * @return The IRgbFunc object representing the invocation of the `rgb()` CSS function
  */
-export function rgb( r: Extended<CssColorSeparation>, g: Extended<CssColorSeparation>,
-    b: Extended<CssColorSeparation>, a?: Extended<CssPercent>): IRgbFunc
+export const rgb = (r: Extended<CssColorSeparation>, g: Extended<CssColorSeparation>,
+    b: Extended<CssColorSeparation>, a?: Extended<CssPercent>): IRgbFunc =>
 {
     return { fn: "rgb", r, g, b, a };
     // return f2s("rgba", [[r, separationToString], [g, separationToString], [b, separationToString], [a, alphaToString]]);
@@ -327,8 +323,8 @@ fdo.rgb = {
  * @param a Optional alpha mask as a percentage value.
  * @return The IHslFunc object representing the invocation of the `hsl()` CSS function
  */
-export function hsl( h: Extended<CssAngle>, s: Extended<CssPercent>, l: Extended<CssPercent>,
-    a?: Extended<CssPercent>): IHslFunc
+export const hsl = (h: Extended<CssAngle>, s: Extended<CssPercent>, l: Extended<CssPercent>,
+    a?: Extended<CssPercent>): IHslFunc =>
 {
     return { fn: "hsl", h, s, l, a };
 }
@@ -351,8 +347,8 @@ fdo.hsl = {
  * @param a Optional alpha mask as a percentage value.
  * @returns The ILabFunc object representing the invocation of the `lab()` CSS function
  */
-export function lab( l: Extended<CssPercent>, da: Extended<number>, db: Extended<number>,
-    a?: Extended<CssPercent>): ILabFunc
+export const lab = (l: Extended<CssPercent>, da: Extended<number>, db: Extended<number>,
+    a?: Extended<CssPercent>): ILabFunc =>
 {
     return { fn: "lab", l, da, db, a };
 }
@@ -375,8 +371,8 @@ fdo.lab = {
  * @param a Optional alpha mask as a percentage value.
  * @returns The ILchFunc object representing the invocation of the `lch()` CSS function
  */
-export function lch( l: Extended<CssPercent>, c: Extended<number>, h: Extended<CssAngle>,
-    a?: Extended<CssPercent>): ILchFunc
+export const lch = (l: Extended<CssPercent>, c: Extended<number>, h: Extended<CssAngle>,
+    a?: Extended<CssPercent>): ILchFunc =>
 {
     return { fn: "lch", l, c, h, a };
 }
@@ -415,12 +411,9 @@ fdo.lch = {
  * @param c Color value as either a number or a named color
  * @param a Alpha channel value
  */
-export function alpha( c: number | keyof INamedColors, a: number): IAlphaFunc
-{
-    return { fn: "alpha", c, a };
-}
+export const alpha = (c: number | keyof INamedColors, a: number): IAlphaFunc => ({ fn: "alpha", c, a });
 
-function alpha2s( c: number | keyof INamedColors, a: number): string
+const alpha2s = (c: number | keyof INamedColors, a: number): string =>
 {
     // if the alpha is 0, return transparent color
     if (a === 0)

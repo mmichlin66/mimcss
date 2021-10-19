@@ -916,6 +916,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
 }
 
 
+
 /**
  * Decorator function for style definition classes that will be embedded into an embedding
  * container for the given category. All style definitions for a given category will be activated
@@ -930,11 +931,9 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
  * class SecondWidgetStyles extends css.StyleDefinition {...}
  * ```
  */
-export function embedded( category: string): ClassDecorator
-{
+export const embedded = (category: string): ClassDecorator =>
     // we return the function that is the actual decorator.
-    return embeddedDecorator.bind( undefined, category);
-}
+    embeddedDecorator.bind( undefined, category);
 
 
 
@@ -959,10 +958,8 @@ export function embedded( category: string): ClassDecorator
  * to generate optimized names. Ignored if the `method` parameter is anything other than
  * [[NameGenerationMethod.Optimized]].
  */
-export function configNameGeneration( method: NameGenerationMethod, prefix?: string): void
-{
-	return s_configureNames( method, prefix);
-}
+export const configNameGeneration = (method: NameGenerationMethod, prefix?: string): void =>
+	s_configureNames( method, prefix);
 
 
 
@@ -979,20 +976,18 @@ export function configNameGeneration( method: NameGenerationMethod, prefix?: str
  * @param classProps Variable argument list of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
  */
-export function classes( ...classProps: ClassPropType[]): string
-{
-	return v2s( classProps, {
+export const classes = (...classProps: ClassPropType[]): string =>
+	v2s( classProps, {
 		obj: (v: IClassRule | IClassNameRule) => v.name,
 		item: classes
 	});
-}
 
 /**
  * Chooses the first non-null name from the given list of classes.
  * @param classProps
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export function chooseClass( ...classProps: ClassPropType[]): string | null
+export const chooseClass = (...classProps: ClassPropType[]): string | null =>
 {
     for( let classProp of classProps)
     {
@@ -1035,7 +1030,7 @@ export function chooseClass( ...classProps: ClassPropType[]): string | null
  * rule, the first rule will see the overridden value of the rule when accessed in the
  * post-constructor code.
  */
-export function virtual( target: any, name: string): void
+export const virtual = (target: any, name: string): void =>
 {
     // symbol to keep the proxy handler value
     let sym = Symbol(name);
@@ -1090,22 +1085,15 @@ export function virtual( target: any, name: string): void
  *   object before returning them from the get method. This is true for "internal" JavaScript
  *   classes like boxed primitive types, Map, Set, Promise and some others.
  */
-function getProxiableObject( v: any): [any, boolean]
+let getProxiableObject = (v: any): [any, boolean] =>
 {
-    if (v == null)
-        return [v, false];
-    else if (typeof v === "string")
-        return [new String(v), true];
-    else if (typeof v === "number")
-        return [new Number(v), true];
-    else if (typeof v === "boolean")
-        return [new Boolean(v), true];
-    else if (typeof v === "symbol")
-        return [new Object(v), true];
-    else if (v instanceof Map || v instanceof Set || v instanceof Array)
-        return [v, true];
-    else
-        return [v, false];
+    return v == null ? [v, false] :
+        typeof v === "string" ? [new String(v), true] :
+        typeof v === "number" ? [new Number(v), true] :
+        typeof v === "boolean" ? [new Boolean(v), true] :
+        typeof v === "symbol" ? [new Object(v), true] :
+        v instanceof Map || v instanceof Set || v instanceof Array ? [v, true] :
+        [v, false];
 }
 
 
@@ -1236,9 +1224,8 @@ class ThemeDefinitionHandler implements ProxyHandler<ThemeDefinition>
  * a reference counter of how many times it was activated and deactivated. The rules are inserted
  * into DOM only upon first activation.
  */
-export function activate<T extends IStyleDefinition>(
-	instOrClass: T | IStyleDefinitionClass<T>,
-	schedulerType?: number): T | null
+export const activate = <T extends IStyleDefinition>(instOrClass: T | IStyleDefinitionClass<T>,
+	schedulerType?: number): T | null =>
 {
 	let instance = processInstanceOrClass( instOrClass) as T;
 	if (instance)
@@ -1254,10 +1241,8 @@ export function activate<T extends IStyleDefinition>(
  * style definition instance maintains a reference counter of how many times it was activated and
  * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
  */
-export function deactivate( instance: IStyleDefinition, schedulerType?: number): void
-{
+export const deactivate = (instance: IStyleDefinition, schedulerType?: number): void =>
 	getActivator(schedulerType).deactivate( instance);
-}
 
 
 
@@ -1267,10 +1252,8 @@ export function deactivate( instance: IStyleDefinition, schedulerType?: number):
  * @returns Theme instance, which is currently active for the given theme class or undefined
  * if no instance is currently active.
  */
-export function getActiveThemeInstance( themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined
-{
-    return getCurrentThemeInstance( themeClass);
-}
+export const getActiveThemeInstance = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
+    getCurrentThemeInstance( themeClass);
 
 
 

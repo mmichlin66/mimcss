@@ -21,10 +21,7 @@ import {getVarsFromSTyleDefinition} from "../rules/RuleContainer";
 /**
  * Returns a string representation of a selector.
  */
-export function selector2s( val: CssSelector): string
-{
-	return v2s( val, { sep: "" });
-}
+export const selector2s = (val: CssSelector): string => v2s( val, { sep: "" });
 
 
 
@@ -34,7 +31,7 @@ export function selector2s( val: CssSelector): string
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-function borderImageToString( val: BorderImage_Object): string
+const borderImageToString = (val: BorderImage_Object): string =>
 {
     // if width is specified, but slice is not, we need to set slice to the default 100% value;
     // if outset is specified but width is not. we need to set width to the default 1 value;
@@ -55,16 +52,14 @@ function borderImageToString( val: BorderImage_Object): string
 
 
 
-function borderImageSliceToString( val: BorderImageSlice_StyleType)
-{
-    return v2s( val, {
+const borderImageSliceToString = (val: BorderImageSlice_StyleType) =>
+    v2s( val, {
         num: WKF.UnitlessOrPercent,
         item: {
             bool: () => "fill",
             num: WKF.UnitlessOrPercent,
         }
     });
-}
 
 
 
@@ -100,10 +95,9 @@ wkf[WKF.Border] = (val: Extended<Border_StyleType>): string => v2s( val, {
 
 
 
-function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>): string
-{
+const gridTemplateAreasToString = (val: Extended<GridTemplateAreas_StyleType>): string =>
     // val can be array of strings or GridTemplateArea_Definition touples
-    return v2s( val, {
+    v2s( val, {
         arr: v => {
             if (v.length === 0)
                 return "";
@@ -113,7 +107,6 @@ function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>):
                 return createGridTemplateAreasFromDefinitions(v);
         }
     });
-}
 
 
 
@@ -121,7 +114,7 @@ function gridTemplateAreasToString( val: Extended<GridTemplateAreas_StyleType>):
  * Converts the array of GridTemplateArea_Definition objects to a string that is suitable for
  * the grid-template-areas format.
  */
-function createGridTemplateAreasFromDefinitions( defs: GridTemplateAreaDefinition[]): string
+const createGridTemplateAreasFromDefinitions = (defs: GridTemplateAreaDefinition[]): string =>
 {
     // calculate total size of the matrix from the areas' sizes
     let rowCount = 0, colCount = 0;
@@ -199,59 +192,8 @@ wkf[WKF.Marker] = (val: Extended<Marker_StyleType>): string =>
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Merges properties from the source styleset to the target styleset. All regular properties are
- * replaced. The "--" property gets special treatment because it is an array.
- * @param target
- * @param source
- * @returns Reference to the target styleset if not null or a new styleset otherwise.
- */
-export function mergeStylesets( target: Styleset | undefined | null,
-    source: Styleset): Styleset
-{
-    if (!source)
-        return target ? target : {};
-
-    // if target is not defined, create it as an empty object. This object will be returned after
-    // properties from the source are copied to it.
-    if (!target)
-    {
-        target = {};
-        Object.assign( target, source);
-        return target;
-    }
-
-    // copy all other properties from the source
-	for( let propName in source)
-	{
-        if (propName === "--")
-            mergeCustomProps( target, source);
-        else
-            target[propName] = source[propName];
-	}
-
-    return target;
-}
-
-
-
-/**
- * Merges "--" property from the source styleset to the target styleset.
- */
-export function mergeCustomProps( target: Styleset, source: Styleset): void
-{
-    let sourceItems = source["--"];
-    if (!sourceItems)
-        return;
-
-    let targetItems = target["--"];
-    target["--"] = !targetItems ? sourceItems.slice() : targetItems.concat( sourceItems);
-}
-
-
-
 /** Converts the given styleset to its string representation */
-export function styleset2s( styleset: Styleset): string
+export const styleset2s = (styleset: Styleset): string =>
 {
     if (!styleset)
         return "{}";
@@ -273,7 +215,7 @@ export function styleset2s( styleset: Styleset): string
  * Extracts name and string values from the given custom CSS property definition.
  * @param customVal
  */
-function getCustomPropNamesAndValues( customVal: CustomVar_StyleType): [string,string?][]
+const getCustomPropNamesAndValues = (customVal: CustomVar_StyleType): [string,string?][] =>
 {
     if (!customVal)
         return [];
@@ -319,7 +261,7 @@ function getCustomPropNamesAndValues( customVal: CustomVar_StyleType): [string,s
  * Converts the given style property to the CSS style string. Property name can be in either
  * dash or camel form.
  */
-export function styleProp2s( propName: string, propVal: any): string
+export const styleProp2s = (propName: string, propVal: any): string =>
 {
     if (!propName)
         return "";
@@ -352,8 +294,8 @@ export function styleProp2s( propName: string, propVal: any): string
  * @param styleset
  * @param forPropFunc
  */
-export function forAllPropsInStylset( styleset: Styleset,
-    forPropFunc: (name: string, val: string, isCustom: boolean, isPrefixed: boolean) => void)
+export const forAllPropsInStylset = (styleset: Styleset,
+    forPropFunc: (name: string, val: string, isCustom: boolean, isPrefixed: boolean) => void) =>
 {
 	for( let propName in styleset)
 	{
@@ -419,16 +361,8 @@ export function forAllPropsInStylset( styleset: Styleset,
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function s_registerStylePropertyInfo( name: string, toStringFunc: AnyToStringFunc)
-{
-    if (name in stylePropertyInfos)
-        return false;
-    else
-    {
-        stylePropertyInfos[name] = toStringFunc;
-        return true;
-    }
-}
+export const s_registerStylePropertyInfo = (name: string, toStringFunc: AnyToStringFunc) =>
+    name in stylePropertyInfos ? false : (stylePropertyInfos[name] = toStringFunc, true);
 
 
 
@@ -860,7 +794,7 @@ type PropPrefixInfo =
 type PropPrefixVariant = [string, string];
 
 
-function getPrefixVariants( name: keyof IStyleset, value: string): PropPrefixVariant[] | null
+const getPrefixVariants = (name: keyof IStyleset, value: string): PropPrefixVariant[] | null =>
 {
     let propInfos = propPrefixInfos[name];
     if (!propInfos)
