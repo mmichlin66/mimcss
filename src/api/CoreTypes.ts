@@ -233,7 +233,7 @@ export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | Global_StyleType;
  * }
  * ```
  */
-export type OneOrPair<T> = T | [T, T?];
+export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
 
 /**
  * Type for box-like properties that can have 1 to 4 values of the given type. This type is used
@@ -262,7 +262,7 @@ export type OneOrPair<T> = T | [T, T?];
  * }
  * ```
  */
-export type OneOrBox<T> = T | [T, T?, T?, T?];
+export type OneOrBox<T> = T | [Extended<T>, Extended<T>?, Extended<T>?, Extended<T>?];
 
 /**
  * Type for properties that can have 1 or more values of the given type. It is used by many style
@@ -284,7 +284,7 @@ export type OneOrBox<T> = T | [T, T?, T?, T?];
  * }
  * ```
  */
-export type OneOrMany<T> = T | T[];
+export type OneOrMany<T> = T | Extended<T>[];
 
 
 

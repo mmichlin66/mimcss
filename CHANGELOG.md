@@ -3,7 +3,8 @@
 
 1. Add `IRawProxy` interface.
 1. `raw()` tag function returns `IRawProxy` instead of `IStringProxy` interface.
-1. Add `CssString` type.
+1. Add `CssString` type to represent the `<string>` type.
+1. Add support for `content-visibility` style property.
 
 
 ## Bug fixes

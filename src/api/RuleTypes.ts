@@ -59,7 +59,7 @@ export type ElementTagName = (keyof HTMLElementTagNameMap) | (keyof SVGElementTa
  * ```
  */
 export type CombinedStyleset = Styleset &
-	{ "+"?: OneOrMany<IStyleRule> } &
+	{ "+"?: IStyleRule | IStyleRule[] } &
 	{ [K in PseudoEntity]?: CombinedStyleset } &
 	{ [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset][] } &
 	{ [K in DependentRuleCombinator]?: [CssSelector, CombinedStyleset][] };
@@ -119,8 +119,14 @@ export type CombinedStyleset = Styleset &
 ```
  */
 export type CombinedClassStyleset = CombinedStyleset &
-    { "++"?: OneOrMany<IClassRule | IClassNameRule | string> };
+    { "++"?: ParentClassType | ParentClassType[] };
 
+/**
+ * Represents types that can be used to inherit from an already defined CSS class. This type is
+ * used in the `"++"` property of the [[CombinedClassStyleset]] type, whcih allows CSS classes
+ * to include definitions of other CSS classes.
+ */
+export type ParentClassType = string | IClassRule | IClassNameRule;
 
 
 
@@ -130,7 +136,7 @@ export type CombinedClassStyleset = CombinedStyleset &
  * (because dependent rules are actually separate CSS rules). Animation styleset can extend other
  * style rules; however, any dependent rules will be ignored.
  */
- export type AnimationStyleset = Styleset & { "+"?: OneOrMany<IStyleRule> };
+ export type AnimationStyleset = Styleset & { "+"?: IStyleRule | IStyleRule[] };
 
 
 
@@ -306,7 +312,7 @@ export interface IAttrSelectorOptions
      * Value to which the attribute value is compared. If not specified, the selector only looks
      * for the presence of the attribute.
      */
-	value: string | boolean | number;
+	v: string | boolean | number;
 
     /** Namespace of the attribute */
 	ns?: string;
@@ -355,7 +361,7 @@ export interface IAttrRule extends IStyleRule
  * The AnimationWaypoint type defines a type that can be used to define a waypoint in an
  * animation sequence. When a waypoint is specified as a number, it is treated as percents.
  */
-export type AnimationWaypoint = OneOrMany<"from" | "to" | number>;
+export type AnimationWaypoint = "from" | "to" | number | ("from" | "to" | number)[];
 
 /**
  * The AnimationFrame type defines a single keyframe within a `@keyframes` rule.

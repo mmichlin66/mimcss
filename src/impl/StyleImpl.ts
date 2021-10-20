@@ -392,6 +392,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     animationName: WKF.OneOrManyWithComma,
     animationPlayState: WKF.OneOrManyWithComma,
     animationTimingFunction: WKF.OneOrManyWithComma,
+    aspectRatio: {
+        sep: "/"
+    },
 
     background: {
         num: WKF.Color,
@@ -699,6 +702,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     zoom: WKF.Percent,
 
     // special properties for IVarRule types
+    CssString: WKF.Quoted,
     CssLength: WKF.Length,
     CssAngle: WKF.Angle,
     CssTime: WKF.Time,

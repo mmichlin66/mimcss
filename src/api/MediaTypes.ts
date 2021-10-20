@@ -1,4 +1,4 @@
-﻿import {IConstant, IGenericProxy, IRawProxy, OneOrMany, OneOrPair} from "./CoreTypes";
+﻿import {IConstant, IGenericProxy, IRawProxy} from "./CoreTypes";
 import {CssAspectRatio, CssNumber, CssLength, CssResolution} from "./NumericTypes";
 import {Styleset} from "./StyleTypes";
 
@@ -22,7 +22,7 @@ export type ExtendedFeature<T> = T | IConstant<T> | IRawProxy | null | undefined
  * Type for a media feature that can be specified either as a single value or as a range between
  * two values of the given type.
  */
-export type OneOrRange<T> = OneOrPair<ExtendedFeature<T>>;
+export type OneOrRange<T> = T | [ExtendedFeature<T>, ExtendedFeature<T>?];
 
 
 
@@ -127,7 +127,7 @@ export type MediaQuery = string | ExtendedMediaFeatureset | IMediaQueryProxy;
  * }
  * ```
  */
-export type MediaStatement = OneOrMany<MediaQuery>;
+export type MediaStatement = MediaQuery | MediaQuery[];
 
 
 
@@ -157,7 +157,7 @@ export interface ISupportsQueryProxy extends IGenericProxy<"supports-query"> {}
   * an array are combined with the "or" operator, the styles within each styleset are combined with
   * the "and" operator.
   */
- export type SupportsStatement = OneOrMany<SupportsQuery>;
+ export type SupportsStatement = SupportsQuery | SupportsQuery[];
 
 
 

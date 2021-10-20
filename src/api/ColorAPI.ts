@@ -1,6 +1,6 @@
 ﻿import {Extended} from "./CoreTypes";
 import {CssAngle, CssPercent} from "./NumericTypes";
-import {CssColor, CssColorSeparation, IAlphaFunc, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc} from "./ColorTypes";
+import {CssColor, CssColorSeparation, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc} from "./ColorTypes";
 import {fdo, v2s, wkf, WKF} from "../impl/Utils";
 
 
@@ -174,10 +174,13 @@ const customColors: { [P: string]: number } = {};
 
 
 /**
- * Registers a new custom color or changes the name of the
- * @param name
- * @param value
- * @returns
+ * Registers a new custom color or changes the value of the existing custom color. The name of the
+ * custom color should have been already added to the [[INamedColors]] interface using the module
+ * augmentation technique. Note that values of standard Web colors cannot be changed.
+ *
+ * @param name Color name. This name cannot be a name of the standard Web color.
+ * @param value Color value to assign to the given named color.
+ * @returns Flag indicating whether the operation was successful.
  */
 export const registerColor = ( name: keyof INamedColors, value: number): boolean =>
 {
@@ -231,34 +234,29 @@ let  colorNumber2s = (val: number): string =>
 
 
 /**
- * Converts color style value to the CSS time string. If a string value is in the Colors object we
- * need to get its number and convert it to the rgb[a]() function because it might be a custom
- * color name added via INamedColors module augmentation. For numeric values, we check if this is
- * one of the predefined colors and return its string representation
+ * Converts color style value to the CSS string. We convert numeric values to the #RRGGBBAA
+ * representation. If a string value is a custom color added via INamedColors module
+ * augmentation we get its number from the `custmColors` object and also convert it to the
+ * #RRGGBBAA representation. Standard named colors as well as are returned as is.
  */
-const color2s = (val: Extended<CssColor>): string =>
+ wkf[WKF.Color] = (val: Extended<CssColor>): string =>
     v2s( val, {
         str: v => v in customColors ? colorNumber2s( customColors[v]) : v,
         num: colorNumber2s
     });
-
- // register color conversion function
- wkf[WKF.Color] = color2s;
 
 
 
  /**
  * Converts the color separation value to a CSS string.
  */
-const separationToString = (c: Extended<number>): string =>
+  wkf[WKF.ColorSeparation] = (c: Extended<number>): string =>
     v2s( c, {
         num: c => {
             c = c < 0 ? -c : c;
             return (c === 0 || c >= 1) ? "" + c : (Math.round( c * 100) + "%");
         }
     })
-
-wkf[WKF.ColorSeparation] = separationToString;
 
 
 
@@ -278,11 +276,13 @@ wkf[WKF.ColorSeparation] = separationToString;
  *     rounded. Numbers beyond this range will be clamped.
  *   - The sign of alpha is ignored; that is, only the absolute value is considered.
  *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb()
+ *
  * @param r Red separation value.
  * @param g Green separation value.
  * @param b Blue separation value.
  * @param a Optional alpha mask as a percentage value.
- * @return The IRgbFunc object representing the invocation of the `rgb()` CSS function
+ * @return The `IRgbFunc` object representing the invocation of the `rgb()` CSS function
  */
 export const rgb = (r: Extended<CssColorSeparation>, g: Extended<CssColorSeparation>,
     b: Extended<CssColorSeparation>, a?: Extended<CssPercent>): IRgbFunc =>
@@ -317,11 +317,13 @@ fdo.rgb = {
  *     rounded. Numbers beyond this range will be clamped.
  *   - The sign of alpha is ignored; that is, only the absolute value is considered.
  *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl()
+ *
  * @param h Hue component as an angle value.
  * @param s Saturation component as a percentage value.
  * @param l Lightness component as a percentage value.
  * @param a Optional alpha mask as a percentage value.
- * @return The IHslFunc object representing the invocation of the `hsl()` CSS function
+ * @return The `IHslFunc` object representing the invocation of the `hsl()` CSS function
  */
 export const hsl = (h: Extended<CssAngle>, s: Extended<CssPercent>, l: Extended<CssPercent>,
     a?: Extended<CssPercent>): IHslFunc =>
@@ -337,15 +339,17 @@ fdo.hsl = {
 
 
 /**
- * Converts the color specified as L*a*b* components and an optional alpha
+ * Converts the color specified as L\*a\*b\* components and an optional alpha
  * mask to a CSS color representation. This method should be used when defining CSS color
  * values in styleset properties.
+ *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lab()
  *
  * @param l CIE Lightness component
  * @param da Distance along the a axis in the Lab colorspace
  * @param db Distance along the b axis in the Lab colorspace
  * @param a Optional alpha mask as a percentage value.
- * @returns The ILabFunc object representing the invocation of the `lab()` CSS function
+ * @returns The `ILabFunc` object representing the invocation of the `lab()` CSS function
  */
 export const lab = (l: Extended<CssPercent>, da: Extended<number>, db: Extended<number>,
     a?: Extended<CssPercent>): ILabFunc =>
@@ -365,11 +369,13 @@ fdo.lab = {
  * mask to a CSS color representation. This method should be used when defining CSS color
  * values in styleset properties.
  *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lch()
+ *
  * @param l CIE Lightness component
  * @param c Chroma component
  * @param h Hue component as an angle value.
  * @param a Optional alpha mask as a percentage value.
- * @returns The ILchFunc object representing the invocation of the `lch()` CSS function
+ * @returns The `ILchFunc` object representing the invocation of the `lch()` CSS function
  */
 export const lch = (l: Extended<CssPercent>, c: Extended<number>, h: Extended<CssAngle>,
     a?: Extended<CssPercent>): ILchFunc =>
@@ -384,59 +390,59 @@ fdo.lch = {
 
 
 
-/**
- * Converts the given color and the alpha mask to the CSS Color representation. This
- * method should be used when defining CSS color values in styleset properties.
- *
- * The color can be specified as a numeric value or as a color name from the [[INamedColors]]
- * interface - including colors added using the module augmentation technique.
- *
- * The alpha mask is specified as a number:
- *   - The sign is ignored; that is, only the absolute value is considered.
- *   - Number 0 to 1 inclusive, which is treated as percentage.
- *   - Number 1 to 100 inclusive, which is treated as percentage.
- *   - Numbers greater than 100 are clamped to 100;
- *
- * **Examples**
- * ```typescript
- * class MyStyles extends css.StyleDefinition
- * {
- *     // applying alpha to a numeric color
- *     cls1 = this.$class({ color: css.alpha( 0xAA00AA, 0.5) })
- *
- *     // applying alpha to a named color
- *     cls1 = this.$class({ color: css.alpha( "darkolivegreen", 0.5) })
- * }
- * ```
- * @param c Color value as either a number or a named color
- * @param a Alpha channel value
- */
-export const alpha = (c: number | keyof INamedColors, a: number): IAlphaFunc => ({ fn: "alpha", c, a });
+// /**
+//  * Converts the given color and the alpha mask to the CSS Color representation. This
+//  * method should be used when defining CSS color values in styleset properties.
+//  *
+//  * The color can be specified as a numeric value or as a color name from the [[INamedColors]]
+//  * interface - including colors added using the module augmentation technique.
+//  *
+//  * The alpha mask is specified as a number:
+//  *   - The sign is ignored; that is, only the absolute value is considered.
+//  *   - Number 0 to 1 inclusive, which is treated as percentage.
+//  *   - Number 1 to 100 inclusive, which is treated as percentage.
+//  *   - Numbers greater than 100 are clamped to 100;
+//  *
+//  * **Examples**
+//  * ```typescript
+//  * class MyStyles extends css.StyleDefinition
+//  * {
+//  *     // applying alpha to a numeric color
+//  *     cls1 = this.$class({ color: css.alpha( 0xAA00AA, 0.5) })
+//  *
+//  *     // applying alpha to a named color
+//  *     cls1 = this.$class({ color: css.alpha( "darkolivegreen", 0.5) })
+//  * }
+//  * ```
+//  * @param c Color value as either a number or a named color
+//  * @param a Alpha channel value
+//  */
+// export const alpha = (c: number | keyof INamedColors, a: number): IAlphaFunc => ({ fn: "alpha", c, a });
 
-const alpha2s = (c: number | keyof INamedColors, a: number): string =>
-{
-    // if the alpha is 0, return transparent color
-    if (a === 0)
-        return "#0000";
+// const alpha2s = (c: number | keyof INamedColors, a: number): string =>
+// {
+//     // if the alpha is 0, return transparent color
+//     if (a === 0)
+//         return "#0000";
 
-    // convert color to numeric value (if it's not a number yet). If the color was given as a
-    // string that we cannot find in the Colors object, return pure white.
-    let n = typeof c === "string" ? Colors[c] : c;
-    if (n == null)
-        return "#FFF";
+//     // convert color to numeric value (if it's not a number yet). If the color was given as a
+//     // string that we cannot find in the Colors object, return pure white.
+//     let n = typeof c === "string" ? Colors[c] : c;
+//     if (n == null)
+//         return "#FFF";
 
-    // negative and positive values of alpha are treated identically, so convert to positive
-    if (a < 0)
-        a = -a;
+//     // negative and positive values of alpha are treated identically, so convert to positive
+//     if (a < 0)
+//         a = -a;
 
-    // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
-    // is 1 or 100, then set it to 0 because 0 in the colorNumberToString means "no alpha".
-    a = a === 1 || a >= 100 ? 0 : a > 1 ? a / 100 : a;
+//     // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
+//     // is 1 or 100, then set it to 0 because 0 in the colorNumberToString means "no alpha".
+//     a = a === 1 || a >= 100 ? 0 : a > 1 ? a / 100 : a;
 
-    // make the new alpha
-    return colorNumber2s( n >= 0 ? n + a : n - a);
-}
+//     // make the new alpha
+//     return colorNumber2s( n >= 0 ? n + a : n - a);
+// }
 
-fdo.alpha = (v: IAlphaFunc) => alpha2s( v.c, v.a)
+// fdo.alpha = (v: IAlphaFunc) => alpha2s( v.c, v.a)
 
 

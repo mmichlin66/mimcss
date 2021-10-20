@@ -446,31 +446,32 @@ export interface IAspectRatioProxy extends IGenericProxy<"aspect-ratio"> {}
 
 /**
  * The `CssAspectRatio` type represents the CSS `<ratio>` type. This type can be used for the
- * `aspect-ratio` CSS property although this property is not implemented yet by most of the
- * browsers. More frequently though this type is used by the `aspect-ratio` media feature in a
- * `@media` rule.
+ * `aspect-ratio` CSS property and by the `aspect-ratio` media feature in a `@media` rule.
  *
  * **Examples:**
  *
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     // using string value
- *     mediaRule1 = this.$media( {aspectRatio: "4/3"}, ...)
+ *     // using pre-defined string literal value
+ *     class1 = this.$class( {aspectRatio: "4/3"})
  *
  *     // using the `ratio()` function
- *     mediaRule2 = this.$media( {aspectRatio: css.ratio( 4, 3)}, ...)
+ *     class2 = this.$class( {aspectRatio: css.ratio( 4, 3)})
  *
- *     // using a single number (not widely supported yet)
- *     mediaRule3 = this.$media( {aspectRatio: 1.33}, ...)
+ *     // using two numeric values
+ *     class3 = this.$class( {aspectRatio: [4, 3]})
+ *
+ *     // using a single number
+ *     mediaRule1 = this.$media( {aspectRatio: 1.33}, ...)
  *
  *     // using a tuple to specify range; this will result in the following media condition:
  *     // (min-aspect-ratio: 4/3) and (max-aspect-ratio:16/9)
- *     mediaRule4 = this.$media( {aspectRatio: ["4/3","16/9"]}, ...)
+ *     mediaRule2 = this.$media( {aspectRatio: ["4/3","16/9"]}, ...)
  * }
  * ```
  */
-export type CssAspectRatio = CssNumber | IAspectRatioProxy |
+export type CssAspectRatio = OneOrPair<CssNumber> | IAspectRatioProxy |
     "1/1" | "4/3" | "16/9" | "185/100" | "239/100";
 
 

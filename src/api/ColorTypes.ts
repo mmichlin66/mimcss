@@ -182,15 +182,22 @@ export type CssColorSeparation = number | string | CssPercent;
 
 /**
  * Represents an invocation of the CSS `rgb()/rgba()` function. This interface is returned from the
- * [[rgb]] function. Developers can use this structure wherever CssColor is accepted.
+ * [[rgb]] function. Developers can use this structure wherever [[CssColor]] is accepted.
  */
 export interface IRgbFunc extends ICssFuncObject
 {
     fn: "rgb";
 
+    /** Red separation value */
     r: Extended<CssColorSeparation>;
+
+    /** Green separation value */
     g: Extended<CssColorSeparation>;
+
+    /** Blue separation value */
     b: Extended<CssColorSeparation>;
+
+    /** Alpha channel value */
     a?: Extended<CssPercent>;
 }
 
@@ -198,15 +205,22 @@ export interface IRgbFunc extends ICssFuncObject
 
 /**
  * Represents an invocation of the CSS `hsl()/hsla()` function. This interface is returned from the
- * [[hsl]] function. Developers can use this structure wherever CssColor is accepted.
+ * [[hsl]] function. Developers can use this structure wherever [[CssColor]] is accepted.
  */
 export interface IHslFunc extends ICssFuncObject
 {
     fn: "hsl";
 
+    /** Hue value */
     h: Extended<CssAngle>;
+
+    /** Saturation value */
     s: Extended<CssPercent>;
+
+    /** Lightness value */
     l: Extended<CssPercent>;
+
+    /** Alpha channel value */
     a?: Extended<CssPercent>;
 }
 
@@ -214,15 +228,22 @@ export interface IHslFunc extends ICssFuncObject
 
 /**
  * Represents an invocation of the CSS `lch()` function. This interface is returned from the
- * [[lch]] function. Developers can use this structure wherever CssColor is accepted.
+ * [[lch]] function. Developers can use this structure wherever [[CssColor]] is accepted.
  */
 export interface ILchFunc extends ICssFuncObject
 {
     fn: "lch";
 
+    /** CIE lightness value */
     l: Extended<CssPercent>;
+
+    /** Chroma (amount of color) value */
     c: Extended<number>;
+
+    /** Hue value */
     h: Extended<CssAngle>;
+
+    /** Alpha channel value */
     a?: Extended<CssPercent>;
 }
 
@@ -230,31 +251,41 @@ export interface ILchFunc extends ICssFuncObject
 
 /**
  * Represents an invocation of the CSS `lab()` function. This interface is returned from the
- * [[lab]] function. Developers can use this structure wherever CssColor is accepted.
+ * [[lab]] function. Developers can use this structure wherever [[CssColor]] is accepted.
  */
 export interface ILabFunc extends ICssFuncObject
 {
     fn: "lab";
 
+    /** CIE lightness value */
     l: Extended<CssPercent>;
+
+    /** Distance along the a axis in the Lab colorspace */
     da: Extended<number>;
+
+    /** Distance along the b axis in the Lab colorspace */
     db: Extended<number>;
+
+    /** Alpha channel value */
     a?: Extended<CssPercent>;
 }
 
 
 
-/**
- * Represents an invocation of the [[alpha]] function. Developers can use this structure wherever
- * CssColor is accepted.
- */
-export interface IAlphaFunc extends ICssFuncObject
-{
-    fn: "alpha";
+// /**
+//  * Represents an invocation of the [[alpha]] function. Developers can use this structure wherever
+//  * [[CssColor]] is accepted.
+//  */
+// export interface IAlphaFunc extends ICssFuncObject
+// {
+//     fn: "alpha";
 
-    c: number | keyof INamedColors;
-    a: number;
-}
+//     /** Color as a number or a string */
+//     c: number | keyof INamedColors;
+
+//     /** Alpha channel value */
+//     a: number;
+// }
 
 
 
@@ -268,7 +299,7 @@ export interface IAlphaFunc extends ICssFuncObject
  *     ignored.
  *   - floating point part of the number is treated as percents of alpha channel. If there is no
  *     floating part, alpha is 1.
- * - functions: [[rgb]], [[hsl]], [[alpha]] as well as any function that returns the [[IColorProxy]] type.
+ * - functions: [[rgb]], [[hsl]], [[lch]], [[lab]], [[alpha]].
  *
  * **Examples:**
  *
@@ -305,7 +336,7 @@ export interface IAlphaFunc extends ICssFuncObject
  * ```
  */
 export type CssColor = number | keyof INamedColors | "transparent" | "currentcolor" | SystemColors |
-    IRgbFunc | IHslFunc | ILchFunc | ILabFunc | IAlphaFunc;
+    IRgbFunc | IHslFunc | ILchFunc | ILabFunc /*| IAlphaFunc*/;
 
 /**
  * Type for CSS color that exclude numeric color representation. Color can be represented using

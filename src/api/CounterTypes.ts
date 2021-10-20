@@ -1,4 +1,4 @@
-﻿import {IRawProxy, OneOrMany, OneOrPair} from "./CoreTypes";
+﻿import {IRawProxy} from "./CoreTypes";
 import {ICounterStyleRule} from "./RuleTypes";
 import {CssImage} from "./ShapeTypes";
 import {ListStyleType_StyleType} from "./StyleTypes";
@@ -9,6 +9,11 @@ import {ListStyleType_StyleType} from "./StyleTypes";
  * Type that extends the given type with the [[IRawProxy]] interface that allows specifying raw string value.
  */
 export type CounterExtended<T> = T | IRawProxy;
+
+
+
+export type CounterOneOrPair<T> = T | [ CounterExtended<T>,  CounterExtended<T>?];
+export type CounterOneOrMany<T> = T | CounterExtended<T>[];
 
 
 
@@ -23,7 +28,7 @@ export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic
 /**
  * Type for specifying counter[[negative]] property.
  */
-export type Negative_CounterType = OneOrPair<CounterExtended<string>>;
+export type Negative_CounterType = CounterOneOrPair<string>;
 
 
 
@@ -37,7 +42,7 @@ export type PrefixSuffix_CounterType = string | CssImage;
 /**
  * Type for specifying counter [[range]] property.
  */
-export type Range_CounterType = "auto" | OneOrMany<CounterExtended<["infinite" | number, "infinite" | number]>>;
+export type Range_CounterType = "auto" | CounterOneOrMany<["infinite" | number, "infinite" | number]>;
 
 
 
@@ -58,14 +63,14 @@ export type Fallback_CounterType = ListStyleType_StyleType;
 /**
  * Type for specifying counter [[symbols]] property.
  */
-export type Symbols_CounterType = OneOrMany<CounterExtended<string>>;
+export type Symbols_CounterType = CounterOneOrMany<string>;
 
 
 
 /**
  * Type for specifying counter [[additiveSymbols]] property.
  */
-export type AdditiveSymbols_CounterType = OneOrMany<CounterExtended<[string | CssImage, number] | [number, string | CssImage]>>;
+export type AdditiveSymbols_CounterType = CounterOneOrMany<[string | CssImage, number] | [number, string | CssImage]>;
 
 
 

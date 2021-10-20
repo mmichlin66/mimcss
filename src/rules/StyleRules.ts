@@ -1,9 +1,9 @@
 import {
-    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IClassNameRule,
-    ElementTagName, AttrSelectorOperation, AttrsDef
+    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule,
+    ElementTagName, AttrSelectorOperation, AttrsDef, ParentClassType
 } from "../api/RuleTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
-import {CssSelector, OneOrMany} from "../api/CoreTypes"
+import {CssSelector} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, symValueToString, v2s} from "../impl/Utils";
 import {styleset2s, styleProp2s, selector2s} from "../impl/StyleImpl"
@@ -522,7 +522,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
     {
         if (propName == "++")
         {
-            let rules = propVal as OneOrMany<IClassRule | IClassNameRule | string>;
+            let rules = propVal as ParentClassType | ParentClassType[];
             if (rules)
                 this.derivedClassRules = Array.isArray(rules) ? rules : [rules];
 
@@ -553,7 +553,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 	protected get cssPrefix(): string { return "."; }
 
     // remembered value of the "++" property of the input styleset
-    private derivedClassRules?: (IClassRule | IClassNameRule | string)[];
+    private derivedClassRules?: ParentClassType[];
 }
 
 
@@ -582,15 +582,15 @@ export class AttrRule extends StyleRule
 	public tag: ElementTagName | IClassRule | IIDRule;
 
     /** Array of attribute conditions */
-	readonly attrs: (string | AttrsDef)[];
+	public attrs: (string | AttrsDef)[];
 
     // overloaded constructors
 	public constructor( tag: ElementTagName | IClassRule | IIDRule,
-        attrs: OneOrMany<string | AttrsDef>, styleset?: CombinedStyleset)
+        attrs: string | AttrsDef | (string | AttrsDef)[], styleset?: CombinedStyleset)
 	{
 		super( styleset);
 		this.tag = tag;
-		this.attrs = Array.isArray(attrs) ? attrs : [attrs];
+		this.attrs = !attrs ? [] : Array.isArray(attrs) ? attrs : [attrs];
 	}
 
 	// Returns the selector part of the style rule.
@@ -606,21 +606,26 @@ export class AttrRule extends StyleRule
                 for( let name in attr)
                 {
                     let valueOrOptions = attr[name];
-                    if (typeof valueOrOptions === "object")
+                    if (valueOrOptions)
                     {
-                        s += "[";
-                        if (valueOrOptions.ns)
-                            s += valueOrOptions.ns + "|";
+                        if (typeof valueOrOptions !== "object")
+                            s += `[${name}="${valueOrOptions}"]`
+                        else if (valueOrOptions.v == null)
+                            s += `[${attr}]`;
+                        else
+                        {
+                            s += "[";
+                            if (valueOrOptions.ns)
+                                s += valueOrOptions.ns + "|";
 
-                        s += `${name}${valueOrOptions.op ?? AttrSelectorOperation.Equal}"${valueOrOptions.value}"`
+                            s += `${name}${valueOrOptions.op ?? AttrSelectorOperation.Equal}"${valueOrOptions.v}"`
 
-                        if (valueOrOptions.ci)
-                            s += " i";
+                            if (valueOrOptions.ci)
+                                s += " i";
 
-                        s += "]"
+                            s += "]"
+                        }
                     }
-                    else
-                        s += `[${name}="${valueOrOptions}"]`
                 }
             }
         }

@@ -353,8 +353,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that defines style properties.
      * @returns `IAttrRule` object representing the attribute selector rule.
      */
-    protected $attr( tag: ElementTagName | IClassRule | IIDRule, attrs: OneOrMany<string | AttrsDef>,
-        styleset?: CombinedStyleset): IAttrRule
+    protected $attr( tag: ElementTagName | IClassRule | IIDRule,
+        attrs: string | AttrsDef | (string | AttrsDef)[], styleset?: CombinedStyleset): IAttrRule
     {
         return new AttrRule( tag, attrs, styleset);
     }
