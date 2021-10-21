@@ -1,4 +1,7 @@
-﻿import {Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, Global_StyleType, CssString} from "./CoreTypes"
+﻿import {
+    Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, Global_StyleType, CssString, CssImage,
+    ICursorFunc, IUrlFunc
+} from "./CoreTypes"
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, CssFrequency, CssResolution,
     CssRadius, HorizontalPositionKeyword, VerticalPositionKeyword, CssPoint, IFitContentProxy,
@@ -8,12 +11,12 @@ import {
 } from "./NumericTypes"
 import {CssColor, CssNonNumericColor} from "./ColorTypes";
 import {
-    FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStretchKeyword, FontStyle, FontSynthesis, FontVariantCaps,
-    FontVariantPosition, FontWeight, SystemFont
+    FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStretchKeyword, FontStyle, FontSynthesis,
+    FontVariantCaps, FontVariantPosition, FontWeight, SystemFont
 } from "./FontTypes";
 import {
-    IUrlFunc, BasicShape, CssImage, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs,
-    ICursorFunc, FillRule, IRayFunc, IStepsFunc, ICubicBezierFunc, TransformFuncs
+    BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs,
+    FillRule, IRayFunc, IStepsFunc, ICubicBezierFunc, TransformFuncs
 } from "./ShapeTypes";
 import {
     IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, IStyleDefinition,

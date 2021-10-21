@@ -181,111 +181,13 @@ export type CssColorSeparation = number | string | CssPercent;
 
 
 /**
- * Represents an invocation of the CSS `rgb()/rgba()` function. This interface is returned from the
- * [[rgb]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ * Base interface for all interfaces representing color functions. Developers can use any function
+ * that returns this interface wherever [[CssColor]] is accepted.
  */
-export interface IRgbFunc extends ICssFuncObject
+export interface ICssColorFunc extends ICssFuncObject
 {
-    fn: "rgb";
-
-    /** Red separation value */
-    r: Extended<CssColorSeparation>;
-
-    /** Green separation value */
-    g: Extended<CssColorSeparation>;
-
-    /** Blue separation value */
-    b: Extended<CssColorSeparation>;
-
-    /** Alpha channel value */
-    a?: Extended<CssPercent>;
+    fn: "rgb" | "hsl" | "lab" | "lch" | "color-mix" | "color-contrast";
 }
-
-
-
-/**
- * Represents an invocation of the CSS `hsl()/hsla()` function. This interface is returned from the
- * [[hsl]] function. Developers can use this structure wherever [[CssColor]] is accepted.
- */
-export interface IHslFunc extends ICssFuncObject
-{
-    fn: "hsl";
-
-    /** Hue value */
-    h: Extended<CssAngle>;
-
-    /** Saturation value */
-    s: Extended<CssPercent>;
-
-    /** Lightness value */
-    l: Extended<CssPercent>;
-
-    /** Alpha channel value */
-    a?: Extended<CssPercent>;
-}
-
-
-
-/**
- * Represents an invocation of the CSS `lch()` function. This interface is returned from the
- * [[lch]] function. Developers can use this structure wherever [[CssColor]] is accepted.
- */
-export interface ILchFunc extends ICssFuncObject
-{
-    fn: "lch";
-
-    /** CIE lightness value */
-    l: Extended<CssPercent>;
-
-    /** Chroma (amount of color) value */
-    c: Extended<number>;
-
-    /** Hue value */
-    h: Extended<CssAngle>;
-
-    /** Alpha channel value */
-    a?: Extended<CssPercent>;
-}
-
-
-
-/**
- * Represents an invocation of the CSS `lab()` function. This interface is returned from the
- * [[lab]] function. Developers can use this structure wherever [[CssColor]] is accepted.
- */
-export interface ILabFunc extends ICssFuncObject
-{
-    fn: "lab";
-
-    /** CIE lightness value */
-    l: Extended<CssPercent>;
-
-    /** Distance along the a axis in the Lab colorspace */
-    da: Extended<number>;
-
-    /** Distance along the b axis in the Lab colorspace */
-    db: Extended<number>;
-
-    /** Alpha channel value */
-    a?: Extended<CssPercent>;
-}
-
-
-
-// /**
-//  * Represents an invocation of the [[alpha]] function. Developers can use this structure wherever
-//  * [[CssColor]] is accepted.
-//  */
-// export interface IAlphaFunc extends ICssFuncObject
-// {
-//     fn: "alpha";
-
-//     /** Color as a number or a string */
-//     c: number | keyof INamedColors;
-
-//     /** Alpha channel value */
-//     a: number;
-// }
 
 
 
@@ -335,23 +237,183 @@ export interface ILabFunc extends ICssFuncObject
  * }
  * ```
  */
-export type CssColor = number | keyof INamedColors | "transparent" | "currentcolor" | SystemColors |
-    IRgbFunc | IHslFunc | ILchFunc | ILabFunc /*| IAlphaFunc*/;
+export type CssColor = number | keyof INamedColors | "transparent" | "currentcolor" |
+    SystemColors | ICssColorFunc;
 
 /**
- * Type for CSS color that exclude numeric color representation. Color can be represented using
- * the following types:
- * - keywords: any string that is a name of a property in the [[INamedColors]] interface or of the
- *   [[SystemColors]] type.
- * - functions: [[rgb]], [[hsl]], [[alpha]] as well as any function that returns the IColorProxy type.
- *
- * Non-numeric representation of color is sometimes required where it can conflict with numeric
- * representations of other style properties. For example, the [[border]] property allows specifying
- * border width, style and color in any order. In this case a numeric representation of color could
- * come into conflict with a numeric representation of width. Therefore, for the `border` property,
- * only non-numeric color representation is allowed.
- */
+* Type for CSS color that exclude numeric color representation. Color can be represented using
+* the following types:
+* - keywords: any string that is a name of a property in the [[INamedColors]] interface or of the
+*   [[SystemColors]] type.
+* - functions: [[rgb]], [[hsl]], [[alpha]] as well as any function that returns the IColorProxy type.
+*
+* Non-numeric representation of color is sometimes required where it can conflict with numeric
+* representations of other style properties. For example, the [[border]] property allows specifying
+* border width, style and color in any order. In this case a numeric representation of color could
+* come into conflict with a numeric representation of width. Therefore, for the `border` property,
+* only non-numeric color representation is allowed.
+*/
 export type CssNonNumericColor = Exclude<CssColor,number>;
+
+
+
+/**
+ * Represents an invocation of the CSS `rgb()/rgba()` function. This interface is returned from the
+ * [[rgb]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface IRgbFunc extends ICssColorFunc
+{
+    fn: "rgb";
+
+    /** Red separation value */
+    r: Extended<CssColorSeparation>;
+
+    /** Green separation value */
+    g: Extended<CssColorSeparation>;
+
+    /** Blue separation value */
+    b: Extended<CssColorSeparation>;
+
+    /** Alpha channel value */
+    a?: Extended<CssPercent>;
+}
+
+
+
+/**
+ * Represents an invocation of the CSS `hsl()/hsla()` function. This interface is returned from the
+ * [[hsl]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface IHslFunc extends ICssColorFunc
+{
+    fn: "hsl";
+
+    /** Hue value */
+    h: Extended<CssAngle>;
+
+    /** Saturation value */
+    s: Extended<CssPercent>;
+
+    /** Lightness value */
+    l: Extended<CssPercent>;
+
+    /** Alpha channel value */
+    a?: Extended<CssPercent>;
+}
+
+
+
+/**
+ * Represents an invocation of the CSS `lch()` function. This interface is returned from the
+ * [[lch]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface ILchFunc extends ICssColorFunc
+{
+    fn: "lch";
+
+    /** CIE lightness value */
+    l: Extended<CssPercent>;
+
+    /** Chroma (amount of color) value */
+    c: Extended<number>;
+
+    /** Hue value */
+    h: Extended<CssAngle>;
+
+    /** Alpha channel value */
+    a?: Extended<CssPercent>;
+}
+
+
+
+/**
+ * Represents an invocation of the CSS `lab()` function. This interface is returned from the
+ * [[lab]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface ILabFunc extends ICssColorFunc
+{
+    fn: "lab";
+
+    /** CIE lightness value */
+    l: Extended<CssPercent>;
+
+    /** Distance along the a axis in the Lab colorspace */
+    da: Extended<number>;
+
+    /** Distance along the b axis in the Lab colorspace */
+    db: Extended<number>;
+
+    /** Alpha channel value */
+    a?: Extended<CssPercent>;
+}
+
+
+
+/**
+ * Represents an invocation of the CSS `color-contrast()` function. This interface is returned from the
+ * [[colorContrast]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface IColorContrastFunc extends ICssColorFunc
+{
+    fn: "color-contrast";
+
+    /** Color to which the list of colors in the `vs` property will be compared */
+    c: Extended<CssColor>;
+
+    /** List of colors from which to select the most contrasting to the base color */
+    vs: Extended<CssColor>[];
+}
+
+
+
+/**
+ * Represents color spaces that CSS works with.
+ */
+export type ColorSpace = "srgb" | "hsl" | "hwb" | "xyz" | "lab" | "lch" | "oklab" | "oklch";
+
+
+
+/**
+ * Represents an invocation of the CSS `color-mix()` function. This interface is returned from the
+ * [[colorMix]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface IColorMixFunc extends ICssColorFunc
+{
+    fn: "color-mix";
+
+    /** Color space in whcih to mix colors */
+    cs?: Extended<ColorSpace>;
+
+    /** First color and optional percentage to include in the mix */
+    c1: [Extended<CssColor>, Extended<CssPercent>?];
+
+    /** Second color and optional percentage to include in the mix */
+    c2: [Extended<CssColor>, Extended<CssPercent>?];
+}
+
+
+
+/**
+ * Allows gradually building the [[IColorMixFunc]] stucture.
+ */
+export interface IColorMixBuilder extends IColorMixFunc
+{
+    /**
+     * Sets the first color and optional percentage
+     *
+     * @param c First color to be mixed
+     * @param p Percentage of the first color to include in the mix
+     */
+    mix( c: Extended<CssColor>, p?: Extended<CssPercent>): this;
+
+    /**
+     * Sets the second color and optional percentage
+     *
+     * @param c Second color to be mixed
+     * @param p Percentage of the second color to include in the mix
+     */
+    with( c: Extended<CssColor>, p?: Extended<CssPercent>): this;
+}
 
 
 

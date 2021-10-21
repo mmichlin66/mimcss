@@ -1,7 +1,7 @@
 ﻿import {Extended, OneOrMany} from "./CoreTypes";
 import {CssAngle, CssPercent} from "./NumericTypes";
-import {CssColor, CssColorSeparation, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc} from "./ColorTypes";
-import {fdo, v2s, wkf, WKF} from "../impl/Utils";
+import {ColorSpace, CssColor, CssColorSeparation, IColorContrastFunc, IColorMixBuilder, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc} from "./ColorTypes";
+import {a2s, fdo, mv2s, v2s, wkf, WKF} from "../impl/Utils";
 
 
 
@@ -394,6 +394,82 @@ fdo.lch = {
     p: [ ["l", WKF.AlwaysPercent], "c", ["h", WKF.Angle], ["a", WKF.Percent, "/"] ],
     s: " "
 };
+
+
+
+/**
+ * Implements the `color-contrast()` CSS property.
+ *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-contrast()
+ *
+ * @param c Color to which the list of colors in the `vs` property will be compared
+ * @param vs List of colors from which to select the most contrasting to the base color.
+ * @returns The `IColorContrastFunc` object representing the invocation of the `color-contrast()`
+ * CSS function
+ */
+export const colorContrast = (c: Extended<CssColor>, ...vs: Extended<CssColor>[]): IColorContrastFunc =>
+    ({ fn: "color-contrast", c, vs });
+
+fdo["color-contrast"] = {
+    p: [
+        ["c", (v: Extended<CssColor>) => v2s( v, WKF.Color) + " vs"],
+        ["vs", (v: Extended<CssColor>[]) => a2s( v, WKF.Color, ",")]
+    ],
+    s: " "
+};
+
+
+
+/**
+ * Represents an invocation of the CSS `color-mix()` function. This interface is returned from the
+ * [[colorMix]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+class ColorMixFunc implements IColorMixBuilder
+{
+    fn: "color-mix" = "color-mix";
+
+    cs?: Extended<ColorSpace>;
+    c1: [Extended<CssColor>, Extended<CssPercent>?];
+    c2: [Extended<CssColor>, Extended<CssPercent>?];
+
+    constructor( cs?: Extended<ColorSpace>) { this.cs = cs; }
+
+    mix( c: Extended<CssColor>, p?: Extended<CssPercent>): this { this.c1 = [c, p]; return this; }
+    with( c: Extended<CssColor>, p?: Extended<CssPercent>): this  { this.c2 = [c, p]; return this; }
+}
+
+/**
+ * Implements the `color-mix()` CSS property.
+ *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-nix()
+ *
+ * **Examples**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefnition
+ * {
+ *     // color-mix( "blue", "red")
+ *     cls1 = this.$class({
+ *         color: css.colorMix().mix("blue").with("red");
+ *     })
+ *
+ *     // color-mix( in srgb, "blue 30%", "red" 60%)
+ *     cls2 = this.$class({
+ *         color: css.colorMix("srgb").mix( "blue", 30).with("red", 60);
+ *     })
+ * }
+ * ```
+ *
+ * @param cs Color space. Default is "lch".
+ * @returns The `IColorMixBuilder` object that allows adding colors and optional percentages to mix
+ */
+export const colorMix = (cs?: Extended<ColorSpace>): IColorMixBuilder => new ColorMixFunc(cs);
+
+fdo["color-mix"] = [
+    ["cs", (v: Extended<ColorSpace>) => v ? "in " + v2s(v) : ""],
+    ["c1", v => mv2s( [[v[0], WKF.Color], [v[1], WKF.Percent]])],
+    ["c2", v => mv2s( [[v[0], WKF.Color], [v[1], WKF.Percent]])],
+];
 
 
 

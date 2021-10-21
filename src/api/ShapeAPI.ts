@@ -1,10 +1,9 @@
-﻿import {Extended} from "./CoreTypes";
+﻿import {Extended, ExtentKeyword, IImageProxy} from "./CoreTypes";
 import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {
-    CrossFadeParam, GradientStopOrHint, LinearGradientAngle, ShapeRadius, IImageProxy, IMinMaxFunc,
-    IPathBuilder, IRepeatFunc, IGridSpanFunc, IUrlFunc, TimingFunctionJumpTerm, ICursorFunc,
-    ExtentKeyword, FillRule, ICircleBuilder, IEllipseBuilder,
+    CrossFadeParam, GradientStopOrHint, LinearGradientAngle, ShapeRadius, IMinMaxFunc, IPathBuilder,
+    IRepeatFunc, IGridSpanFunc, TimingFunctionJumpTerm, FillRule, ICircleBuilder, IEllipseBuilder,
     IInsetBuilder, IPolygonBuilder, PathCommand, PathCommandParam, IRayFunc, IStepsFunc, ICubicBezierFunc,
     PercentFilterNames, IPercentFilterFunc, IBlurFunc, IDropShadowFunc, IHueRotateFunc, IMatrixFunc,
     IMatrix3dFunc, IPerspectiveFunc, IRotateFunc, IRotate3dFunc, IScale1dFunc, IScaleFunc, IScale3dFunc,
@@ -12,9 +11,8 @@ import {
     ILinearGradientFunc, IRadialGradientBuilder, IRadialGradientFunc, IConicGradientBuilder,
     IConicGradientFunc, IGradientBuilder, IGradientFunc
 } from "./ShapeTypes";
-import {IIDRule} from "./RuleTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
-import {f2s, mv2s, WKF, v2s, wkf, a2s, fdo} from "../impl/Utils";
+import {mv2s, WKF, v2s, wkf, a2s, fdo} from "../impl/Utils";
 
 
 
@@ -989,48 +987,6 @@ export const span = (p1: Extended<GridLineCountOrName>, p2?: Extended<GridLineCo
     ({ fn: "span", p1, p2 });
 
 fdo.span = (v: IGridSpanFunc) => mv2s( ["span", v.p1, v.p2])
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Miscellaneous functions.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a function representing the CSS `url()` function. The string parameter
- * will be wrapped in a `url()` invocation. The function can also accept the IIDRule object to
- * create url(#element) invocation, which is often used to address SVG elements by their IDs.
- *
- * @category Miscellaneous
- */
-export const url = (p: Extended<string | IIDRule>): IUrlFunc => ({ fn: "url", p });
-
-
-
-/**
- * Returns a function representing the CSS `url()` function.
- *
- * @category Miscellaneous
- */
-export function cursor( p: Extended<string | IIDRule>): ICursorFunc;
-
-/**
- * Returns a function representing the CSS `url()` function followed by two numbers
- * indicating the cursor hotspot.
- *
- * @category Miscellaneous
- */
-export function cursor( p: Extended<string | IIDRule>, x: number, y: number): ICursorFunc;
-
-// Implementation
-export function cursor( url: Extended<string | IIDRule>, x?: number, y?: number): ICursorFunc
-{
-    return { fn: "cursor", url, x, y };
-}
-
-fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
 
 
 

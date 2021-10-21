@@ -1,8 +1,7 @@
-﻿import {Extended, ICssFuncObject, IGenericProxy} from "./CoreTypes";
+﻿import {CssImage, Extended, ExtentKeyword, ICssFuncObject, ICssImageFunc} from "./CoreTypes";
 import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
-import {IIDRule} from "./RuleTypes";
 
 
 
@@ -13,32 +12,6 @@ import {IIDRule} from "./RuleTypes";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Type representing extent for the [[radialGradient]] or [[ray]] functions.
- */
- export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
-
-
-
- /**
- * The ImageProxy interface represents an invocation of one of CSS functions that are used for
- * specifying images. This interface is returned from functions like [[linearGradient]],
- * [[crossFade]] and others.
- */
- export interface IImageProxy extends IGenericProxy<"image"> {};
-
-
-
- /**
-  * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
-  * Image can be specified either using the [[url]] function that returns the [[IUrlFunc]]
-  * interface or any of the functions that return the [[IImageProxy]] interface such as
-  * [[linearGradient]], [[crossFade]] and others.
-  */
- export type CssImage = IUrlFunc | IImageProxy | ILinearGradientFunc | IRadialGradientFunc | IConicGradientFunc;
-
-
-
- /**
  * Type representing either color stop or color hint for the `<gradient>` CSS functions. Color
  * stop is represented by either a simple color value or a two-to-three element tuple. In this
  * tuple, the first item is the color value, the second item is the distance/angle of where the
@@ -111,7 +84,7 @@ export type LinearGradientAngle = Extended<CssAngle> | SideOrCorner;
  * @typeparam T Type of numeric values used for hints and color stops.
  * @category Image
  */
-export interface IGradientFunc<T extends (CssLength | CssAngle)> extends ICssFuncObject
+export interface IGradientFunc<T extends (CssLength | CssAngle)> extends ICssImageFunc
 {
     /** flag indicating whether the gradient is repeating */
     repeat?: boolean;
@@ -994,48 +967,6 @@ export interface IGridSpanFunc extends ICssFuncObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous CSS functions.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The IUrlFunc interface represents an invocation of the CSS `url()` function. It is returned from
- * the [[url]] function.
- * @category Miscellaneous
- */
-export interface IUrlFunc extends ICssFuncObject
-{
-    fn: "url";
-
-    /** URL or reference to the ID rule identifying an SVG element */
-    p: Extended<string | IIDRule>;
-}
-
-
-
-/**
- * The ICursorFunc interface represents an invocation of the CSS `url()` function with two optional
- * numbers indicating the cursor's hotspot.
- * @category Miscellaneous
- */
-export interface ICursorFunc extends ICssFuncObject
-{
-    fn: "cursor";
-
-    /** Cursor URL or reference to the ID rule identifying an SVG element */
-    url: Extended<string | IIDRule>;
-
-    /** X-coordinate of the cursor hotspot */
-    x?: number;
-
-    /** Y-coordinate of the cursor hotspot */
-    y?: number;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Animation and transition timing functions.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

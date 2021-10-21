@@ -1,5 +1,6 @@
-﻿import {SelectorItem, ISelectorProxy, IRawProxy} from "./CoreTypes"
-import {tag2s} from "../impl/Utils";
+﻿import {SelectorItem, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc} from "./CoreTypes"
+import {fdo, mv2s, tag2s} from "../impl/Utils";
+import { IIDRule } from "./RuleTypes";
 
 
 
@@ -30,7 +31,7 @@ import {tag2s} from "../impl/Utils";
  * }
  * ```
  */
- export const selector = (parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy =>
+export const selector = (parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy =>
     () => tag2s( parts, params);
 
 
@@ -56,6 +57,36 @@ import {tag2s} from "../impl/Utils";
  */
 export const raw = (parts: TemplateStringsArray, ...params: any[]): IRawProxy =>
     () => tag2s( parts, params);
+
+
+
+/**
+ * Returns a function representing the CSS `url()` function. The string parameter
+ * will be wrapped in a `url()` invocation. The function can also accept the IIDRule object to
+ * create url(#element) invocation, which is often used to address SVG elements by their IDs.
+ */
+export const url = (p: Extended<string | IIDRule>): IUrlFunc => ({ fn: "url", p });
+
+
+
+/**
+ * Returns a function representing the CSS `url()` function.
+ */
+export function cursor( p: Extended<string | IIDRule>): ICursorFunc;
+
+/**
+ * Returns a function representing the CSS `url()` function followed by two numbers
+ * indicating the cursor hotspot.
+ */
+export function cursor( p: Extended<string | IIDRule>, x: number, y: number): ICursorFunc;
+
+// Implementation
+export function cursor( url: Extended<string | IIDRule>, x?: number, y?: number): ICursorFunc
+{
+    return { fn: "cursor", url, x, y };
+}
+
+fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
 
 
 
