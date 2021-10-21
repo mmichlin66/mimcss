@@ -37,29 +37,19 @@ const borderImageToString = (val: BorderImage_Object): string =>
     // if outset is specified but width is not. we need to set width to the default 1 value;
     let valCopy: BorderImage_Object = Object.assign( {}, val);
     if (val.slice == null && (val.width != null || val.outset != null))
-        valCopy.slice = "100%";
+        valCopy.slice = () => "100%";
     if (val.width == null && val.outset != null)
         valCopy.width = 1;
 
     return o2s( valCopy, [
         "source",
-        ["slice", borderImageSliceToString],
+        "slice",
         ["width", undefined, "/"],
         ["outset", undefined, "/"],
-        "repeat"
+        "repeat",
+        "mode"
     ]);
 }
-
-
-
-const borderImageSliceToString = (val: BorderImageSlice_StyleType) =>
-    v2s( val, {
-        num: WKF.UnitlessOrPercent,
-        item: {
-            bool: () => "fill",
-            num: WKF.UnitlessOrPercent,
-        }
-    });
 
 
 
@@ -432,31 +422,34 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     blockSize: WKF.Length,
     border: WKF.Border,
     borderBlock: WKF.Border,
+    borderBlockColor: WKF.Colors,
     borderBlockEnd: WKF.Border,
     borderBlockEndColor: WKF.Color,
     borderBlockEndWidth: WKF.Length,
     borderBlockStart: WKF.Border,
     borderBlockStartColor: WKF.Color,
     borderBlockStartWidth: WKF.Length,
+    borderBlockWidth: WKF.Length,
     borderBottom: WKF.Border,
     borderBottomColor: WKF.Color,
     borderBottomLeftRadius: WKF.Radius,
     borderBottomRightRadius: WKF.Radius,
     borderBottomWidth: WKF.Length,
-    borderColor: {
-        any: WKF.Color
-    },
+    borderColor: WKF.Colors,
+    borderEndEndRadius: WKF.Radius,
+    borderEndStartRadius: WKF.Radius,
     borderImage: {
         obj: borderImageToString,
     },
-    borderImageSlice: borderImageSliceToString,
     borderInline: WKF.Border,
+    borderInlineColor: WKF.Colors,
     borderInlineEnd: WKF.Border,
     borderInlineEndColor: WKF.Color,
     borderInlineEndWidth: WKF.Length,
     borderInlineStart: WKF.Border,
     borderInlineStartColor: WKF.Color,
     borderInlineStartWidth: WKF.Length,
+    borderInlineWidth: WKF.Length,
     borderLeft: WKF.Border,
     borderLeftColor: WKF.Color,
     borderLeftWidth: WKF.Length,
@@ -465,6 +458,8 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     borderRightColor: WKF.Color,
     borderRightWidth: WKF.Length,
     borderSpacing: WKF.MultiLengthWithSpace,
+    borderStartEndRadius: WKF.Radius,
+    borderStartStartRadius: WKF.Radius,
     borderTop: WKF.Border,
     borderTopColor: WKF.Color,
     borderTopLeftRadius: WKF.Radius,
@@ -530,6 +525,13 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     height: WKF.Length,
 
     inlineSize: WKF.Length,
+    inset: WKF.MultiLengthWithSpace,
+    insetBlock: WKF.MultiLengthWithSpace,
+    insetBlockEnd: WKF.Length,
+    insetBlockStart: WKF.Length,
+    insetInline: WKF.MultiLengthWithSpace,
+    insetInlineEnd: WKF.Length,
+    insetInlineStart: WKF.Length,
 
     left: WKF.Length,
     letterSpacing: WKF.Length,
@@ -549,6 +551,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     markerEnd: WKF.Marker,
     markerMid: WKF.Marker,
     markerStart: WKF.Marker,
+    maskBorder: {
+        obj: borderImageToString,
+    },
     maskClip: WKF.OneOrManyWithComma,
     maskComposite: WKF.OneOrManyWithComma,
     maskImage: WKF.OneOrManyWithComma,
@@ -589,6 +594,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     outline: WKF.Border,
     outlineColor: WKF.Color,
     outlineOffset: WKF.Length,
+    overflowClipMargin: WKF.Length,
 
     padding: WKF.MultiLengthWithSpace,
     paddingBlock: WKF.MultiLengthWithSpace,
@@ -622,9 +628,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     },
     rowGap: WKF.Length,
 
-    scrollbarColor: {
-        item: WKF.Color
-    },
     scrollMargin: WKF.MultiLengthWithSpace,
     scrollMarginBlock: WKF.MultiLengthWithSpace,
     scrollMarginBlockEnd: WKF.Length,
@@ -647,6 +650,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     scrollPaddingLeft: WKF.Length,
     scrollPaddingRight: WKF.Length,
     scrollPaddingTop: WKF.Length,
+    scrollbarColor: {
+        item: WKF.Color
+    },
     shapeMargin: WKF.Length,
     stopColor: WKF.Color,
     stroke: WKF.Color,
@@ -665,9 +671,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     },
     textDecorationColor: WKF.Color,
     textDecorationThickness: WKF.Length,
-    textEmphasis: {
-        any: WKF.Color
-    },
+    textEmphasis: WKF.Color,
     textEmphasisColor: WKF.Color,
     textFillColor: WKF.Color,
     textIndent: WKF.MultiLengthWithSpace,
@@ -725,13 +729,14 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
 const enum VendorPrefix
 {
-    webkit = 0,
-    moz = 1,
-    ms = 2,
+    webkit = 1,
+    moz = 2,
+    ms = 3,
 }
 
-// Vendor prefixes with indexes from the VendorPrefix enumeration
-const vendorPrefixStrings = ["webkit", "moz", "ms"];
+// Vendor prefixes with indexes from the VendorPrefix enumeration. The first one is only here to
+// allow the first enumeration value to be 1 and not zero.
+const vendorPrefixStrings = ["", "webkit", "moz", "ms"];
 
 
 // Mode indicating to what entity the prefix should be added if a certain value is found in the
@@ -769,11 +774,13 @@ type ValuePrefixInfo =
 
 /**
  * Type defining a property which should be prefixed or whose values should be prefixed.
+ *   - string - specifies the new name of the property
+ *   - number - specifies the single supported vendor prefix
  */
-type PropPrefixInfo =
+type PropPrefixInfo = string | number |
     {
         // Prefix index
-        prefix: VendorPrefix;
+        p: VendorPrefix;
 
         // Alternative name for the property (sometimes a property is not just prefixed, but gets
         // wholly different name).
@@ -800,49 +807,61 @@ type PropPrefixVariant = [string, string];
 
 const getPrefixVariants = (name: keyof IStyleset, value: string): PropPrefixVariant[] | null =>
 {
-    let propInfos = propPrefixInfos[name];
-    if (!propInfos)
+    let info = propPrefixInfos[name];
+    if (!info)
         return null;
 
+    if (typeof info === "string")
+        return [[info, value]];
+
+    if (typeof info === "number")
+        return [[dashToCamel(`${vendorPrefixStrings[info]}-${name}`), value]];
+
     let variants: PropPrefixVariant[] = [];
-    for( let propInfo of propInfos)
+    for( let item of info)
     {
-        let prefixString = vendorPrefixStrings[propInfo.prefix];
-
-        // determine whether the propert name should be prefixed. Note that even if we decide
-        // here that it should not be prefixed, it can change when we go over property values.
-        let shouldPrefixProperty = !propInfo.valsOnly;
-
-        // if property values are defined, try to replace them with prefixed versions. Note that
-        // this can also set the flag indicating that the property name should be prefixed too.
-        let newPropValue = "";
-        if (value && propInfo.vals)
+        if (typeof item === "string")
+            variants.push( [item, value]);
+        else if (typeof item === "number")
+            variants.push( [dashToCamel(`${vendorPrefixStrings[item]}-${name}`), value]);
+        else
         {
-            for( let valueInfo of propInfo.vals)
+            let prefixString = vendorPrefixStrings[item.p];
+
+            // determine whether the property name should be prefixed. Note that even if we decide
+            // here that it should not be prefixed, it can change when we go over property values.
+            let shouldPrefixProperty = !item.valsOnly;
+
+            // if property values are defined, try to replace them with prefixed versions. Note that
+            // this can also set the flag indicating that the property name should be prefixed too.
+            let newPropValue = "";
+            if (value && item.vals)
             {
-                let valueToSearch = valueInfo.val;
-                if (value.indexOf( valueToSearch) < 0)
-                    continue;
-
-                let mode = valueInfo.mode;
-                if (mode !== ValuePrefixMode.PropertyOnly)
+                for( let valueInfo of item.vals)
                 {
-                    let replacement = valueInfo.alt ? valueInfo.alt : `-${prefixString}-${valueToSearch}`;
-                    newPropValue = value.replace( valueToSearch, replacement);
-                    value = newPropValue;
+                    let valueToSearch = valueInfo.val;
+                    if (value.indexOf( valueToSearch) < 0)
+                        continue;
+
+                    if (valueInfo.mode !== ValuePrefixMode.PropertyOnly)
+                    {
+                        newPropValue = value.replace( valueToSearch,
+                            valueInfo.alt ? valueInfo.alt : `-${prefixString}-${valueToSearch}`);
+                        value = newPropValue;
+                    }
+
+                    if (valueInfo.mode !== ValuePrefixMode.ValueOnly)
+                        shouldPrefixProperty = true;
                 }
-
-                if (mode !== ValuePrefixMode.ValueOnly)
-                    shouldPrefixProperty = true;
             }
+
+            let newPropName = "";
+            if (shouldPrefixProperty)
+                newPropName = item.alt ? item.alt : dashToCamel(`${prefixString}-${name}`);
+
+            if (newPropName || newPropValue)
+                variants.push( [newPropName || name, newPropValue || value]);
         }
-
-        let newPropName = "";
-        if (shouldPrefixProperty)
-            newPropName = propInfo.alt ? propInfo.alt : dashToCamel( `${prefixString}-${name}`)
-
-        if (newPropName || newPropValue)
-            variants.push( [newPropName || name, newPropValue || value]);
     }
 
     return variants.length > 0 ? variants : null;
@@ -850,69 +869,68 @@ const getPrefixVariants = (name: keyof IStyleset, value: string): PropPrefixVari
 
 
 
-// Prefix information requiring adding the appropriate prefix
-const webkitInfo = {prefix: VendorPrefix.webkit};
-const mozInfo = {prefix: VendorPrefix.moz};
-const msInfo = {prefix: VendorPrefix.ms};
-
-// Prefix information requiring adding the -webkit- prefix and not any other prefix
-const webkitInfoOnly = [webkitInfo];
-
 // Prefix information for size-like properties that accept "stretch" value
-const sizePrefixInfos: PropPrefixInfo[] = [
-    {prefix: VendorPrefix.webkit, valsOnly: true, vals: [{val: "stretch", mode: ValuePrefixMode.ValueOnly, alt: "-webkit-fill-available"}]},
+const sizePrefixInfo: PropPrefixInfo[] = [
+    {p: VendorPrefix.webkit, valsOnly: true, vals: [{val: "stretch", mode: ValuePrefixMode.ValueOnly, alt: "-webkit-fill-available"}]},
 ];
 
 
 
-const propPrefixInfos: { [K in keyof IStyleset]?: PropPrefixInfo[]} =
+const propPrefixInfos: { [K in keyof IStyleset]?: string | number | PropPrefixInfo[] } =
 {
-    appearance: [ webkitInfo, mozInfo ],
+    appearance: [ VendorPrefix.webkit, VendorPrefix.moz ],
     backgroundClip: [
-        {prefix: VendorPrefix.webkit, valsOnly: true, vals: [{val: "text", mode: ValuePrefixMode.PropertyOnly}]}
+        {p: VendorPrefix.webkit, valsOnly: true, vals: [{val: "text", mode: ValuePrefixMode.PropertyOnly}]}
     ],
-    blockSize: sizePrefixInfos,
-    boxDecorationBreak: webkitInfoOnly,
-    colorAdjust: [ {prefix: VendorPrefix.webkit, alt: "webkitPrintColorAdjust"} ],
-    clipPath: webkitInfoOnly,
-    height: sizePrefixInfos,
-    hyphens: [ webkitInfo, mozInfo, msInfo ],
-    initialLetter: webkitInfoOnly,
-    inlineSize: sizePrefixInfos,
-    lineClamp: webkitInfoOnly,
-    mask: webkitInfoOnly,
-    maskClip: webkitInfoOnly,
-    maskComposite: webkitInfoOnly,
-    maskImage: webkitInfoOnly,
-    maskMode: webkitInfoOnly,
-    maskOrigin: webkitInfoOnly,
-    maskPosition: webkitInfoOnly,
-    maskRepeat: webkitInfoOnly,
-    maskSize: webkitInfoOnly,
-    maskType: webkitInfoOnly,
-    maxBlockSize: sizePrefixInfos,
-    maxHeight: sizePrefixInfos,
-    maxInlineSize: sizePrefixInfos,
-    maxWidth: sizePrefixInfos,
-    minBlockSize: sizePrefixInfos,
-    minHeight: sizePrefixInfos,
-    minInlineSize: sizePrefixInfos,
-    minWidth: sizePrefixInfos,
-    scrollbarColor: webkitInfoOnly,
-    scrollbarWidth: webkitInfoOnly,
-    textEmphasis: webkitInfoOnly,
-    textEmphasisColor: webkitInfoOnly,
-    textEmphasisPosition: webkitInfoOnly,
-    textEmphasisStyle: webkitInfoOnly,
-    textFillColor: webkitInfoOnly,
-    textSizeAdjust: [ webkitInfo, mozInfo, msInfo ],
-    textStroke: webkitInfoOnly,
-    textStrokeColor: webkitInfoOnly,
-    textStrokeWidth: webkitInfoOnly,
+    blockSize: sizePrefixInfo,
+    boxDecorationBreak: VendorPrefix.webkit,
+    colorAdjust: "webkitPrintColorAdjust",
+    clipPath: VendorPrefix.webkit,
+    height: sizePrefixInfo,
+    hyphens: [ VendorPrefix.webkit, VendorPrefix.moz, VendorPrefix.ms ],
+    initialLetter: VendorPrefix.webkit,
+    inlineSize: sizePrefixInfo,
+    lineClamp: VendorPrefix.webkit,
+    mask: VendorPrefix.webkit,
+    maskBorder: "webkitMaskBoxImage",
+    maskBorderOutset: "webkitMaskBoxImageOutset",
+    maskBorderRepeat: "webkitMaskBoxImageRepeat",
+    maskBorderSlice: "webkitMaskBoxImageSlice",
+    maskBorderSource: "webkitMaskBoxImageSource",
+    maskBorderWidth: "webkitMaskBoxImageWidth",
+    maskClip: VendorPrefix.webkit,
+    maskComposite: VendorPrefix.webkit,
+    maskImage: VendorPrefix.webkit,
+    maskMode: VendorPrefix.webkit,
+    maskOrigin: VendorPrefix.webkit,
+    maskPosition: VendorPrefix.webkit,
+    maskRepeat: VendorPrefix.webkit,
+    maskSize: VendorPrefix.webkit,
+    maskType: VendorPrefix.webkit,
+    maxBlockSize: sizePrefixInfo,
+    maxHeight: sizePrefixInfo,
+    maxInlineSize: sizePrefixInfo,
+    maxWidth: sizePrefixInfo,
+    minBlockSize: sizePrefixInfo,
+    minHeight: sizePrefixInfo,
+    minInlineSize: sizePrefixInfo,
+    minWidth: sizePrefixInfo,
+    scrollbarColor: VendorPrefix.webkit,
+    scrollbarWidth: VendorPrefix.webkit,
+    textEmphasis: VendorPrefix.webkit,
+    textEmphasisColor: VendorPrefix.webkit,
+    textEmphasisPosition: VendorPrefix.webkit,
+    textEmphasisStyle: VendorPrefix.webkit,
+    textFillColor: VendorPrefix.webkit,
+    textOrientation: VendorPrefix.webkit,
+    textSizeAdjust: [ VendorPrefix.webkit, VendorPrefix.moz, VendorPrefix.ms ],
+    textStroke: VendorPrefix.webkit,
+    textStrokeColor: VendorPrefix.webkit,
+    textStrokeWidth: VendorPrefix.webkit,
     userSelect: [
-        {prefix: VendorPrefix.webkit, vals: [{val: "none", mode: ValuePrefixMode.PropertyOnly}]}
+        {p: VendorPrefix.webkit, vals: [{val: "none", mode: ValuePrefixMode.PropertyOnly}]}
     ],
-    width: sizePrefixInfos,
+    width: sizePrefixInfo,
 }
 
 

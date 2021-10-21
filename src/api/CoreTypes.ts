@@ -523,7 +523,7 @@ export type SelectorItem = string | SelectorCombinator | IRuleWithSelector | IRa
  * Type for a CSS selector. This type is used to produce arbitrary complex selectors used by the
  * [[$style]] function.
  */
-export type CssSelector = OneOrMany<Extended<SelectorItem>>;
+export type CssSelector = OneOrMany<SelectorItem>;
 
 
 

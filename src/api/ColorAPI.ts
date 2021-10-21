@@ -1,4 +1,4 @@
-﻿import {Extended} from "./CoreTypes";
+﻿import {Extended, OneOrMany} from "./CoreTypes";
 import {CssAngle, CssPercent} from "./NumericTypes";
 import {CssColor, CssColorSeparation, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc} from "./ColorTypes";
 import {fdo, v2s, wkf, WKF} from "../impl/Utils";
@@ -239,18 +239,26 @@ let  colorNumber2s = (val: number): string =>
  * augmentation we get its number from the `custmColors` object and also convert it to the
  * #RRGGBBAA representation. Standard named colors as well as are returned as is.
  */
- wkf[WKF.Color] = (val: Extended<CssColor>): string =>
+wkf[WKF.Color] = (val: Extended<CssColor>): string =>
     v2s( val, {
         str: v => v in customColors ? colorNumber2s( customColors[v]) : v,
         num: colorNumber2s
     });
 
+/**
+ * Converts color style value to the CSS string. We convert numeric values to the #RRGGBBAA
+ * representation. If a string value is a custom color added via INamedColors module
+ * augmentation we get its number from the `custmColors` object and also convert it to the
+ * #RRGGBBAA representation. Standard named colors as well as are returned as is.
+ */
+wkf[WKF.Colors] = (val: OneOrMany<CssColor>): string => v2s( val, { any: WKF.Color })
 
 
- /**
+
+/**
  * Converts the color separation value to a CSS string.
  */
-  wkf[WKF.ColorSeparation] = (c: Extended<number>): string =>
+wkf[WKF.ColorSeparation] = (c: Extended<number>): string =>
     v2s( c, {
         num: c => {
             c = c < 0 ? -c : c;
@@ -288,7 +296,6 @@ export const rgb = (r: Extended<CssColorSeparation>, g: Extended<CssColorSeparat
     b: Extended<CssColorSeparation>, a?: Extended<CssPercent>): IRgbFunc =>
 {
     return { fn: "rgb", r, g, b, a };
-    // return f2s("rgba", [[r, separationToString], [g, separationToString], [b, separationToString], [a, alphaToString]]);
 }
 
 fdo.rgb = {
@@ -388,61 +395,5 @@ fdo.lch = {
     s: " "
 };
 
-
-
-// /**
-//  * Converts the given color and the alpha mask to the CSS Color representation. This
-//  * method should be used when defining CSS color values in styleset properties.
-//  *
-//  * The color can be specified as a numeric value or as a color name from the [[INamedColors]]
-//  * interface - including colors added using the module augmentation technique.
-//  *
-//  * The alpha mask is specified as a number:
-//  *   - The sign is ignored; that is, only the absolute value is considered.
-//  *   - Number 0 to 1 inclusive, which is treated as percentage.
-//  *   - Number 1 to 100 inclusive, which is treated as percentage.
-//  *   - Numbers greater than 100 are clamped to 100;
-//  *
-//  * **Examples**
-//  * ```typescript
-//  * class MyStyles extends css.StyleDefinition
-//  * {
-//  *     // applying alpha to a numeric color
-//  *     cls1 = this.$class({ color: css.alpha( 0xAA00AA, 0.5) })
-//  *
-//  *     // applying alpha to a named color
-//  *     cls1 = this.$class({ color: css.alpha( "darkolivegreen", 0.5) })
-//  * }
-//  * ```
-//  * @param c Color value as either a number or a named color
-//  * @param a Alpha channel value
-//  */
-// export const alpha = (c: number | keyof INamedColors, a: number): IAlphaFunc => ({ fn: "alpha", c, a });
-
-// const alpha2s = (c: number | keyof INamedColors, a: number): string =>
-// {
-//     // if the alpha is 0, return transparent color
-//     if (a === 0)
-//         return "#0000";
-
-//     // convert color to numeric value (if it's not a number yet). If the color was given as a
-//     // string that we cannot find in the Colors object, return pure white.
-//     let n = typeof c === "string" ? Colors[c] : c;
-//     if (n == null)
-//         return "#FFF";
-
-//     // negative and positive values of alpha are treated identically, so convert to positive
-//     if (a < 0)
-//         a = -a;
-
-//     // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
-//     // is 1 or 100, then set it to 0 because 0 in the colorNumberToString means "no alpha".
-//     a = a === 1 || a >= 100 ? 0 : a > 1 ? a / 100 : a;
-
-//     // make the new alpha
-//     return colorNumber2s( n >= 0 ? n + a : n - a);
-// }
-
-// fdo.alpha = (v: IAlphaFunc) => alpha2s( v.c, v.a)
 
 

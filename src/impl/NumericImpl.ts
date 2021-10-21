@@ -38,7 +38,7 @@ const numberStyle2s = <T>( val: Extended<T>, convertFunc?: NumberToStringFunc): 
  * @param convertFunc Function that converts a number to a string.
  * @param separator String to use to separate multiple values.
  */
-const multiNumberStyle2s = <T>( val: OneOrMany<Extended<T>>, convertFunc?: NumberToStringFunc,
+const multiNumberStyle2s = <T>( val: OneOrMany<T>, convertFunc?: NumberToStringFunc,
     separator: string = " "): string =>
     v2s( val, {
         num: convertFunc,
@@ -85,7 +85,7 @@ export class NumericMath<T = any, U extends string = any> implements INumericMat
         return numberStyle2s( val, this.n2s);
     }
 
-    public mv2s( val: OneOrMany<Extended<T>>, separator: string): string
+    public mv2s( val: OneOrMany<T>, separator: string): string
     {
         return multiNumberStyle2s( val, this.n2s, separator);
     }
@@ -218,7 +218,7 @@ const pos2s = (val: Extended<CssPosition>): string =>
 /**
  * Converts multi-position style value to the CSS string.
  */
-const mpos2s = (val: OneOrMany<Extended<CssPosition>>): string =>
+const mpos2s = (val: OneOrMany<CssPosition>): string =>
     v2s( val, {
         arr: (v: any[]) => {
             if (v.length === 0)

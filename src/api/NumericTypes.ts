@@ -421,7 +421,7 @@ export type CssMultiPosition = CssPosition | ([Extended<CssPositionItem>] | Exte
 
 
 /** Type for a single corner radius */
-export type CssRadius = OneOrPair<Extended<CssLength>>;
+export type CssRadius = OneOrPair<CssLength>;
 
 
 
@@ -429,7 +429,7 @@ export type CssRadius = OneOrPair<Extended<CssLength>>;
 export type BorderRadiusItem = [Extended<CssLength>, Extended<CssLength>?, Extended<CssLength>?, Extended<CssLength>?];
 
 /** Type for border-radius style property */
-export type BorderRadius = OneOrBox<Extended<CssLength>> | [BorderRadiusItem, BorderRadiusItem];
+export type BorderRadius = OneOrBox<CssLength> | [BorderRadiusItem, BorderRadiusItem];
 
 
 

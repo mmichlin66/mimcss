@@ -62,22 +62,22 @@ describe("border-image- longhand properties", () =>
 
 		it("'fill' with single number", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", [10, true], "10 fill");
+			dom.testLonghandProp( "borderImageSlice", [10, "fill"], "10 fill");
 		})
 
 		it("'fill' with single percentage", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", [css.percent(5), true], "5% fill");
+			dom.testLonghandProp( "borderImageSlice", [css.percent(5), "fill"], "5% fill");
 		})
 
 		it("'fill' with two numbers one percentage", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", [10, css.percent(5), 12, true], "10 5% 12 fill");
+			dom.testLonghandProp( "borderImageSlice", [10, css.percent(5), 12, "fill"], "10 5% 12 fill");
 		})
 
 		it("'fill' with two numbers two percentages", () =>
 		{
-			dom.testLonghandProp( "borderImageSlice", [10, css.percent(5), 15, css.percent(6), true], "10 5% 15 6% fill");
+			dom.testLonghandProp( "borderImageSlice", [10, css.percent(5), 15, css.percent(6), "fill"], "10 5% 15 6% fill");
 		})
 	})
 
@@ -136,7 +136,7 @@ describe("border-image shorthand property:", () =>
 		dom.testShorthandProp( "borderImage",
 			{
 				source: css.raw`url(image.png)`,
-				slice: [10, true],
+				slice: [10, "fill"],
 				repeat: "stretch",
 				width: [1, css.px(2), css.rem(0.3), 2]
 			},

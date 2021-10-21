@@ -82,6 +82,7 @@ export const enum WKF
     AlwaysPercent,
     ColorSeparation,
     Marker,
+    Colors,
 
     // indicates the length of the array needed to keep conversion functions. This is used when
     // we create this array below. Any new enumeration members must be added before this.
