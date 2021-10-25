@@ -1,14 +1,13 @@
 ﻿import {CssSelector, Extended} from "../api/CoreTypes";
 import {
-    BorderImage_Object, BorderImageSlice_StyleType, Border_StyleType, GridTemplateAreas_StyleType,
+    BorderImage_Object, Border_StyleType, GridTemplateAreas_StyleType,
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType, Styleset,
-    CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType, IStyleset,
+    CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType, IStyleset, StringStyleset, BoxShadow,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
-import {LengthMath, AngleMath} from "./NumericImpl";
-import {VarRule} from "../rules/VarRule";
+import {LengthMath} from "./NumericImpl";
 import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc, mv2s} from "./Utils";
-import {getVarsFromSTyleDefinition} from "../rules/RuleContainer";
+import {getVarsFromSD} from "../rules/RuleContainer";
 
 
 
@@ -53,17 +52,20 @@ const borderImageToString = (val: BorderImage_Object): string =>
 
 
 
+wkf[WKF.BoxShadowSingle] = (val: BoxShadow) => v2s( val, {
+    obj:[
+        ["inset", (v: boolean) => v ? "inset" : ""],
+        ["x", WKF.Length],
+        ["y", WKF.Length],
+        ["blur", WKF.Length],
+        ["spread", WKF.Length],
+        ["color", WKF.Color]
+    ]
+});
+
 wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
-    obj: {
-        props: [
-            ["inset", (v: boolean) => v ? "inset" : ""],
-            ["x", WKF.Length],
-            ["y", WKF.Length],
-            ["blur", WKF.Length],
-            ["spread", WKF.Length],
-            ["color", WKF.Color]
-        ]
-    },
+    obj: WKF.BoxShadowSingle,
+    item: WKF.BoxShadowSingle,
     sep: ","
 });
 
@@ -182,71 +184,6 @@ wkf[WKF.Marker] = (val: Extended<Marker_StyleType>): string =>
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Converts the given styleset to its string representation */
-export const styleset2s = (styleset: Styleset): string =>
-{
-    if (!styleset)
-        return "{}";
-
-    let s = "{";
-
-	forAllPropsInStylset( styleset, (name: string, value: string, isCustom: boolean, isPrefixed: boolean): void => {
-        s += isCustom
-            ? `${name}:${value};`
-            : `${isPrefixed ? "-" : ""}${camelToDash(name)}:${value};`;
-    });
-
-    return s + "}";
-}
-
-
-
-/**
- * Extracts name and string values from the given custom CSS property definition.
- * @param customVal
- */
-const getCustomPropNamesAndValues = (customVal: CustomVar_StyleType): [string,string?][] =>
-{
-    if (!customVal)
-        return [];
-
-    if (Array.isArray(customVal))
-    {
-        let varName: string;
-        let template: string;
-        let value: any;
-        if (customVal.length === 2)
-        {
-            varName = (customVal[0] as VarRule).cssName;
-            template = customVal[0].template;
-            value = customVal[1]
-        }
-        else
-        {
-            varName = customVal[0];
-            if (!varName)
-                return [];
-            else if (!varName.startsWith("--"))
-                varName = "--" + varName;
-
-            template = customVal[1];
-            if (!varName || !template)
-                return [];
-
-            value = customVal[2];
-        }
-
-        return [[varName, styleProp2s( template, value)]];
-    }
-    else
-    {
-        let vars = getVarsFromSTyleDefinition(customVal);
-        return vars.map( varRule => [varRule.cssName, styleProp2s( varRule.template, varRule.getValue())]);
-    }
-}
-
-
-
 /**
  * Converts the given style property to the CSS style string. Property name can be in either
  * dash or camel form.
@@ -278,67 +215,197 @@ export const styleProp2s = (propName: string, propVal: any): string =>
 
 
 
+/** Converts the given styleset to its string representation */
+export const styleset2s = (styleset: Styleset): string =>
+{
+    if (!styleset)
+        return "{}";
+
+    let s = "{";
+
+    // enumerate all styleset properties retrieving also vendor-prefixed variants
+	forAllPropsInStylset(
+        styleset,
+        (name: string, value: string | undefined | null, isCustom: boolean, isPrefixed: boolean): void =>
+        {
+            s += isCustom
+                ? `${name}:${value};`
+                : `${isPrefixed ? "-" : ""}${camelToDash(name)}:${value};`;
+        }
+    );
+
+    return s + "}";
+}
+
+
+
+/**
+ * Converts the given Styleset object into a StringStyleset object, where each Styleset's property
+ * is converted to its string value.
+ */
+export const s2ss = (styleset: Styleset): StringStyleset =>
+{
+    let res: StringStyleset = {};
+
+    // enumerate all styleset properties without retrieving vendor-prefixed variants
+    forAllPropsInStylset(
+        styleset,
+        (name: string, value: string): void =>
+        {
+            res[name] = value;
+        }
+    );
+
+    return res;
+}
+
+
+
+/**
+ * The tuple that contains the result of applying vendor prefixing on a property.
+ * - property name (that may or may not be prefixed).
+ * - property value (that may or may not have prefixed items)
+ */
+type PropPrefixVariant = [string, string];
+
+
+/** Tuple that contains name, template and optional value of a custom CSS property VarRule */
+type VarNTV = [string, string, string?];
+
+
+
+/**
+ * Extracts name and string values from the given custom CSS property definition.
+ * @param customVars
+ */
+const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
+{
+    if (Array.isArray(customVars))
+    {
+        let varName: string;
+        let template: string;
+        let value: any;
+        if (customVars.length === 2)
+        {
+            varName = customVars[0].name;
+            template = customVars[0].template;
+            value = customVars[1]
+        }
+        else
+        {
+            varName = customVars[0];
+            template = customVars[1];
+            value = customVars[2];
+        }
+
+        if (!varName || !template)
+            return [];
+
+        if (!varName.startsWith("--"))
+            varName = "--" + varName;
+
+        return [[varName, template, styleProp2s( template, value)]];
+    }
+    else
+    {
+        let varRules = getVarsFromSD(customVars);
+        return varRules.map( varRule => [varRule.cssName, varRule.template,
+            styleProp2s( varRule.template, varRule.getValue())]);
+    }
+}
+
+
+
+/**
+ * Callback signature for enumerating Styleset properties converted to strings
+ */
+type StylesetPropEnumCallback = (name: string, val: string | undefined | null,
+    isCustom: boolean, isPrefixed: boolean) => void;
+
+
+
 /**
  * For each property - regular and custom - in the given styleset invokes the appropriate
  * function that gets the property name and the value converted to string.
  * @param styleset
- * @param forPropFunc
+ * @param callback
+ * @param getPrefixedVariants Flag indicating whether we need to retrieve property variants with
+ * vendor prefixes
  */
-export const forAllPropsInStylset = (styleset: Styleset,
-    forPropFunc: (name: string, val: string, isCustom: boolean, isPrefixed: boolean) => void) =>
+const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCallback) =>
 {
 	for( let propName in styleset)
 	{
+        // special handling of the "--" property, which is an array where each item is
+        // a two-item or three-item array
 		if (propName === "--")
-		{
-			// special handling of the "--" property, which is an array where each item is
-			// a two-item or three-item array
-			let propVal = styleset[propName] as CustomVar_StyleType[];
-			for( let customVal of propVal)
-			{
-				if (!customVal)
-					continue;
+        {
+            let customVars = styleset[propName] as CustomVar_StyleType[];
+            for( let customVar of customVars)
+            {
+                if (!customVar)
+                    continue;
 
-				let tuples: [string, string?][] = getCustomPropNamesAndValues( customVal);
-                for( let tuple of tuples)
-                {
-                    if (!tuple[0])
-                        continue;
+                // in each tuple, the first element is var name, the second is template property and
+                // the third is the value;
+                let ntvs: VarNTV[] = getVarsNTVs( customVar);
+                for( let ntv of ntvs)
+                    callback( ntv[0], ntv[2], true, false);
 
-                    let varValue = tuple[1] == null ? "" : tuple[1];
-                    forPropFunc( tuple[0], varValue, true, false);
-                }
-			}
-		}
-		else
-		{
-            // prepare map of property names to tuples where the first element is the value and
-            // the second element is the flag whether the property name is a prefixed one.
-            let map: { [p: string]: [string, boolean] } = {};
+                // TODO: the following is commented out because there is no good way to use vendor
+                // prefixes in custom CSS properties - the browsers don't know to select the right
+                // variant.
+                // for( let ntv of ntvs)
+                // {
+                //     let varValue = ntv[2];
+                //     if (!varValue)
+                //         continue;
 
+                //     // get prefixed variants for the var's value based on the template
+                //     let variants = getPrefixVariants( ntv[1] as keyof IStyleset, varValue);
+                //     if (variants)
+                //     {
+                //         for( let variant of variants)
+                //         {
+                //             // we only need to call the callback if the values are different; we
+                //             // ignore variants where the property name was prefixed because property
+                //             // name is not used in the custom CSS property
+                //             if (varValue !== variant[1])
+                //                 callback( ntv[0], variant[1], false, false);
+                //         }
+                //     }
+
+                //     callback( ntv[0], varValue, true, false);
+                // }
+            }
+        }
+        else
+        {
             // get the string representation of the property
             let propValue = styleProp2s( propName, styleset[propName]);
-            map[propName] = [propValue, false];
+            if (!propValue)
+                continue;
 
-            // get vendor-prefixed variants and put them into the map. This can override property
-            // name already in the map if the property name is not prefixed (only the value is in
-            // this case).
+            // get vendor-prefixed variants
             let variants = getPrefixVariants( propName as keyof IStyleset, propValue);
             if (variants)
             {
                 for( let variant of variants)
                 {
-                    // the property name is prefixed if the name from the variant is not the same
-                    // as the original name.
-                    map[variant[0]] = [variant[1], variant[0] !== propName];
+                    // let variantPropName = variant[0];
+                    // let variantValue = variant[1];
+                    // if (variantPropName === propName)
+                    //     propValue = `${variantValue};${propName}:${propValue}`;
+                    // else
+                    //     callback( variantPropName, variantValue, false, true);
+
+                    callback( variant[0], variant[1], false, variant[0] !== propName);
                 }
             }
 
-            for( let name in map)
-            {
-                let tuple = map[name];
-                forPropFunc( name, tuple[0], false, tuple[1]);
-            }
+            // invoke the callback for the originally found prop name and with (perhaps updated)
+            // value
+            callback( propName, propValue, false, false);
         }
 	}
 }
@@ -363,7 +430,7 @@ export const s_registerStylePropertyInfo = (name: string, toStringFunc: AnyToStr
 const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 {
     animation: {
-        any: { props: [
+        any: { obj: [
             ["duration", WKF.Time],
             "func",
             ["delay", WKF.Time],
@@ -390,7 +457,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
         num: WKF.Color,
         any: {
             num: WKF.Color,
-            props: [
+            obj: [
                 ["color", WKF.Color],
                 "image",
                 ["position", WKF.Position],
@@ -495,7 +562,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     floodColor: WKF.Color,
     font: {
         item: WKF.Length,
-        props: [
+        obj: [
             ["style", WKF.FontStyle],
             "variant",
             "weight",
@@ -577,7 +644,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
     objectPosition: WKF.Position,
     offset: {
-        props: [
+        obj: [
             ["position", WKF.Position],
             "path",
             ["distance", WKF.Length],
@@ -662,7 +729,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     },
     textDecoration: {
         num: WKF.Color,
-        props: [
+        obj: [
             "line",
             "style",
             ["color", WKF.Color],
@@ -682,7 +749,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     top: WKF.Length,
     transformOrigin: WKF.MultiLengthWithSpace,
     transition: {
-        any: { props: [
+        any: { obj: [
             ["property", camelToDash],
             ["duration", WKF.Time],
             "func",
@@ -795,14 +862,6 @@ type PropPrefixInfo = string | number |
         vals?: ValuePrefixInfo[];
     };
 
-
-
-/**
- * The tuple that contains the result of applying vendor prefixing on a property.
- * - new property name (that may or may not be prefixed).
- * - new property value (that may or may not have prefixed items)
- */
-type PropPrefixVariant = [string, string];
 
 
 const getPrefixVariants = (name: keyof IStyleset, value: string): PropPrefixVariant[] | null =>

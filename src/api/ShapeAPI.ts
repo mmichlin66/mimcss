@@ -1,4 +1,4 @@
-﻿import {Extended, ExtentKeyword, IImageProxy} from "./CoreTypes";
+﻿import {CssImage, Extended, ExtentKeyword} from "./CoreTypes";
 import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {
@@ -9,10 +9,11 @@ import {
     IMatrix3dFunc, IPerspectiveFunc, IRotateFunc, IRotate3dFunc, IScale1dFunc, IScaleFunc, IScale3dFunc,
     ISkewFunc, ISkew1dFunc, ITranslate1dFunc, ITranslate3dFunc, ITranslateFunc, ILinearGradientBuilder,
     ILinearGradientFunc, IRadialGradientBuilder, IRadialGradientFunc, IConicGradientBuilder,
-    IConicGradientFunc, IGradientBuilder, IGradientFunc
+    IConicGradientFunc, IGradientBuilder, IGradientFunc, ICrossFadeBuilder, ICrossFadeFunc
 } from "./ShapeTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
-import {mv2s, WKF, v2s, wkf, a2s, fdo} from "../impl/Utils";
+import {mv2s, WKF, v2s, wkf, a2s, fdo, f2s} from "../impl/Utils";
+import { url } from "./CoreAPI";
 
 
 
@@ -60,7 +61,8 @@ const gradientStopsOrHintsToString = (val: GradientStopOrHint<any>[], math: WKF.
  *
  * @category Image
  */
-export const linearGradient = (...stops: GradientStopOrHint<CssLength>[]): ILinearGradientBuilder => new LinearGradient( stops);
+export const linearGradient = (...stops: GradientStopOrHint<CssLength>[]): ILinearGradientBuilder =>
+    new LinearGradientBuilder( stops);
 
 fdo["linear-gradient"] = {
     fn: gradientNameToString,
@@ -92,7 +94,8 @@ fdo["linear-gradient"] = {
  *
  * @category Image
  */
-export const radialGradient = (...stops: GradientStopOrHint<CssLength>[]): IRadialGradientBuilder => new RadialGradient( stops);
+export const radialGradient = (...stops: GradientStopOrHint<CssLength>[]): IRadialGradientBuilder =>
+    new RadialGradientBuilder( stops);
 
 fdo["radial-gradient"] = {
     fn: gradientNameToString,
@@ -122,7 +125,8 @@ fdo["radial-gradient"] = {
  *
  * @category Image
  */
-export const conicGradient = (...stops: GradientStopOrHint<CssAngle>[]): IConicGradientBuilder => new ConicGradient( stops);
+export const conicGradient = (...stops: GradientStopOrHint<CssAngle>[]): IConicGradientBuilder =>
+    new ConicGradientBuilder( stops);
 
 fdo["conic-gradient"] = {
     fn: gradientNameToString,
@@ -137,7 +141,7 @@ fdo["conic-gradient"] = {
 /**
  * Base class for gradient implementation
  */
-abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradientBuilder<T>
+abstract class GradientBuilder<T extends (CssLength | CssAngle)> implements IGradientBuilder<T>
 {
     fn: "linear-gradient" | "radial-gradient" | "conic-gradient";
 
@@ -166,7 +170,7 @@ abstract class Gradient<T extends (CssLength | CssAngle)> implements IGradientBu
 /**
  * Implements functionality of linear gradients
  */
-class LinearGradient extends Gradient<CssLength> implements ILinearGradientBuilder
+class LinearGradientBuilder extends GradientBuilder<CssLength> implements ILinearGradientBuilder
 {
     fn: "linear-gradient" = "linear-gradient";
 
@@ -180,7 +184,7 @@ class LinearGradient extends Gradient<CssLength> implements ILinearGradientBuild
 /**
  * Implements functionality of radial gradients
  */
-class RadialGradient extends Gradient<CssLength> implements IRadialGradientBuilder
+class RadialGradientBuilder extends GradientBuilder<CssLength> implements IRadialGradientBuilder
 {
     fn: "radial-gradient" = "radial-gradient";
 
@@ -217,7 +221,7 @@ class RadialGradient extends Gradient<CssLength> implements IRadialGradientBuild
 /**
  * Implements functionality of conic gradients
  */
-class ConicGradient extends Gradient<CssAngle> implements IConicGradientBuilder
+class ConicGradientBuilder extends GradientBuilder<CssAngle> implements IConicGradientBuilder
 {
     fn: "conic-gradient" = "conic-gradient";
 
@@ -231,12 +235,73 @@ class ConicGradient extends Gradient<CssAngle> implements IConicGradientBuilder
 
 
 /**
+ * Implements functionality of cross-fade()
+ */
+class CrossFadeBuilder implements ICrossFadeBuilder
+{
+    fn: "cross-fade" = "cross-fade";
+
+    old?: [Extended<CssImage>, Extended<CssImage>, Extended<CssPercent>];
+    images?: [Extended<CssImage>, Extended<CssPercent>?][];
+    c?: Extended<CssColor>;
+
+    // constructor for old function signature
+	constructor( old: [Extended<CssImage>, Extended<CssImage>, Extended<CssPercent>]);
+
+    // constructor for new function signature
+	constructor( ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]);
+
+	constructor()
+    {
+        let p1 = arguments[0];
+        if (Array.isArray( p1) && p1.length === 3)
+        {
+            // this is the old signature
+            this.old = p1 as [Extended<CssImage>, Extended<CssImage>, Extended<CssPercent>];
+        }
+        else
+        {
+            // this is the new signature
+            this.add( ...arguments);
+        }
+    }
+
+	add( ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]): this
+    {
+        if (!this.images)
+            this.images = [];
+
+        for( let item of images)
+            this.images.push( Array.isArray(item) ? item : [item]);
+
+        return this;
+    }
+
+	color( c: Extended<CssColor>): this { this.c = c; return this; }
+}
+
+
+
+/**
  * Returns an ImageProxy function representing the `cross-fade()` CSS function.
  *
  * @category Image
  */
-export const crossFade = (...args: CrossFadeParam[]): IImageProxy =>
-    () => `cross-fade(${a2s( args, v => mv2s( [v[0], [v[1], [WKF.Percent]]], ","))})`;
+export function crossFade( old: [Extended<CssImage>, Extended<CssImage>, Extended<CssPercent>]): ICrossFadeFunc;
+export function crossFade(  ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]): ICrossFadeBuilder;
+export function crossFade(): ICrossFadeBuilder
+{
+    return new CrossFadeBuilder( ...arguments);
+}
+
+fdo["cross-fade"] = (val: ICrossFadeFunc): string =>
+{
+    return val.images
+        ? f2s( "cross-fade", [[val.images, { item: v => mv2s( [v[0], [v[1], WKF.Percent]]), sep: "," }], [val.c, WKF.Color]])
+        : val.old
+            ? f2s( "cross-fade", [val.old[0], val.old[1], [val.old[2], WKF.Percent]])
+            :"";
+}
 
 
 

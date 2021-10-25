@@ -666,8 +666,7 @@ export class SelectorRule extends StyleRule
  * @param source
  * @returns Reference to the target styleset if not null or a new styleset otherwise.
  */
- function mergeStylesets( target: Styleset | undefined | null,
-    source: Styleset): Styleset
+const mergeStylesets = (target: Styleset | undefined | null, source: Styleset): Styleset =>
 {
     if (!source)
         return target ? target : {};
@@ -698,7 +697,7 @@ export class SelectorRule extends StyleRule
 /**
  * Merges "--" property from the source styleset to the target styleset.
  */
-function mergeCustomProps( target: Styleset, source: Styleset): void
+const mergeCustomProps = (target: Styleset, source: Styleset): void =>
 {
     let sourceItems = source["--"];
     if (!sourceItems)
@@ -713,23 +712,23 @@ function mergeCustomProps( target: Styleset, source: Styleset): void
 /**
  * Returns a string representation of a parameterized pseudo entity.
  */
- function pseudoEntity2s( entityName: string, val: any): string
- {
-     if (!entityName)
-         return "";
+const pseudoEntity2s = (entityName: string, val: any): string =>
+{
+    if (!entityName)
+        return "";
 
-     if (entityName.startsWith( ":nth"))
-         return v2s( val, { arr: nthTupleToString });
-     else
-         return v2s(val);
- }
+    if (entityName.startsWith( ":nth"))
+        return v2s( val, { arr: nthTupleToString });
+    else
+        return v2s(val);
+}
 
 
 
- /**
+/**
  * Converts the given two-number tuple to a string in the form An+B.
  */
-function nthTupleToString( val: [number, number?]): string
+const nthTupleToString = (val: [number, number?]): string =>
 {
 	let v1 = val[1];
 

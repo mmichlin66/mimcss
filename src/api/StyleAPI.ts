@@ -5,10 +5,10 @@ import {
     Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset, VarTemplateName,
     ExtendedVarValue, ICssSerializer, AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType
 } from "./StyleTypes"
-import {styleProp2s, forAllPropsInStylset, s_registerStylePropertyInfo} from "../impl/StyleImpl"
+import {styleProp2s, s_registerStylePropertyInfo, s2ss} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
-import {processInstanceOrClass, serializeInstance} from "../rules/RuleContainer";
+import {processSD, serializeInstance} from "../rules/RuleContainer";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {f2s, mv2s, tag2s, WKF} from "../impl/Utils";
 
@@ -83,15 +83,7 @@ export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: Stri
  * converted to its string value.
  * @param styleset
  */
-export const stylesetToStringStyleset = (styleset: Styleset): StringStyleset =>
-{
-	let res: StringStyleset = {};
-
-	forAllPropsInStylset( styleset,
-		(name: string, value: string): void => { res[name] = value });
-
-	return res;
-}
+export const stylesetToStringStyleset = (styleset: Styleset): StringStyleset => s2ss( styleset);
 
 
 
@@ -112,13 +104,13 @@ export const diffStylesets = (oldStyleset: Styleset, newStyleset: Styleset): Str
 	if (!oldStyleset && !newStyleset)
 		return null;
 	else if (!oldStyleset)
-		return stylesetToStringStyleset( newStyleset);
+		return s2ss( newStyleset);
 	else if (!newStyleset)
-		return stylesetToStringStyleset( oldStyleset);
+		return s2ss( oldStyleset);
 
 	// first convert both stylesets to their string versions
-	let oldStringStyleset =	stylesetToStringStyleset( oldStyleset);
-	let newStringStyleset =	stylesetToStringStyleset( newStyleset);
+	let oldStringStyleset =	s2ss( oldStyleset);
+	let newStringStyleset =	s2ss( newStyleset);
 
 	let updateVal: StringStyleset | null = null;
 
@@ -240,10 +232,7 @@ export const counters = (counterObj: Extended<ICounterRule | string>,
  * @category Miscellaneous
  */
 export const usevar = <K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy =>
-    () => f2s( "var", [
-        "--" + varObj.name,
-        [fallback, (v: ExtendedVarValue<K>) => styleProp2s( varObj.template, v)]
-    ]);
+    () => f2s( "var", ["--" + varObj.name, styleProp2s( varObj.template, fallback)]);
 
 
 
@@ -418,7 +407,7 @@ class CssSerializer implements ICssSerializer
      */
     public add( instOrClass: IStyleDefinition | IStyleDefinitionClass): void
     {
-        let instance = processInstanceOrClass( instOrClass);
+        let instance = processSD( instOrClass);
         if (!instance || this.instances.has(instance))
             return;
 

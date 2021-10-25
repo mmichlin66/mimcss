@@ -118,7 +118,7 @@ const supportsQuery2s = (query: SupportsQuery): string =>
 
 const fontSingleSrc2s = (val: FontSrc): string =>
     v2s( val, {
-        props: [
+        obj: [
             ["local", v => `local(${v})`],
             ["url", v => `url(${v})`],
             ["format", {

@@ -589,16 +589,8 @@ export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner
  */
 export interface ICssImageFunc extends ICssFuncObject
 {
-    fn: "linear-gradient" | "radial-gradient" | "conic-gradient";
+    fn: "linear-gradient" | "radial-gradient" | "conic-gradient" | "cross-fade";
 }
-
-
-
-/**
- * The ImageProxy interface represents an invocation of one of CSS functions that are used for
- * specifying images. This interface is returned from functions like [[crossFade]].
- */
-export interface IImageProxy extends IGenericProxy<"image"> {};
 
 
 
@@ -608,7 +600,7 @@ export interface IImageProxy extends IGenericProxy<"image"> {};
  * interface or any of the functions that return the [[IImageProxy]] or [[ICssImageFunc]]
  * interface such as [[linearGradient]] and [[crossFade]].
  */
-export type CssImage = IUrlFunc | ICssImageFunc | IImageProxy;
+export type CssImage = IUrlFunc | ICssImageFunc;
 
 
 

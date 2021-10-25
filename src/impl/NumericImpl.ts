@@ -212,22 +212,16 @@ wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Converts single position style value to the CSS string.
-const pos2s = (val: Extended<CssPosition>): string =>
-    v2s( val, { any: WKF.Length });
+const pos2s = (val: Extended<CssPosition>): string => v2s( val, { any: WKF.Length });
 
 /**
  * Converts multi-position style value to the CSS string.
  */
 const mpos2s = (val: OneOrMany<CssPosition>): string =>
     v2s( val, {
-        arr: (v: any[]) => {
-            if (v.length === 0)
-                return "";
-            else if (Array.isArray(v[0]))
-                return a2s( v, { any: pos2s }, ",");
-            else
-                return pos2s(v as CssPosition);
-        },
+        arr: (v: any[]) => v.length === 0
+            ? ""
+            : Array.isArray(v[0]) ? a2s( v, { any: pos2s }, ",") : pos2s(v as CssPosition),
         any: pos2s
     });
 
@@ -245,19 +239,12 @@ wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { any: WKF.Length });
 /**
  * Converts border radius style value to the CSS string.
  */
-const borderRadius2s = (val: Extended<BorderRadius>): string =>
+ wkf[WKF.BorderRadius] = (val: Extended<BorderRadius>): string =>
     v2s( val, {
-        arr: v =>
-        {
-            if (Array.isArray( v[0]))
-            return a2s( v, {any: WKF.Length}, "/");
-            else
-                return a2s( v, WKF.Length);
-        },
+        arr: v => Array.isArray( v[0]) ? a2s( v, {any: WKF.Length}, "/") : a2s( v, WKF.Length),
         any: WKF.Length
     });
 
- wkf[WKF.BorderRadius] = borderRadius2s;
 
 
 

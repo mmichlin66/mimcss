@@ -54,7 +54,8 @@ export type NumberToStringFunc = (n: number) => string;
  */
 export const enum WKF
 {
-    Number = 1,
+    None = 0,
+    Number,
     Percent,
     Length,
     Angle,
@@ -78,6 +79,7 @@ export const enum WKF
     GridTrack,
     Quoted,
     FontStyle,
+    BoxShadowSingle,
     BoxShadow,
     AlwaysPercent,
     ColorSeparation,
@@ -94,6 +96,7 @@ export const enum WKF
  * from the WellKnownFunc enumeration
  */
 export let wkf: AnyToStringFunc[] = new Array( WKF.Last);
+wkf[WKF.None] = v => v;
 
 
 
@@ -141,19 +144,16 @@ export type V2SOptions = WKF | AnyToStringFunc |
     arr?: WKF | ((val: any[]) => string);
 
     // Options to use if value is an object
-    obj?: V2SOptions;
-
-    // Options to use to convert value's properties if value is an object
-    props?: P2SOptions;
+    obj?: V2SOptions | P2SOptions;
 
     // Options to use if type-specific function is not defined except for null and string values.
     // This is also used for array elements if arrItemFunc is not defined.
     any?: V2SOptions;
 
-    // Options to use to convert each array item - used only if fromArray is not defined
+    // Options to use to convert each array item - used only if `arr` is not defined
     item?: V2SOptions;
 
-    // Separator for array items used with the item or props properties. If not specified, a
+    // Separator for array items used with the item or obj properties. If not specified, a
     // single space will be used.
     sep?: string;
 };
@@ -218,9 +218,12 @@ export const v2s = (val: any, options?: V2SOptions): string =>
             else if (typeof val.fn === "string")
                 return fdo2s( val);
             else if (options.obj || options.any)
-                newOptions = options.obj ?? options.any;
-            else if (options.props)
-                return o2s( val, options.props, options.sep);
+            {
+                if (Array.isArray(options.obj))
+                    return o2s( val, options.obj, options.sep);
+                else
+                    newOptions = options.obj ?? options.any;
+            }
             else
                 return val.toString();
         }

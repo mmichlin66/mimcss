@@ -9,7 +9,7 @@ import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
-import {embeddedDecorator, getCurrentThemeInstance, processInstanceOrClass, s_configureNames} from "../rules/RuleContainer";
+import {embeddedDecorator, getCurrentTheme, processSD, s_configureNames} from "../rules/RuleContainer";
 import {AbstractRule, AttrRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
@@ -911,7 +911,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     protected $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T
     {
-        return processInstanceOrClass( instOrClass) as T;
+        return processSD( instOrClass) as T;
     }
 }
 
@@ -1227,7 +1227,7 @@ class ThemeDefinitionHandler implements ProxyHandler<ThemeDefinition>
 export const activate = <T extends IStyleDefinition>(instOrClass: T | IStyleDefinitionClass<T>,
 	schedulerType?: number): T | null =>
 {
-	let instance = processInstanceOrClass( instOrClass) as T;
+	let instance = processSD( instOrClass) as T;
 	if (instance)
         getActivator(schedulerType).activate( instance);
 
@@ -1247,13 +1247,14 @@ export const deactivate = (instance: IStyleDefinition, schedulerType?: number): 
 
 
 /**
- * Returns the theme definition object, which is currently active for the given theme.
- * @param themeClass Theme definition class
+ * Returns the theme definition object, which is currently active for the given theme declaration
+ * class.
+ * @param themeClass Theme declaration class
  * @returns Theme instance, which is currently active for the given theme class or undefined
  * if no instance is currently active.
  */
-export const getActiveThemeInstance = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
-    getCurrentThemeInstance( themeClass);
+export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
+    getCurrentTheme( themeClass);
 
 
 

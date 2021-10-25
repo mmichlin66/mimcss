@@ -326,14 +326,14 @@ class RuleContainer implements ITopLevelRuleContainer
             let themeClass = this.instance[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
-                let currInstance = getCurrentThemeInstance( themeClass);
+                let currInstance = getCurrentTheme( themeClass);
                 if (currInstance && currInstance !== this.instance)
                 {
                     let currContainer = currInstance[symContainer] as RuleContainer;
                     currContainer.deactivate();
                 }
 
-                setCurrentThemeInstance( this.instance);
+                setCurrentTheme( this.instance);
             }
         }
 
@@ -374,9 +374,9 @@ class RuleContainer implements ITopLevelRuleContainer
             let themeClass = this.instance[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
-                let currInstance = getCurrentThemeInstance( themeClass);
+                let currInstance = getCurrentTheme( themeClass);
                 if (currInstance === this.instance)
-                    removeCurrentThemeInstance( themeClass);
+                    removeCurrentTheme( themeClass);
             }
         }
 	}
@@ -582,7 +582,7 @@ const findNameForRuleInPrototypeChain = (definitionClass: IStyleDefinitionClass,
  * it has already been processed. If yes, we just return it back; if no, we assign new unique names
  * to its rules.
  */
-export const processInstanceOrClass = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
+export const processSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
 	parent?: IStyleDefinition): IStyleDefinition =>
 	// instOrClass has type "object" if it is an instance and "function" if it is a class
 	typeof instOrClass === "object"
@@ -670,9 +670,9 @@ const processInstance = (instance: IStyleDefinition): void =>
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-export const getVarsFromSTyleDefinition = (instOrClass: IStyleDefinition | IStyleDefinitionClass): VarRule[] =>
+export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass): VarRule[] =>
 {
-    let instance = processInstanceOrClass( instOrClass);
+    let instance = processSD( instOrClass);
     if (!instance)
         return [];
 
@@ -936,7 +936,7 @@ const getThemeBaseClass = (themeClass: IStyleDefinitionClass<ThemeDefinition>): 
  * @returns Theme instance, which is currently activated for the given theme class or null
  * if no istance is currently activated.
  */
-export const getCurrentThemeInstance = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
+export const getCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
 {
     let themeBaseClass = getThemeBaseClass(themeClass)
     return themeBaseClass && themeInstanceMap.get( themeBaseClass);
@@ -949,7 +949,7 @@ export const getCurrentThemeInstance = (themeClass: IStyleDefinitionClass<ThemeD
  * corresponding base theme class.
  * @param theme theme instance to set as current for the corresponding base theme class
  */
-const setCurrentThemeInstance = (theme: ThemeDefinition): void =>
+const setCurrentTheme = (theme: ThemeDefinition): void =>
 {
     let themeBaseClass = getThemeBaseClass( theme.constructor as IStyleDefinitionClass<ThemeDefinition>);
     themeBaseClass && themeInstanceMap.set( themeBaseClass, theme);
@@ -962,7 +962,7 @@ const setCurrentThemeInstance = (theme: ThemeDefinition): void =>
  * corresponding base theme class.
  * @param themeClass Theme definition class
  */
-const removeCurrentThemeInstance = (themeClass: IStyleDefinitionClass<ThemeDefinition>): void =>
+const removeCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): void =>
 {
     let themeBaseClass = getThemeBaseClass( themeClass);
     themeBaseClass && themeInstanceMap.delete( themeBaseClass);

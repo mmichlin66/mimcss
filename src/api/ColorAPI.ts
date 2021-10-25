@@ -432,10 +432,10 @@ class ColorMixFunc implements IColorMixBuilder
     c1: [Extended<CssColor>, Extended<CssPercent>?];
     c2: [Extended<CssColor>, Extended<CssPercent>?];
 
-    constructor( cs?: Extended<ColorSpace>) { this.cs = cs; }
+    constructor( c: Extended<CssColor>, p?: Extended<CssPercent>) { this.c1 = [c, p]; }
 
-    mix( c: Extended<CssColor>, p?: Extended<CssPercent>): this { this.c1 = [c, p]; return this; }
     with( c: Extended<CssColor>, p?: Extended<CssPercent>): this  { this.c2 = [c, p]; return this; }
+    in( cs: Extended<ColorSpace>): this { this.cs = cs; return this; }
 }
 
 /**
@@ -450,12 +450,12 @@ class ColorMixFunc implements IColorMixBuilder
  * {
  *     // color-mix( "blue", "red")
  *     cls1 = this.$class({
- *         color: css.colorMix().mix("blue").with("red");
+ *         color: css.colorMix("blue").with("red");
  *     })
  *
  *     // color-mix( in srgb, "blue 30%", "red" 60%)
  *     cls2 = this.$class({
- *         color: css.colorMix("srgb").mix( "blue", 30).with("red", 60);
+ *         color: css.colorMix("blue", 30).with("red", 60).in("srgb");
  *     })
  * }
  * ```
@@ -463,7 +463,7 @@ class ColorMixFunc implements IColorMixBuilder
  * @param cs Color space. Default is "lch".
  * @returns The `IColorMixBuilder` object that allows adding colors and optional percentages to mix
  */
-export const colorMix = (cs?: Extended<ColorSpace>): IColorMixBuilder => new ColorMixFunc(cs);
+export const colorMix = (c: Extended<CssColor>, p?: Extended<CssPercent>): IColorMixBuilder => new ColorMixFunc( c, p);
 
 fdo["color-mix"] = [
     ["cs", (v: Extended<ColorSpace>) => v ? "in " + v2s(v) : ""],

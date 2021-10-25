@@ -399,20 +399,20 @@ export interface IColorMixFunc extends ICssColorFunc
 export interface IColorMixBuilder extends IColorMixFunc
 {
     /**
-     * Sets the first color and optional percentage
-     *
-     * @param c First color to be mixed
-     * @param p Percentage of the first color to include in the mix
-     */
-    mix( c: Extended<CssColor>, p?: Extended<CssPercent>): this;
-
-    /**
      * Sets the second color and optional percentage
      *
      * @param c Second color to be mixed
      * @param p Percentage of the second color to include in the mix
      */
     with( c: Extended<CssColor>, p?: Extended<CssPercent>): this;
+
+    /**
+     * Sets the color space in which to mix the colors
+     *
+     * @param c First color to be mixed
+     * @param p Percentage of the first color to include in the mix
+     */
+    in( cs: Extended<ColorSpace>): this;
 }
 
 

@@ -1,7 +1,7 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "../api/RuleTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule"
 import {StyleRule} from "./StyleRules";
-import {v2s} from "../impl/Utils";
+import {v2s, WKF} from "../impl/Utils";
 
 
 
@@ -114,11 +114,7 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 	// Returns the selector part of the style rule.
 	public getSelectorString(): string
 	{
-		return v2s( this.waypoint, {
-			num: v => v + "%",
-			item: v => v2s( v, { num: v => v + "%" }),
-			sep: ","
-		})
+		return v2s( this.waypoint, { any: WKF.Percent, sep: "," });
 	}
 
 	/** Identifier of the waypoint */

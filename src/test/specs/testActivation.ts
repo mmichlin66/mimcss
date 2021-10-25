@@ -178,7 +178,9 @@ describe("activation:", () =>
 		let styles2 = css.activate( EmbeddedStyles2);
 
 		let elms = dom.getAllStylesFromHead();
-		expect((elms[0].sheet as CSSStyleSheet).cssRules.length).toEqual(2);
+		let rules = (elms[0].sheet as CSSStyleSheet).cssRules;
+		expect(rules.length).toEqual(2);
+        expect(rules[0].cssText).not.toEqual(rules[1].cssText);
 
 		css.deactivate( styles1!);
 		css.deactivate( styles2!);
