@@ -9,10 +9,10 @@ import {IRule, INamedEntity, IStyleDefinition} from "../api/RuleTypes"
 export interface IRuleSerializationContext
 {
     // Adds rule text
-    addRuleText( s: string, isTopLevelRule?: boolean): void;
+    addRule( s: string, isTopLevelRule?: boolean): void;
 
     // Adds rule text
-    addStyleDefinition( instance: IStyleDefinition): void;
+    addSD( instance: IStyleDefinition): void;
 }
 
 

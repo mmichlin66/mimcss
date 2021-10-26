@@ -6,7 +6,7 @@ import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, Ex
 import {CssSelector} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, symValueToString, v2s} from "../impl/Utils";
-import {styleset2s, styleProp2s, selector2s} from "../impl/StyleImpl"
+import {styleset2s, sp2s, selector2s} from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 
@@ -178,7 +178,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
     public serialize( ctx: IRuleSerializationContext): void
     {
 		if (Object.keys(this.styleset).length > 0)
-			ctx.addRuleText( this.toCssString());
+			ctx.addRule( this.toCssString());
 
         // insert dependent rules under the same parent
         this.forEachDepRule( (depRule: DependentRule) => depRule.serialize( ctx));
@@ -266,7 +266,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.cssRule)
         {
 		    scheduleStyleUpdate( this.cssRule, camelToDash( name),
-                value == null ? null : styleProp2s( name, value), important, schedulerType);
+                value == null ? null : sp2s( name, value), important, schedulerType);
         }
 	}
 
@@ -323,7 +323,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (this.cssRule)
         {
             scheduleStyleUpdate( this.cssRule, varObj.cssName,
-                value == null ? null : styleProp2s( varObj.template, value),
+                value == null ? null : sp2s( varObj.template, value),
                 important, schedulerType);
         }
 	}
@@ -718,22 +718,11 @@ const pseudoEntity2s = (entityName: string, val: any): string =>
         return "";
 
     if (entityName.startsWith( ":nth"))
-        return v2s( val, { arr: nthTupleToString });
+        return v2s( val, {
+            arr: [v => v + "n", v => !v ? "" : v > 0 ? "+" + v : "-" + -v]
+        });
     else
         return v2s(val);
-}
-
-
-
-/**
- * Converts the given two-number tuple to a string in the form An+B.
- */
-const nthTupleToString = (val: [number, number?]): string =>
-{
-	let v1 = val[1];
-
-	// the '!v1n' expression covers null, undefined and 0.
-	return `${val[0]}n${!v1 ? "" : v1 > 0 ? "+" + v1 : "-" + -v1}`;
 }
 
 

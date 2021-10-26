@@ -65,12 +65,12 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		if (!selector)
 			return;
 
-		ctx.addRuleText( `${selector} {`);
+		ctx.addRule( `${selector} {`);
 
 		// insert sub-rules
 		this.ruleContainer.serializeRules( ctx);
 
-		ctx.addRuleText( "}");
+		ctx.addRule( "}");
     }
 
 

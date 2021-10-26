@@ -259,7 +259,7 @@ export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
  * Type for single background value
  * @category Style Helper
  */
-export type Background_Single = CssColor |
+export type Background_Single = CssColor | CssImage |
     {
         color?: Extended<CssColor>,
         image?: Extended<CssImage>,
@@ -468,16 +468,12 @@ export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeatKeyword>;
 /**
  * Type for [[borderImageSlice]] style property
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-slice
+ *
+ * Note: numeric values are treated as is - without appending the percent sign to them.
  * @category Style Property
  */
-export type BorderImageSlice_StyleType = OneOrBox<CssNumber | IPercentProxy | "fill"> |
-    [
-        Extended<CssNumber | IPercentProxy>,
-        Extended<CssNumber | IPercentProxy>,
-        Extended<CssNumber | IPercentProxy>,
-        Extended<CssNumber | IPercentProxy>,
-        "fill"
-    ];
+export type BorderImageSlice_StyleType = OneOrBox<CssPercent | "fill"> |
+    [Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, "fill"];
 
 /**
  * Type for [[borderImageSource]] style property

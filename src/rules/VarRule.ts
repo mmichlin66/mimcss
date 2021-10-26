@@ -1,6 +1,6 @@
 import {IVarRule, IConstRule} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue} from "../api/StyleTypes"
-import {styleProp2s} from "../impl/StyleImpl"
+import {sp2s} from "../impl/StyleImpl"
 import {createName, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
 
 
@@ -40,7 +40,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	// Converts the rule to CSS string.
 	public toCssString(): string | null
 	{
-		return this.value == null ? null : `${this.cssName}: ${styleProp2s( this.template, this.value)}`;
+		return this.value == null ? null : `${this.cssName}: ${sp2s( this.template, this.value)}`;
 	}
 
 
@@ -75,7 +75,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
             this.container.setCustomVarValue( this.cssName,
                 value == null
                     ? null
-                    : styleProp2s( this.template, value), important, schedulerType)
+                    : sp2s( this.template, value), important, schedulerType)
         }
 	}
 
@@ -139,7 +139,7 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
         super.process( container, topLevelContainer, ruleName);
 
         if (!this.cachedValue)
-		    this.cachedValue = styleProp2s( this.template, this.value);
+		    this.cachedValue = sp2s( this.template, this.value);
 	}
 
 

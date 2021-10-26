@@ -1,16 +1,12 @@
-﻿import {Extended, IRawProxy, IStringProxy} from "./CoreTypes";
-import {IStyleDefinitionClass, IVarRule, IStyleDefinition, ICounterRule} from "./RuleTypes";
+﻿import {IStyleDefinitionClass, IStyleDefinition} from "./RuleTypes";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
-import {
-    Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset, VarTemplateName,
-    ExtendedVarValue, ICssSerializer, AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType
-} from "./StyleTypes"
-import {styleProp2s, s_registerStylePropertyInfo, s2ss} from "../impl/StyleImpl"
+import {Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset, ICssSerializer} from "./StyleTypes"
+import {sp2s, s_registerStylePropertyInfo, s2ss, styleset2s} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
 import {processSD, serializeInstance} from "../rules/RuleContainer";
 import {media2s, supports2s} from "../impl/MiscImpl";
-import {f2s, mv2s, tag2s, WKF} from "../impl/Utils";
+import {tag2s} from "../impl/Utils";
 
 
 
@@ -43,14 +39,14 @@ export const registerStyleProperty = (name: string, toStringFunc: (v: any) => st
  * @param stylePropValue Value to convert.
  */
 export const getStylePropValue = <K extends keyof ExtendedBaseStyleset>( stylePropName: K,
-	stylePropValue: ExtendedBaseStyleset[K]): string => styleProp2s( stylePropName, stylePropValue);
+	stylePropValue: ExtendedBaseStyleset[K]): string => sp2s( stylePropName, stylePropValue);
 
 
 
 // Sets style property on HTML or SVG element
 const setElementStyleProp = <K extends keyof IStyleset>( elm: ElementCSSInlineStyle, name: K,
     value: ExtendedBaseStyleset[K], schedulerType?: number): void =>
-    scheduleStyleUpdate( elm, name, styleProp2s( name, value), false, schedulerType);
+    scheduleStyleUpdate( elm, name, sp2s( name, value), false, schedulerType);
 
 
 
@@ -75,6 +71,14 @@ export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset |
 export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
 	schedulerType?: number): void =>
     scheduleStyleUpdate( elm, null, styleset, false, schedulerType);
+
+
+
+/**
+ * Serializes the given [[Styleset]] to a string.
+ * @param styleset
+ */
+export const stylesetToString = (styleset: Styleset): string => styleset2s( styleset);
 
 
 
@@ -149,90 +153,6 @@ export const diffStylesets = (oldStyleset: Styleset, newStyleset: Styleset): Str
 
 	return updateVal;
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// CSS functions.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a function representing the `attr()` CSS function. It returns IStringProxy and
- * theoretically can be used in any style property wherever the CSS `<string>` type is accepted;
- * however, its use by browsers is currently limited to the `content` property. Also not all
- * browsers currently support type, units or fallback values.
- *
- * @category Miscellaneous
- */
- export const attr = (attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
-	fallback?: Extended<string>): IStringProxy =>
-    () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit]), fallback], ",")})`;
-
-
-
-/**
- * Returns a representation of the CSS `counter()` function with an optional counter style.
- *
- * @param c Counter name or counter rule object
- * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
- * @category Miscellaneous
- */
- export const counter = (counterObj: Extended<ICounterRule | string>,
-	style?: Extended<ListStyleType_StyleType>): IStringProxy =>
-    () => f2s( "counter", [counterObj, style]);
-
-
-
-/**
- * Returns a representation of the CSS `counters()` function with the given separator and
- * an optional counter style.
- *
- * @param counterObj Counter name or counter rule object
- * @param sep Separator string between multiple counters
- * @param style Counter style
- * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
- * @category Miscellaneous
- */
-export const counters = (counterObj: Extended<ICounterRule | string>,
-	sep: Extended<string>, style?: Extended<ListStyleType_StyleType>): IStringProxy =>
-    () => f2s( "counters", [counterObj, [sep, WKF.Quoted], style]);
-
-
-
-/**
- * Returns a function representing the invocation of the `var()` CSS function for the given custom
- * CSS property with optional fallbacks. Usually, when you want to refer to a custom CSS property
- * in style rules, it is enough to just refer to the style definition property created using the
- * [[$var]] function; however, if you want to provide a fallback value, you must use this function.
- *
- * **Example:**
- *
- * ```typescript
- * class MyStyles extends StyleDefinition
- * {
- *     // create custom CSS property but without an assigned value; it can be assigned
- *     // later programmatically
- *     bgColor = this.$var( "color")
- *
- *     div = this.$tag( "div", {
- *         // use the custom CSS property with the given fallback value
- *         backgroundColor: css.usevar( this.bgColor, "beige")
- *     })
- * }
- * ```
- *
- * @typeparam K Key of the [[IVarTemplateStyleset]] interface that determines the type of the
- * custom CSS property and of the fallback value.
- * @param varObj Custom CSS property object created using the [[$var]] function.
- * @param fallback Fallback value that will be used if the custom CSS property isnt set.
- * @returns The `IRawProxy` callable interface, whcih allows the `usevar` function to be called
- * in any context.
- * @category Miscellaneous
- */
-export const usevar = <K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy =>
-    () => f2s( "var", ["--" + varObj.name, styleProp2s( varObj.template, fallback)]);
 
 
 
@@ -385,7 +305,7 @@ export const createCssSerializer = (): ICssSerializer => new CssSerializer();
  */
 export const serializeToCSS = (...args: (IStyleDefinition | IStyleDefinitionClass)[]): string =>
 {
-    if (!args || args.length === 0)
+    if (args.length === 0)
         return "";
 
     let serializer = new CssSerializer();
@@ -408,10 +328,10 @@ class CssSerializer implements ICssSerializer
     public add( instOrClass: IStyleDefinition | IStyleDefinitionClass): void
     {
         let instance = processSD( instOrClass);
-        if (!instance || this.instances.has(instance))
+        if (!instance || this.sds.has(instance))
             return;
 
-        this.instances.add( instance);
+        this.sds.add( instance);
     }
 
     /**
@@ -419,16 +339,16 @@ class CssSerializer implements ICssSerializer
      */
     public serialize(): string
     {
-        if (this.instances.size === 0)
+        if (this.sds.size === 0)
             return "";
 
         let ctx = new RuleSerializationContext();
-        this.instances.forEach( instance => ctx.addStyleDefinition( instance));
-        return ctx.topLevelBuf + ctx.nonTopLevelBuf;
+        this.sds.forEach( instance => ctx.addSD( instance));
+        return ctx.tl + ctx.ntl;
     }
 
     // Set of style definition instances. This is needed to not add style definitions more than once
-    instances = new Set<IStyleDefinition>();
+    sds = new Set<IStyleDefinition>();
 }
 
 
@@ -440,32 +360,32 @@ class CssSerializer implements ICssSerializer
 class RuleSerializationContext implements IRuleSerializationContext
 {
     // Adds rule text
-    public addRuleText( s: string, isTopLevelRule?: boolean): void
+    public addRule( s: string, isTopLevelRule?: boolean): void
     {
         if (isTopLevelRule)
-            this.topLevelBuf += s + "\n";
+            this.tl += s + "\n";
         else
-            this.nonTopLevelBuf += s + "\n";
+            this.ntl += s + "\n";
     }
 
     // Adds rule text
-    public addStyleDefinition( instance: IStyleDefinition): void
+    public addSD( instance: IStyleDefinition): void
     {
-        if (!this.instances.has( instance))
+        if (!this.sds.has( instance))
         {
-            this.instances.add( instance);
+            this.sds.add( instance);
             serializeInstance( instance, this);
         }
     }
 
     // String buffer that accumulates top-level rule texts.
-    public topLevelBuf = "";
+    public tl = "";
 
     // String buffer that accumulates non-top-level rule texts.
-    public nonTopLevelBuf = "";
+    public ntl = "";
 
     // Set of style definition instances that were already serialized in this context.
-    private instances = new Set<IStyleDefinition>();
+    private sds = new Set<IStyleDefinition>();
 }
 
 

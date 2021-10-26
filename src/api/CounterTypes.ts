@@ -5,13 +5,17 @@ import {ListStyleType_StyleType} from "./StyleTypes";
 
 
 /**
- * Type that extends the given type with the [[IRawProxy]] interface that allows specifying raw string value.
+ * Type that extends the given type with the [[IRawProxy]] interface that allows specifying a raw
+ * string value.
  */
 export type CounterExtended<T> = T | IRawProxy;
 
 
 
-export type CounterOneOrPair<T> = T | [ CounterExtended<T>,  CounterExtended<T>?];
+/**
+ * Type that allows specifying either the given type or an array with elements of the extended
+ * variant of this type.
+ */
 export type CounterOneOrMany<T> = T | CounterExtended<T>[];
 
 
@@ -27,7 +31,7 @@ export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic
 /**
  * Type for specifying counter[[negative]] property.
  */
-export type Negative_CounterType = CounterOneOrPair<string>;
+export type Negative_CounterType = string | [CounterExtended<string>,  CounterExtended<string>?];
 
 
 

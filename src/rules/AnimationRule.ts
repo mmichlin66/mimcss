@@ -51,10 +51,11 @@ export class AnimationRule extends Rule implements IAnimationRule
 		{
 			try
 			{
-				cssKeyframesRule.appendRule( frameRule.toCssString())
-				let cssRule = cssKeyframesRule.cssRules.item(  cssKeyframesRule.cssRules.length - 1);
-				if (cssRule)
-					frameRule.cssKeyframeRule = cssRule as CSSKeyframeRule;
+				cssKeyframesRule.appendRule( frameRule.toCssString());
+
+                // although the cssRule in the frame is typed as CSSStyleRule, we know that in
+                // practice, it is of the CSSKeyframeRule type.
+				frameRule.cssRule = this.cssRule.cssRules.item(  this.cssRule.cssRules.length - 1) as CSSStyleRule;
 			}
 			catch(x)
 			{
@@ -70,12 +71,12 @@ export class AnimationRule extends Rule implements IAnimationRule
 		if (!this.frameRules)
 			return;
 
-		ctx.addRuleText( `@keyframes ${this.name} {`);
+		ctx.addRule( `@keyframes ${this.name} {`);
 
 		for( let frameRule of this.frameRules)
-			ctx.addRuleText( frameRule.toCssString())
+			ctx.addRule( frameRule.toCssString())
 
-		ctx.addRuleText( "}");
+		ctx.addRule( "}");
     }
 
 
@@ -120,8 +121,11 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 	/** Identifier of the waypoint */
 	public waypoint: AnimationWaypoint;
 
-	/** SOM keyframe rule */
-	public cssKeyframeRule: CSSKeyframeRule;
+	/**
+     * SOM keyframe rule. Although the cssRule in the frame is typed as CSSStyleRule, we know that
+     * in practice, it is of the CSSKeyframeRule type.
+     */
+	public get cssKeyframeRule(): CSSKeyframeRule { return this.cssRule as any as CSSKeyframeRule; };
 }
 
 

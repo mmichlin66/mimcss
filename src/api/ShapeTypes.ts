@@ -1,5 +1,5 @@
 ﻿import {CssImage, Extended, ExtentKeyword, ICssFuncObject, ICssImageFunc} from "./CoreTypes";
-import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
+import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, IResolutionProxy} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
 
@@ -346,9 +346,45 @@ export interface ICrossFadeBuilder extends ICrossFadeFunc
 
 
 /**
- * Type representing parameters for the [[crossFade]] function.
+ * Type of an image that can be specified in the [[imageSet]] function. Since the `image-set()`
+ * CSS function doesn't allow using `image-set()` recursively, this type excludes it. An image
+ * can also be specified just as a URL string.
  */
-export type CrossFadeParam = Extended<CssImage> | [Extended<CssImage>, Extended<CssNumber>];
+export type ImageSetImage = Exclude<CssImage,IImageSetFunc> | string;
+
+/**
+ * Type for specifying a resolution in the [[imageSet]] function. It can be specified either as a
+ * number, in which case it will use the "x" units, or any other resolution specification, e.g.
+ * [[dpi]] function.
+ */
+export type ImageSetResolution = number | IResolutionProxy;
+
+/**
+ * Type of single item that can be specified in the [[imageSet]] function. This can be either an
+ * image or a tuple that contains an image and additional parameters. The following tuple
+ * structures are allowed:
+ *   1. Two-element tuple with image and resolution.
+ *   1. Two-element tuple with image and type.
+ *   1. Three-element tuple with image, type and resolution.
+ */
+export type ImageSetItem = ImageSetImage |
+    [Extended<ImageSetImage>, Extended<ImageSetResolution>] |
+    [Extended<ImageSetImage>, Extended<string>] |
+    [Extended<ImageSetImage>, Extended<string>, Extended<ImageSetResolution>];
+
+/**
+ * Represents an invocation of the `cross-fade()` CSS function. It can be directly assigned to
+ * a suitable style property (e.g. `background-image`). Objects implementing this interface can be
+ * used wherever the CSS `<image>` type is used.
+ * @category Image
+ */
+export interface IImageSetFunc extends ICssImageFunc
+{
+    fn: "image-set";
+
+    /** Array of image specifications */
+    items: ImageSetItem[];
+}
 
 
 

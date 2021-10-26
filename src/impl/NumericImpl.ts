@@ -22,47 +22,7 @@ import {a2s, NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
  * @param floatUnit Units to append if the number is floating point.
  */
 const numberToString = (n: number, intUnit: string = "", floatUint: string = ""): string =>
-    Number.isInteger(n) ?  n + intUnit : n + floatUint;
-
-/**
- * Converts a single number-based style value to the CSS string.
- * @param val Number as a style property type.
- * @param convertFunc Function that converts a number to a string.
- */
-const numberStyle2s = <T>( val: Extended<T>, convertFunc?: NumberToStringFunc): string =>
-    v2s( val, { num: convertFunc});
-
-/**
- * Converts single numeric style value or array of numericstyle values to the CSS string.
- * @param val Single- or multi-number style value.
- * @param convertFunc Function that converts a number to a string.
- * @param separator String to use to separate multiple values.
- */
-const multiNumberStyle2s = <T>( val: OneOrMany<T>, convertFunc?: NumberToStringFunc,
-    separator: string = " "): string =>
-    v2s( val, {
-        num: convertFunc,
-        item: v => numberStyle2s( v, convertFunc),
-        sep: separator
-    });
-
-
-
-/**
- * The mathFunc function returns one of the mathematic CSS function that accepts one or more
- * parameters whose type is derived from NumberBase<T>.
- */
-const mathFunc = <T>( name: string, params: Extended<T>[], convertFunc?: NumberToStringFunc): string =>
-    `${name}(${multiNumberStyle2s( params, convertFunc, ",")})`;
-
-
-
-/**
- * The calcFunc function returns the string representation of the calc() CSS function.
- */
-const calcFunc = <T>( parts: TemplateStringsArray, params: Extended<T>[],
-    convertFunc?: NumberToStringFunc): string =>
-    `calc(${tag2s( parts, params, (v: any) => numberStyle2s( v, convertFunc))})`;
+    n + (Number.isInteger(n) ?  intUnit : floatUint);
 
 
 
@@ -82,12 +42,15 @@ export class NumericMath<T = any, U extends string = any> implements INumericMat
 
     public v2s( val: Extended<T>): string
     {
-        return numberStyle2s( val, this.n2s);
+        return v2s( val, { num: this.n2s });
     }
 
     public mv2s( val: OneOrMany<T>, separator: string): string
     {
-        return multiNumberStyle2s( val, this.n2s, separator);
+        return v2s( val, {
+            any: v => this.v2s(v),
+            sep: separator
+        });
     }
 
     /** Creates CssLength value from the number and the given unit. */
@@ -98,22 +61,28 @@ export class NumericMath<T = any, U extends string = any> implements INumericMat
 
     public min( ...params: Extended<T>[]): IGenericProxy<U>
     {
-        return () => mathFunc( "min", params, this.n2s);
+        return () => this.m( "min", params);
     }
 
     public max( ...params: Extended<T>[]): IGenericProxy<U>
     {
-        return () => mathFunc( "max", params, this.n2s);
+        return () => this.m( "max", params);
     }
 
     public clamp( min: Extended<T>, pref: Extended<T>, max: Extended<T>): IGenericProxy<U>
     {
-        return () => mathFunc( "clamp", [min, pref, max], this.n2s);
+        // return () => mathFunc( "clamp", [min, pref, max], this.n2s);
+        return () => this.m( "clamp", [min, pref, max]);
     }
 
     public calc( formulaParts: TemplateStringsArray, ...params: Extended<T>[]): IGenericProxy<U>
     {
-        return () => calcFunc( formulaParts, params, this.n2s);
+        return () => `calc(${tag2s( formulaParts, params, (v: Extended<T>) => this.v2s(v))})`;
+    }
+
+    private m( name: string, params: Extended<T>[]): string
+    {
+        return `${name}(${this.mv2s( params, ",")})`;
     }
 }
 
@@ -131,16 +100,15 @@ wkf[WKF.Number] = v => NumberMath.v2s( v);
 
 /**
  * The PercentMath object contains methods that implement CSS mathematic functions on the
- * `<percentage>` CSS type by appending a "%" unit suffix.
+ * `<percentage>` CSS type by appending a "%" unit suffix. If the number is between -1 and 1 (non
+ * inclusive), multiplies the number by 100.
  */
 export const PercentMath = new NumericMath<CssPercent,PercentUnits>(
-    n => (Number.isInteger(n) ? n : Math.round(n * 100)) + "%");
-
-wkf[WKF.Percent] = v => PercentMath.v2s( v);
+    n => (n >= 1 || n <= -1 ? n : Math.round(n * 100)) + "%");
 
 /**
  * Converts the given number to string using the following rules:
- * - if the number is between -1 and 1 (non inclusive), multiplies the number and appends "%"
+ * - if the number is between -1 and 1 (non inclusive), multiplies the number by 100 and appends "%"
  * - otherwise, converts the number to string without appending any units.
  */
 const unitlessOrPercentToString = (n: number): string => n >= 1 || n <= -1 ? n.toString() : (Math.round(n * 100) + "%");
@@ -211,23 +179,20 @@ wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Converts single position style value to the CSS string.
-const pos2s = (val: Extended<CssPosition>): string => v2s( val, { any: WKF.Length });
+// // Converts single position style value to the CSS string.
+// const pos2s = (val: Extended<CssPosition>): string => v2s( val, { any: WKF.Length });
+
+wkf[WKF.Position] = (val: Extended<CssPosition>): string => v2s( val, { any: WKF.Length });
+wkf[WKF.AtPosition] = (v: Extended<CssPosition>) => v == null ? "" : "at " + wkf[WKF.Position](v);
 
 /**
  * Converts multi-position style value to the CSS string.
  */
-const mpos2s = (val: OneOrMany<CssPosition>): string =>
+ wkf[WKF.MultiPosition] = (val: OneOrMany<CssPosition>): string =>
     v2s( val, {
-        arr: (v: any[]) => v.length === 0
-            ? ""
-            : Array.isArray(v[0]) ? a2s( v, { any: pos2s }, ",") : pos2s(v as CssPosition),
-        any: pos2s
+        arr2: { any: WKF.Position, sep: "," },
+        any: WKF.Position
     });
-
-wkf[WKF.Position] = pos2s;
-wkf[WKF.AtPosition] = (v: Extended<CssPosition>) => v == null ? "" : "at " + pos2s(v);
-wkf[WKF.MultiPosition] = mpos2s;
 
 
 
@@ -241,7 +206,7 @@ wkf[WKF.Radius] = (v: Extended<CssRadius>) => v2s( v, { any: WKF.Length });
  */
  wkf[WKF.BorderRadius] = (val: Extended<BorderRadius>): string =>
     v2s( val, {
-        arr: v => Array.isArray( v[0]) ? a2s( v, {any: WKF.Length}, "/") : a2s( v, WKF.Length),
+        arr2: { any: { any: WKF.Length }, sep: "/" },
         any: WKF.Length
     });
 

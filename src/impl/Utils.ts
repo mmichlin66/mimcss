@@ -54,7 +54,7 @@ export type NumberToStringFunc = (n: number) => string;
  */
 export const enum WKF
 {
-    None = 0,
+    Default = 0,
     Number,
     Percent,
     Length,
@@ -96,7 +96,6 @@ export const enum WKF
  * from the WellKnownFunc enumeration
  */
 export let wkf: AnyToStringFunc[] = new Array( WKF.Last);
-wkf[WKF.None] = v => v;
 
 
 
@@ -119,6 +118,14 @@ export type P2SOptions = P2SOption[];
 
 
 /**
+ * Defines options to process tuples. Property names are actually integer numbers, whcih are
+ * compared to the tuples' lengths.
+ */
+export type T2SOptions = { [N: number]: V2SOptions[], any?: V2SOptions[] };
+
+
+
+/**
  * The V2SOptions type defines options on how to convert values of differnt
  * types to strings. A value is converted according to the following rules:
  * - If the option is a number it is treated as an ID of a registered conversion function.
@@ -131,7 +138,7 @@ export type V2SOptions = WKF | AnyToStringFunc |
     // String value to use or function to call if value is null or undefined
     nil?: string | ((val?: null) => string);
 
-    // String value to use or function to call if value is a boolean
+    // Ffunction to call if value is a boolean
     bool?: (val: boolean) => string;
 
     // Options to use if value is a string. This allows transforming one string to another.
@@ -141,7 +148,10 @@ export type V2SOptions = WKF | AnyToStringFunc |
     num?: WKF | NumberToStringFunc;
 
     // Options to use if value is an array
-    arr?: WKF | ((val: any[]) => string);
+    arr?: WKF | V2SOptions[] | T2SOptions | ((val: any[]) => string);
+
+    // Options to use if value is an array and the first element of it is also an array
+    arr2?: WKF | V2SOptions | ((val: any[]) => string);
 
     // Options to use if value is an object
     obj?: V2SOptions | P2SOptions;
@@ -167,7 +177,7 @@ export type V2SOptions = WKF | AnyToStringFunc |
 export const v2s = (val: any, options?: V2SOptions): string =>
 {
     // if options is not specified, do standard processing
-    if (!options)
+    if (options == null)
     {
         if (typeof val === "string")
             return val;
@@ -204,10 +214,14 @@ export const v2s = (val: any, options?: V2SOptions): string =>
             return v2s( val());
         else if (Array.isArray(val))
         {
-            if (options.arr)
-                newOptions = options.arr;
-            else if (val.length === 0)
+            if ( val.length === 0)
                 return "";
+            else if (typeof options.arr === "object") // this can also be an array
+                return t2s( val, options.arr, options.sep)
+            else if (options.arr2 && Array.isArray(val[0]))
+                newOptions = options.arr2;
+            else if (options.arr)
+                newOptions = options.arr;
             else
                 return a2s( val, options.item ?? options.any, options.sep);
         }
@@ -240,6 +254,7 @@ export const v2s = (val: any, options?: V2SOptions): string =>
 
 
 
+wkf[WKF.Default] = v2s;
 wkf[WKF.OneOrManyWithComma] = v => v2s( v, { sep: "," });
 wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { sep: "/" });
 wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
@@ -251,7 +266,28 @@ wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
  * and joining the results with the given delimiter.
  */
 export const a2s = (val: any[], options?: V2SOptions, separator: string = " "): string =>
-    !val || val.length === 0 ? "" : val.map( v => v2s( v, options)).filter( v => !!v).join( separator);
+    !val || val.length === 0
+        ? ""
+        : val.map( v => v2s( v, options)).filter( v => !!v).join( separator);
+
+
+
+/**
+ * Converts the given array to a single string by converting every item using the given otions
+ * and joining the results with the given delimiter.
+ */
+export const t2s = (val: any[], options: V2SOptions[] | T2SOptions, separator: string = " "): string =>
+{
+    let v2sOptions = Array.isArray(options) ? options : (options[val.length] ?? options.any);
+    if (!v2sOptions)
+        return a2s( val, undefined, separator);
+
+    let buf: string[] = [];
+    for( let i = 0; i < v2sOptions.length; i++)
+        buf.push( v2s( val[i], v2sOptions[i]));
+
+    return buf.filter( v => !!v).join(separator);
+}
 
 
 
@@ -350,9 +386,9 @@ export const f2s = (name: string, values: ParamListWithOptions, separator = ",")
 
 /**
  * The tag2s is a tag function helper that converts the template string with
- * parameters to a string using the given function to convert parameters.
+ * parameters to a string using the given options object.
  */
-export const tag2s = (parts: TemplateStringsArray, params: any[], convertFunc?: ( v: any) => string): string =>
+export const tag2s = (parts: TemplateStringsArray, params: any[], options?: V2SOptions): string =>
 {
     // number of parameters is always 1 less than the number of string parts
     let paramsLen = params.length;
@@ -361,7 +397,7 @@ export const tag2s = (parts: TemplateStringsArray, params: any[], convertFunc?: 
 
     let s = "";
     for( let i = 0; i < paramsLen; i++)
-        s += parts[i] + (convertFunc ? convertFunc( params[i]) : v2s( params[i]));
+        s += parts[i] + v2s( params[i], options);
 
     // add the last part
     return s + parts[paramsLen];

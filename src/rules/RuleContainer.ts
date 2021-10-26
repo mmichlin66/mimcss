@@ -396,13 +396,11 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// activate referenced style definitions
         for( let ref of this.refs)
-            ctx.addStyleDefinition( ref);
+            ctx.addSD( ref);
 
 		// serialize our custom variables in a ":root" rule
 		if (this.vars.length > 0)
-		{
-			ctx.addRuleText( `:root {${this.vars.map( varObj => varObj.toCssString()).filter( v => !!v).join(";")}}`);
-		}
+			ctx.addRule( `:root {${this.vars.map( varObj => varObj.toCssString()).filter( v => !!v).join(";")}}`);
 
 		// serialize all other rules
 		this.otherRules.forEach( rule => rule.serialize( ctx));

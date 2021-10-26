@@ -1,6 +1,8 @@
-﻿import {SelectorItem, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc} from "./CoreTypes"
-import {fdo, mv2s, tag2s} from "../impl/Utils";
-import { IIDRule } from "./RuleTypes";
+﻿import {SelectorItem, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy} from "./CoreTypes"
+import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
+import {AttrTypeKeyword, AttrUnitKeyword, ExtendedVarValue, ListStyleType_StyleType, VarTemplateName} from "./StyleTypes";
+import {sp2s} from "../impl/StyleImpl";
+import {f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
 
 
 
@@ -67,6 +69,8 @@ export const raw = (parts: TemplateStringsArray, ...params: any[]): IRawProxy =>
  */
 export const url = (p: Extended<string | IIDRule>): IUrlFunc => ({ fn: "url", p });
 
+fdo.url = [ ["p", {str: WKF.Quoted} ]]
+
 
 
 /**
@@ -87,6 +91,84 @@ export function cursor( url: Extended<string | IIDRule>, x?: number, y?: number)
 }
 
 fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
+
+
+
+/**
+ * Returns a function representing the `attr()` CSS function. It returns [[IStringProxy]] and
+ * theoretically can be used in any style property wherever the CSS `<string>` type is accepted;
+ * however, its use by browsers is currently limited to the `content` property. Also not all
+ * browsers currently support type, units or fallback values.
+ *
+ * @param attrName Name of the attribute whose value should be returned.
+ * @param typeOrUnit Optional type or unit keyword that determines the returned CSS type.
+ * @param fallback Optional value that is used if the attribute is not found on the element.
+ * @returns
+ */
+ export const attr = (attrName: Extended<string>, typeOrUnit?: Extended<AttrTypeKeyword | AttrUnitKeyword>,
+	fallback?: Extended<string>): IStringProxy =>
+    () => `attr(${mv2s( [mv2s( [attrName, typeOrUnit]), fallback], ",")})`;
+
+
+
+/**
+ * Returns a representation of the CSS `counter()` function with an optional counter style.
+ *
+ * @param c Counter name or counter rule object
+ * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
+ */
+ export const counter = (counterObj: Extended<ICounterRule | string>,
+	style?: Extended<ListStyleType_StyleType>): IStringProxy =>
+    () => f2s( "counter", [counterObj, style]);
+
+
+
+/**
+ * Returns a representation of the CSS `counters()` function with the given separator and
+ * an optional counter style.
+ *
+ * @param counterObj Counter name or counter rule object
+ * @param sep Separator string between multiple counters
+ * @param style Counter style
+ * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
+ */
+export const counters = (counterObj: Extended<ICounterRule | string>,
+	sep: Extended<string>, style?: Extended<ListStyleType_StyleType>): IStringProxy =>
+    () => f2s( "counters", [counterObj, [sep, WKF.Quoted], style]);
+
+
+
+/**
+ * Returns a function representing the invocation of the `var()` CSS function for the given custom
+ * CSS property with optional fallbacks. Usually, when you want to refer to a custom CSS property
+ * in style rules, it is enough to just refer to the style definition property created using the
+ * [[$var]] function; however, if you want to provide a fallback value, you must use this function.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // create custom CSS property but without an assigned value; it can be assigned
+ *     // later programmatically
+ *     bgColor = this.$var( "color")
+ *
+ *     div = this.$tag( "div", {
+ *         // use the custom CSS property with the given fallback value
+ *         backgroundColor: css.usevar( this.bgColor, "beige")
+ *     })
+ * }
+ * ```
+ *
+ * @typeparam K Key of the [[IVarTemplateStyleset]] interface that determines the type of the
+ * custom CSS property and of the fallback value.
+ * @param varObj Custom CSS property object created using the [[$var]] function.
+ * @param fallback Fallback value that will be used if the custom CSS property isnt set.
+ * @returns The `IRawProxy` callable interface, whcih allows the `usevar` function to be called
+ * in any context.
+ */
+export const usevar = <K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy =>
+    () => f2s( "var", ["--" + varObj.name, sp2s( varObj.template, fallback)]);
 
 
 

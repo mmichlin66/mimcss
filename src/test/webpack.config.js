@@ -1,11 +1,9 @@
 const CopyPlugin = require('copy-webpack-plugin');
 
-module.exports =
-[
+module.exports = [
     // development
     {
-        entry:
-        [
+        entry: [
             "./lib/test/specs/testActivation.js",
             "./lib/test/specs/testStyleRules.js",
             "./lib/test/specs/testColors.js",
@@ -15,10 +13,10 @@ module.exports =
             "./lib/test/specs/testPropsPosition.js",
             "./lib/test/specs/testPropsRadius.js",
             "./lib/test/specs/testVendorPrefixes.js",
+            "./lib/test/specs/testImages.js",
         ],
 
-        output:
-        {
+        output: {
             filename: "mimcss.tests.dev.js",
             path: __dirname + "/../../lib",
             library: 'mimcss-tests',
@@ -30,10 +28,8 @@ module.exports =
         devtool: "inline-source-map",
 
         resolve: { extensions: [".js"] },
-        module:
-        {
-            rules:
-            [
+        module: {
+            rules: [
                 // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
                 { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
             ]

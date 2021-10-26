@@ -91,7 +91,7 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	// Serializes this rule to a string.
     public serialize( ctx: IRuleSerializationContext): void
     {
-		ctx.addRuleText( this.toCssString());
+		ctx.addRule( this.toCssString());
     }
 
 

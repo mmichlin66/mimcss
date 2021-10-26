@@ -5,8 +5,7 @@ import {
     CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType, IStyleset, StringStyleset, BoxShadow,
 } from "../api/StyleTypes";
 import {IIDRule} from "../api/RuleTypes";
-import {LengthMath} from "./NumericImpl";
-import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc, mv2s} from "./Utils";
+import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 import {getVarsFromSD} from "../rules/RuleContainer";
 
 
@@ -36,7 +35,7 @@ const borderImageToString = (val: BorderImage_Object): string =>
     // if outset is specified but width is not. we need to set width to the default 1 value;
     let valCopy: BorderImage_Object = Object.assign( {}, val);
     if (val.slice == null && (val.width != null || val.outset != null))
-        valCopy.slice = () => "100%";
+        valCopy.slice = "100%";
     if (val.width == null && val.outset != null)
         valCopy.width = 1;
 
@@ -75,12 +74,10 @@ wkf[WKF.Border] = (val: Extended<Border_StyleType>): string => v2s( val, {
     num: WKF.Length,
     arr: arr => {
         let numbersProcessed = 0;
-        return arr.map( item => {
-            if (typeof item === "number")
-                return numbersProcessed++ ? v2s( item, WKF.Color) : v2s( item, WKF.Length);
-            else
-                return v2s(item);
-        }).join(" ");
+        return a2s( arr, item => typeof item === "number"
+            ? v2s( item, numbersProcessed++ ? WKF.Color : WKF.Length)
+            : v2s(item)
+        );
     },
 });
 
@@ -90,14 +87,7 @@ wkf[WKF.Border] = (val: Extended<Border_StyleType>): string => v2s( val, {
 const gridTemplateAreasToString = (val: Extended<GridTemplateAreas_StyleType>): string =>
     // val can be array of strings or GridTemplateArea_Definition touples
     v2s( val, {
-        arr: v => {
-            if (v.length === 0)
-                return "";
-            else if (typeof v[0] === "string")
-                return a2s( v, WKF.Quoted);
-            else
-                return createGridTemplateAreasFromDefinitions(v);
-        }
+        arr: v => typeof v[0] === "string" ? a2s( v, WKF.Quoted) : createGridTemplateAreasFromDefinitions(v)
     });
 
 
@@ -188,7 +178,7 @@ wkf[WKF.Marker] = (val: Extended<Marker_StyleType>): string =>
  * Converts the given style property to the CSS style string. Property name can be in either
  * dash or camel form.
  */
-export const styleProp2s = (propName: string, propVal: any): string =>
+export const sp2s = (propName: string, propVal: any): string =>
 {
     if (!propName)
         return "";
@@ -304,13 +294,13 @@ const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
         if (!varName.startsWith("--"))
             varName = "--" + varName;
 
-        return [[varName, template, styleProp2s( template, value)]];
+        return [[varName, template, sp2s( template, value)]];
     }
     else
     {
         let varRules = getVarsFromSD(customVars);
         return varRules.map( varRule => [varRule.cssName, varRule.template,
-            styleProp2s( varRule.template, varRule.getValue())]);
+            sp2s( varRule.template, varRule.getValue())]);
     }
 }
 
@@ -351,38 +341,12 @@ const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCall
                 let ntvs: VarNTV[] = getVarsNTVs( customVar);
                 for( let ntv of ntvs)
                     callback( ntv[0], ntv[2], true, false);
-
-                // TODO: the following is commented out because there is no good way to use vendor
-                // prefixes in custom CSS properties - the browsers don't know to select the right
-                // variant.
-                // for( let ntv of ntvs)
-                // {
-                //     let varValue = ntv[2];
-                //     if (!varValue)
-                //         continue;
-
-                //     // get prefixed variants for the var's value based on the template
-                //     let variants = getPrefixVariants( ntv[1] as keyof IStyleset, varValue);
-                //     if (variants)
-                //     {
-                //         for( let variant of variants)
-                //         {
-                //             // we only need to call the callback if the values are different; we
-                //             // ignore variants where the property name was prefixed because property
-                //             // name is not used in the custom CSS property
-                //             if (varValue !== variant[1])
-                //                 callback( ntv[0], variant[1], false, false);
-                //         }
-                //     }
-
-                //     callback( ntv[0], varValue, true, false);
-                // }
             }
         }
         else
         {
             // get the string representation of the property
-            let propValue = styleProp2s( propName, styleset[propName]);
+            let propValue = sp2s( propName, styleset[propName]);
             if (!propValue)
                 continue;
 
@@ -391,16 +355,7 @@ const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCall
             if (variants)
             {
                 for( let variant of variants)
-                {
-                    // let variantPropName = variant[0];
-                    // let variantValue = variant[1];
-                    // if (variantPropName === propName)
-                    //     propValue = `${variantValue};${propName}:${propValue}`;
-                    // else
-                    //     callback( variantPropName, variantValue, false, true);
-
                     callback( variant[0], variant[1], false, variant[0] !== propName);
-                }
             }
 
             // invoke the callback for the originally found prop name and with (perhaps updated)
@@ -538,7 +493,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
     caretColor: WKF.Color,
     clip:  {
-        arr: v => `rect(${LengthMath.mv2s(v," ")}`
+        arr: v => `rect(${wkf[WKF.MultiLengthWithSpace](v)}`
     },
     color: WKF.Color,
     columnGap: WKF.Length,
@@ -546,16 +501,18 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     columnRuleColor: WKF.Color,
     columnRuleWidth: WKF.MultiLengthWithSpace,
     columnWidth: WKF.Length,
+    content: {
+        str: WKF.Quoted,
+        item: WKF.Quoted
+    },
     cursor: WKF.OneOrManyWithComma,
 
     fill: WKF.Color,
     fillOpacity: WKF.Percent,
     flex: {
         num: WKF.Length,
-        arr: v =>
-        {
-            let s = `${wkf[WKF.Number](v[0])} ${wkf[WKF.Number](v[1])}`;
-            return v.length > 2 ? s +` ${wkf[WKF.Length]( v[2])}` : s;
+        arr: {
+            3: [WKF.Number, WKF.Number, WKF.Length]
         }
     },
     flexBasis: WKF.Length,
@@ -687,10 +644,9 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     right: WKF.Length,
     rotate: {
         num: WKF.Angle,
-        arr: v => {
-            return v.length === 2
-                ? mv2s( [ v[0], [v[1], WKF.Angle] ])
-                : mv2s( [ v[0], v[1], v[2], [v[3], WKF.Angle] ]);
+        arr: {
+            2: [WKF.Default, WKF.Angle],
+            any: [WKF.Default, WKF.Default, WKF.Default, WKF.Angle],
         }
     },
     rowGap: WKF.Length,
@@ -904,7 +860,7 @@ const getPrefixVariants = (name: keyof IStyleset, value: string): PropPrefixVari
 
                     if (valueInfo.mode !== ValuePrefixMode.PropertyOnly)
                     {
-                        newPropValue = value.replace( valueToSearch,
+                        newPropValue = value.split(valueToSearch).join(
                             valueInfo.alt ? valueInfo.alt : `-${prefixString}-${valueToSearch}`);
                         value = newPropValue;
                     }
@@ -929,10 +885,19 @@ const getPrefixVariants = (name: keyof IStyleset, value: string): PropPrefixVari
 
 
 // Prefix information for size-like properties that accept "stretch" value
-const sizePrefixInfo: PropPrefixInfo[] = [
+const sizePrefixInfos: PropPrefixInfo[] = [
     {p: VendorPrefix.webkit, valsOnly: true, vals: [{val: "stretch", mode: ValuePrefixMode.ValueOnly, alt: "-webkit-fill-available"}]},
 ];
 
+// Prefix information for properties that accept "cross-fade" and "image-set" functions (that is, images)
+const imageFuncsPrefixInfo: PropPrefixInfo = {
+    p: VendorPrefix.webkit, valsOnly: true, vals: [
+        {val: "cross-fade", mode: ValuePrefixMode.ValueOnly },
+        {val: "image-set", mode: ValuePrefixMode.ValueOnly }
+    ]
+};
+
+const imageFuncsPrefixInfos: PropPrefixInfo[] = [imageFuncsPrefixInfo];
 
 
 const propPrefixInfos: { [K in keyof IStyleset]?: string | number | PropPrefixInfo[] } =
@@ -941,17 +906,22 @@ const propPrefixInfos: { [K in keyof IStyleset]?: string | number | PropPrefixIn
     backgroundClip: [
         {p: VendorPrefix.webkit, valsOnly: true, vals: [{val: "text", mode: ValuePrefixMode.PropertyOnly}]}
     ],
-    blockSize: sizePrefixInfo,
+    blockSize: sizePrefixInfos,
     boxDecorationBreak: VendorPrefix.webkit,
-    colorAdjust: "webkitPrintColorAdjust",
+    background: imageFuncsPrefixInfos,
+    backgroundImage: imageFuncsPrefixInfos,
+    borderImage: imageFuncsPrefixInfos,
+    borderImageSource: imageFuncsPrefixInfos,
     clipPath: VendorPrefix.webkit,
-    height: sizePrefixInfo,
+    colorAdjust: "webkitPrintColorAdjust",
+    content: imageFuncsPrefixInfos,
+    height: sizePrefixInfos,
     hyphens: [ VendorPrefix.webkit, VendorPrefix.moz, VendorPrefix.ms ],
     initialLetter: VendorPrefix.webkit,
-    inlineSize: sizePrefixInfo,
+    inlineSize: sizePrefixInfos,
     lineClamp: VendorPrefix.webkit,
     mask: VendorPrefix.webkit,
-    maskBorder: "webkitMaskBoxImage",
+    maskBorder: ["webkitMaskBoxImage", imageFuncsPrefixInfo],
     maskBorderOutset: "webkitMaskBoxImageOutset",
     maskBorderRepeat: "webkitMaskBoxImageRepeat",
     maskBorderSlice: "webkitMaskBoxImageSlice",
@@ -959,21 +929,22 @@ const propPrefixInfos: { [K in keyof IStyleset]?: string | number | PropPrefixIn
     maskBorderWidth: "webkitMaskBoxImageWidth",
     maskClip: VendorPrefix.webkit,
     maskComposite: VendorPrefix.webkit,
-    maskImage: VendorPrefix.webkit,
+    maskImage: [VendorPrefix.webkit, imageFuncsPrefixInfo],
     maskMode: VendorPrefix.webkit,
     maskOrigin: VendorPrefix.webkit,
     maskPosition: VendorPrefix.webkit,
     maskRepeat: VendorPrefix.webkit,
     maskSize: VendorPrefix.webkit,
     maskType: VendorPrefix.webkit,
-    maxBlockSize: sizePrefixInfo,
-    maxHeight: sizePrefixInfo,
-    maxInlineSize: sizePrefixInfo,
-    maxWidth: sizePrefixInfo,
-    minBlockSize: sizePrefixInfo,
-    minHeight: sizePrefixInfo,
-    minInlineSize: sizePrefixInfo,
-    minWidth: sizePrefixInfo,
+    maxBlockSize: sizePrefixInfos,
+    maxHeight: sizePrefixInfos,
+    maxInlineSize: sizePrefixInfos,
+    maxWidth: sizePrefixInfos,
+    minBlockSize: sizePrefixInfos,
+    minHeight: sizePrefixInfos,
+    minInlineSize: sizePrefixInfos,
+    minWidth: sizePrefixInfos,
+    shapeOutside: imageFuncsPrefixInfos,
     scrollbarColor: VendorPrefix.webkit,
     scrollbarWidth: VendorPrefix.webkit,
     textEmphasis: VendorPrefix.webkit,
@@ -989,7 +960,7 @@ const propPrefixInfos: { [K in keyof IStyleset]?: string | number | PropPrefixIn
     userSelect: [
         {p: VendorPrefix.webkit, vals: [{val: "none", mode: ValuePrefixMode.PropertyOnly}]}
     ],
-    width: sizePrefixInfo,
+    width: sizePrefixInfos,
 }
 
 

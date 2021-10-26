@@ -31,7 +31,7 @@ abstract class MiscRule<T extends CSSRule> extends Rule
 	// Serializes this rule to a string.
     public serialize( ctx: IRuleSerializationContext): void
     {
-		ctx.addRuleText( this.getRuleText(), this.isTopLevelRule);
+		ctx.addRule( this.getRuleText(), this.isTopLevelRule);
     }
 
 	// Returns CSS string for this rule.

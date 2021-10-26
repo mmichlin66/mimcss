@@ -1,6 +1,6 @@
 ﻿import {ExtendedFontFace, FontSrc, IFontFace} from "../api/FontTypes"
 import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatement} from "../api/MediaTypes";
-import {styleProp2s} from "./StyleImpl";
+import {sp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf, propSet2s} from "./Utils";
 import {ExtendedCounterStyleset, ICounterStyleset} from "../api/CounterTypes";
 
@@ -104,7 +104,7 @@ const supportsQuery2s = (query: SupportsQuery): string =>
                 return "";
 
             return `(${propNames.map( (propName) =>
-                `${camelToDash(propName)}:${styleProp2s( propName, query[propName])}`).join( ") and (")})`;
+                `${camelToDash(propName)}:${sp2s( propName, query[propName])}`).join( ") and (")})`;
         }
     });
 
@@ -115,18 +115,6 @@ const supportsQuery2s = (query: SupportsQuery): string =>
 // CSS @font-face rule.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-const fontSingleSrc2s = (val: FontSrc): string =>
-    v2s( val, {
-        obj: [
-            ["local", v => `local(${v})`],
-            ["url", v => `url(${v})`],
-            ["format", {
-                any: v => `format(\"${v}\")`,
-                sep: ","
-            }]
-        ]
-    });
 
 /**
  * Converts the given font face object to the CSS style string.
@@ -153,7 +141,16 @@ const fontFacePropertyInfos: { [K in keyof IFontFace]?: V2SOptions } =
     fontWeight: { any: WKF.Number },
     lineGapOverride: WKF.Percent,
     src: {
-        any: fontSingleSrc2s,
+        any: {
+            obj: [
+                ["local", v => `local(${v})`],
+                ["url", v => `url(${v})`],
+                ["format", {
+                    any: v => `format(\"${v}\")`,
+                    sep: ","
+                }]
+            ]
+        },
         sep: ","
     },
     sizeAdjust: WKF.Percent,
@@ -222,7 +219,7 @@ const counterStylePropertyInfos: { [K in keyof ICounterStyleset]?: V2SOptions } 
     prefix: WKF.Quoted,
     suffix: WKF.Quoted,
     range: {
-        arr: v => v.length ? Array.isArray(v[0]) ? a2s( v, undefined, ",") : a2s(v) : ""
+        arr2: { sep: "," }
     },
     pad: {
         item: WKF.Quoted
@@ -231,7 +228,8 @@ const counterStylePropertyInfos: { [K in keyof ICounterStyleset]?: V2SOptions } 
         item: WKF.Quoted
     },
     additiveSymbols: {
-        arr: v => v.length ? Array.isArray(v[0]) ? a2s( v, {item: WKF.Quoted}, ",") : a2s( v, WKF.Quoted) : ""
+        arr2: { item: { item: WKF.Quoted }, sep: "," },
+        any: WKF.Quoted
     },
 }
 

@@ -11,7 +11,7 @@ import {f2s, WKF, a2s} from "../impl/Utils";
 
 
 // Helper function for units conversion
-function toUnitsProxy( n: number, unit: string): IGenericProxy { return () => n + unit; }
+const toUnitsProxy = ( n: number, unit: string): IGenericProxy => () => n + unit;
 
 
 

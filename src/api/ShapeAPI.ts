@@ -2,18 +2,17 @@
 import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {
-    CrossFadeParam, GradientStopOrHint, LinearGradientAngle, ShapeRadius, IMinMaxFunc, IPathBuilder,
+    GradientStopOrHint, LinearGradientAngle, ShapeRadius, IMinMaxFunc, IPathBuilder,
     IRepeatFunc, IGridSpanFunc, TimingFunctionJumpTerm, FillRule, ICircleBuilder, IEllipseBuilder,
     IInsetBuilder, IPolygonBuilder, PathCommand, PathCommandParam, IRayFunc, IStepsFunc, ICubicBezierFunc,
     PercentFilterNames, IPercentFilterFunc, IBlurFunc, IDropShadowFunc, IHueRotateFunc, IMatrixFunc,
     IMatrix3dFunc, IPerspectiveFunc, IRotateFunc, IRotate3dFunc, IScale1dFunc, IScaleFunc, IScale3dFunc,
     ISkewFunc, ISkew1dFunc, ITranslate1dFunc, ITranslate3dFunc, ITranslateFunc, ILinearGradientBuilder,
     ILinearGradientFunc, IRadialGradientBuilder, IRadialGradientFunc, IConicGradientBuilder,
-    IConicGradientFunc, IGradientBuilder, IGradientFunc, ICrossFadeBuilder, ICrossFadeFunc
+    IConicGradientFunc, IGradientBuilder, IGradientFunc, ICrossFadeBuilder, ICrossFadeFunc, IImageSetFunc, ImageSetItem, ImageSetResolution
 } from "./ShapeTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
 import {mv2s, WKF, v2s, wkf, a2s, fdo, f2s} from "../impl/Utils";
-import { url } from "./CoreAPI";
 
 
 
@@ -29,14 +28,7 @@ const gradientStopsOrHintsToString = (val: GradientStopOrHint<any>[], math: WKF.
     v2s( val, {
         item: {
             num: WKF.Color,
-            arr: v => {
-                if (v.length === 0)
-                    return "";
-                else if (v.length === 1)
-                    return v2s( v[0], math);
-                else
-                    return mv2s( [[v[0], WKF.Color], [v[1], math], [v[2], math] ]);
-            }
+            arr: { 1: [math], any: [WKF.Color, math, math] }
         },
         sep: ","
     });
@@ -202,12 +194,11 @@ class RadialGradientBuilder extends GradientBuilder<CssLength> implements IRadia
 	public ellipse( ...params: any[]): this
     {
         this.shape = "ellipse";
-        if (params.length === 1)
-            this.size = params[0] as Extended<ExtentKeyword>;
-        else if (params.length === 2)
-            this.size = [params[0] as Extended<CssLength>, params[1] as Extended<CssLength>];
-        else
-            this.size = undefined;
+        this.size =
+            params.length === 1 ? params[0] as Extended<ExtentKeyword> :
+            params.length === 2 ? [params[0] as Extended<CssLength>, params[1] as Extended<CssLength>] :
+            undefined;
+
         return this;
     }
 
@@ -283,25 +274,66 @@ class CrossFadeBuilder implements ICrossFadeBuilder
 
 
 /**
- * Returns an ImageProxy function representing the `cross-fade()` CSS function.
+ * Function returning the ICrossFadeFunc interface representing the "older" `cross-fade` CSS
+ * function invocation that accepts two images and a single percentage.
  *
  * @category Image
  */
 export function crossFade( old: [Extended<CssImage>, Extended<CssImage>, Extended<CssPercent>]): ICrossFadeFunc;
-export function crossFade(  ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]): ICrossFadeBuilder;
+
+/**
+ * Function returning the ICrossFadeFunc interface representing the "newer" `cross-fade` CSS
+ * function invocation that accepts multiple images - each with an optional percentage.
+ *
+ * @category Image
+ */
+export function crossFade( ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]): ICrossFadeBuilder;
+
+/** Implementation */
 export function crossFade(): ICrossFadeBuilder
 {
     return new CrossFadeBuilder( ...arguments);
 }
 
 fdo["cross-fade"] = (val: ICrossFadeFunc): string =>
-{
-    return val.images
-        ? f2s( "cross-fade", [[val.images, { item: v => mv2s( [v[0], [v[1], WKF.Percent]]), sep: "," }], [val.c, WKF.Color]])
-        : val.old
-            ? f2s( "cross-fade", [val.old[0], val.old[1], [val.old[2], WKF.Percent]])
-            :"";
-}
+    f2s( "cross-fade", [
+        val.images
+            ? mv2s( [[val.images, { item: { arr: [WKF.Default, WKF.Percent] }, sep: "," }], [val.c, WKF.Color]], ",")
+            : v2s( val.old, { arr: [WKF.Default, WKF.Default, WKF.Percent], sep: "," })
+    ])
+
+
+
+/**
+ * Returns an ImageProxy function representing the `cross-fade()` CSS function.
+ *
+ * @category Image
+ */
+export const imageSet = ( ...items: ImageSetItem[]): IImageSetFunc => ({ fn: "image-set", items })
+
+const imageTypeToString = (val: Extended<string>): string => v2s( val, {
+    str: v => `type("${v.indexOf("/") > 0 ? val : "image/" + val}")`
+});
+
+const imageResolutionToString = (val: Extended<ImageSetResolution>): string => v2s( val, {
+    num: v => v + "x"
+});
+
+fdo["image-set"] = [
+    [
+        "items", {
+            item: {
+                str: WKF.Quoted,
+                arr: {
+                    1: [WKF.Quoted],
+                    2: [WKF.Quoted, { str: imageTypeToString, num: imageResolutionToString}],
+                    3: [WKF.Quoted, imageTypeToString, imageResolutionToString],
+                }
+            },
+            sep: ","
+        }
+    ]
+]
 
 
 
@@ -1081,7 +1113,7 @@ fdo.steps = ["n", "j"]
 export const cubicBezier = (n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
     n4: Extended<number>): ICubicBezierFunc => ({ fn: "cubic-bezier", n1, n2, n3, n4 });
 
-fdo["cubic-bezier"] = { p: ["n1", "n2", "n3", "n4"] }
+fdo["cubic-bezier"] = ["n1", "n2", "n3", "n4"]
 
 
 
