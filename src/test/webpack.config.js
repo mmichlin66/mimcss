@@ -14,6 +14,8 @@ module.exports = [
             "./lib/test/specs/testPropsRadius.js",
             "./lib/test/specs/testVendorPrefixes.js",
             "./lib/test/specs/testImages.js",
+            "./lib/test/specs/testAnimations.js",
+            "./lib/test/specs/testBackgrounds.js",
         ],
 
         output: {

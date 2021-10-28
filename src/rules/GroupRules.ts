@@ -26,11 +26,8 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
         // container to which our groupng rule belongs becomes the parent container for the
         // style definition instance
-		let instance = processSD( this.instOrClass, container.getDefinitionInstance());
-		if (!instance)
-			return;
-
-		this.instance = instance;
+		let instance = processSD( this.instOrClass, container.getDef());
+		this.sd = instance;
 		this.ruleContainer = getContainerFromInstance( instance);
 	}
 
@@ -39,18 +36,15 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		if (!this.ruleContainer)
-			return;
-
 		let selector = this.getSelectorText();
 		if (!selector)
 			return;
 
-		this.cssRule = Rule.addRuleToDOM( `${selector} {}`, parent) as CSSGroupingRule;
+		this.cssRule = Rule.toDOM( `${selector} {}`, parent) as CSSGroupingRule;
 
 		// insert sub-rules
 		if (this.cssRule)
-			this.ruleContainer.insertRules( this.cssRule);
+			this.ruleContainer.insert( this.cssRule);
 	}
 
 
@@ -58,9 +52,6 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	// Serializes this rule to a string.
     public serialize( ctx: IRuleSerializationContext): void
     {
-		if (!this.ruleContainer)
-			return;
-
 		let selector = this.getSelectorText();
 		if (!selector)
 			return;
@@ -68,7 +59,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		ctx.addRule( `${selector} {`);
 
 		// insert sub-rules
-		this.ruleContainer.serializeRules( ctx);
+		this.ruleContainer.serialize( ctx);
 
 		ctx.addRule( "}");
     }
@@ -100,14 +91,13 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		super.clear();
 
 		// clear sub-rules
-		if (this.ruleContainer)
-			this.ruleContainer.clearRules();
+		this.ruleContainer.clear();
 	}
 
 
 
 	// Instance of the style definition class defining the rules under this grouping rule
-	public get rules(): T { return this.instance as T; }
+	public get definition(): T { return this.sd as T; }
 
 	/** SOM supports rule */
 	public cssRule: CSSGroupingRule | null;
@@ -116,7 +106,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	protected instOrClass: T | IStyleDefinitionClass<T>;
 
 	// Style definition instance.
-	protected instance: IStyleDefinition;
+	protected sd: IStyleDefinition;
 
 	// Rule container for the definition instance.
 	protected ruleContainer: IRuleContainer;

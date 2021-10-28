@@ -44,14 +44,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 		if (!this.frameRules)
 			return;
 
-		this.cssRule = Rule.addRuleToDOM( `@keyframes ${this.name} {}`, parent) as CSSKeyframesRule;
+		this.cssRule = Rule.toDOM( `@keyframes ${this.name} {}`, parent) as CSSKeyframesRule;
 
 		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
 		for( let frameRule of this.frameRules)
 		{
 			try
 			{
-				cssKeyframesRule.appendRule( frameRule.toCssString());
+				cssKeyframesRule.appendRule( frameRule.toCss());
 
                 // although the cssRule in the frame is typed as CSSStyleRule, we know that in
                 // practice, it is of the CSSKeyframeRule type.
@@ -74,7 +74,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 		ctx.addRule( `@keyframes ${this.name} {`);
 
 		for( let frameRule of this.frameRules)
-			ctx.addRule( frameRule.toCssString())
+			ctx.addRule( frameRule.toCss())
 
 		ctx.addRule( "}");
     }
@@ -113,7 +113,7 @@ class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 	}
 
 	// Returns the selector part of the style rule.
-	public getSelectorString(): string
+	public getSel(): string
 	{
 		return v2s( this.waypoint, { any: WKF.Percent, sep: "," });
 	}

@@ -179,18 +179,6 @@ describe("border-image shorthand property:", () =>
 			}
 		);
 	})
-
-	it("raw", () =>
-	{
-		dom.testShorthandProp( "borderImage", css.raw`url(image.png) 10 / / 2 repeat`,
-			{
-				borderImageSource: "url(\"image.png\")",
-				borderImageSlice: "10",
-				borderImageOutset: "2",
-				borderImageRepeat: "repeat",
-			}
-		);
-	})
 })
 
 

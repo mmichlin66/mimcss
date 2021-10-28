@@ -1,3 +1,11 @@
+# 0.11.4
+## Non-breaking changes
+
+1. Update list of style properties and prefixed properties.
+1. Add `color-mix()` and `color-contrast()` functions.
+1. Improve `cross-fade()` function.
+1. Add `image-set()` function.
+
 # 0.11.3
 ## Non-breaking changes
 

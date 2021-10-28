@@ -1,4 +1,4 @@
-import {IStyleDefinition, IStyleDefinitionClass, NameGenerationMethod} from "../api/RuleTypes"
+import {IStyleDefinition, IStyleDefinitionClass, IVarRule, NameGenerationMethod} from "../api/RuleTypes"
 import {StyleDefinition, ThemeDefinition} from "../api/RuleAPI"
 import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
 import {VarRule} from "./VarRule"
@@ -46,35 +46,35 @@ class RuleContainer implements ITopLevelRuleContainer
 {
 	constructor( instance: IStyleDefinition, name: string)
 	{
-		this.instance = instance;
+		this.sd = instance;
 		this.name = name;
 
-        this.definitionClass = instance.constructor as IStyleDefinitionClass;
+        this.sdc = instance.constructor as IStyleDefinitionClass;
         this.parent = instance.$parent;
-		this.embeddingContainer = this.definitionClass[symEmbeddingContainer];
+		this.ec = this.sdc[symEmbeddingContainer];
 
-		this.activationRefCount = 0;
-		this.domStyleElm = null;
+		this.refCount = 0;
+		this.elm = null;
 	}
 
 
 
 	// Processes the properties of the style definition instance. This creates names for classes,
 	// IDs, animations and custom variables.
-	public process(): void
+	public doP(): void
 	{
 		// get parent and top level containers
         if (this.parent)
         {
-            this.parentContainer = this.parent[symContainer];
-            this.topLevelContainer = this.parentContainer!.topLevelContainer;
+            this.pc = this.parent[symContainer];
+            this.tlc = this.pc!.tlc;
         }
         else
-            this.topLevelContainer = this;
+            this.tlc = this;
 
 		// if our container has parent container, prefix our name with the upper one
-		if (this.parentContainer)
-			this.name = `${this.parentContainer.name}_${this.name}`;
+		if (this.pc)
+			this.name = `${this.pc.name}_${this.name}`;
 
 		this.imports = [];
 		this.namespaces = [];
@@ -84,8 +84,8 @@ class RuleContainer implements ITopLevelRuleContainer
 		this.ruleLikes = [];
 
 		// loop over the properties of the definition object and process them.
-		for( let propName in this.instance)
-			this.processProperty( propName, this.instance[propName]);
+		for( let propName in this.sd)
+			this.processProperty( propName, this.sd[propName]);
 
         // loop over rules and rule-like objects and call the postProcess method, which allows
         // them to connect to other rules.
@@ -135,8 +135,8 @@ class RuleContainer implements ITopLevelRuleContainer
 	private processVarRule( propName: string | null, varObj: VarRule): void
 	{
 		// we only process rules once
-		if (!varObj.container)
-			varObj.process( this, this.topLevelContainer, propName);
+		if (!varObj.c)
+			varObj.process( this, this.tlc, propName);
 
         this.vars.push( varObj);
 	}
@@ -147,8 +147,8 @@ class RuleContainer implements ITopLevelRuleContainer
 	private processRuleLike( propName: string | null, ruleLike: RuleLike): void
 	{
 		// we only process rules once
-		if (!ruleLike.container)
-            ruleLike.process( this, this.topLevelContainer, propName);
+		if (!ruleLike.c)
+            ruleLike.process( this, this.tlc, propName);
 
 		this.ruleLikes.push( ruleLike);
 	}
@@ -159,8 +159,8 @@ class RuleContainer implements ITopLevelRuleContainer
 	private processRule( propName: string | null, rule: Rule): void
 	{
 		// we only process rules once
-		if (!rule.container)
-		    rule.process( this, this.topLevelContainer, propName);
+		if (!rule.c)
+		    rule.process( this, this.tlc, propName);
 
 		if (rule instanceof ImportRule)
 			this.imports.push( rule);
@@ -186,18 +186,18 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	/** Returns the instance of the stylesheet definition class */
-	public getDefinitionInstance(): IStyleDefinition
+	public getDef(): IStyleDefinition
 	{
-		return this.instance;
+		return this.sd;
 	}
 
 
 
 	// Sets the given value for the custom CSS roperty with the given name.
-	public setCustomVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
+	public setVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
-		if (this.cssCustomVarStyleRule)
-            scheduleStyleUpdate( this.cssCustomVarStyleRule, name, value, important, schedulerType);
+		if (this.varRootRule)
+            scheduleStyleUpdate( this.varRootRule, name, value, important, schedulerType);
 	}
 
 
@@ -206,7 +206,7 @@ class RuleContainer implements ITopLevelRuleContainer
 	 * Generates a globally unique CSS name for the given rule name unless this rule name already
 	 * exists either in a base class or in the chain of parent grouping rules.
 	 */
-	public getScopedRuleName( ruleName: string): string
+	public getScopedName( ruleName: string): string
 	{
 		// if rule name was not specified, generate it uniquely; otherwise, check whether we
 		// already have this rule name: if yes, return the already assigned name. If we didn't
@@ -215,13 +215,13 @@ class RuleContainer implements ITopLevelRuleContainer
 		// can be generated uniquely).
 		if (!ruleName)
 			return generateUniqueName();
-		else if (ruleName in this.instance && "name" in this.instance[ruleName])
-			return this.instance[ruleName].name;
+		else if (ruleName in this.sd && "name" in this.sd[ruleName])
+			return this.sd[ruleName].name;
 		else
 		{
 			// find out if there is a rule with this name defined in a stylesheet instance created for
 			// a class from the prototype chain of the style definition class.
-			let existingName = findNameForRuleInPrototypeChain( this.definitionClass, ruleName);
+			let existingName = findNameForRuleInPrototypeChain( this.sdc, ruleName);
 			return existingName ? existingName : generateName( this.name, ruleName);
 		}
 	}
@@ -229,7 +229,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
-	public insertRules( container: CSSStyleSheet | CSSGroupingRule): void
+	public insert( container: CSSStyleSheet | CSSGroupingRule): void
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
@@ -241,13 +241,13 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// activate referenced style definitions
 		for( let ref of this.refs)
-			ref[symContainer].activate( this.domStyleElm);
+			ref[symContainer].activate( this.elm);
 
 		// insert our custom variables in a ":root" rule
 		if (this.vars.length > 0)
 		{
-			this.cssCustomVarStyleRule = Rule.addRuleToDOM( `:root {${this.vars.map( varObj =>
-				varObj.toCssString()).filter( v => !!v).join(";")}}`, container) as CSSStyleRule;
+			this.varRootRule = Rule.toDOM( `:root {${this.vars.map( varObj =>
+				varObj.toCss()).filter( v => !!v).join(";")}}`, container) as CSSStyleRule;
 		}
 
 		// insert all other rules
@@ -257,16 +257,16 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	/** Clears all CSS rule objects defined in this container. */
-	public clearRules(): void
+	public clear(): void
 	{
         // import and namespace rules can only exist in the top-level style definition class
-		if (this.isTopLevel)
+		if (!this.parent)
 		{
 			this.imports && this.imports.forEach( rule => rule.clear());
 			this.namespaces && this.namespaces.forEach( rule => rule.clear());
 		}
 
-		this.cssCustomVarStyleRule = null;
+		this.varRootRule = null;
 
 		this.otherRules.forEach( rule => rule.clear());
 
@@ -286,19 +286,19 @@ class RuleContainer implements ITopLevelRuleContainer
      */
 	public activate( insertBefore: Element | null = null): void
 	{
-		if (++this.activationRefCount > 1)
+		if (++this.refCount > 1)
             return;
 
         // only the top-level not-embedded style definitions create the `<style>` element
-        if (this.isTopLevel)
+        if (!this.parent)
         {
-            if (this.embeddingContainer)
-                this.domStyleElm = this.embeddingContainer.domStyleElm;
+            if (this.ec)
+                this.elm = this.ec.domStyleElm;
             else
             {
                 // themes are inserted before the special placeholder element, which is created
                 // at the top of the '<head>' element
-                if (this.instance instanceof ThemeDefinition)
+                if (this.sd instanceof ThemeDefinition)
                 {
                     if (!themePlaceholderElement)
                     {
@@ -310,34 +310,34 @@ class RuleContainer implements ITopLevelRuleContainer
                     insertBefore = themePlaceholderElement;
                 }
 
-                this.domStyleElm = document.createElement( "style");
-                this.domStyleElm.id = this.name;
-                document.head.insertBefore( this.domStyleElm, insertBefore);
+                this.elm = document.createElement( "style");
+                this.elm.id = this.name;
+                document.head.insertBefore( this.elm, insertBefore);
             }
         }
         else
-            this.domStyleElm = this.topLevelContainer.domStyleElm;
+            this.elm = this.tlc.elm;
 
         // if this is a theme class activation, check whether the instance is set as the current
         // one for its theme base class. If no, then deactivate the theme instance currently set
         // as active. In any case, set our new instance as the currently active one.
-        if (this.instance instanceof ThemeDefinition)
+        if (this.sd instanceof ThemeDefinition)
         {
-            let themeClass = this.instance[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
+            let themeClass = this.sd[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
                 let currInstance = getCurrentTheme( themeClass);
-                if (currInstance && currInstance !== this.instance)
+                if (currInstance && currInstance !== this.sd)
                 {
                     let currContainer = currInstance[symContainer] as RuleContainer;
                     currContainer.deactivate();
                 }
 
-                setCurrentTheme( this.instance);
+                setCurrentTheme( this.sd);
             }
         }
 
-        this.insertRules( this.domStyleElm!.sheet as CSSStyleSheet);
+        this.insert( this.elm!.sheet as CSSStyleSheet);
     }
 
 
@@ -347,7 +347,7 @@ class RuleContainer implements ITopLevelRuleContainer
 	{
 
         // guard from extra deactivate calls
-		if (this.activationRefCount === 0)
+		if (this.refCount === 0)
         {
             /// #if DEBUG
                 console.error( `Extra call to deactivate() for style definition class '${this.name}'`);
@@ -356,26 +356,26 @@ class RuleContainer implements ITopLevelRuleContainer
 			return;
         }
 
-		if (--this.activationRefCount > 0)
+		if (--this.refCount > 0)
             return;
 
-        this.clearRules();
+        this.clear();
 
         // only the top-level not-embedded style defiitions create the `<style>` element
-        if (this.isTopLevel && !this.embeddingContainer)
-            this.domStyleElm!.remove();
+        if (!this.parent && !this.ec)
+            this.elm!.remove();
 
-        this.domStyleElm = null;
+        this.elm = null;
 
         // if this is a theme class deactivation, check whether the instance is set as the current
         // one for its theme base class. If yes, remove it as the currently active one.
-        if (this.instance instanceof ThemeDefinition)
+        if (this.sd instanceof ThemeDefinition)
         {
-            let themeClass = this.instance[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
+            let themeClass = this.sd[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
                 let currInstance = getCurrentTheme( themeClass);
-                if (currInstance === this.instance)
+                if (currInstance === this.sd)
                     removeCurrentTheme( themeClass);
             }
         }
@@ -384,11 +384,11 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	/** Writes all rules recursively to the given string. */
-	public serializeRules( ctx: IRuleSerializationContext): void
+	public serialize( ctx: IRuleSerializationContext): void
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
-		if (this.isTopLevel)
+		if (!this.parent)
 		{
 			this.imports && this.imports.forEach( rule => rule.serialize( ctx));
 			this.namespaces && this.namespaces.forEach( rule => rule.serialize( ctx));
@@ -400,7 +400,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 		// serialize our custom variables in a ":root" rule
 		if (this.vars.length > 0)
-			ctx.addRule( `:root {${this.vars.map( varObj => varObj.toCssString()).filter( v => !!v).join(";")}}`);
+			ctx.addRule( `:root {${this.vars.map( varObj => varObj.toCss()).filter( v => !!v).join(";")}}`);
 
 		// serialize all other rules
 		this.otherRules.forEach( rule => rule.serialize( ctx));
@@ -408,16 +408,11 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 
-	// Flag indicating whether this container is for the top-level style definition.
-	private get isTopLevel(): boolean { return !this.parent; }
-
-
-
 	// Instance of the style definition class that this container processed.
-	public instance: IStyleDefinition;
+	public sd: IStyleDefinition;
 
 	// Style definition class that this container creates an instance of.
-	public definitionClass: IStyleDefinitionClass
+	public sdc: IStyleDefinitionClass
 
 	// Name of this container, which, depending on the mode, is either taken from the class
 	// definition name or generated uniquely.
@@ -426,7 +421,7 @@ class RuleContainer implements ITopLevelRuleContainer
 	// Container that is embedding our instance (that is, the instance corresponding to our
     // container). If defined, this container's `<style>` element is used to insert CSS rules
     // into instead of topLevelContainer.
-	public embeddingContainer?: EmbeddingContainer;
+	public ec?: EmbeddingContainer;
 
 	// Instance of the parent style definition class in the chain of grouping rules that
 	// lead to this rule container. For top-level style definitions, this is undefined.
@@ -434,11 +429,11 @@ class RuleContainer implements ITopLevelRuleContainer
 
 	// Rule container that belongs to the parent style defintion. If our container is top-level,
 	// this property is undefined.
-	private parentContainer?: RuleContainer;
+	private pc?: RuleContainer;
 
 	// Rule container that belongs to the owner style defintion. If our container is top-level,
 	// this property points to `this`. Names for named rules are created using this container.
-	private topLevelContainer: RuleContainer;
+	private tlc: RuleContainer;
 
 	// List of references to other style definitions creaed via the $use function.
 	private refs: StyleDefinition[];
@@ -460,13 +455,13 @@ class RuleContainer implements ITopLevelRuleContainer
 	private ruleLikes: RuleLike[];
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
-	private cssCustomVarStyleRule: CSSStyleRule | null;
+	private varRootRule: CSSStyleRule | null;
 
 	// Reference count of activation requests.
-	private activationRefCount: number;
+	private refCount: number;
 
 	// DOM style elemnt
-	public domStyleElm: HTMLStyleElement | null;
+	public elm: HTMLStyleElement | null;
 }
 
 
@@ -515,13 +510,13 @@ let s_nextUniqueID = 1;
 /**
  * Generates name to use for the given rule from the given style sheet.
  */
-function generateName( sheetName: string, ruleName: string): string
+const generateName = (sheetName: string, ruleName: string): string =>
 {
 	switch( s_nameGeneratonMethod)
     {
 		case NameGenerationMethod.UniqueScoped: return `${sheetName}_${ruleName}_${s_nextUniqueID++}`;
-		case NameGenerationMethod.Optimized:return generateUniqueName( s_uniqueStyleNamesPrefix);
-        case NameGenerationMethod.Scoped:return `${sheetName}_${ruleName}`;
+		case NameGenerationMethod.Optimized: return generateUniqueName( s_uniqueStyleNamesPrefix);
+        case NameGenerationMethod.Scoped: return `${sheetName}_${ruleName}`;
     }
 }
 
@@ -581,11 +576,9 @@ const findNameForRuleInPrototypeChain = (definitionClass: IStyleDefinitionClass,
  * to its rules.
  */
 export const processSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
-	parent?: IStyleDefinition): IStyleDefinition =>
+	    parent?: IStyleDefinition): IStyleDefinition =>
 	// instOrClass has type "object" if it is an instance and "function" if it is a class
-	typeof instOrClass === "object"
-        ? (processInstance( instOrClass), instOrClass)
-        : processClass( instOrClass, parent);
+	typeof instOrClass === "object" ? processInstance( instOrClass) : processClass( instOrClass, parent);
 
 
 
@@ -623,7 +616,7 @@ const processClass = (definitionClass: IStyleDefinitionClass,
     // definition instance and process the container rules.
     let container = new RuleContainer( instance, name);
     instance[symContainer] = container;
-    container.process();
+    container.doP();
 
     // associate the definition class with the created definition instance
     definitionClass[symInstance] = instance;
@@ -637,13 +630,13 @@ const processClass = (definitionClass: IStyleDefinitionClass,
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-const processInstance = (instance: IStyleDefinition): void =>
+const processInstance = (instance: IStyleDefinition): IStyleDefinition =>
 {
 	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.
 	let container = instance[symContainer] as RuleContainer;
 	if (container)
-		return;
+		return instance;
 
 	// get the name for our container
 	let name = generateUniqueName();
@@ -658,7 +651,8 @@ const processInstance = (instance: IStyleDefinition): void =>
     // definition instance and process the container rules.
     container = new RuleContainer( instance, name);
     instance[symContainer] = container;
-    container.process();
+    container.doP();
+    return instance;
 }
 
 
@@ -668,7 +662,7 @@ const processInstance = (instance: IStyleDefinition): void =>
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass): VarRule[] =>
+export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass): IVarRule[] =>
 {
     let instance = processSD( instOrClass);
     if (!instance)
@@ -703,7 +697,7 @@ export const activateInstance = (instance: IStyleDefinition, count: number): voi
 
     // if this container has an embedding container, activate the embedding container; otherwise,
     // activate the rule container itself.
-    let whatToActivate = ruleContainer.embeddingContainer ?? ruleContainer;
+    let whatToActivate = ruleContainer.ec ?? ruleContainer;
     for( let i = 0; i < count; i++)
         whatToActivate.activate();
 }
@@ -723,7 +717,7 @@ export const deactivateInstance = (instance: IStyleDefinition, count: number): v
 
     // if this container has an embedding container, deactivate the embedding container; otherwise,
     // deactivate the rule container itself.
-    let whatToActivate = ruleContainer.embeddingContainer ?? ruleContainer;
+    let whatToActivate = ruleContainer.ec ?? ruleContainer;
     for( let i = 0; i < count; i++)
         whatToActivate.deactivate();
 }
@@ -737,7 +731,7 @@ export const serializeInstance = (instance: IStyleDefinition, ctx: IRuleSerializ
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (ruleContainer)
-	    ruleContainer.serializeRules( ctx);
+	    ruleContainer.serialize( ctx);
 }
 
 

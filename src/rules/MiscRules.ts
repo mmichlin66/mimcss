@@ -25,7 +25,7 @@ abstract class MiscRule<T extends CSSRule> extends Rule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		this.cssRule = Rule.addRuleToDOM( this.getRuleText(), parent) as T;
+		this.cssRule = Rule.toDOM( this.getRuleText(), parent) as T;
 	}
 
 	// Serializes this rule to a string.
@@ -158,7 +158,7 @@ export class PageRule extends StyleRule implements IPageRule
 	}
 
 	// Returns the selector part of the style rule.
-	public getSelectorString(): string
+	public getSel(): string
 	{
 		return `@page ${this.pseudoClass ? this.pseudoClass : ""}`;
 	}

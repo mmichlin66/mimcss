@@ -19,9 +19,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyPropValue( a!.c, "counterReset", "A_counter 0");
+			dom.verifyPropValue( a.c, "counterReset", "A_counter 0");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 
 		it("counter-reset with CounterRule and number", () =>
@@ -33,9 +33,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyPropValue( a!.c, "counterReset", "A_counter 2");
+			dom.verifyPropValue( a.c, "counterReset", "A_counter 2");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 
 		it("counter-increment with CounterRule with name override and number", () =>
@@ -47,9 +47,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyPropValue( a!.c, "counterIncrement", "cntr 1");
+			dom.verifyPropValue( a.c, "counterIncrement", "cntr 1");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 
 		it("counter-increment with two CounterRules with and without number", () =>
@@ -62,9 +62,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyPropValue( a!.c, "counterIncrement", "A_counter1 1 A_counter2 2");
+			dom.verifyPropValue( a.c, "counterIncrement", "A_counter1 1 A_counter2 2");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 	})
 
@@ -81,9 +81,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "counter(A_counter)");
+			dom.verifyDependentPropValue( a.c, "::before", "content", "counter(A_counter)");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 
 		it("counter() with CounterRule and style", () =>
@@ -95,9 +95,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "counter(A_counter, circle)");
+			dom.verifyDependentPropValue( a.c, "::before", "content", "counter(A_counter, circle)");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 	})
 
@@ -114,9 +114,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "counters(A_counter, \".\")");
+			dom.verifyDependentPropValue( a.c, "::before", "content", "counters(A_counter, \".\")");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 
 		it("counters() with CounterRule, separator and style", () =>
@@ -128,9 +128,9 @@ describe("counters", () =>
 			}
 
 			let a = css.activate( A);
-			dom.verifyDependentPropValue( a!.c, "::before", "content", "counters(A_counter, \".\", circle)");
+			dom.verifyDependentPropValue( a.c, "::before", "content", "counters(A_counter, \".\", circle)");
 
-			css.deactivate( a!);
+			css.deactivate( a);
 		})
 	})
 

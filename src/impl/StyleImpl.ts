@@ -265,7 +265,7 @@ type VarNTV = [string, string, string?];
 
 
 /**
- * Extracts name and string values from the given custom CSS property definition.
+ * Extracts name, template and string tuples from the given custom CSS property definition.
  * @param customVars
  */
 const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
@@ -299,7 +299,7 @@ const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
     else
     {
         let varRules = getVarsFromSD(customVars);
-        return varRules.map( varRule => [varRule.cssName, varRule.template,
+        return varRules.map( varRule => [varRule.cssVarName, varRule.template,
             sp2s( varRule.template, varRule.getValue())]);
     }
 }

@@ -22,19 +22,19 @@ The goal of the Mimcss library is to support all CSS features in a type-safe and
 
 - Compatible with and independent of any library: use with React, Angular, Vue etc.
 - Co-exists with regular CSS files - doesn't require re-writing of all existing styles at once or at all. You can gradually introduce Mimcss into you project.
-- Stylesheets are defined as TypeScript classes.
+- Stylesheets are defined as TypeScript Style Definition classes.
 - Stylesheets can be dynamically activated (inserted into DOM) and deactivated (removed from DOM).
 - Styled components are supported where each component instance gets its individual set of CSS rules isolated from other instances.
 - Names of classes, IDs, animations, custom CSS properties, counters and grid lines and areas are auto-generated, while developers use properties that return these names.
-- Stylesheets support inheritance - elegant way to implement theming.
+- Theming via style definition class inheritance.
 - All CSS rule types are supported including style rules and at-rules.
 - Automatic support for vendor prefixes.
 - Custom CSS properties are supported in a type safe manner.
 - Style rules can be nested and can extend other style rules.
 - All pseudo styles and pseudo elements are supported using convenient and compact notation.
-- Type safety and autocomplete support for CSS property values to eliminate misspellings.
+- Type safety and autocompletion support for CSS property values to eliminate errors.
 - Using numbers for default units of length, angle, percent and other CSS property types.
-- Using Booleans, numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate misspellings.
+- Using Booleans, numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate errors.
 - Convenience functions for specifying complex property values (e.g. colors, images, filters, shapes, calc(), etc.)
 - Type-safe support for CSS filter, transform, shape, gradient, counter and other functions.
 - Access to CSSRule-derived objects for direct rule and property manipulation.

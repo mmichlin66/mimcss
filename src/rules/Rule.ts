@@ -24,19 +24,19 @@ export interface IRuleSerializationContext
 export interface IRuleContainer
 {
 	/** Returns the instance of the stylesheet definition class */
-	getDefinitionInstance(): IStyleDefinition;
+	getDef(): IStyleDefinition;
 
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
-	insertRules( parent: CSSStyleSheet | CSSGroupingRule): void;
+	insert( parent: CSSStyleSheet | CSSGroupingRule): void;
 
 	/** Clears all CSS rule objects defined in this container. */
-	clearRules(): void;
+	clear(): void;
 
 	/** Writes all rules recursively to the given string. */
-	serializeRules( ctx: IRuleSerializationContext): void;
+	serialize( ctx: IRuleSerializationContext): void;
 
     /** Sets the given value for the custom CSS roperty with the given name. */
-	setCustomVarValue( name: string, value: string | null, important?: boolean, schedulerType?: number): void;
+	setVarValue( name: string, value: string | null, important?: boolean, schedulerType?: number): void;
 }
 
 
@@ -49,7 +49,7 @@ export interface IRuleContainer
 export interface ITopLevelRuleContainer extends IRuleContainer
 {
 	/** Generates a name, which will be unique in this stylesheet */
-	getScopedRuleName( ruleName: string): string;
+	getScopedName( ruleName: string): string;
 }
 
 
@@ -62,10 +62,10 @@ export interface ITopLevelRuleContainer extends IRuleContainer
 export abstract class RuleLike
 {
 	// Processes the rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( c: IRuleContainer, tlc: ITopLevelRuleContainer, ruleName: string | null): void
 	{
-        this.container = container;
-		this.topLevelContainer = topLevelContainer;
+        this.c = c;
+		this.tlc = tlc;
 		this.ruleName = ruleName;
 	}
 
@@ -79,10 +79,10 @@ export abstract class RuleLike
 
 
 	// Rule container to which this rule belongs.
-	public container: IRuleContainer;
+	public c: IRuleContainer;
 
 	// Container at the top of the chain of containers to which this rule belongs.
-	public topLevelContainer: ITopLevelRuleContainer;
+	public tlc: ITopLevelRuleContainer;
 
 	// Name of the property of the stylesheet definition to which this rule was assigned. This can
 	// be null for rules not created via assignment to style definition properties.
@@ -112,7 +112,7 @@ export abstract class Rule extends RuleLike implements IRule
 
 
 	// Inserts the given rule into the given parent rule or stylesheet.
-	public static addRuleToDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule | null
+	public static toDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule | null
 	{
 		try
 		{
@@ -137,11 +137,11 @@ export abstract class Rule extends RuleLike implements IRule
 
 /** Creates scoped names based on the given parameters */
 export const createName = (topLevelContainer: ITopLevelRuleContainer, ruleName: string | null,
-    nameOverride?: string | INamedEntity): string =>
+        nameOverride?: string | INamedEntity): string =>
 	(!ruleName && !nameOverride) ? "" :
-	    !nameOverride ? topLevelContainer.getScopedRuleName( ruleName!) :
-        typeof nameOverride === "string" ? nameOverride :
-        nameOverride.name;
+    !nameOverride ? topLevelContainer.getScopedName( ruleName!) :
+    typeof nameOverride === "string" ? nameOverride :
+    nameOverride.name;
 
 
 

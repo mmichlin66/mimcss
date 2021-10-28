@@ -1225,7 +1225,7 @@ class ThemeDefinitionHandler implements ProxyHandler<ThemeDefinition>
  * into DOM only upon first activation.
  */
 export const activate = <T extends IStyleDefinition>(instOrClass: T | IStyleDefinitionClass<T>,
-	schedulerType?: number): T | null =>
+	schedulerType?: number): T =>
 {
 	let instance = processSD( instOrClass) as T;
 	if (instance)

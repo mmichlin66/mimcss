@@ -1,6 +1,6 @@
-import { ExtendedCounterStyleset } from "../api/CounterTypes";
+import {ExtendedCounterStyleset} from "../api/CounterTypes";
 import {ICounterRule, ICounterStyleRule} from "../api/RuleTypes"
-import { counterStyleset2s } from "../impl/MiscImpl";
+import {counterStyleset2s} from "../impl/MiscImpl";
 import {createName, IRuleContainer, IRuleSerializationContext, ITopLevelRuleContainer, Rule, RuleLike} from "./Rule";
 
 
@@ -41,7 +41,7 @@ export class CounterRule extends RuleLike implements ICounterRule
 	 */
 	public name: string;
 
-	/** Name of the counter */
+    /** Name of the counter */
 	public get counterName(): string { return this.name; }
 
 	// Name or named object that should be used to create a name for this rule. If this property
@@ -85,19 +85,19 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent);
+		this.cssRule = Rule.toDOM( this.toCss(), parent);
 	}
 
 	// Serializes this rule to a string.
     public serialize( ctx: IRuleSerializationContext): void
     {
-		ctx.addRule( this.toCssString());
+		ctx.addRule( this.toCss());
     }
 
 
 
 	// Serializes this rule to a string.
-    private toCssString(): string
+    private toCss(): string
     {
 		return `@counter-style ${this.name} {${counterStyleset2s( this.counterStyleset)}}`;
     }

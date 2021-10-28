@@ -128,7 +128,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 						() => selector2s( tuple[0]) + propName, undefined, tuple[1], this));
 				}
 			}
-			else if (this.parseStylesetProp( propName, propVal))
+			else if (this.parseSP( propName, propVal))
 			{
 				// this is a regular CSS property: copy the property value to our internal styleset
 				this.styleset[propName] = propVal;
@@ -148,7 +148,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Converts the rule to CSS string representing the rule.
-	public toCssString(): string
+	public toCss(): string
 	{
 		return this.selectorText + styleset2s( this.styleset);
 	}
@@ -159,7 +159,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
 		if (Object.keys(this.styleset).length > 0)
-			this.cssRule = Rule.addRuleToDOM( this.toCssString(), parent) as CSSStyleRule;
+			this.cssRule = Rule.toDOM( this.toCss(), parent) as CSSStyleRule;
 
         // insert dependent rules under the same parent
         this.forEachDepRule( (depRule: DependentRule) => depRule.insert( parent));
@@ -178,7 +178,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
     public serialize( ctx: IRuleSerializationContext): void
     {
 		if (Object.keys(this.styleset).length > 0)
-			ctx.addRule( this.toCssString());
+			ctx.addRule( this.toCss());
 
         // insert dependent rules under the same parent
         this.forEachDepRule( (depRule: DependentRule) => depRule.serialize( ctx));
@@ -203,10 +203,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	/** CSS rule selector string */
 	public get selectorText(): string
 	{
-		if (this.cachedSelector == null)
-			this.cachedSelector = this.getSelectorString();
+		if (this._sel == null)
+			this._sel = this.getSel();
 
-		return this.cachedSelector;
+		return this._sel;
 	}
 
 
@@ -237,11 +237,11 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Returns the selector part of the style rule.
-	protected abstract getSelectorString(): string;
+	protected abstract getSel(): string;
 
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If false is returned, the property with the given name will not be added to the styleset.
-	protected parseStylesetProp( propName: string, propVal: any): boolean { return true; }
+	protected parseSP( propName: string, propVal: any): boolean { return true; }
 
 
 
@@ -322,7 +322,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-            scheduleStyleUpdate( this.cssRule, varObj.cssName,
+            scheduleStyleUpdate( this.cssRule, varObj.cssVarName,
                 value == null ? null : sp2s( varObj.template, value),
                 important, schedulerType);
         }
@@ -345,7 +345,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	// Selector string cached after it is first obtained. Needed to not invoke getSelectorString
 	// multiple times in the presence of dependent rules.
-	private cachedSelector: string | null = null;
+	private _sel: string | null = null;
 }
 
 
@@ -388,7 +388,7 @@ class DependentRule extends StyleRule
 
 
 	// Returns the selector part of the style rule.
-	public getSelectorString(): string
+	public getSel(): string
 	{
 		let parentSelector = this.parent!.selectorText;
 		if (this.param)
@@ -430,25 +430,16 @@ export class AbstractRule extends StyleRule
 {
 	// Overrides the StyleRule's implementation to do nothing. No CSSStyleRule is created for
 	// abstract rules.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
-	{
-	}
+	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
 
 	// Overrides the StyleRule's implementation to do nothing.
-	public clear(): void
-	{
-	}
+	public clear(): void {}
 
 	// Overrides the StyleRule's implementation to do nothing.
-    public serialize( ctx: IRuleSerializationContext): void
-    {
-    }
+    public serialize( ctx: IRuleSerializationContext): void {}
 
     // Returns the selector part of the style rule.
-	public getSelectorString(): string
-	{
-		return "";
-	}
+	public getSel(): string { return ""; }
 }
 
 
@@ -475,7 +466,7 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 	}
 
 	// Returns the selector part of the style rule.
-	public getSelectorString(): string
+	public getSel(): string
 	{
 		return this.cssName;
 	}
@@ -518,18 +509,18 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 {
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If returns false, the property with the given name will not be added to the styleset.
-	protected parseStylesetProp( propName: string, propVal: any): boolean
+	protected parseSP( propName: string, propVal: any): boolean
     {
         if (propName == "++")
         {
             let rules = propVal as ParentClassType | ParentClassType[];
             if (rules)
-                this.derivedClassRules = Array.isArray(rules) ? rules : [rules];
+                this.parentClassRules = Array.isArray(rules) ? rules : [rules];
 
             return false;
         }
-        else
-            return super.parseStylesetProp( propName, propVal);
+
+        return super.parseSP( propName, propVal);
     }
 
 	// Post-processes the given rule.
@@ -538,9 +529,9 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         // by now our name and cssName properties have been set to reflect a single name. Now
         // look at the "++" property and if defined, take names from the referenced class rules
         // and append them to the name.
-        if (this.derivedClassRules)
+        if (this.parentClassRules)
         {
-            this.name += " " + this.derivedClassRules.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
+            this.name += " " + this.parentClassRules.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
             this.cssName = "." + this.name.replace( / /g, ".");
         }
 	}
@@ -553,7 +544,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 	protected get cssPrefix(): string { return "."; }
 
     // remembered value of the "++" property of the input styleset
-    private derivedClassRules?: ParentClassType[];
+    private parentClassRules?: ParentClassType[];
 }
 
 
@@ -594,7 +585,7 @@ export class AttrRule extends StyleRule
 	}
 
 	// Returns the selector part of the style rule.
-	public getSelectorString(): string
+	public getSel(): string
 	{
         let s = typeof this.tag === "string" ? this.tag : this.tag.selectorText;
         for( let attr of this.attrs)
@@ -648,7 +639,7 @@ export class SelectorRule extends StyleRule
 	}
 
 	// Returns the selector part of the style rule.
-	public getSelectorString(): string
+	public getSel(): string
 	{
 		return selector2s( this.selector);
 	}

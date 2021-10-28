@@ -24,7 +24,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 
     // This function is used when the object is specified as a value of a style property.
     // We return the var(--name) expression.
-    public toString(): string { return `var(${this.cssName})`; }
+    public toString(): string { return `var(${this.cssVarName})`; }
 
 
 	// Processes the given rule.
@@ -32,15 +32,15 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	{
 		super.process( container, topLevelContainer, ruleName);
 		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
-        this.cssName = "--" + this.name;
+        this.cssVarName = "--" + this.name;
 	}
 
 
 
 	// Converts the rule to CSS string.
-	public toCssString(): string | null
+	public toCss(): string | null
 	{
-		return this.value == null ? null : `${this.cssName}: ${sp2s( this.template, this.value)}`;
+		return this.value == null ? null : `${this.cssVarName}: ${sp2s( this.template, this.value)}`;
 	}
 
 
@@ -63,7 +63,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	 */
 	public setValue( value: ExtendedVarValue<K>, schedulerType?: number): void
 	{
-        if (this.container)
+        if (this.c)
 		{
             let important = false;
             if (value != null && typeof value === "object" && "!" in (value as any))
@@ -72,7 +72,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
                 value = value["!"];
             }
 
-            this.container.setCustomVarValue( this.cssName,
+            this.c.setVarValue( this.cssVarName,
                 value == null
                     ? null
                     : sp2s( this.template, value), important, schedulerType)
@@ -92,11 +92,9 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	public name: string;
 
 	/**
-	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
-	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
-	 * `name` property.
+	 * Custom CSS property name prefixed with `"--"`.
 	 */
-	public cssName: string;
+	public cssVarName: string;
 
 	// Value of the custom CSS property.
 	private value?: ExtendedVarValue<K>;
@@ -125,12 +123,12 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
         super();
 		this.template = template;
         this.value = value;
-        this.cachedValue = cachedValue;
+        this._val = cachedValue;
 	}
 
 
     // This function is used when the object is specified as a value of a style property.
-    public toString(): string { return this.cachedValue!; }
+    public toString(): string { return this._val!; }
 
 
 	// Processes the given rule.
@@ -138,8 +136,8 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 	{
         super.process( container, topLevelContainer, ruleName);
 
-        if (!this.cachedValue)
-		    this.cachedValue = sp2s( this.template, this.value);
+        if (!this._val)
+		    this._val = sp2s( this.template, this.value);
 	}
 
 
@@ -161,7 +159,7 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 	private value?: ExtendedVarValue<K>;
 
 	// Property value cached when the rule is proceed.
-	public cachedValue?: string;
+	private _val?: string;
 }
 
 
