@@ -1,7 +1,4 @@
 # 0.11.5
-## Non-breaking changes
-
-1.
 
 ## Bug fixes
 
