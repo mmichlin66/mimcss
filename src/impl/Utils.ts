@@ -541,7 +541,7 @@ const goOverProps = (val: ICssFuncObject, options?: V2SOptions, sep?: string): s
             buf.push( v2s( val[p], options));
     }
 
-    return `${val.fn}(${buf.join( sep ?? ",")})`;
+    return `${val.fn}(${buf.filter(v=>!!v).join( sep ?? ",")})`;
 }
 
 

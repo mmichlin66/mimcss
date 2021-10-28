@@ -1,3 +1,14 @@
+# 0.11.5
+## Non-breaking changes
+
+1.
+
+## Bug fixes
+
+1. `skew()` function doesn't work - incorrect name is used in CSS serialization.
+2. `dropShadow()` function doesn't work - incorrect order of parameters in CSS serialization.
+
+
 # 0.11.4
 ## Non-breaking changes
 
@@ -5,6 +16,7 @@
 1. Add `color-mix()` and `color-contrast()` functions.
 1. Improve `cross-fade()` function.
 1. Add `image-set()` function.
+
 
 # 0.11.3
 ## Non-breaking changes

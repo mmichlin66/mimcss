@@ -586,7 +586,7 @@ export const dropShadow = (x: Extended<CssLength>, y: Extended<CssLength>,
     color?: Extended<CssColor>, blur?: Extended<CssLength>): IDropShadowFunc => ({ fn: "drop-shadow", x, y, color, blur });
 
 fdo["drop-shadow"] = {
-    p: [ "x", "y", ["color", WKF.Color], "blur" ],
+    p: [ "x", "y", "blur", ["color", WKF.Color] ],
     do: WKF.Length,
     s: " "
 }
@@ -758,7 +758,10 @@ fdo.scale3d = ["sx", "sy", "sz"]
  */
 export const skew = (ax: Extended<CssAngle>, ay?: Extended<CssAngle>): ISkewFunc => ({ fn: "skew", ax, ay });
 
-fdo.scale3d = ["ax", "ay"]
+fdo.skew = {
+    p: ["ax", "ay"],
+    do: WKF.Angle
+}
 
 /**
  * Returns an ISkew1dFunc function representing the `skewX()` CSS function.
@@ -774,7 +777,7 @@ export const skewX = (a: Extended<CssAngle>): ISkew1dFunc => ({ fn: "skewX", a }
  */
 export const skewY = (a: Extended<CssAngle>): ISkew1dFunc => ({ fn: "skewY", a });
 
-fdo.scew = fdo.skewX = fdo.skewY = WKF.Angle;
+fdo.skewX = fdo.skewY = WKF.Angle;
 
 
 
