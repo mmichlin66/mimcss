@@ -1,14 +1,15 @@
 import {
     IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule,
-    ElementTagName, AttrSelectorOperation, AttrsDef, ParentClassType
+    ParentClassType
 } from "../api/RuleTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/StyleTypes"
-import {CssSelector} from "../api/CoreTypes"
+import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {camelToDash, symValueToString, v2s} from "../impl/Utils";
-import {styleset2s, sp2s, selector2s} from "../impl/StyleImpl"
+import {camelToDash, fdo2s, symValueToString} from "../impl/Utils";
+import {styleset2s, sp2s} from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
+import {selector2s} from "../impl/CoreImpl";
 
 
 
@@ -358,7 +359,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 class DependentRule extends StyleRule
 {
 	// for regular selectors, pseudo classes and pseudo elements, the selector already contains
-	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, psudo
+	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, pseudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
 	public constructor( selector: CssSelector, param?: any, style?: CombinedStyleset,
@@ -366,8 +367,8 @@ class DependentRule extends StyleRule
 	{
 		super( style);
 		this.selector = selector;
-		this.param = param;
 		this.parent = parent;
+        this.param = param;
 	}
 
 
@@ -375,7 +376,7 @@ class DependentRule extends StyleRule
 	// Creates a copy of the rule but with new parent (containing rule).
 	public clone( containingRule: StyleRule): DependentRule
 	{
-		let newRule = new DependentRule( this.selector, this.param, undefined, containingRule);
+		let newRule = new DependentRule( this.selector, this.param?.p, undefined, containingRule);
 
         // this method is called on a newly created object so we don't have any properties in
 		// our own styleset yet
@@ -392,8 +393,12 @@ class DependentRule extends StyleRule
 	{
 		let parentSelector = this.parent!.selectorText;
 		if (this.param)
-			return `${parentSelector}${this.selector}(${pseudoEntity2s( this.selector as string, this.param)})`;
-		else
+        {
+            // the "param" value is only set for parameterized pseud entities, so we convert it to
+            // the "func" object form. We also know that the selector is a string - name of the entity.
+			return `${parentSelector}${fdo2s({fn: this.selector as string, p: this.param} as IParameterizedPseudoEntityFunc<any>)}`;
+        }
+        else
 		{
 			// convert selector to string.
 			let selector = selector2s( this.selector);
@@ -410,14 +415,14 @@ class DependentRule extends StyleRule
 
 
 
+	// Parent style rule of which this rule is dependent.
+	public parent?: StyleRule;
+
 	// Partial selector that should be appended to the parent selector.
 	private selector: CssSelector;
 
 	// Optional parameters for the selector - used for parameterized pseudo classes and elements.
 	private param?: any;
-
-	// Parent style rule of which this rule is dependent.
-	public parent?: StyleRule;
 }
 
 
@@ -565,69 +570,6 @@ export class IDRule extends NamedStyleRule implements IIDRule
 
 
 /**
- * The AttrRule type describes a styleset that applies to elements identified by a attribute selector.
- */
-export class AttrRule extends StyleRule
-{
-	/** Name of the element whose attribute is part of the selector */
-	public tag: ElementTagName | IClassRule | IIDRule;
-
-    /** Array of attribute conditions */
-	public attrs: (string | AttrsDef)[];
-
-    // overloaded constructors
-	public constructor( tag: ElementTagName | IClassRule | IIDRule,
-        attrs: string | AttrsDef | (string | AttrsDef)[], styleset?: CombinedStyleset)
-	{
-		super( styleset);
-		this.tag = tag;
-		this.attrs = !attrs ? [] : Array.isArray(attrs) ? attrs : [attrs];
-	}
-
-	// Returns the selector part of the style rule.
-	public getSel(): string
-	{
-        let s = typeof this.tag === "string" ? this.tag : this.tag.selectorText;
-        for( let attr of this.attrs)
-        {
-            if (typeof attr === "string")
-                s += `[${attr}]`;
-            else
-            {
-                for( let name in attr)
-                {
-                    let valueOrOptions = attr[name];
-                    if (valueOrOptions)
-                    {
-                        if (typeof valueOrOptions !== "object")
-                            s += `[${name}="${valueOrOptions}"]`
-                        else if (valueOrOptions.v == null)
-                            s += `[${attr}]`;
-                        else
-                        {
-                            s += "[";
-                            if (valueOrOptions.ns)
-                                s += valueOrOptions.ns + "|";
-
-                            s += `${name}${valueOrOptions.op ?? AttrSelectorOperation.Equal}"${valueOrOptions.v}"`
-
-                            if (valueOrOptions.ci)
-                                s += " i";
-
-                            s += "]"
-                        }
-                    }
-                }
-            }
-        }
-
-		return s;
-	}
-}
-
-
-
-/**
  * The SelectorRule type describes a styleset that applies to elements identified by a CSS selector.
  */
 export class SelectorRule extends StyleRule
@@ -696,24 +638,6 @@ const mergeCustomProps = (target: Styleset, source: Styleset): void =>
 
     let targetItems = target["--"];
     target["--"] = !targetItems ? sourceItems.slice() : targetItems.concat( sourceItems);
-}
-
-
-
-/**
- * Returns a string representation of a parameterized pseudo entity.
- */
-const pseudoEntity2s = (entityName: string, val: any): string =>
-{
-    if (!entityName)
-        return "";
-
-    if (entityName.startsWith( ":nth"))
-        return v2s( val, {
-            arr: [v => v + "n", v => !v ? "" : v > 0 ? "+" + v : "-" + -v]
-        });
-    else
-        return v2s(val);
 }
 
 

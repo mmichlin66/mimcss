@@ -18,7 +18,7 @@ describe("style properties of type <radius>:", () =>
 		})
 	})
 
-	describe("single corner radius", () =>
+	describe("multi corner radius", () =>
 	{
 		it("border radius as one / zero values", () =>
 		{

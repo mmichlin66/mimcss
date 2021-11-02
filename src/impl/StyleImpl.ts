@@ -1,4 +1,4 @@
-﻿import {CssSelector, Extended} from "../api/CoreTypes";
+﻿import {Extended} from "../api/CoreTypes";
 import {
     BorderImage_Object, Border_StyleType, GridTemplateAreas_StyleType,
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType, Styleset,
@@ -7,19 +7,6 @@ import {
 import {IIDRule} from "../api/RuleTypes";
 import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 import {getVarsFromSD} from "../rules/RuleContainer";
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// CSS selector.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a string representation of a selector.
- */
-export const selector2s = (val: CssSelector): string => v2s( val, { sep: "" });
 
 
 

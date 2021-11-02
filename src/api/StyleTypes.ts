@@ -1,6 +1,6 @@
 ﻿import {
     Extended, OneOrPair, OneOrBox, OneOrMany, ExtendedProp, Global_StyleType, CssString, CssImage,
-    ICursorFunc, IUrlFunc
+    ICursorFunc, IUrlFunc, Direction
 } from "./CoreTypes"
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, CssFrequency, CssResolution,
@@ -844,15 +844,6 @@ export type CursorKeyword = "auto" | "default" | "none" | "context-menu" | "help
  * @category Style Property
  */
 export type Cursor_StyleType = OneOrMany<CursorKeyword | IUrlFunc | ICursorFunc>;
-
-
-
-/**
- * Type for [[IStyleset.direction|direction]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/direction
- * @category Style Property
- */
-export type Direction_StyleType = "ltr" | "rtl";
 
 
 
@@ -2824,7 +2815,7 @@ export interface IStyleset
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/direction
      */
-    direction?: Direction_StyleType;
+    direction?: Direction;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/display

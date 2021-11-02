@@ -1,15 +1,8 @@
 ﻿import {
-    ICustomVar, OneOrMany, PseudoEntity, PagePseudoClass, IParameterizedPseudoEntity,
-    DependentRuleCombinator, IConstant, IRuleWithSelector, CssSelector
+    ICustomVar, PseudoEntity, PagePseudoClass, IParameterizedPseudoEntity,
+    DependentRuleCombinator, IConstant, IRuleWithSelector, CssSelector, ElementTagName
 } from "./CoreTypes";
 import {ExtendedBaseStyleset, Styleset, VarTemplateName, VarValue, ExtendedVarValue} from "./StyleTypes";
-
-
-
-/**
- * Type that combines names of all HTML and SVG tags
- */
-export type ElementTagName = (keyof HTMLElementTagNameMap) | (keyof SVGElementTagNameMap) | "*";
 
 
 
@@ -283,76 +276,6 @@ export interface IIDRule extends INamedStyleRule
 {
 	/** Element identifier prefixed with `"#"` */
 	readonly cssIDName: string;
-}
-
-
-
-/**
- * Enumeration for operations defining the behavior of attribute selector.
- */
-export const enum AttrSelectorOperation
-{
-    Equal = "=",
-    ContainsWord = "~=",
-    StartsWithAndHyphen = "|=",
-    StartsWith = "^=",
-    EndsWith = "$=",
-    Contains = "*=",
-}
-
-
-
-/**
- * The `IAttrParams` interface represents an attribute condition clause that defines parameters
- * for a single attribute in an attribute selector.
- */
-export interface IAttrSelectorOptions
-{
-    /**
-     * Value to which the attribute value is compared. If not specified, the selector only looks
-     * for the presence of the attribute.
-     */
-	v: string | boolean | number;
-
-    /** Namespace of the attribute */
-	ns?: string;
-
-    /**
-     * Operation that defines the attribute value comparison behavior. The default value is
-     * [[AttrSelectorOperation.Equal]].
-     */
-	op?: AttrSelectorOperation;
-
-    /**
-     * Flag indicating whether or not attribute value comparison is case-sensitive. The default
-     * value is `false`; that is, the comparison is case-sensitive.
-     */
-	ci?: boolean;
-}
-
-
-
-/**
- * The `AttrsDef` type represents an object whose properties are attribute names and values are
- * comparizon rules for these attributes. This type is used in the [[$attr]] function.
- */
-export type AttrsDef = { [A: string]: string | boolean | number | IAttrSelectorOptions }
-
-
-
-/**
- * The `IAttrRule` interface represents a style rule with attribute selector.
- * This interface is returned from the [[$attr]] function.
- */
-export interface IAttrRule extends IStyleRule
-{
-	/** Name of the element whose attribute is part of the selector */
-	readonly tag: ElementTagName | IClassRule | IIDRule;
-
-    /**
-     * Array of attribute selector definitions that applied to the given element.
-     */
-	readonly attrs: (string | AttrsDef)[];
 }
 
 

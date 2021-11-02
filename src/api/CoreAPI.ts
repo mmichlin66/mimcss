@@ -1,15 +1,19 @@
-﻿import {SelectorItem, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy} from "./CoreTypes"
+﻿import {
+    SelectorItem, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy,
+    SelectorCombinator, CssSelector, ISelectorBuilder, IParameterizedPseudoEntity,
+    NthExpression, Direction, AttrComparisonOperation
+} from "./CoreTypes"
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {AttrTypeKeyword, AttrUnitKeyword, ExtendedVarValue, ListStyleType_StyleType, VarTemplateName} from "./StyleTypes";
 import {sp2s} from "../impl/StyleImpl";
-import {f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
+import {a2s, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
 
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Utility functions
+// Selector functions
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -28,7 +32,7 @@ import {f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
  *     s1 = this.$style( css.selector`ul > li`, {...})
  *
  *     // css: ul.c1:hover {...}
- *     c1 = this.$class()
+ *     c1 = this.$class({...})
  *     s2 = this.$style( css.selector`ul.${this.c1}:hover`, {...})
  * }
  * ```
@@ -37,6 +41,178 @@ export const selector = (parts: TemplateStringsArray, ...params: SelectorItem[])
     () => tag2s( parts, params);
 
 
+
+/**
+ * Array of combinator symbols - needed to check whether a string is a combinator.
+ */
+const selectorCombinators: SelectorCombinator[] = [",", " ", ">", "+", "~", "||"];
+const parameterisedEntities: (keyof IParameterizedPseudoEntity)[] = [":dir", ":has", ":host",
+    ":host-context", ":is", ":lang", ":not", ":nth-child", ":nth-of-type", ":nth-last-child",
+    ":nth-last-of-type", ":where", "::part", "::slotted"];
+
+
+
+/**
+ * Provides means to build complex selectors from multiple selector items of all possible kinds
+ * including tags, classess, IDs, attributes, pseudo classes and pseudo elements combined with
+ * CSS combinators.
+ */
+class SelectorBuilder<E extends keyof IParameterizedPseudoEntity> implements ISelectorBuilder
+{
+    fn: "sel" = "sel";
+    items: CssSelector[] = [];
+
+    constructor( ...items: CssSelector[]);
+    constructor( combinator: SelectorCombinator, ...items: CssSelector[]);
+    constructor( entity: E, param: IParameterizedPseudoEntity[E]);
+    constructor()
+    {
+        this.add( ...arguments);
+    }
+
+
+
+    and( ...items: CssSelector[]): this { return this.a( items, ""); }
+    or( ...items: CssSelector[]): this { this.p(","); return this.a( items, ","); }
+    child( ...items: CssSelector[]): this { this.p(">"); return this.a( items, ">"); }
+    desc( ...items: CssSelector[]): this { this.p(" "); return this.a( items, " "); }
+    sib( ...items: CssSelector[]): this { this.p("~"); return this.a( items, "~"); }
+    adj( ...items: CssSelector[]): this { this.p("+"); return this.a( items, "+"); }
+
+    pseudo<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): this
+    {
+        return this.p({fn: entity, p: param});
+    }
+
+    attr( name: string, val?: string | boolean | number, op?: AttrComparisonOperation,
+        cf?: "i" | "s", ns?: string): this
+    {
+        return this.p( {fn: "attr-sel", name, val, op, cf, ns});
+    }
+
+    is( ...items: CssSelector[]): this { return this.w( ":is", items); }
+    where( ...items: CssSelector[]): this { return this.w( ":where", items); }
+    not( ...items: CssSelector[]): this { return this.w( ":not", items); }
+
+    has( ...items: CssSelector[]): this;
+    has( combinator: SelectorCombinator | "", ...items: CssSelector[]): this;
+    has(): this
+    {
+        this.p( ":has(");
+        this.add( ...arguments);
+        this.p(")");
+        return this;
+    }
+
+    nthChild( nthExpr: NthExpression): this;
+    nthChild( a: number, b: number): this;
+    nthChild( p1: NthExpression, p2?: number) { return this.nth( ":nth-child", p1, p2); }
+
+    nthLastChild( nthExpr: NthExpression): this;
+    nthLastChild( a: number, b: number): this;
+    nthLastChild( p1: NthExpression, p2?: number) { return this.nth( ":nth-last-child", p1, p2); }
+
+    nthType( nthExpr: NthExpression): this;
+    nthType( a: number, b: number): this;
+    nthType( p1: NthExpression, p2?: number) { return this.nth( ":nth-of-type", p1, p2); }
+
+    nthLastType( nthExpr: NthExpression): this;
+    nthLastType( a: number, b: number): this;
+    nthLastType( p1: NthExpression, p2?: number) { return this.nth( ":nth-last-of-type", p1, p2); }
+
+    dir( direction: Direction): this { return this.p( `:dir(${direction})`); }
+    lang( langCode: string): this { return this.p( `:lang(${langCode})`); }
+    part( partName: string): this { return this.p( `::part(${partName})`); }
+    slotted( ...items: CssSelector[]): this { return this.w( "::slotted", items); }
+
+    add( ...items: CssSelector[]): this;
+    add( combinator: SelectorCombinator, ...items: CssSelector[]): this;
+    add<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): this
+    add(): this
+    {
+        let params = Array.from(arguments);
+        let p1 = params[0];
+        return selectorCombinators.includes(p1 as SelectorCombinator)
+            ? this.a( params, p1 as SelectorCombinator, 1)
+            : parameterisedEntities.includes(p1 as keyof IParameterizedPseudoEntity)
+                ? this.pseudo( p1, params[1])
+                : this.a( params, ",");
+    }
+
+
+
+    // Pushes the given selectors intermingled with the given combinator to the list of items. The
+    // "firstCombinatorIndex" parameter indicates the first index after which the combinator
+    // should be inserted.
+    private a( newItems: CssSelector[], combinator: string = ",", firstCombinatorIndex: number = 0): this
+    {
+        for( let i = 0; i < newItems.length; i++)
+        {
+            if (i > firstCombinatorIndex && combinator)
+                this.items.push( combinator);
+
+            this.items.push(newItems[i]);
+        }
+
+        return this;
+    }
+
+
+    // Pushes the given argument to the list of items
+    private p( item: string | SelectorItem | SelectorCombinator): this
+    {
+        this.items.push(item);
+        return this;
+    }
+
+
+    // Wraps the given selectors with the invocation of the given pseudo entity and pushes then
+    // to the list of items
+    private w( name: string, items: CssSelector[], combinator: string = ","): this
+    {
+        this.items.push( name + "(");
+        this.a( items, combinator)
+        this.items.push( ")");
+        return this;
+    }
+
+    // Pushes the "nth" pseudo class with the given parameters to the list of items
+    private nth( name: string, p1: NthExpression, p2?: number)
+    {
+        this.items.push( { fn: name, p: p2 != null ? [p1 as number, p2] : p1 });
+        return this;
+    }
+}
+
+
+
+/**
+ * Creates selector builder object that provides means to build complex selectors from multiple
+ * selector items of all possible kinds including tags, classess, IDs, attributes, pseudo classes
+ * and pseudo elements combined with CSS combinators.
+ * @param items List of selector items to initialize the complex selector. If multiple items are
+ * specified, they are treated as list; that is, they are combined with the `","` combinator.
+ * @returns
+ */
+export function sel( ...items: CssSelector[]): ISelectorBuilder;
+export function sel( combinator: SelectorCombinator, ...items: CssSelector[]): ISelectorBuilder;
+export function sel<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): ISelectorBuilder;
+
+// implementation
+export function sel(): ISelectorBuilder
+{
+    return new SelectorBuilder(...arguments);
+}
+
+fdo["sel"] = v => a2s( v.items, { sep: "", recursive: true }, "");
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Utility functions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * The `raw` function allows specifying arbitrary text for properties whose type normally doesn't

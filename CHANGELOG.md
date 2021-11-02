@@ -1,3 +1,11 @@
+# 0.11.6
+
+## Non-breaking changes
+
+1. Remove `$attr()` method - its functionality is fully covered by the `$style()` method.
+2. Add `sel()` function to define style rule selectors using chain calls.
+
+
 # 0.11.5
 
 ## Bug fixes

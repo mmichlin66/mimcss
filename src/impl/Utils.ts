@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ICssFuncObject } from "../api/CoreTypes";
+import { ICssFuncObject, NthExpression } from "../api/CoreTypes";
 
 /**
  * Converts dashe-case to camelCase, e.g. font-size to fontSize.
@@ -166,6 +166,10 @@ export type V2SOptions = WKF | AnyToStringFunc |
     // Separator for array items used with the item or obj properties. If not specified, a
     // single space will be used.
     sep?: string;
+
+    // Flag indicating that this option object should be passed recursively into arrays within
+    // arrays.
+    recursive?: boolean;
 };
 
 
@@ -223,7 +227,7 @@ export const v2s = (val: any, options?: V2SOptions): string =>
             else if (options.arr)
                 newOptions = options.arr;
             else
-                return a2s( val, options.item ?? options.any, options.sep);
+                return a2s( val, options.item ?? options.any ?? (options.recursive ? options : undefined), options.sep);
         }
         else if (typeof val === "object")
         {
