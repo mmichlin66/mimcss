@@ -591,13 +591,13 @@ export interface IAttrSelectorFunc extends ICssFuncObject
 
 /**
  * Represents a compound selector as an array of selectors. This interface is extended by the
- * [[ISelectorBuilder]] interface, whcih allows building a compound selector using chain calls.
+ * [[ISelectorBuilder]] interface, which allows building a compound selector using chain calls.
  */
 export interface ISelectorFunc extends ICssFuncObject
 {
     fn: "sel";
 
-    // Array of selector items that are combined together to produce a compound selector
+    /** Array of selector items that are combined together to produce a compound selector */
     items: CssSelector[];
 }
 
@@ -613,7 +613,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to immediately follow the existing selector and each other.
      * All items are concatenated and attached to the existing selector without any combinator.
-     * Calling this method without any argumants doesn't have any effect.
+     * Calling this method without any arguments doesn't have any effect.
      *
      * **Example:**
      *
@@ -634,7 +634,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as a list of selectors. All items
      * are  concatenated and attached to the existing selector using the `","` combinator. Calling
-     * this method without any argumants inserts the `","` combinator.
+     * this method without any arguments inserts the `","` combinator.
      *
      * **Example:**
      *
@@ -655,7 +655,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive immediate children.
      * All items are concatenated and attached to the existing selector using the `">"` combinator.
-     * Calling this method without any argumants inserts the `">"` combinator.
+     * Calling this method without any arguments inserts the `">"` combinator.
      *
      * **Example:**
      *
@@ -676,7 +676,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive descendants.
      * All items are concatenated and attached to the existing selector using the `" "` combinator.
-     * Calling this method without any argumants inserts the `" "` combinator.
+     * Calling this method without any arguments inserts the `" "` combinator.
      *
      * **Example:**
      *
@@ -697,7 +697,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive general siblings.
      * All items are concatenated and attached to the existing selector using the `"~"` combinator.
-     * Calling this method without any argumants inserts the `"~"` combinator.
+     * Calling this method without any arguments inserts the `"~"` combinator.
      *
      * **Example:**
      *
@@ -718,7 +718,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive adjacent siblings.
      * All items are concatenated and attached to the existing selector using the `"+"` combinator.
-     * Calling this method without any argumants inserts the `"+"` combinator.
+     * Calling this method without any arguments inserts the `"+"` combinator.
      *
      * **Example:**
      *
@@ -914,7 +914,9 @@ export interface ISelectorBuilder extends ISelectorFunc
     host$( ...items: CssSelector[]): this;
 
     /**
-     * Adds the `":host-context()"` pseudo class to immediately follow the existing selector
+     * Adds the `":host-context()"` pseudo class to immediately follow the existing selector. If
+     * multiple items are specified, they are interpreted as a list; that is, they are combined
+     * using the `","` combinator.
      *
      * **Example:**
      *

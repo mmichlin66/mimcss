@@ -116,6 +116,11 @@ describe("selectors:", () =>
                     css.sel("p").and(this.id1).or(this.cls1).child(this.id2).sib(this.cls2).adj(this.id3).desc(this.cls3),
                     { color: "yellow" },
                 )
+
+                s5 = this.$style(
+                    css.sel("p").or().and(this.id1),
+                    { color: "orange" },
+                )
             }
 
             let a = css.activate( A);
@@ -124,6 +129,7 @@ describe("selectors:", () =>
             expect(a.s2.selectorText).toEqual("p#A_id1.A_cls1");
             expect(a.s3.selectorText).toEqual("p#A_id1,.A_cls1>#A_id2>.A_cls2");
             expect(a.s4.selectorText).toEqual("p#A_id1,.A_cls1>#A_id2~.A_cls2+#A_id3 .A_cls3");
+            expect(a.s5.selectorText).toEqual("p,#A_id1");
 
             css.deactivate( a);
         })

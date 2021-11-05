@@ -2,7 +2,7 @@
 
 ## Non-breaking changes
 
-1. Remove `$attr()` method - its functionality is fully covered by the `$style()` method.
+1. Remove `$attr()` method of the StyleDefinition class - its functionality is fully covered by the `$style()` method.
 2. Add `sel()` function to define style rule selectors using chain calls.
 
 

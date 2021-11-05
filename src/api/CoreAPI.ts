@@ -19,8 +19,8 @@ import {a2s, camelToDash, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
 /**
  * Returns a string representation of a selector. This function is a tag function and must be
  * invoked with the template string without parentheses. This function can be used wherever the
- * [[CssSelector]] or [[SelectorItem]] types are allowed. The parameters embedded into the string
- * must conform to the [[SelectorItem]] type.
+ * [[CssSelector]] types are allowed. The parameters embedded into the string
+ * must conform to the [[CssSelector]] type.
  *
  * **Example:**
  *
