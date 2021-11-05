@@ -20,7 +20,7 @@ describe("style rules:", () =>
 		{
 			cls = this.$class()
 			id = this.$id()
-			tag = this.$style( "h1", {})
+			tag = this.$tag( "h1", {})
 			selector = this.$style( "div > span", {})
 		}
 
@@ -66,7 +66,7 @@ describe("style rules:", () =>
 		{
 			cls = this.$class({ color: "red" })
 			id = this.$id({ color: "red" })
-			tag = this.$style( "h1", { color: "red" })
+			tag = this.$tag( "h1", { color: "red" })
 			selector = this.$style( "div > span", { color: "red" })
 		}
 
@@ -128,6 +128,42 @@ describe("style rules:", () =>
 
 		expect((cssRules[0] as CSSStyleRule).selectorText).toEqual(".A_cls2 > .A_cls1");
 		expect((cssRules[1] as CSSStyleRule).selectorText).toEqual(".A_cls1 + .A_cls2");
+
+		css.deactivate( a);
+	})
+
+
+
+	it("should create dependent style rules for nth pseudo class", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			cls1 = this.$class({
+                ":nth-child": [
+                    [ 4,  { color: "red" } ],
+                    [ [4],  { color: "green" } ],
+                    [ [4, 0],  { color: "blue" } ],
+                    [ [2, 1],  { color: "yellow" } ],
+                    [ "3n+4",  { color: "orange" } ],
+                    [ "even",  { color: "violet" } ],
+                    [ [3,-3],  { color: "azure" } ],
+                ]
+            })
+		}
+
+		let a = css.activate( A);
+		let elm = dom.getStyleElementWithID( "A");
+		expect(elm).toBeTruthy();
+		let cssRules = (elm!.sheet as CSSStyleSheet).cssRules;
+		expect(cssRules.length).toEqual(7);
+
+		expect((cssRules[0] as CSSStyleRule).selectorText).toEqual(".A_cls1:nth-child(4)");
+		expect((cssRules[1] as CSSStyleRule).selectorText).toEqual(".A_cls1:nth-child(4n)");
+		expect((cssRules[2] as CSSStyleRule).selectorText).toEqual(".A_cls1:nth-child(4n)");
+		expect((cssRules[3] as CSSStyleRule).selectorText).toEqual(".A_cls1:nth-child(2n+1)");
+		expect((cssRules[4] as CSSStyleRule).selectorText).toEqual(".A_cls1:nth-child(3n+4)");
+		expect((cssRules[5] as CSSStyleRule).selectorText).toEqual(".A_cls1:nth-child(2n)");
+		expect((cssRules[6] as CSSStyleRule).selectorText).toEqual(".A_cls1:nth-child(3n-3)");
 
 		css.deactivate( a);
 	})

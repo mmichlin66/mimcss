@@ -999,7 +999,7 @@ export const virtual = (target: any, name: string): void =>
             // depending on the object type we may have a different object to pass to the proxy;
             // also we need to know whether the object is a special (internal to JavaScript) one
             // and the handler will have to treat it specially
-            let [newTarget, isSpecial] = getProxiableObject(v);
+            let newTarget = getProxiableObject(v);
 
             // check whether we already have the handler and create it if we don't
             let handler = this[sym] as VirtHandler;
@@ -1011,7 +1011,6 @@ export const virtual = (target: any, name: string): void =>
 
             // set the new vaules to the handler so that it will use it from now on
             handler.target = newTarget;
-            handler.isSpecial = isSpecial;
         }
     });
 }
@@ -1028,15 +1027,14 @@ export const virtual = (target: any, name: string): void =>
  *   object before returning them from the get method. This is true for "internal" JavaScript
  *   classes like boxed primitive types, Map, Set, Promise and some others.
  */
-let getProxiableObject = (v: any): [any, boolean] =>
+const getProxiableObject = (v: any): any =>
 {
-    return v == null ? [v, false] :
-        typeof v === "string" ? [new String(v), true] :
-        typeof v === "number" ? [new Number(v), true] :
-        typeof v === "boolean" ? [new Boolean(v), true] :
-        typeof v === "symbol" ? [new Object(v), true] :
-        v instanceof Map || v instanceof Set || v instanceof Array ? [v, true] :
-        [v, false];
+    return v == null ? v :
+        typeof v === "string" ? new String(v) :
+        typeof v === "number" ? new Number(v) :
+        typeof v === "boolean" ? new Boolean(v) :
+        typeof v === "symbol" ? new Object(v) :
+        v;
 }
 
 
@@ -1049,7 +1047,6 @@ class VirtHandler implements ProxyHandler<any>
 {
     public proxy: any;
     public target: any;
-    public isSpecial: boolean;
 
     // interesting things happen in the get method
     get( t: any, p: PropertyKey, r: any): any
@@ -1065,9 +1062,8 @@ class VirtHandler implements ProxyHandler<any>
         // will be thrown - which is expected.
         let pv = Reflect.get( this.target, p, r);
 
-        // if the requested property is a function of a boxed primitive, bind the original method
-        // to the target object
-        return this.isSpecial && typeof pv === "function" ? pv.bind( this.target) : pv;
+        // if the requested property is a function, bind the original method to the target object
+        return typeof pv === "function" ? pv.bind( this.target) : pv;
     }
 
     // the rest of the methods mostly delegate the calls to the latest target instead of the

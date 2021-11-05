@@ -376,7 +376,7 @@ class DependentRule extends StyleRule
 	// Creates a copy of the rule but with new parent (containing rule).
 	public clone( containingRule: StyleRule): DependentRule
 	{
-		let newRule = new DependentRule( this.selector, this.param?.p, undefined, containingRule);
+		let newRule = new DependentRule( this.selector, this.param, undefined, containingRule);
 
         // this method is called on a newly created object so we don't have any properties in
 		// our own styleset yet

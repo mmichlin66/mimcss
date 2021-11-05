@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { IIDRule } from "./RuleTypes";
+import { IIDRule, INamespaceRule } from "./RuleTypes";
 
 /**
  * Style values that can be used for any CSS property.
@@ -467,6 +467,9 @@ export type PseudoEntity = PseudoClass | PseudoElement;
  *
  *             // css: p:nth-of-type(odd)
  *             ["odd", { color: "yellow" }],
+ *
+ *             // css: p:nth-of-type(2n-1)
+ *             [[2,-1], { color: "orange" }],
  *         ],
  *     })
  * }
@@ -546,15 +549,7 @@ export interface IParameterizedPseudoEntityFunc<T extends keyof IParameterizedPs
 /**
  * Enumeration for operations defining the behavior of attribute selector.
  */
-export const enum AttrComparisonOperation
-{
-    Equal = "=",
-    ContainsWord = "~=",
-    StartsWithAndHyphen = "|=",
-    StartsWith = "^=",
-    EndsWith = "$=",
-    Contains = "*=",
-}
+export type AttrComparisonOperation = "=" | "~=" | "|=" | "^=" | "$=" | "*=";
 
 
 
@@ -577,7 +572,7 @@ export interface IAttrSelectorFunc extends ICssFuncObject
     val?: string | boolean | number;
 
     /** Namespace of the attribute */
-    ns?: string;
+    ns?: string | INamespaceRule;
 
     /**
      * Operation that defines the attribute value comparison behavior. The default value is
@@ -595,16 +590,18 @@ export interface IAttrSelectorFunc extends ICssFuncObject
 
 
 /**
- * Represents a compound selector as an array of selector items. This interface is extended by
- * the [[ISelectorBuilder]] interface, whcih allows building a compound selector using chain calls.
+ * Represents a compound selector as an array of selectors. This interface is extended by the
+ * [[ISelectorBuilder]] interface, whcih allows building a compound selector using chain calls.
  */
 export interface ISelectorFunc extends ICssFuncObject
 {
     fn: "sel";
 
-    // Array of selector items that are combined together
+    // Array of selector items that are combined together to produce a compound selector
     items: CssSelector[];
 }
+
+
 
 /**
  * Provides means to build complex selectors from multiple selector items of all possible kinds
@@ -616,6 +613,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to immediately follow the existing selector and each other.
      * All items are concatenated and attached to the existing selector without any combinator.
+     * Calling this method without any argumants doesn't have any effect.
      *
      * **Example:**
      *
@@ -635,7 +633,8 @@ export interface ISelectorBuilder extends ISelectorFunc
 
     /**
      * Adds one or more selector items to the existing selector as a list of selectors. All items
-     * are  concatenated and attached to the existing selector using the `","` combinator.
+     * are  concatenated and attached to the existing selector using the `","` combinator. Calling
+     * this method without any argumants inserts the `","` combinator.
      *
      * **Example:**
      *
@@ -656,6 +655,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive immediate children.
      * All items are concatenated and attached to the existing selector using the `">"` combinator.
+     * Calling this method without any argumants inserts the `">"` combinator.
      *
      * **Example:**
      *
@@ -676,6 +676,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive descendants.
      * All items are concatenated and attached to the existing selector using the `" "` combinator.
+     * Calling this method without any argumants inserts the `" "` combinator.
      *
      * **Example:**
      *
@@ -696,6 +697,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive general siblings.
      * All items are concatenated and attached to the existing selector using the `"~"` combinator.
+     * Calling this method without any argumants inserts the `"~"` combinator.
      *
      * **Example:**
      *
@@ -716,6 +718,7 @@ export interface ISelectorBuilder extends ISelectorFunc
     /**
      * Adds one or more selector items to the existing selector as consecutive adjacent siblings.
      * All items are concatenated and attached to the existing selector using the `"+"` combinator.
+     * Calling this method without any argumants inserts the `"+"` combinator.
      *
      * **Example:**
      *
@@ -734,27 +737,9 @@ export interface ISelectorBuilder extends ISelectorFunc
     adj( ...items: CssSelector[]): this;
 
     /**
-     * Adds a parameterised pseudo class or element with the corresponding parameter. This is a
-     * generic method that can be used for any parameterised pseudo class or element. There are
-     * more specific methods for every parameterised pseudo class and element that provide more
-     * convenient interface for adding those, e.g. [[is]], [[not]], [[nthChild]] and others.
-     *
-     * **Example:**
-     *
-     * ```typescript
-     * class MyStyles extends css.StyleDefinition
-     * {
-     *     // produces css: section:nth-child(2n+1) {...}
-     *     s1 = css.$style( css.sel("section").pseudo( ":nth-child", [2,1]), {...})
-     * }
-     * ```
-     * @param entity Name of the parameterised pseudo class or element
-     * @param param Parameter for the pseudo entity
-     */
-    pseudo<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): this;
-
-    /**
-     * Adds an attribute selector to immediately follow the existing selector.
+     * Adds an attribute selector to immediately follow the existing selector. This variant doesn't
+     * accept comparison operation and, therefore, performs regular equality comparison. It also
+     * allows omitting the value, in which case, only the presence of the attribute is checked.
      *
      * **Example:**
      *
@@ -764,22 +749,200 @@ export interface ISelectorBuilder extends ISelectorFunc
      *     // produces css: div:[title] {...}
      *     s1 = css.$style( css.sel("div").attr( "title"), {...})
      *
-     *     // produces css: div:[title="tooltip"] {...}
-     *     s1 = css.$style( css.sel("div").attr( "title"), {...})
-     *
-     *     // produces css: a:[href^="https://"] {...}
-     *     s1 = css.$style( css.sel("a").attr( "href", "https://", "^="), {...})
+     *     // produces css: a:[href="https://www.example.com"] {...}
+     *     s2 = css.$style( css.sel("a").attr( "href", "https://www.example.com"), {...})
      * }
      * ```
      * @param name Attribute name.
      * @param val Attribute value - if omitted, only attribute presence is checked.
-     * @param op Attrbute comparison operation.
      * @param cf Flag indicating whether or not attribute comparison is case insensitive. Undefined
      * value means the comparison is case sensitive.
      * @param ns Attribute's namespace.
      */
-    attr( name: string, val?: string | boolean | number, op?: AttrComparisonOperation,
-        cf?: "i" | "s", ns?: string): this;
+    attr( name: string, val?: string | boolean | number, cf?: "i" | "s", ns?: string | INamespaceRule): this;
+    /**
+     * Adds an attribute selector to immediately follow the existing selector.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // produces css: a:[href^="https://"] {...}
+     *     s1 = css.$style( css.sel("a").attr( "href", "^=", "https://"), {...})
+     * }
+     * ```
+     * @param name Attribute name.
+     * @param op Attrbute comparison operation.
+     * @param val Attribute value - if omitted, only attribute presence is checked.
+     * @param cf Flag indicating whether or not attribute comparison is case insensitive. Undefined
+     * value means the comparison is case sensitive.
+     * @param ns Attribute's namespace.
+     */
+    attr( name: string, op: AttrComparisonOperation, val: string | boolean | number,
+        cf?: "i" | "s", ns?: string | INamespaceRule): this;
+
+
+
+    /** Adds the `":active"` pseudo class to immediately follow the existing selector */
+    readonly active: this;
+
+    /** Adds the `":any-link"` pseudo class to immediately follow the existing selector */
+    readonly anyLink: this;
+
+    /** Adds the `":autofill"` pseudo class to immediately follow the existing selector */
+    readonly autofill: this;
+
+    /** Adds the `":blank"` pseudo class to immediately follow the existing selector */
+    readonly blank: this;
+
+    /** Adds the `":checked"` pseudo class to immediately follow the existing selector */
+    readonly checked: this;
+
+    /** Adds the `":default"` pseudo class to immediately follow the existing selector */
+    readonly default: this;
+
+    /** Adds the `":defined"` pseudo class to immediately follow the existing selector */
+    readonly defined: this;
+
+    /**
+     * Adds the `":dir()"` pseudo class with the given direction to immediately follow the
+     * existing selector.
+     */
+    dir( direction: Direction): this;
+
+    /** Adds the `":disabled"` pseudo class to immediately follow the existing selector */
+    readonly disabled: this;
+
+    /** Adds the `":empty"` pseudo class to immediately follow the existing selector */
+    readonly empty: this;
+
+    /** Adds the `":enabled"` pseudo class to immediately follow the existing selector */
+    readonly enabled: this;
+
+    /** Adds the `":first-child"` pseudo class to immediately follow the existing selector */
+    readonly firstChild: this;
+
+    /** Adds the `":first-of-type"` pseudo class to immediately follow the existing selector */
+    readonly firstOfType: this;
+
+    /** Adds the `":first"` pseudo class to immediately follow the existing selector */
+    readonly first: this;
+
+    /** Adds the `":focus-visible"` pseudo class to immediately follow the existing selector */
+    readonly focusVisible: this;
+
+    /** Adds the `":focus-within"` pseudo class to immediately follow the existing selector */
+    readonly focusWithin: this;
+
+    /** Adds the `":focus"` pseudo class to immediately follow the existing selector */
+    readonly focus: this;
+
+    /** Adds the `":fullscreen"` pseudo class to immediately follow the existing selector */
+    readonly fullscreen: this;
+
+    ///////////////////// The "has" method is commented out because it is not clear yet how to
+    ///////////////////// implement it in an elegant way, and because browsers don't support it.
+    // /**
+    //  * Adds the `":has()"` pseudo class to immediately follow the existing selector. If multiple
+    //  * items are specified, they are interpreted as a list; that is, they are combined using
+    //  * the `","` combinator.
+    //  *
+    //  * **Example:**
+    //  *
+    //  * ```typescript
+    //  * class MyStyles extends css.StyleDefinition
+    //  * {
+    //  *     c1 = css.$class({...})
+    //  *     c2 = css.$class({...})
+    //  *
+    //  *     // produces css: section:has(.c1, .c2) {...}
+    //  *     s1 = css.$style( css.sel("section").has( this.c1, this.c2), {...})
+    //  * }
+    //  * ```
+    //  * @param items List of selectors to be added
+    //  */
+    // has( ...items: CssSelector[]): this;
+    // /**
+    //  * Adds the `":has()"` pseudo class with partial selector that starts with the given combinator.
+    //  * If multiple items are specified, they are concatenated using the given combinator. A
+    //  * special value `""` (empty string) of the `combinator` parameter allows to concatenate the
+    //  * items without any combinator.
+    //  *
+    //  * **Example:**
+    //  *
+    //  * ```typescript
+    //  * class MyStyles extends css.StyleDefinition
+    //  * {
+    //  *     c1 = css.$class({...})
+    //  *     c2 = css.$class({...})
+    //  *
+    //  *     // produces css: section:has(> .c1 > .c2) {...}
+    //  *     s1 = css.$style( css.sel("section").has( ">", this.c1, this.c2), {...})
+    //  *
+    //  *     // produces css: section:has(.c1.c2) {...}
+    //  *     s2 = css.$style( css.sel("section").has( "", this.c1, this.c2), {...})
+    //  * }
+    //  * ```
+    //  * @param combinator Combinator to use to concatenate the items and to attach them to the
+    //  * existing selector.
+    //  * @param items List of selectors to be added
+    //  */
+    // has( combinator: SelectorCombinator | "", ...items: CssSelector[]): this;
+
+    /** Adds the `":host"` pseudo class to immediately follow the existing selector */
+    readonly host: this;
+
+    /**
+     * Adds the `":host()"` parameterized pseudo class to immediately follow the existing selector.
+     * The method has the dollar-sign in its name to differentiate it from the property [[host]].
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     c1 = css.$class({...})
+     *     c2 = css.$class({...})
+     *
+     *     // produces css: :host(.c1, .c2) {...}
+     *     s = css.$style( css.sel().host$( this.c1, this.c2), {...})
+     * }
+     * ```
+     * @param items List of selectors to be added
+     */
+    host$( ...items: CssSelector[]): this;
+
+    /**
+     * Adds the `":host-context()"` pseudo class to immediately follow the existing selector
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     c1 = css.$class({...})
+     *     c2 = css.$class({...})
+     *
+     *     // produces css: :host-context(.c1, .c2) {...}
+     *     s = css.$style( css.sel().hostContext( this.c1, this.c2), {...})
+     * }
+     * ```
+     * @param items List of selectors to be added
+     */
+    hostContext( ...items: CssSelector[]): this;
+
+    /** Adds the `":hover"` pseudo class to immediately follow the existing selector */
+    readonly hover: this;
+
+    /** Adds the `":in-range"` pseudo class to immediately follow the existing selector */
+    readonly inRange: this;
+
+    /** Adds the `":indeterminate"` pseudo class to immediately follow the existing selector */
+    readonly indeterminate: this;
+
+    /** Adds the `":invalid"` pseudo class to immediately follow the existing selector */
+    readonly invalid: this;
 
     /**
      * Adds the `":is()"` pseudo class to immediately follow the existing selector. If multiple
@@ -803,25 +966,21 @@ export interface ISelectorBuilder extends ISelectorFunc
     is( ...items: CssSelector[]): this;
 
     /**
-     * Adds the `":where()"` pseudo class to immediately follow the existing selector. If multiple
-     * items are specified, they are interpreted as a list; that is, they are combined using
-     * the `","` combinator.
-     *
-     * **Example:**
-     *
-     * ```typescript
-     * class MyStyles extends css.StyleDefinition
-     * {
-     *     c1 = css.$class({...})
-     *     c2 = css.$class({...})
-     *
-     *     // produces css: :where(.c1, .c2) > p:hover {...}
-     *     s1 = css.$style( css.sel().where( this.c1, this.c2).child("p:hover"), {...})
-     * }
-     * ```
-     * @param items List of selectors to be added
+     * Adds the `":lang()"` pseudo class with the given direction.
      */
-    where( ...items: CssSelector[]): this;
+    lang( langCode: string): this;
+
+    /** Adds the `":last-child"` pseudo class to immediately follow the existing selector */
+    readonly lastChild: this;
+
+    /** Adds the `":last-of-type"` pseudo class to immediately follow the existing selector */
+    readonly lastOfType: this;
+
+    /** Adds the `":left"` pseudo class to immediately follow the existing selector */
+    readonly left: this;
+
+    /** Adds the `":link"` pseudo class to immediately follow the existing selector */
+    readonly link: this;
 
     /**
      * Adds the `":not()"` pseudo class to immediately follow the existing selector. If multiple
@@ -842,53 +1001,6 @@ export interface ISelectorBuilder extends ISelectorFunc
      * @param items List of selectors to be added
      */
     not( ...items: CssSelector[]): this;
-
-    /**
-     * Adds the `":has()"` pseudo class to immediately follow the existing selector. If multiple
-     * items are specified, they are interpreted as a list; that is, they are combined using
-     * the `","` combinator.
-     *
-     * **Example:**
-     *
-     * ```typescript
-     * class MyStyles extends css.StyleDefinition
-     * {
-     *     c1 = css.$class({...})
-     *     c2 = css.$class({...})
-     *
-     *     // produces css: section:has(.c1, .c2) {...}
-     *     s1 = css.$style( css.sel("section").has( this.c1, this.c2), {...})
-     * }
-     * ```
-     * @param items List of selectors to be added
-     */
-    has( ...items: CssSelector[]): this;
-    /**
-     * Adds the `":has()"` pseudo class with partial selector that starts with the given combinator.
-     * If multiple items are specified, they are concatenated using the given combinator. A
-     * special value `""` (empty string) of the `combinator` parameter allows to concatenate the
-     * items without any combinator.
-     *
-     * **Example:**
-     *
-     * ```typescript
-     * class MyStyles extends css.StyleDefinition
-     * {
-     *     c1 = css.$class({...})
-     *     c2 = css.$class({...})
-     *
-     *     // produces css: section:has(> .c1 > .c2) {...}
-     *     s1 = css.$style( css.sel("section").has( ">", this.c1, this.c2), {...})
-     *
-     *     // produces css: section:has(.c1.c2) {...}
-     *     s2 = css.$style( css.sel("section").has( "", this.c1, this.c2), {...})
-     * }
-     * ```
-     * @param combinator Combinator to use to concatenate the items and to attach them to the
-     * existing selector.
-     * @param items List of selectors to be added
-     */
-    has( combinator: SelectorCombinator | "", ...items: CssSelector[]): this;
 
     /**
      * Adds the `":nth-child()"` pseudo class with the given parameters.
@@ -933,83 +1045,300 @@ export interface ISelectorBuilder extends ISelectorFunc
      * }
      * ```
      * @param a Number before the `"n"` in the `"An+B"` expression
-     * @param b Number after the `"+"` in the `"An+B"` expression. Use Negative value
+     * @param b Number after the `"+"` in the `"An+B"` expression. Use negative value
      * to create a `"An-B"` expression.
      */
     nthChild( a: number, b: number): this;
 
     /**
      * Adds the `":nth-last-child()"` pseudo class with the given parameters.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // produces css: p:nth-last-child("odd") {...}
+     *     s1 = css.$style( css.sel("p").nthLastChild("odd"), {...})
+     *
+     *     // produces css: p:nth-last-child(3) {...}
+     *     s2 = css.$style( css.sel("p").nthLastChild(3), {...})
+     *
+     *     // produces css: p:nth-last-child(3n) {...}
+     *     s3 = css.$style( css.sel("p").nthLastChild([3]), {...})
+     *
+     *     // produces css: p:nth-last-child(3n+1) {...}
+     *     s4 = css.$style( css.sel("p").nthLastChild([3,1]), {...})
+     *
+     *     // produces css: p:nth-last-child(3n-1) {...}
+     *     s5 = css.$style( css.sel("p").nthLastChild([3,-1]), {...})
+     * }
+     * ```
+     * @param nthExpr String, number or tuple providing the value for the `"nth"` expression
      */
     nthLastChild( nthExpr: NthExpression): this;
     /**
      * Adds the `":nth-last-child()"` pseudo class with the given parameters.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // produces css: p:nth-last-child(3n+1) {...}
+     *     s1 = css.$style( css.sel("p").nthLastChild(3, 1), {...})
+     *
+     *     // produces css: p:nth-last-child(3n-1) {...}
+     *     s2 = css.$style( css.sel("p").nthLastChild(3, -1), {...})
+     * }
+     * ```
+     * @param a Number before the `"n"` in the `"An+B"` expression
+     * @param b Number after the `"+"` in the `"An+B"` expression. Use negative value
+     * to create a `"An-B"` expression.
      */
     nthLastChild( a: number, b: number): this;
 
     /**
      * Adds the `":nth-of-type()"` pseudo class with the given parameters.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // produces css: p:nth-of-type("odd") {...}
+     *     s1 = css.$style( css.sel("p").nthOfType("odd"), {...})
+     *
+     *     // produces css: p:nth-of-type(3) {...}
+     *     s2 = css.$style( css.sel("p").nthOfType(3), {...})
+     *
+     *     // produces css: p:nth-of-type(3n) {...}
+     *     s3 = css.$style( css.sel("p").nthOfType([3]), {...})
+     *
+     *     // produces css: p:nth-of-type(3n+1) {...}
+     *     s4 = css.$style( css.sel("p").nthOfType([3,1]), {...})
+     *
+     *     // produces css: p:nth-of-type(3n-1) {...}
+     *     s5 = css.$style( css.sel("p").nthOfType([3,-1]), {...})
+     * }
+     * ```
+     * @param nthExpr String, number or tuple providing the value for the `"nth"` expression
      */
-    nthType( nthExpr: NthExpression): this;
+    nthOfType( nthExpr: NthExpression): this;
     /**
      * Adds the `":nth-of-type()"` pseudo class with the given parameters.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // produces css: p:nth-of-type(3n+1) {...}
+     *     s1 = css.$style( css.sel("p").nthOfType(3, 1), {...})
+     *
+     *     // produces css: p:nth-of-type(3n-1) {...}
+     *     s2 = css.$style( css.sel("p").nthOfType(3, -1), {...})
+     * }
+     * ```
+     * @param a Number before the `"n"` in the `"An+B"` expression
+     * @param b Number after the `"+"` in the `"An+B"` expression. Use negative value
+     * to create a `"An-B"` expression.
      */
-    nthType( a: number, b: number): this;
+    nthOfType( a: number, b: number): this;
 
     /**
      * Adds the `":nth-last-of-type()"` pseudo class with the given parameters.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // produces css: p:nth-last-of-type("odd") {...}
+     *     s1 = css.$style( css.sel("p").nthLastOfType("odd"), {...})
+     *
+     *     // produces css: p:nth-last-of-type(3) {...}
+     *     s2 = css.$style( css.sel("p").nthLastOfType(3), {...})
+     *
+     *     // produces css: p:nth-last-of-type(3n) {...}
+     *     s3 = css.$style( css.sel("p").nthLastOfType([3]), {...})
+     *
+     *     // produces css: p:nth-last-of-type(3n+1) {...}
+     *     s4 = css.$style( css.sel("p").nthLastOfType([3,1]), {...})
+     *
+     *     // produces css: p:nth-last-of-type(3n-1) {...}
+     *     s5 = css.$style( css.sel("p").nthLastOfType([3,-1]), {...})
+     * }
+     * ```
+     * @param nthExpr String, number or tuple providing the value for the `"nth"` expression
      */
-    nthLastType( nthExpr: NthExpression): this;
+    nthLastOfType( nthExpr: NthExpression): this;
     /**
      * Adds the `":nth-last-of-type()"` pseudo class with the given parameters.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // produces css: p:nth-last-of-type(3n+1) {...}
+     *     s1 = css.$style( css.sel("p").nthLastOfType(3, 1), {...})
+     *
+     *     // produces css: p:nth-last-of-type(3n-1) {...}
+     *     s2 = css.$style( css.sel("p").nthLastOfType(3, -1), {...})
+     * }
+     * ```
+     * @param a Number before the `"n"` in the `"An+B"` expression
+     * @param b Number after the `"+"` in the `"An+B"` expression. Use negative value
+     * to create a `"An-B"` expression.
      */
-    nthLastType( a: number, b: number): this;
+    nthLastOfType( a: number, b: number): this;
+
+    /** Adds the `":only-child"` pseudo class to immediately follow the existing selector */
+    readonly onlyChild: this;
+
+    /** Adds the `":only-of-type"` pseudo class to immediately follow the existing selector */
+    readonly onlyOfType: this;
+
+    /** Adds the `":optional"` pseudo class to immediately follow the existing selector */
+    readonly optional: this;
+
+    /** Adds the `":out-of-range"` pseudo class to immediately follow the existing selector */
+    readonly outOfRange: this;
+
+    /** Adds the `":paused"` pseudo class to immediately follow the existing selector */
+    readonly paused: this;
+
+    /** Adds the `":picture-in-picture"` pseudo class to immediately follow the existing selector */
+    readonly pictureInPicture: this;
+
+    /** Adds the `":placeholder-shown"` pseudo class to immediately follow the existing selector */
+    readonly placeholderShown: this;
+
+    /** Adds the `":playing"` pseudo class to immediately follow the existing selector */
+    readonly playing: this;
+
+    /** Adds the `":read-only"` pseudo class to immediately follow the existing selector */
+    readonly readOnly: this;
+
+    /** Adds the `":read-write"` pseudo class to immediately follow the existing selector */
+    readonly readWrite: this;
+
+    /** Adds the `":required"` pseudo class to immediately follow the existing selector */
+    readonly required: this;
+
+    /** Adds the `":right"` pseudo class to immediately follow the existing selector */
+    readonly right: this;
+
+    /** Adds the `":root"` pseudo class to immediately follow the existing selector */
+    readonly root: this;
+
+    /** Adds the `":scope"` pseudo class to immediately follow the existing selector */
+    readonly scope: this;
+
+    /** Adds the `":target"` pseudo class to immediately follow the existing selector */
+    readonly target: this;
+
+    /** Adds the `":valid"` pseudo class to immediately follow the existing selector */
+    readonly valid: this;
+
+    /** Adds the `":visited"` pseudo class to immediately follow the existing selector */
+    readonly visited: this;
+
+    /** Adds the `":user-invalid"` pseudo class to immediately follow the existing selector */
+    readonly userInvalid: this;
+
+    /** Adds the `":user-valid"` pseudo class to immediately follow the existing selector */
+    readonly userValid: this;
 
     /**
-     * Adds the `":dir()"` pseudo class with the given direction.
+     * Adds the `":where()"` pseudo class to immediately follow the existing selector. If multiple
+     * items are specified, they are interpreted as a list; that is, they are combined using
+     * the `","` combinator.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     c1 = css.$class({...})
+     *     c2 = css.$class({...})
+     *
+     *     // produces css: :where(.c1, .c2) > p:hover {...}
+     *     s1 = css.$style( css.sel().where( this.c1, this.c2).child("p:hover"), {...})
+     * }
+     * ```
+     * @param items List of selectors to be added
      */
-    dir( direction: Direction): this;
+    where( ...items: CssSelector[]): this;
 
-    /**
-     * Adds the `":lang()"` pseudo class with the given direction.
-     */
-    lang( langCode: string): this;
+
+
+    /** Adds the `"::after"` pseudo element to immediately follow the existing selector */
+    readonly after: this;
+
+    /** Adds the `"::backdrop"` pseudo element to immediately follow the existing selector */
+    readonly backdrop: this;
+
+    /** Adds the `"::before"` pseudo element to immediately follow the existing selector */
+    readonly before: this;
+
+    /** Adds the `"::cue-region"` pseudo element to immediately follow the existing selector */
+    readonly cueRegion: this;
+
+    /** Adds the `"::cue"` pseudo element to immediately follow the existing selector */
+    readonly cue: this;
+
+    /** Adds the `"::first-letter"` pseudo element to immediately follow the existing selector */
+    readonly firstLetter: this;
+
+    /** Adds the `"::first-line"` pseudo element to immediately follow the existing selector */
+    readonly firstLine: this;
+
+    /** Adds the `"::grammar-error"` pseudo element to immediately follow the existing selector */
+    readonly grammarError: this;
+
+    /** Adds the `"::marker"` pseudo element to immediately follow the existing selector */
+    readonly marker: this;
 
     /**
      * Adds the `"::part()"` pseudo element with the given parameter.
      */
     part( partName: string): this;
 
+    /** Adds the `"::placeholder"` pseudo element to immediately follow the existing selector */
+    readonly placeholder: this;
+
+    /** Adds the `"::selection"` pseudo element to immediately follow the existing selector */
+    readonly selection: this;
+
     /**
-     * Adds the `"::slotted()"` pseudo element with the given selector.
+     * Adds the `"::slotted()"` pseudo element to immediately follow the existing selector. If
+     * multiple items are specified, they are interpreted as a list; that is, they are combined
+     * using the `","` combinator.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     c1 = css.$class({...})
+     *     c2 = css.$class({...})
+     *
+     *     // produces css: ::slotted(.c1, .c2) {...}
+     *     s1 = css.$style( css.sel().slotted( this.c1, this.c2)), {...})
+     * }
+     * ```
+     * @param items List of selectors to be added
      */
     slotted( ...items: CssSelector[]): this;
 
-    /**
-     * Adds the given selectors to immediately follow the existing selector
-     */
-    add( ...items: CssSelector[]): this;
-    /**
-     * Adds the given selectors after the given combinator. Multiple selectors are separated
-     * with the same combinator.
-     */
-    add( combinator: SelectorCombinator, ...items: CssSelector[]): this;
-    /**
-     * Adds the given parameterized pseudo class or element with the corresponding parameter
-     */
-    add<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): this;
+    /** Adds the `"::spelling-error"` pseudo element to immediately follow the existing selector */
+    readonly spellingError: this;
+
+    /** Adds the `"::target-text"` pseudo element to immediately follow the existing selector */
+    readonly targetText: this;
 }
-
-
-
-/**
- * Type for a single selector item that can be used as a parameter wherever selectors are used,
- * e.g. as arguments to the [[selector]] and [[sel]] functions or in [[CombinedStyleset]] nested
- * rules.
- */
-export type SelectorItem = ElementTagName | PseudoEntity | IRuleWithSelector | ISelectorProxy |
-    ISelectorFunc | IAttrSelectorFunc | IParameterizedPseudoEntityFunc<any> |
-    SelectorCombinator | IRawProxy | string;
 
 
 
@@ -1017,7 +1346,9 @@ export type SelectorItem = ElementTagName | PseudoEntity | IRuleWithSelector | I
  * Type for a CSS selector. This type is used to produce arbitrary complex selectors used by the
  * [[$style]] function. If array is specified, all items are converted to strings and concatenated.
  */
-export type CssSelector = SelectorItem | SelectorItem[];
+export type CssSelector = ElementTagName | PseudoEntity | IRuleWithSelector | ISelectorProxy |
+    ISelectorFunc | IAttrSelectorFunc | IParameterizedPseudoEntityFunc<any> |
+    SelectorCombinator | IRawProxy | string | CssSelector[];
 
 
 

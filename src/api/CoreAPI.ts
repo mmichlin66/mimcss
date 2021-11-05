@@ -1,12 +1,11 @@
 ﻿import {
-    SelectorItem, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy,
-    SelectorCombinator, CssSelector, ISelectorBuilder, IParameterizedPseudoEntity,
-    NthExpression, Direction, AttrComparisonOperation
+    CssSelector, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy,
+    ISelectorBuilder, NthExpression, AttrComparisonOperation
 } from "./CoreTypes"
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {AttrTypeKeyword, AttrUnitKeyword, ExtendedVarValue, ListStyleType_StyleType, VarTemplateName} from "./StyleTypes";
 import {sp2s} from "../impl/StyleImpl";
-import {a2s, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
+import {a2s, camelToDash, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
 
 
 
@@ -37,171 +36,300 @@ import {a2s, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
  * }
  * ```
  */
-export const selector = (parts: TemplateStringsArray, ...params: SelectorItem[]): ISelectorProxy =>
+export const selector = (parts: TemplateStringsArray, ...params: CssSelector[]): ISelectorProxy =>
     () => tag2s( parts, params);
 
 
 
 /**
+ * Array of attribute comparison operation strings - needed to check whether a string is an
+ * attribute comparison operation.
+ */
+const attrComparisonOperations: AttrComparisonOperation[] = ["=",  "~=", "|=", "^=", "$=", "*="];
+
+/**
  * Array of combinator symbols - needed to check whether a string is a combinator.
  */
-const selectorCombinators: SelectorCombinator[] = [",", " ", ">", "+", "~", "||"];
-const parameterisedEntities: (keyof IParameterizedPseudoEntity)[] = [":dir", ":has", ":host",
-    ":host-context", ":is", ":lang", ":not", ":nth-child", ":nth-of-type", ":nth-last-child",
-    ":nth-last-of-type", ":where", "::part", "::slotted"];
+const selectorCombinators = [",", " ", ">", "+", "~", "||"];
+
+// /**
+//  * Array of non-parameterized pseudo classes - needed to check whether a string is such pseudo class.
+//  */
+// const simplePseudoClasses = [
+//     "blank", "first", "left", "right",
+//     "active", "any-link", "autofill", "blank", "checked", "default", "defined", "disabled",
+//     "empty", "enabled", "firstChild", "firstOfType", "fullscreen", "focus",
+//     "focusVisible", "focusWithin", "host", "hover", "indeterminate", "inRange", "invalid",
+//     "lastChild", "lastOfType", "left", "link", "onlyChild", "onlyOfType", "optional",
+//     "outOfRange", "paused", "placeholderShown", "readOnly", "readWrite", "required",
+//     "right", "root", "scope", "target", "valid", "visited"
+// ];
+
+// /**
+//  * Array of non-parameterized pseudo elements - needed to check whether a string is such pseudo element.
+//  */
+// const simplePseudoElements = [
+//     "after", "backdrop", "before", "cue", "firstLetter", "firstLine",
+//     "grammarError", "marker", "placeholder", "selection", "spellingError"
+// ];
+
+// /**
+//  * Array of parameterized pseudo classes - needed to check whether a string is such pseudo class.
+//  */
+// const parameterizedPseudoClasses = [
+//     "dir", "has", "host", "hostContext", "is", "lang", "not", "nthChild", "nthOfType", "nthLastChild",
+//     "nthLastOfType", "where"
+// ];
+
+// /**
+//  * Array of parameterized pseudo elements - needed to check whether a string is such pseudo element.
+//  */
+// const parameterizedPseudoElements = [
+//     "part", "slotted"
+// ];
 
 
 
 /**
- * Provides means to build complex selectors from multiple selector items of all possible kinds
- * including tags, classess, IDs, attributes, pseudo classes and pseudo elements combined with
- * CSS combinators.
+ * Provide numeric values that are used to identify what to do when an appropriate property or
+ * method from the ISelectorBuilder interface is invoked.
  */
-class SelectorBuilder<E extends keyof IParameterizedPseudoEntity> implements ISelectorBuilder
+const enum SelectorProcessingType
 {
-    fn: "sel" = "sel";
+    SimplePseudoElement = 1,
+    ParameterizedPseudoClass,
+    ParameterizedPseudoElement,
+}
+
+/**
+ * Type that determines how a property or a method of the ISelectorBuilder interface should be
+ * converted to CssSelector values: The type can be one of the following:
+ *   - number - one of the values from the SelectorProcessingType enumeration
+ *   - Function - the function will be bound to the SelectorBuilderHandler instance and the
+ *     property name.
+ *   - object with the following fieds:
+ *     - f - the function will be bound to the SelectorBuilderHandler instance, the
+ *       property name and whatever arguments are specified in the "a" field.
+ *     - a - array of arguments to which the function specified by the "f" field wil be bound to
+ *       in addition to the SelectorBuilderHandler instance and the property name.
+ *     - p - optional prefix to be added to the property name for pseudo classes and elements.
+ *     - n - optional name of the entity to be passed to the function instead of the property name.
+ */
+type SelectorProcessingInfo = SelectorProcessingType | Function |
+    { f: Function, a: any[], p?: ":" | "::", n?: string };
+
+// SelectorProcessingInfo object that used several times, so it is "cached" here
+const pseudoClassWithSelectorsInfo: SelectorProcessingInfo = { f: wrapAndAddSelectors, a: [","], p: ":" };
+
+/**
+ * Object containing information about how properties and methods of the ISelectorBuilder interface
+ * should be converted to CssSelector values. If a name of the property is not in this object, it
+ * is treated as a non-parameterized pseudo class.
+ */
+const selectorInfos: { [P in string]: SelectorProcessingInfo } =
+{
+    // helper methods
+    "attr": addAttrSelector,
+    "and": { f: addSelectorsWithCombinators, a: [""] },
+    "or": { f: addSelectorsWithCombinators, a: [","] },
+    "child": { f: addSelectorsWithCombinators, a: [">"] },
+    "desc": { f: addSelectorsWithCombinators, a: [" "] },
+    "sib": { f: addSelectorsWithCombinators, a: ["~"] },
+    "adj": { f: addSelectorsWithCombinators, a: ["+"] },
+
+    // simple pseudo elements
+    "after": SelectorProcessingType.SimplePseudoElement,
+    "backdrop": SelectorProcessingType.SimplePseudoElement,
+    "before": SelectorProcessingType.SimplePseudoElement,
+    "cue": SelectorProcessingType.SimplePseudoElement,
+    "firstLetter": SelectorProcessingType.SimplePseudoElement,
+    "firstLine": SelectorProcessingType.SimplePseudoElement,
+    "grammarError": SelectorProcessingType.SimplePseudoElement,
+    "marker": SelectorProcessingType.SimplePseudoElement,
+    "placeholder": SelectorProcessingType.SimplePseudoElement,
+    "selection": SelectorProcessingType.SimplePseudoElement,
+    "spellingError": SelectorProcessingType.SimplePseudoElement,
+
+    // parameterized pseudo classes
+    "dir": SelectorProcessingType.ParameterizedPseudoClass,
+    // "has": pseudoClassWithSelectorsInfo,
+    "host$": { f: wrapAndAddSelectors, a: [","], p: ":", n: ":host" },
+    "hostContext": pseudoClassWithSelectorsInfo,
+    "is": pseudoClassWithSelectorsInfo,
+    "lang": SelectorProcessingType.ParameterizedPseudoClass,
+    "not": pseudoClassWithSelectorsInfo,
+    "nthChild": addNthPseudoClass,
+    "nthLastChild": addNthPseudoClass,
+    "nthOfType": addNthPseudoClass,
+    "nthLastOfType": addNthPseudoClass,
+    "where": pseudoClassWithSelectorsInfo,
+
+    // parameterized pseudo elements
+    "part": SelectorProcessingType.ParameterizedPseudoElement,
+    "slotted": { f: wrapAndAddSelectors, a: [","], p: "::" },
+}
+
+
+
+/**
+ * Proxy handler that serves as an implementation of the ISelectorBuilder interface.
+ */
+class SelectorBuilderHandler implements ProxyHandler<ISelectorBuilder>
+{
     items: CssSelector[] = [];
 
-    constructor( ...items: CssSelector[]);
-    constructor( combinator: SelectorCombinator, ...items: CssSelector[]);
-    constructor( entity: E, param: IParameterizedPseudoEntity[E]);
-    constructor()
+    // array of keys that are considered "own": these are the keys from the ISelectorFunc interface
+    static keys = ["fn", "items"];
+
+    get( t: any, propName: PropertyKey, r: any): any
     {
-        this.add( ...arguments);
-    }
+        if (typeof propName !== "string")
+            return undefined;
 
+        // the following makes our object to implement the ISelectorFunc interface
+        if (propName === "fn")
+            return "sel";
+        else if (propName === "items")
+            return this.items;
 
-
-    and( ...items: CssSelector[]): this { return this.a( items, ""); }
-    or( ...items: CssSelector[]): this { this.p(","); return this.a( items, ","); }
-    child( ...items: CssSelector[]): this { this.p(">"); return this.a( items, ">"); }
-    desc( ...items: CssSelector[]): this { this.p(" "); return this.a( items, " "); }
-    sib( ...items: CssSelector[]): this { this.p("~"); return this.a( items, "~"); }
-    adj( ...items: CssSelector[]): this { this.p("+"); return this.a( items, "+"); }
-
-    pseudo<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): this
-    {
-        return this.p({fn: entity, p: param});
-    }
-
-    attr( name: string, val?: string | boolean | number, op?: AttrComparisonOperation,
-        cf?: "i" | "s", ns?: string): this
-    {
-        return this.p( {fn: "attr-sel", name, val, op, cf, ns});
-    }
-
-    is( ...items: CssSelector[]): this { return this.w( ":is", items); }
-    where( ...items: CssSelector[]): this { return this.w( ":where", items); }
-    not( ...items: CssSelector[]): this { return this.w( ":not", items); }
-
-    has( ...items: CssSelector[]): this;
-    has( combinator: SelectorCombinator | "", ...items: CssSelector[]): this;
-    has(): this
-    {
-        this.p( ":has(");
-        this.add( ...arguments);
-        this.p(")");
-        return this;
-    }
-
-    nthChild( nthExpr: NthExpression): this;
-    nthChild( a: number, b: number): this;
-    nthChild( p1: NthExpression, p2?: number) { return this.nth( ":nth-child", p1, p2); }
-
-    nthLastChild( nthExpr: NthExpression): this;
-    nthLastChild( a: number, b: number): this;
-    nthLastChild( p1: NthExpression, p2?: number) { return this.nth( ":nth-last-child", p1, p2); }
-
-    nthType( nthExpr: NthExpression): this;
-    nthType( a: number, b: number): this;
-    nthType( p1: NthExpression, p2?: number) { return this.nth( ":nth-of-type", p1, p2); }
-
-    nthLastType( nthExpr: NthExpression): this;
-    nthLastType( a: number, b: number): this;
-    nthLastType( p1: NthExpression, p2?: number) { return this.nth( ":nth-last-of-type", p1, p2); }
-
-    dir( direction: Direction): this { return this.p( `:dir(${direction})`); }
-    lang( langCode: string): this { return this.p( `:lang(${langCode})`); }
-    part( partName: string): this { return this.p( `::part(${partName})`); }
-    slotted( ...items: CssSelector[]): this { return this.w( "::slotted", items); }
-
-    add( ...items: CssSelector[]): this;
-    add( combinator: SelectorCombinator, ...items: CssSelector[]): this;
-    add<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): this
-    add(): this
-    {
-        let params = Array.from(arguments);
-        let p1 = params[0];
-        return selectorCombinators.includes(p1 as SelectorCombinator)
-            ? this.a( params, p1 as SelectorCombinator, 1)
-            : parameterisedEntities.includes(p1 as keyof IParameterizedPseudoEntity)
-                ? this.pseudo( p1, params[1])
-                : this.a( params, ",");
-    }
-
-
-
-    // Pushes the given selectors intermingled with the given combinator to the list of items. The
-    // "firstCombinatorIndex" parameter indicates the first index after which the combinator
-    // should be inserted.
-    private a( newItems: CssSelector[], combinator: string = ",", firstCombinatorIndex: number = 0): this
-    {
-        for( let i = 0; i < newItems.length; i++)
+        let info = selectorInfos[propName];
+        if (!info)
+            return pushSelector.call( this, pseudoCamelTodDash( ":", propName));
+        else if (info === SelectorProcessingType.SimplePseudoElement)
+            return pushSelector.call( this, pseudoCamelTodDash( "::", propName));
+        else if (info === SelectorProcessingType.ParameterizedPseudoClass)
+            return addParameterizedPseudoEntity.bind( this, pseudoCamelTodDash( ":", propName));
+        else if (info === SelectorProcessingType.ParameterizedPseudoElement)
+            return addParameterizedPseudoEntity.bind( this, pseudoCamelTodDash( "::", propName));
+        else if (typeof info === "function")
+            return info.bind( this, propName);
+        else
         {
-            if (i > firstCombinatorIndex && combinator)
-                this.items.push( combinator);
-
-            this.items.push(newItems[i]);
+            propName = info.n ?? (info.p ? pseudoCamelTodDash( info.p, propName) : propName);
+            return info.f.bind( this, propName, ...info.a);
         }
-
-        return this;
     }
 
+    ownKeys( t: any): ArrayLike<string | symbol> { return SelectorBuilderHandler.keys; }
+    has( t: any, p: string): boolean { return SelectorBuilderHandler.keys.includes(p); }
 
-    // Pushes the given argument to the list of items
-    private p( item: string | SelectorItem | SelectorCombinator): this
+
+
+    // reference to the proxy object that this handler serves. We need it to return from
+    // our functions in order to make the call chaining work.
+    proxy: any;
+
+    constructor( items: CssSelector[])
     {
-        this.items.push(item);
-        return this;
-    }
-
-
-    // Wraps the given selectors with the invocation of the given pseudo entity and pushes then
-    // to the list of items
-    private w( name: string, items: CssSelector[], combinator: string = ","): this
-    {
-        this.items.push( name + "(");
-        this.a( items, combinator)
-        this.items.push( ")");
-        return this;
-    }
-
-    // Pushes the "nth" pseudo class with the given parameters to the list of items
-    private nth( name: string, p1: NthExpression, p2?: number)
-    {
-        this.items.push( { fn: name, p: p2 != null ? [p1 as number, p2] : p1 });
-        return this;
+        this.items = items;
     }
 }
+
+
+
+// adds an attribute selector
+function addAttrSelector( this: SelectorBuilderHandler, propName: string,
+    attrName: string, p2?: any, p3?: any, p4?: any, p5?: any): any
+{
+    return pushSelector.call( this,
+        attrComparisonOperations.includes(p2)
+            ? {fn: "attr-sel", name: attrName, val: p3, op: p2, cf: p4, ns: p5}
+            : {fn: "attr-sel", name: attrName, val: p2, cf: p3, ns: p4}
+    );
+}
+
+// Pushes a selector for the given parameterized pseudo entity to the list of items
+function addParameterizedPseudoEntity( this: SelectorBuilderHandler, entity: string, param: any): any
+{
+    return pushSelector.call( this, { fn: entity, p: param });
+}
+
+// Adds the given selectors intermingled with the given combinator to the list of items.
+function addSelectorsWithCombinators( this: SelectorBuilderHandler, entity: string,
+    combinator: string, ...newItems: CssSelector[]): any
+{
+    return pushSelectorsWithCombinators.call( this, combinator, true, ...newItems);
+}
+
+// Wraps the given selectors with the invocation of the given pseudo entity and pushes them
+// to the list of items
+function wrapAndAddSelectors( this: SelectorBuilderHandler, name: string, combinator: string, ...newItems: CssSelector[]): any
+{
+    this.items.push( name + "(");
+    pushSelectorsWithCombinators.call( this, combinator, false, ...newItems)
+    this.items.push( ")");
+    return this.proxy;
+}
+
+// Pushes the "nth" pseudo class with the given parameters to the list of items
+function addNthPseudoClass( this: SelectorBuilderHandler, propName: string, p1: NthExpression, p2?: number): any
+{
+    return pushSelector.call( this, { fn: pseudoCamelTodDash( ":", propName), p: p2 != null ? [p1 as number, p2] : p1 });
+}
+
+// Pushes the given selectors intermingled with the given combinator to the list of items. The
+// "insertBefore" parameter indicates whether the combinator should be inserted before the first
+// selector item.
+function pushSelectorsWithCombinators( this: SelectorBuilderHandler, combinator: string,
+    insertBefore: boolean, ...newItems: CssSelector[]): any
+{
+    if (insertBefore && combinator)
+        this.items.push( combinator);
+
+    for( let i = 0; i < newItems.length; i++)
+    {
+        if (i > 0 && combinator)
+            this.items.push( combinator);
+
+        this.items.push(newItems[i]);
+    }
+
+    return this.proxy;
+}
+
+// Pushes the given argument to the list of items
+function pushSelector( this: SelectorBuilderHandler, item: CssSelector): any
+{
+    this.items.push(item);
+    return this.proxy;
+}
+
+// combines the given prefix with the pseudo entity camel name converted to dash form
+const pseudoCamelTodDash = (prefix: ":" | "::", name: string) => prefix + camelToDash(name);
 
 
 
 /**
  * Creates selector builder object that provides means to build complex selectors from multiple
  * selector items of all possible kinds including tags, classess, IDs, attributes, pseudo classes
- * and pseudo elements combined with CSS combinators.
+ * and pseudo elements combined with CSS combinators. This function returns the [[ISelectorBuilder]]
+ * interface, which has methods and properties for all selector items.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     cls = this.$class({...})
+ *     myID = this.$id({...})
+ *
+ *     // produces CSS: label.cls1[data-item="myID"]:hover {...}
+ *     s1 = this.$style( css.sel("label").and(this.cls1)).attr("for", this.myID).hover, {...})
+ * }
+ * ```
  * @param items List of selector items to initialize the complex selector. If multiple items are
  * specified, they are treated as list; that is, they are combined with the `","` combinator.
  * @returns
  */
-export function sel( ...items: CssSelector[]): ISelectorBuilder;
-export function sel( combinator: SelectorCombinator, ...items: CssSelector[]): ISelectorBuilder;
-export function sel<T extends keyof IParameterizedPseudoEntity>( entity: T, param: IParameterizedPseudoEntity[T]): ISelectorBuilder;
-
-// implementation
-export function sel(): ISelectorBuilder
+export const sel = (...items: CssSelector[]): ISelectorBuilder =>
 {
-    return new SelectorBuilder(...arguments);
+    let handler = new SelectorBuilderHandler(items);
+    let proxy = new Proxy( {}, handler);
+
+    // the handler should reference the proxy in order to return it from methods (and properties)
+    // to allow chain calls.
+    handler.proxy = proxy;
+    return proxy as ISelectorBuilder;
 }
 
 fdo["sel"] = v => a2s( v.items, { sep: "", recursive: true }, "");
