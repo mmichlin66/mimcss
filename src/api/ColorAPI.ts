@@ -1,6 +1,6 @@
 ﻿import {Extended, OneOrMany} from "./CoreTypes";
 import {CssAngle, CssPercent} from "./NumericTypes";
-import {ColorSpace, CssColor, CssColorSeparation, IColorContrastFunc, IColorMixBuilder, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc} from "./ColorTypes";
+import {ColorSpace, CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorMixBuilder, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc} from "./ColorTypes";
 import {a2s, fdo, mv2s, v2s, wkf, WKF} from "../impl/Utils";
 
 
@@ -471,5 +471,61 @@ fdo["color-mix"] = [
     ["c2", v => mv2s( [[v[0], WKF.Color], [v[1], WKF.Percent]])],
 ];
 
+
+
+/**
+ * Converts the given color and the alpha mask to the CSS Color representation. This
+ * method should be used when defining CSS color values in styleset properties.
+ *
+ * The color can be specified as a numeric value or as a color name from the [[INamedColors]]
+ * interface - including colors added using the module augmentation technique.
+ *
+ * The alpha mask is specified as a number:
+ *   - The sign is ignored; that is, only the absolute value is considered.
+ *   - Number 0 to 1 inclusive, which is treated as percentage.
+ *   - Number 1 to 100 inclusive, which is treated as percentage.
+ *   - Numbers greater than 100 are clamped to 100;
+ *
+ * **Examples**
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // applying alpha to a numeric color
+ *     cls1 = this.$class({ color: css.alpha( 0xAA00AA, 0.5) })
+ *
+ *     // applying alpha to a named color
+ *     cls1 = this.$class({ color: css.alpha( "darkolivegreen", 0.5) })
+ * }
+ * ```
+ * @param c Color value as either a number or a named color
+ * @param a Alpha channel value
+ */
+export const alpha = (c: number | keyof INamedColors, a: number): IAlphaFunc => ({ fn: "alpha", c, a });
+
+const alpha2s = (c: number | keyof INamedColors, a: number): string =>
+{
+    // if the alpha is 0, return transparent color
+    if (a === 0)
+        return "#0000";
+
+    // convert color to numeric value (if it's not a number yet). If the color was given as a
+    // string that we cannot find in the Colors object, return pure white.
+    let n = typeof c === "string" ? Colors[c] : c;
+    if (n == null)
+        return "#FFF";
+
+    // negative and positive values of alpha are treated identically, so convert to positive
+    if (a < 0)
+        a = -a;
+
+    // convert alpha to a number with absolute value less than 1 (if it is not yet). If alpha
+    // is 1 or 100, then set it to 0 because 0 in the colorNumberToString means "no alpha".
+    a = a === 1 || a >= 100 ? 0 : a > 1 ? a / 100 : a;
+
+    // make the new alpha
+    return colorNumber2s( n >= 0 ? n + a : n - a);
+}
+
+fdo.alpha = (v: IAlphaFunc) => alpha2s( v.c, v.a)
 
 

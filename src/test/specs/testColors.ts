@@ -34,10 +34,10 @@ describe("Colors", () =>
 			dom.testLonghandProp( "color", "red", "red");
 		})
 
-		// it("named color with alpha function", () =>
-		// {
-		// 	dom.testLonghandProp( "color", css.alpha( "red", 0.5), "rgba(255, 0, 0, 0.5)");
-		// })
+		it("named color with alpha function", () =>
+		{
+			dom.testLonghandProp( "color", css.alpha( "red", 0.5), "rgba(255, 0, 0, 0.5)");
+		})
 	})
 
 
@@ -49,10 +49,10 @@ describe("Colors", () =>
 			dom.testLonghandProp( "color", 0x123456, "rgb(18, 52, 86)");
 		})
 
-		// it("numeric color with alpha function", () =>
-		// {
-		// 	dom.testLonghandProp( "color", css.alpha( 0x00FF00, 0.5), "rgba(0, 255, 0, 0.5)");
-		// })
+		it("numeric color with alpha function", () =>
+		{
+			dom.testLonghandProp( "color", css.alpha( 0x00FF00, 0.5), "rgba(0, 255, 0, 0.5)");
+		})
 
 		it("numeric color with alpha floating point part", () =>
 		{
@@ -64,10 +64,10 @@ describe("Colors", () =>
 			dom.testLonghandProp( "color", -0x123456, "rgb(237, 203, 169)");
 		})
 
-		// it("negative color with alpha function", () =>
-		// {
-		// 	dom.testLonghandProp( "color", css.alpha( -0x123456, 0.5), "rgba(237, 203, 169, 0.5)");
-		// })
+		it("negative color with alpha function", () =>
+		{
+			dom.testLonghandProp( "color", css.alpha( -0x123456, 0.5), "rgba(237, 203, 169, 0.5)");
+		})
 
 		it("negative color with alpha as floating point part", () =>
 		{

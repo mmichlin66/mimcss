@@ -186,7 +186,7 @@ export type CssColorSeparation = number | string | CssPercent;
  */
 export interface ICssColorFunc extends ICssFuncObject
 {
-    fn: "rgb" | "hsl" | "lab" | "lch" | "color-mix" | "color-contrast";
+    fn: "rgb" | "hsl" | "lab" | "lch" | "color-mix" | "color-contrast" | "alpha";
 }
 
 
@@ -413,6 +413,20 @@ export interface IColorMixBuilder extends IColorMixFunc
      * @param p Percentage of the first color to include in the mix
      */
     in( cs: Extended<ColorSpace>): this;
+}
+
+
+
+/**
+ * Represents an invocation of the [[alpha]] function. Developers can use this structure wherever
+ * CssColor is accepted.
+ */
+export interface IAlphaFunc extends ICssColorFunc
+{
+    fn: "alpha";
+
+    c: number | keyof INamedColors;
+    a: number;
 }
 
 
