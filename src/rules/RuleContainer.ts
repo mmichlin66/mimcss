@@ -116,7 +116,7 @@ class RuleContainer implements ITopLevelRuleContainer
 		else if (propVal instanceof RuleLike)
 			this.processRuleLike( propName, propVal)
 		else if (Array.isArray(propVal))
-			this.processArray( propVal)
+			this.processArray( propName, propVal)
 	}
 
 
@@ -173,14 +173,15 @@ class RuleContainer implements ITopLevelRuleContainer
 
 
 	// Processes rules from the given array.
-	private processArray( propVals: any[]): void
+	private processArray( propName: string | null, propVals: any[]): void
 	{
 		if (!propVals || propVals.length === 0)
 			return;
 
 		// loop over the properties of the definition object and process those that are rules.
+        let i = 0;
 		for( let propVal of propVals)
-			this.processProperty( null, propVal);
+			this.processProperty( `${propName}_${i++}`, propVal);
 	}
 
 
