@@ -222,17 +222,9 @@ export const styleset2s = (styleset: Styleset): string =>
  */
 export const s2ss = (styleset: Styleset): StringStyleset =>
 {
-    let res: StringStyleset = {};
-
     // enumerate all styleset properties without retrieving vendor-prefixed variants
-    forAllPropsInStylset(
-        styleset,
-        (name: string, value: string): void =>
-        {
-            res[name] = value;
-        }
-    );
-
+    let res: StringStyleset = {};
+    forAllPropsInStylset( styleset, (name: string, value: string): void => {res[name] = value});
     return res;
 }
 

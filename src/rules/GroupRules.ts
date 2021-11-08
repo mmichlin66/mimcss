@@ -26,9 +26,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
         // container to which our groupng rule belongs becomes the parent container for the
         // style definition instance
-		let instance = processSD( this.instOrClass, container.getDef());
-		this.sd = instance;
-		this.ruleContainer = getContainerFromInstance( instance);
+		this.sc = getContainerFromInstance( this._sd = processSD( this.instOrClass, container.getDef()));
 	}
 
 
@@ -36,7 +34,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		let selector = this.getSelectorText();
+		let selector = this.getSel();
 		if (!selector)
 			return;
 
@@ -44,7 +42,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
 		// insert sub-rules
 		if (this.cssRule)
-			this.ruleContainer.insert( this.cssRule);
+			this.sc.insert( this.cssRule);
 	}
 
 
@@ -52,14 +50,14 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	// Serializes this rule to a string.
     public serialize( ctx: IRuleSerializationContext): void
     {
-		let selector = this.getSelectorText();
+		let selector = this.getSel();
 		if (!selector)
 			return;
 
 		ctx.addRule( `${selector} {`);
 
 		// insert sub-rules
-		this.ruleContainer.serialize( ctx);
+		this.sc.serialize( ctx);
 
 		ctx.addRule( "}");
     }
@@ -69,19 +67,19 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	// Condition of this grouping rule.
 	public get condition(): string
     {
-        if (!this._condition)
-            this._condition = this.getConditionText();
+        if (!this._cond)
+            this._cond = this.getCond();
 
-        return this._condition ?? "";
+        return this._cond ?? "";
     }
 
 
 
 	// Returns the condition string of this grouping rule.
-	protected abstract getConditionText(): string | null;
+	protected abstract getCond(): string | null;
 
 	// Returns the selector string of this grouping rule.
-	protected abstract getSelectorText(): string | null;
+	protected abstract getSel(): string | null;
 
 
 
@@ -91,28 +89,28 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		super.clear();
 
 		// clear sub-rules
-		this.ruleContainer.clear();
+		this.sc.clear();
 	}
 
 
 
 	// Instance of the style definition class defining the rules under this grouping rule
-	public get definition(): T { return this.sd as T; }
+	public get sd(): T { return this._sd as T; }
 
 	/** SOM supports rule */
 	public cssRule: CSSGroupingRule | null;
 
 	// Style definition class that defines rules under this grouping rule.
-	protected instOrClass: T | IStyleDefinitionClass<T>;
+	private instOrClass: T | IStyleDefinitionClass<T>;
 
 	// Style definition instance.
-	protected sd: IStyleDefinition;
+	private _sd: IStyleDefinition;
 
-	// Rule container for the definition instance.
-	protected ruleContainer: IRuleContainer;
+	// Rule container for the definition instance - this container contains sub-rules.
+	private sc: IRuleContainer;
 
 	// Condition of this grouping rule.
-	private _condition: string | null;
+	private _cond: string | null;
 }
 
 
@@ -126,7 +124,7 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 	{
 		super( instOrClass);
 
-		this.statement = statement;
+		this.stmt = statement;
 	}
 
 
@@ -140,16 +138,15 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 
 
 	// Returns the condition string of this grouping rule.
-	protected getConditionText(): string | null
+	protected getCond(): string | null
     {
-        return supports2s( this.statement);
+        return supports2s( this.stmt);
     }
 
 	// Returns the selector string of this grouping rule.
-	protected getSelectorText(): string | null
+	protected getSel(): string | null
 	{
-		// determine whether the query is supported and if it is not, don't insert the rule
-		return CSS.supports( this.condition) ? `@supports ${this.condition}` : null;
+		return `@supports ${this.condition}`;
 	}
 
 
@@ -158,7 +155,7 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 	public cssRule: CSSSupportsRule | null;
 
 	// support statement for this rule.
-	private statement: SupportsStatement;
+	private stmt: SupportsStatement;
 }
 
 
@@ -172,19 +169,19 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
 	{
 		super( instOrClass);
 
-		this.statement = statement;
+		this.stmt = statement;
 	}
 
 
 
 	// Returns the condition string of this grouping rule.
-	protected getConditionText(): string | null
+	protected getCond(): string | null
     {
-        return media2s( this.statement);
+        return media2s( this.stmt);
     }
 
 	// Returns the selector string of this grouping rule.
-	protected getSelectorText(): string | null
+	protected getSel(): string | null
 	{
 		return `@media ${this.condition}`;
 	}
@@ -209,7 +206,7 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
 	public cssRule: CSSMediaRule | null;
 
 	// media statement for this rule.
-	private statement: MediaStatement;
+	private stmt: MediaStatement;
 
     // cached MediaQueryList object created for the media statement
     private _mql: MediaQueryList | null = null;

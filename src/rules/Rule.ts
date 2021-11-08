@@ -11,7 +11,7 @@ export interface IRuleSerializationContext
     // Adds rule text
     addRule( s: string, isTopLevelRule?: boolean): void;
 
-    // Adds rule text
+    // Adds StyleDefinition instance
     addSD( instance: IStyleDefinition): void;
 }
 

@@ -560,7 +560,7 @@ export interface IGroupRule<T extends IStyleDefinition = any> extends IRule
 	readonly condition: string;
 
 	// Instance of the style definition class defining the rules under this grouping rule
-	readonly definition: T;
+	readonly sd: T;
 
 	/** CSSOM grouping rule */
 	readonly cssRule: CSSGroupingRule | null;

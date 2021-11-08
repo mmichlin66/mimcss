@@ -21,15 +21,15 @@ export abstract class StyleRule extends Rule implements IStyleRule
 {
 	// The styleset can be an CombinedStyleset for many rules; however, for some it is just
 	// of the Styleset type.
-	public constructor( styleset?: Styleset)
+	public constructor( inputStyleset?: Styleset)
 	{
 		super();
 
 		this.styleset = {};
 		this.dependentRules = {};
 
-		if (styleset)
-			this.parseInputStyleset( styleset as CombinedStyleset);
+		if (inputStyleset)
+			this.parseInputStyleset( inputStyleset as CombinedStyleset);
 	}
 
 
@@ -47,40 +47,29 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 */
 	private parseInputStyleset( inputStyleset: CombinedStyleset): void
 	{
-		// if we have parents, we first copy properties from them so that our own properties
-		// can override them.
-		if (inputStyleset["+"])
-		{
-			// the value is a single StyleRule or an array of StyleRules to copy properties from
-			let extendsPropVal = inputStyleset["+"] as (StyleRule | StyleRule[]);
-			let parentRules: StyleRule[];
-			if (extendsPropVal instanceof StyleRule)
-				parentRules = [extendsPropVal];
-			else
-				parentRules = extendsPropVal;
-
-			// If we have parent rules, copy stylesets and dependent rules from them.
-			if (parentRules && parentRules.length > 0)
-			{
-				for( let parent of parentRules)
-				{
-					this.styleset = mergeStylesets( this.styleset, parent.styleset);
-					this.copyDependentRulesFrom( parent);
-				}
-			}
-		}
-
-		// merge custom  properties
-		mergeCustomProps( this.styleset, inputStyleset);
-
 		for( let propName in inputStyleset)
 		{
-			// skip over already processed parents and custom properties
-			if (propName === "+" || propName === "--")
-				continue;
-
 			let propVal = inputStyleset[propName];
-			if (propName.startsWith(":"))
+            if (propName === "+")
+            {
+                let extendsPropVal = propVal as (StyleRule | StyleRule[]);
+                if (extendsPropVal)
+                {
+                    // the value is a single StyleRule or an array of StyleRules to copy properties from
+                    let parentRules = extendsPropVal instanceof StyleRule ? [extendsPropVal] : extendsPropVal;
+                    for( let parent of parentRules)
+                    {
+                        this.styleset = mergeStylesets( this.styleset, parent.styleset);
+                        this.copyDepRules( parent);
+                    }
+                }
+            }
+            else if (propName === "--")
+            {
+                if (propVal)
+                    mergeCustomProps( this.styleset, propVal as CustomVar_StyleType[]);
+            }
+			else if (propName.startsWith(":"))
 			{
 				// if the value is an array, then this is an array of tuples representing
 				// parameterised pseudo entities where the first element is the parameter value
@@ -91,44 +80,30 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					let tuples = propVal as [any, CombinedStyleset][];
 					if (tuples.length > 0)
 					{
-						this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
+						this.dependentRules[propName] = tuples.map( tuple => new DepRule(
 							propName, tuple[0], tuple[1], this));
 					}
 				}
 				else
-					this.dependentRules[propName] = new DependentRule( "&" + propName, undefined,
+					this.dependentRules[propName] = new DepRule( "&" + propName, undefined,
 						propVal as CombinedStyleset, this);
 			}
-			else if (propName === "&")
-			{
-				// value is an array of two-element tuples with selector and styleset
-				let tuples = propVal as [CssSelector, CombinedStyleset][];
-				if (tuples.length > 0)
-				{
-					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
-						tuple[0], undefined, tuple[1], this));
-				}
-			}
-			else if (propName.startsWith("&"))
-			{
-				// value is an array of two-element tuples with selector and styleset
-				let tuples = propVal as [CssSelector, CombinedStyleset][];
-				if (tuples.length > 0)
-				{
-					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
-						() => propName + selector2s( tuple[0]), undefined, tuple[1], this));
-				}
-			}
-			else if (propName.endsWith("&"))
-			{
-				// value is an array of two-element tuples with selector and styleset
-				let tuples = propVal as [CssSelector, CombinedStyleset][];
-				if (tuples.length > 0)
-				{
-					this.dependentRules[propName] = tuples.map( tuple => new DependentRule(
-						() => selector2s( tuple[0]) + propName, undefined, tuple[1], this));
-				}
-			}
+			else if (propName.includes("&"))
+            {
+                // value is an array of two-element tuples with selector and styleset
+                let tuples = propVal as [CssSelector, CombinedStyleset][];
+                if (tuples.length > 0)
+                {
+                    this.dependentRules[propName] = tuples.map( tuple => {
+                        let newSelector = propName === "&"
+                            ? tuple[0]
+                            : propName.startsWith("&")
+                                ? [propName, tuple[0]]
+                                : [tuple[0], propName];
+                        return new DepRule( newSelector, undefined, tuple[1], this)
+                    });
+                }
+            }
 			else if (this.parseSP( propName, propVal))
 			{
 				// this is a regular CSS property: copy the property value to our internal styleset
@@ -143,7 +118,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
 	{
 		super.process( container, topLevelContainer, ruleName);
-        this.forEachDepRule( (depRule: DependentRule) => depRule.process( container, topLevelContainer, null));
+        this.forEachDepRule( (depRule: DepRule) => depRule.process( container, topLevelContainer, null));
 	}
 
 
@@ -163,7 +138,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			this.cssRule = Rule.toDOM( this.toCss(), parent) as CSSStyleRule;
 
         // insert dependent rules under the same parent
-        this.forEachDepRule( (depRule: DependentRule) => depRule.insert( parent));
+        this.forEachDepRule( (depRule: DepRule) => depRule.insert( parent));
 	}
 
 	// Clers the CSS rule object.
@@ -172,7 +147,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		super.clear();
 
         // clear dependent rules
-        this.forEachDepRule( (depRule: DependentRule) => depRule.clear());
+        this.forEachDepRule( (depRule: DepRule) => depRule.clear());
 	}
 
 	// Serializes this rule to a string.
@@ -182,16 +157,16 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			ctx.addRule( this.toCss());
 
         // insert dependent rules under the same parent
-        this.forEachDepRule( (depRule: DependentRule) => depRule.serialize( ctx));
+        this.forEachDepRule( (depRule: DepRule) => depRule.serialize( ctx));
 
     }
 
 	// Invoke the given function for each of the dependent rules.
-	private forEachDepRule( func: (depRule: DependentRule) => void): void
+	private forEachDepRule( func: (depRule: DepRule) => void): void
 	{
 		for( let propName in this.dependentRules)
 		{
-			let propVal = this.dependentRules[propName] as DependentRule | DependentRule[];
+			let propVal = this.dependentRules[propName] as DepRule | DepRule[];
 			if (Array.isArray(propVal))
                 for( let depRule of propVal) func( depRule);
 			else
@@ -213,25 +188,27 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Copies dependent rules from another style rule object.
-	protected copyDependentRulesFrom( src: StyleRule): void
+	protected copyDepRules( src: StyleRule): void
 	{
-		for( let propName in src.dependentRules)
+        let srsDepRules = src.dependentRules;
+        let thisDepRules = this.dependentRules;
+		for( let propName in srsDepRules)
 		{
-			let srcRuleOrArr = src.dependentRules[propName] as DependentRule | DependentRule[];
+			let srcRuleOrArr = srsDepRules[propName] as DepRule | DepRule[];
 			if (Array.isArray(srcRuleOrArr))
 			{
                 if (srcRuleOrArr.length > 0)
                 {
-                    let thisArr = this.dependentRules[propName];
+                    let thisArr = thisDepRules[propName];
                     if (!thisArr)
-                        this.dependentRules[propName] = thisArr = [];
+                        thisDepRules[propName] = thisArr = [];
 
                     for( let srcDepRule of srcRuleOrArr)
                         thisArr.push( srcDepRule.clone( this));
                 }
 			}
 			else
-				this.dependentRules[propName] = srcRuleOrArr.clone( this);
+				thisDepRules[propName] = srcRuleOrArr.clone( this);
 		}
 	}
 
@@ -356,7 +333,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
  * is used for pseudo classes, pseudo elements, combinators and other selectors that combine the
  * containing rule's selector with additional selector items.
  */
-class DependentRule extends StyleRule
+class DepRule extends StyleRule
 {
 	// for regular selectors, pseudo classes and pseudo elements, the selector already contains
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, pseudo
@@ -374,14 +351,14 @@ class DependentRule extends StyleRule
 
 
 	// Creates a copy of the rule but with new parent (containing rule).
-	public clone( containingRule: StyleRule): DependentRule
+	public clone( containingRule: StyleRule): DepRule
 	{
-		let newRule = new DependentRule( this.selector, this.param, undefined, containingRule);
+		let newRule = new DepRule( this.selector, this.param, undefined, containingRule);
 
         // this method is called on a newly created object so we don't have any properties in
 		// our own styleset yet
 		newRule.styleset = mergeStylesets( newRule.styleset, this.styleset);
-		newRule.copyDependentRulesFrom( this);
+		newRule.copyDepRules( this);
 
         return newRule;
 	}
@@ -394,7 +371,7 @@ class DependentRule extends StyleRule
 		let parentSelector = this.parent!.selectorText;
 		if (this.param)
         {
-            // the "param" value is only set for parameterized pseud entities, so we convert it to
+            // the "param" value is only set for parameterized pseudo entities, so we convert it to
             // the "func" object form. We also know that the selector is a string - name of the entity.
 			return `${parentSelector}${fdo2s({fn: this.selector as string, p: this.param} as IParameterizedPseudoEntityFunc<any>)}`;
         }
@@ -617,7 +594,7 @@ const mergeStylesets = (target: Styleset | undefined | null, source: Styleset): 
 	for( let propName in source)
 	{
         if (propName === "--")
-            mergeCustomProps( target, source);
+            mergeCustomProps( target, source[propName]!);
         else
             target[propName] = source[propName];
 	}
@@ -630,14 +607,10 @@ const mergeStylesets = (target: Styleset | undefined | null, source: Styleset): 
 /**
  * Merges "--" property from the source styleset to the target styleset.
  */
-const mergeCustomProps = (target: Styleset, source: Styleset): void =>
+const mergeCustomProps = (target: Styleset, sourceVars: CustomVar_StyleType[]): void =>
 {
-    let sourceItems = source["--"];
-    if (!sourceItems)
-        return;
-
-    let targetItems = target["--"];
-    target["--"] = !targetItems ? sourceItems.slice() : targetItems.concat( sourceItems);
+    let targetVars = target["--"];
+    target["--"] = !targetVars ? sourceVars.slice() : targetVars.concat( sourceVars);
 }
 
 

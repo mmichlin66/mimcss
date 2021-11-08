@@ -79,7 +79,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * style definitions, this property is always undefined. This property can also be undefined
      * if it was not provided to the constructor when creating the style definition class manually.
      */
-    public get $parent(): P | undefined { return this[symParent]; }
+public get $parent(): P | undefined { return this[symParent]; }
 
 
 
@@ -119,7 +119,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that will be inherited by style rules that extend this abstract rule.
      * @returns `IStyleRule` object that should be used by the derived rules in the `"+"` property.
      */
-    protected $abstract( styleset: CombinedStyleset): IStyleRule
+    public $abstract( styleset: CombinedStyleset): IStyleRule
     {
         return new AbstractRule( styleset);
     }
@@ -167,7 +167,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IClassRule` object that should be used for getting the class name and for accessing
      * the style properties if needed.
      */
-    protected $class( styleset?: CombinedClassStyleset, nameOverride?: string | IClassRule): IClassRule
+    public $class( styleset?: CombinedClassStyleset, nameOverride?: string | IClassRule): IClassRule
     {
         return new ClassRule( styleset, nameOverride);
     }
@@ -214,7 +214,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
      * `".class1.class2"`.
      */
-    protected $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
+    public $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
     {
         return new ClassNameRule( classes);
     }
@@ -261,7 +261,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IIDRule` object that should be used for getting the ID name and for accessing
      * the style properties if needed.
      */
-    protected $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
+    public $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
     {
         return new IDRule( styleset, nameOverride);
     }
@@ -296,10 +296,9 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that defines style properties for the tags.
      * @returns `IStyleRule` object representing the tag rule.
      */
-    protected $tag( tag: "*" | OneOrMany<ElementTagName>,
-        styleset: CombinedStyleset): IStyleRule
+    public $tag( tag: "*" | OneOrMany<ElementTagName>, styleset: CombinedStyleset): IStyleRule
     {
-        return new SelectorRule( Array.isArray(tag) ? a2s( tag, undefined, ",") : tag, styleset);
+        return new SelectorRule( Array.isArray(tag) ? tag.join(",") : tag, styleset);
     }
 
 
@@ -345,7 +344,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that defines style properties for this selector.
      * @returns `IStyleRule` object representing the style rule.
      */
-    protected $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
+    public $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
     {
         return new SelectorRule( selector, styleset);
     }
@@ -386,8 +385,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * another animation.
      * @returns `IAnimationRule` object that should be used for getting the animation name.
      */
-    protected $keyframes( frames?: AnimationFrame[],
-        nameOverride?: string | IAnimationRule): IAnimationRule
+    public $keyframes( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule): IAnimationRule
     {
         return new AnimationRule( frames, nameOverride);
     }
@@ -435,7 +433,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns The `IVarRule` object that represents the custom property. Any usage of this object in
      * style properties or function parameters is substituted by the `var()` CSS function invocation.
      */
-    protected $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
+    public $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
                     nameOverride?: string | IVarRule<K>): IVarRule<K>
     {
         return new VarRule( template, value, nameOverride);
@@ -476,7 +474,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns The `IConstRule` object that represents the value of the constant. The value is
      * computed once when the style definition is processed.
      */
-    protected $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
+    public $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
     {
         return new ConstRule( template, value);
     }
@@ -512,7 +510,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * existing counter.
      * @returns The `ICounterRule` object that represents the counter.
      */
-    protected $counter( nameOverride?: string | ICounterRule): ICounterRule
+    public $counter( nameOverride?: string | ICounterRule): ICounterRule
     {
         return new CounterRule( nameOverride);
     }
@@ -542,7 +540,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * existing counter style.
      * @returns The `ICounterStyleRule` object that represents the counter style.
      */
-    protected $counterStyle( counterStyleset?: ExtendedCounterStyleset,
+    public $counterStyle( counterStyleset?: ExtendedCounterStyleset,
         nameOverride?: string | ICounterStyleRule): ICounterStyleRule
     {
         return new CounterStyleRule( counterStyleset, nameOverride);
@@ -590,7 +588,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * `"-end"` is appended; if the flag is undefined, no suffix is appended to the rule name.
      * @returns The `IGridLineRule` object that represents the grid line.
      */
-    protected $gridline( nameOverride?: string | IGridLineRule,
+    public $gridline( nameOverride?: string | IGridLineRule,
         isStartEndOrNone?: boolean): IGridLineRule
     {
         return new GridLineRule( nameOverride, isStartEndOrNone);
@@ -647,7 +645,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * existing grid area.
      * @returns The `IGridAreaRule` object that represents the grid area.
      */
-    protected $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
+    public $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
     {
         return new GridAreaRule( nameOverride);
     }
@@ -675,7 +673,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * font to use.
      * @returns The `IFontFaceRule` object that represents the @font-face rule.
      */
-    protected $fontface( fontface: ExtendedFontFace): IFontFaceRule
+    public $fontface( fontface: ExtendedFontFace): IFontFaceRule
     {
         return new FontFaceRule( fontface);
     }
@@ -701,7 +699,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * page where the Mimcss library is invoked.
      * @returns The `IImportRule` object that represents the `@import` rule.
      */
-    protected $import( url: string, mediaQuery?: string | MediaStatement,
+    public $import( url: string, mediaQuery?: string | MediaStatement,
         supportsQuery?: string | SupportsStatement): IImportRule
     {
         return new ImportRule( url, mediaQuery, supportsQuery);
@@ -725,7 +723,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param prefix Prefix string to use for the namespace.
      * @returns The `INamespaceRule` object that represents the namespace rule.
      */
-    protected $namespace( namespace: string, prefix?: string): INamespaceRule
+    public $namespace( namespace: string, prefix?: string): INamespaceRule
     {
         return new NamespaceRule( namespace, prefix);
     }
@@ -748,7 +746,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styles to apply.
      * @returns The `IPageRule` object that represents the page rule.
      */
-    protected $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
+    public $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
     {
         return new PageRule( pseudoClass, styleset);
     }
@@ -776,9 +774,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param instOrClass Either style definition class or an instance of a style defintion class.
      * @returns `ISupportsRule` object representing the supports rule
      */
-    protected $supports( statement: SupportsStatement,
-        instOrClass: StyleDefinition<StyleDefinition<P>> | IStyleDefinitionClass<StyleDefinition<StyleDefinition<P>>>
-        ): ISupportsRule<StyleDefinition<StyleDefinition<P>>>
+    public $supports<T extends StyleDefinition<StyleDefinition<P>>>( statement: SupportsStatement,
+        instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>
     {
         return new SupportsRule( statement, instOrClass);
     }
@@ -806,9 +803,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param instOrClass Either style definition class or an instance of a style defintion class.
      * @returns `IMediaRule` object representing the media rule
      */
-    protected $media( statement: MediaStatement,
-        instOrClass: StyleDefinition<StyleDefinition<P>> | IStyleDefinitionClass<StyleDefinition<StyleDefinition<P>>>
-        ): IMediaRule<StyleDefinition<StyleDefinition<P>>>
+    public $media<T extends StyleDefinition<StyleDefinition<P>>>( statement: MediaStatement,
+        instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>
     {
         return new MediaRule( statement, instOrClass);
     }
@@ -852,7 +848,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns An instance of the style definition class, which will be activated and deactivated
      * along with the enclosing style definition.
      */
-    protected $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T
+    public $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T
     {
         return processSD( instOrClass) as T;
     }
