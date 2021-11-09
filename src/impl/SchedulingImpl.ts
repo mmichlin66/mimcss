@@ -91,7 +91,7 @@ class SynchronousActivator implements IStyleActivator
 	 */
 	public activate( definition: IStyleDefinition): void
 	{
-		activateInstance( definition, 1);
+		activateInstance( definition);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class SynchronousActivator implements IStyleActivator
 	 */
 	public deactivate( definition: IStyleDefinition): void
 	{
-		deactivateInstance( definition, 1);
+		deactivateInstance( definition);
 	}
 
 	/**
@@ -132,53 +132,16 @@ class SynchronousActivator implements IStyleActivator
 
 
 /**
- * Represents objects that are used by the SchedulingActivator class for setting property values.
- * When both name and value properties are null, the style will be set to an empty string
- * effectively removing all styles from the element or the rule.
- */
-interface ScheduledStyleUpdate
-{
-	/**
-     * Style object in which to set the property value. The style object can belong to either a
-     * style rulee or to an HTML element.
-     */
-	ruleOrElm: CSSStyleRule | ElementCSSInlineStyle;
-
-	/**
-     * Dashe-cased property name if setting a value of a single property or null if setting values
-     * of multiple properties.
-     */
-	name: string | null;
-
-	/**
-     * Property value if setting a value of a single property or a StringStyleset object if setting
-     * values of multiple properties. If the value is null or undefined, it is removed.
-     */
-	value?: string | StringStyleset | null;
-
-	/**
-     * Flag indicating whether the property should be marked "!important". This flag is ignored
-     * when setting values of multiple properties.
-     */
-	important?: boolean;
-}
-
-
-
-/**
  * The SchedulingActivator class keeps a map of StyleDefinition instances that are scheduled for
  * activation or deactivation. Each instance is mapped to a refernce count, which is incremented
  * upon the activate calls and decremented upon the deactivate calls. When the doActivation
  * method is called The style definition will be either activated or deactivated based on whether
  * the reference count is positive or negative.
  */
-export class SchedulingActivator implements IStyleActivator
+class SchedulingActivator implements IStyleActivator
 {
-    // Map of style definition class instances to the reference count of activation/deactivation.
-	private definitions = new Map<IStyleDefinition,number>();
-
-    // Array of style property values to be set/removed.
-    private props: ScheduledStyleUpdate[] = [];
+    // Array of functions that will be invoked when the scheduled update runs.
+    private actions: (()=>void)[] = [];
 
     // optional scheduler object
     private scheduler?: IScheduler;
@@ -201,20 +164,10 @@ export class SchedulingActivator implements IStyleActivator
 	 */
 	public activate( definition: IStyleDefinition): void
 	{
-		let refCount = this.definitions.get( definition) || 0;
-		if (refCount === -1)
-		{
-			this.definitions.delete( definition);
-			if (this.isSchedulingNeeded)
-				this.scheduler!.cancelDOMUpdate();
-		}
-		else
-		{
-			if (this.isSchedulingNeeded)
-                this.scheduler!.scheduleDOMUpdate();
+        if (this.isSchedulingNeeded)
+            this.scheduler!.scheduleDOMUpdate();
 
-			this.definitions.set( definition, ++refCount);
-		}
+        this.actions.push( () => activateInstance( definition));
 	}
 
 
@@ -224,20 +177,10 @@ export class SchedulingActivator implements IStyleActivator
 	 */
 	public deactivate( definition: IStyleDefinition): void
 	{
-		let refCount = this.definitions.get( definition) || 0;
-		if (refCount === 1)
-		{
-			this.definitions.delete( definition);
-			if (this.isSchedulingNeeded)
-                this.scheduler!.cancelDOMUpdate();
-		}
-		else
-		{
-			if (this.isSchedulingNeeded)
-                this.scheduler!.scheduleDOMUpdate();
+        if (this.isSchedulingNeeded)
+            this.scheduler!.scheduleDOMUpdate();
 
-			this.definitions.set( definition, --refCount);
-		}
+        this.actions.push( () => deactivateInstance( definition));
 	}
 
 
@@ -252,7 +195,7 @@ export class SchedulingActivator implements IStyleActivator
 		if (this.isSchedulingNeeded)
             this.scheduler!.scheduleDOMUpdate();
 
-		this.props.push({ ruleOrElm, name, value, important });
+		this.actions.push( () => updateStyleProperty( ruleOrElm, name, value, important));
 	}
 
 
@@ -262,7 +205,7 @@ export class SchedulingActivator implements IStyleActivator
 	 */
 	public forceDOMUpdate(): void
 	{
-		if (this.definitions.size > 0 || this.props.length > 0)
+		if (this.actions.length > 0)
 		{
             this.doDOMUpdate();
             this.scheduler && this.scheduler.cancelDOMUpdate();
@@ -277,9 +220,9 @@ export class SchedulingActivator implements IStyleActivator
 	 */
 	public cancelDOMUpdate(): void
 	{
-		if (this.definitions.size > 0 || this.props.length > 0)
+		if (this.actions.length > 0)
 		{
-			this.clearActivation();
+			this.actions = [];
             this.scheduler && this.scheduler.cancelDOMUpdate();
 		}
 	}
@@ -288,7 +231,7 @@ export class SchedulingActivator implements IStyleActivator
 
 	private get isSchedulingNeeded(): boolean
     {
-		return !!this.scheduler && !this.definitions.size && !this.props.length;
+		return !!this.scheduler && !this.actions.length;
     }
 
 
@@ -299,35 +242,12 @@ export class SchedulingActivator implements IStyleActivator
 	 */
 	private doDOMUpdate(): void
 	{
-        // activate/deactivate style definitions
-		this.definitions.forEach( (refCount: number, definition: IStyleDefinition) =>
-		{
-			if (refCount > 0)
-				activateInstance( definition, refCount);
-			else
-				deactivateInstance( definition, -refCount);
-		})
-
-		this.definitions.clear();
-
         // update style properties
-        for( let prop of this.props)
-    		updateStyleProperty( prop.ruleOrElm, prop.name, prop.value, prop.important);
+        for( let action of this.actions)
+    		action();
 
-		this.props = [];
+		this.actions = [];
     }
-
-
-
-	/**
-	 * Clears all activation/deactivation data for all style definitions accumulated since the last
-	 * activation/deactivation.
-	 */
-	private clearActivation(): void
-	{
-        this.definitions.clear();
-        this.props = [];
-	}
 }
 
 
@@ -338,10 +258,10 @@ export class SchedulingActivator implements IStyleActivator
 class AnimationFrameScheduler implements IScheduler
 {
     // Handle returned by requestAnimationFrame function.
-	private requestHandle = 0;
+	private h = 0;
 
     // Callback to call to write changes to the DOM.
-	private doDOMUpdate: () => void;
+	private cb: () => void;
 
 
     /**
@@ -350,7 +270,7 @@ class AnimationFrameScheduler implements IScheduler
      */
     public init( doDOMUpdate: () => void)
     {
-        this.doDOMUpdate = doDOMUpdate;
+        this.cb = doDOMUpdate;
     }
 
 	/**
@@ -358,7 +278,7 @@ class AnimationFrameScheduler implements IScheduler
 	 */
     public scheduleDOMUpdate(): void
     {
-		this.requestHandle = requestAnimationFrame( this.onAnimationFrame)
+		this.h = requestAnimationFrame( this.onFrame)
     }
 
 	/**
@@ -366,10 +286,10 @@ class AnimationFrameScheduler implements IScheduler
 	 */
     public cancelDOMUpdate(): void
     {
-		if (this.requestHandle > 0)
+		if (this.h > 0)
 		{
-			cancelAnimationFrame( this.requestHandle);
-			this.requestHandle = 0;
+			cancelAnimationFrame( this.h);
+			this.h = 0;
 		}
     }
 
@@ -377,10 +297,10 @@ class AnimationFrameScheduler implements IScheduler
 	/**
 	 * Is invoked when animation frame should be executed.
 	 */
-	private onAnimationFrame = (): void =>
+	private onFrame = (): void =>
 	{
-		this.requestHandle = 0;
-		this.doDOMUpdate();
+		this.h = 0;
+		this.cb();
 	}
 }
 

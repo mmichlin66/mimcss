@@ -1,3 +1,10 @@
+# 0.11.7
+
+## Non-breaking changes
+
+1. Allow named rules (e.g. $class()) to be created using arrays.
+
+
 # 0.11.6
 
 ## Non-breaking changes

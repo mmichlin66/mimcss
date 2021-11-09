@@ -270,31 +270,20 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		{
 			if (value == null)
 			{
-				if (currCustomProps.length > 0)
-				{
-					let index = currCustomProps.findIndex( item => item[0] === varObj);
-					if (index >= 0)
-					{
-						if (currCustomProps.length === 1)
-							this.styleset["--"] = undefined;
-						else
-							currCustomProps.splice( index, 1);
-					}
-				}
+                let index = currCustomProps.findIndex( item => item[0] === varObj);
+                if (index >= 0)
+                    currCustomProps.splice( index, 1);
 			}
-			else
-			{
-				if (!currCustomProps)
-					this.styleset["--"] = currCustomProps = [[varObj, value]];
-				else
-				{
-					let index = currCustomProps.findIndex( item => item[0] === varObj);
-					if (index >= 0)
-						currCustomProps[index][1] = value;
-					else
-						currCustomProps.push( [varObj, value]);
-				}
-			}
+			else if (!currCustomProps)
+                this.styleset["--"] = [[varObj, value]];
+            else
+            {
+                let index = currCustomProps.findIndex( item => item[0] === varObj);
+                if (index >= 0)
+                    currCustomProps[index][1] = value;
+                else
+                    currCustomProps.push( [varObj, value]);
+            }
 		}
 
 		// second, if CSSRule alredy exists, set/remove the property value there

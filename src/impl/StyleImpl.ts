@@ -352,7 +352,7 @@ const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCall
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const s_registerStylePropertyInfo = (name: string, toStringFunc: AnyToStringFunc) =>
+export const s_registerSP = (name: string, toStringFunc: AnyToStringFunc) =>
     name in stylePropertyInfos ? false : (stylePropertyInfos[name] = toStringFunc, true);
 
 

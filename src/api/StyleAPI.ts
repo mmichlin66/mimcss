@@ -1,7 +1,7 @@
 ﻿import {IStyleDefinitionClass, IStyleDefinition} from "./RuleTypes";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
 import {Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset, ICssSerializer} from "./StyleTypes"
-import {sp2s, s_registerStylePropertyInfo, s2ss, styleset2s} from "../impl/StyleImpl"
+import {sp2s, s_registerSP, s2ss, styleset2s} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
 import {processSD, serializeInstance} from "../rules/RuleContainer";
@@ -28,7 +28,7 @@ import {tag2s} from "../impl/Utils";
  * also the way to support properties with vendor prefixes.
  */
 export const registerStyleProperty = (name: string, toStringFunc: (v: any) => string): boolean =>
-    s_registerStylePropertyInfo( name, toStringFunc);
+    s_registerSP( name, toStringFunc);
 
 
 

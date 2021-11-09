@@ -61,7 +61,7 @@ class RuleContainer implements ITopLevelRuleContainer
 
 	// Processes the properties of the style definition instance. This creates names for classes,
 	// IDs, animations and custom variables.
-	public doP(): void
+	public process(): void
 	{
 		// get parent and top level containers
         if (this.parent)
@@ -617,7 +617,7 @@ const processClass = (definitionClass: IStyleDefinitionClass,
     // definition instance and process the container rules.
     let container = new RuleContainer( instance, name);
     instance[symContainer] = container;
-    container.doP();
+    container.process();
 
     // associate the definition class with the created definition instance
     definitionClass[symInstance] = instance;
@@ -652,7 +652,7 @@ const processInstance = (instance: IStyleDefinition): IStyleDefinition =>
     // definition instance and process the container rules.
     container = new RuleContainer( instance, name);
     instance[symContainer] = container;
-    container.doP();
+    container.process();
     return instance;
 }
 
@@ -690,7 +690,7 @@ export const getContainerFromInstance = (instance: IStyleDefinition): RuleContai
  * it was activated and deactivated. The rules are inserted to DOM only when this reference counter
  * goes from 0 to 1.
  */
-export const activateInstance = (instance: IStyleDefinition, count: number): void =>
+export const activateInstance = (instance: IStyleDefinition): void =>
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (!ruleContainer)
@@ -698,9 +698,7 @@ export const activateInstance = (instance: IStyleDefinition, count: number): voi
 
     // if this container has an embedding container, activate the embedding container; otherwise,
     // activate the rule container itself.
-    let whatToActivate = ruleContainer.ec ?? ruleContainer;
-    for( let i = 0; i < count; i++)
-        whatToActivate.activate();
+    (ruleContainer.ec ?? ruleContainer).activate();
 }
 
 
@@ -710,7 +708,7 @@ export const activateInstance = (instance: IStyleDefinition, count: number): voi
  * definition object maintains a reference counter of how many times it was activated and
  * deactivated. The rules are removed from DOM only when this reference counter goes from 1 to 0.
  */
-export const deactivateInstance = (instance: IStyleDefinition, count: number): void =>
+export const deactivateInstance = (instance: IStyleDefinition): void =>
 {
 	let ruleContainer = getContainerFromInstance( instance);
 	if (!ruleContainer)
@@ -718,9 +716,7 @@ export const deactivateInstance = (instance: IStyleDefinition, count: number): v
 
     // if this container has an embedding container, deactivate the embedding container; otherwise,
     // deactivate the rule container itself.
-    let whatToActivate = ruleContainer.ec ?? ruleContainer;
-    for( let i = 0; i < count; i++)
-        whatToActivate.deactivate();
+    (ruleContainer.ec ?? ruleContainer).deactivate();
 }
 
 
