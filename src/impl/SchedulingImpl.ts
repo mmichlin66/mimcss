@@ -1,7 +1,7 @@
 import {IStyleDefinition} from "../api/RuleTypes";
 import {SchedulerType, IScheduler} from "../api/SchedulingTypes";
+import {StringStyleset} from "../api/Stylesets";
 import {activateInstance, deactivateInstance} from "../rules/RuleContainer";
-import {StringStyleset} from "../api/StyleTypes";
 
 
 

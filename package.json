@@ -52,6 +52,7 @@
         "lib/api/SchedulingTypes.d.ts",
         "lib/api/SchedulingAPI.d.ts",
         "lib/api/StyleTypes.d.ts",
+        "lib/api/Stylesets.d.ts",
         "lib/api/StyleAPI.d.ts"
     ]
 }

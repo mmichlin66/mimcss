@@ -1,6 +1,6 @@
 import {PagePseudoClass} from "../api/CoreTypes";
 import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "../api/RuleTypes";
-import {Styleset} from "../api/StyleTypes";
+import {Styleset} from "../api/Stylesets";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"

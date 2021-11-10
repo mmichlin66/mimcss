@@ -2,10 +2,15 @@
     "readme": "none",
     "name": "Mimcss Reference",
 	"excludeExternals": true,
+    "excludeInternal": true,
     "excludePrivate": true,
     "disableSources": true,
+    "hideGenerator": true,
+    "includeVersion": true,
+	"includes": "./typedoc",
 	"out": "./reference",
+    "entryPointStrategy": "expand",
 	"entryPoints": [
-		"./src/api"
+		"./src/api/"
 	]
 }

@@ -3,7 +3,8 @@
     ISelectorBuilder, NthExpression, AttrComparisonOperation
 } from "./CoreTypes"
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
-import {AttrTypeKeyword, AttrUnitKeyword, ExtendedVarValue, ListStyleType_StyleType, VarTemplateName} from "./StyleTypes";
+import {AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType} from "./StyleTypes";
+import {ExtendedVarValue, VarTemplateName} from "./Stylesets";
 import {sp2s} from "../impl/StyleImpl";
 import {a2s, camelToDash, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
 

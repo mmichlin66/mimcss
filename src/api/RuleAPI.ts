@@ -8,7 +8,7 @@ import {
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
-import {Styleset, VarTemplateName, ExtendedVarValue} from "./StyleTypes";
+import {Styleset, VarTemplateName, ExtendedVarValue} from "./Stylesets";
 import {embeddedDecorator, getCurrentTheme, processSD, s_configureNames} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"

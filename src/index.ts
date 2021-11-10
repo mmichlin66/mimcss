@@ -9,6 +9,7 @@ export * from "./api/MediaTypes";
 export * from "./api/RuleTypes";
 export * from "./api/SchedulingTypes";
 export * from "./api/StyleTypes";
+export * from "./api/Stylesets";
 
 export * from "./api/CoreAPI";
 export * from "./api/NumericAPI";

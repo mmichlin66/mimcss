@@ -1,9 +1,10 @@
 ﻿import {Extended} from "../api/CoreTypes";
 import {
     BorderImage_Object, Border_StyleType, GridTemplateAreas_StyleType,
-    GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType, Styleset,
-    CustomVar_StyleType, VarTemplateName, BoxShadow_StyleType, IStyleset, StringStyleset, BoxShadow,
+    GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
+    BoxShadow_StyleType, BoxShadow,
 } from "../api/StyleTypes";
+import { CustomVar_StyleType, IStyleset, StringStyleset, Styleset, VarTemplateName } from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
 import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 import {getVarsFromSD} from "../rules/RuleContainer";
