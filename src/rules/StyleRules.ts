@@ -1,8 +1,8 @@
+import {IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "../api/RuleTypes";
 import {
-    IStyleRule, CombinedStyleset, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule,
-    ParentClassType
-} from "../api/RuleTypes";
-import {ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue} from "../api/Stylesets"
+    ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
+    CombinedStyleset, ParentClassType
+} from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, fdo2s, symValueToString} from "../impl/Utils";

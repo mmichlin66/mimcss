@@ -1,14 +1,14 @@
 ﻿import {CssSelector, PagePseudoClass, OneOrMany, ElementTagName} from "./CoreTypes";
 import {
-    CombinedStyleset, IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
+    IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType,
-    NameGenerationMethod, ICounterStyleRule, IStyleDefinition, CombinedClassStyleset,
+    NameGenerationMethod, ICounterStyleRule, IStyleDefinition
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
-import {Styleset, VarTemplateName, ExtendedVarValue} from "./Stylesets";
+import {Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset} from "./Stylesets";
 import {embeddedDecorator, getCurrentTheme, processSD, s_configureNames} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
@@ -17,7 +17,7 @@ import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
-import {a2s, v2s} from "../impl/Utils";
+import {v2s} from "../impl/Utils";
 import {getActivator} from "../impl/SchedulingImpl";
 
 

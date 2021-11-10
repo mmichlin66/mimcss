@@ -1,4 +1,5 @@
-import {IAnimationRule, AnimationFrame, AnimationWaypoint, AnimationStyleset, IAnimationFrameRule} from "../api/RuleTypes"
+import {IAnimationRule, AnimationFrame, AnimationWaypoint, IAnimationFrameRule} from "../api/RuleTypes"
+import {AnimationStyleset} from "../api/Stylesets";
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule"
 import {StyleRule} from "./StyleRules";
 import {v2s, WKF} from "../impl/Utils";

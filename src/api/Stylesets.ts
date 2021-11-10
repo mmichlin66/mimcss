@@ -1,12 +1,20 @@
 ﻿import {
-    CssImage, CssString, Direction, ExtendedProp, Global_StyleType, OneOrBox, OneOrMany, OneOrPair
+    CssImage, CssSelector, CssString, DependentRuleCombinator, Direction, ExtendedProp,
+    Global_StyleType, IParameterizedPseudoEntity, OneOrBox, OneOrMany, OneOrPair, PseudoEntity
 } from "./CoreTypes"
 import {CssColor} from "./ColorTypes";
-import {BorderRadius, CssAngle, CssAspectRatio, CssFrequency, CssLength, CssLengthOrAuto, CssMultiPosition, CssMultiPositionX, CssMultiPositionY, CssNumber, CssPercent, CssPoint, CssPosition, CssRadius, CssResolution, CssSize, CssTime} from "./NumericTypes";
+import {BorderRadius, CssAngle, CssAspectRatio, CssFrequency, CssLength, CssLengthOrAuto,
+    CssMultiPosition, CssMultiPositionX, CssMultiPositionY, CssNumber, CssPercent, CssPoint,
+    CssPosition, CssRadius, CssResolution, CssSize, CssTime} from "./NumericTypes";
 import * as st from "./StyleTypes";
-import { FillRule } from "./ShapeTypes";
-import { FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis, FontVariantCaps, FontVariantPosition } from "./FontTypes";
-import { IStyleDefinition, IStyleDefinitionClass, IVarRule } from "./RuleTypes";
+import {FillRule} from "./ShapeTypes";
+import {
+    FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis,
+    FontVariantCaps, FontVariantPosition
+} from "./FontTypes";
+import {
+    IClassNameRule, IClassRule, IStyleDefinition, IStyleDefinitionClass, IStyleRule, IVarRule
+} from "./RuleTypes";
 
 
 /**
@@ -2130,7 +2138,6 @@ export interface IStyleset
  * "extended" versions of their types. These extended types are defined by adding basic keywords
  * (e.g. "unset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
  * is defined in the IStyleset interface.
- * @category Styleset
  */
 export type ExtendedBaseStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStyleset[K]> }
 
@@ -2203,21 +2210,18 @@ export interface IVarTemplateStyleset extends IStyleset
 /**
  * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
  * custom CSS properties using the [[$var]] function.
- * @category Style Helper
  */
 export type VarTemplateName = keyof IVarTemplateStyleset;
 
 /**
  * The VarValueType generic type defines the type of the value that can be assigned to the custom
  * CSS property using the generic type K as its template.
- * @category Style Helper
  */
 export type VarValue<K extends VarTemplateName> = IVarTemplateStyleset[K];
 
 /**
  * The VarValueType generic type defines the type of the value that can be assigned to the custom
  * CSS property using the generic type K as its template.
- * @category Style Helper
  */
 export type ExtendedVarValue<K extends VarTemplateName> = ExtendedProp<VarValue<K>>;
 
@@ -2294,7 +2298,6 @@ export type ExtendedVarValue<K extends VarTemplateName> = ExtendedProp<VarValue<
  *   --link: orange;
  * }
  * ```
- * @category Style Helper
  */
 export type CustomVar_StyleType<K extends VarTemplateName = any> =
     [IVarRule<K>, ExtendedVarValue<K>] |
@@ -2309,7 +2312,6 @@ export type CustomVar_StyleType<K extends VarTemplateName = any> =
  * properties representing the standard CSS styles, this type also includes the "--" property,
  * which is an array of [[CustomVar_StyleType]] objects each specifying a value for a single
  * custom property.
- * @category Styleset
  */
 export type Styleset = ExtendedBaseStyleset &
     {
@@ -2324,9 +2326,135 @@ export type Styleset = ExtendedBaseStyleset &
 
 /**
  * The StringStyleset type maps CSS properties including custom properties to the string values.
- * @category Styleset
  */
 export type StringStyleset = { [K: string]: string | null | undefined }
+
+
+
+/**
+ * The `CombinedStyleset` type extends the Styleset type with certain properties that provide
+ * additional meaning to the styleset and allow building dependent style rules:
+ * - The `"+"` property specifies one or more parent style rules. This allows specifying
+ *   parent rules using a convenient style-property-like notation.
+ * - Properties with pseudo class names (e.g. `:hover`) or pseudo element names (e.g. `::after`).
+ *   These properties define a styleset that will be assigned to the selector obtained by using
+ *   the original styleset's owner followed by the given pseudo class or pseudo element.
+ * - Properties with names of parameterized pseudo classes (e.g. `:nth-child`) or parameterized
+ *   pseudo elements (e.g. `::slotted`). These properties contain a tuple, where the first
+ *   element is the parameter for the selector and the second element is the styleset.
+ *   These properties define a styleset that will be assigned to the selector obtained by using
+ *   the original styleset's owner followed by the given pseudo class or pseudo element.
+ * - Properties with the ampersand symbol (`&`) that contain arrays of two-element tuples each
+ *   defining a selector and a style corresponding to this selector. Selectors can use the
+ *   ampersand symbol to refer to the parent style selector. If the ampersand symbol is not used,
+ *   the selector will be simply appended to the parent selector.
+ *
+ * Functions that return style rules (e.g. [[$class]]) accept the `CombinedStyleset` as a parameter,
+ * for example:
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     class1 = this.$class({})
+ *     class2 = this.$class({
+ *         backgroundColor: "white",
+ *         ":hover" : { backgroundColor: "grey" },
+ *         "&": [
+ *             [ "li > &", { backgroundColor: "yellow" } ],
+ *             [ this.class1, { backgroundColor: "orange" } ]
+ *         ]
+ *     })
+ * }
+ * ```
+ *
+ * This will translate to the following CSS (in reality, class names are auto-generated):
+ *
+ * ```css
+ * .class2 { backgroundColor: white; }
+ * .class2:hover { backgroundColor: grey; }
+ * li > .class2 { backgroundColor: yellow; }
+ * .class2.class1 { backgroundColor: orange; }
+ * ```
+ */
+ export type CombinedStyleset = Styleset &
+ { "+"?: IStyleRule | IStyleRule[] } &
+ { [K in PseudoEntity]?: CombinedStyleset } &
+ { [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset][] } &
+ { [K in DependentRuleCombinator]?: [CssSelector, CombinedStyleset][] };
+
+
+
+
+/**
+* Extends the CombinedStyleset type with the "++" property, which
+* allows combining multiple class rules. Note that the "+" (single plus) property allows deriving
+* from any base style rules (not necessarily classes) and the style properties from the base rules
+* are simply copied to the new rule. Additionally, even if class rules were among the base rules,
+* the names of the base classes are lost.
+*
+* The "++" (double plus) property is different and it only applies to class rules and only allows
+* deriving from class rules. The style properties from the base classes are not copied to the new
+* rule; instead, the name of the new class becomes a concatenation of the new rule name and the
+* names of all base classes.
+*
+* ```typescript
+* class MyStyles extends css.StyleDefinition
+* {
+*     redFG = this.$class({ color: "red" })
+*     whiteBG = this.$class({ backgroundColor: "white" })
+*
+*     emphasized = this.$class({
+*         "++": [this.redFG, this.whiteBG],
+*         fontWeight: 700
+*     })
+* }
+* ```
+*
+* This will translate to the following CSS (in reality, class names are auto-generated):
+*
+* ```css
+* .redFG { color: red; }
+* .whiteBG { backgroundColor: white; }
+* .emphasized.redFG.whiteBG { fontWeight: 700; }
+* ```
+*
+* Note that when the MyStyles is activated and the emphasized property is applied to an element,
+* the class name will be not just "emphasized", but "emphasized redFG whiteBG". That is, the
+* following rendering function
+*
+* ```typescript
+* let styles = css.activate(MyStyles);
+* render()
+* {
+*     return <div className={styles.emphasized.name}>Important stuff</div>
+* }
+* ```
+*
+* will generate the following HTML:
+*
+* ```html
+* <div className="emphasized redFG whiteBG">Important stuff</div>
+```
+*/
+export type CombinedClassStyleset = CombinedStyleset &
+ { "++"?: ParentClassType | ParentClassType[] };
+
+/**
+* Represents types that can be used to inherit from an already defined CSS class. This type is
+* used in the `"++"` property of the [[CombinedClassStyleset]] type, whcih allows CSS classes
+* to include definitions of other CSS classes.
+*/
+export type ParentClassType = string | IClassRule | IClassNameRule;
+
+
+
+/**
+* Defines an object containing style properties for an animation frame.
+* Stylesets for keyframes allow custom properties (via "--") but don't allow dependent rules
+* (because dependent rules are actually separate CSS rules). Animation styleset can extend other
+* style rules; however, any dependent rules will be ignored.
+*/
+export type AnimationStyleset = Styleset & { "+"?: IStyleRule | IStyleRule[] };
 
 
 
