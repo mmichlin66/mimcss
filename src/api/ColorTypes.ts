@@ -381,7 +381,7 @@ export interface IColorMixFunc extends ICssColorFunc
 {
     fn: "color-mix";
 
-    /** Color space in whcih to mix colors */
+    /** Color space in which to mix colors */
     cs?: Extended<ColorSpace>;
 
     /** First color and optional percentage to include in the mix */

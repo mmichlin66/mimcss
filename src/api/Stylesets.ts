@@ -35,7 +35,6 @@ export interface IStyleset
     alignContent?: st.AlignContent_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
      * [[include: styleProps/alignItems.md]]
      */
     alignItems?: st.AlignItems_StyleType;
@@ -46,12 +45,12 @@ export interface IStyleset
     alignSelf?: st.AlignSelf_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/alignment-baseline
+     * [[include: styleProps/alignmentBaseline.md]]
      */
     alignmentBaseline?: st.AlignmentBaseline_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
+     * [[include: styleProps/animation.md]]
      */
     animation?: st.Animation_StyleType;
 
@@ -2441,7 +2440,7 @@ export type CombinedClassStyleset = CombinedStyleset &
 
 /**
 * Represents types that can be used to inherit from an already defined CSS class. This type is
-* used in the `"++"` property of the [[CombinedClassStyleset]] type, whcih allows CSS classes
+* used in the `"++"` property of the [[CombinedClassStyleset]] type, which allows CSS classes
 * to include definitions of other CSS classes.
 */
 export type ParentClassType = string | IClassRule | IClassNameRule;

@@ -63,6 +63,7 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 	 */
 	public setValue( value: ExtendedVarValue<K>, schedulerType?: number): void
 	{
+        this.value = value;
         if (this.c)
 		{
             let important = false;

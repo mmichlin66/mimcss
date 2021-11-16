@@ -1,3 +1,5 @@
+The **align-self** CSS property overrides a grid or flex item's align-items value. In Grid, it aligns the item inside the grid area. In Flexbox, it aligns the item on the cross axis.
+
 **Example**
 
 ```typescript
@@ -5,19 +7,21 @@ import * as css from "mimcss"
 
 class MyStyles extends css.StyleDefinition
 {
-    cls1 = css.$class({
-        alignSelf: "self-start"
-    })
+    // Using string literal
+    cls1 = this.$class({ alignSelf: "self-start" })
 
-    cls2 = css.$class({
-        alignSelf: "first baseline"
-    })
+    // Using custom property
+    defaultAlignSelf = this.$var( "alignItems", "first baseline")
+    cls2 = this.$class({ alignSelf: this.defaultAlignSelf })
 
-    cls3 = css.$class({
-        alignSelf: "safe center"
-    })
+    // Using with "!important" flag
+    cls3 = this.$class({ alignSelf: {"!": "safe center"} })
+
+    // Using with global values
+    cls4 = this.$class({ alignSelf: "initial" })
 }
 ```
 
-**MDN**: https://developer.mozilla.org/en-US/docs/Web/CSS/align-self
+**See Also:**
+- <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-self" target="mdn">MDN Page</a>
 
