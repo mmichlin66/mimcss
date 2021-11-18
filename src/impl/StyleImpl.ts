@@ -2,7 +2,7 @@
 import {
     BorderImage_Object, Border_StyleType, GridTemplateAreas_StyleType,
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
-    BoxShadow_StyleType, BoxShadow,
+    BoxShadow_StyleType, BoxShadow_Single,
 } from "../api/StyleTypes";
 import { CustomVar_StyleType, IStyleset, StringStyleset, Styleset, VarTemplateName } from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
@@ -39,7 +39,7 @@ const borderImageToString = (val: BorderImage_Object): string =>
 
 
 
-wkf[WKF.BoxShadowSingle] = (val: BoxShadow) => v2s( val, {
+wkf[WKF.BoxShadowSingle] = (val: BoxShadow_Single) => v2s( val, {
     obj:[
         ["inset", (v: boolean) => v ? "inset" : ""],
         ["x", WKF.Length],
@@ -364,6 +364,7 @@ export const s_registerSP = (name: string, toStringFunc: AnyToStringFunc) =>
  */
 const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 {
+    accentColor: WKF.Color,
     animation: {
         any: { obj: [
             ["duration", WKF.Time],
