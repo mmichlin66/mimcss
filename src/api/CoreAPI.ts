@@ -1,6 +1,6 @@
 ﻿import {
     CssSelector, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy,
-    ISelectorBuilder, NthExpression, AttrComparisonOperation
+    ISelectorBuilder, NthExpression, AttrComparisonOperation, TimingFunctionJumpTerm, ICubicBezierFunc, IStepsFunc
 } from "./CoreTypes"
 import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
 import {AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType} from "./StyleTypes";
@@ -334,6 +334,36 @@ export const sel = (...items: CssSelector[]): ISelectorBuilder =>
 }
 
 fdo["sel"] = v => a2s( v.items, { sep: "", recursive: true }, "");
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Animation and transition timing functions.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Returns a function representing an invocation of the CSS `steps()` function.
+ *
+ * @category Transition and Animation
+ */
+ export const steps = (n: Extended<number>, j?: TimingFunctionJumpTerm): IStepsFunc =>
+ ({ fn: "steps", n, j });
+
+fdo.steps = ["n", "j"]
+
+
+
+/**
+* Returns a function representing an invocation of the CSS `cubic-bezier()` function.
+*
+* @category Transition and Animation
+*/
+export const cubicBezier = (n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
+ n4: Extended<number>): ICubicBezierFunc => ({ fn: "cubic-bezier", n1, n2, n3, n4 });
+
+fdo["cubic-bezier"] = ["n1", "n2", "n3", "n4"]
 
 
 

@@ -1,5 +1,5 @@
 ﻿import {
-    Extended, OneOrPair, OneOrBox, OneOrMany, CssString, CssImage, ICursorFunc, IUrlFunc
+    Extended, OneOrPair, OneOrBox, OneOrMany, CssString, CssImage, ICursorFunc, IUrlFunc, TimingFunction
 } from "./CoreTypes"
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, HorizontalPositionKeyword,
@@ -10,7 +10,7 @@ import {CssColor, CssNonNumericColor} from "./ColorTypes";
 import {FontStretchKeyword, FontStyle, FontWeight, SystemFont} from "./FontTypes";
 import {
     BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs,
-    IRayFunc, IStepsFunc, ICubicBezierFunc, TransformFuncs
+    IRayFunc, TransformFuncs
 } from "./ShapeTypes";
 import {
     IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule
@@ -34,41 +34,40 @@ import {IStyleset} from "./Stylesets";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// CSS property types.
+// CSS style property types.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Type for [[alignContent]] style property.
-
+ * Keywords used for the [[alignContent]] style property.
  */
-export type AlignContent_StyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignContentKeywords = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" |
     "space-between" | "space-around" | "space-evenly";
 
 
 
 /**
- * Type for [[alignItems]] style property
+ * Keywords used for the [[alignItems]] style property
  */
-export type AlignItems_StyleType = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignItemsKeywords = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center";
 
 
 
 /**
- * Type for [[alignSelf]] style property
+ * Keywords used for the [[alignSelf]] style property
  */
-export type AlignSelf_StyleType = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
+export type AlignSelfKeywords = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" |
     "self-start" | "self-end" | "baseline" | "first baseline" | "last baseline" |
     "safe center" | "unsafe center";
 
 
 
 /**
- * Type for [[alignmentBaseline]] style property
+ * Keywords used for the [[alignmentBaseline]] style property
  */
-export type AlignmentBaseline_StyleType = "auto" | "baseline" | "before-edge" | "text-before-edge" |
+export type AlignmentBaselineKeywords = "auto" | "baseline" | "before-edge" | "text-before-edge" |
     "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" |
     "hanging" | "mathematical" | "top" | "center" | "bottom";
 
@@ -84,9 +83,9 @@ export type Animation_Single =
         func?: Extended<TimingFunction>;
         delay?: Extended<CssTime>;
         count?: Extended<AnimationIterationCount_Single>;
-        direction?: Extended<AnimationDirection_Single>;
-        mode?: Extended<AnimationFillMode_Single>;
-        state?: Extended<AnimationPlayState_Single>;
+        direction?: Extended<AnimationDirectionKeywords>;
+        mode?: Extended<AnimationFillModeKeywords>;
+        state?: Extended<AnimationPlayStateKeywords>;
     };
 
 /**
@@ -97,102 +96,41 @@ export type Animation_StyleType = OneOrMany<string | Animation_Single>;
 
 
 /**
- * Type for [[animationDelay]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-delay
- *
+ * Keywords used for the [[animationDirection]] property.
  */
-export type AnimationDelay_StyleType = OneOrMany<CssTime>;
+export type AnimationDirectionKeywords = "normal" | "reverse" | "alternate" | "alternate-reverse";
+
+
+/**
+ * Keywords used for the [[animationFillMode]] property
+ */
+export type AnimationFillModeKeywords = "none" | "forwards" | "backwards" | "both";
 
 
 
 /**
- * Type for single animation direction
- *
- */
-export type AnimationDirection_Single = "normal" | "reverse" | "alternate" | "alternate-reverse";
-
-/**
- * Type for [[animationDirection]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction
- *
- */
-export type AnimationDirection_StyleType = OneOrMany<AnimationDirection_Single>;
-
-
-
-/**
- * Type for [[animationDuration]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-duration
- *
- */
-export type AnimationDuration_StyleType = OneOrMany<CssTime>;
-
-
-
-/**
- * Type for single animation fill mode
- *
- */
-export type AnimationFillMode_Single = "none" | "forwards" | "backwards" | "both";
-
-/**
- * Type for [[animationFillMode]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode
- *
- */
-export type AnimationFillMode_StyleType = OneOrMany<AnimationDirection_Single>;
-
-
-
-/**
- * Type for single animation iteration count
- *
+ * Type for [[animationIterationCount]] property
  */
 export type AnimationIterationCount_Single = "infinite" | CssNumber;
 
-/**
- * Type for [[animationIterationCount]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count
- *
- */
-export type AnimationIterationCount_StyleType = OneOrMany<AnimationIterationCount_Single>;
-
 
 
 /**
- * Type for single animation name
- *
+ * Type for [[animationName]] property
  */
 export type AnimationName_Single = "none" | string | IAnimationRule;
 
+
+
 /**
- * Type for [[animationName]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-name
- *
+ * Keywords used for the [[animationPlayState]] property
  */
-export type AnimationName_StyleType = OneOrMany<AnimationName_Single>;
+export type AnimationPlayStateKeywords = "paused" | "running";
 
 
 
 /**
- * Type for single animation play state
- *
- */
-export type AnimationPlayState_Single = "paused" | "running";
-
-/**
- * Type for [[animationPlayState]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state
- *
- */
-export type AnimationPlayState_StyleType = OneOrMany<AnimationPlayState_Single>;
-
-
-
-/**
- * Type for [[appearance]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/appearance
- *
+ * Keywords used for the [[appearance]] style property
  */
 export type Appearance_StyleType = "none" | "auto" | "textfield" | "menulist-button" |
     "searchfield" | "textarea" | "push-button" | "slider-horizontal" | "checkbox" | "radio" |
@@ -201,39 +139,14 @@ export type Appearance_StyleType = "none" | "auto" | "textfield" | "menulist-but
 
 
 /**
- * Type for simple animation timing functions - those that don't have parameters
- *
- */
-export type TimingFunctionKeyword = "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out" | "step-start" | "step-end";
-
-/**
- * Type for single animation timing function
- *
- */
-export type TimingFunction = TimingFunctionKeyword | IStepsFunc | ICubicBezierFunc;
-
-/**
- * Type for [[animationTimingFunction]] and [[transitionTimingFunction]] style properties
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timing-function
- *
- */
-export type TimingFunction_StyleType = OneOrMany<TimingFunction>;
-
-
-
-/**
  * Type for [[aspectRatio]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
- *
  */
 export type AspectRatio_StyleType = CssAspectRatio | "auto";
 
 
 
 /**
- * Type for [[backfaceVisibility]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
- *
+ * Keywords used for the [[backfaceVisibility]] style property
  */
 export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 
@@ -241,7 +154,6 @@ export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 
 /**
  * Type for single background value
- *
  */
 export type Background_Single = string | CssColor | CssImage |
     {
@@ -257,55 +169,41 @@ export type Background_Single = string | CssColor | CssImage |
 
 /**
  * Type for [[background]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background
- *
  */
 export type Background_StyleType = OneOrMany<Background_Single>;
 
 
 
 /**
- * Type for single background attachment
- *
+ * Keywords used for the [[backgroundAttachment]] property
  */
 export type BackgroundAttachment = "scroll" | "fixed" | "local";
 
 /**
  * Type for [[backgroundAttachment]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
- *
  */
 export type BackgroundAttachment_StyleType = OneOrMany<BackgroundAttachment>;
 
 
 
 /**
- * Type for single background blend mode
+ *Keywords used for the [[backgroundBlendMode]] and [[mixBlendMode]] properties
  *
  */
-export type BlendMode = "normal" | "multiply" | "screen" | "overlay" | "darken" |
+export type BlendModeKeywords = "normal" | "multiply" | "screen" | "overlay" | "darken" |
     "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" |
     "exclusion" | "hue" | "saturation" | "color" | "luminosity";
 
-/**
- * Type for [[backgroundBlendMode]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode
- *
- */
-export type BackgroundBlendMode_StyleType = OneOrMany<BlendMode>;
-
 
 
 /**
- * Type for single background clip
+ * Keywords used for the [[backgroundClip]] property
  *
  */
 export type BackgroundClip = "border-box" | "padding-box" | "content-box" | "text";
 
 /**
  * Type for [[backgroundClip]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip
- *
  */
 export type BackgroundClip_StyleType = OneOrMany<BackgroundClip>;
 
@@ -313,23 +211,19 @@ export type BackgroundClip_StyleType = OneOrMany<BackgroundClip>;
 
 /**
  * Type for [[backgroundImage]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
- *
  */
 export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
 
 
 
 /**
- * Type for single background origin
+ * Keywords used for the [[backgroundOrigin]] property
  *
  */
 export type BackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text";
 
 /**
  * Type for [[backgroundOrigin]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
- *
  */
 export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin>;
 
@@ -337,15 +231,14 @@ export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin>;
 
 /**
  * Keywords for single background repeat
- *
  */
-export type BackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat";
+export type BackgroundRepeatKeywords = "repeat" | "space" | "round" | "no-repeat";
 
 /**
  * Type for single background repeat
  *
  */
-export type BackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeyword>;
+export type BackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeywords>;
 
 /**
  * Type for [[backgroundRepeat]] style property
@@ -1485,7 +1378,7 @@ export type PerspectiveOrigin_StyleType = HorizontalPositionKeyword | VerticalPo
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/place-content
  *
  */
-export type PlaceContent_StyleType = AlignContent_StyleType | [Extended<AlignContent_StyleType>, Extended<JustifyContent_StyleType>];
+export type PlaceContent_StyleType = AlignContentKeywords | [Extended<AlignContentKeywords>, Extended<JustifyContent_StyleType>];
 
 
 
@@ -1494,7 +1387,7 @@ export type PlaceContent_StyleType = AlignContent_StyleType | [Extended<AlignCon
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/place-items
  *
  */
-export type PlaceItems_StyleType = AlignItems_StyleType | [Extended<AlignItems_StyleType>, Extended<JustifyItems_StyleType>];
+export type PlaceItems_StyleType = AlignItemsKeywords | [Extended<AlignItemsKeywords>, Extended<JustifyItems_StyleType>];
 
 
 
@@ -1503,7 +1396,7 @@ export type PlaceItems_StyleType = AlignItems_StyleType | [Extended<AlignItems_S
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/place-self
  *
  */
-export type PlaceSelf_StyleType = AlignSelf_StyleType | [Extended<AlignSelf_StyleType>, Extended<JustifySelf_StyleType>];
+export type PlaceSelf_StyleType = AlignSelfKeywords | [Extended<AlignSelfKeywords>, Extended<JustifySelf_StyleType>];
 
 
 

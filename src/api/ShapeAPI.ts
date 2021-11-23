@@ -3,8 +3,8 @@ import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssP
 import {CssColor} from "./ColorTypes";
 import {
     GradientStopOrHint, LinearGradientAngle, ShapeRadius, IMinMaxFunc, IPathBuilder,
-    IRepeatFunc, IGridSpanFunc, TimingFunctionJumpTerm, FillRule, ICircleBuilder, IEllipseBuilder,
-    IInsetBuilder, IPolygonBuilder, PathCommand, PathCommandParam, IRayFunc, IStepsFunc, ICubicBezierFunc,
+    IRepeatFunc, IGridSpanFunc, FillRule, ICircleBuilder, IEllipseBuilder,
+    IInsetBuilder, IPolygonBuilder, PathCommand, PathCommandParam, IRayFunc,
     PercentFilterNames, IPercentFilterFunc, IBlurFunc, IDropShadowFunc, IHueRotateFunc, IMatrixFunc,
     IMatrix3dFunc, IPerspectiveFunc, IRotateFunc, IRotate3dFunc, IScale1dFunc, IScaleFunc, IScale3dFunc,
     ISkewFunc, ISkew1dFunc, ITranslate1dFunc, ITranslate3dFunc, ITranslateFunc, ILinearGradientBuilder,
@@ -1087,36 +1087,6 @@ export const span = (p1: Extended<GridLineCountOrName>, p2?: Extended<GridLineCo
     ({ fn: "span", p1, p2 });
 
 fdo.span = (v: IGridSpanFunc) => mv2s( ["span", v.p1, v.p2])
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Animation and transition timing functions.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Returns a function representing an invocation of the CSS `steps()` function.
- *
- * @category Transition and Animation
- */
-export const steps = (n: Extended<number>, j?: TimingFunctionJumpTerm): IStepsFunc =>
-    ({ fn: "steps", n, j });
-
-fdo.steps = ["n", "j"]
-
-
-
-/**
- * Returns a function representing an invocation of the CSS `cubic-bezier()` function.
- *
- * @category Transition and Animation
- */
-export const cubicBezier = (n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
-    n4: Extended<number>): ICubicBezierFunc => ({ fn: "cubic-bezier", n1, n2, n3, n4 });
-
-fdo["cubic-bezier"] = ["n1", "n2", "n3", "n4"]
 
 
 

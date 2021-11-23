@@ -4,7 +4,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { IIDRule, INamespaceRule } from "./RuleTypes";
+import {IIDRule, INamespaceRule} from "./RuleTypes";
+
+
 
 /**
  * Style values that can be used for any CSS property.
@@ -1355,6 +1357,66 @@ export type CssSelector = ElementTagName | PseudoEntity | IRuleWithSelector | IS
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Miscellaneous CSS types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Type for simple animation timing functions - those that don't have parameters
+ *
+ */
+export type TimingFunctionKeywords = "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out" | "step-start" | "step-end";
+
+
+
+/** Type for step animation timing function jump-term */
+export type TimingFunctionJumpTerm = "jump-start" | "jump-end" | "jump-none" | "jump-both" | "start" | "end";
+
+/**
+ * The IStepsFunc interface represents an invocation of the CSS `steps()` function. It is returned
+ * from the [[steps]] function.
+ * @category Transition and Animation
+ */
+export interface IStepsFunc extends ICssFuncObject
+{
+    fn: "steps";
+
+    /** Number of stops */
+    n: Extended<number>;
+
+    /** Jump term */
+    j?: TimingFunctionJumpTerm;
+}
+
+
+
+/**
+ * The ICubicBezierFunc interface represents an invocation of the CSS `cubic-bezier()` function.
+ * It is returned from the [[cubicBezier]] function.
+ * @category Transition and Animation
+ */
+export interface ICubicBezierFunc extends ICssFuncObject
+{
+    fn: "cubic-bezier";
+
+    n1: Extended<number>;
+    n2: Extended<number>;
+    n3: Extended<number>,
+    n4: Extended<number>;
+}
+
+
+
+/**
+ * Type for single animation timing function
+ *
+ */
+export type TimingFunction = TimingFunctionKeywords | IStepsFunc | ICubicBezierFunc;
+
+
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous CSS functions.
 //

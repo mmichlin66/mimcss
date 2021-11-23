@@ -69,6 +69,6 @@ class MyStyles extends css.StyleDefinition
 
 **See Also:**
 - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation" target="mdn">MDN Page</a>
-- <a href="https://css-tricks.com/almanac/properties/a/animation" target="mdn">CSS-Tricks Almanac</a>
-- <a href="http://www.mimcss.com/demo/playground.html?file=animations.tsx" target="playground">Animations in Playground</a>
+- <a href="https://css-tricks.com/almanac/properties/a/animation" target="css-tricks">CSS-Tricks Almanac</a>
+- <a href="https://www.mimcss.com/demo/playground.html?file=animations.tsx" target="playground">Mimcss Playground</a>
 

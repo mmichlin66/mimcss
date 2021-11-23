@@ -24,5 +24,5 @@ class MyStyles extends css.StyleDefinition
 
 **See Also:**
 - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-content" target="mdn">MDN Page</a>
-- <a href="https://css-tricks.com/almanac/properties/a/align-content" target="mdn">CSS-Tricks Almanac</a>
+- <a href="https://css-tricks.com/almanac/properties/a/align-content" target="css-tricks">CSS-Tricks Almanac</a>
 
