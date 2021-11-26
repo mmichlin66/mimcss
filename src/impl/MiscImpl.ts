@@ -1,4 +1,4 @@
-﻿import {ExtendedFontFace, FontSrc, IFontFace} from "../api/FontTypes"
+﻿import {ExtendedFontFace, IFontFace} from "../api/FontTypes"
 import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatement} from "../api/MediaTypes";
 import {sp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf, propSet2s} from "./Utils";
@@ -59,6 +59,9 @@ const mediaFeature2s = (dashName: string, camelName: string, val: any, options: 
 
 const mediaFeatureInfos: { [K in keyof IMediaFeatureset]?: V2SOptions } =
 {
+    aspectRatio: {
+        num: (v: number) => v + "/1"
+    },
     height: WKF.Length,
     minHeight: WKF.Length,
     maxHeight: WKF.Length,

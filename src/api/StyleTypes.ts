@@ -74,7 +74,7 @@ export type AlignmentBaselineKeywords = "auto" | "baseline" | "before-edge" | "t
 
 
 /**
- * Type for single animation. Used by [[Animation_StyleType]].
+ * Type for single animation. Used by [[Animation_StyleType]] style property.
  */
 export type Animation_Single =
     {
@@ -96,34 +96,34 @@ export type Animation_StyleType = OneOrMany<string | Animation_Single>;
 
 
 /**
- * Keywords used for the [[animationDirection]] property.
+ * Keywords used for the [[animationDirection]] style property.
  */
 export type AnimationDirectionKeywords = "normal" | "reverse" | "alternate" | "alternate-reverse";
 
 
 /**
- * Keywords used for the [[animationFillMode]] property
+ * Keywords used for the [[animationFillMode]] style property
  */
 export type AnimationFillModeKeywords = "none" | "forwards" | "backwards" | "both";
 
 
 
 /**
- * Type for [[animationIterationCount]] property
+ * Type for [[animationIterationCount]] style property
  */
 export type AnimationIterationCount_Single = "infinite" | CssNumber;
 
 
 
 /**
- * Type for [[animationName]] property
+ * Type for [[animationName]] style property
  */
 export type AnimationName_Single = "none" | string | IAnimationRule;
 
 
 
 /**
- * Keywords used for the [[animationPlayState]] property
+ * Keywords used for the [[animationPlayState]] style property
  */
 export type AnimationPlayStateKeywords = "paused" | "running";
 
@@ -132,9 +132,7 @@ export type AnimationPlayStateKeywords = "paused" | "running";
 /**
  * Keywords used for the [[appearance]] style property
  */
-export type Appearance_StyleType = "none" | "auto" | "textfield" | "menulist-button" |
-    "searchfield" | "textarea" | "push-button" | "slider-horizontal" | "checkbox" | "radio" |
-    "square-button" | "menulist" | "listbox" | "meter" | "progress-bar" | "button";
+export type AppearanceKeywords = "none" | "auto" | "textfield" | "menulist-button";
 
 
 
@@ -146,7 +144,7 @@ export type AspectRatio_StyleType = CssAspectRatio | "auto";
 
 
 /**
- * Keywords used for the [[backfaceVisibility]] style property
+ * Keywords used for the [[backfaceVisibilityMode]] style property
  */
 export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
 
@@ -175,7 +173,7 @@ export type Background_StyleType = OneOrMany<Background_Single>;
 
 
 /**
- * Keywords used for the [[backgroundAttachment]] property
+ * Keywords used for the [[backgroundAttachment]] style property
  */
 export type BackgroundAttachment = "scroll" | "fixed" | "local";
 

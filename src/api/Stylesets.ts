@@ -100,12 +100,12 @@ export interface IStyleset
     animationTimingFunction?: OneOrMany<TimingFunction>;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/appearance
+     * [[include: styleProps/appearance.md]]
      */
-    appearance?: st.Appearance_StyleType;
+    appearance?: st.AppearanceKeywords | string;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
+     * [[include: styleProps/aspectRatio.md]]
      */
     aspectRatio?: st.AspectRatio_StyleType;
 

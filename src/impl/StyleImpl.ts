@@ -385,9 +385,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     animationName: WKF.OneOrManyWithComma,
     animationPlayState: WKF.OneOrManyWithComma,
     animationTimingFunction: WKF.OneOrManyWithComma,
-    aspectRatio: {
-        sep: "/"
-    },
 
     background: {
         num: WKF.Color,

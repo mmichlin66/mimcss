@@ -342,35 +342,28 @@ export const khz = (n: number): IFrequencyProxy => toUnitsProxy( n, "khz");
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an `IFitContentProxy` function representing the `fit-content()` CSS function
+ * Returns an [[IFitContentProxy]] function representing the `fit-content()` CSS function
  * ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content())).
  */
-export function fitContent( size: Extended<CssLength>): IFitContentProxy
-{
-    return () => f2s( "fit-content", [[size, WKF.Length]]);
-}
+export const fitContent = (size: Extended<CssLength>): IFitContentProxy =>
+    () => f2s( "fit-content", [[size, WKF.Length]]);
 
 
 
 /**
- * Returns an `IAspectRatioProxy` function representing the `<ratio>` CSS type.
+ * Returns an [[IAspectRatioProxy]] function representing the `<ratio>` CSS type.
  */
-export function ratio( w: CssNumber, h?: CssNumber): IAspectRatioProxy
-{
-    return () => a2s( [w, h], undefined, "/");
-}
+export const ratio = (w: CssNumber, h?: CssNumber): IAspectRatioProxy => () => [w,h].join("/");
 
 
 
 /**
- * Returns an `IRectProxy` function representing the `rect()` CSS function used for the `clip`
+ * Returns an [[IRectProxy]] function representing the `rect()` CSS function used for the `clip`
  * style property.
  * @deprecated The CSS `clip` property and `rect()` function are deprecated.
  */
-export function rect( top: CssLength, right: CssLength, bottom: CssLength, left: CssLength): IRectProxy
-{
-    return () => `rect(${a2s( [top, right, bottom, left], WKF.Length, ",")})`;
-}
+export const rect = (top: CssLength, right: CssLength, bottom: CssLength, left: CssLength): IRectProxy =>
+    () => `rect(${a2s( [top, right, bottom, left], WKF.Length, ",")})`;
 
 
 
