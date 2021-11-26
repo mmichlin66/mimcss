@@ -1,7 +1,7 @@
 import {IStyleDefinition} from "../api/RuleTypes";
 import {SchedulerType, IScheduler} from "../api/SchedulingTypes";
 import {StringStyleset} from "../api/Stylesets";
-import {activateInstance, deactivateInstance} from "../rules/RuleContainer";
+import {activateSD, deactivateSD} from "../rules/RuleContainer";
 
 
 
@@ -91,7 +91,7 @@ class SynchronousActivator implements IStyleActivator
 	 */
 	public activate( definition: IStyleDefinition): void
 	{
-		activateInstance( definition);
+		activateSD( definition);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class SynchronousActivator implements IStyleActivator
 	 */
 	public deactivate( definition: IStyleDefinition): void
 	{
-		deactivateInstance( definition);
+		deactivateSD( definition);
 	}
 
 	/**
@@ -167,7 +167,7 @@ class SchedulingActivator implements IStyleActivator
         if (this.isSchedulingNeeded)
             this.scheduler!.scheduleDOMUpdate();
 
-        this.actions.push( () => activateInstance( definition));
+        this.actions.push( () => activateSD( definition));
 	}
 
 
@@ -180,7 +180,7 @@ class SchedulingActivator implements IStyleActivator
         if (this.isSchedulingNeeded)
             this.scheduler!.scheduleDOMUpdate();
 
-        this.actions.push( () => deactivateInstance( definition));
+        this.actions.push( () => deactivateSD( definition));
 	}
 
 

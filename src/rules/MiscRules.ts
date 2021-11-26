@@ -7,7 +7,7 @@ import {fontFace2s} from "../impl/MiscImpl"
 import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {StyleRule} from "./StyleRules";
-import {symValueToString} from "../impl/Utils";
+import {symV2S} from "../impl/Utils";
 
 
 
@@ -185,7 +185,7 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 
     // This function is used when the object is specified as a value of a style property.
     // We return the CSS class name.
-    [symValueToString](): string { return this.cssClassName; }
+    [symV2S](): string { return this.cssClassName; }
 
 	/** CSS rule selector string */
 	public get selectorText(): string

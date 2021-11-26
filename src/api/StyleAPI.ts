@@ -4,7 +4,7 @@ import {Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset} from "./Style
 import {sp2s, s_registerSP, s2ss, styleset2s} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
-import {processSD, serializeInstance} from "../rules/RuleContainer";
+import {processSD, serializeSD} from "../rules/RuleContainer";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {tag2s} from "../impl/Utils";
 
@@ -374,7 +374,7 @@ class RuleSerializationContext implements IRuleSerializationContext
         if (!this.sds.has( instance))
         {
             this.sds.add( instance);
-            serializeInstance( instance, this);
+            serializeSD( instance, this);
         }
     }
 

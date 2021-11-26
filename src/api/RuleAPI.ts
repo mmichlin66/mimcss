@@ -9,7 +9,7 @@ import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset} from "./Stylesets";
-import {embeddedDecorator, getCurrentTheme, processSD, s_configureNames} from "../rules/RuleContainer";
+import {embeddedDecorator, getCurrentTheme, processSD, configNames} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
@@ -28,7 +28,7 @@ import {getActivator} from "../impl/SchedulingImpl";
  * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
  * property when processing the rules in the style definition object.
  */
-const symParent = Symbol("parent");
+const symParent = Symbol();
 
 
 
@@ -898,7 +898,7 @@ export const embedded = (category: string): ClassDecorator =>
  * [[NameGenerationMethod.Optimized]].
  */
 export const configNameGeneration = (method: NameGenerationMethod, prefix?: string): void =>
-	s_configureNames( method, prefix);
+	configNames( method, prefix);
 
 
 

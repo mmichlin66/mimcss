@@ -5,7 +5,7 @@ import {
 } from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
 import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
-import {camelToDash, fdo2s, symValueToString} from "../impl/Utils";
+import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
 import {styleset2s, sp2s} from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
@@ -29,7 +29,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		this.dependentRules = {};
 
 		if (inputStyleset)
-			this.parseInputStyleset( inputStyleset as CombinedStyleset);
+			this.parse( inputStyleset as CombinedStyleset);
 	}
 
 
@@ -38,14 +38,14 @@ export abstract class StyleRule extends Rule implements IStyleRule
      * StyleRule-derived object is encountered by the `v2s` function, the rule's selector will be
      * used.
      */
-    [symValueToString](): string { return this.selectorText; }
+    [symV2S](): string { return this.selectorText; }
 
 
 	/**
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
 	 * important properties and dependent rules.
 	 */
-	private parseInputStyleset( inputStyleset: CombinedStyleset): void
+	private parse( inputStyleset: CombinedStyleset): void
 	{
 		for( let propName in inputStyleset)
 		{
@@ -486,7 +486,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         {
             let rules = propVal as ParentClassType | ParentClassType[];
             if (rules)
-                this.parentClassRules = Array.isArray(rules) ? rules : [rules];
+                this.parents = Array.isArray(rules) ? rules : [rules];
 
             return false;
         }
@@ -500,9 +500,9 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         // by now our name and cssName properties have been set to reflect a single name. Now
         // look at the "++" property and if defined, take names from the referenced class rules
         // and append them to the name.
-        if (this.parentClassRules)
+        if (this.parents)
         {
-            this.name += " " + this.parentClassRules.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
+            this.name += " " + this.parents.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
             this.cssName = "." + this.name.replace( / /g, ".");
         }
 	}
@@ -515,7 +515,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 	protected get cssPrefix(): string { return "."; }
 
     // remembered value of the "++" property of the input styleset
-    private parentClassRules?: ParentClassType[];
+    private parents?: ParentClassType[];
 }
 
 

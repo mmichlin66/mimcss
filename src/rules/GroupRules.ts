@@ -1,6 +1,6 @@
 import {IStyleDefinitionClass, IStyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
-import {getContainerFromInstance, processSD} from "./RuleContainer"
+import {getRCfromSD, processSD} from "./RuleContainer"
 import {IRuleContainer, ITopLevelRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
 import {media2s, supports2s} from "../impl/MiscImpl";
 
@@ -26,7 +26,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
         // container to which our groupng rule belongs becomes the parent container for the
         // style definition instance
-		this.sc = getContainerFromInstance( this._sd = processSD( this.instOrClass, container.getDef()));
+		this.sc = getRCfromSD( this._sd = processSD( this.instOrClass, container.getDef()));
 	}
 
 

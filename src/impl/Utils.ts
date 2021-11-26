@@ -35,7 +35,7 @@ export const camelToDash = (camel: string): string =>
  * symbol because the standard method toString exists on every object and we only want some to
  * explicitly provide this support.
  */
- export const symValueToString: unique symbol = Symbol();
+ export const symV2S: unique symbol = Symbol();
 
 
 
@@ -191,8 +191,8 @@ export const v2s = (val: any, options?: V2SOptions): string =>
             return v2s(val());
         else if (val == null)
             return "";
-        else if (typeof val[symValueToString] === "function")
-            return val[symValueToString]();
+        else if (typeof val[symV2S] === "function")
+            return val[symV2S]();
         else if (typeof val.fn === "string")
             return fdo2s( val);
         else
@@ -231,8 +231,8 @@ export const v2s = (val: any, options?: V2SOptions): string =>
         }
         else if (typeof val === "object")
         {
-            if (typeof val[symValueToString] === "function")
-                return val[symValueToString]();
+            if (typeof val[symV2S] === "function")
+                return val[symV2S]();
             else if (typeof val.fn === "string")
                 return fdo2s( val);
             else if (options.obj || options.any)
