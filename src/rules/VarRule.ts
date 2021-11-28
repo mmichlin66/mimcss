@@ -1,7 +1,7 @@
 import {IVarRule, IConstRule} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue} from "../api/Stylesets"
 import {sp2s} from "../impl/StyleImpl"
-import {createName, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import {IRuleContainer, RuleLike} from "./Rule";
 
 
 
@@ -28,10 +28,10 @@ export class VarRule<K extends VarTemplateName = any> extends RuleLike implement
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-		super.process( container, topLevelContainer, ruleName);
-		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
+		super.process( container, ruleName);
+		this.name = container.getScopedName( ruleName, this.nameOverride);
         this.cssVarName = "--" + this.name;
 	}
 
@@ -133,9 +133,9 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, topLevelContainer, ruleName);
+        super.process( container, ruleName);
 
         if (!this._val)
 		    this._val = sp2s( this.template, this.value);

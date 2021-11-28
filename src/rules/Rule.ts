@@ -26,6 +26,9 @@ export interface IRuleContainer
 	/** Returns the instance of the stylesheet definition class */
 	getDef(): IStyleDefinition;
 
+	/** Generates a name, which will be unique in this stylesheet */
+	getScopedName( ruleName: string | null, nameOverride?: string | INamedEntity): string;
+
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
 	insert( parent: CSSStyleSheet | CSSGroupingRule): void;
 
@@ -42,30 +45,16 @@ export interface IRuleContainer
 
 
 /**
- * The ITopLevelRuleContainer interface represents a top-level style definition object that "owns"
- * the rules under this container. In particular, the owner's job is to generate "scoped" unique
- * names.
- */
-export interface ITopLevelRuleContainer extends IRuleContainer
-{
-	/** Generates a name, which will be unique in this stylesheet */
-	getScopedName( ruleName: string): string;
-}
-
-
-
-/**
  * The RuleLike abstract class is a base for all "rules" defined in the style definition classes -
- * whether they correspond to real CssRules (and thus derive from the Rule class) or not (such as
+ * whether they correspond to real CSS rules (and thus derive from the Rule class) or not (such as
  * counters, grid lines and grid areas).
  */
 export abstract class RuleLike
 {
 	// Processes the rule.
-	public process( c: IRuleContainer, tlc: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( c: IRuleContainer, ruleName: string | null): void
 	{
         this.c = c;
-		this.tlc = tlc;
 		this.ruleName = ruleName;
 	}
 
@@ -73,9 +62,6 @@ export abstract class RuleLike
 
 	// Rule container to which this rule belongs.
 	public c: IRuleContainer;
-
-	// Container at the top of the chain of containers to which this rule belongs.
-	public tlc: ITopLevelRuleContainer;
 
 	// Name of the property of the stylesheet definition to which this rule was assigned. This can
 	// be null for rules not created via assignment to style definition properties.
@@ -85,9 +71,7 @@ export abstract class RuleLike
 
 
 /**
- * The Rule class is used as a base class for all rules. As a parent of RuleContainer, the Rule
- * class is also an ancestor for Stylesheet; however, most of its the fields are undefined in
- * te Stylesheet instances.
+ * The Rule class is used as a base class for all rules.
  */
 export abstract class Rule extends RuleLike implements IRule
 {
@@ -104,7 +88,7 @@ export abstract class Rule extends RuleLike implements IRule
 
 
 
-	// Inserts the given rule into the given parent rule or stylesheet.
+	// Inserts the given rule into the given parent grouping rule or stylesheet.
 	public static toDOM( ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule | null
 	{
 		try
@@ -122,19 +106,9 @@ export abstract class Rule extends RuleLike implements IRule
 
 
 	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
-	// the styles sheet or the parent rule. This is undefined for Stylesheet objects.
+	// the styles sheet or the parent rule.
 	public cssRule: CSSRule | null;
 }
-
-
-
-/** Creates scoped names based on the given parameters */
-export const createName = (topLevelContainer: ITopLevelRuleContainer, ruleName: string | null,
-        nameOverride?: string | INamedEntity): string =>
-	(!ruleName && !nameOverride) ? "" :
-    !nameOverride ? topLevelContainer.getScopedName( ruleName!) :
-    typeof nameOverride === "string" ? nameOverride :
-    nameOverride.name;
 
 
 

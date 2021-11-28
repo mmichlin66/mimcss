@@ -4,7 +4,7 @@ import {
     CombinedStyleset, ParentClassType
 } from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
-import {Rule, ITopLevelRuleContainer, createName, IRuleContainer, IRuleSerializationContext} from "./Rule";
+import {Rule, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
 import {styleset2s, sp2s} from "../impl/StyleImpl"
 import {VarRule} from "./VarRule";
@@ -115,10 +115,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-		super.process( container, topLevelContainer, ruleName);
-        this.forEachDepRule( (depRule: DepRule) => depRule.process( container, topLevelContainer, null));
+		super.process( container, ruleName);
+        this.forEachDepRule( (depRule: DepRule) => depRule.process( container, null));
 	}
 
 
@@ -428,11 +428,11 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, ruleName: string): void
 	{
-		super.process( container, topLevelContainer, ruleName);
+		super.process( container, ruleName);
 
-		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
+		this.name = container.getScopedName( ruleName, this.nameOverride);
         this.cssName = this.cssPrefix + this.name.replace( / /g, this.cssPrefix);
 	}
 

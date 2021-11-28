@@ -4,7 +4,7 @@ import {Styleset} from "../api/Stylesets";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
-import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer, ITopLevelRuleContainer} from "./Rule";
+import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {StyleRule} from "./StyleRules";
 import {symV2S} from "../impl/Utils";
@@ -194,9 +194,9 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, topLevelContainer, ruleName);
+        super.process( container, ruleName);
 
         this.name = this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
         this.cssClassName = "." + this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(".");

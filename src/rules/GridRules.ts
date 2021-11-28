@@ -1,5 +1,5 @@
 import {IGridLineRule, IGridAreaRule} from "../api/RuleTypes"
-import {createName, IRuleContainer, ITopLevelRuleContainer, RuleLike} from "./Rule";
+import {IRuleContainer, RuleLike} from "./Rule";
 
 
 
@@ -26,9 +26,9 @@ export class GridLineRule extends RuleLike implements IGridLineRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, topLevelContainer, ruleName);
+        super.process( container, ruleName);
 
         let name: string;
         let areaName: string | undefined;
@@ -47,7 +47,7 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
         else
         {
-            name = createName( topLevelContainer, ruleName, nameOverride);
+            name = container.getScopedName( ruleName, nameOverride);
 
             // if the obtained name doesn't have "-start" or "-end" but the isStartEndOrNone flag is
             // defined (that is, it is either start or end line), we need to append the suffix. If the
@@ -134,15 +134,15 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
     public toString(): string { return this.name; }
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, topLevelContainer, ruleName);
+        super.process( container, ruleName);
 
-        this.name = createName( topLevelContainer, ruleName, this.nameOverride);
+        this.name = container.getScopedName( ruleName, this.nameOverride);
 
         // process line rules
-        this.startLine.process( container, topLevelContainer, null);
-        this.endLine.process( container, topLevelContainer, null);
+        this.startLine.process( container, null);
+        this.endLine.process( container, null);
 	}
 
 	/**

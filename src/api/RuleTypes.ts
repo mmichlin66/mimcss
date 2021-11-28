@@ -1,8 +1,8 @@
 ﻿import {
     ICustomVar, PseudoEntity, PagePseudoClass, IParameterizedPseudoEntity,
-    DependentRuleCombinator, IConstant, IRuleWithSelector, CssSelector,
+    DependentRuleCombinator, IConstant, IRuleWithSelector
 } from "./CoreTypes";
-import {ExtendedBaseStyleset, Styleset, VarTemplateName, VarValue, ExtendedVarValue, AnimationStyleset} from "./Stylesets";
+import {ExtendedBaseStyleset, VarTemplateName, VarValue, ExtendedVarValue, AnimationStyleset} from "./Stylesets";
 
 
 

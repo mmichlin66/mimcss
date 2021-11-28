@@ -1,6 +1,6 @@
-import {IStyleDefinition, IStyleDefinitionClass, IVarRule, NameGenerationMethod} from "../api/RuleTypes"
+import {INamedEntity, IStyleDefinition, IStyleDefinitionClass, IVarRule, NameGenerationMethod} from "../api/RuleTypes"
 import {StyleDefinition, ThemeDefinition} from "../api/RuleAPI"
-import {Rule, ITopLevelRuleContainer, RuleLike, IRuleSerializationContext} from "./Rule"
+import {Rule, RuleLike, IRuleSerializationContext, IRuleContainer} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
 import {getActivator, scheduleStyleUpdate} from "../impl/SchedulingImpl";
@@ -40,10 +40,10 @@ let s_themePlaceholderElm: Element;
  * The RuleContainer class is a shadow structure that accompanies every processed style definition
  * object. Since StyleDefinition class is an exported class visible to developers, we don't want
  * to have a lot of functionality in it. The RuleContainer object is linked to the StyleDefinition
- * object via the [symRuleContainer] symbol. It contains all the functionality for parsing rule
+ * object via the [symContainer] symbol. It contains all the functionality for parsing rule
  * definitions, name assignment and activation/deactivation.
  */
-class RuleContainer implements ITopLevelRuleContainer
+class RuleContainer implements IRuleContainer
 {
 	constructor( sd: IStyleDefinition, name: string)
 	{
@@ -119,7 +119,7 @@ class RuleContainer implements ITopLevelRuleContainer
         {
             if (propVal instanceof RuleLike)
             {
-                propVal.process( this, this.tlc, propName);
+                propVal.process( this, propName);
                 if (propVal instanceof VarRule)
                     this.vars.push( propVal);
                 else if (propVal instanceof ImportRule)
@@ -157,52 +157,55 @@ class RuleContainer implements ITopLevelRuleContainer
 	 * Generates a globally unique CSS name for the given rule name unless this rule name already
 	 * exists either in a base class or in the chain of parent grouping rules.
 	 */
-	public getScopedName( ruleName: string): string
+	public getScopedName( ruleName: string, nameOverride?: string | INamedEntity): string
 	{
-		// if rule name was not specified, generate it uniquely; otherwise, check whether we
-		// already have this rule name: if yes, return the already assigned name. If we didn't
-		// find the name, try to find it in the base classes); if not found there, generate it
-		// using this container's name and the rule name (note that depending on the mode, both
-		// can be generated uniquely).
-		if (!ruleName)
+        if (nameOverride)
+            return typeof nameOverride === "string" ? nameOverride : nameOverride.name;
+		else if (!ruleName)
 			return generateUniqueName();
 		else if (ruleName in this.sd && "name" in this.sd[ruleName])
 			return this.sd[ruleName].name;
 		else
 		{
-			// find out if there is a rule with this name defined in a stylesheet instance created for
-			// a class from the prototype chain of the style definition class.
+			// find out if there is a rule with this name defined in a stylesheet instance created
+            // for a class from the prototype chain of the style definition class. Otherwise, if
+            // there is a parent container, recurse to it; otherwise, generate the name.
 			let existingName = findNameForRuleInPrototypeChain( this.sdc, ruleName);
-			return existingName ? existingName : generateName( this.name, ruleName);
+            if (existingName)
+                return existingName;
+            else if (this.pc)
+                return this.pc.getScopedName( ruleName);
+            else
+			    return generateName( this.name, ruleName);
 		}
 	}
 
 
 
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
-	public insert( container: CSSStyleSheet | CSSGroupingRule): void
+	public insert( sheetOrGroupingRule: CSSStyleSheet | CSSGroupingRule): void
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
-		if (container instanceof CSSStyleSheet)
+		if (sheetOrGroupingRule instanceof CSSStyleSheet)
 		{
-			this.imports && this.imports.forEach( rule => rule.insert( container));
-			this.namespaces && this.namespaces.forEach( rule => rule.insert( container));
+			this.imports && this.imports.forEach( rule => rule.insert( sheetOrGroupingRule));
+			this.namespaces && this.namespaces.forEach( rule => rule.insert( sheetOrGroupingRule));
 		}
 
 		// activate referenced style definitions
 		for( let ref of this.refs)
 			ref[symContainer].activate( this.elm);
 
-		// insert our custom variables in a ":root" rule
+		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)
 		{
 			this.varRootRule = Rule.toDOM( `:root {${this.vars.map( varObj =>
-				varObj.toCss()).filter( v => !!v).join(";")}}`, container) as CSSStyleRule;
+				varObj.toCss()).filter( v => !!v).join(";")}}`, sheetOrGroupingRule) as CSSStyleRule;
 		}
 
 		// insert all other rules
-		this.otherRules.forEach( rule => rule.insert( container));
+		this.otherRules.forEach( rule => rule.insert( sheetOrGroupingRule));
 	}
 
 
@@ -465,7 +468,7 @@ const generateName = (sheetName: string, ruleName: string): string =>
 	switch( s_nameGeneratonMethod)
     {
 		case NameGenerationMethod.UniqueScoped: return `${sheetName}_${ruleName}_${s_nextUniqueID++}`;
-		case NameGenerationMethod.Optimized: return generateUniqueName( s_uniqueStyleNamesPrefix);
+		case NameGenerationMethod.Optimized: return generateUniqueName();
         case NameGenerationMethod.Scoped: return `${sheetName}_${ruleName}`;
     }
 }
@@ -483,7 +486,7 @@ const generateUniqueName = (prefix?: string): string =>
 
 // Looks up a property with the given name in the prototype chain of the given style definition
 // class. If found and if the property is a rule, then returns the name assigned for it.
-const findNameForRuleInPrototypeChain = (definitionClass: IStyleDefinitionClass, ruleName: string) =>
+const findNameForRuleInPrototypeChain = (definitionClass: IStyleDefinitionClass, ruleName: string): string | null =>
 {
 	if (!definitionClass)
 		return null;
@@ -494,7 +497,7 @@ const findNameForRuleInPrototypeChain = (definitionClass: IStyleDefinitionClass,
                 baseClass = Object.getPrototypeOf( baseClass))
 	{
 		// check if the base class already has an associated instance; if yes, check whether
-		// it hase a property with the given rule name. If yes, then use this rule's already
+		// it has a property with the given rule name. If yes, then use this rule's already
         // generated name (if exists).
 		if (baseClass.hasOwnProperty(symInstance))
 		{

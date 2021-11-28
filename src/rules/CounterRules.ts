@@ -1,7 +1,7 @@
 import {ExtendedCounterStyleset} from "../api/CounterTypes";
 import {ICounterRule, ICounterStyleRule} from "../api/RuleTypes"
 import {counterStyleset2s} from "../impl/MiscImpl";
-import {createName, IRuleContainer, IRuleSerializationContext, ITopLevelRuleContainer, Rule, RuleLike} from "./Rule";
+import {IRuleContainer, IRuleSerializationContext, Rule, RuleLike} from "./Rule";
 
 
 
@@ -26,10 +26,10 @@ export class CounterRule extends RuleLike implements ICounterRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, topLevelContainer, ruleName);
-		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
+        super.process( container, ruleName);
+		this.name = container.getScopedName( ruleName, this.nameOverride);
 	}
 
 
@@ -76,10 +76,10 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, topLevelContainer: ITopLevelRuleContainer, ruleName: string | null): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
-        super.process( container, topLevelContainer, ruleName);
-		this.name = createName( topLevelContainer, ruleName, this.nameOverride);
+        super.process( container, ruleName);
+		this.name = container.getScopedName( ruleName, this.nameOverride);
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.
