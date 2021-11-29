@@ -12,19 +12,19 @@ import {ClassRule} from "./StyleRules"
 // instances that we don't want to be visible to developers.
 
 /** Symbol on the style definition class pointing to the singleton instance. */
-const symInstance = Symbol();
+const symInstance = Symbol("sd");
 
 /**
  * Symbol on the style definition instance pointing to the RuleContainer object that is
  * responsible for processing rules.
  */
-const symContainer = Symbol();
+const symContainer = Symbol("rc");
 
 /**
  * Symbol on the style definition instance pointing to the StyleDefinition class for which
  * this instance was created.
  */
-const symClass = Symbol();
+const symClass = Symbol("sdc");
 
 
 

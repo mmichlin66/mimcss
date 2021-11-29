@@ -28,7 +28,7 @@ import {getActivator} from "../impl/SchedulingImpl";
  * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
  * property when processing the rules in the style definition object.
  */
-const symParent = Symbol();
+const symParent = Symbol("parent");
 
 
 
@@ -79,7 +79,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * style definitions, this property is always undefined. This property can also be undefined
      * if it was not provided to the constructor when creating the style definition class manually.
      */
-public get $parent(): P | undefined { return this[symParent]; }
+    public get $parent(): P | undefined { return this[symParent]; }
 
 
 
@@ -974,39 +974,21 @@ export const virtual = (target: any, name: string): void =>
     // symbol to keep the proxy handler value
     let sym = Symbol(name);
 
-    Object.defineProperty( target.constructor.prototype, name, {
+    Object.defineProperty( target, name, {
         enumerable: true,
-        get()
-        {
-            // check whether we already have the handler and create it if we don't. In this
-            // case we also create a proxy for an empty object
-            let handler = this[sym] as VirtHandler;
-            if (!handler)
-            {
-                this[sym] = handler = new VirtHandler();
-                handler.proxy = new Proxy( {}, handler);
-            }
-
-            return handler.proxy;
-        },
+        get() { return ensureHandlerAndProxy( this, sym).x; },
 
         set(v)
         {
-            // depending on the object type we may have a different object to pass to the proxy;
-            // also we need to know whether the object is a special (internal to JavaScript) one
-            // and the handler will have to treat it specially
-            let newTarget = getProxiableObject(v);
-
-            // check whether we already have the handler and create it if we don't
-            let handler = this[sym] as VirtHandler;
-            if (!handler)
-            {
-                this[sym] = handler = new VirtHandler();
-                handler.proxy = new Proxy( newTarget == null ? {} : newTarget, handler);
-            }
-
-            // set the new vaules to the handler so that it will use it from now on
-            handler.target = newTarget;
+            // set the new value to the handler so that it will use it from now on. The primitive
+            // values are boxed.
+            let type = typeof v;
+            ensureHandlerAndProxy( this, sym).t =
+                type === "string" ? new String(v) :
+                type === "number" ? new Number(v) :
+                type === "boolean" ? new Boolean(v) :
+                type === "symbol" ? new Object(v) :
+                v;
         }
     });
 }
@@ -1014,23 +996,21 @@ export const virtual = (target: any, name: string): void =>
 
 
 /**
- * For the given value returns a two-element tuple:
- * - the first element is the value that should be passed to a proxy. For objects, it is the input
- *   value. For primitive types it is the boxed object (e.g. Number for numbers). For null and
- *   undefined it is null and undefined respectively
- * - the second element is the "special" flag, which is true if the proxy handler will have to have
- *   a special treatment the objects' methods; that is, it will have to bind them to the target
- *   object before returning them from the get method. This is true for "internal" JavaScript
- *   classes like boxed primitive types, Map, Set, Promise and some others.
+ * Creates handler and proxy in the given object using the given symbol if not created yet.
+ * Returns the handler. Proxy is stored in the handler's property.
  */
-const getProxiableObject = (v: any): any =>
+const ensureHandlerAndProxy = (instance: any, sym: symbol): VirtHandler =>
 {
-    return v == null ? v :
-        typeof v === "string" ? new String(v) :
-        typeof v === "number" ? new Number(v) :
-        typeof v === "boolean" ? new Boolean(v) :
-        typeof v === "symbol" ? new Object(v) :
-        v;
+    // check whether we already have the handler and create it if we don't. In this
+    // case we also create a proxy for an empty object
+    let handler = instance[sym] as VirtHandler;
+    if (!handler)
+    {
+        instance[sym] = handler = new VirtHandler();
+        handler.x = new Proxy( {}, handler);
+    }
+
+    return handler;
 }
 
 
@@ -1041,55 +1021,58 @@ const getProxiableObject = (v: any): any =>
  */
 class VirtHandler implements ProxyHandler<any>
 {
-    public proxy: any;
-    public target: any;
+    // Proxy object, which works with this handler
+    public x: any;
+
+    // the latest target object to use for all proxy handler operations
+    public t: any;
 
     // interesting things happen in the get method
     get( t: any, p: PropertyKey, r: any): any
     {
         // if our value is null or undefined and the requested property is a well-known symbol
         // toPrimitive we return a function that returns either null or undefined. This will help
-        // if our proxy either participate in an arithmetic expression or or is combined with a
+        // if our proxy either participate in an arithmetic expression or is combined with a
         // string.
-        if (this.target == null && p === Symbol.toPrimitive)
-            return () => this.target;
+        if (this.t == null && p === Symbol.toPrimitive)
+            return () => this.t;
 
         // get the value of the request property; if the value is null or undefined, an exception
         // will be thrown - which is expected.
-        let pv = Reflect.get( this.target, p, r);
+        let pv = Reflect.get( this.t, p, r);
 
         // if the requested property is a function, bind the original method to the target object
-        return typeof pv === "function" ? pv.bind( this.target) : pv;
+        return typeof pv === "function" ? pv.bind( this.t) : pv;
     }
 
     // the rest of the methods mostly delegate the calls to the latest target instead of the
     // original target. In some cases, we check whether the target is null or undefined so that
-    // we don'tthrow exceptions wher we can avoid it.
+    // we don't throw exceptions where we can avoid it.
 
     getPrototypeOf( t: any): object | null
-        { return this.target == null ? null : Reflect.getPrototypeOf( this.target); }
+        { return this.t == null ? null : Reflect.getPrototypeOf( this.t); }
     setPrototypeOf(t: any, v: any): boolean
-        { return Reflect.setPrototypeOf( this.target, v); }
+        { return Reflect.setPrototypeOf( this.t, v); }
     isExtensible(t: any): boolean
-        { return this.target == null ? false : Reflect.isExtensible( this.target); }
+        { return this.t == null ? false : Reflect.isExtensible( this.t); }
     preventExtensions(t: any): boolean
-        { return this.target == null ? false : Reflect.preventExtensions( this.target); }
+        { return this.t == null ? false : Reflect.preventExtensions( this.t); }
     getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
-        { return Reflect.getOwnPropertyDescriptor( this.target, p); }
+        { return Reflect.getOwnPropertyDescriptor( this.t, p); }
     has(t: any, p: PropertyKey): boolean
-        { return this.target == null ? false : Reflect.has( this.target, p); }
+        { return this.t == null ? false : Reflect.has( this.t, p); }
     set( t: any, p: PropertyKey, v: any, r: any): boolean
-        { return Reflect.set( this.target, p, v, r); }
+        { return Reflect.set( this.t, p, v, r); }
     deleteProperty(t: any, p: PropertyKey): boolean
-        { return Reflect.deleteProperty( this.target, p); }
+        { return Reflect.deleteProperty( this.t, p); }
     defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
-        { return Reflect.defineProperty( this.target, p, attrs); }
+        { return Reflect.defineProperty( this.t, p, attrs); }
     ownKeys(t: any): ArrayLike<string | symbol>
-        { return Reflect.ownKeys( this.target); }
+        { return Reflect.ownKeys( this.t); }
     apply(t: any, thisArg: any, args?: any): any
-        { return this.target.apply( this, args); }
+        { return this.t.apply( thisArg, args); }
     construct(t: any, args: any, newTarget?: any): object
-        { return Reflect.construct( this.target, args, newTarget); }
+        { return Reflect.construct( this.t, args, newTarget); }
 }
 
 
