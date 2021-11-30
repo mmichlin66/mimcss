@@ -428,7 +428,7 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string): void
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
 		super.process( container, ruleName);
 
@@ -494,12 +494,14 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         return super.parseSP( propName, propVal);
     }
 
-	// Post-processes the given rule.
-	public postProcess(): void
+	// Processes the given rule.
+	public process( container: IRuleContainer, ruleName: string | null): void
 	{
+		super.process( container, ruleName);
+
         // by now our name and cssName properties have been set to reflect a single name. Now
-        // look at the "++" property and if defined, take names from the referenced class rules
-        // and append them to the name.
+        // look at the parent class rues defined using the "++" property and take names from the
+        // referenced class rules and append them to the name.
         if (this.parents)
         {
             this.name += " " + this.parents.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");

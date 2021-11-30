@@ -9,7 +9,7 @@ import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset} from "./Stylesets";
-import {embeddedDecorator, getCurrentTheme, processSD, configNames} from "../rules/RuleContainer";
+import {embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule} from "../rules/VarRule"
@@ -64,12 +64,17 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     /**
      * Style definition instances are created directly only by the *styled components* - that is,
      * components that use different styles for each instance. Otherwise, style definition
-     * instances are created when either the [[$use]] or [[activate]] function is called.
+     * instances are created when either the [[$use]] method or [[activate]] function is called.
      * @param parent Reference to the parent style definition class
      */
     public constructor( parent?: P)
     {
         this[symParent] = parent;
+
+        // instead of returning an instance of our class, the constructor returns a proxy. This
+        // allows creating proxies for all properties defined in the class, which allows processing
+        // the properties immediately upon definition.
+        return new Proxy<StyleDefinition<P>>( this, new RuleContainer( this));
     }
 
     /**
@@ -968,112 +973,11 @@ export const chooseClass = (...classProps: ClassPropType[]): string | null =>
  * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
  * rule, the first rule will see the overridden value of the rule when accessed in the
  * post-constructor code.
+ *
+ * @deprecated This decorator is deprecated as  all rules defined in style definition classes are
+ * always virtualized.
  */
-export const virtual = (target: any, name: string): void =>
-{
-    // symbol to keep the proxy handler value
-    let sym = Symbol(name);
-
-    Object.defineProperty( target, name, {
-        enumerable: true,
-        get() { return ensureHandlerAndProxy( this, sym).x; },
-
-        set(v)
-        {
-            // set the new value to the handler so that it will use it from now on. The primitive
-            // values are boxed.
-            let type = typeof v;
-            ensureHandlerAndProxy( this, sym).t =
-                type === "string" ? new String(v) :
-                type === "number" ? new Number(v) :
-                type === "boolean" ? new Boolean(v) :
-                type === "symbol" ? new Object(v) :
-                v;
-        }
-    });
-}
-
-
-
-/**
- * Creates handler and proxy in the given object using the given symbol if not created yet.
- * Returns the handler. Proxy is stored in the handler's property.
- */
-const ensureHandlerAndProxy = (instance: any, sym: symbol): VirtHandler =>
-{
-    // check whether we already have the handler and create it if we don't. In this
-    // case we also create a proxy for an empty object
-    let handler = instance[sym] as VirtHandler;
-    if (!handler)
-    {
-        instance[sym] = handler = new VirtHandler();
-        handler.x = new Proxy( {}, handler);
-    }
-
-    return handler;
-}
-
-
-
-/**
- * Handler for the proxy created by the `@virtual` decorator. It keeps the current value of a
- * rule so that the most recent value is used whenever the proxy is accessed.
- */
-class VirtHandler implements ProxyHandler<any>
-{
-    // Proxy object, which works with this handler
-    public x: any;
-
-    // the latest target object to use for all proxy handler operations
-    public t: any;
-
-    // interesting things happen in the get method
-    get( t: any, p: PropertyKey, r: any): any
-    {
-        // if our value is null or undefined and the requested property is a well-known symbol
-        // toPrimitive we return a function that returns either null or undefined. This will help
-        // if our proxy either participate in an arithmetic expression or is combined with a
-        // string.
-        if (this.t == null && p === Symbol.toPrimitive)
-            return () => this.t;
-
-        // get the value of the request property; if the value is null or undefined, an exception
-        // will be thrown - which is expected.
-        let pv = Reflect.get( this.t, p, r);
-
-        // if the requested property is a function, bind the original method to the target object
-        return typeof pv === "function" ? pv.bind( this.t) : pv;
-    }
-
-    // the rest of the methods mostly delegate the calls to the latest target instead of the
-    // original target. In some cases, we check whether the target is null or undefined so that
-    // we don't throw exceptions where we can avoid it.
-
-    getPrototypeOf( t: any): object | null
-        { return this.t == null ? null : Reflect.getPrototypeOf( this.t); }
-    setPrototypeOf(t: any, v: any): boolean
-        { return Reflect.setPrototypeOf( this.t, v); }
-    isExtensible(t: any): boolean
-        { return this.t == null ? false : Reflect.isExtensible( this.t); }
-    preventExtensions(t: any): boolean
-        { return this.t == null ? false : Reflect.preventExtensions( this.t); }
-    getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
-        { return Reflect.getOwnPropertyDescriptor( this.t, p); }
-    has(t: any, p: PropertyKey): boolean
-        { return this.t == null ? false : Reflect.has( this.t, p); }
-    set( t: any, p: PropertyKey, v: any, r: any): boolean
-        { return Reflect.set( this.t, p, v, r); }
-    deleteProperty(t: any, p: PropertyKey): boolean
-        { return Reflect.deleteProperty( this.t, p); }
-    defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
-        { return Reflect.defineProperty( this.t, p, attrs); }
-    ownKeys(t: any): ArrayLike<string | symbol>
-        { return Reflect.ownKeys( this.t); }
-    apply(t: any, thisArg: any, args?: any): any
-        { return this.t.apply( thisArg, args); }
-    construct(t: any, args: any, newTarget?: any): object
-        { return Reflect.construct( this.t, args, newTarget); }
-}
+export const virtual = (target: any, name: string): void => {};
 
 
 
@@ -1086,45 +990,6 @@ class VirtHandler implements ProxyHandler<any>
  */
 export abstract class ThemeDefinition<P extends StyleDefinition = any> extends StyleDefinition<P>
 {
-    constructor( parent?: P)
-    {
-        super(parent);
-
-        // instead of returning an instance of our class, the constructor returns a proxy where
-        // both the target and the handler are our own instance. This allows creating proxies for
-        // all properties defined in the class, which is needed for proper use and overriding.
-        return new Proxy<ThemeDefinition<P>>( this, new ThemeDefinitionHandler());
-    }
-}
-
-
-
-/**
- * The `ThemeDefinitionHandler` class serves as a proxy handler for Proxy(ThemeDefinition).
- */
-class ThemeDefinitionHandler implements ProxyHandler<ThemeDefinition>
-{
-    keys: string[] = [];
-
-    set( t: ThemeDefinition, p: PropertyKey, v: any, r: any): boolean
-    {
-        if (typeof p === "symbol" || typeof p === "number" || t[p] !== undefined)
-            return Reflect.set( t, p, v, r);
-        else
-        {
-            if (!Array.isArray(v))
-                virtual( t, p);
-
-            t[p] = v;
-            this.keys.push(p);
-            return true;
-        }
-    }
-
-    ownKeys(t: ThemeDefinition): ArrayLike<string | symbol>
-    {
-        return this.keys;
-    }
 }
 
 

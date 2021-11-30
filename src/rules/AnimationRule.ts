@@ -27,7 +27,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, ruleName: string | null)
 	{
 		super.process( container, ruleName);
 

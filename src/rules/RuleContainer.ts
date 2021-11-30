@@ -4,7 +4,6 @@ import {Rule, RuleLike, IRuleSerializationContext, IRuleContainer} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
 import {getActivator, scheduleStyleUpdate} from "../impl/SchedulingImpl";
-import {ClassRule} from "./StyleRules"
 
 
 
@@ -37,34 +36,33 @@ let s_themePlaceholderElm: Element;
 
 
 /**
+ * Flag indicating that a rule container is created not directly (as for styled components)
+ * but from the processClass function. This variable is set to true before instantiating the
+ * style definition class (and thus the RuleCOntainer object) and is set back to false after
+ * it is used in the RuleContainer constructor.
+ */
+let s_processingStyleDefinitionClass = false;
+
+
+
+/**
  * The RuleContainer class is a shadow structure that accompanies every processed style definition
  * object. Since StyleDefinition class is an exported class visible to developers, we don't want
  * to have a lot of functionality in it. The RuleContainer object is linked to the StyleDefinition
  * object via the [symContainer] symbol. It contains all the functionality for parsing rule
  * definitions, name assignment and activation/deactivation.
  */
-class RuleContainer implements IRuleContainer
+export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefinition>
 {
-	constructor( sd: IStyleDefinition, name: string)
+	constructor( sd: IStyleDefinition)
 	{
 		this.sd = sd;
-		this.name = name;
 
         this.sdc = sd.constructor as IStyleDefinitionClass;
         this.parent = sd.$parent;
 		this.ec = this.sdc[symEmbeddingContainer];
 
-		this.refCount = 0;
-		this.elm = null;
-	}
-
-
-
-	// Processes the properties of the style definition instance. This creates names for classes,
-	// IDs, animations and custom variables.
-	public process(): void
-	{
-		// get parent and top level containers
+        // get parent and top level containers
         if (this.parent)
         {
             this.pc = this.parent[symContainer];
@@ -73,28 +71,68 @@ class RuleContainer implements IRuleContainer
         else
             this.tlc = this;
 
+        // get the name for our container. If the container is created for a class from the
+        // processClass function, then the flag s_processingStyleDefinitionClass is defined
+        // and the name isgenerated depending on the current generation method. If this flag is
+        // false, that means that the container is created from a direct "new" call on the style
+        // definition class and the name is generated uniquely.
+        let name: string;
+        if (s_processingStyleDefinitionClass)
+        {
+            s_processingStyleDefinitionClass = false;
+            name = !this.sdc.name || s_nameGeneratonMethod === NameGenerationMethod.Optimized
+                ? generateUniqueName()
+                : this.sdc.name;
+
+            // associate the definition class with the created definition instance
+            this.sdc[symInstance] = sd;
+            sd[symClass] = this.sdc;
+        }
+        else
+        {
+            name = generateUniqueName();
+            if (s_nameGeneratonMethod !== NameGenerationMethod.Optimized && this.sdc.name)
+                name += "_" + this.sdc.name;
+        }
+
+        // Style Definition instance points to this rule container
+        sd[symContainer] = this;
+
 		// if our container has parent container, prefix our name with the upper one
-		if (this.pc)
-			this.name = `${this.pc.name}_${this.name}`;
+        this.name = this.pc ? `${this.pc.name}_${name}` : name;
+	}
 
-		this.imports = [];
-		this.namespaces = [];
-		this.vars = [];
-		this.refs = [];
-		this.otherRules = [];
-		this.ruleLikes = [];
 
+
+    // ProxyHandler method, whcih virtualizes all non-array properties
+    set( t: StyleDefinition, p: PropertyKey, v: any, r: any): boolean
+    {
+        if (typeof p === "symbol" || typeof p === "number" || p in t /*t[p] !== undefined*/)
+            return Reflect.set( t, p, v, r);
+        else
+        {
+            // we don't virtualize arrays because there is no trap for isArray() method, which
+            // we use later in the processProperty() method.
+            if (!Array.isArray(v))
+                virtualize( t, p);
+
+            t[p] = v;
+            this.keys.push(p);
+            return true;
+        }
+    }
+
+
+
+    // Processes the properties of the style definition instance. This creates names for classes,
+	// IDs, animations and custom variables.
+	public process(): void
+	{
 		// loop over the properties of the definition object and process them.
-		for( let propName in this.sd)
+		for( let propName of this.keys)
 			this.processProperty( propName, this.sd[propName]);
 
-        // loop over rule objects and call the postProcess method, which allows
-        // them to connect to other rules.
-        for( let rule of this.otherRules)
-        {
-            if (rule instanceof ClassRule)
-                rule.postProcess();
-        }
+        this.processed = true;
 	}
 
 
@@ -108,9 +146,11 @@ class RuleContainer implements IRuleContainer
             processInstance( propVal);
             this.refs.push( propVal);
         }
+        // else if (propVal instanceof Array)
         else if (Array.isArray(propVal))
         {
-            // loop over array elements and recursively process them. Index becomes part of the rule name.
+            // loop over array elements and recursively process them. Index becomes part of the
+            // rule name.
             let i = 0;
             for( let item of propVal)
                 this.processProperty( `${propName}_${i++}`, item);
@@ -189,8 +229,8 @@ class RuleContainer implements IRuleContainer
 		// rule, don't insert @import and @namespace rules at all
 		if (sheetOrGroupingRule instanceof CSSStyleSheet)
 		{
-			this.imports && this.imports.forEach( rule => rule.insert( sheetOrGroupingRule));
-			this.namespaces && this.namespaces.forEach( rule => rule.insert( sheetOrGroupingRule));
+			this.imports.forEach( rule => rule.insert( sheetOrGroupingRule));
+			this.namespaces.forEach( rule => rule.insert( sheetOrGroupingRule));
 		}
 
 		// activate referenced style definitions
@@ -216,8 +256,8 @@ class RuleContainer implements IRuleContainer
         // import and namespace rules can only exist in the top-level style definition class
 		if (!this.parent)
 		{
-			this.imports && this.imports.forEach( rule => rule.clear());
-			this.namespaces && this.namespaces.forEach( rule => rule.clear());
+			this.imports.forEach( rule => rule.clear());
+			this.namespaces.forEach( rule => rule.clear());
 		}
 
 		this.varRootRule = null;
@@ -274,8 +314,9 @@ class RuleContainer implements IRuleContainer
 
         // if this is a theme class activation, check whether the instance is set as the current
         // one for its theme base class. If no, then deactivate the theme instance currently set
-        // as active. In any case, set our new instance as the currently active one.
-        if (this.sd instanceof ThemeDefinition)
+        // as active. In any case, set our new instance as the currently active one. We ignore
+        // theme declaration classes - those that directly derive from ThemeDefinition
+        if (this.sd instanceof ThemeDefinition && Object.getPrototypeOf(this.sdc) !== ThemeDefinition)
         {
             let themeClass = this.sd[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
@@ -322,7 +363,7 @@ class RuleContainer implements IRuleContainer
 
         // if this is a theme class deactivation, check whether the instance is set as the current
         // one for its theme base class. If yes, remove it as the currently active one.
-        if (this.sd instanceof ThemeDefinition)
+        if (this.sd instanceof ThemeDefinition && Object.getPrototypeOf(this.sdc) !== ThemeDefinition)
         {
             let themeClass = this.sd[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
@@ -343,8 +384,8 @@ class RuleContainer implements IRuleContainer
 		// rule, don't insert @import and @namespace rules at all
 		if (!this.parent)
 		{
-			this.imports && this.imports.forEach( rule => rule.serialize( ctx));
-			this.namespaces && this.namespaces.forEach( rule => rule.serialize( ctx));
+			this.imports.forEach( rule => rule.serialize( ctx));
+			this.namespaces.forEach( rule => rule.serialize( ctx));
 		}
 
 		// activate referenced style definitions
@@ -388,33 +429,41 @@ class RuleContainer implements IRuleContainer
 	// this property points to `this`. Names for named rules are created using this container.
 	private tlc: RuleContainer;
 
+    // Array of names of properties that would be considered "own" properties of the style
+    // definition object. This array keeps the  property names in the order they are defined
+    // in the class
+    private keys: string[] = [];
+
+    // Flag determining whether this container has already been processed
+    public processed: boolean;
+
 	// List of references to other style definitions creaed via the $use function.
-	private refs: StyleDefinition[];
+	private refs: StyleDefinition[] = [];
 
 	// List of @import rules
-	private imports: ImportRule[];
+	private imports: ImportRule[] = [];
 
 	// List of @namespace rules
-	private namespaces: NamespaceRule[];
+	private namespaces: NamespaceRule[] = [];
 
 	// List of custom variable rules.
-	private vars: VarRule[];
+	private vars: VarRule[] = [];
     public getVars(): VarRule[] { return this.vars; }
 
 	// List of rules that are not imports, namespaces, custom vars, references or grouping rules.
-	private otherRules: Rule[];
+	private otherRules: Rule[] = [];
 
 	// List of rule-like objects.
-	private ruleLikes: RuleLike[];
+	private ruleLikes: RuleLike[] = [];
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
 	private varRootRule: CSSStyleRule | null;
 
 	// Reference count of activation requests.
-	private refCount: number;
+	private refCount: number = 0;
 
 	// DOM style elemnt
-	public elm: HTMLStyleElement | null;
+	public elm: HTMLStyleElement | null = null;
 }
 
 
@@ -542,38 +591,35 @@ export const processSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
  * object or null if the given class is itself a top-level class (that is, is not a class
  * that defines rules within nested grouping rules).
  */
-const processClass = (definitionClass: IStyleDefinitionClass,
-	parent?: IStyleDefinition): IStyleDefinition =>
+const processClass = (sdc: IStyleDefinitionClass, parent?: IStyleDefinition): IStyleDefinition =>
 {
-    // check whether this definition class is already associated with an instance
-    if (definitionClass.hasOwnProperty(symInstance))
-        return definitionClass[symInstance];
+    // check whether this definition class is already associated with an instance. Note that we
+    // use hasOwnProperty() because otherwise, this could return instance for the base style
+    // definition class.
+	if (sdc.hasOwnProperty(symInstance))
+        return sdc[symInstance] as IStyleDefinition;
 
     // recursively process all base classes so that rule names are generated. We don't activate styles
     // for these classes because derived classes will have all the rules from all the base classes
     // as their own and so these rules will be activated as part of the derived class.
-    let baseClass = Object.getPrototypeOf( definitionClass);
+    let baseClass = Object.getPrototypeOf( sdc);
     if (baseClass !== StyleDefinition && baseClass !== ThemeDefinition)
-		processClass( baseClass, parent);
+        processClass( baseClass, parent);
 
-    // create the instance of the definition class and mark it as the instance created for it
-    let instance = new definitionClass( parent);
-    instance[symClass] = definitionClass;
+    try
+    {
+        // create the instance of the definition class
+        s_processingStyleDefinitionClass = true;
+        let sd = new sdc( parent);
 
-    // get the name for our container
-    let name = !definitionClass.name || s_nameGeneratonMethod === NameGenerationMethod.Optimized
-        ? generateUniqueName()
-        : definitionClass.name;
-
-    // create rule container, put reference to this container in the symbol property of the
-    // definition instance and process the container rules.
-    let container = new RuleContainer( instance, name);
-    instance[symContainer] = container;
-    container.process();
-
-    // associate the definition class with the created definition instance
-    definitionClass[symInstance] = instance;
-    return instance;
+        // get rule container from the instance and process the rules.
+        (sd[symContainer] as RuleContainer).process();
+        return sd;
+    }
+    finally
+    {
+        s_processingStyleDefinitionClass = false;
+    }
 }
 
 
@@ -583,29 +629,15 @@ const processClass = (definitionClass: IStyleDefinitionClass,
  * instance has already been processed, we do nothing; otherwise, we assign new unique names
  * to its rules.
  */
-const processInstance = (instance: IStyleDefinition): IStyleDefinition =>
+const processInstance = (sd: IStyleDefinition): IStyleDefinition =>
 {
 	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.
-	let container = instance[symContainer] as RuleContainer;
-	if (container)
-		return instance;
+	let container = sd[symContainer] as RuleContainer;
+    if (!container.processed)
+        container.process();
 
-	// get the name for our container
-	let name = generateUniqueName();
-	if (s_nameGeneratonMethod !== NameGenerationMethod.Optimized)
-	{
-		let definitionClass = instance.constructor;
-		if (definitionClass.name)
-			name += "_" + definitionClass.name;
-	}
-
-    // create rule container, put reference to this container in the symbol property of the
-    // definition instance and process the container rules.
-    container = new RuleContainer( instance, name);
-    instance[symContainer] = container;
-    container.process();
-    return instance;
+    return sd;
 }
 
 
@@ -616,14 +648,7 @@ const processInstance = (instance: IStyleDefinition): IStyleDefinition =>
  * to its rules.
  */
 export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass): IVarRule[] =>
-{
-    let instance = processSD( instOrClass);
-    if (!instance)
-        return [];
-
-	let ruleContainer = instance[symContainer] as RuleContainer;
-    return ruleContainer.getVars();
-}
+    (processSD( instOrClass)[symContainer] as RuleContainer).getVars();
 
 
 
@@ -832,6 +857,134 @@ export const embeddedDecorator = (category: string, target: IStyleDefinitionClas
 
     // add our class to the container
     ec.add( target);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Rule virtualization.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Decorator that should be applied to a rule if it is defined and used in the same style
+ * definition class but then is overridden in a derived style definition class. The problem
+ * this solves is this: when a rule is defined in a base class and then overridden in a derived
+ * class, when an instance of the derived class is created, the rules that are created in the
+ * base and derived classes see different values of the rule. Since our rules are defined as
+ * part of the constructor, the base class constructor's code only sees the value assigned in that
+ * code. If another rule in the base class uses this first rule, this value is remembered.
+ *
+ * The `@virtual` decorator creates a Proxy object for the rule with the handler that keeps the
+ * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
+ * rule, the first rule will see the overridden value of the rule when accessed in the
+ * post-constructor code.
+ */
+const virtualize = (target: any, name: string): void =>
+{
+    // symbol to keep the proxy handler value
+    let sym = Symbol(name);
+
+    Object.defineProperty( target, name, {
+        enumerable: true,
+        get() { return ensureHandlerAndProxy( this, sym).x; },
+
+        set(v)
+        {
+            // set the new value to the handler so that it will use it from now on. The primitive
+            // values are boxed.
+            let type = typeof v;
+            ensureHandlerAndProxy( this, sym).t =
+                type === "string" ? new String(v) :
+                type === "number" ? new Number(v) :
+                type === "boolean" ? new Boolean(v) :
+                type === "symbol" ? new Object(v) :
+                v;
+        }
+    });
+}
+
+
+
+/**
+ * Creates handler and proxy in the given object using the given symbol if not created yet.
+ * Returns the handler. Proxy is stored in the handler's property.
+ */
+const ensureHandlerAndProxy = (instance: any, sym: symbol): VirtHandler =>
+{
+    // check whether we already have the handler and create it if we don't. In this
+    // case we also create a proxy for an empty object
+    let handler = instance[sym] as VirtHandler;
+    if (!handler)
+    {
+        instance[sym] = handler = new VirtHandler();
+        handler.x = new Proxy( {}, handler);
+    }
+
+    return handler;
+}
+
+
+
+/**
+ * Handler for the proxy created by the `@virtual` decorator. It keeps the current value of a
+ * rule so that the most recent value is used whenever the proxy is accessed.
+ */
+class VirtHandler implements ProxyHandler<any>
+{
+    // Proxy object, which works with this handler
+    public x: any;
+
+    // the latest target object to use for all proxy handler operations
+    public t: any;
+
+    // interesting things happen in the get method
+    get( t: any, p: PropertyKey, r: any): any
+    {
+        // if our value is null or undefined and the requested property is a well-known symbol
+        // toPrimitive we return a function that returns either null or undefined. This will help
+        // if our proxy either participate in an arithmetic expression or is combined with a
+        // string.
+        if (this.t == null && p === Symbol.toPrimitive)
+            return () => this.t;
+
+        // get the value of the request property; if the value is null or undefined, an exception
+        // will be thrown - which is expected.
+        let pv = Reflect.get( this.t, p, r);
+
+        // if the requested property is a function, bind the original method to the target object
+        return typeof pv === "function" ? pv.bind( this.t) : pv;
+    }
+
+    // the rest of the methods mostly delegate the calls to the latest target instead of the
+    // original target. In some cases, we check whether the target is null or undefined so that
+    // we don't throw exceptions where we can avoid it.
+
+    getPrototypeOf( t: any): object | null
+        { return this.t == null ? null : Reflect.getPrototypeOf( this.t); }
+    setPrototypeOf(t: any, v: any): boolean
+        { return Reflect.setPrototypeOf( this.t, v); }
+    isExtensible(t: any): boolean
+        { return this.t == null ? false : Reflect.isExtensible( this.t); }
+    preventExtensions(t: any): boolean
+        { return this.t == null ? false : Reflect.preventExtensions( this.t); }
+    getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
+        { return Reflect.getOwnPropertyDescriptor( this.t, p); }
+    has(t: any, p: PropertyKey): boolean
+        { return this.t == null ? false : Reflect.has( this.t, p); }
+    set( t: any, p: PropertyKey, v: any, r: any): boolean
+        { return Reflect.set( this.t, p, v, r); }
+    deleteProperty(t: any, p: PropertyKey): boolean
+        { return Reflect.deleteProperty( this.t, p); }
+    defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
+        { return Reflect.defineProperty( this.t, p, attrs); }
+    ownKeys(t: any): ArrayLike<string | symbol>
+        { return Reflect.ownKeys( this.t); }
+    apply(t: any, thisArg: any, args?: any): any
+        { return this.t.apply( thisArg, args); }
+    construct(t: any, args: any, newTarget?: any): object
+        { return Reflect.construct( this.t, args, newTarget); }
 }
 
 

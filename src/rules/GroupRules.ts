@@ -20,7 +20,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string)
+	public process( container: IRuleContainer, ruleName: string | null)
 	{
 		super.process( container, ruleName);
 
