@@ -14,7 +14,7 @@ class MyStyles extends css.StyleDefinition
     cls2 = this.$class({ animationTimingFunction: css.steps(4, "jump-start") })
 
     // Using `cubic-bezier()` function
-    cls3 = this.$class({ animationTimingFunction: css.cubic-bezier(0.1, 0.7, 1.0, 0.1) })
+    cls3 = this.$class({ animationTimingFunction: css.cubicBezier(0.1, 0.7, 1.0, 0.1) })
 
     // Using custom property
     varFunc = this.$var( "animationTimingFunction", css.steps(6, "start"))

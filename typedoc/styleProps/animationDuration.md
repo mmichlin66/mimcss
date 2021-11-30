@@ -18,7 +18,7 @@ class MyStyles extends css.StyleDefinition
     // Using time-unit function: 3s
     cls3 = this.$class({ animationDuration: css.s(3) })
 
-    // Using time-unit function: 500ms
+    // Using time-unit function: -500ms
     cls4 = this.$class({ animationDuration: css.ms(-500) })
 
     // Using custom property
