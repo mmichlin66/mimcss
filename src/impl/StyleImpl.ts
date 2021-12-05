@@ -718,6 +718,40 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     CssMultiPosition: WKF.MultiPosition,
     CssRadius: WKF.Radius,
     CssColor: WKF.Color,
+
+    "<number>#": WKF.OneOrManyWithComma,
+
+    "<length>": WKF.Length,
+    "<length>+": WKF.MultiLengthWithSpace,
+    "<length>#": { any: WKF.Length, sep: ","},
+
+    "<percentage>": WKF.Percent,
+    "<percentage>+": { any: WKF.Percent },
+    "<percentage>#": { any: WKF.Percent, sep: ","},
+
+    "<length-percentage>": WKF.Length,
+    "<length-percentage>+": WKF.MultiLengthWithSpace,
+    "<length-percentage>#": { any: WKF.Length, sep: ","},
+
+    "<angle>": WKF.Angle,
+    "<angle>+": { any: WKF.Angle },
+    "<angle>#": { any: WKF.Angle, sep: ","},
+
+    "<time>": WKF.Time,
+    "<time>+": { any: WKF.Time },
+    "<time>#": WKF.MultiTimeWithComma,
+
+    "<resolution>": WKF.Resolution,
+    "<resolution>+": { any: WKF.Resolution },
+    "<resolution>#": { any: WKF.Resolution, sep: ","},
+
+    "<color>": WKF.Color,
+    "<color>+": { any: WKF.Color },
+    "<color>#": { any: WKF.Color, sep: ","},
+
+    "<image>#": WKF.OneOrManyWithComma,
+
+    "<custom-ident>#": WKF.OneOrManyWithComma,
 };
 
 

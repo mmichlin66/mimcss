@@ -2,6 +2,7 @@
 import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, IResolutionProxy} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
+import { SyntaxKey } from "./Stylesets";
 
 
 
@@ -384,6 +385,69 @@ export interface IImageSetFunc extends ICssImageFunc
 
     /** Array of image specifications */
     items: ImageSetItem[];
+}
+
+
+
+/**
+ * Maps names of paint worklets to tuple types defining the arguments that are passed to the
+ * [[paint]] function. This interface is intended to be extended using the module augmentation
+ * technique. After a worklet is defined as part of this interface, it also has to be registered
+ * using the [[registerPaintWorklet]] function.
+ *
+ * **Example**
+ *
+ * ```typescript
+ * // Add our worklet to the IPaintWorkletArgs interface
+ * declare module "mimcss"
+ * {
+ *     interface IPaintWorkletArgs
+ *     {
+ *         myPaintWorklet: ["<color>", "<length>"]
+ *     }
+ * }
+ *
+ * // Register our worklet
+ * css.registerPaintWorklet( "myPaintWorklet", ["<color>", "<length>"], "my-paint-worklet.js");
+ *
+ * // Use our worklet
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     painted1 = this.$class({
+ *         // pass color "red" and length "20px"
+ *         backgroundImage: css.paint( "myPaintWorklet", "red", 20)
+ *     })
+ *
+ *     painted1 = this.$class({
+ *         // pass color "blue" and length "1inch"
+ *         backgroundImage: css.paint( "myPaintWorklet", "red", css.inch(1))
+ *     })
+ * }
+ * ```
+ *
+ */
+export interface IPaintWorklets
+{
+    [P: string]: SyntaxKey[];
+}
+
+
+
+/**
+ * Represents an invocation of the `paint()` CSS function. It can be directly assigned to
+ * a suitable style property (e.g. `background-image`). Objects implementing this interface can be
+ * used wherever the CSS `<image>` type is used.
+ * @category Image
+ */
+export interface IPaintFunc extends ICssImageFunc
+{
+    fn: "paint";
+
+    /** Name of the paint worklet */
+    name: string;
+
+    /** Array of arguments */
+    args: string[];
 }
 
 

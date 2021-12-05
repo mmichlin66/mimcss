@@ -9,10 +9,13 @@ import {
     IMatrix3dFunc, IPerspectiveFunc, IRotateFunc, IRotate3dFunc, IScale1dFunc, IScaleFunc, IScale3dFunc,
     ISkewFunc, ISkew1dFunc, ITranslate1dFunc, ITranslate3dFunc, ITranslateFunc, ILinearGradientBuilder,
     ILinearGradientFunc, IRadialGradientBuilder, IRadialGradientFunc, IConicGradientBuilder,
-    IConicGradientFunc, IGradientBuilder, IGradientFunc, ICrossFadeBuilder, ICrossFadeFunc, IImageSetFunc, ImageSetItem, ImageSetResolution
+    IConicGradientFunc, IGradientBuilder, IGradientFunc, ICrossFadeBuilder, ICrossFadeFunc, IImageSetFunc,
+    ImageSetItem, ImageSetResolution, IPaintWorklets, IPaintFunc
 } from "./ShapeTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
 import {mv2s, WKF, v2s, wkf, a2s, fdo, f2s} from "../impl/Utils";
+import { MappedSyntaxTypes, SyntaxKey } from "./Stylesets";
+import { sp2s } from "../impl/StyleImpl";
 
 
 
@@ -226,6 +229,28 @@ class ConicGradientBuilder extends GradientBuilder<CssAngle> implements IConicGr
 
 
 /**
+ * Function returning the ICrossFadeFunc interface representing the "older" `cross-fade` CSS
+ * function invocation that accepts two images and a single percentage.
+ *
+ * @category Image
+ */
+export function crossFade( old: [Extended<CssImage>, Extended<CssImage>, Extended<CssPercent>]): ICrossFadeFunc;
+
+/**
+ * Function returning the ICrossFadeFunc interface representing the "newer" `cross-fade` CSS
+ * function invocation that accepts multiple images - each with an optional percentage.
+ *
+ * @category Image
+ */
+export function crossFade( ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]): ICrossFadeBuilder;
+
+/** Implementation */
+export function crossFade(): ICrossFadeBuilder
+{
+    return new CrossFadeBuilder( ...arguments);
+}
+
+/**
  * Implements functionality of cross-fade()
  */
 class CrossFadeBuilder implements ICrossFadeBuilder
@@ -271,30 +296,6 @@ class CrossFadeBuilder implements ICrossFadeBuilder
 	color( c: Extended<CssColor>): this { this.c = c; return this; }
 }
 
-
-
-/**
- * Function returning the ICrossFadeFunc interface representing the "older" `cross-fade` CSS
- * function invocation that accepts two images and a single percentage.
- *
- * @category Image
- */
-export function crossFade( old: [Extended<CssImage>, Extended<CssImage>, Extended<CssPercent>]): ICrossFadeFunc;
-
-/**
- * Function returning the ICrossFadeFunc interface representing the "newer" `cross-fade` CSS
- * function invocation that accepts multiple images - each with an optional percentage.
- *
- * @category Image
- */
-export function crossFade( ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]): ICrossFadeBuilder;
-
-/** Implementation */
-export function crossFade(): ICrossFadeBuilder
-{
-    return new CrossFadeBuilder( ...arguments);
-}
-
 fdo["cross-fade"] = (val: ICrossFadeFunc): string =>
     f2s( "cross-fade", [
         val.images
@@ -305,11 +306,14 @@ fdo["cross-fade"] = (val: ICrossFadeFunc): string =>
 
 
 /**
- * Returns an ImageProxy function representing the `cross-fade()` CSS function.
+ * Returns an IImageSetFunc object representing the `image-set()` CSS function.
+ *
+ * @param items One or more items specifying an image and optionally image type and resolution.
+ * @returns
  *
  * @category Image
  */
-export const imageSet = ( ...items: ImageSetItem[]): IImageSetFunc => ({ fn: "image-set", items })
+export const imageSet = (...items: ImageSetItem[]): IImageSetFunc => ({ fn: "image-set", items })
 
 const imageTypeToString = (val: Extended<string>): string => v2s( val, {
     str: v => `type("${v.indexOf("/") > 0 ? val : "image/" + val}")`
@@ -326,7 +330,7 @@ fdo["image-set"] = [
                 str: WKF.Quoted,
                 arr: {
                     1: [WKF.Quoted],
-                    2: [WKF.Quoted, { str: imageTypeToString, num: imageResolutionToString}],
+                    2: [WKF.Quoted, {str: imageTypeToString, num: imageResolutionToString}],
                     3: [WKF.Quoted, imageTypeToString, imageResolutionToString],
                 }
             },
@@ -334,6 +338,89 @@ fdo["image-set"] = [
         }
     ]
 ]
+
+
+
+/**
+ * Registers a paint worklet with the given name, optional argument syntax and optional URL of
+ * the worklet module. The worklet name should have been added to the [[IPaintWorklets]] interface
+ * using the module augmentation technique. Although it is possible to use paint worklets without
+ * adding them to the [[IPaintWorklets]] interface, this will prevent Mimcss from enforcing the
+ * types of arguments when the [[paint]] function is invoked.
+ * @param name Worklet name
+ * @param syntax Tuple containing syntax definitions for worklet arguments.
+ * @param url URL to the worklet module. If specified, the module will be automatically added.
+ */
+export const registerPaintWorklet = async <K extends keyof IPaintWorklets>( name: K,
+    syntax: IPaintWorklets[K] = [], url?: string): Promise<void> =>
+{
+    if ((CSS as any).paintWorklet)
+    {
+        if (!registeredPaintWorkletInfos[name])
+        {
+            registeredPaintWorkletInfos[name] = {syntax, url};
+
+            // if URL is specified use it to add worklet module
+            if (url && !addedPaintWorkletModules.has(url))
+            {
+                addedPaintWorkletModules.add(url);
+                try
+                {
+                    await (CSS as any).paintWorklet.addModule( url);
+                }
+                catch(x)
+                {
+                    console.error( `Error adding module '${url}' for paint worklet '${name}'`, x)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Defines information we keep for registered paint worklets.
+ */
+type PaintWorkletInfo<K extends keyof IPaintWorklets> = { syntax: IPaintWorklets[K], url?: string };
+
+/**
+ * Information about registered paint worklets.
+ */
+let registeredPaintWorkletInfos: { [K in keyof IPaintWorklets]?: PaintWorkletInfo<K> } = {};
+
+/**
+ * Set of URLs of already added paint worklet modules.
+ */
+let addedPaintWorkletModules = new Set<string>();
+
+
+
+/**
+ * Returns the IPaintFunc object describing an invocation of the `paint()` CSS function.
+ *
+ * @param name Paint worklet name.
+ * @param args Parameters to be passed to the paint worklet.
+ *
+ * @category Image
+ *
+ * @ts-expect-error: Erroneously reports TS2370 although the rest's type is an array (a tuple) */
+export const paint = <K extends keyof IPaintWorklets>( name: K, ...args: MappedSyntaxTypes<IPaintWorklets[K]>): IPaintFunc =>
+    ({ fn: "paint", name: name as string, args: args as any as string[] })
+
+fdo["paint"] = (v: IPaintFunc): string =>
+{
+    if (!v?.args?.length)
+        return `paint(${v.name})`;
+
+    let info = registeredPaintWorkletInfos[v.name];
+    let buf: string[] = [];
+    for( let i = 0; i < v.args.length; i++)
+    {
+        let syntax = info?.syntax[i];
+        buf.push( syntax ? sp2s( syntax, v.args[i]) : v2s( v.args[i]));
+    }
+
+    return `paint(${v.name},${buf.filter(v=>!!v).join(",")})`;
+}
 
 
 

@@ -25,17 +25,17 @@ abstract class MiscRule<T extends CSSRule> extends Rule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
 	{
-		this.cssRule = Rule.toDOM( this.getRuleText(), parent) as T;
+		this.cssRule = Rule.toDOM( this.toCss(), parent) as T;
 	}
 
 	// Serializes this rule to a string.
     public serialize( ctx: IRuleSerializationContext): void
     {
-		ctx.addRule( this.getRuleText(), this.isTopLevelRule);
+		ctx.addRule( this.toCss(), this.isTopLevelRule);
     }
 
 	// Returns CSS string for this rule.
-    protected abstract getRuleText(): string;
+    protected abstract toCss(): string;
 
 	/** SOM font-face rule */
 	public cssRule: T;
@@ -63,7 +63,7 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 	}
 
 	// Returns CSS string for this rule.
-    protected getRuleText(): string
+    protected toCss(): string
     {
 		let url: string;
 		if (this.url.startsWith("url") || this.url.startsWith("\"") || this.url.startsWith("'"))
@@ -106,7 +106,7 @@ export class NamespaceRule extends MiscRule<CSSNamespaceRule> implements INamesp
 	}
 
 	// Returns CSS string for this rule.
-    protected getRuleText(): string
+    protected toCss(): string
     {
 		let url = this.namespace.startsWith( "url(") ? this.namespace : `url(${this.namespace})`;
 		return `@namespace ${this.prefix ? this.prefix : ""} ${url}`;
@@ -135,7 +135,7 @@ export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFace
 	}
 
 	// Returns CSS string for this rule.
-    protected getRuleText(): string
+    protected toCss(): string
     {
 		return `@font-face {${fontFace2s( this.fontface)}}`;
     }

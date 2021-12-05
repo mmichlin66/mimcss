@@ -7,7 +7,6 @@ import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
 import {Rule, IRuleContainer, IRuleSerializationContext} from "./Rule";
 import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
 import {styleset2s, sp2s} from "../impl/StyleImpl"
-import {VarRule} from "./VarRule";
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
 
@@ -261,7 +260,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: ExtendedVarValue<K>,
 		important?: boolean, schedulerType?: number): void
 	{
-		if (!varObj || !(varObj instanceof VarRule))
+		if (!varObj)
 			return;
 
 		// first set/remove the value in our internal styleset object

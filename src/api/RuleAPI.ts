@@ -1,4 +1,4 @@
-﻿import {CssSelector, PagePseudoClass, OneOrMany, ElementTagName} from "./CoreTypes";
+﻿import {CssSelector, PagePseudoClass, OneOrMany, ElementTagName, ExtendedProp} from "./CoreTypes";
 import {
     IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
@@ -8,11 +8,11 @@ import {
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
-import {Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset} from "./Stylesets";
+import {Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset, ISyntaxTypeStyleset} from "./Stylesets";
 import {embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
-import {VarRule, ConstRule} from "../rules/VarRule"
+import {VarRule, ConstRule, PropertyRule} from "../rules/VarRule"
 import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
@@ -428,7 +428,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * ```
      *
      * @param template Either a name of a style property (in camel-case) or a name of the property from
-     * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
+     * the [[IVarTemplateStyleset]] interface. The type corresponding to this property defines the type
      * of the second parameter.
      * @param value The value assigned to the property.
      * @param nameOverride String or another `IVarRule` object that determines the name of the
@@ -442,6 +442,102 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
                     nameOverride?: string | IVarRule<K>): IVarRule<K>
     {
         return new VarRule( template, value, nameOverride);
+    }
+
+
+
+    /**
+     * Creates new `@property` rule. The property name will be created when the rule is processed
+     * as part of the style definition class. The name can be also overridden by providing either
+     * an explicit name or another custom variable rule.
+     *
+     * This variant allows specifying syntax as one of predefined syntax items such as `<number>`
+     * or `<color>` optionally accompanied with the multipliers `"#"` or `"+". The type of initial
+     * value as well as the type that can be passed to the `setValue` method of the returned
+     * [[IVarValue]] interface will be enforced according to the syntax specified.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // define and use custom CSS property
+     *     importantTextColor = this.$property( "<color>", "red", false)
+     *     important = this.$class({
+     *         color: this.importantTextColor
+     *     })
+     *
+     *     // use different value for the custom property under another CSS class
+     *     special = this.$class({
+     *         "+": this.important,
+     *         "--": [ [this.importantTextColor, "maroon"] ]
+     *     })
+     * }
+     * ```
+     *
+     * @param syntax Name of the property from the [[ISyntaxTypeStyleset]] interface. The type
+     * corresponding to this property defines the type of the initial value parameter.
+     * @param initValue The value to be used as initial value of the property.
+     * @param inherits Flag indicating whether the custom property registration inherits by default.
+     * @param nameOverride String or another `IVarRule` object that determines the name of the
+     * custom property. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism. This might be useful if there is a need for the name to match a name of
+     * existing property.
+     * @returns The `IVarRule` object that represents the `@property` rule. Any usage of this object in
+     * style properties or function parameters is substituted by the `var()` CSS function invocation.
+     */
+    public $property<K extends keyof ISyntaxTypeStyleset>(
+        syntax: K, initValue: ExtendedVarValue<K>, inherits: boolean,
+        nameOverride?: string | IVarRule<K>): IVarRule<K>
+
+    /**
+     * Creates new `@property` rule. The property name will be created when the rule is processed
+     * as part of the style definition class. The name can be also overridden by providing either
+     * an explicit name or another custom variable rule.
+     *
+     * This variant allows specifying arbitrary syntax and the developers are responsible to
+     * provide correct syntax. The type of initial value as well as the type that can be passed to
+     * the `setValue` method of the returned [[IVarValue]] interface are limited to string. The
+     * developers are responsible to pass values that conform to the specified syntax.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // define and use custom CSS property
+     *     importantTextColor = this.$property( "<color>", "red", false)
+     *     important = this.$class({
+     *         color: this.importantTextColor
+     *     })
+     *
+     *     // use different value for the custom property under another CSS class
+     *     special = this.$class({
+     *         "+": this.important,
+     *         "--": [ [this.importantTextColor, "maroon"] ]
+     *     })
+     * }
+     * ```
+     *
+     * @param syntax Single-element tuple containing the syntax string.
+     * @param initValue The value to be used as initial value of the property.
+     * @param inherits Flag indicating whether the custom property registration inherits by default.
+     * @param nameOverride String or another `IVarRule` object that determines the name of the
+     * custom property. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism. This might be useful if there is a need for the name to match a name of
+     * existing property.
+     * @returns The `IVarRule` object that represents the `@property` rule. Any usage of this object in
+     * style properties or function parameters is substituted by the `var()` CSS function invocation.
+     */
+    public $property( syntax: [string], initValue: ExtendedProp<string>, inherits: boolean,
+        nameOverride?: string | IVarRule<"*">): IVarRule<"*">;
+
+    // implementation
+    $property<K extends keyof ISyntaxTypeStyleset = any, T extends K | [string] = any>(
+        syntax: T, initValue: ExtendedVarValue<K>, inherits = true,
+        nameOverride?: string | IVarRule<K>): IVarRule<K>
+    {
+        return new PropertyRule( syntax, initValue, inherits, nameOverride);
     }
 
 

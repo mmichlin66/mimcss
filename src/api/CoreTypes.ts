@@ -1476,7 +1476,8 @@ export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner
  */
 export interface ICssImageFunc extends ICssFuncObject
 {
-    fn: "linear-gradient" | "radial-gradient" | "conic-gradient" | "cross-fade" | "image-set";
+    fn: "linear-gradient" | "radial-gradient" | "conic-gradient" |
+        "cross-fade" | "image-set" | "paint";
 }
 
 

@@ -2,7 +2,10 @@
 
 ## Non-breaking changes
 
-1. Allow named rules (e.g. $class()) to be created using arrays.
+1. Allow named rules (e.g. $class()) to be created using arrays. Names are created by appending rule indexes.
+2. Use ESNEXT instead of ES2017 in tsconfig.json.
+3. Add support for @property at-rules.
+4. Add support for paint() CSS function.
 
 
 # 0.11.6

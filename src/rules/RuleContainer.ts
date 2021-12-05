@@ -222,7 +222,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
 
-	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
+    /** Inserts all rules defined in this container to either the style sheet or grouping rule. */
 	public insert( sheetOrGroupingRule: CSSStyleSheet | CSSGroupingRule): void
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
@@ -240,8 +240,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)
 		{
-			this.varRootRule = Rule.toDOM( `:root {${this.vars.map( varObj =>
-				varObj.toCss()).filter( v => !!v).join(";")}}`, sheetOrGroupingRule) as CSSStyleRule;
+			this.varRootRule = Rule.toDOM( getRootCssForVars( this.vars), sheetOrGroupingRule) as CSSStyleRule;
 		}
 
 		// insert all other rules
@@ -394,7 +393,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// serialize our custom variables in a ":root" rule
 		if (this.vars.length > 0)
-			ctx.addRule( `:root {${this.vars.map( varObj => varObj.toCss()).filter( v => !!v).join(";")}}`);
+			ctx.addRule( getRootCssForVars( this.vars));
 
 		// serialize all other rules
 		this.otherRules.forEach( rule => rule.serialize( ctx));
@@ -465,6 +464,12 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	// DOM style elemnt
 	public elm: HTMLStyleElement | null = null;
 }
+
+
+
+const getRootCssForVars = (vars: VarRule[]): string =>
+    `:root {${vars.map( varObj => varObj.toCss()).filter( v => !!v).join(";")}}`;
+
 
 
 

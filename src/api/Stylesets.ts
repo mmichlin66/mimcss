@@ -7,7 +7,7 @@ import {BorderRadius, CssAngle, CssAspectRatio, CssFrequency, CssLength, CssLeng
     CssMultiPosition, CssMultiPositionX, CssMultiPositionY, CssNumber, CssPercent, CssPoint,
     CssPosition, CssRadius, CssResolution, CssSize, CssTime} from "./NumericTypes";
 import * as st from "./StyleTypes";
-import {FillRule} from "./ShapeTypes";
+import {FillRule, TransformFuncs} from "./ShapeTypes";
 import {
     FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis,
     FontVariantCaps, FontVariantPosition
@@ -2148,14 +2148,14 @@ export type ExtendedBaseStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStyl
 
 
 /**
- * The `IVarTemplateStyleset` interface maps template names to the types, which can be used for
+ * The `ICustomTypeStyleset` interface maps template names to the types, which can be used for
  * defining custom CSS properties (a.k.a. variables). Normally, variables are defined using the
  * names of the style properties and their type is determined by the type of this property in the
  * [[IStyleset]] interface. Sometimes, however, there is a need to define variables of some other
  * types, for which there is no suitable style property. The `IVarTemplateStyleset` interface provides
  * many basic types and it can also be extended using the TypeScript's module augmentation.
  */
-export interface IVarTemplateStyleset extends IStyleset
+export interface ICustomTypeStyleset
 {
     /** Allows having CSS variables and constants that accept value of any type */
     "any"?: any;
@@ -2209,6 +2209,83 @@ export interface IVarTemplateStyleset extends IStyleset
     CssImage?: CssImage;
 }
 
+
+
+/**
+ * The `ISyntaxTypeStyleset` interface maps CSS syntax names to the types, which can be used for
+ * defining custom CSS properties (a.k.a. variables) via the @property rules.
+ */
+export interface ISyntaxTypeStyleset
+{
+    /** Allows having CSS variables and constants that accept value of any type */
+    "*"?: string;
+
+    /** Allows having CSS variables and constants that accept a `<number>` CSS value */
+    "<number>"?: CssNumber;
+    "<number>+"?: OneOrMany<CssNumber>;
+    "<number>#"?: OneOrMany<CssNumber>;
+
+    /** Allows having CSS variables and constants that accept a `<length>` CSS value */
+    "<length>"?: CssLength;
+    "<length>+"?: OneOrMany<CssLength>;
+    "<length>#"?: OneOrMany<CssLength>;
+
+    /** Allows having CSS variables and constants that accept a `<percent>` CSS value */
+    "<percentage>"?: CssPercent;
+    "<percentage>+"?: OneOrMany<CssPercent>;
+    "<percentage>#"?: OneOrMany<CssPercent>;
+
+    /** Allows having CSS variables and constants that accept a `<length-percentage>` CSS value */
+    "<length-percentage>"?: CssLength;
+    "<length-percentage>+"?: OneOrMany<CssLength>;
+    "<length-percentage>#"?: OneOrMany<CssLength>;
+
+    /** Allows having CSS variables and constants that accept an `<angle>` CSS value */
+    "<angle>"?: CssAngle;
+    "<angle>+"?: OneOrMany<CssAngle>;
+    "<angle>#"?: OneOrMany<CssAngle>;
+
+    /** Allows having CSS variables and constants that accept a `<time>` CSS value */
+    "<time>"?: CssTime;
+    "<time>+"?: OneOrMany<CssTime>;
+    "<time>#"?: OneOrMany<CssTime>;
+
+    /** Allows having CSS variables and constants that accept a `<resolution>` CSS value */
+    "<resolution>"?: CssResolution;
+    "<resolution>+"?: OneOrMany<CssResolution>;
+    "<resolution>#"?: OneOrMany<CssResolution>;
+
+    /** Allows having CSS variables and constants that accept a `<color>` CSS value */
+    "<color>"?: CssColor;
+    "<color>+"?: OneOrMany<CssColor>;
+    "<color>#"?: OneOrMany<CssColor>;
+
+    /** Allows having CSS variables and constants that accept an `<image>` CSS value */
+    "<image>"?: CssImage;
+    "<image>+"?: OneOrMany<CssImage>;
+    "<image>#"?: OneOrMany<CssImage>;
+
+    /** Allows having CSS variables and constants that accept a `<custom-ident>` value */
+    "<custom-ident>"?: string;
+    "<custom-ident>+"?: OneOrMany<string>;
+    "<custom-ident>#"?: OneOrMany<string>;
+
+    /** Allows having CSS variables and constants that accept a `<transform-function>` value */
+    "<transform-function>"?: TransformFuncs;
+    "<transform-list>+"?: OneOrMany<TransformFuncs>;
+}
+
+
+
+/**
+ * The `IVarTemplateStyleset` interface maps template names to the types, which can be used for
+ * defining custom CSS properties (a.k.a. variables). Normally, variables are defined using the
+ * names of the style properties and their type is determined by the type of this property in the
+ * [[IStyleset]] interface. Sometimes, however, there is a need to define variables of some other
+ * types, for which there is no suitable style property. The `IVarTemplateStyleset` interface provides
+ * many basic types and it can also be extended using the TypeScript's module augmentation.
+ */
+export interface IVarTemplateStyleset extends IStyleset, ICustomTypeStyleset, ISyntaxTypeStyleset {}
 
 
 /**
@@ -2380,85 +2457,100 @@ export type StringStyleset = { [K: string]: string | null | undefined }
  * .class2.class1 { backgroundColor: orange; }
  * ```
  */
- export type CombinedStyleset = Styleset &
- { "+"?: IStyleRule | IStyleRule[] } &
- { [K in PseudoEntity]?: CombinedStyleset } &
- { [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset][] } &
- { [K in DependentRuleCombinator]?: [CssSelector, CombinedStyleset][] };
+export type CombinedStyleset = Styleset &
+    { "+"?: IStyleRule | IStyleRule[] } &
+    { [K in PseudoEntity]?: CombinedStyleset } &
+    { [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset][] } &
+    { [K in DependentRuleCombinator]?: [CssSelector, CombinedStyleset][] };
 
 
 
 
 /**
-* Extends the CombinedStyleset type with the "++" property, which
-* allows combining multiple class rules. Note that the "+" (single plus) property allows deriving
-* from any base style rules (not necessarily classes) and the style properties from the base rules
-* are simply copied to the new rule. Additionally, even if class rules were among the base rules,
-* the names of the base classes are lost.
-*
-* The "++" (double plus) property is different and it only applies to class rules and only allows
-* deriving from class rules. The style properties from the base classes are not copied to the new
-* rule; instead, the name of the new class becomes a concatenation of the new rule name and the
-* names of all base classes.
-*
-* ```typescript
-* class MyStyles extends css.StyleDefinition
-* {
-*     redFG = this.$class({ color: "red" })
-*     whiteBG = this.$class({ backgroundColor: "white" })
-*
-*     emphasized = this.$class({
-*         "++": [this.redFG, this.whiteBG],
-*         fontWeight: 700
-*     })
-* }
-* ```
-*
-* This will translate to the following CSS (in reality, class names are auto-generated):
-*
-* ```css
-* .redFG { color: red; }
-* .whiteBG { backgroundColor: white; }
-* .emphasized.redFG.whiteBG { fontWeight: 700; }
-* ```
-*
-* Note that when the MyStyles is activated and the emphasized property is applied to an element,
-* the class name will be not just "emphasized", but "emphasized redFG whiteBG". That is, the
-* following rendering function
-*
-* ```typescript
-* let styles = css.activate(MyStyles);
-* render()
-* {
-*     return <div className={styles.emphasized.name}>Important stuff</div>
-* }
-* ```
-*
-* will generate the following HTML:
-*
-* ```html
-* <div className="emphasized redFG whiteBG">Important stuff</div>
-```
-*/
+ * Extends the CombinedStyleset type with the "++" property, which
+ * allows combining multiple class rules. Note that the "+" (single plus) property allows deriving
+ * from any base style rules (not necessarily classes) and the style properties from the base rules
+ * are simply copied to the new rule. Additionally, even if class rules were among the base rules,
+ * the names of the base classes are lost.
+ *
+ * The "++" (double plus) property is different and it only applies to class rules and only allows
+ * deriving from class rules. The style properties from the base classes are not copied to the new
+ * rule; instead, the name of the new class becomes a concatenation of the new rule name and the
+ * names of all base classes.
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     redFG = this.$class({ color: "red" })
+ *     whiteBG = this.$class({ backgroundColor: "white" })
+ *
+ *     emphasized = this.$class({
+ *         "++": [this.redFG, this.whiteBG],
+ *         fontWeight: 700
+ *     })
+ * }
+ * ```
+ *
+ * This will translate to the following CSS (in reality, class names are auto-generated):
+ *
+ * ```css
+ * .redFG { color: red; }
+ * .whiteBG { backgroundColor: white; }
+ * .emphasized.redFG.whiteBG { fontWeight: 700; }
+ * ```
+ *
+ * Note that when the MyStyles is activated and the emphasized property is applied to an element,
+ * the class name will be not just "emphasized", but "emphasized redFG whiteBG". That is, the
+ * following rendering function
+ *
+ * ```typescript
+ * let styles = css.activate(MyStyles);
+ * render()
+ * {
+ *     return <div className={styles.emphasized.name}>Important stuff</div>
+ * }
+ * ```
+ *
+ * will generate the following HTML:
+ *
+ * ```html
+ * <div className="emphasized redFG whiteBG">Important stuff</div>
+ * ```
+ */
 export type CombinedClassStyleset = CombinedStyleset &
  { "++"?: ParentClassType | ParentClassType[] };
 
 /**
-* Represents types that can be used to inherit from an already defined CSS class. This type is
-* used in the `"++"` property of the [[CombinedClassStyleset]] type, which allows CSS classes
-* to include definitions of other CSS classes.
-*/
+ * Represents types that can be used to inherit from an already defined CSS class. This type is
+ * used in the `"++"` property of the [[CombinedClassStyleset]] type, which allows CSS classes
+ * to include definitions of other CSS classes.
+ */
 export type ParentClassType = string | IClassRule | IClassNameRule;
 
 
 
 /**
-* Defines an object containing style properties for an animation frame.
-* Stylesets for keyframes allow custom properties (via "--") but don't allow dependent rules
-* (because dependent rules are actually separate CSS rules). Animation styleset can extend other
-* style rules; however, any dependent rules will be ignored.
-*/
+ * Defines an object containing style properties for an animation frame.
+ * Stylesets for keyframes allow custom properties (via "--") but don't allow dependent rules
+ * (because dependent rules are actually separate CSS rules). Animation styleset can extend other
+ * style rules; however, any dependent rules will be ignored.
+ */
 export type AnimationStyleset = Styleset & { "+"?: IStyleRule | IStyleRule[] };
+
+
+
+/**
+ * Helper type describing keys of the [[ISyntaxTypeStyleset]] interface.
+ */
+export type SyntaxKey = (keyof ISyntaxTypeStyleset) & string;
+
+/**
+ * Type that maps a tuple type with syntax keys to a tuple type with corresponding syntax types.
+ * For example, it will map type `["<color>", "<length>"]` to type `[CssColor, CssLength]`.
+ * This type is used when defining parameters for the [[paint]] CSS function.
+ */
+export type MappedSyntaxTypes<T extends SyntaxKey[]> =
+    { [i in keyof T]: T[i] extends SyntaxKey ? ISyntaxTypeStyleset[T[i]] : never }
 
 
 

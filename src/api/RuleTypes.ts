@@ -194,8 +194,8 @@ export interface IAnimationFrameRule extends IStyleRule
 
 
 /**
- * The IVarRule interface represents a CSS custom property definition.
- * Objects implementing this interface are returned from the [[$var]] function.
+ * The IVarRule interface represents a CSS custom property definition. Objects implementing this
+ * interface are returned from the [[$var]] and [[$property]] function.
  */
 export interface IVarRule<K extends VarTemplateName = any> extends INamedEntity, ICustomVar<VarValue<K>>
 {
