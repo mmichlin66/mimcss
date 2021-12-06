@@ -1,7 +1,7 @@
 import {IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "../api/RuleTypes";
 import {
-    ExtendedBaseStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
-    CombinedStyleset, ParentClassType
+    ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
+    CombinedStyleset, ParentClassType, IStyleset
 } from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
 import {Rule, IRuleContainer, IRuleSerializationContext} from "./Rule";
@@ -58,7 +58,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
                     let parentRules = extendsPropVal instanceof StyleRule ? [extendsPropVal] : extendsPropVal;
                     for( let parent of parentRules)
                     {
-                        this.styleset = mergeStylesets( this.styleset, parent.styleset);
+                        mergeStylesets( this.styleset, parent.styleset);
                         this.copyDepRules( parent);
                     }
                 }
@@ -72,7 +72,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			{
 				// if the value is an array, then this is an array of tuples representing
 				// parameterised pseudo entities where the first element is the parameter value
-				// (string) and the second the CombinedStyleset. Otherwise, the value is just an
+				// (string) and the second the CombinedStyleset. Otherwise, the value is just a
 				// CombinedStyleset.
 				if (Array.isArray(propVal))
 				{
@@ -106,7 +106,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			else if (this.parseSP( propName, propVal))
 			{
 				// this is a regular CSS property: copy the property value to our internal styleset
-				this.styleset[propName] = propVal;
+                mergePropValues( this.styleset, propName, propVal)
 			}
 		}
 	}
@@ -230,7 +230,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-    public setProp<K extends keyof ExtendedBaseStyleset>( name: K, value: ExtendedBaseStyleset[K],
+    public setProp<K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K],
         important?: boolean, schedulerType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
@@ -327,10 +327,10 @@ class DepRule extends StyleRule
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, pseudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
-	public constructor( selector: CssSelector, param?: any, style?: CombinedStyleset,
+	public constructor( selector: CssSelector, param?: any, styleset?: CombinedStyleset,
 		parent?: StyleRule)
 	{
-		super( style);
+		super( styleset);
 		this.selector = selector;
 		this.parent = parent;
         this.param = param;
@@ -345,7 +345,7 @@ class DepRule extends StyleRule
 
         // this method is called on a newly created object so we don't have any properties in
 		// our own styleset yet
-		newRule.styleset = mergeStylesets( newRule.styleset, this.styleset);
+		mergeStylesets( newRule.styleset, this.styleset);
 		newRule.copyDepRules( this);
 
         return newRule;
@@ -562,34 +562,25 @@ export class SelectorRule extends StyleRule
 /**
  * Merges properties from the source styleset to the target styleset. All regular properties are
  * replaced. The "--" property gets special treatment because it is an array.
- * @param target
+ * @param target Target Styleset object - cannot be null or undefined;
+ * @param source Source Styleset object - cannot be null or undefined.
  * @param source
- * @returns Reference to the target styleset if not null or a new styleset otherwise.
  */
-const mergeStylesets = (target: Styleset | undefined | null, source: Styleset): Styleset =>
+const mergeStylesets = (target: Styleset, source: Styleset): void =>
 {
-    if (!source)
-        return target ? target : {};
-
-    // if target is not defined, create it as an empty object. This object will be returned after
-    // properties from the source are copied to it.
-    if (!target)
-    {
-        target = {};
-        Object.assign( target, source);
-        return target;
-    }
-
     // copy all other properties from the source
-	for( let propName in source)
-	{
-        if (propName === "--")
-            mergeCustomProps( target, source[propName]!);
-        else
-            target[propName] = source[propName];
-	}
-
-    return target;
+    if (Object.keys(target).length === 0)
+        Object.assign( target, source);
+    else
+    {
+        for( let propName in source)
+        {
+            if (propName === "--")
+                mergeCustomProps( target, source[propName]!);
+            else
+                mergePropValues( target, propName, source[propName]);
+        }
+    }
 }
 
 
@@ -603,5 +594,42 @@ const mergeCustomProps = (target: Styleset, sourceVars: CustomVar_StyleType[]): 
     target["--"] = !targetVars ? sourceVars.slice() : targetVars.concat( sourceVars);
 }
 
+
+/**
+ * Merges values of the given property from the source styleset to the target styleset. Note that
+ * both source or target value can be either null or single value or an object with the `"[]"`
+ * property that contains multiple values.
+ * @param target Target Styleset object - cannot be null or undefined.
+ * @param propName Name of the property.
+ * @param sourceVal Value from the source styleset to merge with the target value - can be null or
+ * undefined.
+ */
+const mergePropValues = (target: Styleset, propName: string, sourceVal: any): void =>
+{
+    if (sourceVal == null)
+        delete target[propName];
+    else
+    {
+        let targetVal = target[propName];
+        if (targetVal == null)
+        {
+            // if property doesn't exist in the target or its value is null or undefined, just
+            // take the source's value
+            target[propName] = sourceVal;
+        }
+        else
+        {
+            let targetArray: any[] = targetVal["[]"];
+            if (!targetArray)
+                target[propName] = { "[]": targetArray = [targetVal] };
+
+            let sourceArray: any[] = sourceVal["[]"];
+            if (!sourceArray)
+                targetArray.push( sourceVal);
+            else
+                targetArray.push( ...sourceArray);
+        }
+    }
+}
 
 

@@ -171,13 +171,28 @@ export const sp2s = (propName: string, propVal: any): string =>
     if (!propName)
         return "";
 
-    // if the property value is an object with the "!" property, then the actual value is the
-    // value of this property and we also need to set the "!important" flag
+    // handle special properties "!" and "[]"
     let impFlag = false;
-    if (typeof propVal === "object" && "!" in propVal)
+    if (typeof propVal === "object")
     {
-        propVal = propVal["!"];
-        impFlag = true;
+        if ("!" in propVal)
+        {
+            // if the property value is an object with the "!" property, then the actual value is
+            // the value of this property and we also need to set the "!important" flag.
+            propVal = propVal["!"];
+            impFlag = true;
+        }
+        else if ("[]" in propVal)
+        {
+            // If the property value is an object with the "[]" property, then we take the last
+            // value from this property's array.
+            let arr = propVal["[]"] as any[];
+            if (!arr || arr.length === 0)
+                return "";
+
+            // recurse with the last value from the array
+            return sp2s( propName, arr[arr.length-1]);
+        }
     }
 
     // convert the value to string based on the information object for the property (if defined)
@@ -325,22 +340,38 @@ const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCall
         }
         else
         {
-            // get the string representation of the property
-            let propValue = sp2s( propName, styleset[propName]);
-            if (!propValue)
+            let propVal = styleset[propName];
+            if (propVal == null)
                 continue;
-
-            // get vendor-prefixed variants
-            let variants = getPrefixVariants( propName as keyof IStyleset, propValue);
-            if (variants)
+            else
             {
-                for( let variant of variants)
-                    callback( variant[0], variant[1], false, variant[0] !== propName);
-            }
+                // check whether the property contains an array of values behind the object with
+                // the "[]" property. If not, convert the single value to an array, so that we can
+                // iterate over it.
+                let propArray = propVal["[]"] as any[];
+                if (!propArray)
+                    propArray = [propVal];
 
-            // invoke the callback for the originally found prop name and with (perhaps updated)
-            // value
-            callback( propName, propValue, false, false);
+                for( let propVal of propArray)
+                {
+                    // get the string representation of the property value
+                    let propString = sp2s( propName, propVal);
+                    if (!propString)
+                        continue;
+
+                    // get vendor-prefixed variants
+                    let variants = getPrefixVariants( propName as keyof IStyleset, propString);
+                    if (variants)
+                    {
+                        for( let variant of variants)
+                            callback( variant[0], variant[1], false, variant[0] !== propName);
+                    }
+
+                    // invoke the callback for the originally found prop name and with (perhaps updated)
+                    // value
+                    callback( propName, propString, false, false);
+                }
+            }
         }
 	}
 }
@@ -706,19 +737,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
 
     zoom: WKF.Percent,
 
-    // special properties for IVarRule types
-    CssString: WKF.Quoted,
-    CssLength: WKF.Length,
-    CssAngle: WKF.Angle,
-    CssTime: WKF.Time,
-    CssResolution: WKF.Resolution,
-    CssFrequency: WKF.Frequency,
-    CssPercent: WKF.Percent,
-    CssPosition: WKF.Position,
-    CssMultiPosition: WKF.MultiPosition,
-    CssRadius: WKF.Radius,
-    CssColor: WKF.Color,
-
+    // properties for CSS syntax values
     "<number>#": WKF.OneOrManyWithComma,
 
     "<length>": WKF.Length,
@@ -752,6 +771,15 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     "<image>#": WKF.OneOrManyWithComma,
 
     "<custom-ident>#": WKF.OneOrManyWithComma,
+
+    // special properties for IVarRule types
+    "<string>": WKF.Quoted,
+    "<frequency>": WKF.Frequency,
+    "<size>": WKF.Length,
+    "<point>": WKF.MultiLengthWithSpace,
+    "<position>": WKF.Position,
+    "<multi-position>": WKF.MultiPosition,
+    "<radius>": WKF.Radius,
 };
 
 

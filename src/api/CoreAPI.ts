@@ -503,7 +503,7 @@ export const counters = (counterObj: Extended<ICounterRule | string>,
  * in any context.
  */
 export const usevar = <K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy =>
-    () => f2s( "var", ["--" + varObj.name, sp2s( varObj.template, fallback)]);
+    () => f2s( "var", [varObj.cssVarName, sp2s( varObj.template, fallback)]);
 
 
 

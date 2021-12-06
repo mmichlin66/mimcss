@@ -8,14 +8,14 @@
 * [Quick Start](#quick-start)
 * [Examples](#examples)
 
-Mimcss is a TypeScript library that allows authoring CSS styles by writing TypeScript code and without creating CSS files. You code your style rules including CSS tags, classes, animations, media etc. by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of you HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
+Mimcss is a CSS-in-JS library that allows authoring CSS styles without creating CSS files. You code your style rules including CSS tags, classes, animations, media etc. by creating TypeScript classes. The Mimcss library processes these classes and creates the rules that are inserted into a `<style>` element in the `<head>` of your HTML document. As a result, your application or library bundle is self contained and doesn't require a separate CSS bundle.
 
 ## Motivation
 The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. There are several distinct areas that Mimcss addresses:
 
 - Making names of CSS entities (classes, element IDs, animations, custom properties, counters, grid lines and areas) full TypeScript citizens so that when they are referred to from the JSX code, misspelled or undefined names cause compile time errors instead of being detected only at run time.
 - Using the full expressive power of TypeScript's typing system for setting values of style properties. While in the regular CSS as well as in several CSS-in-JS libraries, style property values can only be set as strings (and sometimes numbers), Mimcss defines a separate type for each style property making the process of setting property values more convenient and less error-prone.
-- Avoiding the regular monolithic structure of CSS styles that are present in the browser's memory for the entirety of the application life-time. As with regular JavaScript objects, CSS styles created with Mimcss can be loaded on demand and stay in memory only while needed. Mimcss provides several style loading and unloading technics that developers can use depending on whether the styles are used throughout the application or only needed by a certain component.
+- Avoiding the regular monolithic structure of CSS styles that are present in the browser's memory for the entirety of the application life-time. As with regular JavaScript objects, CSS styles created with Mimcss can be loaded on demand and stay in memory only while needed. Mimcss provides several style loading and unloading technics that developers can use depending on whether the styles are used throughout the application or only needed by certain components.
 - Seeing CSS not as a static structure, but as data that can be changed programmatically in order to manipulate application visual styles and layouts. Depending on the content, it is sometimes more efficient to change the CSS style of a certain class than to assign a different class to a set of HTML elements. Mimcss also provides several scheduling mechanisms that allow coordination between DOM writing activities (including direct style changes) in order to avoid excessive style recalculations and layout thrashing.
 
 ## Features
@@ -25,7 +25,7 @@ The goal of the Mimcss library is to support all CSS features in a type-safe and
 - Stylesheets are defined as TypeScript Style Definition classes.
 - Stylesheets can be dynamically activated (inserted into DOM) and deactivated (removed from DOM).
 - Styled components are supported where each component instance gets its individual set of CSS rules isolated from other instances.
-- Names of classes, IDs, animations, custom CSS properties, counters and grid lines and areas are auto-generated, while developers use properties that return these names.
+- Names of CSS classes, IDs, animations, custom CSS properties, counters and grid lines and areas are auto-generated, while developers use properties that return these names. Auto-generation mechanism can be overridden if there is a need to use pre-defined names.
 - Theming via style definition class inheritance.
 - All CSS rule types are supported including style rules and at-rules.
 - Automatic support for vendor prefixes.
@@ -35,8 +35,8 @@ The goal of the Mimcss library is to support all CSS features in a type-safe and
 - Type safety and autocompletion support for CSS property values to eliminate errors.
 - Using numbers for default units of length, angle, percent and other CSS property types.
 - Using Booleans, numbers, tuples, arrays, objects and functions (in addition to strings) when specifying CSS property values to increase convenience and eliminate errors.
-- Convenience functions for specifying complex property values (e.g. colors, images, filters, shapes, calc(), etc.)
-- Type-safe support for CSS filter, transform, shape, gradient, counter and other functions.
+- Convenience functions for specifying complex property values for colors, images, filters, transforms, shapes, calc(), etc.
+- Type-safe support for CSS filter, transform, shape, gradient, counter and other properties.
 - Access to CSSRule-derived objects for direct rule and property manipulation.
 - Several built-in mechanisms for scheduling DOM writing activities as well as the ability to write custom scheduling mechanisms.
 
@@ -58,7 +58,7 @@ Mimcss contains many exported types and functions; therefore, it is recommended 
 import * as css from "mimcss"
 ```
 
-Mimcss provides [Guide](https://mmichlin66.github.io/mimcss/guide/introduction.html) and [Reference](https://mmichlin66.github.io/mimcss/reference.html) documents for developers. Both documents undergo constant improvements. Mimcss also provides a [Playground](https://mmichlin66.github.io/demo/mimcss/playground.html), where you can write TypeScript code using Mimcss features and immediately see the results.
+Mimcss provides [Guide](https://www.mimcss.com/guide/introduction.html) and [Reference](https://www.mimcss.com/reference.html) documents for developers. Both documents undergo constant improvements. Mimcss also provides a [Playground](https://www.mimcss.com/demo/mimcss/playground.html), where you can write TypeScript code using Mimcss features and immediately see the results.
 
 ## Quick Start
 Let's assume that we need to create several styles for a couple of classes and an element ID. With Mimcss, you create a TypeScript class and then, in your component's TypeScript code, you refer to the CSS classes and IDs using the TypeScript class's properties:
@@ -115,17 +115,17 @@ export class MyComponent extends React.Component
 
 Coding CSS styles in TypeScript brings the following advantages:
 
-- The autocomplete mechanism of our IDE will prompt us with the list of defined names. As soon as we type `myStyles.` the IDE will present the list of all the properties defined in our style definition class.
+- The autocomplete mechanism of the IDE will prompt with the list of defined names. As soon as we type `myStyles.` the IDE will present the list of all the properties defined in our style definition class.
 - If we change the name of or remove the property in the `MyStyles` class and forget to change it in our component's `render` method, the project will not build. Thus a compile time error will prevent a much harder to find run time error.
 - Notice how we used numbers instead of strings when defining `color` and `fontWeight` properties. Notice also how we used array, object and function notations to specify complex style properties for the `greeting` class. Mimcss defines types for all style properties and provides numerous methods to set their values in a type-safe and easy-to-use way.
 - The styles are not present in the browser's memory until the code that uses them calls the `activate` function that inserts the styles into DOM. There are several activation strategies suitable for different scenarios - from styles that are shared by entire application to those that are used by only a single component. The developers are in full control of when the rules are activated. Moreover, since activating rules means writing to DOM, components can synchronize this process with other DOM-writing activities.
 - The names we are using in our code are not actually the names that will be used in the resulting HTML. The actual names to use in HTML will be auto-generated by the Mimcss infrastructure, which ensures that they will be globally unique. In Debug mode the generated names reflect the names used in the code, while in Release mode, the names are created with minimal length.
 
 ## Examples
-The following short sections provide examples of Mimcss capabilities. This is really just scratching the surface - for more information please see [Mimcss Guide](https://mmichlin66.github.io/mimcss/guide/introduction.html).
+The following short sections provide examples of Mimcss capabilities. This is really just scratching the surface - for more information please see [Mimcss Guide](https://www.mimcss.com/guide/introduction.html).
 
 ### Supported CSS Rules
-Mimcss supports all types of CSS rules (except @charset):
+Mimcss supports all types of CSS rules (well, except @charset because we don't actually write any CSS files):
 
 ```tsx
 class MyStyles extends css.StyleDefinition
@@ -202,7 +202,7 @@ class MyStyles extends css.StyleDefinition
 }
 ```
 
-**See Also:** [Mimcss Guide: Defining Rules](https://mmichlin66.github.io/mimcss/guide/defining-rules.html)
+**See Also:** [Mimcss Guide: Defining Rules](https://www.mimcss.com/guide/defining-rules.html)
 
 ### Extending Style Rules
 The `"+"` property allows specifying one or more style rules you want your style rule to extend:
@@ -252,7 +252,7 @@ This is equivalent to the following CSS:
 }
 ```
 
-**See Also:** [Mimcss Guide: Reusing Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#reusing-styles)
+**See Also:** [Mimcss Guide: Reusing Styles](https://www.mimcss.com/guide/defining-styles.html#reusing-styles)
 
 ### Pseudo Classes and Pseudo Elements
 While pseudo classes and pseudo elements can be defined using regular style rules (via the `$style` function), there is an easier way to define them:
@@ -279,7 +279,7 @@ This is equivalent to the following CSS:
 }
 ```
 
-**See Also:** [Mimcss Guide: Dependent Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#dependent-styles)
+**See Also:** [Mimcss Guide: Dependent Styles](https://www.mimcss.com/guide/defining-styles.html#dependent-styles)
 
 ### Pseudo Classes with Parameters
 Some pseudo classes require parameters, e.g. `:nth-child(2n+1)`. This is how it is expressed in Mimcss:
@@ -309,7 +309,7 @@ p:nth-of-type(odd) {
 }
 ```
 
-**See Also:** [Mimcss Guide: Dependent Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#dependent-styles)
+**See Also:** [Mimcss Guide: Dependent Styles](https://www.mimcss.com/guide/defining-styles.html#dependent-styles)
 
 ### Complex Related Selectors
 We often define a CSS class (or tag or ID) rule and then define related rules with complex selectors. You can use the ampersand (`"&"`) property to define such rules in Mimcss. Within the selectors, every occurrence of the `"&"` symbol will be replaced with the "parent" selector.
@@ -343,7 +343,7 @@ td > ul:hover {
 }
 ```
 
-**See Also:** [Mimcss Guide: Dependent Styles](https://mmichlin66.github.io/mimcss/guide/defining-styles.html#dependent-styles)
+**See Also:** [Mimcss Guide: Dependent Styles](https://www.mimcss.com/guide/defining-styles.html#dependent-styles)
 
 ### Custom CSS Properties
 Although custom CSS properties by themselves are not CSS rules, in Mimcss they are defined using the same notation as the rules.
@@ -403,7 +403,7 @@ myStyles.footer.setCustomProp( myStyles.defaultColor, "darkgreen");
 
 ```
 
-**See Also:** [Mimcss Guide: Custom Properties](https://mmichlin66.github.io/mimcss/guide/custom-properties.html)
+**See Also:** [Mimcss Guide: Custom Properties](https://www.mimcss.com/guide/custom-properties.html)
 
 ### Named Colors
 In CSS, there is a list of pre-defined colors, which can be specified by names. In Mimcss, you can use these colors and you can also define your own named colors and refer to them by names.
@@ -428,7 +428,7 @@ class MyStyles extends css.StyleDefinition
 }
 ```
 
-**See Also:** [Mimcss Guide: Working with Colors](https://mmichlin66.github.io/mimcss/guide/style-property-types.html#working-with-colors)
+**See Also:** [Mimcss Guide: Working with Colors](https://www.mimcss.com/guide/style-property-types.html#working-with-colors)
 
 ### Working with Units
 In CSS, values of many properties should be specified with units corresponding to the CSS type of the property. For example, the `<length>` type has units such as "px", "rem", "in", "cm", etc.; the `<angle>` type has units such as "deg", "rad", "turn", etc. For many properties, CSS also allows using percents - "%".
@@ -464,10 +464,10 @@ class MyStyles extends css.StyleDefinition
 }
 ```
 
-**See Also:** [Mimcss Guide: Numeric Types](https://mmichlin66.github.io/mimcss/guide/style-property-types.html#numeric-types)
+**See Also:** [Mimcss Guide: Numeric Types](https://www.mimcss.com/guide/style-property-types.html#numeric-types)
 
 ## Conclusion
-We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://mmichlin66.github.io/mimcss/guide/introduction.html) to find more information. Also check out the [Playground](https://mmichlin66.github.io/demo/mimcss/playground.html), where you can write TypeScript code using Mimcss features and immediately see the results.
+We hope you will find Mimcss useful. Please refer to [Mimcss Guide](https://www.mimcss.com/guide/introduction.html) to find more information. Also check out the [Playground](https://www.mimcss.com/demo/mimcss/playground.html), where you can write TypeScript code using Mimcss features and immediately see the results.
 
 
 

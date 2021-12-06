@@ -239,6 +239,88 @@ describe("style rules:", () =>
 	{
 		dom.testPropPriority( "paddingLeft", { "!": 8 }, true);
 	})
+
+
+
+	it("create multiple name:value pairs for the same property", () =>
+	{
+        let s = css.stylesetToString( {color: {"[]": ["red", "blue"]} });
+        expect(s).toEqual( "{color:red;color:blue;}");
+    })
+
+
+
+	it("create multiple name:value pairs when extending style rule: single value and single value", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			abstr = this.$abstract({ color: "red" })
+			cls = this.$class({ "+": this.abstr, color: "blue" })
+		}
+
+		let s = css.serializeToCSS( A);
+		expect(s).toEqual(".A_cls{color:red;color:blue;}");
+    })
+
+
+
+	it("create multiple name:value pairs when extending style rule: single value and multi value", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			abstr = this.$abstract({ color: "red" })
+			cls = this.$class({ "+": this.abstr, color: {"[]": ["blue", "green"]} })
+		}
+
+		let s = css.serializeToCSS( A);
+		expect(s).toEqual(".A_cls{color:red;color:blue;color:green;}");
+    })
+
+
+
+	it("create multiple name:value pairs when extending style rule: multi value and single value", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			abstr = this.$abstract({ color: {"[]": ["red", "blue"]} })
+			cls = this.$class({ "+": this.abstr, color: "green" })
+		}
+
+		let s = css.serializeToCSS( A);
+		expect(s).toEqual(".A_cls{color:red;color:blue;color:green;}");
+    })
+
+
+
+	it("create multiple name:value pairs when extending style rule: multi value and multi value", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			abstr = this.$abstract({ color: {"[]": ["red", "blue"]} })
+			cls = this.$class({ "+": this.abstr, color: {"[]": ["green", "yellow"]} })
+		}
+
+		let s = css.serializeToCSS( A);
+		expect(s).toEqual(".A_cls{color:red;color:blue;color:green;color:yellow;}");
+    })
+
+
+
+	it("create multiple name:value pairs when extending multiple style rules", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			abstr1 = this.$abstract({ color: {"[]": ["red", "blue"]} })
+			abstr2 = this.$abstract({ color: {"[]": ["green", "yellow"]} })
+			cls = this.$class({
+                color: {"[]": ["brown", "orange"]},
+                "+": [this.abstr1, this.abstr2]
+            })
+		}
+
+		let s = css.serializeToCSS( A);
+		expect(s).toEqual(".A_cls{color:brown;color:orange;color:red;color:blue;color:green;color:yellow;}");
+    })
 })
 
 

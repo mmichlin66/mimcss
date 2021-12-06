@@ -1,6 +1,6 @@
 ﻿import {IStyleDefinitionClass, IStyleDefinition, ICssSerializer} from "./RuleTypes";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
-import {Styleset, ExtendedBaseStyleset, StringStyleset, IStyleset} from "./Stylesets"
+import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Stylesets"
 import {sp2s, s_registerSP, s2ss, styleset2s} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
 import {IRuleSerializationContext} from "../rules/Rule";
@@ -38,14 +38,14 @@ export const registerStyleProperty = (name: string, toStringFunc: (v: any) => st
  * to a CSS compliant string.
  * @param stylePropValue Value to convert.
  */
-export const getStylePropValue = <K extends keyof ExtendedBaseStyleset>( stylePropName: K,
-	stylePropValue: ExtendedBaseStyleset[K]): string => sp2s( stylePropName, stylePropValue);
+export const getStylePropValue = <K extends keyof IStyleset>( stylePropName: K,
+	stylePropValue: ExtendedIStyleset[K]): string => sp2s( stylePropName, stylePropValue);
 
 
 
 // Sets style property on HTML or SVG element
 const setElementStyleProp = <K extends keyof IStyleset>( elm: ElementCSSInlineStyle, name: K,
-    value: ExtendedBaseStyleset[K], schedulerType?: number): void =>
+    value: ExtendedIStyleset[K], schedulerType?: number): void =>
     scheduleStyleUpdate( elm, name, sp2s( name, value), false, schedulerType);
 
 
@@ -173,7 +173,7 @@ declare global
          * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
          * will be used.
          */
-        setStyleProp<K extends keyof IStyleset>( name: K, value: ExtendedBaseStyleset[K],
+        setStyleProp<K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K],
             schedulerType?: number): void;
 
         /**
@@ -201,7 +201,7 @@ SVGElement.prototype.setStyleset = setThisElementStyle;
 
 // Sets style property on HTML or SVG element
 function setThisElementStyleProp<K extends keyof IStyleset>( name: K,
-    value: ExtendedBaseStyleset[K], schedulerType?: number): void
+    value: ExtendedIStyleset[K], schedulerType?: number): void
 {
     setElementStyleProp( this, name, value, schedulerType);
 }
@@ -363,9 +363,9 @@ class RuleSerializationContext implements IRuleSerializationContext
     public addRule( s: string, isTopLevelRule?: boolean): void
     {
         if (isTopLevelRule)
-            this.tl += s + "\n";
+            this.tl += s;
         else
-            this.ntl += s + "\n";
+            this.ntl += s;
     }
 
     // Adds rule text
