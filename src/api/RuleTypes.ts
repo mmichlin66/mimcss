@@ -164,7 +164,7 @@ export type AnimationWaypoint = "from" | "to" | number | ("from" | "to" | number
  * The waypoint can be specified as "from" or "to" strings or as a number 0 to 100, which will be
  * treated as percents.
  */
-export type AnimationFrame = [AnimationWaypoint, AnimationStyleset];
+export type AnimationFrame = [AnimationWaypoint, AnimationStyleset | AnimationStyleset[]];
 
 /**
  * The IAnimationRule interface represents the `@keyframes` rule.

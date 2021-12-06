@@ -242,10 +242,26 @@ describe("style rules:", () =>
 
 
 
-	it("create multiple name:value pairs for the same property", () =>
+	it("create multiple name:value pairs for the same property using \"[]\"", () =>
 	{
         let s = css.stylesetToString( {color: {"[]": ["red", "blue"]} });
         expect(s).toEqual( "{color:red;color:blue;}");
+    })
+
+
+
+	it("create multiple name:value pairs for the same property using multiple stylesets", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			cls = this.$class([
+                { color: "red" },
+                { color: "blue" }
+            ])
+		}
+
+        let s = css.serializeToCSS( A);
+        expect(s).toEqual( ".A_cls{color:red;color:blue;}");
     })
 
 
@@ -314,12 +330,31 @@ describe("style rules:", () =>
 			abstr2 = this.$abstract({ color: {"[]": ["green", "yellow"]} })
 			cls = this.$class({
                 color: {"[]": ["brown", "orange"]},
-                "+": [this.abstr1, this.abstr2]
+                "+": [this.abstr1, this.abstr2],
             })
 		}
 
 		let s = css.serializeToCSS( A);
 		expect(s).toEqual(".A_cls{color:brown;color:orange;color:red;color:blue;color:green;color:yellow;}");
+    })
+
+
+
+	it("create multiple name:value pairs when extending multiple style rules: intermingled", () =>
+	{
+		class A extends css.StyleDefinition
+		{
+			abstr1 = this.$abstract({ color: {"[]": ["red", "blue"]} })
+			abstr2 = this.$abstract({ color: {"[]": ["green", "yellow"]} })
+			cls = this.$class([
+                {"+": [this.abstr1]},
+                {color: {"[]": ["brown", "orange"]}},
+                {"+": [this.abstr2]},
+            ])
+		}
+
+		let s = css.serializeToCSS( A);
+		expect(s).toEqual(".A_cls{color:red;color:blue;color:brown;color:orange;color:green;color:yellow;}");
     })
 })
 

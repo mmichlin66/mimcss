@@ -107,7 +107,7 @@ export class AnimationRule extends Rule implements IAnimationRule
  */
 class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 {
-	public constructor( waypoint: AnimationWaypoint, styleset?: AnimationStyleset)
+	public constructor( waypoint: AnimationWaypoint, styleset?: AnimationStyleset | AnimationStyleset[])
 	{
 		super( styleset);
 		this.waypoint = waypoint;

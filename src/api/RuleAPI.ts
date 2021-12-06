@@ -124,7 +124,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that will be inherited by style rules that extend this abstract rule.
      * @returns `IStyleRule` object that should be used by the derived rules in the `"+"` property.
      */
-    public $abstract( styleset: CombinedStyleset): IStyleRule
+    public $abstract( styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
     {
         return new AbstractRule( styleset);
     }
@@ -172,7 +172,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IClassRule` object that should be used for getting the class name and for accessing
      * the style properties if needed.
      */
-    public $class( styleset?: CombinedClassStyleset, nameOverride?: string | IClassRule): IClassRule
+    public $class( styleset?: CombinedClassStyleset | CombinedStyleset[],
+        nameOverride?: string | IClassRule): IClassRule
     {
         return new ClassRule( styleset, nameOverride);
     }
@@ -266,7 +267,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IIDRule` object that should be used for getting the ID name and for accessing
      * the style properties if needed.
      */
-    public $id( styleset?: CombinedStyleset, nameOverride?: string | IIDRule): IIDRule
+    public $id( styleset?: CombinedStyleset | CombinedStyleset[], nameOverride?: string | IIDRule): IIDRule
     {
         return new IDRule( styleset, nameOverride);
     }
@@ -301,7 +302,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that defines style properties for the tags.
      * @returns `IStyleRule` object representing the tag rule.
      */
-    public $tag( tag: "*" | OneOrMany<ElementTagName>, styleset: CombinedStyleset): IStyleRule
+    public $tag( tag: "*" | OneOrMany<ElementTagName>, styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
     {
         return new SelectorRule( Array.isArray(tag) ? tag.join(",") : tag, styleset);
     }
@@ -349,7 +350,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styleset that defines style properties for this selector.
      * @returns `IStyleRule` object representing the style rule.
      */
-    public $style( selector: CssSelector, styleset: CombinedStyleset): IStyleRule
+    public $style( selector: CssSelector, styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
     {
         return new SelectorRule( selector, styleset);
     }
@@ -551,7 +552,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * satisfies the type defined by the `template` parameter including other constants, custom
      * properties and functions.
      *
-     * No CSS rules are created for costants and due to this fact constants are preferable to custom
+     * No CSS rules are created for constants and, due to this fact, constants are preferable to custom
      * properties unless the intention is to change the variable value at run-time or to redefine its
      * value under different style rules.
      *

@@ -2435,9 +2435,9 @@ export type StringStyleset = { [K: string]: string | null | undefined }
  */
 export type CombinedStyleset = Styleset &
     { "+"?: IStyleRule | IStyleRule[] } &
-    { [K in PseudoEntity]?: CombinedStyleset } &
-    { [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset][] } &
-    { [K in DependentRuleCombinator]?: [CssSelector, CombinedStyleset][] };
+    { [K in PseudoEntity]?: CombinedStyleset | CombinedStyleset[] } &
+    { [K in keyof IParameterizedPseudoEntity]?: [IParameterizedPseudoEntity[K], CombinedStyleset | CombinedStyleset[]][] } &
+    { [K in DependentRuleCombinator]?: [CssSelector, CombinedStyleset | CombinedStyleset[]][] };
 
 
 
@@ -2494,7 +2494,7 @@ export type CombinedStyleset = Styleset &
  * ```
  */
 export type CombinedClassStyleset = CombinedStyleset &
- { "++"?: ParentClassType | ParentClassType[] };
+    { "++"?: ParentClassType | ParentClassType[] };
 
 /**
  * Represents types that can be used to inherit from an already defined CSS class. This type is

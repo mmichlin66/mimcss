@@ -20,7 +20,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 {
 	// The styleset can be an CombinedStyleset for many rules; however, for some it is just
 	// of the Styleset type.
-	public constructor( inputStyleset?: Styleset)
+	public constructor( inputStyleset?: Styleset | Styleset[])
 	{
 		super();
 
@@ -28,7 +28,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		this.dependentRules = {};
 
 		if (inputStyleset)
-			this.parse( inputStyleset as CombinedStyleset);
+        {
+            if (Array.isArray( inputStyleset))
+                inputStyleset.forEach( v => this.parse(v));
+            else
+			    this.parse( inputStyleset);
+        }
 	}
 
 
@@ -44,7 +49,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
 	 * important properties and dependent rules.
 	 */
-	private parse( inputStyleset: CombinedStyleset): void
+	private parse( inputStyleset: Styleset): void
 	{
 		for( let propName in inputStyleset)
 		{
@@ -76,7 +81,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				// CombinedStyleset.
 				if (Array.isArray(propVal))
 				{
-					let tuples = propVal as [any, CombinedStyleset][];
+					let tuples = propVal as [any, CombinedStyleset | CombinedStyleset[]][];
 					if (tuples.length > 0)
 					{
 						this.dependentRules[propName] = tuples.map( tuple => new DepRule(
@@ -90,7 +95,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 			else if (propName.includes("&"))
             {
                 // value is an array of two-element tuples with selector and styleset
-                let tuples = propVal as [CssSelector, CombinedStyleset][];
+                let tuples = propVal as [CssSelector, CombinedStyleset | CombinedStyleset[]][];
                 if (tuples.length > 0)
                 {
                     this.dependentRules[propName] = tuples.map( tuple => {
@@ -327,7 +332,7 @@ class DepRule extends StyleRule
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, pseudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
-	public constructor( selector: CssSelector, param?: any, styleset?: CombinedStyleset,
+	public constructor( selector: CssSelector, param?: any, styleset?: CombinedStyleset | CombinedStyleset[],
 		parent?: StyleRule)
 	{
 		super( styleset);
@@ -420,9 +425,9 @@ export class AbstractRule extends StyleRule
  */
 abstract class NamedStyleRule extends StyleRule implements INamedEntity
 {
-	public constructor( style?: CombinedStyleset, nameOverride?: string | INamedEntity)
+	public constructor( styleset?: CombinedStyleset | CombinedStyleset[], nameOverride?: string | INamedEntity)
 	{
-		super( style);
+		super( styleset);
 		this.nameOverride = nameOverride;
 	}
 
@@ -541,7 +546,7 @@ export class IDRule extends NamedStyleRule implements IIDRule
  */
 export class SelectorRule extends StyleRule
 {
-	public constructor( selector: CssSelector, styleset?: CombinedStyleset)
+	public constructor( selector: CssSelector, styleset?: CombinedStyleset | CombinedStyleset[])
 	{
 		super( styleset);
 		this.selector = selector;
