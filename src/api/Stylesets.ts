@@ -2208,7 +2208,7 @@ export interface ISyntaxTypeStyleset
 
     /** Allows having CSS variables and constants that accept a `<transform-function>` value */
     "<transform-function>"?: TransformFuncs;
-    "<transform-list>+"?: OneOrMany<TransformFuncs>;
+    "<transform-list>"?: OneOrMany<TransformFuncs>;
 }
 
 
