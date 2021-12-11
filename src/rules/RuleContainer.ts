@@ -88,7 +88,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
 
-    // ProxyHandler method, whcih virtualizes all non-array properties
+    // ProxyHandler method, which virtualizes all non-array properties
     set( t: StyleDefinition, p: PropertyKey, v: any, r: any): boolean
     {
         if (typeof p === "symbol" || typeof p === "number" || p in t /*t[p] !== undefined*/)

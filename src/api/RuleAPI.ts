@@ -29,13 +29,13 @@ import {getActivator} from "../impl/SchedulingImpl";
 
 
 
-/**
- * Symbol that is used by the `$parent` property in the StyleDefinition class that keeps reference
- * to the parnt style definition class. Developers can use this property to access rules in
- * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
- * property when processing the rules in the style definition object.
- */
-const symParent = Symbol("parent");
+// /**
+//  * Symbol that is used by the `$parent` property in the StyleDefinition class that keeps reference
+//  * to the parnt style definition class. Developers can use this property to access rules in
+//  * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
+//  * property when processing the rules in the style definition object.
+//  */
+// const symParent = Symbol("parent");
 
 
 
@@ -69,25 +69,6 @@ const symParent = Symbol("parent");
 export abstract class StyleDefinition<P extends StyleDefinition = any> implements IStyleDefinition<P>
 {
     /**
-     * Style definition instances are created directly only by the *styled components* - that is,
-     * components that use different styles for each instance. Otherwise, style definition
-     * instances are created when either the [[$use]] method or [[activate]] function is called.
-     * @param parent Reference to the parent style definition class
-     */
-    public constructor( parent?: P)
-    {
-        this[symParent] = parent;
-
-        // Style Definition instance points to rule container
-        let rc = new RuleContainer( this);
-        this[symRC] = rc;
-
-        // instead of returning an instance of our class, the constructor returns a proxy. This
-        // allows creating proxies for all properties defined in the class.
-        return new Proxy<StyleDefinition<P>>( this, rc);
-    }
-
-    /**
      * Refers to the instance of the style definition class which is the parent of this style
      * definition object in the chain of style definition classes. Through this member, all rules
      * and other members defined in the parent definition class can be accessed. For top-level
@@ -115,7 +96,28 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      */
-    public get $parent(): P | undefined { return this[symParent]; }
+    public readonly $parent?: P;
+
+
+
+    /**
+     * Style definition instances are created directly only by the *styled components* - that is,
+     * components that use different styles for each instance. Otherwise, style definition
+     * instances are created when either the [[$use]] method or [[activate]] function is called.
+     * @param parent Reference to the parent style definition class
+     */
+    public constructor( parent?: P)
+    {
+        this.$parent = parent;
+
+        // Style Definition instance points to rule container
+        let rc = new RuleContainer( this);
+        this[symRC] = rc;
+
+        // instead of returning an instance of our class, the constructor returns a proxy. This
+        // allows creating proxies for all properties defined in the class.
+        return new Proxy<StyleDefinition<P>>( this, rc);
+    }
 
 
 
