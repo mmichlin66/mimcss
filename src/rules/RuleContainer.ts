@@ -2,7 +2,7 @@ import {INamedEntity, IStyleDefinition, IStyleDefinitionClass, IVarRule, NameGen
 import {StyleDefinition, ThemeDefinition} from "../api/RuleAPI"
 import {
     Rule, RuleLike, IRuleContainer, IActivationContext, IMimcssGroupingRule, IMimcssKeyframesRule,
-    IMimcssRule, IMimcssStyleElement, IMimcssRuleBag, IServerActivationContext
+    IMimcssRule, IMimcssStyleElement, IMimcssRuleBag, IServerActivationContext, symRC
 } from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
@@ -11,17 +11,8 @@ import { SchedulerType } from "../api/SchedulingTypes"
 
 
 
-// Define symbols that are used for keeping important information on the style definition
-// instances that we don't want to be visible to developers.
-
 /** Symbol on the style definition class pointing to the singleton instance. */
 const symInstance = Symbol("sd");
-
-/**
- * Symbol on the style definition instance pointing to the RuleContainer object that is
- * responsible for processing rules.
- */
-const symContainer = Symbol("rc");
 
 /**
  * Symbol on the style definition instance pointing to the StyleDefinition class for which
@@ -61,7 +52,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         // get parent and top level containers
         if (this.parent)
         {
-            this.pc = this.parent[symContainer];
+            this.pc = this.parent[symRC];
             this.tlc = this.pc!.tlc;
         }
         else
@@ -90,9 +81,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             if (s_nameGeneratonMethod !== NameGenerationMethod.Optimized && this.sdc.name)
                 name += "_" + this.sdc.name;
         }
-
-        // Style Definition instance points to this rule container
-        sd[symContainer] = this;
 
 		// if our container has parent container, prefix our name with the upper one
         this.name = this.pc ? `${this.pc.name}_${name}` : name;
@@ -231,7 +219,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// activate referenced style definitions
 		for( let ref of this.refs)
-			ref[symContainer].activate( this.elm);
+			ref[symRC].activate( this.elm);
 
 		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)
@@ -259,7 +247,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// deactivate imported stylesheets
 		for( let ref of this.refs)
-			ref[symContainer].deactivate();
+			ref[symRC].deactivate();
 	}
 
 
@@ -308,7 +296,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
                 let currInstance = getCurrentTheme( themeClass);
                 if (currInstance && currInstance !== this.sd)
                 {
-                    let currContainer = currInstance[symContainer] as RuleContainer;
+                    let currContainer = currInstance[symRC] as RuleContainer;
                     currContainer.deactivate();
                 }
 
@@ -579,7 +567,7 @@ const processClass = (sdc: IStyleDefinitionClass, parent?: IStyleDefinition): IS
         let sd = new sdc( parent);
 
         // get rule container from the instance and process the rules.
-        (sd[symContainer] as RuleContainer).process();
+        (sd[symRC] as RuleContainer).process();
         return sd;
     }
     finally
@@ -599,7 +587,7 @@ const processInstance = (sd: IStyleDefinition): IStyleDefinition =>
 {
 	// if the instance is already processed, just return; in this case we ignore the
 	// embeddingContainer parameter.
-	let container = sd[symContainer] as RuleContainer;
+	let container = sd[symRC] as RuleContainer;
     if (!container.processed)
         container.process();
 
@@ -614,15 +602,7 @@ const processInstance = (sd: IStyleDefinition): IStyleDefinition =>
  * to its rules.
  */
 export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass): IVarRule[] =>
-    (processSD( instOrClass)[symContainer] as RuleContainer).getVars();
-
-
-
-/**
- * Returns rule container object associated with the given style definition object.
- */
-export const getRCfromSD = (instance: IStyleDefinition): RuleContainer =>
-	instance ? instance[symContainer] : null;
+    (processSD( instOrClass)[symRC] as RuleContainer).getVars();
 
 
 
@@ -635,7 +615,7 @@ export const getRCfromSD = (instance: IStyleDefinition): RuleContainer =>
  */
 export const activateSD = (instance: IStyleDefinition): void =>
 {
-	let ruleContainer = getRCfromSD( instance);
+	let ruleContainer = instance[symRC];
 	if (!ruleContainer)
         return;
 
@@ -653,7 +633,7 @@ export const activateSD = (instance: IStyleDefinition): void =>
  */
 export const deactivateSD = (instance: IStyleDefinition): void =>
 {
-	let ruleContainer = getRCfromSD( instance);
+	let ruleContainer = instance[symRC];
 	if (!ruleContainer)
         return;
 
@@ -748,7 +728,7 @@ class EmbeddingContainer
                     ? cls[symInstance]
                     : processClass(cls);
 
-                (instance[symContainer] as RuleContainer).activate();
+                (instance[symRC] as RuleContainer).activate();
             }
 		}
 	}
@@ -771,7 +751,7 @@ class EmbeddingContainer
                 if (!cls.hasOwnProperty(symInstance))
                     continue;
 
-                (cls[symInstance][symContainer] as RuleContainer).deactivate();
+                (cls[symInstance][symRC] as RuleContainer).deactivate();
             }
 		}
 	}

@@ -12,6 +12,7 @@ import {
     Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset,
     ISyntaxTypeStyleset
 } from "./Stylesets";
+import {symRC} from "../rules/Rule";
 import {
     embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
     s_startSSR, s_stopSSR, s_startHydration, s_stopHydration
@@ -77,10 +78,13 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     {
         this[symParent] = parent;
 
+        // Style Definition instance points to rule container
+        let rc = new RuleContainer( this);
+        this[symRC] = rc;
+
         // instead of returning an instance of our class, the constructor returns a proxy. This
-        // allows creating proxies for all properties defined in the class, which allows processing
-        // the properties immediately upon definition.
-        return new Proxy<StyleDefinition<P>>( this, new RuleContainer( this));
+        // allows creating proxies for all properties defined in the class.
+        return new Proxy<StyleDefinition<P>>( this, rc);
     }
 
     /**

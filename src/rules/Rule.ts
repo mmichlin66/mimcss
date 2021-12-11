@@ -3,6 +3,14 @@ import {IRule, INamedEntity, IStyleDefinition} from "../api/RuleTypes"
 
 
 /**
+ * Symbol on the style definition instance pointing to the RuleContainer object that is
+ * responsible for processing rules.
+ */
+ export const symRC = Symbol("rc");
+
+
+
+ /**
  * The IRuleContainer interface represents an object that accompanies and is associated with
  * a style definition object.
  */
@@ -34,10 +42,10 @@ export interface IRuleContainer
 export abstract class RuleLike
 {
 	// Processes the rule.
-	public process( c: IRuleContainer, ruleName: string | null): void
+	public process( c: IRuleContainer, propName: string | null): void
 	{
         this.c = c;
-		this.ruleName = ruleName;
+		this.pn = propName;
 	}
 
 
@@ -47,7 +55,7 @@ export abstract class RuleLike
 
 	// Name of the property of the stylesheet definition to which this rule was assigned. This can
 	// be null for rules not created via assignment to style definition properties.
-	public ruleName: string | null;
+	public pn: string | null;
 }
 
 
