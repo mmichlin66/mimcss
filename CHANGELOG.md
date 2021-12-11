@@ -1,3 +1,10 @@
+# 0.11.8
+
+## Non-breaking changes
+
+1. Add support for server-side rendering and hydration.
+
+
 # 0.11.7
 
 ## Non-breaking changes

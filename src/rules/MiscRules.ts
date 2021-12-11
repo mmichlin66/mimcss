@@ -4,7 +4,7 @@ import {Styleset} from "../api/Stylesets";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
-import {Rule, IRuleSerializationContext, RuleLike, IRuleContainer} from "./Rule";
+import {Rule, RuleLike, IRuleContainer, IMimcssStyleElement, IMimcssGroupingRule} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {StyleRule} from "./StyleRules";
 import {symV2S} from "../impl/Utils";
@@ -23,16 +23,10 @@ abstract class MiscRule<T extends CSSRule> extends Rule
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
 	{
-		this.cssRule = Rule.toDOM( this.toCss(), parent) as T;
+		this.cssRule = parent.addRule( this.toCss())?.cssRule as T;
 	}
-
-	// Serializes this rule to a string.
-    public serialize( ctx: IRuleSerializationContext): void
-    {
-		ctx.addRule( this.toCss(), this.isTopLevelRule);
-    }
 
 	// Returns CSS string for this rule.
     protected abstract toCss(): string;

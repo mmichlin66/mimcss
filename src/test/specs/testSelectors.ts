@@ -31,7 +31,7 @@ describe("selectors:", () =>
 
             let a = css.activate( A);
 
-            expect(a.s1.selectorText).toEqual("p#A_id1.A_cls1");
+            expect(a.s1.cssRule!.selectorText).toEqual("p#A_id1.A_cls1");
 
             css.deactivate( a);
         })
@@ -51,7 +51,7 @@ describe("selectors:", () =>
 
             let a = css.activate( A);
 
-            expect(a.s1.selectorText).toEqual("p >#A_id1.A_cls1");
+            expect(a.s1.cssRule!.selectorText).toEqual("p > #A_id1.A_cls1");
 
             css.deactivate( a);
         })
@@ -76,7 +76,7 @@ describe("selectors:", () =>
 
             let a = css.activate( A);
 
-            expect(a.s1.selectorText).toEqual("p, #A_id1, .A_cls1");
+            expect(a.s1.cssRule!.selectorText).toEqual("p, #A_id1, .A_cls1");
 
             css.deactivate( a);
         })
@@ -125,11 +125,11 @@ describe("selectors:", () =>
 
             let a = css.activate( A);
 
-            expect(a.s1.selectorText).toEqual("p#A_id1.A_cls1");
-            expect(a.s2.selectorText).toEqual("p#A_id1.A_cls1");
-            expect(a.s3.selectorText).toEqual("p#A_id1,.A_cls1>#A_id2>.A_cls2");
-            expect(a.s4.selectorText).toEqual("p#A_id1,.A_cls1>#A_id2~.A_cls2+#A_id3 .A_cls3");
-            expect(a.s5.selectorText).toEqual("p,#A_id1");
+            expect(a.s1.cssRule!.selectorText).toEqual("p#A_id1.A_cls1");
+            expect(a.s2.cssRule!.selectorText).toEqual("p#A_id1.A_cls1");
+            expect(a.s3.cssRule!.selectorText).toEqual("p#A_id1, .A_cls1 > #A_id2 > .A_cls2");
+            expect(a.s4.cssRule!.selectorText).toEqual("p#A_id1, .A_cls1 > #A_id2 ~ .A_cls2 + #A_id3 .A_cls3");
+            expect(a.s5.cssRule!.selectorText).toEqual("p, #A_id1");
 
             css.deactivate( a);
         })
@@ -177,20 +177,20 @@ describe("selectors:", () =>
                     { color: "red" },
                 )
 
-                mathML = this.$namespace( css.WebNamespaces.MathML, "mml")
-                s5 = this.$style(
-                    css.sel("p").attr("title", "https://www.example.com", "i", this.mathML),
-                    { color: "red" },
-                )
+                // mathML = this.$namespace( css.WebNamespaces.MathML, "mml")
+                // s5 = this.$style(
+                //     css.sel("p").attr("title", "https://www.example.com", "i", this.mathML),
+                //     { color: "red" },
+                // )
             }
 
             let a = css.activate( A);
 
-            expect(a.s1.selectorText).toEqual("p[title]");
-            expect(a.s2.selectorText).toEqual('p[title="https://www.example.com"]');
-            expect(a.s3.selectorText).toEqual('p[title^="https://"]');
-            expect(a.s4.selectorText).toEqual('p[title="https://www.example.com" i]');
-            expect(a.s5.selectorText).toEqual('p[mml|title="https://www.example.com" i]');
+            expect(a.s1.cssRule!.selectorText).toEqual("p[title]");
+            expect(a.s2.cssRule!.selectorText).toEqual('p[title="https://www.example.com"]');
+            expect(a.s3.cssRule!.selectorText).toEqual('p[title^="https://"]');
+            expect(a.s4.cssRule!.selectorText).toEqual('p[title="https://www.example.com" i]');
+            // expect(a.s5.cssRule!.selectorText).toEqual('p[mml|title="https://www.example.com" i]');
 
             css.deactivate( a);
         })
@@ -214,7 +214,7 @@ describe("selectors:", () =>
 
             let a = css.activate( A);
 
-            expect(a.s1.selectorText).toEqual(":is(#A_id1,.A_cls1) :is(:where(#A_id2,.A_cls2):not(#A_id3,.A_cls3))");
+            expect(a.s1.cssRule!.selectorText).toEqual(":is(#A_id1, .A_cls1) :is(:where(#A_id2, .A_cls2):not(#A_id3, .A_cls3))");
 
             css.deactivate( a);
         })
@@ -257,7 +257,7 @@ describe("selectors:", () =>
 
             let a = css.activate( A);
 
-            expect(a.s1.selectorText).toEqual(".A_cls1:hover>::after");
+            expect(a.s1.cssRule!.selectorText).toEqual(".A_cls1:hover > ::after");
 
             css.deactivate( a);
         })

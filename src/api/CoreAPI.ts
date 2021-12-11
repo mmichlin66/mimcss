@@ -53,42 +53,6 @@ const attrComparisonOperations: AttrComparisonOperation[] = ["=",  "~=", "|=", "
  */
 const selectorCombinators = [",", " ", ">", "+", "~", "||"];
 
-// /**
-//  * Array of non-parameterized pseudo classes - needed to check whether a string is such pseudo class.
-//  */
-// const simplePseudoClasses = [
-//     "blank", "first", "left", "right",
-//     "active", "any-link", "autofill", "blank", "checked", "default", "defined", "disabled",
-//     "empty", "enabled", "firstChild", "firstOfType", "fullscreen", "focus",
-//     "focusVisible", "focusWithin", "host", "hover", "indeterminate", "inRange", "invalid",
-//     "lastChild", "lastOfType", "left", "link", "onlyChild", "onlyOfType", "optional",
-//     "outOfRange", "paused", "placeholderShown", "readOnly", "readWrite", "required",
-//     "right", "root", "scope", "target", "valid", "visited"
-// ];
-
-// /**
-//  * Array of non-parameterized pseudo elements - needed to check whether a string is such pseudo element.
-//  */
-// const simplePseudoElements = [
-//     "after", "backdrop", "before", "cue", "firstLetter", "firstLine",
-//     "grammarError", "marker", "placeholder", "selection", "spellingError"
-// ];
-
-// /**
-//  * Array of parameterized pseudo classes - needed to check whether a string is such pseudo class.
-//  */
-// const parameterizedPseudoClasses = [
-//     "dir", "has", "host", "hostContext", "is", "lang", "not", "nthChild", "nthOfType", "nthLastChild",
-//     "nthLastOfType", "where"
-// ];
-
-// /**
-//  * Array of parameterized pseudo elements - needed to check whether a string is such pseudo element.
-//  */
-// const parameterizedPseudoElements = [
-//     "part", "slotted"
-// ];
-
 
 
 /**
@@ -314,7 +278,7 @@ const pseudoCamelTodDash = (prefix: ":" | "::", name: string) => prefix + camelT
  *     cls = this.$class({...})
  *     myID = this.$id({...})
  *
- *     // produces CSS: label.cls1[data-item="myID"]:hover {...}
+ *     // produces CSS: label.cls1[for="myID"]:hover {...}
  *     s1 = this.$style( css.sel("label").and(this.cls1)).attr("for", this.myID).hover, {...})
  * }
  * ```

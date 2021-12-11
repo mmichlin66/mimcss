@@ -8,8 +8,14 @@ import {
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
-import {Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset, ISyntaxTypeStyleset} from "./Stylesets";
-import {embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer} from "../rules/RuleContainer";
+import {
+    Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset,
+    ISyntaxTypeStyleset
+} from "./Stylesets";
+import {
+    embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
+    s_startSSR, s_stopSSR, s_startHydration, s_stopHydration
+} from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule, PropertyRule} from "../rules/VarRule"
@@ -78,7 +84,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     }
 
     /**
-     * Refers to the instance of the style definition class which is the parnt of this style
+     * Refers to the instance of the style definition class which is the parent of this style
      * definition object in the chain of style definition classes. Through this member, all rules
      * and other members defined in the parent definition class can be accessed. For top-level
      * style definitions, this property is always undefined. This property can also be undefined
@@ -1157,6 +1163,42 @@ export const deactivate = (instance: IStyleDefinition, schedulerType?: number): 
  */
 export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
     getCurrentTheme( themeClass);
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// SSR support.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Sets server-side activation context. Throws an error if non-default activation context is
+ * already set.
+ */
+export const startSSR = (): void => s_startSSR();
+
+/**
+ * Stops server-side activation functionality and returns a string with serialized styles. The
+ * string should be added to the `<head>` element using `insertAdjacentHTML()` method.
+ * Throws an error if SSR has not been started.
+ * @returns String containing serialized styles
+ */
+export const stopSSR = (): string => s_stopSSR();
+
+
+
+/**
+ * Sets hydration activation context. Throws an error if non-default activation context is
+ * already set.
+ */
+export const startHydration = (): void => s_startHydration();
+
+/**
+ * Stops hydration activation functionality and restore the default activation context.
+ * @returns String containing serialized styles
+ */
+export const stopHydration = (): void => s_stopHydration();
 
 
 

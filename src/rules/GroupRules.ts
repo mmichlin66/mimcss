@@ -1,7 +1,7 @@
 import {IStyleDefinitionClass, IStyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {getRCfromSD, processSD} from "./RuleContainer"
-import {IRuleContainer, Rule, IRuleSerializationContext} from "./Rule"
+import {IRuleContainer, Rule, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule"
 import {media2s, supports2s} from "../impl/MiscImpl";
 
 
@@ -11,9 +11,10 @@ import {media2s, supports2s} from "../impl/MiscImpl";
  */
 export abstract class GroupRule<T extends IStyleDefinition> extends Rule implements IGroupRule<T>
 {
-	public constructor( instOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( rn: string, instOrClass: T | IStyleDefinitionClass<T>)
 	{
 		super();
+        this.rn = rn;
 		this.instOrClass = instOrClass;
 	}
 
@@ -26,41 +27,24 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
         // container to which our groupng rule belongs becomes the parent container for the
         // style definition instance
-		this.sc = getRCfromSD( this._sd = processSD( this.instOrClass, container.getDef()));
+		this.sd = processSD( this.instOrClass, container.getDef()) as T;
+		this.rc = getRCfromSD( this.sd);
 	}
 
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
 	{
-		let selector = this.getSel();
-		if (!selector)
-			return;
+		let mimcssRule = parent.addGroupingRule( `@${this.rn} ${this.condition}`);
+        if (mimcssRule)
+        {
+            this.cssRule = mimcssRule?.cssRule as CSSGroupingRule;
 
-		this.cssRule = Rule.toDOM( `${selector} {}`, parent) as CSSGroupingRule;
-
-		// insert sub-rules
-		if (this.cssRule)
-			this.sc.insert( this.cssRule);
+            // insert sub-rules
+			this.rc.insert( mimcssRule);
+        }
 	}
-
-
-
-	// Serializes this rule to a string.
-    public serialize( ctx: IRuleSerializationContext): void
-    {
-		let selector = this.getSel();
-		if (!selector)
-			return;
-
-		ctx.addRule( `${selector} {`);
-
-		// insert sub-rules
-		this.sc.serialize( ctx);
-
-		ctx.addRule( "}");
-    }
 
 
 
@@ -78,9 +62,6 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	// Returns the condition string of this grouping rule.
 	protected abstract getCond(): string | null;
 
-	// Returns the selector string of this grouping rule.
-	protected abstract getSel(): string | null;
-
 
 
 	// Clers the CSS rule object.
@@ -89,25 +70,25 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		super.clear();
 
 		// clear sub-rules
-		this.sc.clear();
+		this.rc.clear();
 	}
 
 
 
 	// Instance of the style definition class defining the rules under this grouping rule
-	public get sd(): T { return this._sd as T; }
+	public sd: T;
 
 	/** SOM supports rule */
 	public cssRule: CSSGroupingRule | null;
 
+	// Name of the at-rule (e.g. "supports").
+	private rn: string;
+
 	// Style definition class that defines rules under this grouping rule.
 	private instOrClass: T | IStyleDefinitionClass<T>;
 
-	// Style definition instance.
-	private _sd: IStyleDefinition;
-
 	// Rule container for the definition instance - this container contains sub-rules.
-	private sc: IRuleContainer;
+	private rc: IRuleContainer;
 
 	// Condition of this grouping rule.
 	private _cond: string | null;
@@ -122,8 +103,7 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 {
 	public constructor( statement: SupportsStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
-		super( instOrClass);
-
+		super( "supports", instOrClass);
 		this.stmt = statement;
 	}
 
@@ -132,7 +112,7 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 	/** Flag indicated whether the browser supports this rule's query */
     public get isSupported(): boolean
     {
-        return CSS.supports( this.condition);
+        return window && CSS.supports( this.condition);
     }
 
 
@@ -142,12 +122,6 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
     {
         return supports2s( this.stmt);
     }
-
-	// Returns the selector string of this grouping rule.
-	protected getSel(): string | null
-	{
-		return `@supports ${this.condition}`;
-	}
 
 
 
@@ -167,8 +141,7 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
 {
 	public constructor( statement: MediaStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
-		super( instOrClass);
-
+		super( "media", instOrClass);
 		this.stmt = statement;
 	}
 
@@ -180,24 +153,15 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
         return media2s( this.stmt);
     }
 
-	// Returns the selector string of this grouping rule.
-	protected getSel(): string | null
-	{
-		return `@media ${this.condition}`;
-	}
-
 
 
     /**
      * Returns `MediaQueryList` object that allows programmatic checking whether the document matches
      * the media statement and also allows listening to its `change` event.
      */
-    public get mql(): MediaQueryList
+    public get queryList(): MediaQueryList | undefined
     {
-        if (!this._mql)
-            this._mql = window.matchMedia( this.condition);
-
-        return this._mql;
+        return window && matchMedia( this.condition);
     }
 
 
@@ -207,9 +171,6 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
 
 	// media statement for this rule.
 	private stmt: MediaStatement;
-
-    // cached MediaQueryList object created for the media statement
-    private _mql: MediaQueryList | null = null;
 }
 
 

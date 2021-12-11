@@ -327,13 +327,6 @@ export const getActivator = (schedulerType?: number): IStyleActivator =>
 
 
 /**
- * Returns the current default scheduler type.
- */
-export const getDefaultScheduler = (): number => s_defaultSchedulerType;
-
-
-
-/**
  * Sets the default scheduling type that is used by activate and deactivate functions that are
  * called without explicitly providing value to the scheduling parameter. Returns the type of the
  * previous default activator or 0 if an error occurs (e.g. the given scheduler type ID is not
@@ -364,26 +357,6 @@ export const registerScheduler = (scheduler: IScheduler): number =>
 	let id = s_nextCustomSchedulerType++;
 	s_registeredActivators.set( id, new SchedulingActivator( scheduler));
 	return id;
-}
-
-
-
-/**
- * Unregisters a scheduler object with the given scheduler type identifier.
- */
-export const unregisterScheduler = (id: number): void =>
-{
-	if (id >= s_firstCustomSchedulerType)
-	{
-		s_registeredActivators.delete( id);
-
-		// if the deleted scheduler was our default one, we set the default to SYNC
-        if (s_defaultSchedulerType === id)
-        {
-            s_defaultSchedulerType = SchedulerType.Sync;
-            s_defaultActivator = s_synchronousActivator;
-        }
-	}
 }
 
 

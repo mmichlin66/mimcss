@@ -1,6 +1,6 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, IAnimationFrameRule} from "../api/RuleTypes"
 import {AnimationStyleset} from "../api/Stylesets";
-import {Rule, IRuleContainer, IRuleSerializationContext} from "./Rule"
+import {Rule, IRuleContainer, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule"
 import {StyleRule} from "./StyleRules";
 import {v2s, WKF} from "../impl/Utils";
 
@@ -40,45 +40,23 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
 	{
 		if (!this.frameRules)
 			return;
 
-		this.cssRule = Rule.toDOM( `@keyframes ${this.name} {}`, parent) as CSSKeyframesRule;
-
-		let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
-		for( let frameRule of this.frameRules)
-		{
-			try
-			{
-				cssKeyframesRule.appendRule( frameRule.toCss());
-
+		let mimcssRule = parent.addKeyframesRule( this.name);
+        if (mimcssRule)
+        {
+            this.cssRule = mimcssRule?.cssRule as CSSKeyframesRule;
+            for( let frameRule of this.frameRules)
+            {
                 // although the cssRule in the frame is typed as CSSStyleRule, we know that in
                 // practice, it is of the CSSKeyframeRule type.
-				frameRule.cssRule = this.cssRule.cssRules.item(  this.cssRule.cssRules.length - 1) as CSSStyleRule;
-			}
-			catch(x)
-			{
-				console.error( "Cannot add CSS keyframe rule", x)
-			}
-		}
+                frameRule.cssRule = mimcssRule.addFrame( frameRule.toCss())?.cssRule as CSSStyleRule;
+            }
+        }
 	}
-
-
-	// Serializes this rule to a string.
-    public serialize( ctx: IRuleSerializationContext): void
-    {
-		if (!this.frameRules)
-			return;
-
-		ctx.addRule( `@keyframes ${this.name} {`);
-
-		for( let frameRule of this.frameRules)
-			ctx.addRule( frameRule.toCss())
-
-		ctx.addRule( "}");
-    }
 
 
 

@@ -1,10 +1,7 @@
-﻿import {IStyleDefinitionClass, IStyleDefinition, ICssSerializer} from "./RuleTypes";
-import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
+﻿import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
 import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Stylesets"
 import {sp2s, s_registerSP, s2ss, styleset2s} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
-import {IRuleSerializationContext} from "../rules/Rule";
-import {processSD, serializeSD} from "../rules/RuleContainer";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {tag2s} from "../impl/Utils";
 
@@ -280,113 +277,6 @@ export const mediaToString = (query: MediaStatement): string => media2s( query);
  * Converts the given supports query value to the CSS supports query string.
  */
 export const supportsToString = (query: SupportsStatement): string => supports2s( query);
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Style serialization.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Creates a new ICssSerializer object that allows adding style definition classes
- * and instances and serializing them to a string. This can be used for server-side rendering when
- * the resultant string can be set as the content of a `<style>` element.
- */
-export const createCssSerializer = (): ICssSerializer => new CssSerializer();
-
-
-
-/**
- * Serializes one or more style definition classes and instances and returns their CSS string
- * representation. This can be used for server-side rendering when the resultant string can be
- * set as the content of a `<style>` element.
- */
-export const serializeToCSS = (...args: (IStyleDefinition | IStyleDefinitionClass)[]): string =>
-{
-    if (args.length === 0)
-        return "";
-
-    let serializer = new CssSerializer();
-    args.forEach( instOrClass => serializer.add( instOrClass));
-    return serializer.serialize();
-}
-
-
-
-/**
- * The StyleSerializer class allows adding style definition classes and objects
- * and serializing them to a single string. This can be used for server-side rendering when
- * the resultant string can be set as the content of a `<style>` element.
- */
-class CssSerializer implements ICssSerializer
-{
-    /**
-     * Adds style definition class or instance.
-     */
-    public add( instOrClass: IStyleDefinition | IStyleDefinitionClass): void
-    {
-        let instance = processSD( instOrClass);
-        if (!instance || this.sds.has(instance))
-            return;
-
-        this.sds.add( instance);
-    }
-
-    /**
-     * Returns concatenated string representation of all CSS rules added to the context.
-     */
-    public serialize(): string
-    {
-        if (this.sds.size === 0)
-            return "";
-
-        let ctx = new RuleSerializationContext();
-        this.sds.forEach( instance => ctx.addSD( instance));
-        return ctx.tl + ctx.ntl;
-    }
-
-    // Set of style definition instances. This is needed to not add style definitions more than once
-    sds = new Set<IStyleDefinition>();
-}
-
-
-
-/**
- * The RuleSerializationContext class implements the IRuleSerializationContext interface and
- * accumulates text of serialized CSS rules.
- */
-class RuleSerializationContext implements IRuleSerializationContext
-{
-    // Adds rule text
-    public addRule( s: string, isTopLevelRule?: boolean): void
-    {
-        if (isTopLevelRule)
-            this.tl += s;
-        else
-            this.ntl += s;
-    }
-
-    // Adds rule text
-    public addSD( instance: IStyleDefinition): void
-    {
-        if (!this.sds.has( instance))
-        {
-            this.sds.add( instance);
-            serializeSD( instance, this);
-        }
-    }
-
-    // String buffer that accumulates top-level rule texts.
-    public tl = "";
-
-    // String buffer that accumulates non-top-level rule texts.
-    public ntl = "";
-
-    // Set of style definition instances that were already serialized in this context.
-    private sds = new Set<IStyleDefinition>();
-}
 
 
 

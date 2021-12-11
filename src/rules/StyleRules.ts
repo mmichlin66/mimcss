@@ -4,7 +4,7 @@ import {
     CombinedStyleset, ParentClassType, IStyleset
 } from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
-import {Rule, IRuleContainer, IRuleSerializationContext} from "./Rule";
+import {Rule, IRuleContainer, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule";
 import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
 import {styleset2s, sp2s} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
@@ -136,10 +136,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
 	{
 		if (Object.keys(this.styleset).length > 0)
-			this.cssRule = Rule.toDOM( this.toCss(), parent) as CSSStyleRule;
+			this.cssRule = parent.addRule( this.toCss())?.cssRule as CSSStyleRule;
 
         // insert dependent rules under the same parent
         this.forEachDepRule( (depRule: DepRule) => depRule.insert( parent));
@@ -153,17 +153,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
         // clear dependent rules
         this.forEachDepRule( (depRule: DepRule) => depRule.clear());
 	}
-
-	// Serializes this rule to a string.
-    public serialize( ctx: IRuleSerializationContext): void
-    {
-		if (Object.keys(this.styleset).length > 0)
-			ctx.addRule( this.toCss());
-
-        // insert dependent rules under the same parent
-        this.forEachDepRule( (depRule: DepRule) => depRule.serialize( ctx));
-
-    }
 
 	// Invoke the given function for each of the dependent rules.
 	private forEachDepRule( func: (depRule: DepRule) => void): void
@@ -405,13 +394,10 @@ export class AbstractRule extends StyleRule
 {
 	// Overrides the StyleRule's implementation to do nothing. No CSSStyleRule is created for
 	// abstract rules.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
+	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void {}
 
 	// Overrides the StyleRule's implementation to do nothing.
 	public clear(): void {}
-
-	// Overrides the StyleRule's implementation to do nothing.
-    public serialize( ctx: IRuleSerializationContext): void {}
 
     // Returns the selector part of the style rule.
 	public getSel(): string { return ""; }

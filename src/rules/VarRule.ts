@@ -1,7 +1,7 @@
 import {IVarRule, IConstRule} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue, ISyntaxTypeStyleset} from "../api/Stylesets"
 import {sp2s} from "../impl/StyleImpl"
-import {IRuleContainer, IRuleSerializationContext, Rule, RuleLike} from "./Rule";
+import {IMimcssGroupingRule, IMimcssStyleElement, IRuleContainer, Rule, RuleLike} from "./Rule";
 
 
 
@@ -40,15 +40,6 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
 
         this.cssVarName = "--" + this.name;
     }
-
-
-
-    // Inserts this rule into the given parent rule or stylesheet. This method is called when the
-    // style definition class, to which this rule belongs, is activated.
-    public insert( parent: CSSStyleSheet | CSSGroupingRule): void {}
-
-    // Serializes this rule to a string.
-    public serialize( ctx: IRuleSerializationContext): void {}
 
 
 
@@ -128,6 +119,12 @@ export class VarRule<K extends VarTemplateName = any> extends VarBaseRule<K>
 	}
 
 
+    // Inserts this rule into the given parent rule or stylesheet. This method is called when the
+    // style definition class, to which this rule belongs, is activated.
+    public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void {}
+
+
+
 	// Converts the rule to CSS string.
 	public toCss(): string | null
 	{
@@ -159,33 +156,17 @@ export class PropertyRule<K extends keyof ISyntaxTypeStyleset = any, T extends K
         this.inherits = inherits;
     }
 
-    // public constructor( syntax: K, initValue: ExtendedVarValue<K>, inherits: boolean, nameOverride?: string | IVarRule<K>)
-	// {
-    //     super( syntax, initValue, nameOverride);
-	// 	this.inherits = inherits;
-	// }
 
 
 	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
 	// style definition class, to which this rule belongs, is activated.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
     {
-		this.cssRule = Rule.toDOM( this.toCss(), parent);
+		let ruleText = `@property ${this.cssVarName}{syntax:'${this.syntax}';` +
+            `inherits:${this.inherits};initial-value:${sp2s( this.template, this.value)};}`;
+
+        this.cssRule = parent.addRule( ruleText)?.cssRule as CSSRule;
     }
-
-	// Serializes this rule to a string.
-	public serialize( ctx: IRuleSerializationContext): void
-    {
-		ctx.addRule( this.toCss());
-    }
-
-
-    // Converts the rule to CSS string.
-	public toCss(): string
-	{
-		return `@property ${this.cssVarName}{syntax:'${this.syntax}';inherits:${this.inherits};` +
-            `initial-value:${sp2s( this.template, this.value)};}`;
-	}
 
 
 

@@ -1,9 +1,13 @@
 import {INamedEntity, IStyleDefinition, IStyleDefinitionClass, IVarRule, NameGenerationMethod} from "../api/RuleTypes"
 import {StyleDefinition, ThemeDefinition} from "../api/RuleAPI"
-import {Rule, RuleLike, IRuleSerializationContext, IRuleContainer} from "./Rule"
+import {
+    Rule, RuleLike, IRuleContainer, IActivationContext, IMimcssGroupingRule, IMimcssKeyframesRule,
+    IMimcssRule, IMimcssStyleElement, IMimcssRuleBag, IServerActivationContext
+} from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import {getActivator, scheduleStyleUpdate} from "../impl/SchedulingImpl";
+import {getActivator, scheduleStyleUpdate, setDefaultScheduler} from "../impl/SchedulingImpl";
+import { SchedulerType } from "../api/SchedulingTypes"
 
 
 
@@ -24,14 +28,6 @@ const symContainer = Symbol("rc");
  * this instance was created.
  */
 const symClass = Symbol("sdc");
-
-
-
-/**
- * Element that is created at the top of the "<head>" element before any theme is activated. When
- * themes are activated, their '<style>' elements are created before this element.
- */
-let s_themePlaceholderElm: Element;
 
 
 
@@ -223,11 +219,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
     /** Inserts all rules defined in this container to either the style sheet or grouping rule. */
-	public insert( sheetOrGroupingRule: CSSStyleSheet | CSSGroupingRule): void
+	public insert( sheetOrGroupingRule: IMimcssStyleElement | IMimcssGroupingRule): void
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
-		if (sheetOrGroupingRule instanceof CSSStyleSheet)
+		if (!this.parent)
 		{
 			this.imports.forEach( rule => rule.insert( sheetOrGroupingRule));
 			this.namespaces.forEach( rule => rule.insert( sheetOrGroupingRule));
@@ -239,9 +235,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)
-		{
-			this.varRootRule = Rule.toDOM( getRootCssForVars( this.vars), sheetOrGroupingRule) as CSSStyleRule;
-		}
+			this.varRootRule = sheetOrGroupingRule.addRule( getRootCssForVars( this.vars))?.cssRule as CSSStyleRule;
 
 		// insert all other rules
 		this.otherRules.forEach( rule => rule.insert( sheetOrGroupingRule));
@@ -259,7 +253,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 			this.namespaces.forEach( rule => rule.clear());
 		}
 
-		this.varRootRule = null;
+		this.varRootRule = undefined;
 
 		this.otherRules.forEach( rule => rule.clear());
 
@@ -277,9 +271,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      * inserted. If not specified, the new element will be inserted as the last element under the
      * '<head>' element.
      */
-	public activate( insertBefore: Element | null = null): void
+	public activate( insertBefore?: IMimcssStyleElement): void
 	{
-		if (++this.refCount > 1)
+        // activation context may not exist if the code is executing on a server and SSR has
+        // not been started
+		if (!s_activationContext || ++this.refCount > 1)
             return;
 
         // only the top-level not-embedded style definitions create the `<style>` element
@@ -292,20 +288,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
                 // themes are inserted before the special placeholder element, which is created
                 // at the top of the '<head>' element
                 if (this.sd instanceof ThemeDefinition)
-                {
-                    if (!s_themePlaceholderElm)
-                    {
-                        s_themePlaceholderElm = document.createElement( "style");
-                        s_themePlaceholderElm.id = generateUniqueName( "themePlaceholderElement_");
-                        document.head.insertBefore( s_themePlaceholderElm, document.head.firstElementChild);
-                    }
+                    insertBefore = s_activationContext?.getThemePlaceholder();
 
-                    insertBefore = s_themePlaceholderElm;
-                }
-
-                this.elm = document.createElement( "style");
-                this.elm.id = this.name;
-                document.head.insertBefore( this.elm, insertBefore);
+                this.elm = s_activationContext?.createStyleElm( this.name, insertBefore);
             }
         }
         else
@@ -331,7 +316,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             }
         }
 
-        this.insert( this.elm!.sheet as CSSStyleSheet);
+        this.insert( this.elm!);
     }
 
 
@@ -358,7 +343,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         if (!this.parent && !this.ec)
             this.elm!.remove();
 
-        this.elm = null;
+        this.elm = undefined;
 
         // if this is a theme class deactivation, check whether the instance is set as the current
         // one for its theme base class. If yes, remove it as the currently active one.
@@ -372,31 +357,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
                     removeCurrentTheme( themeClass);
             }
         }
-	}
-
-
-
-	/** Writes all rules recursively to the given string. */
-	public serialize( ctx: IRuleSerializationContext): void
-	{
-		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
-		// rule, don't insert @import and @namespace rules at all
-		if (!this.parent)
-		{
-			this.imports.forEach( rule => rule.serialize( ctx));
-			this.namespaces.forEach( rule => rule.serialize( ctx));
-		}
-
-		// activate referenced style definitions
-        for( let ref of this.refs)
-            ctx.addSD( ref);
-
-		// serialize our custom variables in a ":root" rule
-		if (this.vars.length > 0)
-			ctx.addRule( getRootCssForVars( this.vars));
-
-		// serialize all other rules
-		this.otherRules.forEach( rule => rule.serialize( ctx));
 	}
 
 
@@ -456,13 +416,14 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	private ruleLikes: RuleLike[] = [];
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
-	private varRootRule: CSSStyleRule | null;
+	private varRootRule: CSSStyleRule | undefined;
 
 	// Reference count of activation requests.
 	private refCount: number = 0;
 
-	// DOM style elemnt
-	public elm: HTMLStyleElement | null = null;
+	// Object representing either DOM style element for client activation context or serialization
+    // implementation.
+	public elm?: IMimcssStyleElement;
 }
 
 
@@ -703,18 +664,6 @@ export const deactivateSD = (instance: IStyleDefinition): void =>
 
 
 
-/**
- * Serializes the given style definition to the given string.
- */
-export const serializeSD = (instance: IStyleDefinition, ctx: IRuleSerializationContext): void =>
-{
-	let ruleContainer = getRCfromSD( instance);
-	if (ruleContainer)
-	    ruleContainer.serialize( ctx);
-}
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Embedding
@@ -722,7 +671,7 @@ export const serializeSD = (instance: IStyleDefinition, ctx: IRuleSerializationC
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Symbol used in style definition classes to point to an embedding container */
-let symEmbeddingContainer = Symbol();
+let symEmbeddingContainer = Symbol("ec");
 
 
 
@@ -749,7 +698,7 @@ class EmbeddingContainer
     private sdcs: Set<IStyleDefinitionClass>;
 
 	// DOM style elemnt
-	public elm: HTMLStyleElement | null;
+	public elm?: IMimcssStyleElement;
 
 
 
@@ -768,7 +717,7 @@ class EmbeddingContainer
      */
     public add( cls: IStyleDefinitionClass): void
     {
-        // add our class to the container
+        // add the class to our container
         this.sdcs.add( cls);
 
         // set the symbol on our class to point to the container
@@ -789,9 +738,7 @@ class EmbeddingContainer
         // rules from all the style definition classes.
 		if (++this.refCount === 1)
 		{
-            this.elm = document.createElement( "style");
-            this.elm.id = this.id;
-            document.head.appendChild( this.elm);
+            this.elm = s_activationContext?.createStyleElm( this.id);
 
             for( let cls of this.sdcs)
             {
@@ -801,8 +748,7 @@ class EmbeddingContainer
                     ? cls[symInstance]
                     : processClass(cls);
 
-            	let ruleContainer = instance[symContainer] as RuleContainer;
-                ruleContainer.activate();
+                (instance[symContainer] as RuleContainer).activate();
             }
 		}
 	}
@@ -817,7 +763,7 @@ class EmbeddingContainer
 		if (--this.refCount === 0)
 		{
             this.elm?.remove();
-            this.elm = null;
+            this.elm = undefined;
 
             for( let cls of this.sdcs)
             {
@@ -825,9 +771,7 @@ class EmbeddingContainer
                 if (!cls.hasOwnProperty(symInstance))
                     continue;
 
-                let instance = cls[symInstance];
-            	let ruleContainer = instance[symContainer] as RuleContainer;
-                ruleContainer.deactivate();
+                (cls[symInstance][symContainer] as RuleContainer).deactivate();
             }
 		}
 	}
@@ -1065,6 +1009,507 @@ const removeCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>):
 {
     let themeBaseClass = getThemeBaseClass( themeClass);
     themeBaseClass && s_themeInstanceMap.delete( themeBaseClass);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Client-side rendering implementation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Style element that divides between theme and non-theme style elements. This is needed to always
+ * place theme styles before the non-theme ones.
+ */
+let s_clientThemePlaceholderElm: ClientMimcssStyleElement | undefined = undefined;
+
+/**
+ * ID of the style element that divides between theme and non-theme style elements.
+ */
+const s_themePlaceholderElmID = "__mimcss_themes__";
+
+
+
+// Inserts the given rule into the given parent grouping rule or stylesheet.
+const addDomRule = (ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule | null =>
+{
+    try
+    {
+        let index = parent.insertRule( ruleText, parent.cssRules.length);
+        return parent.cssRules[index];
+    }
+    catch( x)
+    {
+        console.error( `Cannot add CSS rule '${ruleText}'`, x)
+        return null;
+    }
+}
+
+
+
+/**
+ * Client-side implementation of activation context.
+ */
+class ClientActivationContext implements IActivationContext
+{
+    getThemePlaceholder(): IMimcssStyleElement
+    {
+        if (!s_clientThemePlaceholderElm)
+        {
+            let domElm = document.createElement( "style");
+            domElm.id = s_themePlaceholderElmID;
+            document.head.insertBefore( domElm, document.head.firstElementChild);
+            s_clientThemePlaceholderElm = new ClientMimcssStyleElement( domElm);
+        }
+
+        return s_clientThemePlaceholderElm;
+    }
+
+    createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement
+    {
+        let domElm = document.createElement( "style");
+        domElm.id = id;
+        document.head.insertBefore( domElm, insertBefore ? insertBefore.domElm : null);
+        return new ClientMimcssStyleElement( domElm);
+    }
+}
+
+/**
+ * Client-side implementation of an object to which rules can be added.
+ */
+abstract class ClientMimcssRuleBag implements IMimcssRuleBag
+{
+    constructor( public domRuleBag: CSSStyleSheet | CSSGroupingRule) {}
+
+    addRule( ruleText: string): IMimcssRule | null
+    {
+        let cssRule = addDomRule( ruleText, this.domRuleBag);
+        return cssRule ? new ClientMimcssRule( cssRule) : null;
+    }
+
+    addGroupingRule( selector: string): IMimcssGroupingRule | null
+    {
+        let cssRule = addDomRule( `${selector} {}`, this.domRuleBag);
+        return cssRule ? new ClientMimcssGroupingRule( cssRule) : null;
+    }
+
+    addKeyframesRule( name: string): IMimcssKeyframesRule | null
+    {
+        let cssRule = addDomRule( `@keyframes ${name} {}`, this.domRuleBag);
+        return cssRule ? new ClientMimcssKeyframesRule( cssRule) : null;
+    }
+}
+
+/**
+ * Client-side implementation of a style element.
+ */
+class ClientMimcssStyleElement extends ClientMimcssRuleBag implements IMimcssStyleElement
+{
+    constructor( public domElm: HTMLStyleElement)
+    {
+        super( domElm.sheet!)
+    }
+
+    remove(): void
+    {
+        this.domElm?.remove();
+    }
+}
+
+/**
+ * Client-side implementation of a base interface for CSS rule.
+ */
+class ClientMimcssRule implements IMimcssRule
+{
+    constructor(public cssRule: CSSRule | null) {}
+}
+
+/**
+ * Client-side implementation of a grouping rule to which rules can be added.
+ */
+class ClientMimcssGroupingRule extends ClientMimcssRuleBag implements IMimcssGroupingRule
+{
+    constructor( public cssRule: CSSRule)
+    {
+        super( cssRule as CSSGroupingRule)
+    }
+}
+
+/**
+ * Client-side implementation of keyframes rule to which frames can be added.
+ */
+class ClientMimcssKeyframesRule extends ClientMimcssRule
+{
+    addFrame( frameText: string): IMimcssRule | null
+    {
+        try
+        {
+            (this.cssRule as CSSKeyframesRule).appendRule( frameText);
+            let cssFrameRule = (this.cssRule as CSSKeyframesRule).cssRules.item(
+                (this.cssRule as CSSKeyframesRule).cssRules.length - 1);
+
+            return cssFrameRule ? new ClientMimcssRule( cssFrameRule) : null;
+        }
+        catch(x)
+        {
+            console.error( "Cannot add CSS keyframe rule", x)
+            return null;
+        }
+    }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hydration-side rendering implementation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Hydration-side implementation of activation context.
+ */
+class HydrationActivationContext implements IActivationContext
+{
+    getThemePlaceholder(): IMimcssStyleElement
+    {
+        if (!s_clientThemePlaceholderElm)
+        {
+            let domElm = document.getElementById( s_themePlaceholderElmID) as HTMLStyleElement;
+            if (domElm)
+                s_clientThemePlaceholderElm = new HydrationMimcssStyleElement( domElm);
+            else
+                throw new Error( "Theme placeholder element was requested but was not found");
+        }
+
+        return s_clientThemePlaceholderElm;
+    }
+
+    createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement
+    {
+        let domElm = document.getElementById( id) as HTMLStyleElement;
+        if (domElm)
+            return new HydrationMimcssStyleElement( domElm);
+        else
+            throw new Error( `Style element with ID '${id}' was requested but was not found`);
+    }
+}
+
+/**
+ * Hydration-side implementation of an object to which rules can be added.
+ */
+abstract class HydrationMimcssRuleBag implements IMimcssRuleBag
+{
+    constructor( public domRuleBag: CSSStyleSheet | CSSGroupingRule) {}
+
+    addRule( ruleText: string): IMimcssRule | null
+    {
+        let cssRule = this.domRuleBag.cssRules[this.index++];
+        return cssRule ? new HydrationMimcssRule( cssRule) : null;
+    }
+
+    addGroupingRule( selector: string): IMimcssGroupingRule | null
+    {
+        let cssRule = this.domRuleBag.cssRules[this.index++];
+        return cssRule ? new HydrationMimcssGroupingRule( cssRule) : null;
+    }
+
+    addKeyframesRule( name: string): IMimcssKeyframesRule | null
+    {
+        let cssRule = this.domRuleBag.cssRules[this.index++];
+        return cssRule ? new HydrationMimcssKeyframesRule( cssRule) : null;
+    }
+
+    // index of the rule in the list of rules under the stylesheet or grouping rule
+    private index = 0;
+}
+
+/**
+ * Hydration-side implementation of a style element.
+ */
+class HydrationMimcssStyleElement extends HydrationMimcssRuleBag implements IMimcssStyleElement
+{
+    constructor( public domElm: HTMLStyleElement)
+    {
+        super( domElm.sheet!)
+    }
+
+    remove(): void
+    {
+        this.domElm?.remove();
+    }
+}
+
+/**
+ * Hydration-side implementation of a base interface for CSS rule.
+ */
+class HydrationMimcssRule implements IMimcssRule
+{
+    constructor(public cssRule: CSSRule | null) {}
+}
+
+/**
+ * Hydration-side implementation of a grouping rule to which rules can be added.
+ */
+class HydrationMimcssGroupingRule extends HydrationMimcssRuleBag implements IMimcssGroupingRule
+{
+    constructor( public cssRule: CSSRule)
+    {
+        super( cssRule as CSSGroupingRule)
+    }
+}
+
+/**
+ * Hydration-side implementation of keyframes rule to which frames can be added.
+ */
+class HydrationMimcssKeyframesRule extends HydrationMimcssRule
+{
+    addFrame( frameText: string): IMimcssRule | null
+    {
+        let cssFrameRule = (this.cssRule as CSSKeyframesRule).cssRules[this.index++];
+        return cssFrameRule ? new HydrationMimcssRule( cssFrameRule) : null;
+    }
+
+    // index of the frame in the list of frames under the keyframes rule
+    private index = 0;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Server-side rendering implementation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Server-side implementation of activation context.
+ */
+class ServerActivationContext implements IServerActivationContext
+{
+    getThemePlaceholder(): IMimcssStyleElement
+    {
+        if (!this.themeElm)
+            this.elms.splice( 0, 0, this.themeElm = new ServerMimcssStyleElement(s_themePlaceholderElmID));
+
+        return this.themeElm;
+    }
+
+    createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement
+    {
+        let elm = new ServerMimcssStyleElement(id);
+        if (insertBefore)
+            this.elms.splice( this.elms.indexOf( insertBefore as ServerMimcssStyleElement), 0, elm);
+        else
+            this.elms.push( elm);
+
+        return elm;
+    }
+
+    serialize(): string
+    {
+        return this.elms.map( elm => elm.serialize()).join("");
+    }
+
+    private elms: ServerMimcssStyleElement[] = [];
+    private themeElm?: ServerMimcssStyleElement;
+}
+
+/**
+ * Server-side implementation of an object to which rules can be added.
+ */
+abstract class ServerMimcssRuleBag implements IMimcssRuleBag
+{
+    addRule( ruleText: string): IMimcssRule | null
+    {
+        let rule = new ServerMimcssRule( ruleText);
+        this.rules.push(rule);
+        return rule;
+    }
+
+    addGroupingRule( selector: string): IMimcssGroupingRule | null
+    {
+        let rule = new ServerMimcssGroupingRule( selector);
+        this.rules.push(rule);
+        return rule;
+    }
+
+    addKeyframesRule( name: string): IMimcssKeyframesRule | null
+    {
+        let rule = new ServerMimcssKeyframesRule( name);
+        this.rules.push(rule);
+        return rule;
+    }
+
+    serialize(): string
+    {
+        return this.rules.map( rule => rule.serialize()).join("");
+    }
+
+    private rules: (ServerMimcssRule | ServerMimcssGroupingRule | ServerMimcssKeyframesRule)[] = [];
+}
+
+/**
+ * Server-side implementation of a style element.
+ */
+class ServerMimcssStyleElement extends ServerMimcssRuleBag implements IMimcssStyleElement
+{
+    constructor( public id: string) { super(); }
+    public domElm: HTMLStyleElement | null = null;
+    remove(): void {}
+
+    serialize(): string
+    {
+        return `<style id="${this.id}">${super.serialize()}</style>`;
+    }
+}
+
+/**
+ * Server-side implementation of a base interface for CSS rule.
+ */
+class ServerMimcssRule implements IMimcssRule
+{
+    constructor( public ruleText: string) {}
+    public cssRule: CSSRule | null = null;
+
+    serialize(): string
+    {
+        return this.ruleText;
+    }
+}
+
+/**
+ * Server-side implementation of a grouping rule to which rules can be added.
+ */
+class ServerMimcssGroupingRule extends ServerMimcssRuleBag implements IMimcssGroupingRule
+{
+    constructor( public selector: string) { super(); }
+    public cssRule: CSSRule | null = null;
+
+    serialize(): string
+    {
+        return `${this.selector}{${super.serialize()}}`;
+    }
+}
+
+/**
+ * Server-side implementation of a keyframes rule to which frames can be added.
+ */
+class ServerMimcssKeyframesRule implements IMimcssKeyframesRule
+{
+    constructor( public name: string) {}
+    public cssRule: CSSRule | null = null;
+
+    addFrame( frameText: string): IMimcssRule | null
+    {
+        let frame = new ServerMimcssRule( frameText);
+        this.frames.push( frame);
+        return frame;
+    }
+
+    serialize(): string
+    {
+        return `@keyframes ${this.name}{${this.frames.map( frame => frame.serialize()).join("")}}`;
+    }
+
+    private frames: ServerMimcssRule[] = [];
+}
+
+
+
+/**
+ * Client activation context. In the client environment, it is ClientActivationContext instance;
+ * in the server environment, it is undefined.
+ */
+const s_clientActivationContext = document?.head ? new ClientActivationContext() : undefined;
+
+/**
+ * Activation context to use. In the client environment, it is by default ClientActivationContext
+ * but can be changed (temporarily) to HydrationActivationContext. In the server environment, it
+ * is by default undefined, but can be changed to ServerActivationContext.
+ */
+let s_activationContext: IActivationContext | undefined = s_clientActivationContext;
+
+/**
+ * Scheduler type remembered upon starting SSR or hydration process. This will be used to restore
+ * the sceduler when SSR or hydration process is stopped.
+ */
+let s_rememberedSchedulerType: number = 0;
+
+
+
+/**
+ * Sets server-side activation context. Throws an error if non-default activation context is
+ * already set.
+ */
+export const s_startSSR = (): void =>
+{
+    if (s_activationContext !== s_clientActivationContext)
+        throw new Error("SSR already started");
+    else
+    {
+        s_activationContext = new ServerActivationContext();
+        s_rememberedSchedulerType = setDefaultScheduler( SchedulerType.Sync);
+    }
+}
+
+/**
+ * Stops server-side activation functionality and returns a string with serialized styles. The
+ * string should be added to the `<head>` element using `insertAdjacentHTML()` method.
+ * Throws an error if SSR has not been started.
+ * @returns String containing serialized styles
+ */
+export const s_stopSSR = (): string =>
+{
+    if (!s_activationContext || !(s_activationContext instanceof ServerActivationContext))
+        throw new Error("SSR not started");
+    else
+    {
+        // restore scheduler type existed before we started SSR
+        setDefaultScheduler( s_rememberedSchedulerType);
+        s_rememberedSchedulerType = 0;
+
+        let s = s_activationContext.serialize();
+        s_activationContext = s_clientActivationContext;
+        return s;
+    }
+}
+
+
+
+/**
+ * Sets hydration activation context. Throws an error if non-default activation context is
+ * already set.
+ */
+export const s_startHydration = (): void =>
+{
+    if (s_activationContext !== s_clientActivationContext)
+        throw new Error("Hydration already started");
+    else
+    {
+        s_activationContext = new HydrationActivationContext();
+        s_rememberedSchedulerType = setDefaultScheduler( SchedulerType.Sync);
+    }
+}
+
+/**
+ * Stops hydration activation functionality and restore the default activation context.
+ * @returns String containing serialized styles
+ */
+export const s_stopHydration = (): void =>
+{
+    if (!s_activationContext || !(s_activationContext instanceof HydrationActivationContext))
+        throw new Error("Hydration not started");
+    else
+    {
+        // restore scheduler type existed before we started SSR
+        setDefaultScheduler( s_rememberedSchedulerType);
+        s_rememberedSchedulerType = 0;
+
+        s_activationContext = s_clientActivationContext;
+    }
 }
 
 

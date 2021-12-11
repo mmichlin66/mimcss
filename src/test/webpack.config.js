@@ -17,6 +17,7 @@ module.exports = [
             "./lib/test/specs/testAnimations.js",
             "./lib/test/specs/testBackgrounds.js",
             "./lib/test/specs/testSelectors.js",
+            "./lib/test/specs/testSSR.js",
         ],
 
         output: {

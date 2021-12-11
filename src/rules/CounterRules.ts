@@ -1,7 +1,7 @@
 import {ExtendedCounterStyleset} from "../api/CounterTypes";
 import {ICounterRule, ICounterStyleRule} from "../api/RuleTypes"
 import {counterStyleset2s} from "../impl/MiscImpl";
-import {IRuleContainer, IRuleSerializationContext, Rule, RuleLike} from "./Rule";
+import {IMimcssGroupingRule, IMimcssStyleElement, IRuleContainer, Rule, RuleLike} from "./Rule";
 
 
 
@@ -83,16 +83,11 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: CSSStyleSheet | CSSGroupingRule): void
+	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
 	{
-		this.cssRule = Rule.toDOM( this.toCss(), parent);
+		let ruleText = `@counter-style ${this.name} {${counterStyleset2s( this.counterStyleset)}}`;
+		this.cssRule = parent.addRule( ruleText)?.cssRule as CSSRule;
 	}
-
-	// Serializes this rule to a string.
-    public serialize( ctx: IRuleSerializationContext): void
-    {
-		ctx.addRule( this.toCss());
-    }
 
 
 

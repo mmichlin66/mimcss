@@ -260,8 +260,10 @@ describe("style rules:", () =>
             ])
 		}
 
-        let s = css.serializeToCSS( A);
-        expect(s).toEqual( ".A_cls{color:red;color:blue;}");
+        css.startSSR();
+        css.activate( A);
+        let s = css.stopSSR();
+        expect(s).toEqual( "<style id=\"A\">.A_cls{color:red;color:blue;}</style>");
     })
 
 
@@ -274,8 +276,10 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: "blue" })
 		}
 
-		let s = css.serializeToCSS( A);
-		expect(s).toEqual(".A_cls{color:red;color:blue;}");
+        css.startSSR();
+        css.activate( A);
+        let s = css.stopSSR();
+		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;}</style>");
     })
 
 
@@ -288,8 +292,10 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: {"[]": ["blue", "green"]} })
 		}
 
-		let s = css.serializeToCSS( A);
-		expect(s).toEqual(".A_cls{color:red;color:blue;color:green;}");
+        css.startSSR();
+        css.activate( A);
+        let s = css.stopSSR();
+		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:green;}</style>");
     })
 
 
@@ -302,8 +308,10 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: "green" })
 		}
 
-		let s = css.serializeToCSS( A);
-		expect(s).toEqual(".A_cls{color:red;color:blue;color:green;}");
+        css.startSSR();
+        css.activate( A);
+        let s = css.stopSSR();
+		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:green;}</style>");
     })
 
 
@@ -316,8 +324,10 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: {"[]": ["green", "yellow"]} })
 		}
 
-		let s = css.serializeToCSS( A);
-		expect(s).toEqual(".A_cls{color:red;color:blue;color:green;color:yellow;}");
+        css.startSSR();
+        css.activate( A);
+        let s = css.stopSSR();
+		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:green;color:yellow;}</style>");
     })
 
 
@@ -334,8 +344,10 @@ describe("style rules:", () =>
             })
 		}
 
-		let s = css.serializeToCSS( A);
-		expect(s).toEqual(".A_cls{color:brown;color:orange;color:red;color:blue;color:green;color:yellow;}");
+        css.startSSR();
+        css.activate( A);
+        let s = css.stopSSR();
+		expect(s).toEqual("<style id=\"A\">.A_cls{color:brown;color:orange;color:red;color:blue;color:green;color:yellow;}</style>");
     })
 
 
@@ -353,8 +365,10 @@ describe("style rules:", () =>
             ])
 		}
 
-		let s = css.serializeToCSS( A);
-		expect(s).toEqual(".A_cls{color:red;color:blue;color:brown;color:orange;color:green;color:yellow;}");
+        css.startSSR();
+        css.activate( A);
+        let s = css.stopSSR();
+		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:brown;color:orange;color:green;color:yellow;}</style>");
     })
 })
 
