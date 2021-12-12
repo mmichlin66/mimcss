@@ -46,44 +46,45 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		this.sd = sd;
 
         this.sdc = sd.constructor as IStyleDefinitionClass;
-        this.parent = sd.$parent;
+        this.psd = sd.$parent;
 		this.ec = this.sdc[symEmbeddingContainer];
 
         // get parent and top level containers
-        if (this.parent)
-        {
-            this.pc = this.parent[symRC];
-            this.tlc = this.pc!.tlc;
-        }
-        else
-            this.tlc = this;
+        if (this.psd)
+            this.pc = this.psd[symRC];
 
-        // get the name for our container. If the container is created for a class from the
+        // set the name for our container. For optimized name generation mode, generate unique
+        // name. Otherwise, if the container is created for a class from the
         // processClass function, then the flag s_processingStyleDefinitionClass is defined
-        // and the name isgenerated depending on the current generation method. If this flag is
+        // and the name is generated depending on the current generation method. If this flag is
         // false, that means that the container is created from a direct "new" call on the style
         // definition class and the name is generated uniquely.
-        let name: string;
-        if (s_processingStyleDefinitionClass)
-        {
-            s_processingStyleDefinitionClass = false;
-            name = !this.sdc.name || s_nameGeneratonMethod === NameGenerationMethod.Optimized
-                ? generateUniqueName()
-                : this.sdc.name;
-
-            // associate the definition class with the created definition instance
-            this.sdc[symInstance] = sd;
-            sd[symClass] = this.sdc;
-        }
+        if (s_nameGeneratonMethod === NameGenerationMethod.Optimized)
+            this.name = generateUniqueName();
         else
         {
-            name = generateUniqueName();
-            if (s_nameGeneratonMethod !== NameGenerationMethod.Optimized && this.sdc.name)
-                name += "_" + this.sdc.name;
-        }
+            let className = this.sdc.name;
+            let name = className ? "" : generateUniqueName();
+            if (s_processingStyleDefinitionClass)
+            {
+                s_processingStyleDefinitionClass = false;
 
-		// if our container has parent container, prefix our name with the upper one
-        this.name = this.pc ? `${this.pc.name}_${name}` : name;
+                name = !className
+                    ? generateUniqueName()
+                    : s_nameGeneratonMethod === NameGenerationMethod.UniqueScoped
+                        ? generateUniqueName( className + "_")
+                        : className;
+            }
+            else
+            {
+                name = generateUniqueName();
+                if (className)
+                    name += "_" + className;
+            }
+
+            // if our container has parent container, prefix our name with the upper one
+            this.name = this.pc ? `${this.pc.name}_${name}` : name;
+        }
 	}
 
 
@@ -91,8 +92,15 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
     // ProxyHandler method, which virtualizes all non-array properties
     set( t: StyleDefinition, p: PropertyKey, v: any, r: any): boolean
     {
-        if (typeof p === "symbol" || typeof p === "number" || p in t /*t[p] !== undefined*/)
-            return Reflect.set( t, p, v, r);
+        if (typeof p !== "string")
+            t[p] = v;
+        else if (p in t)
+        {
+            if (v instanceof RuleLike)
+                v.process( p);
+
+            t[p] = v;
+        }
         else
         {
             // we don't virtualize arrays because there is no trap for isArray() method, which
@@ -101,23 +109,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
                 virtualize( t, p);
 
             t[p] = v;
-            this.keys.push(p);
-            return true;
+            this.processProperty( p, t[p]);
         }
+
+        return true;
     }
-
-
-
-    // Processes the properties of the style definition instance. This creates names for classes,
-	// IDs, animations and custom variables.
-	public process(): void
-	{
-		// loop over the properties of the definition object and process them.
-		for( let propName of this.keys)
-			this.processProperty( propName, this.sd[propName]);
-
-        this.processed = true;
-	}
 
 
 
@@ -126,10 +122,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	private processProperty( propName: string | null, propVal: any): void
 	{
 		if (propVal instanceof StyleDefinition)
-        {
-            processInstance( propVal);
             this.refs.push( propVal);
-        }
         // else if (propVal instanceof Array)
         else if (Array.isArray(propVal))
         {
@@ -143,7 +136,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         {
             if (propVal instanceof RuleLike)
             {
-                propVal.process( this, propName);
+                propVal.process( propName);
                 if (propVal instanceof VarRule)
                     this.vars.push( propVal);
                 else if (propVal instanceof ImportRule)
@@ -156,14 +149,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
                     this.ruleLikes.push( propVal);
             }
         }
-	}
-
-
-
-	/** Returns the instance of the stylesheet definition class */
-	public getDef(): IStyleDefinition
-	{
-		return this.sd;
 	}
 
 
@@ -188,6 +173,8 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		else if (!ruleName)
 			return generateUniqueName();
 		else if (ruleName in this.sd && "name" in this.sd[ruleName])
+            // this handles cases when a "named" rule already exists in the style definition;
+            // for example when a derived class overrides the value of a base class
 			return this.sd[ruleName].name;
 		else
 		{
@@ -211,7 +198,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
-		if (!this.parent)
+		if (!this.psd)
 		{
 			this.imports.forEach( rule => rule.insert( sheetOrGroupingRule));
 			this.namespaces.forEach( rule => rule.insert( sheetOrGroupingRule));
@@ -235,7 +222,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	public clear(): void
 	{
         // import and namespace rules can only exist in the top-level style definition class
-		if (!this.parent)
+		if (!this.psd)
 		{
 			this.imports.forEach( rule => rule.clear());
 			this.namespaces.forEach( rule => rule.clear());
@@ -267,7 +254,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             return;
 
         // only the top-level not-embedded style definitions create the `<style>` element
-        if (!this.parent)
+        if (!this.pc)
         {
             if (this.ec)
                 this.elm = this.ec.elm;
@@ -282,7 +269,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             }
         }
         else
-            this.elm = this.tlc.elm;
+            this.elm = this.pc.elm;
 
         // if this is a theme class activation, check whether the instance is set as the current
         // one for its theme base class. If no, then deactivate the theme instance currently set
@@ -328,7 +315,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         this.clear();
 
         // only the top-level not-embedded style defiitions create the `<style>` element
-        if (!this.parent && !this.ec)
+        if (!this.psd && !this.ec)
             this.elm!.remove();
 
         this.elm = undefined;
@@ -349,37 +336,38 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
 
-	// Instance of the style definition class that this container processed.
+	/**
+     * Style Definition - instance of the style definition class that this container is
+     * attached to.
+     */
 	public sd: IStyleDefinition;
 
-	// Style definition class that this container creates an instance of.
+	/** Style Definition Class to whose instance this container is attached. */
 	public sdc: IStyleDefinitionClass
 
-	// Name of this container, which, depending on the mode, is either taken from the class
-	// definition name or generated uniquely.
+	/**
+     * Name of this container, which, depending on the mode, is either taken from the class
+     * definition name or generated uniquely.
+     */
 	public name: string
 
-	// Container that is embedding our instance (that is, the instance corresponding to our
-    // container). If defined, this container's `<style>` element is used to insert CSS rules
-    // into instead of topLevelContainer.
+	/** Embedding Container that is embedding our instance (that is, the instance corresponding
+     * to our container). If defined, this container's `<style>` element is used to insert CSS
+     * rules into instead of topLevelContainer.
+     */
 	public ec?: EmbeddingContainer;
 
-	// Instance of the parent style definition class in the chain of grouping rules that
-	// lead to this rule container. For top-level style definitions, this is undefined.
-	private parent?: IStyleDefinition;
+	/**
+     * Parent Style Definition - instance of the parent style definition class in the chain of
+     * grouping rules that lead to this rule container. For top-level style definitions, this is
+     * undefined.
+     */
+	private psd?: IStyleDefinition;
 
-	// Rule container that belongs to the parent style defintion. If our container is top-level,
-	// this property is undefined.
+	/** Parent Container - rule container that belongs to the parent style defintion. If our
+     * container is top-level, this property is undefined.
+     */
 	private pc?: RuleContainer;
-
-	// Rule container that belongs to the owner style defintion. If our container is top-level,
-	// this property points to `this`. Names for named rules are created using this container.
-	private tlc: RuleContainer;
-
-    // Array of names of properties that would be considered "own" properties of the style
-    // definition object. This array keeps the  property names in the order they are defined
-    // in the class
-    private keys: string[] = [];
 
     // Flag determining whether this container has already been processed
     public processed: boolean;
@@ -534,7 +522,7 @@ const findNameForRuleInPrototypeChain = (definitionClass: IStyleDefinitionClass,
 export const processSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
 	    parent?: IStyleDefinition): IStyleDefinition =>
 	// instOrClass has type "object" if it is an instance and "function" if it is a class
-	typeof instOrClass === "object" ? processInstance( instOrClass) : processClass( instOrClass, parent);
+	typeof instOrClass === "object" ? instOrClass : processClass( instOrClass, parent);
 
 
 
@@ -566,32 +554,15 @@ const processClass = (sdc: IStyleDefinitionClass, parent?: IStyleDefinition): IS
         s_processingStyleDefinitionClass = true;
         let sd = new sdc( parent);
 
-        // get rule container from the instance and process the rules.
-        (sd[symRC] as RuleContainer).process();
+        // associate the definition class with the created definition instance
+        sdc[symInstance] = sd;
+        sd[symClass] = sdc;
         return sd;
     }
     finally
     {
         s_processingStyleDefinitionClass = false;
     }
-}
-
-
-
-/**
- * Processes the given style definition instance and assigns names to its rules. If the
- * instance has already been processed, we do nothing; otherwise, we assign new unique names
- * to its rules.
- */
-const processInstance = (sd: IStyleDefinition): IStyleDefinition =>
-{
-	// if the instance is already processed, just return; in this case we ignore the
-	// embeddingContainer parameter.
-	let container = sd[symRC] as RuleContainer;
-    if (!container.processed)
-        container.process();
-
-    return sd;
 }
 
 

@@ -1,6 +1,6 @@
-import {IAnimationRule, AnimationFrame, AnimationWaypoint, IAnimationFrameRule} from "../api/RuleTypes"
+import {IAnimationRule, AnimationFrame, AnimationWaypoint, IAnimationFrameRule, IStyleDefinition} from "../api/RuleTypes"
 import {AnimationStyleset} from "../api/Stylesets";
-import {Rule, IRuleContainer, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule"
+import {Rule, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule"
 import {StyleRule} from "./StyleRules";
 import {v2s, WKF} from "../impl/Utils";
 
@@ -11,12 +11,13 @@ import {v2s, WKF} from "../impl/Utils";
  */
 export class AnimationRule extends Rule implements IAnimationRule
 {
-	public constructor( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule)
+	public constructor( sd: IStyleDefinition, frames?: AnimationFrame[],
+        nameOverride?: string | IAnimationRule)
 	{
-		super();
+		super(sd);
 
 		if (frames)
-			this.frameRules = frames.map( frame => new AnimationFrameRule( frame[0], frame[1]));
+			this.frameRules = frames.map( frame => new AnimationFrameRule( sd, frame[0], frame[1]));
 
 		this.nameOverride = nameOverride;
 	}
@@ -27,14 +28,14 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null)
+	public process( ruleName: string | null)
 	{
-		super.process( container, ruleName);
+		super.process( ruleName);
 
-		this.name = container.getScopedName( ruleName, this.nameOverride);
+		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 
 		for( let keyframeRule of this.frameRules)
-			keyframeRule.process( container, ruleName);
+			keyframeRule.process( null);
 	}
 
 
@@ -85,9 +86,10 @@ export class AnimationRule extends Rule implements IAnimationRule
  */
 class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
 {
-	public constructor( waypoint: AnimationWaypoint, styleset?: AnimationStyleset | AnimationStyleset[])
+	public constructor( sd: IStyleDefinition, waypoint: AnimationWaypoint,
+        styleset?: AnimationStyleset | AnimationStyleset[])
 	{
-		super( styleset);
+		super( sd, styleset);
 		this.waypoint = waypoint;
 	}
 

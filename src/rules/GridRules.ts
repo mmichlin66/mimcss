@@ -1,5 +1,5 @@
-import {IGridLineRule, IGridAreaRule} from "../api/RuleTypes"
-import {IRuleContainer, RuleLike} from "./Rule";
+import {IGridLineRule, IGridAreaRule, IStyleDefinition} from "../api/RuleTypes"
+import {RuleLike} from "./Rule";
 
 
 
@@ -12,9 +12,10 @@ export class GridLineRule extends RuleLike implements IGridLineRule
     // if the nameOverride is an area rule object, the isStartEndOrNone flag is always defined
     // because this constructor can only be invoked for the start and end lines of the GridAreaRule
     // object.
-    public constructor( nameOverride?: string | IGridLineRule | IGridAreaRule, isStartEndOrNone?: boolean)
+    public constructor( sd: IStyleDefinition, nameOverride?: string | IGridLineRule | IGridAreaRule,
+        isStartEndOrNone?: boolean)
 	{
-        super();
+        super(sd);
         this.nameOverride = nameOverride;
         this.isStartEndOrNone = isStartEndOrNone;
 	}
@@ -26,9 +27,9 @@ export class GridLineRule extends RuleLike implements IGridLineRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-        super.process( container, ruleName);
+        super.process( ruleName);
 
         let name: string;
         let areaName: string | undefined;
@@ -47,7 +48,7 @@ export class GridLineRule extends RuleLike implements IGridLineRule
         }
         else
         {
-            name = container.getScopedName( ruleName, nameOverride);
+            name = this.rc.getScopedName( ruleName, nameOverride);
 
             // if the obtained name doesn't have "-start" or "-end" but the isStartEndOrNone flag is
             // defined (that is, it is either start or end line), we need to append the suffix. If the
@@ -119,14 +120,14 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
     // if the nameOverride is an area rule object, the isStartEndOrNone flag is always defined
     // because this constructor can only be invoked for the start and end lines of the GridAreaRule
     // object.
-    public constructor( nameOverride?: string | IGridAreaRule)
+    public constructor( sd: IStyleDefinition, nameOverride?: string | IGridAreaRule)
 	{
-        super();
+        super(sd);
         this.nameOverride = nameOverride;
 
         // create line rules
-        this.startLine = new GridLineRule( this, true);
-        this.endLine = new GridLineRule( this, false);
+        this.startLine = new GridLineRule( sd, this, true);
+        this.endLine = new GridLineRule( sd, this, false);
 	}
 
     // This function is used when the object is specified as a value of a style property.
@@ -134,15 +135,15 @@ export class GridAreaRule extends RuleLike implements IGridAreaRule
     public toString(): string { return this.name; }
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-        super.process( container, ruleName);
+        super.process( ruleName);
 
-        this.name = container.getScopedName( ruleName, this.nameOverride);
+        this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 
         // process line rules
-        this.startLine.process( container, null);
-        this.endLine.process( container, null);
+        this.startLine.process( null);
+        this.endLine.process( null);
 	}
 
 	/**

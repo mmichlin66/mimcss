@@ -160,7 +160,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $abstract( styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
     {
-        return new AbstractRule( styleset);
+        return new AbstractRule( this, styleset);
     }
 
 
@@ -209,7 +209,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     public $class( styleset?: CombinedClassStyleset | CombinedClassStyleset[],
         nameOverride?: string | IClassRule): IClassRule
     {
-        return new ClassRule( styleset, nameOverride);
+        return new ClassRule( this, styleset, nameOverride);
     }
 
 
@@ -256,7 +256,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
     {
-        return new ClassNameRule( classes);
+        return new ClassNameRule( this, classes);
     }
 
 
@@ -303,7 +303,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $id( styleset?: CombinedStyleset | CombinedStyleset[], nameOverride?: string | IIDRule): IIDRule
     {
-        return new IDRule( styleset, nameOverride);
+        return new IDRule( this, styleset, nameOverride);
     }
 
 
@@ -338,7 +338,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $tag( tag: "*" | OneOrMany<ElementTagName>, styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
     {
-        return new SelectorRule( Array.isArray(tag) ? tag.join(",") : tag, styleset);
+        return new SelectorRule( this, Array.isArray(tag) ? tag.join(",") : tag, styleset);
     }
 
 
@@ -386,7 +386,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $style( selector: CssSelector, styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
     {
-        return new SelectorRule( selector, styleset);
+        return new SelectorRule( this, selector, styleset);
     }
 
 
@@ -427,7 +427,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $keyframes( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule): IAnimationRule
     {
-        return new AnimationRule( frames, nameOverride);
+        return new AnimationRule( this, frames, nameOverride);
     }
 
 
@@ -476,7 +476,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     public $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
                     nameOverride?: string | IVarRule<K>): IVarRule<K>
     {
-        return new VarRule( template, value, nameOverride);
+        return new VarRule( this, template, value, nameOverride);
     }
 
 
@@ -572,7 +572,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
         syntax: T, initValue: ExtendedVarValue<K>, inherits = true,
         nameOverride?: string | IVarRule<K>): IVarRule<K>
     {
-        return new PropertyRule( syntax, initValue, inherits, nameOverride);
+        return new PropertyRule( this, syntax, initValue, inherits, nameOverride);
     }
 
 
@@ -612,7 +612,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $const<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>): IConstRule
     {
-        return new ConstRule( template, value);
+        return new ConstRule( this, template, value);
     }
 
 
@@ -648,7 +648,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $counter( nameOverride?: string | ICounterRule): ICounterRule
     {
-        return new CounterRule( nameOverride);
+        return new CounterRule( this, nameOverride);
     }
 
     /**
@@ -679,7 +679,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     public $counterStyle( counterStyleset?: ExtendedCounterStyleset,
         nameOverride?: string | ICounterStyleRule): ICounterStyleRule
     {
-        return new CounterStyleRule( counterStyleset, nameOverride);
+        return new CounterStyleRule( this, counterStyleset, nameOverride);
     }
 
     /**
@@ -727,7 +727,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     public $gridline( nameOverride?: string | IGridLineRule,
         isStartEndOrNone?: boolean): IGridLineRule
     {
-        return new GridLineRule( nameOverride, isStartEndOrNone);
+        return new GridLineRule( this, nameOverride, isStartEndOrNone);
     }
 
 
@@ -783,7 +783,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $gridarea( nameOverride?: string | IGridAreaRule): IGridAreaRule
     {
-        return new GridAreaRule( nameOverride);
+        return new GridAreaRule( this, nameOverride);
     }
 
 
@@ -811,7 +811,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $fontface( fontface: ExtendedFontFace): IFontFaceRule
     {
-        return new FontFaceRule( fontface);
+        return new FontFaceRule( this, fontface);
     }
 
 
@@ -838,7 +838,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     public $import( url: string, mediaQuery?: string | MediaStatement,
         supportsQuery?: string | SupportsStatement): IImportRule
     {
-        return new ImportRule( url, mediaQuery, supportsQuery);
+        return new ImportRule( this, url, mediaQuery, supportsQuery);
     }
 
     /**
@@ -861,7 +861,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $namespace( namespace: string, prefix?: string): INamespaceRule
     {
-        return new NamespaceRule( namespace, prefix);
+        return new NamespaceRule( this, namespace, prefix);
     }
 
     /**
@@ -884,7 +884,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
     {
-        return new PageRule( pseudoClass, styleset);
+        return new PageRule( this, pseudoClass, styleset);
     }
 
     /**
@@ -913,7 +913,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     public $supports<T extends StyleDefinition<StyleDefinition<P>>>( statement: SupportsStatement,
         instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>
     {
-        return new SupportsRule( statement, instOrClass);
+        return new SupportsRule( this, statement, instOrClass);
     }
 
     /**
@@ -942,7 +942,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     public $media<T extends StyleDefinition<StyleDefinition<P>>>( statement: MediaStatement,
         instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>
     {
-        return new MediaRule( statement, instOrClass);
+        return new MediaRule( this, statement, instOrClass);
     }
 
 

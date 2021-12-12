@@ -1,7 +1,7 @@
 import {ExtendedCounterStyleset} from "../api/CounterTypes";
-import {ICounterRule, ICounterStyleRule} from "../api/RuleTypes"
+import {ICounterRule, ICounterStyleRule, IStyleDefinition} from "../api/RuleTypes"
 import {counterStyleset2s} from "../impl/MiscImpl";
-import {IMimcssGroupingRule, IMimcssStyleElement, IRuleContainer, Rule, RuleLike} from "./Rule";
+import {IMimcssGroupingRule, IMimcssStyleElement, Rule, RuleLike} from "./Rule";
 
 
 
@@ -13,9 +13,9 @@ import {IMimcssGroupingRule, IMimcssStyleElement, IRuleContainer, Rule, RuleLike
  */
 export class CounterRule extends RuleLike implements ICounterRule
 {
-	public constructor( nameOverride?: string | ICounterRule)
+	public constructor( sd: IStyleDefinition, nameOverride?: string | ICounterRule)
 	{
-        super();
+        super(sd);
 		this.nameOverride = nameOverride;
 	}
 
@@ -26,10 +26,10 @@ export class CounterRule extends RuleLike implements ICounterRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-        super.process( container, ruleName);
-		this.name = container.getScopedName( ruleName, this.nameOverride);
+        super.process( ruleName);
+		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 	}
 
 
@@ -56,9 +56,10 @@ export class CounterRule extends RuleLike implements ICounterRule
  */
 export class CounterStyleRule extends Rule implements ICounterStyleRule
 {
-	public constructor( counterStyleset?: ExtendedCounterStyleset, nameOverride?: string | ICounterStyleRule)
+	public constructor( sd: IStyleDefinition, counterStyleset?: ExtendedCounterStyleset,
+        nameOverride?: string | ICounterStyleRule)
 	{
-        super();
+        super(sd);
         this.counterStyleset = counterStyleset ?? {};
 		this.nameOverride = nameOverride;
 	}
@@ -76,10 +77,10 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-        super.process( container, ruleName);
-		this.name = container.getScopedName( ruleName, this.nameOverride);
+        super.process( ruleName);
+		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.

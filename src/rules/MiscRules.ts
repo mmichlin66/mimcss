@@ -1,10 +1,10 @@
 import {PagePseudoClass} from "../api/CoreTypes";
-import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule} from "../api/RuleTypes";
+import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition} from "../api/RuleTypes";
 import {Styleset} from "../api/Stylesets";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
-import {Rule, RuleLike, IRuleContainer, IMimcssStyleElement, IMimcssGroupingRule} from "./Rule";
+import {Rule, RuleLike, IMimcssStyleElement, IMimcssGroupingRule} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {StyleRule} from "./StyleRules";
 import {symV2S} from "../impl/Utils";
@@ -16,10 +16,9 @@ import {symV2S} from "../impl/Utils";
  */
 abstract class MiscRule<T extends CSSRule> extends Rule
 {
-	public constructor( isTopLevelRule?: boolean)
+	public constructor( sd: IStyleDefinition)
 	{
-		super();
-		this.isTopLevelRule = isTopLevelRule;
+		super(sd);
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.
@@ -33,10 +32,6 @@ abstract class MiscRule<T extends CSSRule> extends Rule
 
 	/** SOM font-face rule */
 	public cssRule: T;
-
-    // Flag indicating whether this rule can only be at the top-level of stylesheets (e.g. @import
-    // and @namespace).
-    private isTopLevelRule?: boolean;
 }
 
 
@@ -46,10 +41,10 @@ abstract class MiscRule<T extends CSSRule> extends Rule
  */
 export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 {
-	public constructor( url: string, mediaStatement?: MediaStatement, supportsStatement?: string | SupportsStatement)
+	public constructor( sd: IStyleDefinition, url: string, mediaStatement?: MediaStatement,
+        supportsStatement?: string | SupportsStatement)
 	{
-        // this is a top-level rule
-		super( true);
+		super(sd);
 
 		this.url = url;
 		this.mediaStatement = mediaStatement;
@@ -90,10 +85,9 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
  */
 export class NamespaceRule extends MiscRule<CSSNamespaceRule> implements INamespaceRule
 {
-	public constructor( namespace: string, prefix?: string)
+	public constructor( sd: IStyleDefinition, namespace: string, prefix?: string)
 	{
-        // this is a top-level rule
-		super( true);
+		super(sd);
 
 		this.namespace = namespace;
 		this.prefix = prefix;
@@ -121,9 +115,9 @@ export class NamespaceRule extends MiscRule<CSSNamespaceRule> implements INamesp
  */
 export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFaceRule
 {
-	public constructor( fontface: ExtendedFontFace)
+	public constructor( sd: IStyleDefinition, fontface: ExtendedFontFace)
 	{
-		super();
+		super(sd);
 
 		this.fontface = fontface;
 	}
@@ -145,9 +139,9 @@ export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFace
  */
 export class PageRule extends StyleRule implements IPageRule
 {
-	public constructor( pseudoClass?: PagePseudoClass, style?: Styleset)
+	public constructor( sd: IStyleDefinition, pseudoClass?: PagePseudoClass, style?: Styleset)
 	{
-		super( style);
+		super( sd, style);
 		this.pseudoClass = pseudoClass;
 	}
 
@@ -171,9 +165,9 @@ export class PageRule extends StyleRule implements IPageRule
  */
 export class ClassNameRule extends RuleLike implements IClassNameRule
 {
-	public constructor( classes: (IClassRule | IClassNameRule | string)[])
+	public constructor( sd: IStyleDefinition, classes: (IClassRule | IClassNameRule | string)[])
 	{
-		super();
+		super(sd);
 		this.classes = classes;
 	}
 
@@ -188,9 +182,9 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-        super.process( container, ruleName);
+        super.process( ruleName);
 
         this.name = this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
         this.cssClassName = "." + this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(".");

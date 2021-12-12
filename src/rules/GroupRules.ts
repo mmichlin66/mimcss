@@ -11,9 +11,9 @@ import {media2s, supports2s} from "../impl/MiscImpl";
  */
 export abstract class GroupRule<T extends IStyleDefinition> extends Rule implements IGroupRule<T>
 {
-	public constructor( rn: string, instOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( sd: IStyleDefinition, rn: string, instOrClass: T | IStyleDefinitionClass<T>)
 	{
-		super();
+		super(sd);
         this.rn = rn;
 		this.instOrClass = instOrClass;
 	}
@@ -21,14 +21,14 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null)
+	public process( ruleName: string | null)
 	{
-		super.process( container, ruleName);
+		super.process( ruleName);
 
-        // container to which our groupng rule belongs becomes the parent container for the
+        // container to which our grouping rule belongs becomes the parent container for the
         // style definition instance
-		this.sd = processSD( this.instOrClass, container.getDef()) as T;
-		this.rc = this.sd[symRC];
+		this.gsd = processSD( this.instOrClass, this.sd) as T;
+		this.grc = this.gsd[symRC];
 	}
 
 
@@ -42,7 +42,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
             this.cssRule = mimcssRule?.cssRule as CSSGroupingRule;
 
             // insert sub-rules
-			this.rc.insert( mimcssRule);
+			this.grc.insert( mimcssRule);
         }
 	}
 
@@ -70,27 +70,29 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 		super.clear();
 
 		// clear sub-rules
-		this.rc.clear();
+		this.grc.clear();
 	}
 
 
 
-	// Instance of the style definition class defining the rules under this grouping rule
-	public sd: T;
+	/** Instance of the style definition class defining the rules under this grouping rule */
+	public gsd: T;
 
 	/** SOM supports rule */
 	public cssRule: CSSGroupingRule | null;
 
-	// Name of the at-rule (e.g. "supports").
+	/** Name of the at-rule (e.g. "supports"). */
 	private rn: string;
 
-	// Style definition class that defines rules under this grouping rule.
+	/** Style definition class that defines rules under this grouping rule. */
 	private instOrClass: T | IStyleDefinitionClass<T>;
 
-	// Rule container for the definition instance - this container contains sub-rules.
-	private rc: IRuleContainer;
+	/**
+     * Group Rule Container - this container contains rules for the group definition instance.
+     */
+	private grc: IRuleContainer;
 
-	// Condition of this grouping rule.
+	/** Condition of this grouping rule. */
 	private _cond: string | null;
 }
 
@@ -101,9 +103,9 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
  */
 export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
 {
-	public constructor( statement: SupportsStatement, instOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( sd: IStyleDefinition, statement: SupportsStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
-		super( "supports", instOrClass);
+		super( sd, "supports", instOrClass);
 		this.stmt = statement;
 	}
 
@@ -139,9 +141,9 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
  */
 export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implements IMediaRule<T>
 {
-	public constructor( statement: MediaStatement, instOrClass: T | IStyleDefinitionClass<T>)
+	public constructor( sd: IStyleDefinition, statement: MediaStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
-		super( "media", instOrClass);
+		super( sd, "media", instOrClass);
 		this.stmt = statement;
 	}
 

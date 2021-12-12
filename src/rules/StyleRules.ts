@@ -1,10 +1,10 @@
-import {IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule} from "../api/RuleTypes";
+import {IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IStyleDefinition} from "../api/RuleTypes";
 import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
     CombinedStyleset, ParentClassType, IStyleset
 } from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
-import {Rule, IRuleContainer, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule";
+import {Rule, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule";
 import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
 import {styleset2s, sp2s} from "../impl/StyleImpl"
 import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
@@ -20,9 +20,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 {
 	// The styleset can be an CombinedStyleset for many rules; however, for some it is just
 	// of the Styleset type.
-	public constructor( inputStyleset?: Styleset | Styleset[])
+	public constructor( sd: IStyleDefinition, inputStyleset?: Styleset | Styleset[])
 	{
-		super();
+		super(sd);
 
 		this.styleset = {};
 		this.dependentRules = {};
@@ -30,9 +30,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		if (inputStyleset)
         {
             if (Array.isArray( inputStyleset))
-                inputStyleset.forEach( v => this.parse(v));
+                inputStyleset.forEach( v => this.parse( sd, v));
             else
-			    this.parse( inputStyleset);
+			    this.parse( sd, inputStyleset);
         }
 	}
 
@@ -49,7 +49,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
 	 * important properties and dependent rules.
 	 */
-	private parse( inputStyleset: Styleset): void
+	private parse( sd: IStyleDefinition, inputStyleset: Styleset): void
 	{
 		for( let propName in inputStyleset)
 		{
@@ -85,11 +85,11 @@ export abstract class StyleRule extends Rule implements IStyleRule
 					if (tuples.length > 0)
 					{
 						this.dependentRules[propName] = tuples.map( tuple => new DepRule(
-							propName, tuple[0], tuple[1], this));
+							sd, propName, tuple[0], tuple[1], this));
 					}
 				}
 				else
-					this.dependentRules[propName] = new DepRule( "&" + propName, undefined,
+					this.dependentRules[propName] = new DepRule( sd, "&" + propName, undefined,
 						propVal as CombinedStyleset, this);
 			}
 			else if (propName.includes("&"))
@@ -104,7 +104,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
                             : propName.startsWith("&")
                                 ? [propName, tuple[0]]
                                 : [tuple[0], propName];
-                        return new DepRule( newSelector, undefined, tuple[1], this)
+                        return new DepRule( sd, newSelector, undefined, tuple[1], this)
                     });
                 }
             }
@@ -119,10 +119,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-		super.process( container, ruleName);
-        this.forEachDepRule( (depRule: DepRule) => depRule.process( container, null));
+		super.process( ruleName);
+        this.forEachDepRule( (depRule: DepRule) => depRule.process( null));
 	}
 
 
@@ -321,10 +321,10 @@ class DepRule extends StyleRule
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, pseudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
-	public constructor( selector: CssSelector, param?: any, styleset?: CombinedStyleset | CombinedStyleset[],
+	public constructor( sd: IStyleDefinition, selector: CssSelector, param?: any, styleset?: CombinedStyleset | CombinedStyleset[],
 		parent?: StyleRule)
 	{
-		super( styleset);
+		super( sd, styleset);
 		this.selector = selector;
 		this.parent = parent;
         this.param = param;
@@ -335,7 +335,7 @@ class DepRule extends StyleRule
 	// Creates a copy of the rule but with new parent (containing rule).
 	public clone( containingRule: StyleRule): DepRule
 	{
-		let newRule = new DepRule( this.selector, this.param, undefined, containingRule);
+		let newRule = new DepRule( this.sd, this.selector, this.param, undefined, containingRule);
 
         // this method is called on a newly created object so we don't have any properties in
 		// our own styleset yet
@@ -411,18 +411,19 @@ export class AbstractRule extends StyleRule
  */
 abstract class NamedStyleRule extends StyleRule implements INamedEntity
 {
-	public constructor( styleset?: CombinedStyleset | CombinedStyleset[], nameOverride?: string | INamedEntity)
+	public constructor( sd: IStyleDefinition, styleset?: CombinedStyleset | CombinedStyleset[],
+        nameOverride?: string | INamedEntity)
 	{
-		super( styleset);
+		super( sd, styleset);
 		this.nameOverride = nameOverride;
 	}
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-		super.process( container, ruleName);
+		super.process( ruleName);
 
-		this.name = container.getScopedName( ruleName, this.nameOverride);
+		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
         this.cssName = this.cssPrefix + this.name.replace( / /g, this.cssPrefix);
 	}
 
@@ -485,9 +486,9 @@ export class ClassRule extends NamedStyleRule implements IClassRule
     }
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-		super.process( container, ruleName);
+		super.process( ruleName);
 
         // by now our name and cssName properties have been set to reflect a single name. Now
         // look at the parent class rues defined using the "++" property and take names from the
@@ -532,9 +533,10 @@ export class IDRule extends NamedStyleRule implements IIDRule
  */
 export class SelectorRule extends StyleRule
 {
-	public constructor( selector: CssSelector, styleset?: CombinedStyleset | CombinedStyleset[])
+	public constructor( sd: IStyleDefinition, selector: CssSelector,
+        styleset?: CombinedStyleset | CombinedStyleset[])
 	{
-		super( styleset);
+		super( sd, styleset);
 		this.selector = selector;
 	}
 

@@ -1,7 +1,7 @@
-import {IVarRule, IConstRule} from "../api/RuleTypes"
+import {IVarRule, IConstRule, IStyleDefinition} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue, ISyntaxTypeStyleset} from "../api/Stylesets"
 import {sp2s} from "../impl/StyleImpl"
-import {IMimcssGroupingRule, IMimcssStyleElement, IRuleContainer, Rule, RuleLike} from "./Rule";
+import {IMimcssGroupingRule, IMimcssStyleElement, Rule, RuleLike} from "./Rule";
 
 
 
@@ -12,9 +12,9 @@ import {IMimcssGroupingRule, IMimcssStyleElement, IRuleContainer, Rule, RuleLike
  */
 abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule implements IVarRule<K>
 {
-    public constructor( template: K, value?: ExtendedVarValue<K>, nameOverride?: string | IVarRule<K>)
+    public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>, nameOverride?: string | IVarRule<K>)
     {
-        super();
+        super(sd);
         this.template = template;
         this.value = value;
         this.nameOverride = nameOverride;
@@ -31,10 +31,10 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
 
 
     // Processes the given rule.
-    public process( container: IRuleContainer, ruleName: string | null): void
+    public process( ruleName: string | null): void
     {
-        super.process( container, ruleName);
-        this.name = container.getScopedName( ruleName, this.nameOverride);
+        super.process( ruleName);
+        this.name = this.rc.getScopedName( ruleName, this.nameOverride);
         if (this.name.startsWith("--"))
             this.name = this.name.substr(2);
 
@@ -62,7 +62,7 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     public setValue( value: ExtendedVarValue<K>, schedulerType?: number): void
     {
         this.value = value;
-        if (this.c)
+        if (this.rc)
         {
             let important = false;
             if (value != null && typeof value === "object" && "!" in (value as any))
@@ -71,7 +71,7 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
                 value = value["!"];
             }
 
-            this.c.setVarValue( this.cssVarName,
+            this.rc.setVarValue( this.cssVarName,
                 value == null
                     ? null
                     : sp2s( this.template, value), important, schedulerType)
@@ -113,9 +113,10 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
  */
 export class VarRule<K extends VarTemplateName = any> extends VarBaseRule<K>
 {
-	public constructor( template: K, value?: ExtendedVarValue<K>, nameOverride?: string | IVarRule<K>)
+	public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>,
+        nameOverride?: string | IVarRule<K>)
 	{
-        super( template, value, nameOverride);
+        super( sd, template, value, nameOverride);
 	}
 
 
@@ -139,17 +140,17 @@ export class VarRule<K extends VarTemplateName = any> extends VarBaseRule<K>
  */
 export class PropertyRule<K extends keyof ISyntaxTypeStyleset = any, T extends K | [string] = any> extends VarBaseRule<K>
 {
-    public constructor( syntax: T, initValue?: ExtendedVarValue<K>, inherits: boolean = true,
+    public constructor( sd: IStyleDefinition, syntax: T, initValue?: ExtendedVarValue<K>, inherits: boolean = true,
         nameOverride?: string | IVarRule<K>)
     {
         if (Array.isArray(syntax))
         {
-            super( "*" as K, initValue, nameOverride);
+            super( sd, "*" as K, initValue, nameOverride);
             this.syntax = syntax[0];
         }
         else
         {
-            super( syntax as K, initValue, nameOverride);
+            super( sd, syntax as K, initValue, nameOverride);
             this.syntax = syntax;
         }
 
@@ -191,9 +192,9 @@ export class PropertyRule<K extends keyof ISyntaxTypeStyleset = any, T extends K
  */
 export class ConstRule<K extends VarTemplateName = any> extends RuleLike implements IConstRule<K>
 {
-	public constructor( template: K, value?: ExtendedVarValue<K>, cachedValue?: string)
+	public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>, cachedValue?: string)
 	{
-        super();
+        super(sd);
 		this.template = template;
         this.value = value;
         this._val = cachedValue;
@@ -205,9 +206,9 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 
 
 	// Processes the given rule.
-	public process( container: IRuleContainer, ruleName: string | null): void
+	public process( ruleName: string | null): void
 	{
-        super.process( container, ruleName);
+        super.process( ruleName);
 
         if (!this._val)
 		    this._val = sp2s( this.template, this.value);

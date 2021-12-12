@@ -16,9 +16,6 @@ import {IRule, INamedEntity, IStyleDefinition} from "../api/RuleTypes"
  */
 export interface IRuleContainer
 {
-	/** Returns the instance of the stylesheet definition class */
-	getDef(): IStyleDefinition;
-
 	/** Generates a name, which will be unique in this stylesheet */
 	getScopedName( ruleName: string | null, nameOverride?: string | INamedEntity): string;
 
@@ -41,20 +38,30 @@ export interface IRuleContainer
  */
 export abstract class RuleLike
 {
-	// Processes the rule.
-	public process( c: IRuleContainer, propName: string | null): void
+    constructor( sd: IStyleDefinition)
+    {
+        this.sd = sd;
+        this.rc = sd[symRC] as IRuleContainer;
+    }
+
+	/** Processes the rule. */
+	public process( propName: string | null, prevValue?: any): void
 	{
-        this.c = c;
 		this.pn = propName;
 	}
 
 
 
-	// Rule container to which this rule belongs.
-	public c: IRuleContainer;
+	/** Style Definition object to which this rule belongs. */
+	public sd: IStyleDefinition;
 
-	// Name of the property of the stylesheet definition to which this rule was assigned. This can
-	// be null for rules not created via assignment to style definition properties.
+	/** Rule Container corresponding to the style definition object to which this rule belongs. */
+	public rc: IRuleContainer;
+
+	/**
+     * Name of the property of the stylesheet definition to which this rule was assigned. This can
+     * be null for rules not created via assignment to style definition properties.
+     */
 	public pn: string | null;
 }
 
