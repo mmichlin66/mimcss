@@ -1,8 +1,9 @@
 ﻿import {
     CssSelector, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy,
-    ISelectorBuilder, NthExpression, AttrComparisonOperation, TimingFunctionJumpTerm, ICubicBezierFunc, IStepsFunc
+    ISelectorBuilder, NthExpression, AttrComparisonOperation, TimingFunctionJumpTerm,
+    ICubicBezierFunc, IStepsFunc, INSTagFunc, ElementTagName, SelectorCombinator,
 } from "./CoreTypes"
-import {ICounterRule, IIDRule, IVarRule} from "./RuleTypes";
+import {ICounterRule, IIDRule, INamespaceRule, IVarRule} from "./RuleTypes";
 import {AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType} from "./StyleTypes";
 import {ExtendedVarValue, VarTemplateName} from "./Stylesets";
 import {sp2s} from "../impl/StyleImpl";
@@ -47,11 +48,6 @@ export const selector = (parts: TemplateStringsArray, ...params: CssSelector[]):
  * attribute comparison operation.
  */
 const attrComparisonOperations: AttrComparisonOperation[] = ["=",  "~=", "|=", "^=", "$=", "*="];
-
-/**
- * Array of combinator symbols - needed to check whether a string is a combinator.
- */
-const selectorCombinators = [",", " ", ">", "+", "~", "||"];
 
 
 
@@ -298,6 +294,51 @@ export const sel = (...items: CssSelector[]): ISelectorBuilder =>
 }
 
 fdo["sel"] = v => a2s( v.items, { sep: "", recursive: true }, "");
+
+
+
+/**
+ * Creates a new selector for the given element tags with the given namespace prefix. The
+ * `ns` parameter specifies the namespace prefix as either a string or a reference to the
+ * namespace rule. The `tags` parameter specifies either a single tag or an array of tags. In
+ * addition, an asterisk symbol (`"*"`) can be specified to target all elements.
+ *
+ * When multiple tags are specified, the will be combied using the selector combinators
+ * specified by the `comb` parameter.
+ *
+ * **Examples:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // define HTML as default namespace and "svg" as a prefix for SVG namespace
+ *     htmlNS = this.$namespace( css.WebNamespaces.HTML)
+ *     svgNS = this.$namespace( css.WebNamespaces.SVG, "svg")
+ *
+ *     // produces CSS "svg|a {}", which will match only SVG `<a>` elements
+ *     rule1 = this.$style( css.nstag( this.svgNS, "a"), {})
+ *
+ *     // produces CSS "*|a {}", which will match both HTML and SVG `<a>` elements
+ *     rule2 = this.$style( css.nstag( "*", "a"), {})
+ *
+ *     // produces CSS "svg|circle, svg|ellipse {}"
+ *     rule3 = this.$style( css.nstag( this.svgNS, ["circle", "ellipse"]), {})
+ * }
+ * ```
+ *
+ * @param ns Namespace prefix string or reference to a namespace rule. This can also be `"*"`,
+ * in which case tags of all naespaces are selected
+ * @param tags One or more element tag names.
+ * @param comb Optional selector combinator if more than one tag is given. Default is `","`.
+ * @returns Object representing parameters from which namespaced tag selector is created.
+ */
+export const nstag = (ns: string | INamespaceRule, tags: "*" | ElementTagName | ElementTagName[],
+    comb: SelectorCombinator = ","): INSTagFunc => ({fn: "nstag", ns, tags, comb})
+
+fdo["nstag"] = (v: INSTagFunc) => {
+    let prefix = typeof v.ns === "string" ? v.ns + "|" : v.ns.prefix ? v.ns.prefix + "|" : "";
+    return typeof v.tags === "string" ? prefix + v.tags : v.tags.map( tag => prefix + tag).join(v.comb);
+}
 
 
 

@@ -570,6 +570,26 @@ export interface IParameterizedPseudoEntity extends IParameterizedPseudoClass, I
 
 
 /**
+ * Represents a selector for one or more namespaced tags; that is, tags accompanied by a namespace
+ * prefix. This interface is returned from the [[tagNS]] function.
+ */
+export interface INSTagFunc extends ICssFuncObject
+{
+    fn: "nstag";
+
+    /** Namespace prefix string or reference to a namespace rule */
+    ns: string | INamespaceRule;
+
+    /** One or more element tag names */
+    tags: "*" | ElementTagName | ElementTagName[];
+
+    /** Optional selector combinator if more than one tag is given. Default is `","`. */
+    comb?: SelectorCombinator;
+}
+
+
+
+/**
  * Represents an invocation of a parameterized pseudo entity with corresponding parameter.
  */
 export interface IParameterizedPseudoEntityFunc<T extends keyof IParameterizedPseudoEntity> extends ICssFuncObject
@@ -1385,8 +1405,8 @@ export interface ISelectorBuilder extends ISelectorFunc
  * Type for a CSS selector. This type is used to produce arbitrary complex selectors used by the
  * [[$style]] function. If array is specified, all items are converted to strings and concatenated.
  */
-export type CssSelector = ElementTagName | PseudoEntity | IRuleWithSelector | ISelectorProxy |
-    ISelectorFunc | IAttrSelectorFunc | IParameterizedPseudoEntityFunc<any> |
+export type CssSelector = ElementTagName | INSTagFunc | PseudoEntity | IRuleWithSelector |
+    ISelectorProxy | ISelectorFunc | IAttrSelectorFunc | IParameterizedPseudoEntityFunc<any> |
     SelectorCombinator | IRawProxy | string | CssSelector[];
 
 
@@ -1450,12 +1470,6 @@ export interface ICubicBezierFunc extends ICssFuncObject
 export type TimingFunction = TimingFunctionKeywords | IStepsFunc | ICubicBezierFunc;
 
 
-
- ///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Miscellaneous CSS functions.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * The IUrlFunc interface represents an invocation of the CSS `url()` function. It is returned from

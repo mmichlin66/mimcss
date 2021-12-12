@@ -262,6 +262,35 @@ describe("selectors:", () =>
             css.deactivate( a);
         })
    })
+
+
+
+    it("css.nstag() function", () =>
+    {
+        class A extends css.StyleDefinition
+        {
+            // define HTML as default namespace and "svg" as a prefix for SVG namespace
+            htmlNS = this.$namespace( css.WebNamespaces.HTML)
+            svgNS = this.$namespace( css.WebNamespaces.SVG, "svg")
+
+            // produces CSS "svg|a {}", which will match only SVG `<a>` elements
+            s1 = this.$style( css.nstag( this.svgNS, "a"), { color: "red" })
+
+            // produces CSS "*|a {}", which will match both HTML and SVG `<a>` elements
+            s2 = this.$style( css.nstag( "*", "a"), { color: "red" })
+
+            // produces CSS "svg|circle, svg|ellipse {}"
+            s3 = this.$style( css.nstag( this.svgNS, ["circle", "ellipse"]), { color: "red" })
+        }
+
+        let a = css.activate( A);
+
+        expect(a.s1.cssRule!.selectorText).toEqual("svg|a");
+        expect(a.s2.cssRule!.selectorText).toEqual("*|a");
+        expect(a.s3.cssRule!.selectorText).toEqual("svg|circle, svg|ellipse");
+
+        css.deactivate( a);
+    })
 })
 
 

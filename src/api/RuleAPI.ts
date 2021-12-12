@@ -1,4 +1,4 @@
-﻿import {CssSelector, PagePseudoClass, OneOrMany, ElementTagName, ExtendedProp} from "./CoreTypes";
+﻿import {CssSelector, PagePseudoClass, ElementTagName, ExtendedProp} from "./CoreTypes";
 import {
     IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
@@ -26,16 +26,6 @@ import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {v2s} from "../impl/Utils";
 import {getActivator} from "../impl/SchedulingImpl";
-
-
-
-// /**
-//  * Symbol that is used by the `$parent` property in the StyleDefinition class that keeps reference
-//  * to the parnt style definition class. Developers can use this property to access rules in
-//  * the chain of nested grouping rules. We need this symbol to avoid enumerating the `$parent`
-//  * property when processing the rules in the style definition object.
-//  */
-// const symParent = Symbol("parent");
 
 
 
@@ -321,13 +311,16 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * ```typescript
      * class MyStyles extends css.StyleDefinition
      * {
-     *     // using string for selecting a single elemenet tag
+     *     // using string for selecting a single elemenet tag;
+     *     // produces CSS "tr {}"
      *     tr = this.$tag( "tr", {})
      *
-     *     // using array for selecting multiple elemenet tags
+     *     // using array for selecting multiple elemenet tags;
+     *     // produces CSS "h1, h2, h3 {}"
      *     header123 = this.$tag( ["h1", "h2", "h3"], {})
      *
      *     // using asterisk to address all elements
+     *     // produces CSS "* {}"
      *     all = this.$tag( "*", {})
      * }
      * ```
@@ -336,7 +329,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset One or more styleset objects that define style properties for the tags.
      * @returns `IStyleRule` object representing the tag rule.
      */
-    public $tag( tag: "*" | OneOrMany<ElementTagName>, styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
+    public $tag( tag: "*" | ElementTagName | ElementTagName[],
+        styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule
     {
         return new SelectorRule( this, Array.isArray(tag) ? tag.join(",") : tag, styleset);
     }
