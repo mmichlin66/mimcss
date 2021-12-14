@@ -307,16 +307,6 @@ class AnimationFrameScheduler implements IScheduler
 
 
 /**
- * Schedules the update of the value of the given CSS property in the given rule.
- */
-export const scheduleStyleUpdate = (ruleOrElm: CSSStyleRule | ElementCSSInlineStyle,
-    name: string | null, value?: string | StringStyleset | null,
-    important?: boolean, schedulerType?: number)
-    : void => getActivator(schedulerType).updateStyle( ruleOrElm, name, value, important);
-
-
-
-/**
  * Returns the activator for the given scheduler type. If scheduler type is not specified returns
  * the activator currently set as default. If, for some reason, the default activator is not set,
  * returns the synchronous activator.

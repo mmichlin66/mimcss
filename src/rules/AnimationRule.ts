@@ -1,6 +1,6 @@
 import {IAnimationRule, AnimationFrame, AnimationWaypoint, IAnimationFrameRule, IStyleDefinition} from "../api/RuleTypes"
 import {AnimationStyleset} from "../api/Stylesets";
-import {Rule, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule"
+import {Rule, IMimcssRuleBag} from "./Rule"
 import {StyleRule} from "./StyleRules";
 import {v2s, WKF} from "../impl/Utils";
 
@@ -41,12 +41,12 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
+	public insert( ruleBag: IMimcssRuleBag): void
 	{
 		if (!this.frameRules)
 			return;
 
-		let mimcssRule = parent.addKeyframesRule( this.name);
+		let mimcssRule = ruleBag.addKeyframes( this.name);
         if (mimcssRule)
         {
             this.cssRule = mimcssRule?.cssRule as CSSKeyframesRule;

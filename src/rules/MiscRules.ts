@@ -1,12 +1,9 @@
-import {PagePseudoClass} from "../api/CoreTypes";
-import {IFontFaceRule, IImportRule, IPageRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition} from "../api/RuleTypes";
-import {Styleset} from "../api/Stylesets";
+import {IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition} from "../api/RuleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
-import {Rule, RuleLike, IMimcssStyleElement, IMimcssGroupingRule} from "./Rule";
+import {Rule, RuleLike, IMimcssRuleBag} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
-import {StyleRule} from "./StyleRules";
 import {symV2S} from "../impl/Utils";
 
 
@@ -22,9 +19,9 @@ abstract class MiscRule<T extends CSSRule> extends Rule
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
+	public insert( ruleBag: IMimcssRuleBag): void
 	{
-		this.cssRule = parent.addRule( this.toCss())?.cssRule as T;
+		this.cssRule = ruleBag.add( this.toCss())?.cssRule as T;
 	}
 
 	// Returns CSS string for this rule.
@@ -130,32 +127,6 @@ export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFace
 
 	// Object defining font-face properties.
 	public fontface: ExtendedFontFace;
-}
-
-
-
-/**
- * The PageRule class represents the CSS @page rule.
- */
-export class PageRule extends StyleRule implements IPageRule
-{
-	public constructor( sd: IStyleDefinition, pseudoClass?: PagePseudoClass, style?: Styleset)
-	{
-		super( sd, style);
-		this.pseudoClass = pseudoClass;
-	}
-
-	// Returns the selector part of the style rule.
-	public getSel(): string
-	{
-		return `@page ${this.pseudoClass ? this.pseudoClass : ""}`;
-	}
-
-	/** SOM page rule */
-	public cssRule: CSSPageRule;
-
-	/** Optional name of the page pseudo style (e.g. "":first") */
-	public pseudoClass?: PagePseudoClass;
 }
 
 

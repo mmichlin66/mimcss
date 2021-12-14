@@ -20,7 +20,7 @@ export interface IRuleContainer
 	getScopedName( ruleName: string | null, nameOverride?: string | INamedEntity): string;
 
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
-	insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void;
+	insert( ruleBag: IMimcssRuleBag): void;
 
 	/** Clears all CSS rule objects defined in this container. */
 	clear(): void;
@@ -74,7 +74,7 @@ export abstract class Rule extends RuleLike implements IRule
 {
 	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
 	// style definition class, to which this rule belongs, is activated.
-	public abstract insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void;
+	public abstract insert( ruleBag: IMimcssRuleBag): void;
 
 	// Clers the CSS rule object. This method is called when the style definition class, to which
 	// this rule belongs, is deactivated.
@@ -110,9 +110,9 @@ export interface IActivationContext
  */
 export interface IMimcssRuleBag
 {
-    addRule( ruleText: string): IMimcssRule | null;
-    addGroupingRule( selector: string): IMimcssGroupingRule | null;
-    addKeyframesRule( name: string): IMimcssKeyframesRule | null;
+    add( ruleText: string): IMimcssRule | null;
+    addGroup( selector: string): IMimcssGroupingRule | null;
+    addKeyframes( name: string): IMimcssKeyframesRule | null;
 }
 
 /**

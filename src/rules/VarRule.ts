@@ -1,7 +1,7 @@
 import {IVarRule, IConstRule, IStyleDefinition} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue, ISyntaxTypeStyleset} from "../api/Stylesets"
 import {sp2s} from "../impl/StyleImpl"
-import {IMimcssGroupingRule, IMimcssStyleElement, Rule, RuleLike} from "./Rule";
+import {IMimcssRuleBag, Rule, RuleLike} from "./Rule";
 
 
 
@@ -122,7 +122,7 @@ export class VarRule<K extends VarTemplateName = any> extends VarBaseRule<K>
 
     // Inserts this rule into the given parent rule or stylesheet. This method is called when the
     // style definition class, to which this rule belongs, is activated.
-    public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void {}
+    public insert( ruleBag: IMimcssRuleBag): void {}
 
 
 
@@ -161,12 +161,12 @@ export class PropertyRule<K extends keyof ISyntaxTypeStyleset = any, T extends K
 
 	// Inserts this rule into the given parent rule or stylesheet. This method is called when the
 	// style definition class, to which this rule belongs, is activated.
-	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
+	public insert( ruleBag: IMimcssRuleBag): void
     {
 		let ruleText = `@property ${this.cssVarName}{syntax:'${this.syntax}';` +
             `inherits:${this.inherits};initial-value:${sp2s( this.template, this.value)};}`;
 
-        this.cssRule = parent.addRule( ruleText)?.cssRule as CSSRule;
+        this.cssRule = ruleBag.add( ruleText)?.cssRule as CSSRule;
     }
 
 

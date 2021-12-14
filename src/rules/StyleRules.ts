@@ -1,13 +1,16 @@
-import {IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IStyleDefinition} from "../api/RuleTypes";
+import {
+    IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IStyleDefinition,
+    IPageRule
+} from "../api/RuleTypes";
 import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
     CombinedStyleset, ParentClassType, IStyleset
 } from "../api/Stylesets"
-import {CssSelector, IParameterizedPseudoEntityFunc} from "../api/CoreTypes"
-import {Rule, IMimcssGroupingRule, IMimcssStyleElement} from "./Rule";
+import {CssSelector, IParameterizedPseudoEntityFunc, PagePseudoClass} from "../api/CoreTypes"
+import {Rule, IMimcssRuleBag} from "./Rule";
 import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
 import {styleset2s, sp2s} from "../impl/StyleImpl"
-import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
+import {getActivator} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
 
 
@@ -54,25 +57,20 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		for( let propName in inputStyleset)
 		{
 			let propVal = inputStyleset[propName];
-            if (propName === "+")
+            if (propVal == null)
+                continue;
+            else if (propName === "+")
             {
-                let extendsPropVal = propVal as (StyleRule | StyleRule[]);
-                if (extendsPropVal)
+                // the value is a single StyleRule or an array of StyleRules to copy properties from
+                let parentRules = propVal instanceof StyleRule ? [propVal] : propVal as StyleRule[];
+                for( let parent of parentRules)
                 {
-                    // the value is a single StyleRule or an array of StyleRules to copy properties from
-                    let parentRules = extendsPropVal instanceof StyleRule ? [extendsPropVal] : extendsPropVal;
-                    for( let parent of parentRules)
-                    {
-                        mergeStylesets( this.styleset, parent.styleset);
-                        this.copyDepRules( parent);
-                    }
+                    mergeStylesets( this.styleset, parent.styleset);
+                    this.copyDepRules( parent);
                 }
             }
             else if (propName === "--")
-            {
-                if (propVal)
-                    mergeCustomProps( this.styleset, propVal as CustomVar_StyleType[]);
-            }
+                mergeCustomProps( this.styleset, propVal as CustomVar_StyleType[]);
 			else if (propName.startsWith(":"))
 			{
 				// if the value is an array, then this is an array of tuples representing
@@ -81,12 +79,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 				// CombinedStyleset.
 				if (Array.isArray(propVal))
 				{
-					let tuples = propVal as [any, CombinedStyleset | CombinedStyleset[]][];
-					if (tuples.length > 0)
-					{
-						this.dependentRules[propName] = tuples.map( tuple => new DepRule(
-							sd, propName, tuple[0], tuple[1], this));
-					}
+					this.dependentRules[propName] = propVal.map(
+                        (tuple: [any, CombinedStyleset | CombinedStyleset[]]) =>
+                            new DepRule(sd, propName, tuple[0], tuple[1], this));
 				}
 				else
 					this.dependentRules[propName] = new DepRule( sd, "&" + propName, undefined,
@@ -136,13 +131,13 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
+	public insert( ruleBag: IMimcssRuleBag): void
 	{
 		if (Object.keys(this.styleset).length > 0)
-			this.cssRule = parent.addRule( this.toCss())?.cssRule as CSSStyleRule;
+			this.cssRule = ruleBag.add( this.toCss())?.cssRule as CSSStyleRule;
 
         // insert dependent rules under the same parent
-        this.forEachDepRule( (depRule: DepRule) => depRule.insert( parent));
+        this.forEachDepRule( (depRule: DepRule) => depRule.insert( ruleBag));
 	}
 
 	// Clers the CSS rule object.
@@ -236,8 +231,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-		    scheduleStyleUpdate( this.cssRule, camelToDash( name),
-                value == null ? null : sp2s( name, value), important, schedulerType);
+		    getActivator(schedulerType).updateStyle( this.cssRule, camelToDash( name),
+                value == null ? null : sp2s( name, value), important);
         }
 	}
 
@@ -282,9 +277,9 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-            scheduleStyleUpdate( this.cssRule, varObj.cssVarName,
+            getActivator(schedulerType).updateStyle( this.cssRule, varObj.cssVarName,
                 value == null ? null : sp2s( varObj.template, value),
-                important, schedulerType);
+                important);
         }
 	}
 
@@ -394,7 +389,7 @@ export class AbstractRule extends StyleRule
 {
 	// Overrides the StyleRule's implementation to do nothing. No CSSStyleRule is created for
 	// abstract rules.
-	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void {}
+	public insert( ruleBag: IMimcssRuleBag): void {}
 
 	// Overrides the StyleRule's implementation to do nothing.
 	public clear(): void {}
@@ -553,6 +548,32 @@ export class SelectorRule extends StyleRule
 
 
 /**
+ * The PageRule class represents the CSS @page rule.
+ */
+export class PageRule extends StyleRule implements IPageRule
+{
+    public constructor( sd: IStyleDefinition, pseudoClass?: PagePseudoClass, style?: Styleset)
+    {
+        super( sd, style);
+        this.pseudoClass = pseudoClass;
+    }
+
+    // Returns the selector part of the style rule.
+    public getSel(): string
+    {
+        return `@page ${this.pseudoClass ? this.pseudoClass : ""}`;
+    }
+
+    /** SOM page rule */
+    public cssRule: CSSPageRule;
+
+    /** Optional name of the page pseudo style (e.g. "":first") */
+    public pseudoClass?: PagePseudoClass;
+}
+
+
+
+/**
  * Merges properties from the source styleset to the target styleset. All regular properties are
  * replaced. The "--" property gets special treatment because it is an array.
  * @param target Target Styleset object - cannot be null or undefined;
@@ -590,38 +611,33 @@ const mergeCustomProps = (target: Styleset, sourceVars: CustomVar_StyleType[]): 
 
 /**
  * Merges values of the given property from the source styleset to the target styleset. Note that
- * both source or target value can be either null or single value or an object with the `"[]"`
- * property that contains multiple values.
+ * both source or target value can be either single value or an object with the `"[]"` property
+ * that contains multiple values.
  * @param target Target Styleset object - cannot be null or undefined.
  * @param propName Name of the property.
- * @param sourceVal Value from the source styleset to merge with the target value - can be null or
- * undefined.
+ * @param sourceVal Value from the source styleset to merge with the target value - cannot be null
+ * or undefined.
  */
 const mergePropValues = (target: Styleset, propName: string, sourceVal: any): void =>
 {
-    if (sourceVal == null)
-        delete target[propName];
+    let targetVal = target[propName];
+    if (targetVal == null)
+    {
+        // if property doesn't exist in the target or its value is null or undefined, just
+        // take the source's value
+        target[propName] = sourceVal;
+    }
     else
     {
-        let targetVal = target[propName];
-        if (targetVal == null)
-        {
-            // if property doesn't exist in the target or its value is null or undefined, just
-            // take the source's value
-            target[propName] = sourceVal;
-        }
-        else
-        {
-            let targetArray: any[] = targetVal["[]"];
-            if (!targetArray)
-                target[propName] = { "[]": targetArray = [targetVal] };
+        let targetArray: any[] = targetVal["[]"];
+        if (!targetArray)
+            target[propName] = { "[]": targetArray = [targetVal] };
 
-            let sourceArray: any[] = sourceVal["[]"];
-            if (!sourceArray)
-                targetArray.push( sourceVal);
-            else
-                targetArray.push( ...sourceArray);
-        }
+        let sourceArray: any[] = sourceVal["[]"];
+        if (!sourceArray)
+            targetArray.push( sourceVal);
+        else
+            targetArray.push( ...sourceArray);
     }
 }
 

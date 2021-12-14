@@ -417,7 +417,7 @@ export interface IStyleDefinitionClass<T extends IStyleDefinition<P> = any,
 /**
  * The IGroupRule interface represents a grouping CSS rule.
  */
-export interface IGroupRule<T extends IStyleDefinition = any> extends IRule
+export interface IGroupRule<T extends IStyleDefinition = any, R extends CSSGroupingRule = any> extends IRule
 {
 	/** Condition of this grouping rule. */
 	readonly condition: string;
@@ -426,7 +426,7 @@ export interface IGroupRule<T extends IStyleDefinition = any> extends IRule
 	readonly gsd: T;
 
 	/** CSSOM grouping rule */
-	readonly cssRule: CSSGroupingRule | null;
+	readonly cssRule: R | null;
 }
 
 
@@ -435,13 +435,10 @@ export interface IGroupRule<T extends IStyleDefinition = any> extends IRule
  * The ISupportsRule interface represents the CSS @supports rule.
  * Objects implementing this interface are returned from the [[$supports]] function.
  */
-export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupRule<T>
+export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSSupportsRule>
 {
 	/** Flag indicated whether the browser supports this rule's query */
     readonly isSupported: boolean;
-
-	/** CSSOM supports rule */
-	readonly cssRule: CSSSupportsRule | null;
 }
 
 
@@ -450,16 +447,13 @@ export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupR
  * The IMediaRule interface represents the CSS @media rule.
  * Objects implementing this interface are returned from the [[$media]] function.
  */
-export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule<T>
+export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSMediaRule>
 {
     /**
      * Returns `MediaQueryList` object that allows programmatic checking whether the document matches
      * the media statement and also allows listening to its `change` event
      */
     readonly queryList: MediaQueryList | undefined;
-
-    /** CSSOM media rule */
-	readonly cssRule: CSSMediaRule | null;
 }
 
 

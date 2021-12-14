@@ -1,7 +1,7 @@
 import {ExtendedCounterStyleset} from "../api/CounterTypes";
 import {ICounterRule, ICounterStyleRule, IStyleDefinition} from "../api/RuleTypes"
 import {counterStyleset2s} from "../impl/MiscImpl";
-import {IMimcssGroupingRule, IMimcssStyleElement, Rule, RuleLike} from "./Rule";
+import {IMimcssRuleBag, Rule, RuleLike} from "./Rule";
 
 
 
@@ -84,10 +84,10 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	}
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
+	public insert( ruleBag: IMimcssRuleBag): void
 	{
 		let ruleText = `@counter-style ${this.name} {${counterStyleset2s( this.counterStyleset)}}`;
-		this.cssRule = parent.addRule( ruleText)?.cssRule as CSSRule;
+		this.cssRule = ruleBag.add( ruleText)?.cssRule as CSSRule;
 	}
 
 

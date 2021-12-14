@@ -6,8 +6,8 @@ import {
 } from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import {getActivator, scheduleStyleUpdate, setDefaultScheduler} from "../impl/SchedulingImpl";
-import { SchedulerType } from "../api/SchedulingTypes"
+import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
+import {SchedulerType} from "../api/SchedulingTypes"
 
 
 
@@ -25,7 +25,7 @@ const symClass = Symbol("sdc");
 /**
  * Flag indicating that a rule container is created not directly (as for styled components)
  * but from the processClass function. This variable is set to true before instantiating the
- * style definition class (and thus the RuleCOntainer object) and is set back to false after
+ * style definition class (and thus the RuleContainer object) and is set back to false after
  * it is used in the RuleContainer constructor.
  */
 let s_processingStyleDefinitionClass = false;
@@ -135,19 +135,16 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         else
         {
             if (propVal instanceof RuleLike)
-            {
                 propVal.process( propName);
-                if (propVal instanceof VarRule)
-                    this.vars.push( propVal);
-                else if (propVal instanceof ImportRule)
-                    this.imports.push( propVal);
-                else if (propVal instanceof NamespaceRule)
-                    this.namespaces.push( propVal);
-                else if (propVal instanceof Rule)
-                    this.otherRules.push( propVal);
-                else
-                    this.ruleLikes.push( propVal);
-            }
+
+            if (propVal instanceof VarRule)
+                this.vars.push( propVal);
+            else if (propVal instanceof ImportRule)
+                this.imports.push( propVal);
+            else if (propVal instanceof NamespaceRule)
+                this.namespaces.push( propVal);
+            else if (propVal instanceof Rule)
+                this.rules.push( propVal);
         }
 	}
 
@@ -157,7 +154,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	public setVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
 		if (this.varRootRule)
-            scheduleStyleUpdate( this.varRootRule, name, value, important, schedulerType);
+        getActivator(schedulerType).updateStyle( this.varRootRule, name, value, important);
 	}
 
 
@@ -194,14 +191,14 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
     /** Inserts all rules defined in this container to either the style sheet or grouping rule. */
-	public insert( sheetOrGroupingRule: IMimcssStyleElement | IMimcssGroupingRule): void
+	public insert( ruleBag: IMimcssRuleBag): void
 	{
 		// insert @import and @namespace rules as they must be before other rules. If the parent is a grouping
 		// rule, don't insert @import and @namespace rules at all
 		if (!this.psd)
 		{
-			this.imports.forEach( rule => rule.insert( sheetOrGroupingRule));
-			this.namespaces.forEach( rule => rule.insert( sheetOrGroupingRule));
+			this.imports.forEach( rule => rule.insert( ruleBag));
+			this.namespaces.forEach( rule => rule.insert( ruleBag));
 		}
 
 		// activate referenced style definitions
@@ -210,10 +207,10 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)
-			this.varRootRule = sheetOrGroupingRule.addRule( getRootCssForVars( this.vars))?.cssRule as CSSStyleRule;
+			this.varRootRule = ruleBag.add( getRootCssForVars( this.vars))?.cssRule as CSSStyleRule;
 
 		// insert all other rules
-		this.otherRules.forEach( rule => rule.insert( sheetOrGroupingRule));
+		this.rules.forEach( rule => rule.insert( ruleBag));
 	}
 
 
@@ -230,7 +227,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		this.varRootRule = undefined;
 
-		this.otherRules.forEach( rule => rule.clear());
+		this.rules.forEach( rule => rule.clear());
 
 		// deactivate imported stylesheets
 		for( let ref of this.refs)
@@ -369,9 +366,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      */
 	private pc?: RuleContainer;
 
-    // Flag determining whether this container has already been processed
-    public processed: boolean;
-
 	// List of references to other style definitions creaed via the $use function.
 	private refs: StyleDefinition[] = [];
 
@@ -386,10 +380,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
     public getVars(): VarRule[] { return this.vars; }
 
 	// List of rules that are not imports, namespaces, custom vars, references or grouping rules.
-	private otherRules: Rule[] = [];
-
-	// List of rule-like objects.
-	private ruleLikes: RuleLike[] = [];
+	private rules: Rule[] = [];
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
 	private varRootRule: CSSStyleRule | undefined;
@@ -974,7 +965,7 @@ const removeCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>):
  * Style element that divides between theme and non-theme style elements. This is needed to always
  * place theme styles before the non-theme ones.
  */
-let s_clientThemePlaceholderElm: ClientMimcssStyleElement | undefined = undefined;
+let s_clientThemePlaceholderElm: IMimcssStyleElement | undefined = undefined;
 
 /**
  * ID of the style element that divides between theme and non-theme style elements.
@@ -1034,19 +1025,19 @@ abstract class ClientMimcssRuleBag implements IMimcssRuleBag
 {
     constructor( public domRuleBag: CSSStyleSheet | CSSGroupingRule) {}
 
-    addRule( ruleText: string): IMimcssRule | null
+    add( ruleText: string): IMimcssRule | null
     {
         let cssRule = addDomRule( ruleText, this.domRuleBag);
         return cssRule ? new ClientMimcssRule( cssRule) : null;
     }
 
-    addGroupingRule( selector: string): IMimcssGroupingRule | null
+    addGroup( selector: string): IMimcssGroupingRule | null
     {
         let cssRule = addDomRule( `${selector} {}`, this.domRuleBag);
         return cssRule ? new ClientMimcssGroupingRule( cssRule) : null;
     }
 
-    addKeyframesRule( name: string): IMimcssKeyframesRule | null
+    addKeyframes( name: string): IMimcssKeyframesRule | null
     {
         let cssRule = addDomRule( `@keyframes ${name} {}`, this.domRuleBag);
         return cssRule ? new ClientMimcssKeyframesRule( cssRule) : null;
@@ -1155,19 +1146,19 @@ abstract class HydrationMimcssRuleBag implements IMimcssRuleBag
 {
     constructor( public domRuleBag: CSSStyleSheet | CSSGroupingRule) {}
 
-    addRule( ruleText: string): IMimcssRule | null
+    add( ruleText: string): IMimcssRule | null
     {
         let cssRule = this.domRuleBag.cssRules[this.index++];
         return cssRule ? new HydrationMimcssRule( cssRule) : null;
     }
 
-    addGroupingRule( selector: string): IMimcssGroupingRule | null
+    addGroup( selector: string): IMimcssGroupingRule | null
     {
         let cssRule = this.domRuleBag.cssRules[this.index++];
         return cssRule ? new HydrationMimcssGroupingRule( cssRule) : null;
     }
 
-    addKeyframesRule( name: string): IMimcssKeyframesRule | null
+    addKeyframes( name: string): IMimcssKeyframesRule | null
     {
         let cssRule = this.domRuleBag.cssRules[this.index++];
         return cssRule ? new HydrationMimcssKeyframesRule( cssRule) : null;
@@ -1273,21 +1264,21 @@ class ServerActivationContext implements IServerActivationContext
  */
 abstract class ServerMimcssRuleBag implements IMimcssRuleBag
 {
-    addRule( ruleText: string): IMimcssRule | null
+    add( ruleText: string): IMimcssRule | null
     {
         let rule = new ServerMimcssRule( ruleText);
         this.rules.push(rule);
         return rule;
     }
 
-    addGroupingRule( selector: string): IMimcssGroupingRule | null
+    addGroup( selector: string): IMimcssGroupingRule | null
     {
         let rule = new ServerMimcssGroupingRule( selector);
         this.rules.push(rule);
         return rule;
     }
 
-    addKeyframesRule( name: string): IMimcssKeyframesRule | null
+    addKeyframes( name: string): IMimcssKeyframesRule | null
     {
         let rule = new ServerMimcssKeyframesRule( name);
         this.rules.push(rule);

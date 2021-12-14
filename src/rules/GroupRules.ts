@@ -1,7 +1,7 @@
 import {IStyleDefinitionClass, IStyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {processSD} from "./RuleContainer"
-import {IRuleContainer, Rule, IMimcssGroupingRule, IMimcssStyleElement, symRC} from "./Rule"
+import {IRuleContainer, Rule, symRC, IMimcssRuleBag} from "./Rule"
 import {media2s, supports2s} from "../impl/MiscImpl";
 
 
@@ -9,7 +9,8 @@ import {media2s, supports2s} from "../impl/MiscImpl";
 /**
  * The GroupRule class serves as a base class for all grouping CSS rules.
  */
-export abstract class GroupRule<T extends IStyleDefinition> extends Rule implements IGroupRule<T>
+export abstract class GroupRule<T extends IStyleDefinition, R extends CSSGroupingRule = any>
+    extends Rule implements IGroupRule<T>
 {
 	public constructor( sd: IStyleDefinition, rn: string, instOrClass: T | IStyleDefinitionClass<T>)
 	{
@@ -34,12 +35,12 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( parent: IMimcssStyleElement | IMimcssGroupingRule): void
+	public insert( ruleBag: IMimcssRuleBag): void
 	{
-		let mimcssRule = parent.addGroupingRule( `@${this.rn} ${this.condition}`);
+		let mimcssRule = ruleBag.addGroup( `@${this.rn} ${this.condition}`);
         if (mimcssRule)
         {
-            this.cssRule = mimcssRule?.cssRule as CSSGroupingRule;
+            this.cssRule = mimcssRule?.cssRule as R;
 
             // insert sub-rules
 			this.grc.insert( mimcssRule);
@@ -79,7 +80,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 	public gsd: T;
 
 	/** SOM supports rule */
-	public cssRule: CSSGroupingRule | null;
+	public cssRule: R | null;
 
 	/** Name of the at-rule (e.g. "supports"). */
 	private rn: string;
@@ -101,7 +102,7 @@ export abstract class GroupRule<T extends IStyleDefinition> extends Rule impleme
 /**
  * The SupportRule class describes a CSS @supports rule.
  */
-export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> implements ISupportsRule<T>
+export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T,CSSSupportsRule> implements ISupportsRule<T>
 {
 	public constructor( sd: IStyleDefinition, statement: SupportsStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
@@ -127,9 +128,6 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 
 
 
-    /** SOM supports rule */
-	public cssRule: CSSSupportsRule | null;
-
 	// support statement for this rule.
 	private stmt: SupportsStatement;
 }
@@ -139,7 +137,7 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T> imple
 /**
  * The MediaRule class describes a CSS @media rule.
  */
-export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implements IMediaRule<T>
+export class MediaRule<T extends IStyleDefinition> extends GroupRule<T,CSSMediaRule> implements IMediaRule<T>
 {
 	public constructor( sd: IStyleDefinition, statement: MediaStatement, instOrClass: T | IStyleDefinitionClass<T>)
 	{
@@ -167,9 +165,6 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T> implemen
     }
 
 
-
-    /** SOM media rule */
-	public cssRule: CSSMediaRule | null;
 
 	// media statement for this rule.
 	private stmt: MediaStatement;

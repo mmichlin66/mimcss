@@ -1,7 +1,7 @@
 ﻿import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
 import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Stylesets"
 import {sp2s, s_registerSP, s2ss, styleset2s} from "../impl/StyleImpl"
-import {scheduleStyleUpdate} from "../impl/SchedulingImpl";
+import {getActivator} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {tag2s} from "../impl/Utils";
 
@@ -43,7 +43,7 @@ export const getStylePropValue = <K extends keyof IStyleset>( stylePropName: K,
 // Sets style property on HTML or SVG element
 const setElementStyleProp = <K extends keyof IStyleset>( elm: ElementCSSInlineStyle, name: K,
     value: ExtendedIStyleset[K], schedulerType?: number): void =>
-    scheduleStyleUpdate( elm, name, sp2s( name, value), false, schedulerType);
+    getActivator(schedulerType).updateStyle( elm, name, sp2s( name, value), false);
 
 
 
@@ -67,7 +67,7 @@ export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset |
  */
 export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
 	schedulerType?: number): void =>
-    scheduleStyleUpdate( elm, null, styleset, false, schedulerType);
+    getActivator(schedulerType).updateStyle( elm, null, styleset, false);
 
 
 

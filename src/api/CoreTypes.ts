@@ -170,7 +170,7 @@ export interface IConstant<T = any>
  * Developers don't usually use this type directly - it is used by Mimcss to define style property
  * types as well as function parameter types.
  */
-export type Extended<T> = T | ICustomVar<T> | IConstant<T> | IRawProxy | null | undefined;
+export type Extended<T> = T | ICustomVar<T> | IConstant<T> | IRawProxy;
 
 
 

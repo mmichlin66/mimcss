@@ -17,12 +17,12 @@ import {
     embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
     s_startSSR, s_stopSSR, s_startHydration, s_stopHydration
 } from "../rules/RuleContainer";
-import {AbstractRule, ClassRule, IDRule, SelectorRule} from "../rules/StyleRules"
+import {AbstractRule, ClassRule, IDRule, SelectorRule, PageRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule, PropertyRule} from "../rules/VarRule"
 import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
-import {FontFaceRule, ImportRule, NamespaceRule, PageRule, ClassNameRule} from "../rules/MiscRules"
+import {FontFaceRule, ImportRule, NamespaceRule, ClassNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {v2s} from "../impl/Utils";
 import {getActivator} from "../impl/SchedulingImpl";
