@@ -1040,7 +1040,9 @@ export const configNameGeneration = (method: NameGenerationMethod, prefix?: stri
 
 /**
  * Concatenates the names of the given classes into a single string that can be assigned to a
- * `class` property of an HTML element.
+ * `class` property of an HTML element. This can be useful when an element should have multiple
+ * classes assigned to it and some of these classes are specified as [[IClassRule]] or
+ * [[IClassNameRule]] while others are specified as strings.
  *
  * @param classProps Variable argument list of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
@@ -1052,29 +1054,28 @@ export const classes = (...classProps: ClassPropType[]): string =>
 	});
 
 /**
- * Chooses the first non-null name from the given list of classes.
- * @param classProps
+ * Chooses the first non-empty name from the given list of classes. This is useful when an element
+ * should have a single class applied to it while the class can be chosen from an ordered list or
+ * hierarchy of possible choices.
+ *
+ * @param classProps Variable argument list of either class names or class rule objects.
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export const chooseClass = (...classProps: ClassPropType[]): string | null =>
+export const chooseClass = (...classProps: ClassPropType[]): string =>
 {
     for( let classProp of classProps)
     {
-        if (!classProp)
-            continue;
-        else if (typeof classProp === "string")
-            return classProp;
-        else if (Array.isArray(classProp))
-        {
-            let name = chooseClass( classProp);
-            if (name)
-                return name;
-        }
-        else if (classProp.name)
-            return classProp.name;
+        let name =
+            typeof classProp === "string" ? classProp :
+            Array.isArray(classProp) ? chooseClass( classProp) :
+            classProp && classProp.name;
+
+        // if non-null and non-empty name - return it
+        if (name)
+            return name;
     }
 
-	return null;
+	return "";
 }
 
 
@@ -1099,7 +1100,7 @@ export const chooseClass = (...classProps: ClassPropType[]): string | null =>
  * rule, the first rule will see the overridden value of the rule when accessed in the
  * post-constructor code.
  *
- * @deprecated This decorator is deprecated as  all rules defined in style definition classes are
+ * @deprecated This decorator is deprecated as all rules defined in style definition classes are
  * always virtualized.
  */
 export const virtual = (target: any, name: string): void => {};
@@ -1127,12 +1128,68 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
 
 /**
  * Activates the given style definition class or instance and inserts all its rules into DOM. If
- * the input object is not an instance but a class, which is not yet associated with an instance,
- * the instance is first created and processed. Note that each style definition instance maintains
- * a reference counter of how many times it was activated and deactivated. The rules are inserted
- * into DOM only upon first activation.
+ * the class is not yet associated with an instance, the instance is first created and processed.
+ * Note that each style definition instance maintains a reference counter of how many times it was
+ * activated and deactivated. The rules are inserted into DOM only upon first activation.
+ *
+ * Activating a class (as opposed to activating a directly created instance) is intended for
+ * "global" CSS entities - that is, entities that are used throughout the application or
+ * application area. No matter how many times a class is activated or how many times it is used
+ * from other style definitions, a single instance is created and used by Mimcss.
+ *
+ * **Example**
+ * ```typescript
+ * class CommonStyles extends css.StyleDefinition
+ * {
+ *     red = this.$class({ color: red })
+ * }
+ *
+ * class MyComponent
+ * {
+ *     private styles: CommonStyles;
+ *
+ *     // Activate class
+ *     willMount() { this.styles = css.activate( CommonStyles); }
+ *     willUnmount() { css.deactivate( this.styles); }
+ *     render() { return <div className={this.styles.red.name}</div> }
+ * }
+ * ```
+ *
+ * Activating an instance (as opposed to activating a class) is intended for "scoped" CSS entities -
+ * that is, entities that apply to instances of certain components, a.k.a. *Styled Components*.
+ * In this approach, every instance of a component creates its own instance of the style definition
+ * class and Mimcss will create independent instances of CSS rules specific (*scoped*) to each
+ * component instance.
+ *
+ * **Example**
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     red = this.$class({ color: red })
+ * }
+ *
+ * class MyComponent
+ * {
+ *     // Create style definition directly
+ *     private styles = new MyStyles();
+ *
+ *     // Activate instance
+ *     willMount() { this.styles = css.activate( this.styles); }
+ *     willUnmount() { css.deactivate( this.styles); }
+ *     render() { return <div className={this.styles.red.name}</div> }
+ * }
+ * ```
+ *
+ * @typeparam T Type of the style definition class or instance passed to the function. This is
+ * also the type, which is returned form the function.
+ * @param instOrClass Style definition class or instance
+ * @param schedulerType Identifier of a pre-defined or registered scheduler. If not specified, the
+ * scheduler set as default will be used.
+ * @returns Instance of the style definition class - either created (if this was the first
+ * activation of the class) or already associated with the class. If the input parameter is an
+ * instance (as opposed to a class), the return value is the same instance.
  */
-export const activate = <T extends IStyleDefinition>(instOrClass: T | IStyleDefinitionClass<T>,
+export const activate = <T extends IStyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>,
 	schedulerType?: number): T =>
 {
 	let instance = processSD( instOrClass) as T;
@@ -1146,11 +1203,15 @@ export const activate = <T extends IStyleDefinition>(instOrClass: T | IStyleDefi
 
 /**
  * Deactivates the given style definition instance by removing its rules from DOM. Note that each
- * style definition instance maintains a reference counter of how many times it was activated and
- * deactivated. The rules are removed from DOM only when this reference counter goes down to 0.
+ * style definition instance maintains a counter of how many times it was activated and
+ * deactivated. The rules are removed from DOM only when this counter goes down to 0.
+ *
+ * @param sd Instance of a style definition class to be deactivated.
+ * @param schedulerType Identifier of a pre-defined or registered scheduler. If not specified, the
+ * scheduler set as default will be used.
  */
-export const deactivate = (instance: IStyleDefinition, schedulerType?: number): void =>
-	getActivator(schedulerType).deactivate( instance);
+export const deactivate = (sd: IStyleDefinition, schedulerType?: number): void =>
+	getActivator(schedulerType).deactivate( sd);
 
 
 

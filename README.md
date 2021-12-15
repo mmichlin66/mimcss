@@ -21,11 +21,11 @@ The goal of the Mimcss library is to support all CSS features in a type-safe and
 ## Features
 - Compatible with and independent of any library: use with React, Angular, Vue etc.
 - Co-exists with regular CSS files - doesn't require re-writing of all existing styles at once or at all. You can gradually introduce Mimcss into you project.
-- Stylesheets are defined as TypeScript Style Definition classes.
+- Stylesheets are defined as TypeScript classes.
 - Stylesheets are dynamically activated (inserted into DOM) and can be deactivated (removed from DOM) if desired.
 - Styled components are supported where each component instance gets its individual set of CSS rules isolated from other instances.
 - Names of CSS classes, IDs, animations, custom CSS properties, counters and grid lines and areas are auto-generated, while developers use properties that return these names. Auto-generation mechanism can be overridden if there is a need to use pre-defined names.
-- Theming via style definition class inheritance.
+- Support for theming via style definition class inheritance.
 - Support for server-side rendering.
 - All CSS rule types are supported including style rules and at-rules.
 - Automatic support for vendor prefixes.

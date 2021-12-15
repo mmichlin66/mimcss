@@ -92,24 +92,28 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
     // ProxyHandler method, which virtualizes all non-array properties
     set( t: StyleDefinition, p: PropertyKey, v: any, r: any): boolean
     {
-        if (typeof p !== "string")
+        if (typeof p !== "string" || typeof v !== "object")
             t[p] = v;
-        else if (p in t)
-        {
-            if (v instanceof RuleLike)
-                v.process( p);
-
-            t[p] = v;
-        }
         else
         {
-            // we don't virtualize arrays because there is no trap for isArray() method, which
-            // we use later in the processProperty() method.
-            if (!Array.isArray(v))
-                virtualize( t, p);
+            let isRuleLike = v instanceof RuleLike;
+            if (p in t)
+            {
+                if (isRuleLike)
+                    v.process( p);
 
-            t[p] = v;
-            this.processProperty( p, t[p]);
+                t[p] = v;
+            }
+            else
+            {
+                // we don't virtualize arrays because there is no trap for isArray() method, which
+                // we use later in the processProperty() method.
+                if (isRuleLike)
+                    virtualize( t, p);
+
+                t[p] = v;
+                this.processProperty( p, t[p]);
+            }
         }
 
         return true;
@@ -767,59 +771,31 @@ export const embeddedDecorator = (category: string, target: IStyleDefinitionClas
  * part of the constructor, the base class constructor's code only sees the value assigned in that
  * code. If another rule in the base class uses this first rule, this value is remembered.
  *
- * The `@virtual` decorator creates a Proxy object for the rule with the handler that keeps the
+ * The `virtualize` function creates a Proxy object for the rule with the handler that keeps the
  * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
  * rule, the first rule will see the overridden value of the rule when accessed in the
  * post-constructor code.
  */
 const virtualize = (target: any, name: string): void =>
 {
-    // symbol to keep the proxy handler value
-    let sym = Symbol(name);
+    // we may directly create the handler and the proxy because this function will be invoked
+    // for every StyleDefinition instance (as opposed to once per class).
+    let handler = new VirtHandler();
+    handler.x = new Proxy( {}, handler);
 
     Object.defineProperty( target, name, {
         enumerable: true,
-        get() { return ensureHandlerAndProxy( this, sym).x; },
 
-        set(v)
-        {
-            // set the new value to the handler so that it will use it from now on. The primitive
-            // values are boxed.
-            let type = typeof v;
-            ensureHandlerAndProxy( this, sym).t =
-                type === "string" ? new String(v) :
-                type === "number" ? new Number(v) :
-                type === "boolean" ? new Boolean(v) :
-                type === "symbol" ? new Object(v) :
-                v;
-        }
+        // return the proxy object
+        get(): any { return handler.x; },
+
+        // set the new value to the handler so that it will use it from now on.
+        set(v): void { handler.t = v; }
     });
 }
 
-
-
 /**
- * Creates handler and proxy in the given object using the given symbol if not created yet.
- * Returns the handler. Proxy is stored in the handler's property.
- */
-const ensureHandlerAndProxy = (instance: any, sym: symbol): VirtHandler =>
-{
-    // check whether we already have the handler and create it if we don't. In this
-    // case we also create a proxy for an empty object
-    let handler = instance[sym] as VirtHandler;
-    if (!handler)
-    {
-        instance[sym] = handler = new VirtHandler();
-        handler.x = new Proxy( {}, handler);
-    }
-
-    return handler;
-}
-
-
-
-/**
- * Handler for the proxy created by the `@virtual` decorator. It keeps the current value of a
+ * Handler for the proxy created by the `virtualize` function. It keeps the current value of a
  * rule so that the most recent value is used whenever the proxy is accessed.
  */
 class VirtHandler implements ProxyHandler<any>
@@ -854,12 +830,12 @@ class VirtHandler implements ProxyHandler<any>
 
     getPrototypeOf( t: any): object | null
         { return this.t == null ? null : Reflect.getPrototypeOf( this.t); }
-    setPrototypeOf(t: any, v: any): boolean
-        { return Reflect.setPrototypeOf( this.t, v); }
-    isExtensible(t: any): boolean
-        { return this.t == null ? false : Reflect.isExtensible( this.t); }
-    preventExtensions(t: any): boolean
-        { return this.t == null ? false : Reflect.preventExtensions( this.t); }
+    // setPrototypeOf(t: any, v: any): boolean
+    //     { return Reflect.setPrototypeOf( this.t, v); }
+    // isExtensible(t: any): boolean
+    //     { return this.t == null ? false : Reflect.isExtensible( this.t); }
+    // preventExtensions(t: any): boolean
+    //     { return this.t == null ? false : Reflect.preventExtensions( this.t); }
     getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
         { return Reflect.getOwnPropertyDescriptor( this.t, p); }
     has(t: any, p: PropertyKey): boolean
@@ -872,10 +848,10 @@ class VirtHandler implements ProxyHandler<any>
         { return Reflect.defineProperty( this.t, p, attrs); }
     ownKeys(t: any): ArrayLike<string | symbol>
         { return Reflect.ownKeys( this.t); }
-    apply(t: any, thisArg: any, args?: any): any
-        { return this.t.apply( thisArg, args); }
-    construct(t: any, args: any, newTarget?: any): object
-        { return Reflect.construct( this.t, args, newTarget); }
+    // apply(t: any, thisArg: any, args?: any): any
+    //     { return this.t.apply( thisArg, args); }
+    // construct(t: any, args: any, newTarget?: any): object
+    //     { return Reflect.construct( this.t, args, newTarget); }
 }
 
 
