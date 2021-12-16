@@ -142,23 +142,24 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
 		this.classes = classes;
 	}
 
+	// Prefix for CSS classes.
+	public prefix: ".";
+
     // This function is used when the object is specified as a value of a style property.
     // We return the CSS class name.
-    [symV2S](): string { return this.cssClassName; }
+    [symV2S](): string { return this.cssName; }
 
 	/** CSS rule selector string */
 	public get selectorText(): string
 	{
-		return this.cssClassName;
+		return this.cssName;
 	}
 
 	// Processes the given rule.
 	public process( ruleName: string | null): void
 	{
-        super.process( ruleName);
-
-        this.name = this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
-        this.cssClassName = "." + this.classes.map( cls => typeof cls === "string" ? cls : cls.name).join(".");
+        this.name = this.classes.map( v => typeof v === "string" ? v : v.name).join(" ");
+        this.cssName = "." + this.name.replace( / /g, ".");
     }
 
     // Implementation of the toString method returns the combined name of the classes (without
@@ -172,7 +173,7 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
     public name: string;
 
     /** All class CSS names (with dots) concatenated together */
-    public cssClassName: string;
+    public cssName: string;
 
     private classes: (IClassRule | IClassNameRule | string)[];
 }

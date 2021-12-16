@@ -209,7 +209,7 @@ export const sp2s = (propName: string, propVal: any): string =>
 
 
 /** Converts the given styleset to its string representation */
-export const styleset2s = (styleset: Styleset): string =>
+export const s2s = (styleset: Styleset): string =>
 {
     if (!styleset)
         return "{}";
@@ -294,7 +294,7 @@ const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
     else
     {
         let varRules = getVarsFromSD(customVars);
-        return varRules.map( varRule => [varRule.cssVarName, varRule.template,
+        return varRules.map( varRule => [varRule.cssName, varRule.template,
             sp2s( varRule.template, varRule.getValue())]);
     }
 }

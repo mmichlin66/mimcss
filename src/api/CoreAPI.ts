@@ -5,10 +5,11 @@
 } from "./CoreTypes"
 import {ICounterRule, IIDRule, INamespaceRule, IVarRule} from "./RuleTypes";
 import {AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType} from "./StyleTypes";
-import {ExtendedVarValue, VarTemplateName} from "./Stylesets";
+import {ExtendedVarValue, Styleset, VarTemplateName} from "./Stylesets";
+import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy} from "./MediaTypes";
 import {sp2s} from "../impl/StyleImpl";
+import {media2s, supports2s} from "../impl/MiscImpl";
 import {a2s, camelToDash, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
-
 
 
 
@@ -303,7 +304,7 @@ fdo["sel"] = v => a2s( v.items, { sep: "", recursive: true }, "");
  * namespace rule. The `tags` parameter specifies either a single tag or an array of tags. In
  * addition, an asterisk symbol (`"*"`) can be specified to target all elements.
  *
- * When multiple tags are specified, the will be combied using the selector combinators
+ * When multiple tags are specified, they will be combied using the selector combinators
  * specified by the `comb` parameter.
  *
  * **Examples:**
@@ -369,6 +370,58 @@ export const cubicBezier = (n1: Extended<number>, n2: Extended<number>, n3: Exte
  n4: Extended<number>): ICubicBezierFunc => ({ fn: "cubic-bezier", n1, n2, n3, n4 });
 
 fdo["cubic-bezier"] = ["n1", "n2", "n3", "n4"]
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// @media and @supports queries.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Tag function that represents a media query. This function allows expressing media queries in
+ * a natural string form while embedding media feature values in type safe manner. The string can
+ * contain any media expressions while the embedded objects must be of type [[IMediaFeatureset]].
+ * Multiple features in the feature set will be expanded into clauses combined with the "and"
+ * operator.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // screen and (min-width: 400px) and (max-width: 600px) and (orientation: portrait)
+ *     ifNarrowDevice = this.$media(
+ *         css.media`screen and ${{width:[400,600], orientation: "portrait"}}`, ...)
+ * }
+ * ```
+ */
+export const media = (parts: TemplateStringsArray, ...params: ExtendedMediaFeatureset[]): IMediaQueryProxy =>
+    () => tag2s( parts, params, v => typeof v === "string" ? v : media2s(v));
+
+
+
+/**
+ * Tag function that represents a supports query. This function allows expressing supports
+ * queries in a natural string form while embedding media feature values in type safe manner. The
+ * string can contain any supports expressions while the embedded objects must be of type
+ * Styleset. Multiple properties in the styleset will be expanded into clauses combined with the
+ * "or" operator.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // not (transform-origin: 30px 30px 30px)
+ *     ifNoTransformOrigin = this.$supports(
+ *         css.supports`not (${{transform-origin: [30, 30, 30]}})`, ...)
+ * }
+ * ```
+ */
+export const supports = (parts: TemplateStringsArray, ...params: Styleset[]): ISupportsQueryProxy =>
+    () => tag2s( parts, params, v => typeof v === "string" ? v : supports2s(v));
 
 
 
@@ -508,7 +561,7 @@ export const counters = (counterObj: Extended<ICounterRule | string>,
  * in any context.
  */
 export const usevar = <K extends VarTemplateName>( varObj: IVarRule<K>, fallback?: ExtendedVarValue<K>): IRawProxy =>
-    () => f2s( "var", [varObj.cssVarName, sp2s( varObj.template, fallback)]);
+    () => f2s( "var", [varObj.cssName, sp2s( varObj.template, fallback)]);
 
 
 

@@ -1,6 +1,7 @@
 import {
     IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IStyleDefinition,
-    IPageRule
+    IPageRule,
+    IPrefixedNamedEntity
 } from "../api/RuleTypes";
 import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
@@ -9,7 +10,7 @@ import {
 import {CssSelector, IParameterizedPseudoEntityFunc, PagePseudoClass} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
 import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
-import {styleset2s, sp2s} from "../impl/StyleImpl"
+import {s2s, sp2s} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
 
@@ -116,7 +117,6 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Processes the given rule.
 	public process( ruleName: string | null): void
 	{
-		super.process( ruleName);
         this.forEachDepRule( (depRule: DepRule) => depRule.process( null));
 	}
 
@@ -125,7 +125,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Converts the rule to CSS string representing the rule.
 	public toCss(): string
 	{
-		return this.selectorText + styleset2s( this.styleset);
+		return this.selectorText + s2s( this.styleset);
 	}
 
 
@@ -219,7 +219,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-    public setProp<K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K],
+    public setProp<K extends keyof IStyleset>( name: K, value?: ExtendedIStyleset[K] | null,
         important?: boolean, schedulerType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
@@ -277,7 +277,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-            getActivator(schedulerType).updateStyle( this.cssRule, varObj.cssVarName,
+            getActivator(schedulerType).updateStyle( this.cssRule, varObj.cssName,
                 value == null ? null : sp2s( varObj.template, value),
                 important);
         }
@@ -404,7 +404,7 @@ export class AbstractRule extends StyleRule
  * The NamedStyleRule class is a base for style rule classes that are also named entities - such
  * as class rule and ID rule.
  */
-abstract class NamedStyleRule extends StyleRule implements INamedEntity
+abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 {
 	public constructor( sd: IStyleDefinition, styleset?: CombinedStyleset | CombinedStyleset[],
         nameOverride?: string | INamedEntity)
@@ -419,7 +419,7 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 		super.process( ruleName);
 
 		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
-        this.cssName = this.cssPrefix + this.name.replace( / /g, this.cssPrefix);
+        this.cssName = this.prefix + this.name;
 	}
 
 	// Returns the selector part of the style rule.
@@ -436,7 +436,7 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 
 	// Returns prefix that is put before the entity name to create a CSS name used in style rule
 	// selectors.
-	protected abstract get cssPrefix(): string;
+	public prefix: "." | "#";
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -462,8 +462,11 @@ abstract class NamedStyleRule extends StyleRule implements INamedEntity
 /**
  * The ClassRule class describes a styleset that applies to elements identified by a CSS class.
  */
-export class ClassRule extends NamedStyleRule implements IClassRule
+export class ClassRule extends NamedStyleRule implements IClassRule, IPrefixedNamedEntity
 {
+	// Prefix for CSS classes.
+	public prefix: "." = ".";
+
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If returns false, the property with the given name will not be added to the styleset.
 	protected parseSP( propName: string, propVal: any): boolean
@@ -490,17 +493,10 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         // referenced class rules and append them to the name.
         if (this.parents)
         {
-            this.name += " " + this.parents.map( cls => typeof cls === "string" ? cls : cls.name).join(" ");
+            this.name += " " + this.parents.map( v => typeof v === "string" ? v : v.name).join(" ");
             this.cssName = "." + this.name.replace( / /g, ".");
         }
 	}
-
-	/** Name of the class prefixed with "." */
-	public get cssClassName(): string { return this.cssName; }
-
-	// Returns prefix that is put before the entity name to create a CSS name used in style rule
-	// selectors.
-	protected get cssPrefix(): string { return "."; }
 
     // remembered value of the "++" property of the input styleset
     private parents?: ParentClassType[];
@@ -511,14 +507,10 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 /**
  * The IDRule class describes a styleset that applies to elements identified by an ID.
  */
-export class IDRule extends NamedStyleRule implements IIDRule
+export class IDRule extends NamedStyleRule implements IIDRule, IPrefixedNamedEntity
 {
-	/** Name of the element ID prefixed with "#" */
-	public get cssIDName(): string { return this.cssName; }
-
-	// Returns prefix that is put before the entity name to create a CSS name used in style rule
-	// selectors.
-	protected get cssPrefix(): string { return "#"; }
+	// Prefix for CSS element identifiers.
+	public prefix: "#" = "#";
 }
 
 

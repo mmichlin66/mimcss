@@ -1,9 +1,8 @@
-﻿import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy, MediaStatement, SupportsStatement} from "./MediaTypes";
+﻿import {MediaStatement, SupportsStatement} from "./MediaTypes";
 import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Stylesets"
-import {sp2s, s_registerSP, s2ss, styleset2s} from "../impl/StyleImpl"
+import {sp2s, s_registerSP, s2ss, s2s} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
-import {tag2s} from "../impl/Utils";
 
 
 
@@ -75,7 +74,7 @@ export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: Stri
  * Serializes the given [[Styleset]] to a string.
  * @param styleset
  */
-export const stylesetToString = (styleset: Styleset): string => styleset2s( styleset);
+export const stylesetToString = (styleset: Styleset): string => s2s( styleset);
 
 
 
@@ -186,26 +185,17 @@ declare global
     }
 }
 
-
-// functions on HTML and SVG element prototypes
-HTMLElement.prototype.setStyleProp = setThisElementStyleProp;
-SVGElement.prototype.setStyleProp = setThisElementStyleProp;
-
-HTMLElement.prototype.setStyleset = setThisElementStyle;
-SVGElement.prototype.setStyleset = setThisElementStyle;
-
-
-
 // Sets style property on HTML or SVG element
-function setThisElementStyleProp<K extends keyof IStyleset>( name: K,
-    value: ExtendedIStyleset[K], schedulerType?: number): void
+HTMLElement.prototype.setStyleProp = SVGElement.prototype.setStyleProp =
+    function <K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K],
+        schedulerType?: number): void
 {
     setElementStyleProp( this, name, value, schedulerType);
 }
 
-
-
-function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
+// Sets styleset on HTML or SVG element
+HTMLElement.prototype.setStyleset = SVGElement.prototype.setStyleset =
+    function( styleset: Styleset, schedulerType?: number): void
 {
     setElementStyle( this, styleset, schedulerType);
 }
@@ -219,57 +209,11 @@ function setThisElementStyle( styleset: Styleset, schedulerType?: number): void
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Tag function that represents a media query. This function allows expressing media queries in
- * a natural string form while embedding media feature values in type safe manner. The string can
- * contain any media expressions while the embedded objects must be of type [[IMediaFeatureset]].
- * Multiple features in the feature set will be expanded into clauses combined with the "and"
- * operator.
- *
- * **Example:**
- *
- * ```typescript
- * class MyStyles extends StyleDefinition
- * {
- *     // screen and (min-width: 400px) and (max-width: 600px) and (orientation: portrait)
- *     ifNarrowDevice = this.$media(
- *         css.media`screen and ${{width:[400,600], orientation: "portrait"}}`, ...)
- * }
- * ```
- */
- export const media = (parts: TemplateStringsArray, ...params: ExtendedMediaFeatureset[]): IMediaQueryProxy =>
-    () => tag2s( parts, params, v => typeof v === "string" ? v : media2s(v));
-
-
-
-/**
  * Converts the given media query value to the CSS media query string. This function can be used
  * by libraries that allow specifying [[MediaStatement]] for the `media` attribute of elements
  * such as `<link>`, `<style>` and `<source>`
  */
 export const mediaToString = (query: MediaStatement): string => media2s( query);
-
-
-
-/**
- * Tag function that represents a supports query. This function allows expressing supports
- * queries in a natural string form while embedding media feature values in type safe manner. The
- * string can contain any supports expressions while the embedded objects must be of type
- * Styleset. Multiple properties in the styleset will be expanded into clauses combined with the
- * "or" operator.
- *
- * **Example:**
- *
- * ```typescript
- * class MyStyles extends StyleDefinition
- * {
- *     // not (transform-origin: 30px 30px 30px)
- *     ifNoTransformOrigin = this.$supports(
- *         css.supports`not (${{transform-origin: [30, 30, 30]}})`, ...)
- * }
- * ```
- */
- export const supports = (parts: TemplateStringsArray, ...params: Styleset[]): ISupportsQueryProxy =>
-    () => tag2s( parts, params, v => typeof v === "string" ? v : supports2s(v));
 
 
 

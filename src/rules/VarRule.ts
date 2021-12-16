@@ -25,20 +25,14 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     // We return the var(--name) expression.
     public toString(): string
     {
-        return `var(${this.cssVarName})`;
+        return `var(${this.cssName})`;
     }
-
-
 
     // Processes the given rule.
     public process( ruleName: string | null): void
     {
-        super.process( ruleName);
         this.name = this.rc.getScopedName( ruleName, this.nameOverride);
-        if (this.name.startsWith("--"))
-            this.name = this.name.substr(2);
-
-        this.cssVarName = "--" + this.name;
+        this.cssName = "--" + this.name;
     }
 
 
@@ -50,8 +44,6 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     {
         return this.value!;
     }
-
-
 
     /**
      * Sets new value of this custom CSS property.
@@ -71,7 +63,7 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
                 value = value["!"];
             }
 
-            this.rc.setVarValue( this.cssVarName,
+            this.rc.setVarValue( this.cssName,
                 value == null
                     ? null
                     : sp2s( this.template, value), important, schedulerType)
@@ -83,6 +75,9 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     // Name of a non-custom CSS property whose type determines the type of the custom property value.
     public template: K;
 
+	// Prefix for CSS classes.
+	public prefix: "--" = "--";
+
     /**
      * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
      * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
@@ -93,7 +88,7 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     /**
      * Custom CSS property name prefixed with `"--"`.
      */
-    public cssVarName: string;
+    public cssName: string;
 
     // Value of the custom CSS property.
     protected value?: ExtendedVarValue<K>;
@@ -129,7 +124,7 @@ export class VarRule<K extends VarTemplateName = any> extends VarBaseRule<K>
 	// Converts the rule to CSS string.
 	public toCss(): string | null
 	{
-		return this.value == null ? null : `${this.cssVarName}: ${sp2s( this.template, this.value)}`;
+		return this.value == null ? null : `${this.cssName}: ${sp2s( this.template, this.value)}`;
 	}
 }
 
@@ -163,7 +158,7 @@ export class PropertyRule<K extends keyof ISyntaxTypeStyleset = any, T extends K
 	// style definition class, to which this rule belongs, is activated.
 	public insert( ruleBag: IMimcssRuleBag): void
     {
-		let ruleText = `@property ${this.cssVarName}{syntax:'${this.syntax}';` +
+		let ruleText = `@property ${this.cssName}{syntax:'${this.syntax}';` +
             `inherits:${this.inherits};initial-value:${sp2s( this.template, this.value)};}`;
 
         this.cssRule = ruleBag.add( ruleText)?.cssRule as CSSRule;
@@ -192,36 +187,26 @@ export class PropertyRule<K extends keyof ISyntaxTypeStyleset = any, T extends K
  */
 export class ConstRule<K extends VarTemplateName = any> extends RuleLike implements IConstRule<K>
 {
-	public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>, cachedValue?: string)
+	public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>)
 	{
         super(sd);
 		this.template = template;
-        this.value = value;
-        this._val = cachedValue;
+		this.value = value;
+        this.s = sp2s( template, value);
 	}
 
 
     // This function is used when the object is specified as a value of a style property.
-    public toString(): string { return this._val!; }
-
-
-	// Processes the given rule.
-	public process( ruleName: string | null): void
-	{
-        super.process( ruleName);
-
-        if (!this._val)
-		    this._val = sp2s( this.template, this.value);
-	}
+    public toString(): string { return this.s; }
 
 
 
-	/**
+    /**
 	 * Gets the value of the property.
 	 */
     public getValue(): ExtendedVarValue<K>
     {
-        return this.value!;
+        return this.value;
     }
 
 
@@ -229,11 +214,11 @@ export class ConstRule<K extends VarTemplateName = any> extends RuleLike impleme
 	// Name of a non-custom CSS property whose type determines the type of the custom property value.
 	public template: K;
 
-	// Value of the custom CSS property.
+	// Constant's value as a string.
 	private value?: ExtendedVarValue<K>;
 
-	// Property value cached when the rule is proceed.
-	private _val?: string;
+	// Constant's value as a string.
+	private s: string;
 }
 
 

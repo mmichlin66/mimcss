@@ -44,11 +44,11 @@ export abstract class RuleLike
         this.rc = sd[symRC] as IRuleContainer;
     }
 
-	/** Processes the rule. */
-	public process( propName: string | null, prevValue?: any): void
-	{
-		this.pn = propName;
-	}
+	/**
+     * Processes the rule assigned to the property with the given name. Property name can be null
+     * for rules not assigned to a property; e.g. dependent rules defined in the CombinedStyleset.
+     */
+	public process( propName: string | null): void {}
 
 
 
@@ -57,12 +57,6 @@ export abstract class RuleLike
 
 	/** Rule Container corresponding to the style definition object to which this rule belongs. */
 	public rc: IRuleContainer;
-
-	/**
-     * Name of the property of the stylesheet definition to which this rule was assigned. This can
-     * be null for rules not created via assignment to style definition properties.
-     */
-	public pn: string | null;
 }
 
 

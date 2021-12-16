@@ -28,7 +28,6 @@ export class CounterRule extends RuleLike implements ICounterRule
 	// Processes the given rule.
 	public process( ruleName: string | null): void
 	{
-        super.process( ruleName);
 		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 	}
 
@@ -79,7 +78,6 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	// Processes the given rule.
 	public process( ruleName: string | null): void
 	{
-        super.process( ruleName);
 		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 	}
 

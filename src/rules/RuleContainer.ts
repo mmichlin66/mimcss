@@ -89,13 +89,18 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
 
-    // ProxyHandler method, which virtualizes all non-array properties
+    // ProxyHandler method, which virtualizes all RuleLike properties
     set( t: StyleDefinition, p: PropertyKey, v: any, r: any): boolean
     {
         if (typeof p !== "string" || typeof v !== "object")
             t[p] = v;
         else
         {
+            // we only virtualize rule-like objects. We don't virtualize arrays because there
+            // is no trap for isArray() method, which we use later in the processProperty()
+            // method. We also don't virtualize primitive types because there is no trap for
+            // typeof operation (needed when converting values to strings). We also don't
+            // virtualize style definition instances (results of $use() method invocations).
             let isRuleLike = v instanceof RuleLike;
             if (p in t)
             {
@@ -106,8 +111,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             }
             else
             {
-                // we don't virtualize arrays because there is no trap for isArray() method, which
-                // we use later in the processProperty() method.
                 if (isRuleLike)
                     virtualize( t, p);
 
