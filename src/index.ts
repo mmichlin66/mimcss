@@ -3,6 +3,7 @@
 export * from "./api/CoreTypes";
 export * from "./api/NumericTypes";
 export * from "./api/ColorTypes";
+export * from "./api/CounterTypes";
 export * from "./api/ShapeTypes";
 export * from "./api/FontTypes";
 export * from "./api/MediaTypes";

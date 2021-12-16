@@ -1,6 +1,6 @@
 {
     "name": "mimcss",
-    "version": "0.11.8",
+    "version": "0.11.9",
     "description": "Authoring CSS in TypeScript",
     "homepage": "https://mmichlin66.github.io/mimcss/guide/introduction.html",
     "repository": "github:mmichlin66/mimcss",
@@ -44,6 +44,7 @@
         "lib/api/ColorTypes.d.ts",
         "lib/api/ColorAPI.d.ts",
         "lib/api/FontTypes.d.ts",
+        "lib/api/CounterTypes.d.ts",
         "lib/api/ShapeTypes.d.ts",
         "lib/api/ShapeAPI.d.ts",
         "lib/api/MediaTypes.d.ts",
