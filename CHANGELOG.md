@@ -2,7 +2,9 @@
 
 ## Non-breaking changes
 
-1. Add support for server-side rendering and hydration.
+1. Add support for server-side rendering and hydration. Use `startSSR()/stopSSR()` functions during server-side rendering and `startHydration()/stopHydration()` during the first rendering of SSR-produced HTML page.
+2. Use the `Scoped` name generation method in Debug builds (`mimcss.dev.js`) by default - instead of the `UniqueScoped` method in previous versions. This produces somewhat more user friendly and, most importantly, predictable class names, which can be used during tests. Note that if you have identically named style definition classes that have a chance to be activated at the same time, you need to set the `UniqueScoped` method using the `configNameGeneration()` function.
+3. Upgrade TypeScript version used during Mimcss builds to 4.5.4, which brings some new DOM/CSSOM interfaces - notably, CSSCounterStyleRule. Since this interface is used in Mimcss declaration files, user must use TypeScript version 4.4 or more recent.
 
 
 # 0.11.7

@@ -1229,37 +1229,51 @@ export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // SSR support.
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sets server-side activation context. Throws an error if non-default activation context is
- * already set.
+ * Starts server-side activation functionality. Throws an error if non-default activation
+ * context is already set. This function should be called before any style definitions that
+ * are part of the application are activated.
+ *
+ * Calling this function causes all activated style definitions to be serialized to a string,
+ * which can be retrieved by calling the [[stopSSR]] function.
  */
 export const startSSR = (): void => s_startSSR();
 
 /**
- * Stops server-side activation functionality and returns a string with serialized styles. The
- * string should be added to the `<head>` element using `insertAdjacentHTML()` method.
+ * Stops server-side activation functionality and returns a string with serialized styles style
+ * definitions that were activated during application rendering. The string should be added to
+ * the `<head>` element of the HTML page using `insertAdjacentHTML()` method.
+ *
  * Throws an error if SSR has not been started.
- * @returns String containing serialized styles
+ * @returns String containing serialized styles.
  */
 export const stopSSR = (): string => s_stopSSR();
 
 
 
 /**
- * Sets hydration activation context. Throws an error if non-default activation context is
+ * Starts hydration activation functionality. Throws an error if non-default activation context is
  * already set.
+ *
+ * Calling this function causes all activated style definitions to find appropriate `<style>`
+ * elements instead of creating new ones. The functionality assumes that those elements were put
+ * to the HTML during server-side page rendering. It also assumes that the style definitions and
+ * the rules defined in these style definitions are exaclty the same, and the rules are in the same
+ * order as they were during the server-side rendering. Otherwise the behavior is unpredictable.
  */
 export const startHydration = (): void => s_startHydration();
 
 /**
- * Stops hydration activation functionality and restore the default activation context.
- * @returns String containing serialized styles
+ * Stops hydration activation functionality and restore the default activation context. After this
+ * function is called, all style activations will create new `<style>` elements in the HTML.
+ *
+ * Throws an error if SSR has not been started.
  */
 export const stopHydration = (): void => s_stopHydration();
 
