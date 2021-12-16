@@ -289,16 +289,7 @@ export interface ICounterRule extends INamedEntity
 export interface ICounterStyleRule extends IRule, INamedEntity
 {
 	/** CSSOM counter-style rule */
-	readonly cssRule: CSSRule | null;
-	// readonly cssRule: CSSCounterStyleRule | null;
-
-    /**
-     * Name of the counter style - this property returns the same value as the `name` property
-     * inherited from the [[INamedEntity]] interface. This property is only needed to distinguish
-     * this interface from others.
-     * @ignore
-     */
-	readonly counterStyleName: string;
+	readonly cssRule: CSSCounterStyleRule | null;
 }
 
 

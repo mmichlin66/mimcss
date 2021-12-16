@@ -65,17 +65,13 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 
 
 
-    /** Name of the counter */
-	public get counterStyleName(): string { return this.name; }
-
-
-
     // This function is used when the object is specified as a value in a style property or in
     // another counter style rule. We return the counter style name.
     public toString(): string { return this.name; }
 
 
-	// Processes the given rule.
+
+    // Processes the given rule.
 	public process( ruleName: string | null): void
 	{
 		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
@@ -85,22 +81,13 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 	public insert( ruleBag: IMimcssRuleBag): void
 	{
 		let ruleText = `@counter-style ${this.name} {${counterStyleset2s( this.counterStyleset)}}`;
-		this.cssRule = ruleBag.add( ruleText)?.cssRule as CSSRule;
+		this.cssRule = ruleBag.add( ruleText)?.cssRule as CSSCounterStyleRule;
 	}
 
 
 
-	// Serializes this rule to a string.
-    private toCss(): string
-    {
-		return `@counter-style ${this.name} {${counterStyleset2s( this.counterStyleset)}}`;
-    }
-
-
-
 	/** SOM counter-style rule */
-	// public cssRule: CSSCounterStyleRule;
-	public cssRule: CSSRule | null;
+	public cssRule: CSSCounterStyleRule;
 
     /**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
