@@ -436,7 +436,7 @@ export const configNames = (method: NameGenerationMethod, prefix?: string): void
 let s_nameGeneratonMethod = NameGenerationMethod.Optimized;
 
 /// #if DEBUG
-s_nameGeneratonMethod = NameGenerationMethod.UniqueScoped;
+s_nameGeneratonMethod = NameGenerationMethod.Scoped;
 /// #endif
 
 /**
