@@ -765,7 +765,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     "<resolution>#": { any: WKF.Resolution, sep: ","},
 
     "<color>": WKF.Color,
-    "<color>+": { any: WKF.Color },
+    "<color>+": WKF.Colors,
     "<color>#": { any: WKF.Color, sep: ","},
 
     "<image>#": WKF.OneOrManyWithComma,

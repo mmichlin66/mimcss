@@ -115,7 +115,7 @@ export interface IStyleRule extends IRule, IRuleWithSelector
  * The `IClassRule` interface represents a style rule where the selector is a single class name.
  * This interface is returned from the [[$class]] function.
  */
-export interface IClassRule extends IStyleRule, INamedEntity
+export interface IClassRule extends IStyleRule, IPrefixedNamedEntity
 {
 	// Prefix for CSS classes.
 	prefix: ".";
@@ -156,7 +156,7 @@ export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType
  * The `IIDRule` interface represents a style rule where the selector is a single element ID.
  * This interface is returned from the [[$id]] function.
  */
-export interface IIDRule extends IStyleRule, INamedEntity
+export interface IIDRule extends IStyleRule, IPrefixedNamedEntity
 {
 	// Prefix for CSS element identifiers.
 	prefix: "#";

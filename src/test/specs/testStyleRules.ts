@@ -180,7 +180,7 @@ describe("style rules:", () =>
 				color: "red",
 				"&": [
 					[ "&.other, .other& div > span", { color: "brown" } ],
-					[ css.selector`&${this.cls1}, ${this.cls1}& + ${"table"}`, { color: "brown" } ]
+					[ `&${this.cls1.cssName}, ${this.cls1.cssName}& + table`, { color: "brown" } ]
 				]
 			})
 		}

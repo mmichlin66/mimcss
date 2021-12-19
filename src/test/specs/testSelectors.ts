@@ -59,6 +59,31 @@ describe("selectors:", () =>
 
 
 
+    describe("template literals", () =>
+    {
+        it("tag, ID, class", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                cls1 = this.$class()
+                id1 = this.$id()
+
+                s1 = this.$style(
+                    `p, ${this.id1.cssName}, ${this.cls1.cssName}`,
+                    { color: "red" },
+                )
+            }
+
+            let a = css.activate( A);
+
+            expect(a.s1.cssRule!.selectorText).toEqual("p, #A_id1, .A_cls1");
+
+            css.deactivate( a);
+        })
+    })
+
+
+
     describe("css.selectors`` tag function", () =>
     {
         it("tag, ID, class", () =>

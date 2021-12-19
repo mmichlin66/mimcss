@@ -255,7 +255,7 @@ This is equivalent to the following CSS:
 **See Also:** [Mimcss Guide: Reusing Styles](https://www.mimcss.com/guide/defining-styles.html#reusing-styles)
 
 ### Pseudo Classes and Pseudo Elements
-While pseudo classes and pseudo elements can be defined using regular style rules (via the `$style` function), there is an easier way to define them:
+While pseudo classes and pseudo elements can be defined using regular style rules (via the `$style` method), there is an easier way to define them:
 
 ```tsx
 class MyStyles extends css.StyleDefinition

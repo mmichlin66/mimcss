@@ -48,6 +48,17 @@ export abstract class StyleRule extends Rule implements IStyleRule
      */
     [symV2S](): string { return this.selectorText; }
 
+    /**
+     * The `toString()` method is used whenever there is the need to convert the object to string.
+     * In `v2s` context, the `toString()` method has lower precedence than the `symV2S` property
+     * and this allows the `toString()` to be overridden in derived classes without changing the
+     * `syV2S` functionality. For example, the `toString()` for class and ID rules will return
+     * the clas and ID names (without the prefixes) respectively, while the basic (this)
+     * implementation returns the selector text.
+     */
+    public toString(): string { return this.selectorText; }
+
+
 
 	/**
 	 * Goes over properties in the given styleset and parses them into proper styleset, set of
@@ -219,7 +230,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-    public setProp<K extends keyof IStyleset>( name: K, value?: ExtendedIStyleset[K] | null,
+    public setProp<K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K] | null,
         important?: boolean, schedulerType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
@@ -246,7 +257,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
-	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: ExtendedVarValue<K>,
+	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: ExtendedVarValue<K> | null,
 		important?: boolean, schedulerType?: number): void
 	{
 		if (!varObj)

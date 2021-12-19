@@ -66,7 +66,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * if it was not provided to the constructor when creating the style definition class manually.
      *
      * The `$parent` reference is used when there is a need to refer from grouping rules (created
-     * by `$media()` or `$support()` functions) to the rules defined in the parent style definition
+     * by `$media()` or `$support()` methods) to the rules defined in the parent style definition
      * class. If there are multiple nested grouping rules, then the constuct `this.$parent.$parent...`
      * allows reaching to rules defined in any ancestor style definition class.
      *
@@ -949,7 +949,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * many times this function is invoked. However, if an instance, which has not yet been processed,
      * is passed, then a new set of unique names will be created for it.
      *
-     * The `$use` function is used to reference a style definition from another style definition, for
+     * The `$use` method is used to reference a style definition from another style definition, for
      * example:
      *
      * ```typescript
@@ -969,7 +969,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * When the `$use` function is called, the rules from the referenced style definition are not
+     * When the `$use` method is called, the rules from the referenced style definition are not
      * inserted into the DOM; they will be inserted when the style definition class that contains
      * the `$use` call is activated. The same style definition class can be used from several
      * other style definitions: as long as there is at least one referencing style definition that

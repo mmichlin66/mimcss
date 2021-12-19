@@ -1,3 +1,8 @@
+# 0.11.9
+
+1. Fix build issue by adding CounterTypes.d.ts to package.json
+
+
 # 0.11.8
 
 ## Non-breaking changes
