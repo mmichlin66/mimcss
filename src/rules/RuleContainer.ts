@@ -257,6 +257,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		if (!s_activationContext || ++this.refCount > 1)
             return;
 
+        /// #if DEBUG
+        let timeLabel = `Activating style definition '${this.name}'`;
+        console.time( timeLabel);
+        /// #endif
+
         // only the top-level not-embedded style definitions create the `<style>` element
         if (!this.pc)
         {
@@ -279,9 +284,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         // one for its theme base class. If no, then deactivate the theme instance currently set
         // as active. In any case, set our new instance as the currently active one. We ignore
         // theme declaration classes - those that directly derive from ThemeDefinition
-        if (this.sd instanceof ThemeDefinition && Object.getPrototypeOf(this.sdc) !== ThemeDefinition)
+        if (isThemeImplementation(this.sd))
         {
-            let themeClass = this.sd[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
+            let themeClass = this.sdc as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
                 let currInstance = getCurrentTheme( themeClass);
@@ -296,6 +301,10 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         }
 
         this.insert( this.elm!);
+
+        /// #if DEBUG
+        console.timeEnd( timeLabel);
+        /// #endif
     }
 
 
@@ -316,6 +325,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		if (--this.refCount > 0)
             return;
 
+        /// #if DEBUG
+        let timeLabel = `Deactivating style definition '${this.name}'`;
+        console.time( timeLabel);
+        /// #endif
+
         this.clear();
 
         // only the top-level not-embedded style defiitions create the `<style>` element
@@ -326,9 +340,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
         // if this is a theme class deactivation, check whether the instance is set as the current
         // one for its theme base class. If yes, remove it as the currently active one.
-        if (this.sd instanceof ThemeDefinition && Object.getPrototypeOf(this.sdc) !== ThemeDefinition)
+        if (isThemeImplementation(this.sd))
         {
-            let themeClass = this.sd[symClass] as unknown as IStyleDefinitionClass<ThemeDefinition>;
+            let themeClass = this.sdc as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
                 let currInstance = getCurrentTheme( themeClass);
@@ -336,6 +350,10 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
                     removeCurrentTheme( themeClass);
             }
         }
+
+        /// #if DEBUG
+        console.timeEnd( timeLabel);
+        /// #endif
 	}
 
 
@@ -869,6 +887,19 @@ class VirtHandler implements ProxyHandler<any>
  * Map of them definition classes to the instances that are currently active for these classes.
  */
 let s_themeInstanceMap = new Map<IStyleDefinitionClass<ThemeDefinition>,ThemeDefinition>();
+
+
+
+/**
+ * Determines whether this style definition class is an implementatin of a theme - that is, it is
+ * an instance of ThemeDeclaration class but doesn't derive directly from ThemeDeclaration. It can
+ * serve as type guard.
+ *
+ * @param sd Style definition instance
+ * @returns boolean
+ */
+const isThemeImplementation = (sd: IStyleDefinition): sd is ThemeDefinition =>
+    sd instanceof ThemeDefinition && Object.getPrototypeOf(sd[symClass]) !== ThemeDefinition;
 
 
 
