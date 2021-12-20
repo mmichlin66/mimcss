@@ -179,15 +179,11 @@ wkf[WKF.Frequency] = v => FrequencyMath.v2s( v);
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// // Converts single position style value to the CSS string.
-// const pos2s = (val: Extended<CssPosition>): string => v2s( val, { any: WKF.Length });
-
+// Converts single position style value to the CSS string.
 wkf[WKF.Position] = (val: Extended<CssPosition>): string => v2s( val, { any: WKF.Length });
 wkf[WKF.AtPosition] = (v: Extended<CssPosition>) => v == null ? "" : "at " + wkf[WKF.Position](v);
 
-/**
- * Converts multi-position style value to the CSS string.
- */
+// Converts multi-position style value to the CSS string.
  wkf[WKF.MultiPosition] = (val: OneOrMany<CssPosition>): string =>
     v2s( val, {
         arr2: { any: WKF.Position, sep: "," },

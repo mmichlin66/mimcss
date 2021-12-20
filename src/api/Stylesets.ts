@@ -352,7 +352,7 @@ export interface IStyleset
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color
      */
-     borderInlineColor?: OneOrPair<CssColor>;
+    borderInlineColor?: OneOrPair<CssColor>;
 
      /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end
@@ -1201,7 +1201,7 @@ export interface IStyleset
     mask?:st. DefaultStyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-image
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/mask-border
      */
     maskBorder?: st.MaskBorder_StyleType;
 

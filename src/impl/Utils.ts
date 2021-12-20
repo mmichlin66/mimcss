@@ -328,8 +328,7 @@ export const o2s = (val: {[p:string]: any}, options: P2SOptions, separator?: str
         if (prefix)
             params.push( prefix);
 
-        let options = typeof nameOrTuple === "string" ? defaultOptions : nameOrTuple[1];
-        params.push( v2s( propVal, options));
+        params.push( v2s( propVal, typeof nameOrTuple === "string" ? defaultOptions : nameOrTuple[1]));
     }
 
     return params.filter( v => !!v).join( separator ?? " ");
