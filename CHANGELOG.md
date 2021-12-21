@@ -1,3 +1,9 @@
+# 0.11.10
+
+1. IClassRule and IIDRule interfaces now extend the IPrefixedNamedEntity interface.
+2. Add `size` property to `@page` at-rule.
+
+
 # 0.11.9
 
 1. Fix build issue by adding CounterTypes.d.ts to package.json

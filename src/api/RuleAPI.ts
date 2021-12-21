@@ -10,7 +10,8 @@ import {ExtendedFontFace} from "./FontTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {
     Styleset, VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset,
-    ISyntaxTypeStyleset
+    ISyntaxTypeStyleset,
+    PageRuleStyleset
 } from "./Stylesets";
 import {symRC} from "../rules/Rule";
 import {
@@ -521,6 +522,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
         syntax: K, initValue: ExtendedVarValue<K>, inherits: boolean,
         nameOverride?: string | IVarRule<K>): IVarRule<K>
 
+
+
     /**
      * Creates new `@property` rule. The property name will be created when the rule is processed
      * as part of the style definition class. The name can be also overridden by providing either
@@ -647,6 +650,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
         return new CounterRule( this, nameOverride);
     }
 
+
+
     /**
      * Creates new counter style rule. The counter style name will be created when the rule is
      * processed as part of the style definition class. The name can be also overridden by providing
@@ -677,6 +682,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     {
         return new CounterStyleRule( this, counterStyleset, nameOverride);
     }
+
+
 
     /**
      * Creates a new grid line rule. The line name will be created when the rule is processed as
@@ -837,6 +844,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
         return new ImportRule( this, url, mediaQuery, supportsQuery);
     }
 
+
+
     /**
      * Creates new `@namespace` rule.
      *
@@ -860,6 +869,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
         return new NamespaceRule( this, namespace, prefix);
     }
 
+
+
     /**
      * Creates new `@page` rule.
      *
@@ -878,10 +889,12 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @param styleset Styles to apply.
      * @returns The `IPageRule` object that represents the page rule.
      */
-    public $page( pseudoClass?: PagePseudoClass, styleset?: Styleset): IPageRule
+    public $page( pseudoClass?: PagePseudoClass, styleset?: PageRuleStyleset): IPageRule
     {
         return new PageRule( this, pseudoClass, styleset);
     }
+
+
 
     /**
      * Creates a new `@supports` rule.
@@ -911,6 +924,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     {
         return new SupportsRule( this, statement, instOrClass);
     }
+
+
 
     /**
      * Creates new `@media` rule.

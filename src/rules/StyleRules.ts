@@ -5,7 +5,7 @@ import {
 } from "../api/RuleTypes";
 import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
-    CombinedStyleset, ParentClassType, IStyleset
+    CombinedStyleset, ParentClassType, IStyleset, PageRuleStyleset
 } from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc, PagePseudoClass} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
@@ -555,7 +555,7 @@ export class SelectorRule extends StyleRule
  */
 export class PageRule extends StyleRule implements IPageRule
 {
-    public constructor( sd: IStyleDefinition, pseudoClass?: PagePseudoClass, style?: Styleset)
+    public constructor( sd: IStyleDefinition, pseudoClass?: PagePseudoClass, style?: PageRuleStyleset)
     {
         super( sd, style);
         this.pseudoClass = pseudoClass;

@@ -578,6 +578,7 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     },
     rowGap: WKF.Length,
 
+    size: WKF.MultiLengthWithSpace,
     stroke: WKF.Color,
 
     textCombineUpright: {
