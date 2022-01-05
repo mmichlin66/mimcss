@@ -1,13 +1,16 @@
-import {INamedEntity, IStyleDefinition, IStyleDefinitionClass, IVarRule, NameGenerationMethod} from "../api/RuleTypes"
+import {
+    ActivationType, IActivationContext, IAdoptionActivationContext, IClientActivationContext,
+    INamedEntity, IServerActivationContext, IStyleDefinition, IStyleDefinitionClass, IVarRule,
+    NameGenerationMethod
+} from "../api/RuleTypes"
 import {StyleDefinition, ThemeDefinition} from "../api/RuleAPI"
 import {
-    Rule, RuleLike, IRuleContainer, IActivationContext, IMimcssGroupingRule, IMimcssKeyframesRule,
-    IMimcssRule, IMimcssStyleElement, IMimcssRuleBag, IServerActivationContext, symRC
+    Rule, RuleLike, IRuleContainer, IMimcssActivationContext, IMimcssGroupingRule, IMimcssKeyframesRule,
+    IMimcssRule, IMimcssStyleElement, IMimcssRuleBag, symRC
 } from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
-import {SchedulerType} from "../api/SchedulingTypes"
+import {getActivator} from "../impl/SchedulingImpl";
 
 
 
@@ -254,7 +257,8 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	{
         // activation context may not exist if the code is executing on a server and SSR has
         // not been started
-		if (!s_activationContext || ++this.refCount > 1)
+        let activationContext = getCurrentActivationContext();
+		if (!activationContext || activationContext.addRef(this) > 1)
             return;
 
         /// #if DEBUG
@@ -272,9 +276,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
                 // themes are inserted before the special placeholder element, which is created
                 // at the top of the '<head>' element
                 if (this.sd instanceof ThemeDefinition)
-                    insertBefore = s_activationContext?.getThemePlaceholder();
+                    insertBefore = activationContext.getThemePlaceholder();
 
-                this.elm = s_activationContext?.createStyleElm( this.name, insertBefore);
+                this.elm = activationContext.createStyleElm( this.name, insertBefore);
             }
         }
         else
@@ -312,17 +316,8 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	/** Removes this stylesheet from DOM. */
 	public deactivate(): void
 	{
-        // guard from extra deactivate calls
-		if (this.refCount === 0)
-        {
-            /// #if DEBUG
-                console.error( `Extra call to deactivate() for style definition class '${this.name}'`);
-            /// #endif
-
-			return;
-        }
-
-		if (--this.refCount > 0)
+        let activationContext = getCurrentActivationContext();
+		if (!activationContext || activationContext.delRef(this) > 0)
             return;
 
         /// #if DEBUG
@@ -409,9 +404,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 	// ":root" rule where all custom CSS properties defined in this container are defined.
 	private varRootRule: CSSStyleRule | undefined;
-
-	// Reference count of activation requests.
-	private refCount: number = 0;
 
 	// Object representing either DOM style element for client activation context or serialization
     // implementation.
@@ -652,15 +644,6 @@ class EmbeddingContainer
     /** ID to use for the `<style>` element */
     private id: string;
 
-    /**
-     * Number of activated style definitions belonging to this container. This number is
-     * incremented upon activation and decremented upon deactivation of style definitions. When
-     * this number goes from 0 to 1, the `<style>` element is created and all rules from all
-     * style definitions are inserted into it. When this number goes from 1 to 0, the `<style>`
-     * element is removed.
-     */
-    private refCount: number;
-
     /** Collection of style definition classes "embedded" in this container */
     private sdcs: Set<IStyleDefinitionClass>;
 
@@ -672,7 +655,6 @@ class EmbeddingContainer
     public constructor( id: string)
     {
         this.id = id;
-        this.refCount = 0;
         this.sdcs = new Set<IStyleDefinitionClass>();
     }
 
@@ -692,55 +674,59 @@ class EmbeddingContainer
 
         // if the embedding container is currently activated, we need to activate the added
         // style definition class using the currently default activator
-        if (this.refCount > 0)
+        if (this.elm)
             getActivator().activate( processClass( cls)!);
     }
 
 	/**
-     * Inserts all stylesheets in this container into DOM.
+     * Inserts all style definitions in this container into DOM.
      */
 	public activate(): void
 	{
-        // only if this is the first activation call, create the style element and insert all
-        // rules from all the style definition classes.
-		if (++this.refCount === 1)
-		{
-            this.elm = s_activationContext?.createStyleElm( this.id);
+        // activation context may not exist if the code is executing on a server and SSR has
+        // not been started
+        let activationContext = getCurrentActivationContext();
+		if (!activationContext || activationContext.addRef(this) > 1)
+            return;
 
-            for( let cls of this.sdcs)
-            {
-                // definition class may be already associated with an instance; if not -
-                // process it now.
-                let instance = cls.hasOwnProperty(symInstance)
-                    ? cls[symInstance]
-                    : processClass(cls);
+        // create the style element and insert all rules from all the style definition classes.
+        this.elm = activationContext.createStyleElm( this.id);
 
-                (instance[symRC] as RuleContainer).activate();
-            }
-		}
+        for( let cls of this.sdcs)
+        {
+            // definition class may be already associated with an instance; if not -
+            // process it now. We must use hasOwnProperty because a base class can already
+            // have an associated instance, but we need our own class.
+            let instance = cls.hasOwnProperty(symInstance)
+                ? cls[symInstance]
+                : processClass(cls);
+
+            (instance[symRC] as RuleContainer).activate();
+        }
 	}
 
 	/**
-     * Removes all stylesheets in this container into DOM.
+     * Removes all stylesheets in this container from DOM.
      */
 	public deactivate(): void
 	{
         // only if this is the last deactivation call, remove the style element and remove all
         // rules from all the style definition classes.
-		if (--this.refCount === 0)
-		{
-            this.elm?.remove();
-            this.elm = undefined;
+        let activationContext = getCurrentActivationContext();
+		if (!activationContext || activationContext.delRef(this) > 0)
+            return;
 
-            for( let cls of this.sdcs)
-            {
-                // definition class must be already associated with an instance
-                if (!cls.hasOwnProperty(symInstance))
-                    continue;
+        this.elm?.remove();
+        this.elm = undefined;
 
-                (cls[symInstance][symRC] as RuleContainer).deactivate();
-            }
-		}
+        for( let cls of this.sdcs)
+        {
+            // definition class must be already associated with an instance
+            if (!cls.hasOwnProperty(symInstance))
+                continue;
+
+            (cls[symInstance][symRC] as RuleContainer).deactivate();
+        }
 	}
 }
 
@@ -967,6 +953,44 @@ const removeCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>):
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// Base implementation for activation contexts
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Base implementation for all activation contexts. It manages activation reference counts for
+ * RuleContainer and EmbeddingContainer objects
+ */
+abstract class ActivationContextBase implements IMimcssActivationContext
+{
+    abstract getThemePlaceholder(): IMimcssStyleElement;
+    abstract createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement;
+
+    addRef( obj: any): number
+    {
+        let count = this.map.get(obj);
+        count = !count ? 1 : count + 1;
+        this.map.set( obj, count);
+        return count;
+    }
+
+    delRef( obj: any): number
+    {
+        let count = this.map.get(obj);
+        if (!count)
+            return 0;
+
+        --count ? this.map.set( obj, count) : this.map.delete(obj);
+        return count;
+    }
+
+    map = new Map<any,number>();
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Client-side rendering implementation
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1004,15 +1028,21 @@ const addDomRule = (ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): 
 /**
  * Client-side implementation of activation context.
  */
-class ClientActivationContext implements IActivationContext
+class ClientActivationContext extends ActivationContextBase implements IMimcssActivationContext, IClientActivationContext
 {
+    constructor( parent?: ParentNode)
+    {
+        super();
+        this.parent = parent ?? document.head;
+    }
+
     getThemePlaceholder(): IMimcssStyleElement
     {
         if (!s_clientThemePlaceholderElm)
         {
             let domElm = document.createElement( "style");
             domElm.id = s_themePlaceholderElmID;
-            document.head.insertBefore( domElm, document.head.firstElementChild);
+            this.parent.insertBefore( domElm, document.head.firstElementChild);
             s_clientThemePlaceholderElm = new ClientMimcssStyleElement( domElm);
         }
 
@@ -1023,9 +1053,11 @@ class ClientActivationContext implements IActivationContext
     {
         let domElm = document.createElement( "style");
         domElm.id = id;
-        document.head.insertBefore( domElm, insertBefore ? insertBefore.domElm : null);
+        this.parent.insertBefore( domElm, insertBefore ? (insertBefore as ClientMimcssStyleElement).domElm : null);
         return new ClientMimcssStyleElement( domElm);
     }
+
+    readonly parent: ParentNode;
 }
 
 /**
@@ -1033,23 +1065,23 @@ class ClientActivationContext implements IActivationContext
  */
 abstract class ClientMimcssRuleBag implements IMimcssRuleBag
 {
-    constructor( public domRuleBag: CSSStyleSheet | CSSGroupingRule) {}
+    constructor( public sheet: CSSStyleSheet | CSSGroupingRule) {}
 
     add( ruleText: string): IMimcssRule | null
     {
-        let cssRule = addDomRule( ruleText, this.domRuleBag);
+        let cssRule = addDomRule( ruleText, this.sheet);
         return cssRule ? new ClientMimcssRule( cssRule) : null;
     }
 
     addGroup( selector: string): IMimcssGroupingRule | null
     {
-        let cssRule = addDomRule( `${selector} {}`, this.domRuleBag);
+        let cssRule = addDomRule( `${selector} {}`, this.sheet);
         return cssRule ? new ClientMimcssGroupingRule( cssRule) : null;
     }
 
     addKeyframes( name: string): IMimcssKeyframesRule | null
     {
-        let cssRule = addDomRule( `@keyframes ${name} {}`, this.domRuleBag);
+        let cssRule = addDomRule( `@keyframes ${name} {}`, this.sheet);
         return cssRule ? new ClientMimcssKeyframesRule( cssRule) : null;
     }
 }
@@ -1059,15 +1091,27 @@ abstract class ClientMimcssRuleBag implements IMimcssRuleBag
  */
 class ClientMimcssStyleElement extends ClientMimcssRuleBag implements IMimcssStyleElement
 {
-    constructor( public domElm: HTMLStyleElement)
+    constructor( domElm: HTMLStyleElement)
     {
         super( domElm.sheet!)
+        this.domElm = domElm;
     }
 
     remove(): void
     {
-        this.domElm?.remove();
+        /// #if DEBUG
+        if (!this.domElm)
+        {
+            console.error( "Attempt to remove style element that has already been removed");
+            return;
+        }
+        /// #endif
+
+        this.domElm.remove();
+        this.domElm = null;
     }
+
+    domElm: HTMLStyleElement | null;
 }
 
 /**
@@ -1098,9 +1142,10 @@ class ClientMimcssKeyframesRule extends ClientMimcssRule
     {
         try
         {
-            (this.cssRule as CSSKeyframesRule).appendRule( frameText);
-            let cssFrameRule = (this.cssRule as CSSKeyframesRule).cssRules.item(
-                (this.cssRule as CSSKeyframesRule).cssRules.length - 1);
+            let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
+            cssKeyframesRule.appendRule( frameText);
+            let cssFrameRule = cssKeyframesRule.cssRules.item(
+                cssKeyframesRule.cssRules.length - 1);
 
             return cssFrameRule ? new ClientMimcssRule( cssFrameRule) : null;
         }
@@ -1116,6 +1161,243 @@ class ClientMimcssKeyframesRule extends ClientMimcssRule
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// Client-side "adoption" implementation, which allows creating CSSStyleSheet objects and adopting
+// them in many places. This is mostly used for custom Web elements; however, can also be used in
+// the document.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Client-side implementation of activation context, which doesn't create `<style>` element, but
+ * instead, creates CSSStyleSheet objects. After activation phase is complete, the stylesheet
+ * objects are "adopted" by either Document or ShadowRoot elements.
+ */
+class AdoptionActivationContext extends ClientActivationContext implements IAdoptionActivationContext
+{
+    constructor( root: DocumentOrShadowRoot)
+    {
+        super( root instanceof Document ? document.head : root as any as ShadowRoot);
+        this.root = root;
+    }
+
+    getThemePlaceholder(): IMimcssStyleElement
+    {
+        if (!this.themeElm)
+        {
+            this.themeElm = new AdoptionMimcssStyleElement( this);
+            this.elms.splice( 0, 0, this.themeElm);
+        }
+
+        return this.themeElm;
+    }
+
+    createStyleElm( id: string, insertBefore?: AdoptionMimcssStyleElement): IMimcssStyleElement
+    {
+        let elm = new AdoptionMimcssStyleElement( this);
+        if (insertBefore)
+            this.elms.splice( this.elms.indexOf( insertBefore), 0, elm);
+        else
+            this.elms.push( elm);
+
+        return elm;
+    }
+
+    removeElm( elm: AdoptionMimcssStyleElement): void
+    {
+        let index = this.elms.indexOf(elm);
+        if (index >= 0)
+            this.elms.splice( index, 1);
+    }
+
+    adopt(): void
+    {
+        (this.root as any).adoptedStyleSheets = this.elms.map( elm => elm.sheet as CSSStyleSheet);
+    }
+
+    readonly root: DocumentOrShadowRoot;
+
+    private elms: AdoptionMimcssStyleElement[] = [];
+    private themeElm?: AdoptionMimcssStyleElement;
+}
+
+/**
+ * Client-side implementation of a style element.
+ */
+class AdoptionMimcssStyleElement extends ClientMimcssRuleBag implements IMimcssStyleElement
+{
+    constructor( ctx: AdoptionActivationContext)
+    {
+        super( new CSSStyleSheet());
+        this.ctx = ctx;
+    }
+
+    remove(): void
+    {
+        if (this.ctx)
+        {
+            this.ctx.removeElm( this);
+            this.ctx = null;
+        }
+        /// #if DEBUG
+        else
+        {
+            console.error( "Attempt to remove style element that has already been removed");
+            return;
+        }
+        /// #endif
+
+    }
+
+    /**
+     * Reference to the adoption context, which is used when the element is removed.
+     */
+    private ctx: AdoptionActivationContext | null;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Server-side rendering implementation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Server-side implementation of activation context.
+ */
+class ServerActivationContext extends ActivationContextBase implements IServerActivationContext
+{
+    getThemePlaceholder(): IMimcssStyleElement
+    {
+        if (!this.themeElm)
+            this.elms.splice( 0, 0, this.themeElm = new ServerMimcssStyleElement(s_themePlaceholderElmID));
+
+        return this.themeElm;
+    }
+
+    createStyleElm( id: string, insertBefore?: ServerMimcssStyleElement): IMimcssStyleElement
+    {
+        let elm = new ServerMimcssStyleElement(id);
+        if (insertBefore)
+            this.elms.splice( this.elms.indexOf( insertBefore), 0, elm);
+        else
+            this.elms.push( elm);
+
+        return elm;
+    }
+
+    serialize(): string
+    {
+        return this.elms.map( elm => elm.serialize()).join("");
+    }
+
+    private elms: ServerMimcssStyleElement[] = [];
+    private themeElm?: ServerMimcssStyleElement;
+}
+
+/**
+ * Server-side implementation of an object to which rules can be added.
+ */
+abstract class ServerMimcssRuleBag implements IMimcssRuleBag
+{
+    add( ruleText: string): IMimcssRule | null
+    {
+        let rule = new ServerMimcssRule( ruleText);
+        this.rules.push(rule);
+        return rule;
+    }
+
+    addGroup( selector: string): IMimcssGroupingRule | null
+    {
+        let rule = new ServerMimcssGroupingRule( selector);
+        this.rules.push(rule);
+        return rule;
+    }
+
+    addKeyframes( name: string): IMimcssKeyframesRule | null
+    {
+        let rule = new ServerMimcssKeyframesRule( name);
+        this.rules.push(rule);
+        return rule;
+    }
+
+    serialize(): string
+    {
+        return this.rules.map( rule => rule.serialize()).join("");
+    }
+
+    private rules: (ServerMimcssRule | ServerMimcssGroupingRule | ServerMimcssKeyframesRule)[] = [];
+}
+
+/**
+ * Server-side implementation of a style element.
+ */
+class ServerMimcssStyleElement extends ServerMimcssRuleBag implements IMimcssStyleElement
+{
+    constructor( public id: string) { super(); }
+    remove(): void {}
+
+    serialize(): string
+    {
+        return `<style id="${this.id}">${super.serialize()}</style>`;
+    }
+}
+
+/**
+ * Server-side implementation of a base interface for CSS rule.
+ */
+class ServerMimcssRule implements IMimcssRule
+{
+    constructor( public ruleText: string) {}
+    public cssRule: CSSRule | null = null;
+
+    serialize(): string
+    {
+        return this.ruleText;
+    }
+}
+
+/**
+ * Server-side implementation of a grouping rule to which rules can be added.
+ */
+class ServerMimcssGroupingRule extends ServerMimcssRuleBag implements IMimcssGroupingRule
+{
+    constructor( public selector: string) { super(); }
+    public cssRule: CSSRule | null = null;
+
+    serialize(): string
+    {
+        return `${this.selector}{${super.serialize()}}`;
+    }
+}
+
+/**
+ * Server-side implementation of a keyframes rule to which frames can be added.
+ */
+class ServerMimcssKeyframesRule implements IMimcssKeyframesRule
+{
+    constructor( public name: string) {}
+    public cssRule: CSSRule | null = null;
+
+    addFrame( frameText: string): IMimcssRule | null
+    {
+        let frame = new ServerMimcssRule( frameText);
+        this.frames.push( frame);
+        return frame;
+    }
+
+    serialize(): string
+    {
+        return `@keyframes ${this.name}{${this.frames.map( frame => frame.serialize()).join("")}}`;
+    }
+
+    private frames: ServerMimcssRule[] = [];
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Hydration-side rendering implementation
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1123,13 +1405,13 @@ class ClientMimcssKeyframesRule extends ClientMimcssRule
 /**
  * Hydration-side implementation of activation context.
  */
-class HydrationActivationContext implements IActivationContext
+class HydrationActivationContext extends ClientActivationContext implements IClientActivationContext
 {
     getThemePlaceholder(): IMimcssStyleElement
     {
         if (!s_clientThemePlaceholderElm)
         {
-            let domElm = document.getElementById( s_themePlaceholderElmID) as HTMLStyleElement;
+            let domElm = this.parent.querySelector( `style[id=${s_themePlaceholderElmID}`) as HTMLStyleElement;
             if (domElm)
                 s_clientThemePlaceholderElm = new HydrationMimcssStyleElement( domElm);
             else
@@ -1141,7 +1423,7 @@ class HydrationActivationContext implements IActivationContext
 
     createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement
     {
-        let domElm = document.getElementById( id) as HTMLStyleElement;
+        let domElm = this.parent.querySelector( `style[id=${id}`) as HTMLStyleElement;
         if (domElm)
             return new HydrationMimcssStyleElement( domElm);
         else
@@ -1232,237 +1514,76 @@ class HydrationMimcssKeyframesRule extends HydrationMimcssRule
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Server-side rendering implementation
+// Activation context switching
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Server-side implementation of activation context.
+ * Helper constatnt that determines whether the code is executed in the browser (client-side).
  */
-class ServerActivationContext implements IServerActivationContext
-{
-    getThemePlaceholder(): IMimcssStyleElement
-    {
-        if (!this.themeElm)
-            this.elms.splice( 0, 0, this.themeElm = new ServerMimcssStyleElement(s_themePlaceholderElmID));
-
-        return this.themeElm;
-    }
-
-    createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement
-    {
-        let elm = new ServerMimcssStyleElement(id);
-        if (insertBefore)
-            this.elms.splice( this.elms.indexOf( insertBefore as ServerMimcssStyleElement), 0, elm);
-        else
-            this.elms.push( elm);
-
-        return elm;
-    }
-
-    serialize(): string
-    {
-        return this.elms.map( elm => elm.serialize()).join("");
-    }
-
-    private elms: ServerMimcssStyleElement[] = [];
-    private themeElm?: ServerMimcssStyleElement;
-}
-
-/**
- * Server-side implementation of an object to which rules can be added.
- */
-abstract class ServerMimcssRuleBag implements IMimcssRuleBag
-{
-    add( ruleText: string): IMimcssRule | null
-    {
-        let rule = new ServerMimcssRule( ruleText);
-        this.rules.push(rule);
-        return rule;
-    }
-
-    addGroup( selector: string): IMimcssGroupingRule | null
-    {
-        let rule = new ServerMimcssGroupingRule( selector);
-        this.rules.push(rule);
-        return rule;
-    }
-
-    addKeyframes( name: string): IMimcssKeyframesRule | null
-    {
-        let rule = new ServerMimcssKeyframesRule( name);
-        this.rules.push(rule);
-        return rule;
-    }
-
-    serialize(): string
-    {
-        return this.rules.map( rule => rule.serialize()).join("");
-    }
-
-    private rules: (ServerMimcssRule | ServerMimcssGroupingRule | ServerMimcssKeyframesRule)[] = [];
-}
-
-/**
- * Server-side implementation of a style element.
- */
-class ServerMimcssStyleElement extends ServerMimcssRuleBag implements IMimcssStyleElement
-{
-    constructor( public id: string) { super(); }
-    public domElm: HTMLStyleElement | null = null;
-    remove(): void {}
-
-    serialize(): string
-    {
-        return `<style id="${this.id}">${super.serialize()}</style>`;
-    }
-}
-
-/**
- * Server-side implementation of a base interface for CSS rule.
- */
-class ServerMimcssRule implements IMimcssRule
-{
-    constructor( public ruleText: string) {}
-    public cssRule: CSSRule | null = null;
-
-    serialize(): string
-    {
-        return this.ruleText;
-    }
-}
-
-/**
- * Server-side implementation of a grouping rule to which rules can be added.
- */
-class ServerMimcssGroupingRule extends ServerMimcssRuleBag implements IMimcssGroupingRule
-{
-    constructor( public selector: string) { super(); }
-    public cssRule: CSSRule | null = null;
-
-    serialize(): string
-    {
-        return `${this.selector}{${super.serialize()}}`;
-    }
-}
-
-/**
- * Server-side implementation of a keyframes rule to which frames can be added.
- */
-class ServerMimcssKeyframesRule implements IMimcssKeyframesRule
-{
-    constructor( public name: string) {}
-    public cssRule: CSSRule | null = null;
-
-    addFrame( frameText: string): IMimcssRule | null
-    {
-        let frame = new ServerMimcssRule( frameText);
-        this.frames.push( frame);
-        return frame;
-    }
-
-    serialize(): string
-    {
-        return `@keyframes ${this.name}{${this.frames.map( frame => frame.serialize()).join("")}}`;
-    }
-
-    private frames: ServerMimcssRule[] = [];
-}
-
+const isClient = !!window?.document
 
 
 /**
  * Client activation context. In the client environment, it is ClientActivationContext instance;
  * in the server environment, it is undefined.
  */
-const s_clientActivationContext = document?.head ? new ClientActivationContext() : undefined;
+const s_globalClientActivationContext = isClient ? new ClientActivationContext() : undefined;
 
 /**
- * Activation context to use. In the client environment, it is by default ClientActivationContext
- * but can be changed (temporarily) to HydrationActivationContext. In the server environment, it
- * is by default undefined, but can be changed to ServerActivationContext.
+ * Activation context stack.
  */
-let s_activationContext: IActivationContext | undefined = s_clientActivationContext;
-
-/**
- * Scheduler type remembered upon starting SSR or hydration process. This will be used to restore
- * the sceduler when SSR or hydration process is stopped.
- */
-let s_rememberedSchedulerType: number = 0;
+let s_activationContextStack: IMimcssActivationContext[] =
+    s_globalClientActivationContext ? [s_globalClientActivationContext] : [];
 
 
 
 /**
- * Sets server-side activation context. Throws an error if non-default activation context is
- * already set.
+ * Creates activation context of the given type. Some types may require additional parameters.
+ * @param type Activation type
+ * @param args Optional parametrs that depend on the activation type
+ * @returns
  */
-export const s_startSSR = (): void =>
+export function s_createActCtx( type: ActivationType, ...args: any[]): IActivationContext | undefined
 {
-    if (s_activationContext !== s_clientActivationContext)
-        throw new Error("SSR already started");
-    else
+    if (!isClient && type != ActivationType.SSR)
+        return undefined;
+    else if (type === ActivationType.Client)
     {
-        s_activationContext = new ServerActivationContext();
-        s_rememberedSchedulerType = setDefaultScheduler( SchedulerType.Sync);
+        let parent = args[0] as ParentNode;
+        return parent ? new ClientActivationContext(parent) : s_globalClientActivationContext;
     }
+    else if (type === ActivationType.Adoption)
+        return isClient ? new AdoptionActivationContext( args[0] as DocumentOrShadowRoot) : undefined;
+    else if (type === ActivationType.SSR)
+        return new ServerActivationContext();
+    else
+        return new HydrationActivationContext(args[0] as ParentNode);
 }
 
 /**
- * Stops server-side activation functionality and returns a string with serialized styles. The
- * string should be added to the `<head>` element using `insertAdjacentHTML()` method.
- * Throws an error if SSR has not been started.
- * @returns String containing serialized styles
+ * Pushes the given activation context to the top of the stack
  */
-export const s_stopSSR = (): string =>
+export const s_pushActCtx = (ctx: IActivationContext): void =>
 {
-    if (!s_activationContext || !(s_activationContext instanceof ServerActivationContext))
-        throw new Error("SSR not started");
-    else
-    {
-        // restore scheduler type existed before we started SSR
-        setDefaultScheduler( s_rememberedSchedulerType);
-        s_rememberedSchedulerType = 0;
-
-        let s = s_activationContext.serialize();
-        s_activationContext = s_clientActivationContext;
-        return s;
-    }
+    if (ctx)
+        s_activationContextStack.push( ctx as IMimcssActivationContext);
 }
+
+/**
+ * Removes the activation context from the top of the stack and returns it
+ */
+export const s_popActCtx = (): IActivationContext | undefined => s_activationContextStack.pop();
 
 
 
 /**
- * Sets hydration activation context. Throws an error if non-default activation context is
- * already set.
+ * Returns activation context from the top of the stack
  */
-export const s_startHydration = (): void =>
-{
-    if (s_activationContext !== s_clientActivationContext)
-        throw new Error("Hydration already started");
-    else
-    {
-        s_activationContext = new HydrationActivationContext();
-        s_rememberedSchedulerType = setDefaultScheduler( SchedulerType.Sync);
-    }
-}
-
-/**
- * Stops hydration activation functionality and restore the default activation context.
- * @returns String containing serialized styles
- */
-export const s_stopHydration = (): void =>
-{
-    if (!s_activationContext || !(s_activationContext instanceof HydrationActivationContext))
-        throw new Error("Hydration not started");
-    else
-    {
-        // restore scheduler type existed before we started SSR
-        setDefaultScheduler( s_rememberedSchedulerType);
-        s_rememberedSchedulerType = 0;
-
-        s_activationContext = s_clientActivationContext;
-    }
-}
+const getCurrentActivationContext = (): IMimcssActivationContext | undefined =>
+    s_activationContextStack.length > 0
+        ? s_activationContextStack[s_activationContextStack.length - 1]
+        : undefined;
 
 
 

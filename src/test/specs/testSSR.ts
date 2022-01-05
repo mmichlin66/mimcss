@@ -26,6 +26,7 @@ describe("SSR and Hydration", () =>
         expect(sds[0].cls.cssRule?.selectorText).toEqual(".A_cls");
 
         sds.forEach( sd => css.deactivate( sd));
+        css.popActivationContext();
     })
 
 
@@ -46,6 +47,7 @@ describe("SSR and Hydration", () =>
         expect(sds[0].tag.cssRule?.selectorText).toEqual("span");
 
         sds.forEach( sd => css.deactivate( sd));
+        css.popActivationContext();
     })
 
 
@@ -68,6 +70,7 @@ describe("SSR and Hydration", () =>
         expect(sds[1].a.cls.cssRule?.selectorText).toEqual(".A_cls");
 
         sds.forEach( sd => css.deactivate( sd));
+        css.popActivationContext();
     })
 })
 
@@ -75,16 +78,18 @@ describe("SSR and Hydration", () =>
 
 function doSSRandHydrate( ...classes: css.IStyleDefinitionClass[]): any[]
 {
-    css.startSSR();
+    let ctxSSR = css.createActivationContext( css.ActivationType.SSR) as css.IServerActivationContext;
+    css.pushActivationContext(ctxSSR!);
     let sds = classes.map( cls => css.activate( cls));
-    let s = css.stopSSR();
+    let s = ctxSSR.serialize();
     sds.forEach( sd => css.deactivate( sd));
+    css.popActivationContext();
 
     document.head.insertAdjacentHTML( "beforeend", s);
 
-    css.startHydration();
+    let ctxHydration = css.createActivationContext( css.ActivationType.Hydration);
+    css.pushActivationContext( ctxHydration!);
     sds = classes.map( cls => css.activate( cls));
-    css.stopHydration();
 
     return sds;
 }

@@ -1,4 +1,4 @@
-import {IRule, INamedEntity, IStyleDefinition} from "../api/RuleTypes"
+import {IRule, INamedEntity, IStyleDefinition, IActivationContext} from "../api/RuleTypes"
 
 
 
@@ -93,10 +93,12 @@ export abstract class Rule extends RuleLike implements IRule
  * Represents the context in which style definitions are activated. Different implementations
  * exists for client-side and server-side rendering.
  */
-export interface IActivationContext
+export interface IMimcssActivationContext extends IActivationContext
 {
     getThemePlaceholder(): IMimcssStyleElement;
     createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement;
+    addRef( obj: any): number;
+    delRef( obj: any): number;
 }
 
 /**
@@ -115,7 +117,6 @@ export interface IMimcssRuleBag
  */
 export interface IMimcssStyleElement extends IMimcssRuleBag
 {
-    readonly domElm: HTMLStyleElement | null;
     remove(): void;
 }
 
@@ -145,14 +146,21 @@ export interface IMimcssKeyframesRule extends IMimcssRule
     addFrame( frameText: string): IMimcssRule | null;
 }
 
-/**
- * Represents the context in which style definitions are activated. Different implementations
- * exists for client-side and server-side rendering.
- */
-export interface IServerActivationContext extends IActivationContext
-{
-    serialize(): string;
-}
+// /**
+//  * Represents the activation context for adoting style definitions.
+//  */
+// export interface IAdoptionActivationContext extends IMimcssActivationContext
+// {
+//     adopt(): void;
+// }
+
+// /**
+//  * Represents the activation context for server-side rendering.
+//  */
+// export interface IServerActivationContext extends IMimcssActivationContext
+// {
+//     serialize(): string;
+// }
 
 
 

@@ -548,3 +548,87 @@ export const enum NameGenerationMethod
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Activation.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Provides values that identify activation types. The contaxt are created using the
+ * [[createActCtx]] function.
+ */
+export const enum ActivationType
+{
+    /**
+     * Regular client-side activation type under which `<style>` elements are created and inserted
+     * indo the document's `<head>` element.
+     */
+    Client = 1,
+
+    /**
+     * Client-side activation type under which CSSStyleSheet objects are created and then adopted
+     * either by shadow roots of custom Web elements or the document iself. Since this
+     * functionality is not widely implemented yet, it reverts to the regular client-side
+     * functionality if not supported by the browser.
+     */
+    Adoption,
+
+    /**
+     * Server-side activation type under which styles are written into the internal buffer and the
+     * resulting string can be obtained from the [[IServerActivationContext.serialize]] method.
+     */
+    SSR,
+
+    /**
+     * Client-side activation type under which `<style>` elements already exist in the HTML
+     * document (as result of SSR) and are linked to during the activation process.
+     */
+    Hydration,
+}
+
+
+
+/**
+ * Represents the context in which style definitions are activated. Different implementations
+ * exists for client-side and server-side rendering.
+ */
+export interface IActivationContext
+{
+}
+
+/**
+ * Represents the context in which style definitions are activated. Different implementations
+ * exists for client-side and server-side rendering.
+ */
+export interface IClientActivationContext extends IActivationContext
+{
+    readonly parent: ParentNode;
+}
+
+/**
+ * Represents the activation context for adopting style definitions.
+ */
+export interface IAdoptionActivationContext extends IClientActivationContext
+{
+    readonly root: DocumentOrShadowRoot;
+    adopt(): void;
+}
+
+/**
+ * Represents the activation context for server-side rendering.
+ */
+export interface IServerActivationContext extends IActivationContext
+{
+    serialize(): string;
+}
+
+/**
+ * Represents the activation context for hydration.
+ */
+export interface IHydrationActivationContext extends IClientActivationContext
+{
+}
+
+
+
