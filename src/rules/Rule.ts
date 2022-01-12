@@ -95,8 +95,8 @@ export abstract class Rule extends RuleLike implements IRule
  */
 export interface IMimcssActivationContext extends IActivationContext
 {
-    getThemePlaceholder(): IMimcssStyleElement;
-    createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement;
+    getThemePlaceholder(): IMimcssStyleElement | undefined;
+    createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined;
     addRef( obj: any): number;
     delRef( obj: any): number;
 }
