@@ -1290,7 +1290,7 @@ export function createActivationContext(): IActivationContext | undefined
 
 /**
  * Pushes the given activation context to the top of the stack
-*/
+ */
 export const pushActivationContext = (ctx: IActivationContext): void => s_pushActCtx(ctx);
 
 /**

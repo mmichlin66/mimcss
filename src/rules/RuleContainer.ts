@@ -32,9 +32,9 @@ let s_processingStyleDefinitionClass = false;
 /**
  * The RuleContainer class is a shadow structure that accompanies every processed style definition
  * object. Since StyleDefinition class is an exported class visible to developers, we don't want
- * to have a lot of functionality in it. The RuleContainer object is linked to the StyleDefinition
- * object via the [symContainer] symbol. It contains all the functionality for parsing rule
- * definitions, name assignment and activation/deactivation.
+ * to have a lot of functionality in it. The RuleContainer object is a proxy handler for the
+ * StyleDefinition object symbol. It contains all the functionality for parsing rule definitions,
+ * name assignment and activation/deactivation.
  */
 export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefinition>
 {
