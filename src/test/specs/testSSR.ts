@@ -21,12 +21,9 @@ describe("SSR and Hydration", () =>
             cls = this.$class({ color: "red" })
         }
 
-        let sds = doSSRandHydrate( A);
-
-        expect(sds[0].cls.cssRule?.selectorText).toEqual(".A_cls");
-
-        sds.forEach( sd => css.deactivate( sd));
-        css.popActivationContext();
+        doSSRandHydrate( [A], (sds) =>
+            expect(sds[0].cls.cssRule?.selectorText).toEqual(".A_cls")
+        );
     })
 
 
@@ -40,14 +37,11 @@ describe("SSR and Hydration", () =>
             tag = this.$tag( "span", { color: "red" })
         }
 
-        let sds = doSSRandHydrate( A);
-
-        expect(sds[0].cls.cssRule?.selectorText).toEqual(".A_cls");
-        expect(sds[0].id.cssRule?.selectorText).toEqual("#A_id");
-        expect(sds[0].tag.cssRule?.selectorText).toEqual("span");
-
-        sds.forEach( sd => css.deactivate( sd));
-        css.popActivationContext();
+        doSSRandHydrate( [A], (sds) => {
+            expect(sds[0].cls.cssRule?.selectorText).toEqual(".A_cls");
+            expect(sds[0].id.cssRule?.selectorText).toEqual("#A_id");
+            expect(sds[0].tag.cssRule?.selectorText).toEqual("span");
+        });
     })
 
 
@@ -65,33 +59,31 @@ describe("SSR and Hydration", () =>
             id = this.$id({ color: "red" })
         }
 
-        let sds = doSSRandHydrate( A, B);
-
-        expect(sds[1].a.cls.cssRule?.selectorText).toEqual(".A_cls");
-
-        sds.forEach( sd => css.deactivate( sd));
-        css.popActivationContext();
+        doSSRandHydrate( [A, B], (sds) =>
+            expect(sds[1].a.cls.cssRule?.selectorText).toEqual(".A_cls")
+        );
     })
 })
 
 
 
-function doSSRandHydrate( ...classes: css.IStyleDefinitionClass[]): any[]
+function doSSRandHydrate( classes: css.IStyleDefinitionClass[],
+    testFunc: ( sds: any[]) => void): void
 {
-    let ctxSSR = css.createActivationContext( css.ActivationType.SSR) as css.IServerActivationContext;
-    css.pushActivationContext(ctxSSR!);
+    css.startSSR();
     let sds = classes.map( cls => css.activate( cls));
-    let s = ctxSSR.serialize();
+    let s = css.stopSSR();
     sds.forEach( sd => css.deactivate( sd));
-    css.popActivationContext();
 
     document.head.insertAdjacentHTML( "beforeend", s);
 
-    let ctxHydration = css.createActivationContext( css.ActivationType.Hydration);
-    css.pushActivationContext( ctxHydration!);
+    css.startHydration();
     sds = classes.map( cls => css.activate( cls));
+    css.stopHydration();
 
-    return sds;
+    testFunc(sds);
+
+    sds.forEach( sd => css.deactivate( sd));
 }
 
 

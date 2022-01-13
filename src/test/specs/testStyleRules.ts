@@ -362,11 +362,9 @@ describe("style rules:", () =>
 
 function serialize( cls: css.IStyleDefinitionClass): string
 {
-    let ctx = css.createActivationContext( css.ActivationType.SSR) as css.IServerActivationContext;
-    css.pushActivationContext(ctx!);
+    css.startSSR();
     css.activate( cls);
-    css.popActivationContext();
-    return ctx.serialize();
+    return css.stopSSR();
 }
 
 

@@ -1,4 +1,4 @@
-import {IRule, INamedEntity, IStyleDefinition, IActivationContext} from "../api/RuleTypes"
+import {IRule, INamedEntity, IStyleDefinition, IStyleDefinitionClass} from "../api/RuleTypes"
 
 
 
@@ -91,14 +91,27 @@ export abstract class Rule extends RuleLike implements IRule
 
 /**
  * Represents the context in which style definitions are activated. Different implementations
- * exists for client-side and server-side rendering.
+ * exists for client-side and server-side rendering. Activation context are respponsible for:
+ * - mapping style definition class to style definition instance (that is, the same class will
+ *   have different instances in different contexts).
+ * - creating and removing elements including the theme placeholder element.
  */
-export interface IMimcssActivationContext extends IActivationContext
+export interface IMimcssActivationContext
 {
-    getThemePlaceholder(): IMimcssStyleElement | undefined;
-    createStyleElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined;
-    addRef( obj: any): number;
-    delRef( obj: any): number;
+    /** Retrieves style definition instance associated with the given class in this context. */
+    getClassSD( sdc: IStyleDefinitionClass): IStyleDefinition | undefined;
+
+    /** Associates style definition instance with the given class in this context. */
+    setClassSD( sdc: IStyleDefinitionClass, sd: IStyleDefinition): void;
+
+    /** Creates theme placeholder style element */
+    getThemeElm(): IMimcssStyleElement | undefined;
+
+    /** Creates style element with the given ID */
+    createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined;
+
+    /** Removes the given style element */
+    removeElm( elm: IMimcssStyleElement): void;
 }
 
 /**
@@ -106,8 +119,13 @@ export interface IMimcssActivationContext extends IActivationContext
  */
 export interface IMimcssRuleBag
 {
+    /** Adds a simple CSS rule */
     add( ruleText: string): IMimcssRule | null;
+
+    /** Adds a grouping CSS rule */
     addGroup( selector: string): IMimcssGroupingRule | null;
+
+    /** Adds a keyframes CSS rule */
     addKeyframes( name: string): IMimcssKeyframesRule | null;
 }
 
@@ -117,7 +135,6 @@ export interface IMimcssRuleBag
  */
 export interface IMimcssStyleElement extends IMimcssRuleBag
 {
-    remove(): void;
 }
 
 /**
@@ -126,6 +143,7 @@ export interface IMimcssStyleElement extends IMimcssRuleBag
  */
 export interface IMimcssRule
 {
+    /** CSSOM object for the rule - may be null in some contexts */
     readonly cssRule: CSSRule | null;
 }
 
@@ -143,24 +161,9 @@ export interface IMimcssGroupingRule extends IMimcssRule, IMimcssRuleBag
  */
 export interface IMimcssKeyframesRule extends IMimcssRule
 {
+    /** Adds a frame to this keyframes rule */
     addFrame( frameText: string): IMimcssRule | null;
 }
-
-// /**
-//  * Represents the activation context for adoting style definitions.
-//  */
-// export interface IAdoptionActivationContext extends IMimcssActivationContext
-// {
-//     adopt(): void;
-// }
-
-// /**
-//  * Represents the activation context for server-side rendering.
-//  */
-// export interface IServerActivationContext extends IMimcssActivationContext
-// {
-//     serialize(): string;
-// }
 
 
 

@@ -3,8 +3,7 @@ import {
     IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType,
-    NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IClientActivationContext,
-    IServerActivationContext, IHydrationActivationContext, ActivationType, IActivationContext, IAdoptionActivationContext
+    NameGenerationMethod, ICounterStyleRule, IStyleDefinition
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
@@ -16,7 +15,7 @@ import {
 import {symRC} from "../rules/Rule";
 import {
     embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
-    s_createActCtx, s_pushActCtx, s_popActCtx
+    s_startSSR, s_stopSSR, s_startHydration, s_stopHydration
 } from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule, PageRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
@@ -1246,57 +1245,45 @@ export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Activation contexts.
+// SSR support.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Creates activation context of the given type.
- * @param type Activation type
- * @returns Activation context interface or undefined if context cannot be created
+ * Starts server-side activation functionality. This function should be called before any style
+ * definitions that are part of the application are activated.
+ *
+ * Calling this function causes all activated style definitions to be serialized to a string,
+ * which can be retrieved by calling the [[stopSSR]] function.
  */
-export function createActivationContext( type: ActivationType.Client,
-    root?: ParentNode): IClientActivationContext | undefined;
+export const startSSR = (): void => s_startSSR();
 
 /**
- * Creates activation context of the given type.
- * @param type Activation type
- * @returns Adoption activation context interface or undefined if context cannot be created
+ * Stops server-side activation functionality and returns a string with serialized styles style
+ * definitions that were activated during application rendering. The string should be added to
+ * the `<head>` element of the HTML page using `insertAdjacentHTML()` method.
+ *
+ * @returns String containing serialized styles.
  */
-export function createActivationContext( type: ActivationType.Adoption,
-    root: DocumentOrShadowRoot): IAdoptionActivationContext | undefined;
+export const stopSSR = (): string => s_stopSSR();
+
+
 
 /**
- * Creates activation context of the given type.
- * @param type Activation type
- * @returns Activation context interface or undefined if context cannot be created
+ * Starts hydration activation functionality.
+ *
+ * Calling this function causes all activated style definitions to find appropriate `<style>`
+ * elements instead of creating new ones. The functionality assumes that those elements were put
+ * to the HTML during server-side page rendering. It also assumes that the style definitions and
+ * the rules defined in these style definitions are exaclty the same, and the rules are in the same
+ * order as they were during the server-side rendering. Otherwise the behavior is unpredictable.
  */
-export function createActivationContext( type: ActivationType.SSR): IServerActivationContext
+export const startHydration = (): void => s_startHydration();
 
 /**
- * Creates activation context of the given type.
- * @param type Activation type
- * @returns Activation context interface or undefined if context cannot be created
+ * Stops hydration activation functionality and restore the default activation context.
  */
-export function createActivationContext( type: ActivationType.Hydration,
-    root?: ParentNode): IHydrationActivationContext | undefined
-
-// Implementation
-export function createActivationContext(): IActivationContext | undefined
-{
-    let [type, ...args] = arguments;
-    return s_createActCtx( type, ...args);
-}
-
-/**
- * Pushes the given activation context to the top of the stack
- */
-export const pushActivationContext = (ctx: IActivationContext): void => s_pushActCtx(ctx);
-
-/**
- * Removes the activation context from the top of the stack and returns it
- */
-export const popActivationContext = (): IActivationContext | undefined => s_popActCtx();
+export const stopHydration = (): void => s_stopHydration();
 
 
 
