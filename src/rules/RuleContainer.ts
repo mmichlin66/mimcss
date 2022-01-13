@@ -987,20 +987,20 @@ const removeCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>):
 abstract class ActivationContextBase implements IMimcssActivationContext
 {
     /** Retrieves style definition instance associated with the given class in this context. */
-    getClassSD( sdc: IStyleDefinitionClass): IStyleDefinition | undefined
+    public getClassSD( sdc: IStyleDefinitionClass): IStyleDefinition | undefined
     {
         return this.sds.get(sdc);
     }
 
     /** Associates style definition instance with the given class in this context. */
-    setClassSD( sdc: IStyleDefinitionClass, sd: IStyleDefinition): void
+    public setClassSD( sdc: IStyleDefinitionClass, sd: IStyleDefinition): void
     {
         this.sds.set( sdc, sd);
     }
 
-    abstract getThemeElm(): IMimcssStyleElement | undefined;
-    abstract createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined;
-    abstract removeElm( elm: IMimcssStyleElement): void;
+    public abstract getThemeElm(): IMimcssStyleElement | undefined;
+    public abstract createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined;
+    public abstract removeElm( elm: IMimcssStyleElement): void;
 
     /** Map of style definition classes to style definition instances in this context */
     private sds = new Map<IStyleDefinitionClass,IStyleDefinition>();
@@ -1014,7 +1014,7 @@ abstract class ActivationContextBase implements IMimcssActivationContext
  */
 abstract class ArrayBasedActivationContext extends ActivationContextBase
 {
-    getThemeElm(): IMimcssStyleElement | undefined
+    public getThemeElm(): IMimcssStyleElement | undefined
     {
         if (!this.themeElm)
         {
@@ -1025,7 +1025,7 @@ abstract class ArrayBasedActivationContext extends ActivationContextBase
         return this.themeElm;
     }
 
-    createElm( id: string, insertBefore?: ConstructableStyleElement): IMimcssStyleElement | undefined
+    public createElm( id: string, insertBefore?: ConstructableStyleElement): IMimcssStyleElement | undefined
     {
         let elm = this.newElm(id);
         if (insertBefore)
@@ -1036,7 +1036,7 @@ abstract class ArrayBasedActivationContext extends ActivationContextBase
         return elm;
     }
 
-    removeElm( elm: ConstructableStyleElement): void
+    public removeElm( elm: ConstructableStyleElement): void
     {
         let index = this.elms.indexOf(elm);
         if (index >= 0)
@@ -1093,74 +1093,77 @@ class ClientActivationContext extends ActivationContextBase implements IMimcssAc
     constructor( parent?: ParentNode)
     {
         super();
-        this.parent = parent ?? document.head;
+        this.node = parent ?? document.head;
     }
 
-    getThemeElm(): IMimcssStyleElement | undefined
+    public getThemeElm(): IMimcssStyleElement | undefined
     {
-        let themeElm = this.themeElm;
-        if (!themeElm)
+        if (!this.themeElm)
         {
+            let domElm: HTMLStyleElement | undefined;
             if (this.hydrate)
             {
-                let domElm = this.parent.querySelector( `style[id=${s_themePlaceholderElmID}`) as HTMLStyleElement;
-                if (domElm)
-                    themeElm = new HydrationStyleElement( domElm);
+                domElm = this.node.querySelector( `style[id=${s_themePlaceholderElmID}`) as HTMLStyleElement;
 
                 /// #if DEBUG
-                else
+                if (!domElm)
                     console.error( "Theme placeholder element was requested during hydration but was not found");
                 /// #endif
             }
-            else
+
+            // if we didn't find element, create one now
+            if (!domElm)
             {
-                let domElm = document.createElement( "style");
+                domElm = document.createElement( "style");
                 domElm.id = s_themePlaceholderElmID;
-                this.parent.insertBefore( domElm, document.head.firstElementChild);
-                themeElm = new ClientStyleElement( domElm);
+                this.node.insertBefore( domElm, document.head.firstElementChild);
             }
+
+            this.themeElm = new ClientStyleElement( domElm);
         }
 
         return this.themeElm;
     }
 
-    createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined
+    public createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined
     {
+        let domElm: HTMLStyleElement | undefined;
         if (this.hydrate)
         {
-            let domElm = this.parent.querySelector( `style[id=${id}`) as HTMLStyleElement;
+            domElm = this.node.querySelector( `style[id=${id}`) as HTMLStyleElement;
             if (domElm)
                 return new HydrationStyleElement( domElm);
 
             /// #if DEBUG
             else
-            {
                 console.error( `Style element with ID '${id}' was requested during hydration but was not found`);
-                return undefined;
-            }
             /// #endif
         }
-        else
+
+        // if we didn't find element, create one now
+        if (!domElm)
         {
-            let domElm = document.createElement( "style");
+            domElm = document.createElement( "style");
             domElm.id = id;
-            this.parent.insertBefore( domElm, insertBefore ? (insertBefore as ClientStyleElement).domElm : null);
-            return new ClientStyleElement( domElm);
+            this.node.insertBefore( domElm, insertBefore ? (insertBefore as ClientStyleElement).domElm : null);
         }
+
+        return new ClientStyleElement( domElm);
     }
 
-    removeElm( elm: ClientStyleElement | HydrationStyleElement): void
+    public removeElm( elm: ClientStyleElement | HydrationStyleElement): void
     {
         elm?.domElm?.remove();
     }
 
-    readonly parent: ParentNode;
+    /** Flag indicating whether the context is currently working in hydration mode */
+    public hydrate = false;
 
-    /** Flag indicating whether the context works in hydration mode */
-    hydrate = false;
+    /** DOM node to which `<style>` element are added */
+    private readonly node: ParentNode;
 
     /** Theme placeholder element */
-    protected themeElm?: IMimcssStyleElement;
+    private themeElm?: IMimcssStyleElement;
 }
 
 /**
@@ -1173,24 +1176,25 @@ abstract class ClientRuleBag implements IMimcssRuleBag
         this.sheet = sheet;
     }
 
-    add( ruleText: string): IMimcssRule | null
+    public add( ruleText: string): IMimcssRule | null
     {
         let cssRule = addDomRule( ruleText, this.sheet);
         return cssRule ? new ClientRule( cssRule) : null;
     }
 
-    addGroup( selector: string): IMimcssGroupingRule | null
+    public addGroup( selector: string): IMimcssGroupingRule | null
     {
         let cssRule = addDomRule( `${selector} {}`, this.sheet);
         return cssRule ? new ClientGroupingRule( cssRule as CSSGroupingRule) : null;
     }
 
-    addKeyframes( name: string): IMimcssKeyframesRule | null
+    public addKeyframes( name: string): IMimcssKeyframesRule | null
     {
         let cssRule = addDomRule( `@keyframes ${name} {}`, this.sheet);
         return cssRule ? new ClientKeyframesRule( cssRule) : null;
     }
 
+    // either stylesheet or a grouping rule under which rules should be added
     public sheet: CSSStyleSheet | CSSGroupingRule;
 }
 
@@ -1199,13 +1203,10 @@ abstract class ClientRuleBag implements IMimcssRuleBag
  */
 class ClientStyleElement extends ClientRuleBag implements IMimcssStyleElement
 {
-    constructor( domElm: HTMLStyleElement)
+    constructor( public domElm: HTMLStyleElement)
     {
         super( domElm.sheet!)
-        this.domElm = domElm;
     }
-
-    domElm: HTMLStyleElement;
 }
 
 /**
@@ -1224,10 +1225,9 @@ class ClientGroupingRule extends ClientRuleBag implements IMimcssGroupingRule
     constructor( cssRule: CSSGroupingRule)
     {
         super( cssRule);
-        this.cssRule = cssRule;
     }
 
-    public cssRule: CSSGroupingRule;
+    public get cssRule(): CSSGroupingRule { return this.sheet as CSSGroupingRule};
 }
 
 /**
@@ -1235,7 +1235,7 @@ class ClientGroupingRule extends ClientRuleBag implements IMimcssGroupingRule
  */
 class ClientKeyframesRule extends ClientRule
 {
-    addFrame( frameText: string): IMimcssRule | null
+    public addFrame( frameText: string): IMimcssRule | null
     {
         try
         {
@@ -1357,7 +1357,7 @@ class ServerActivationContext extends ArrayBasedActivationContext
         return new ServerStyleElement(id);
     }
 
-    serialize(): string
+    public serialize(): string
     {
         return this.elms.map( (elm: ServerStyleElement) => elm.serialize()).join("");
     }
@@ -1368,28 +1368,28 @@ class ServerActivationContext extends ArrayBasedActivationContext
  */
 abstract class ServerRuleBag implements IMimcssRuleBag
 {
-    add( ruleText: string): IMimcssRule | null
+    public add( ruleText: string): IMimcssRule | null
     {
         let rule = new ServerRule( ruleText);
         this.rules.push(rule);
         return rule;
     }
 
-    addGroup( selector: string): IMimcssGroupingRule | null
+    public addGroup( selector: string): IMimcssGroupingRule | null
     {
         let rule = new ServerGroupingRule( selector);
         this.rules.push(rule);
         return rule;
     }
 
-    addKeyframes( name: string): IMimcssKeyframesRule | null
+    public addKeyframes( name: string): IMimcssKeyframesRule | null
     {
         let rule = new ServerKeyframesRule( name);
         this.rules.push(rule);
         return rule;
     }
 
-    serialize(): string
+    public serialize(): string
     {
         return this.rules.map( rule => rule.serialize()).join("");
     }
@@ -1404,7 +1404,7 @@ class ServerStyleElement extends ServerRuleBag implements IMimcssStyleElement
 {
     constructor( public id: string) { super(); }
 
-    serialize(): string
+    public serialize(): string
     {
         return `<style id="${this.id}">${super.serialize()}</style>`;
     }
@@ -1416,9 +1416,10 @@ class ServerStyleElement extends ServerRuleBag implements IMimcssStyleElement
 class ServerRule implements IMimcssRule
 {
     constructor( public ruleText: string) {}
+
     public cssRule: CSSRule | null = null;
 
-    serialize(): string
+    public serialize(): string
     {
         return this.ruleText;
     }
@@ -1430,9 +1431,10 @@ class ServerRule implements IMimcssRule
 class ServerGroupingRule extends ServerRuleBag implements IMimcssGroupingRule
 {
     constructor( public selector: string) { super(); }
+
     public cssRule: CSSRule | null = null;
 
-    serialize(): string
+    public serialize(): string
     {
         return `${this.selector}{${super.serialize()}}`;
     }
@@ -1446,14 +1448,14 @@ class ServerKeyframesRule implements IMimcssKeyframesRule
     constructor( public name: string) {}
     public cssRule: CSSRule | null = null;
 
-    addFrame( frameText: string): IMimcssRule | null
+    public addFrame( frameText: string): IMimcssRule | null
     {
         let frame = new ServerRule( frameText);
         this.frames.push( frame);
         return frame;
     }
 
-    serialize(): string
+    public serialize(): string
     {
         return `@keyframes ${this.name}{${this.frames.map( frame => frame.serialize()).join("")}}`;
     }
@@ -1474,31 +1476,31 @@ class ServerKeyframesRule implements IMimcssKeyframesRule
  */
 abstract class HydrationRuleBag implements IMimcssRuleBag
 {
-    constructor( domRuleBag: CSSStyleSheet | CSSGroupingRule)
+    constructor( sheet: CSSStyleSheet | CSSGroupingRule)
     {
-        this.domRuleBag = domRuleBag;
+        this.sheet = sheet;
     }
 
-    add( ruleText: string): IMimcssRule | null
+    public add( ruleText: string): IMimcssRule | null
     {
-        let cssRule = this.domRuleBag.cssRules[this.index++];
+        let cssRule = this.sheet.cssRules[this.index++];
         return cssRule ? new ClientRule( cssRule) : null;
     }
 
-    addGroup( selector: string): IMimcssGroupingRule | null
+    public addGroup( selector: string): IMimcssGroupingRule | null
     {
-        let cssRule = this.domRuleBag.cssRules[this.index++];
+        let cssRule = this.sheet.cssRules[this.index++];
         return cssRule ? new HydrationGroupingRule( cssRule as CSSGroupingRule) : null;
     }
 
-    addKeyframes( name: string): IMimcssKeyframesRule | null
+    public addKeyframes( name: string): IMimcssKeyframesRule | null
     {
-        let cssRule = this.domRuleBag.cssRules[this.index++];
+        let cssRule = this.sheet.cssRules[this.index++];
         return cssRule ? new HydrationKeyframesRule( cssRule) : null;
     }
 
     // either stylesheet or a grouping rule under which rules should be added
-    public domRuleBag: CSSStyleSheet | CSSGroupingRule;
+    public sheet: CSSStyleSheet | CSSGroupingRule;
 
     // index of the rule in the list of rules under the stylesheet or grouping rule
     private index = 0;
@@ -1509,13 +1511,10 @@ abstract class HydrationRuleBag implements IMimcssRuleBag
  */
 class HydrationStyleElement extends HydrationRuleBag implements IMimcssStyleElement
 {
-    constructor( domElm: HTMLStyleElement)
+    constructor( public domElm: HTMLStyleElement)
     {
         super( domElm.sheet!);
-        this.domElm = domElm;
     }
-
-    public domElm: HTMLStyleElement;
 }
 
 /**
@@ -1526,10 +1525,9 @@ class HydrationGroupingRule extends HydrationRuleBag implements IMimcssGroupingR
     constructor( cssRule: CSSGroupingRule)
     {
         super( cssRule);
-        this.cssRule = cssRule;
     }
 
-    public cssRule: CSSGroupingRule;
+    public get cssRule(): CSSGroupingRule { return this.sheet as CSSGroupingRule};
 }
 
 /**
@@ -1537,7 +1535,7 @@ class HydrationGroupingRule extends HydrationRuleBag implements IMimcssGroupingR
  */
 class HydrationKeyframesRule extends ClientRule
 {
-    addFrame( frameText: string): IMimcssRule | null
+    public addFrame( frameText: string): IMimcssRule | null
     {
         let cssFrameRule = (this.cssRule as CSSKeyframesRule).cssRules[this.index++];
         return cssFrameRule ? new ClientRule( cssFrameRule) : null;
@@ -1562,13 +1560,13 @@ class HydrationKeyframesRule extends ClientRule
 class DummyActivationContext extends ActivationContextBase implements IMimcssStyleElement,
     IMimcssRule, IMimcssGroupingRule, IMimcssKeyframesRule
 {
-    getThemeElm(): IMimcssStyleElement | undefined { return this; }
-    createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined { return this; }
-    removeElm( elm: IMimcssStyleElement): void {}
-    add( ruleText: string): IMimcssRule | null { return this; }
-    addGroup( selector: string): IMimcssGroupingRule | null { return this; }
-    addKeyframes( name: string): IMimcssKeyframesRule | null { return this; }
-    addFrame( frameText: string): IMimcssRule | null { return this; }
+    public getThemeElm(): IMimcssStyleElement | undefined { return this; }
+    public createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined { return this; }
+    public removeElm( elm: IMimcssStyleElement): void {}
+    public add( ruleText: string): IMimcssRule | null { return this; }
+    public addGroup( selector: string): IMimcssGroupingRule | null { return this; }
+    public addKeyframes( name: string): IMimcssKeyframesRule | null { return this; }
+    public addFrame( frameText: string): IMimcssRule | null { return this; }
 
     public cssRule: CSSRule | null = null;
 }
