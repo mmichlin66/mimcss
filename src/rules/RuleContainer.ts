@@ -180,7 +180,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 			// find out if there is a rule with this name defined in a stylesheet instance created
             // for a class from the prototype chain of the style definition class. Otherwise, if
             // there is a parent container, recurse to it; otherwise, generate the name.
-			let existingName = this.ctx && findNameForRuleInPrototypeChain( this.ctx, this.sdc, ruleName);
+			let existingName = findNameForRuleInPrototypeChain( this.ctx, this.sdc, ruleName);
             if (existingName)
                 return existingName;
             else if (this.pc)
@@ -250,7 +250,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         // activation context may not exist if the code is executing on a server and SSR has
         // not been started
         let ctx = this.ctx;
-		if (!ctx || ++this.actCount > 1)
+		if (++this.actCount > 1)
             return;
 
         /// #if DEBUG
@@ -309,7 +309,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	public deactivate(): void
 	{
         let ctx = this.ctx;
-		if (!ctx || --this.actCount > 0)
+		if (--this.actCount > 0)
             return;
 
         /// #if DEBUG
@@ -410,7 +410,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	private varRootRule: CSSStyleRule | undefined;
 
 	/** Activation context in which this object has been created. */
-	public ctx?: IMimcssActivationContext;
+	public ctx: IMimcssActivationContext;
 
 	/** Activation reference count. */
 	public actCount = 0;
@@ -549,27 +549,16 @@ export const processSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
  * that defines rules within nested grouping rules).
  */
 const processClass = (sdc: IStyleDefinitionClass, parent?: IStyleDefinition): IStyleDefinition =>
-{
-    let ctx = getCurrentActivationContext();
-    if (!ctx)
-    {
-        /// #if DEBUG
-        console.error("No activation context to process class");
-        /// #endif
-        return new sdc( parent);
-    }
-
-    return processClassInContext( ctx, sdc, parent);
-}
+    processClassInContext( getCurrentActivationContext(), sdc, parent);
 
 
 
 /**
- * Processes the given style definition class by creating its instance and associating a
- * rule container object with it. The class will be associated with the instance using a
- * Symbol property. The parent parameter is a reference to the parent style defiition
- * object or null if the given class is itself a top-level class (that is, is not a class
- * that defines rules within nested grouping rules).
+ * Processes the given style definition class by creating its instance and associating a rule
+ * container object with it. The class will be associated with the instance in the given context.
+ * The parent parameter is a reference to the parent style defiition object or null if the given
+ * class is itself a top-level class (that is, is not a class that defines rules within nested
+ * grouping rules).
  */
 const processClassInContext = (ctx: IMimcssActivationContext, sdc: IStyleDefinitionClass,
     parent?: IStyleDefinition): IStyleDefinition =>
@@ -678,7 +667,7 @@ class EmbeddingContainer
     private sdcs: Set<IStyleDefinitionClass>;
 
 	/** Activation context in which this object has been created. */
-	public ctx?: IMimcssActivationContext;
+	public ctx: IMimcssActivationContext;
 
 	/** Activation reference count. */
 	public actCount = 0;
@@ -716,7 +705,7 @@ class EmbeddingContainer
         // if the embedding container is currently activated, we need to activate the added
         // style definition class using the currently default activator
         if (this.elm)
-            getActivator().activate( processClass( cls)!);
+            getActivator().activate( processClassInContext( this.ctx, cls)!);
     }
 
 	/**
@@ -727,7 +716,7 @@ class EmbeddingContainer
         // activation context may not exist if the code is executing on a server and SSR has
         // not been started
         let ctx = this.ctx;
-		if (!ctx || ++this.actCount > 1)
+		if (++this.actCount > 1)
             return;
 
         // create the style element and insert all rules from all the style definition classes.
@@ -750,7 +739,7 @@ class EmbeddingContainer
         // only if this is the last deactivation call, remove the style element and remove all
         // rules from all the style definition classes.
         let ctx = this.ctx;
-		if (!ctx || --this.actCount > 0)
+		if (--this.actCount > 0)
             return;
 
         if (this.elm)
@@ -1434,7 +1423,6 @@ abstract class ServerRuleBag implements IMimcssRuleBag
 class ServerStyleElement extends ServerRuleBag implements IMimcssStyleElement
 {
     constructor( public id: string) { super(); }
-    remove(): void {}
 
     serialize(): string
     {
@@ -1583,6 +1571,32 @@ class HydrationKeyframesRule extends ClientRule
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// Dummy implementation of activation context that doesn't actually insert any rules anywhere. It
+// is used when no current activation context is available.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Dummy implementation of activation context and all related interfaces.
+ */
+class DummyActivationContext extends ActivationContextBase implements IMimcssStyleElement,
+    IMimcssRule, IMimcssGroupingRule, IMimcssKeyframesRule
+{
+    getThemeElm(): IMimcssStyleElement | undefined { return this; }
+    createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined { return this; }
+    removeElm( elm: IMimcssStyleElement): void {}
+    add( ruleText: string): IMimcssRule | null { return this; }
+    addGroup( selector: string): IMimcssGroupingRule | null { return this; }
+    addKeyframes( name: string): IMimcssKeyframesRule | null { return this; }
+    addFrame( frameText: string): IMimcssRule | null { return this; }
+
+    public cssRule: CSSRule | null = null;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Activation context switching
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1614,12 +1628,13 @@ const s_globalAdoptionActivationContext = isAdoptionSupported ? new Constructabl
  * Activation context stack.
  */
 let s_activationContextStack: IMimcssActivationContext[] =
-    s_globalClientActivationContext ? [s_globalClientActivationContext] : [];
+    [s_globalClientActivationContext ? s_globalClientActivationContext : new DummyActivationContext()];
 
 /**
- * Map of client or adoption activation contexts per ParentNode/DocumentOrShadowRoot instances.
+ * Map of adoption (or client if adoption is not supported) activation contexts per
+ * DocumentOrShadowRoot objects.
  */
-let s_clientContexts = new Map<ParentNode | DocumentOrShadowRoot, IMimcssActivationContext>();
+let s_adoptionContexts = new Map<DocumentOrShadowRoot, IMimcssActivationContext>();
 
 
 
@@ -1637,12 +1652,10 @@ const s_pushActCtx = (ctx: IMimcssActivationContext): void =>
 const s_popActCtx = (ctx: IMimcssActivationContext): void =>
 {
     let len = s_activationContextStack.length;
-    if (len > 0 && s_activationContextStack[len-1] === ctx)
+    if (len > 1 && s_activationContextStack[len-1] === ctx)
         s_activationContextStack.pop();
 
     /// #if DEBUG
-    else if (len === 0)
-        console.error("Attempt to pop activation context from the empty stack");
     else
         console.error("Attempt to pop wrong activation context from the stack");
     /// #endif
@@ -1651,12 +1664,11 @@ const s_popActCtx = (ctx: IMimcssActivationContext): void =>
 
 
 /**
- * Returns activation context from the top of the stack
+ * Returns activation context from the top of the stack. Note that it always returns a valid
+ * object although it can be a dummy implementation.
  */
-const getCurrentActivationContext = (): IMimcssActivationContext | undefined =>
-    s_activationContextStack.length > 0
-        ? s_activationContextStack[s_activationContextStack.length - 1]
-        : undefined;
+const getCurrentActivationContext = (): IMimcssActivationContext =>
+    s_activationContextStack[s_activationContextStack.length - 1];
 
 
 
@@ -1685,7 +1697,7 @@ export const s_startSSR = (): void =>
 export const s_stopSSR = (): string =>
 {
     let ctx = getCurrentActivationContext();
-    if (!ctx || !(ctx instanceof ServerActivationContext))
+    if (!(ctx instanceof ServerActivationContext))
         return "";
 
     // restore scheduler type existed before we started SSR
@@ -1706,7 +1718,7 @@ export const s_stopSSR = (): string =>
 export const s_startHydration = (): void =>
 {
     let ctx = getCurrentActivationContext();
-    if (!ctx || ctx !== s_globalClientActivationContext)
+    if (ctx !== s_globalClientActivationContext)
     {
         /// #if DEBUG
         console.error("Attempt to set hydration on a non-client activation context");
@@ -1724,7 +1736,7 @@ export const s_startHydration = (): void =>
 export const s_stopHydration = (): void =>
 {
     let ctx = getCurrentActivationContext();
-    if (!ctx || ctx !== s_globalClientActivationContext)
+    if (ctx !== s_globalClientActivationContext)
         return;
 
     s_globalClientActivationContext.hydrate = false;
