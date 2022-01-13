@@ -15,7 +15,8 @@ import {
 import {symRC} from "../rules/Rule";
 import {
     embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
-    s_startSSR, s_stopSSR, s_startHydration, s_stopHydration
+    s_startSSR, s_stopSSR, s_startHydration, s_stopHydration, s_popAdoptCtx, s_pushAdoptCtx,
+    s_releaseAdoptCtx
 } from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule, PageRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
@@ -100,8 +101,13 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     {
         this.$parent = parent;
 
-        // Style Definition instance points to rule container
-        let rc = new RuleContainer( this);
+        // Style Definition instance points to rule container. Note that we use the second argumnet
+        // although the constuctor signature only has one argument. This is because we need to
+        // distinguish between when the style definition instance is created by processing the
+        // class versus by directly calling the new operator. The latter is required for "Styled
+        // Components" and they will never pass the second parameter. RuleContainer uses this
+        // second parameter to determine how to generate the name associated with the class.
+        let rc = new RuleContainer( this, arguments[1]);
         this[symRC] = rc;
 
         // instead of returning an instance of our class, the constructor returns a proxy. This
@@ -1240,6 +1246,45 @@ export const deactivate = (sd: IStyleDefinition, schedulerType?: number): void =
  */
 export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
     getCurrentTheme( themeClass);
+
+
+
+/**
+ * Establishes an activation context corresponding to the given document or shadow root, so that
+ * styles definitions created and activated while this context is active will be "adopted" by the
+ * given object. After this function is called and the style definitions are activated, the
+ * [[popAdoptionContext]] function must be called.
+ *
+ * For custom Web elements, the pair of `pushAdoptionContext` and [[popAdoptionContext]] functions
+ * is usually called in the `connected` callback; however, they can be called whenever new style
+ * definitions are activated. For example, they can be called when handling events within the
+ * custom Web element's code.
+ *
+ * @param root Document or ShadowRoot object to which style definitions will be adopted
+ */
+export const pushAdoptionContext = (root: DocumentOrShadowRoot): void => s_pushAdoptCtx( root);
+
+
+
+/**
+ * Removes the activation context corresponding to the given document or shadow root established
+ * by an earlier call to the [[pushAdoptionCtx]] function. Each call to the [[pushAdoptionCtx]]
+ * function must be eventually paired with the call to the `popAdoptionContext` functions.
+ *
+ * @param root Document or ShadowRoot object to which style definitions were adopted
+ */
+export const popAdoptionContext = (root: DocumentOrShadowRoot): void => s_popAdoptCtx( root);
+
+
+
+/**
+ * Releases resources taken by the activation context established for the given document or shadow
+ * root object by the first call to the [[pushAdoptionContext]] function.
+ *
+ * For custom Web elements, this function should be called in the `disconnected` callback.
+ * @param root Document or ShadowRoot object to which style definitions were adopted
+ */
+export const releaseAdoptionContext = (root: DocumentOrShadowRoot): void => s_releaseAdoptCtx( root);
 
 
 

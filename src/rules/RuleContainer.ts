@@ -14,16 +14,6 @@ import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
 
 
 /**
- * Flag indicating that a rule container is created not directly (as for styled components)
- * but from the processClass function. This variable is set to true before instantiating the
- * style definition class (and thus the RuleContainer object) and is set back to false after
- * it is used in the RuleContainer constructor.
- */
-let s_processingStyleDefinitionClass = false;
-
-
-
-/**
  * The RuleContainer class is a shadow structure that accompanies every processed style definition
  * object. Since StyleDefinition class is an exported class visible to developers, we don't want
  * to have a lot of functionality in it. The RuleContainer object is a proxy handler for the
@@ -32,7 +22,7 @@ let s_processingStyleDefinitionClass = false;
  */
 export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefinition>
 {
-	constructor( sd: IStyleDefinition)
+	constructor( sd: IStyleDefinition, processingStyleDefinitionClass: boolean)
 	{
 		this.sd = sd;
 
@@ -60,10 +50,8 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         {
             let className = this.sdc.name;
             let name = className ? "" : generateUniqueName();
-            if (s_processingStyleDefinitionClass)
+            if (processingStyleDefinitionClass)
             {
-                s_processingStyleDefinitionClass = false;
-
                 name = !className
                     ? generateUniqueName()
                     : s_nameGeneratonMethod === NameGenerationMethod.UniqueScoped
@@ -577,20 +565,14 @@ const processClassInContext = (ctx: IMimcssActivationContext, sdc: IStyleDefinit
     if (baseClass !== StyleDefinition && baseClass !== ThemeDefinition)
         processClass( baseClass, parent);
 
-    try
-    {
-        // create the instance of the definition class
-        s_processingStyleDefinitionClass = true;
-        sd = new sdc( parent);
+    // create the instance of the definition class. We pass the second argument (which is not
+    // part of the StyleDefinition constructor signature) in order to indicate that the instance
+    // is created by processing a class and not directly by callers via the "new" invocation.
+    sd = new (sdc as any)( parent, true);
 
-        // associate the definition class with the created definition instance
-        ctx.setClassSD( sdc, sd!);
-        return sd!;
-    }
-    finally
-    {
-        s_processingStyleDefinitionClass = false;
-    }
+    // associate the definition class with the created definition instance
+    ctx.setClassSD( sdc, sd!);
+    return sd!;
 }
 
 
@@ -1328,7 +1310,6 @@ class AdoptionActivationContext extends ArrayBasedActivationContext
     {
         super();
         this.root = root;
-        this.parent = root instanceof Document ? document.head : root as any as ShadowRoot;
     }
 
     /** Method that is responsible for creating an instance of IMimcssStyleElement interface */
@@ -1344,7 +1325,6 @@ class AdoptionActivationContext extends ArrayBasedActivationContext
     }
 
     readonly root: DocumentOrShadowRoot;
-    readonly parent: ParentNode;
 }
 
 /**
@@ -1669,6 +1649,50 @@ const s_popActCtx = (ctx: IMimcssActivationContext): void =>
  */
 const getCurrentActivationContext = (): IMimcssActivationContext =>
     s_activationContextStack[s_activationContextStack.length - 1];
+
+
+
+/**
+ * Establishes an activation context corresponding to the given document or shadow root.
+ */
+export const s_pushAdoptCtx = (root: DocumentOrShadowRoot): void =>
+{
+    let ctx = s_adoptionContexts.get(root);
+    if (!ctx)
+    {
+        ctx = isAdoptionSupported
+            ? new AdoptionActivationContext(root)
+            : new ClientActivationContext( root instanceof Document ? root.head : root as any as ParentNode);
+
+        s_adoptionContexts.set( root, ctx);
+    }
+
+    s_pushActCtx(ctx);
+}
+
+
+
+/**
+ * Removes the activation context corresponding to the given document or shadow root established
+ * by an earlier call to s_pushAdoptCtx.
+ */
+export const s_popAdoptCtx = (root: DocumentOrShadowRoot): void =>
+{
+    let ctx = s_adoptionContexts.get(root);
+    if (ctx)
+        s_popActCtx(ctx);
+}
+
+
+
+/**
+ * Releases resources taken by the activation context established for the given document or shadow
+ * root object by the first call to the s_pushAdoptCtx function.
+ */
+ export const s_releaseAdoptCtx = (root: DocumentOrShadowRoot): void =>
+{
+    s_adoptionContexts.delete(root);
+}
 
 
 
