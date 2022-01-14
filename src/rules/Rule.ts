@@ -6,15 +6,41 @@ import {IRule, INamedEntity, IStyleDefinition, IStyleDefinitionClass} from "../a
  * Symbol on the style definition instance pointing to the RuleContainer object that is
  * responsible for processing rules.
  */
- export const symRC = Symbol("rc");
+export const symRC = Symbol("rc");
 
 
 
- /**
+/**
+ * Represents an object that contains rules and which corresponds to a single stylesheet.
+ */
+export interface IMimcssContainer
+{
+	/**
+     * Name of this container, which, depending on the mode, is either taken from the class
+     * definition name or generated uniquely.
+     */
+    readonly name: string;
+
+	/** Activation context in which this object has been created. */
+	ctx: IMimcssActivationContext;
+
+	// /** Activation reference count. */
+	// actCount: number;
+
+	/** DOM style elemnt */
+	elm?: IMimcssStyleElement;
+
+    activate( insertBefore?: IMimcssStyleElement): void;
+    deactivate(): void;
+}
+
+
+
+/**
  * The IRuleContainer interface represents an object that accompanies and is associated with
  * a style definition object.
  */
-export interface IRuleContainer
+export interface IRuleContainer extends IMimcssContainer
 {
 	/** Generates a name, which will be unique in this stylesheet */
 	getScopedName( ruleName: string | null, nameOverride?: string | INamedEntity): string;
@@ -27,6 +53,16 @@ export interface IRuleContainer
 
     /** Sets the given value for the custom CSS roperty with the given name. */
 	setVarValue( name: string, value: string | null, important?: boolean, schedulerType?: number): void;
+}
+
+
+
+/**
+ * Represents an object that accompanies and is associated with
+ * a style definition object.
+ */
+export interface IEmbeddingContainer extends IMimcssContainer
+{
 }
 
 
@@ -104,11 +140,21 @@ export interface IMimcssActivationContext
     /** Associates style definition instance with the given class in this context. */
     setClassSD( sdc: IStyleDefinitionClass, sd: IStyleDefinition): void;
 
+    /**
+     * Activates the given container and its related containers in this context.
+     */
+    activate( container: IMimcssContainer, insertBefore?: IMimcssStyleElement): void;
+
+    /**
+     * Deactivates the given container and its related containers in this context;
+     */
+    deactivate( container: IMimcssContainer): void;
+
     /** Creates theme placeholder style element */
-    getThemeElm(): IMimcssStyleElement | undefined;
+    getThemeElm(): IMimcssStyleElement;
 
     /** Creates style element with the given ID */
-    createElm( id: string, insertBefore?: IMimcssStyleElement): IMimcssStyleElement | undefined;
+    createElm( container: IMimcssContainer, insertBefore?: IMimcssStyleElement): IMimcssStyleElement;
 
     /** Removes the given style element */
     removeElm( elm: IMimcssStyleElement): void;
@@ -120,13 +166,13 @@ export interface IMimcssActivationContext
 export interface IMimcssRuleBag
 {
     /** Adds a simple CSS rule */
-    add( ruleText: string): IMimcssRule | null;
+    add( ruleText: string): IMimcssRule;
 
     /** Adds a grouping CSS rule */
-    addGroup( selector: string): IMimcssGroupingRule | null;
+    addGroup( selector: string): IMimcssGroupingRule;
 
     /** Adds a keyframes CSS rule */
-    addKeyframes( name: string): IMimcssKeyframesRule | null;
+    addKeyframes( name: string): IMimcssKeyframesRule;
 }
 
 /**
@@ -162,7 +208,7 @@ export interface IMimcssGroupingRule extends IMimcssRule, IMimcssRuleBag
 export interface IMimcssKeyframesRule extends IMimcssRule
 {
     /** Adds a frame to this keyframes rule */
-    addFrame( frameText: string): IMimcssRule | null;
+    addFrame( frameText: string): IMimcssRule;
 }
 
 
