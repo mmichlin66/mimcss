@@ -11,6 +11,34 @@ export const symRC = Symbol("rc");
 
 
 /**
+ * Object that keeps information about adoption of rule containers and embedding containers for
+ * a given documents and shadow roots object.
+ */
+ export interface IAdoptionRootInfo
+{
+    /**
+     * Activates the given container and its related containers in this context.
+     */
+    add( container: IMimcssContainer): void;
+
+    /**
+     * Deactivates the given container and its related containers in this context;
+     */
+    remove( container: IMimcssContainer): void;
+
+    /**
+     * The root property is an object that implements the DocumentOrShadowRoot interface - that is,
+     * it is either a document object or a shadow root of a custom Web element. Since the current
+     * DOM library doesn't have the "adoptedStyleSheets" property on this interface yet, and that's
+     * the property that we will be using, we define the type of the "root" property as an object
+     * that has the "adoptedStyleSheets" property.
+     */
+    readonly root: { adoptedStyleSheets: CSSStyleSheet[] };
+ }
+
+
+
+/**
  * Represents an object that contains rules and which corresponds to a single stylesheet.
  */
 export interface IMimcssContainer
@@ -32,6 +60,9 @@ export interface IMimcssContainer
 
     activate( insertBefore?: IMimcssStyleElement): void;
     deactivate(): void;
+
+    adopt( rootInfo: IAdoptionRootInfo): void;
+    unadopt( rootInfo: IAdoptionRootInfo): void;
 }
 
 

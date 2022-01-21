@@ -5,7 +5,7 @@ import {SchedulerType} from "../api/SchedulingTypes"
 import {StyleDefinition, ThemeDefinition} from "../api/RuleAPI"
 import {
     Rule, RuleLike, IRuleContainer, IMimcssActivationContext, IMimcssGroupingRule, IMimcssKeyframesRule,
-    IMimcssRule, IMimcssStyleElement, IMimcssRuleBag, symRC, IEmbeddingContainer, IMimcssContainer
+    IMimcssRule, IMimcssStyleElement, IMimcssRuleBag, symRC, IEmbeddingContainer, IMimcssContainer, IAdoptionRootInfo
 } from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
@@ -14,6 +14,16 @@ import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
 
 
 /**
+ * Flag indicating that a rule container is created not directly (as for styled components)
+ * but from the processClass function. This variable is set to true before instantiating the
+ * style definition class (and thus the RuleContainer object) and is set back to false after
+ * it is used in the RuleContainer constructor.
+ */
+ let s_processingStyleDefinitionClass = false;
+
+
+
+ /**
  * The RuleContainer class is a shadow structure that accompanies every processed style definition
  * object. Since StyleDefinition class is an exported class visible to developers, we don't want
  * to have a lot of functionality in it. The RuleContainer object is a proxy handler for the
@@ -22,12 +32,13 @@ import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
  */
 export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefinition>
 {
-	constructor( sd: IStyleDefinition, processingStyleDefinitionClass: boolean)
+	constructor( sd: IStyleDefinition)
 	{
 		this.sd = sd;
 
-        // get the current activation context, which will be the context under which this object
-        // will operate
+        // activation context can be undefined if the style definition instance was created via
+        // the new operator (as for styled components). In this case, the context will be set
+        // externally when the style definition is passed to the activate() function.
         this.ctx = getCurrentActivationContext();
 
         this.sdc = sd.constructor as IStyleDefinitionClass;
@@ -50,8 +61,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         {
             let className = this.sdc.name;
             let name = className ? "" : generateUniqueName();
-            if (processingStyleDefinitionClass)
+            if (s_processingStyleDefinitionClass)
             {
+                s_processingStyleDefinitionClass = false;
                 name = !className
                     ? generateUniqueName()
                     : s_nameGeneratonMethod === NameGenerationMethod.UniqueScoped
@@ -238,8 +250,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         // activation context may not exist if the code is executing on a server and SSR has
         // not been started
         let ctx = this.ctx;
-		// if (++this.actCount > 1)
-        //     return;
 
         /// #if DEBUG
         let timeLabel = `Activating style definition '${this.name}'`;
@@ -275,10 +285,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             {
                 let currInstance = getCurrentTheme( themeClass);
                 if (currInstance && currInstance !== this.sd)
-                {
-                    let currContainer = currInstance[symRC] as RuleContainer;
-                    currContainer.deactivate();
-                }
+                    ctx.deactivate( currInstance[symRC] as RuleContainer);
 
                 setCurrentTheme( this.sd);
             }
@@ -297,8 +304,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	public deactivate(): void
 	{
         let ctx = this.ctx;
-		// if (--this.actCount > 0)
-        //     return;
 
         /// #if DEBUG
         let timeLabel = `Deactivating style definition '${this.name}'`;
@@ -342,7 +347,37 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
 
-	/**
+    /**
+     * Adds this container as well as containers of the referenced style definitions
+     * to the given root information object.
+     */
+    public adopt( rootInfo: IAdoptionRootInfo): void
+    {
+        if (!this.ec && !this.pc)
+            rootInfo.add( this);
+
+		// adopt referenced style definitions
+		for( let ref of this.refs)
+			(ref[symRC] as RuleContainer).adopt( rootInfo);
+    }
+
+    /**
+     * Removes this container as well as containers of the referenced style definitions
+     * from the given root information object.
+     */
+    public unadopt( rootInfo: IAdoptionRootInfo): void
+    {
+        if (!this.ec && !this.pc)
+            rootInfo.remove( this);
+
+		// unadopt referenced style definitions
+		for( let ref of this.refs)
+			(ref[symRC] as RuleContainer).unadopt( rootInfo);
+    }
+
+
+
+    /**
      * Style Definition - instance of the style definition class that this container is
      * attached to.
      */
@@ -519,8 +554,7 @@ const findNameForRuleInPrototypeChain = (ctx: IMimcssActivationContext,
  * this function is called.
  *
  * If the parameter is an object (an instance of the StyleDefinition class) then we check whether
- * it has already been processed. If yes, we just return it back; if no, we assign new unique names
- * to its rules.
+ * it is associated with an activation context. If it's not, associates it with the current context.
  */
 export const processSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
 	    parent?: IStyleDefinition): IStyleDefinition =>
@@ -568,7 +602,15 @@ const processClassInContext = (ctx: IMimcssActivationContext, sdc: IStyleDefinit
     // create the instance of the definition class. We pass the second argument (which is not
     // part of the StyleDefinition constructor signature) in order to indicate that the instance
     // is created by processing a class and not directly by callers via the "new" invocation.
-    sd = new (sdc as any)( parent, true);
+    try
+    {
+        s_processingStyleDefinitionClass = true;
+        sd = new sdc( parent);
+    }
+    finally
+    {
+        s_processingStyleDefinitionClass = false;
+    }
 
     // associate the definition class with the created definition instance
     ctx.setClassSD( sdc, sd!);
@@ -587,16 +629,91 @@ export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionCl
 
 
 /**
- * Activates the given style definition and inserts all its rules into DOM.
+ * Creates an instance of the given style definition class so that its activation creates a
+ * *constructable style sheet", which will be adopted by the given document or shadow root.
+ * @param sdc Style definition class
+ * @param root Document or shadow root object. If the browser supports constructable style sheets,
+ * the style definition will be adopted by the given root when activated. If the the browser does
+ * not supports constructable style sheets, the style definition will create a `<style>` element
+ * in the document's `<head>` or in the shadow root.
+ * @param args Parameters to be passed to the style definition constructor.
+ * @returns New instance of the style definition class.
  */
-export const activateSD = (instance: IStyleDefinition): void =>
+ export const s_construct = <T extends IStyleDefinitionClass>( sdc: T,
+	root: DocumentOrShadowRoot, ...args: ConstructorParameters<T>): InstanceType<T> =>
 {
-	let ruleContainer = instance[symRC];
+    return callWithRootContext( root, () => new sdc( ...args));
+}
+
+
+
+/**
+ * Processes the given style definition instance or class and schedules its activation. If the root
+ * parameter is specified and the browser supports constructable style sheets, then it uses the
+ * constructable activation context for processing the style definition. After activation, the
+ * style sheet will be adopted by the given root.
+ */
+export const s_activate = <T extends IStyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>,
+    root?: DocumentOrShadowRoot, schedulerType?: number): T =>
+{
+    // if style sheet adoption is not supported, we want to pass undefined in the root parameter
+    // when we schedule activation. Thus, when the activateSD function is invoked, we will not
+    // call the adopt method.
+    return callWithRootContext( root, () => {
+        let sd = processSD( instOrClass) as T;
+        if (sd)
+            getActivator(schedulerType).activate( sd, isAdoptionSupported ? root : undefined);
+
+        return sd;
+    });
+}
+
+
+
+/**
+ * Calls the given function after optionally establishing an activation context for the given root.
+ * If the root parameter is specified and the browser supports constructable style sheets, it sets
+ * the constructable activation context for processing the style definition. If the root parameter
+ * is specified, but the broser does not support constructable style sheets, it creates a regular
+ * client context for the document.head or shadow root element. If the root parameter is not
+ * defined, it doesn't establish any activation context and the function is called using the
+ * current activation context.
+ */
+const callWithRootContext = <T extends () => any>(root: DocumentOrShadowRoot | undefined, func: T): ReturnType<T> =>
+{
+    let newCtx = root && (isAdoptionSupported ? globalConstructableActivationContext : getClientContext( root));
+    newCtx && pushActCtx( newCtx);
+
+    try
+    {
+        return func();
+    }
+    finally
+    {
+        newCtx && popActCtx( newCtx);
+    }
+}
+
+
+
+/**
+ * Activates the given style definition and inserts all its rules into DOM. If root parameter
+ * is defined, we will also
+ */
+export const activateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot): void =>
+{
+	let ruleContainer = sd[symRC];
 
     // if this container has an embedding container, activate the embedding container; otherwise,
     // activate the rule container itself.
 	let container: IMimcssContainer = ruleContainer.ec || ruleContainer;
-    container.ctx.activate( container);
+    let ctx = container.ctx;
+    ctx.activate( container);
+
+    // if the activation context is constructable, then adopt this style definition by
+    // the given root (which is guaranteed to be defined)
+    if (ctx === globalConstructableActivationContext)
+        adopt( container, root!);
 }
 
 
@@ -604,14 +721,21 @@ export const activateSD = (instance: IStyleDefinition): void =>
 /**
  * Deactivates the given style definition by removing its rules from DOM.
  */
-export const deactivateSD = (instance: IStyleDefinition): void =>
+export const deactivateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot): void =>
 {
-	let ruleContainer = instance[symRC];
+	let ruleContainer = sd[symRC];
 
     // if this container has an embedding container, deactivate the embedding container; otherwise,
     // deactivate the rule container itself.
 	let container: IMimcssContainer = ruleContainer.ec || ruleContainer;
-    container.ctx.deactivate( container);
+    let ctx = container.ctx;
+
+    // if the activation context is constructable, then unadopt this style definition by
+    // the given root (which is guaranteed to be defined)
+    if (ctx === globalConstructableActivationContext)
+        unadopt( container, root!);
+
+    ctx.deactivate( container);
 }
 
 
@@ -690,8 +814,6 @@ class EmbeddingContainer implements IEmbeddingContainer
         // activation context may not exist if the code is executing on a server and SSR has
         // not been started
         let ctx = this.ctx;
-		// if (++this.actCount > 1)
-        //     return;
 
         // create the style element and insert all rules from all the style definition classes.
         this.elm = ctx.createElm( this);
@@ -701,7 +823,6 @@ class EmbeddingContainer implements IEmbeddingContainer
             // definition class may be already associated with an instance; if not -
             // process it now.
             let sd = processClassInContext( ctx, sdc);
-            // (sd[symRC] as RuleContainer).activate();
             ctx.activate(sd[symRC] as RuleContainer);
         }
 	}
@@ -714,8 +835,6 @@ class EmbeddingContainer implements IEmbeddingContainer
         // only if this is the last deactivation call, remove the style element and remove all
         // rules from all the style definition classes.
         let ctx = this.ctx;
-		// if (--this.actCount > 0)
-        //     return;
 
         if (this.elm)
         {
@@ -745,6 +864,40 @@ class EmbeddingContainer implements IEmbeddingContainer
             ctx.deactivate(sd[symRC] as RuleContainer);
         }
 	}
+
+
+
+    /**
+     * Adds this container as well as containers of the referenced style definitions
+     * to the given root information object.
+     */
+    public adopt( rootInfo: IAdoptionRootInfo): void
+    {
+        rootInfo.add( this);
+
+        // adopt referenced style definitions
+        for( let sdc of this.sdcs)
+        {
+            let sd = this.ctx.getClassSD( sdc);
+            sd && (sd[symRC] as RuleContainer).adopt( rootInfo);
+        }
+    }
+
+    /**
+     * Removes this container as well as containers of the referenced style definitions
+     * from the given root information object.
+     */
+    public unadopt( rootInfo: IAdoptionRootInfo): void
+    {
+        rootInfo.remove( this);
+
+        // unadopt referenced style definitions
+        for( let sdc of this.sdcs)
+        {
+            let sd = this.ctx.getClassSD( sdc);
+            sd && (sd[symRC] as RuleContainer).unadopt( rootInfo);
+        }
+    }
 }
 
 
@@ -1050,7 +1203,8 @@ abstract class ArrayBasedActivationContext<T extends IMimcssStyleElement> extend
         if (!elm)
         {
             elm = this.newElm();
-            this.addThemeElm(elm);
+            this.elms.splice( 0, 0, elm);
+            this.themeElm = elm;
         }
 
         return elm;
@@ -1059,7 +1213,11 @@ abstract class ArrayBasedActivationContext<T extends IMimcssStyleElement> extend
     public createElm( container: IMimcssContainer, insertBefore?: T): T
     {
         let elm = this.newElm( container);
-        this.addElm( elm, insertBefore);
+        if (insertBefore)
+            this.elms.splice( this.elms.indexOf( insertBefore), 0, elm);
+        else
+            this.elms.push( elm);
+
         return elm;
     }
 
@@ -1070,18 +1228,9 @@ abstract class ArrayBasedActivationContext<T extends IMimcssStyleElement> extend
             this.elms.splice( index, 1);
     }
 
-    protected addThemeElm( elm: T): void
+    public clear(): void
     {
-        this.elms.splice( 0, 0, elm);
-        this.themeElm = elm;
-    }
-
-    protected addElm( elm: T, insertBefore?: T): void
-    {
-        if (insertBefore)
-            this.elms.splice( this.elms.indexOf( insertBefore), 0, elm);
-        else
-            this.elms.push( elm);
+        this.elms = [];
     }
 
     /**
@@ -1095,25 +1244,6 @@ abstract class ArrayBasedActivationContext<T extends IMimcssStyleElement> extend
 
     /** Theme placeholder element */
     protected themeElm?: T;
-}
-
-
-
-/**
- * Dummy implementation of activation context and all related interfaces. This is needed so that
- * we always have a defined activation context - even in non-browser environments.
- */
-class DummyActivationContext extends ActivationContextBase implements IMimcssStyleElement,
-    IMimcssRule, IMimcssGroupingRule, IMimcssKeyframesRule
-{
-    public getThemeElm(): IMimcssStyleElement { return this; }
-    public createElm( container: IMimcssContainer, insertBefore?: IMimcssStyleElement): IMimcssStyleElement { return this; }
-    public removeElm( elm: IMimcssStyleElement): void {}
-    public add( ruleText: string): IMimcssRule { return this; }
-    public addGroup( selector: string): IMimcssGroupingRule { return this; }
-    public addKeyframes( name: string): IMimcssKeyframesRule { return this; }
-    public addFrame( frameText: string): IMimcssRule { return this; }
-    public cssRule: CSSRule | null = null;
 }
 
 
@@ -1307,6 +1437,38 @@ class ClientKeyframesRule extends ClientRule implements IMimcssKeyframesRule
 
 
 
+/**
+ * Map of document or shadow root objects to the corresponding ClientActivationContext objects.
+ * This is needed only if constructable style sheets are not supported.
+ */
+const clientContextsForRoots = new Map<DocumentOrShadowRoot,ClientActivationContext>();
+
+/**
+ * Returns existing or creates new client activation context for the given document or shadow
+ * root object.
+ */
+const getClientContext = (root: DocumentOrShadowRoot): ClientActivationContext =>
+{
+    let ctx = clientContextsForRoots.get( root);
+    if (!ctx)
+    {
+        ctx = new ClientActivationContext( root instanceof Document ? root.head : root as any as ParentNode);
+        clientContextsForRoots.set( root, ctx);
+    }
+
+    return ctx;
+}
+
+/**
+ * Deletes client activation context for the given document or shadow root object.
+ */
+export const s_releaseShadow = (root: ShadowRoot): void =>
+{
+    clientContextsForRoots.delete( root);
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Client-side "constructable" implementation, which allows creating CSSStyleSheet objects directly
@@ -1374,6 +1536,7 @@ class ConstructableStyleElement extends ClientRuleBag implements IMimcssStyleEle
     constructor( container?: IMimcssContainer)
     {
         super( new CSSStyleSheet());
+        this.container = container;
     }
 
     /** Container for which the element was created - is null for theme placeholder */
@@ -1381,130 +1544,6 @@ class ConstructableStyleElement extends ClientRuleBag implements IMimcssStyleEle
 
     /** Reference count - how many times the container of this element has been activated */
     public actCount = 1;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Client-side "adoption" implementation, which works in conjunction with the constructable
-// activation context and adopts CSSStyleSheet object using the "adoptedStyleSheets" property on
-// the given document or shadow root objects. Instances of this class are created only if style
-// sheet adoption is implemented by the browser.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Adoption implementation of activation context. Note that since instances of this class are
- * created only if adoption is supported by the browser, we can freely access the
- * s_globalConstructableActivationContext variable, which is guaranteed to be defined.
- *
- * For mapping SD classes to instances and for creating/removing elements, the adoption contexts
- * simply delegate to the global constructable context. However, they keep their own reference
- * counting of containers. When a container is activated for the first time in this context,
- * all elements from this container are adopted. When the container is deactivated and its
- * reference counter becomes zero, all elements from this container are removed from adoption.
- */
-class AdoptionActivationContext implements IMimcssActivationContext
-{
-    constructor( root: DocumentOrShadowRoot)
-    {
-        this.root = root as any;
-    }
-
-    /** Retrieves style definition instance associated with the given class in this context. */
-    public getClassSD( sdc: IStyleDefinitionClass): IStyleDefinition | undefined
-    {
-        return s_globalConstructableActivationContext!.getClassSD(sdc);
-    }
-
-    /** Associates style definition instance with the given class in this context. */
-    public setClassSD( sdc: IStyleDefinitionClass, sd: IStyleDefinition): void
-    {
-        s_globalConstructableActivationContext?.setClassSD( sdc, sd);
-    }
-
-    /**
-     * Activates the given container and its related containers in this context.
-     */
-    activate( container: IMimcssContainer, insertBefore?: IMimcssStyleElement): void
-    {
-        let count = this.counts.get( container);
-        if (!count)
-        {
-            s_globalConstructableActivationContext!.activate( container, insertBefore);
-            count = 1;
-            this.elms.add( container.elm as ConstructableStyleElement);
-            this.adopt();
-        }
-        else
-            count++;
-
-        this.counts.set( container, count);
-    }
-
-    /**
-     * Deactivates the given container and its related containers in this context;
-     */
-    deactivate( container: IMimcssContainer): void
-    {
-        let count = this.counts.get( container);
-        if (!count)
-            return;
-        else if (--count === 0)
-        {
-            this.counts.delete(container);
-            this.elms.delete(container.elm as ConstructableStyleElement);
-            s_globalConstructableActivationContext!.deactivate( container);
-            this.adopt();
-        }
-        else
-            this.counts.set( container, count);
-    }
-
-    public getThemeElm(): ConstructableStyleElement
-    {
-        return s_globalConstructableActivationContext!.getThemeElm();
-    }
-
-    public createElm( container: IMimcssContainer, insertBefore?: ConstructableStyleElement): ConstructableStyleElement
-    {
-        return s_globalConstructableActivationContext!.createElm( container, insertBefore);
-    }
-
-    public removeElm( elm: ConstructableStyleElement): void
-    {
-        s_globalConstructableActivationContext!.removeElm( elm);
-    }
-
-    /** Method that is responsible for creating an instance of IMimcssStyleElement interface */
-    protected newElm( container?: IMimcssContainer): ConstructableStyleElement
-    {
-        // this method is not actually called
-        return null as any;
-    }
-
-    private adopt(): void
-    {
-        this.root.adoptedStyleSheets =
-            Array.from(this.elms).map( (elm: ConstructableStyleElement) => elm.sheet as CSSStyleSheet);
-    }
-
-    /**
-     * The root property is an object that implements the DocumentOrShadowRoot interface - that is,
-     * it is either a document object or a shadow root of a custom Web element. Since the current
-     * DOM library doesn't have the "adoptedStyleSheets" property on this interface yet, and that's
-     * the property that we will be using, we define the type of the "root" property as an object
-     * that has the "adoptedStyleSheets" property.
-     */
-    public readonly root: { adoptedStyleSheets: CSSStyleSheet[] };
-
-    /** Map of rule connector or embedding connector objects to their reference counts */
-    private counts = new Map<IMimcssContainer,number>();
-
-    /** Array of constructable elements adopted in this context */
-    // private elms: ConstructableStyleElement[] = [];
-    private elms = new Set<ConstructableStyleElement>();
 }
 
 
@@ -1541,21 +1580,21 @@ abstract class ServerRuleBag implements IMimcssRuleBag
 {
     public add( ruleText: string): IMimcssRule
     {
-        let rule = new ServerRule( ruleText);
-        this.rules.push(rule);
-        return rule;
+        return this.push(new ServerRule( ruleText)) as IMimcssRule;
     }
 
     public addGroup( selector: string): IMimcssGroupingRule
     {
-        let rule = new ServerGroupingRule( selector);
-        this.rules.push(rule);
-        return rule;
+        return this.push(new ServerGroupingRule( selector)) as IMimcssGroupingRule;
     }
 
     public addKeyframes( name: string): IMimcssKeyframesRule
     {
-        let rule = new ServerKeyframesRule( name);
+        return this.push(new ServerKeyframesRule( name)) as IMimcssKeyframesRule;
+    }
+
+    private push( rule: ServerRule | ServerGroupingRule | ServerKeyframesRule): typeof rule
+    {
         this.rules.push(rule);
         return rule;
     }
@@ -1667,7 +1706,6 @@ abstract class HydrationRuleBag implements IMimcssRuleBag
 
     public addGroup( selector: string): IMimcssGroupingRule
     {
-        let cssRule = this.sheet.cssRules[this.index++];
         return new HydrationGroupingRule( this.sheet.cssRules[this.index++] as CSSGroupingRule);
     }
 
@@ -1744,7 +1782,7 @@ const isClient = !!window?.document
  * Client activation context. In the client environment, it is ClientActivationContext instance;
  * in the server environment, it is undefined.
  */
-const s_globalClientActivationContext = isClient ? new ClientActivationContext() : undefined;
+const globalClientActivationContext = isClient ? new ClientActivationContext() : undefined;
 
 /**
  * Helper constant that determines whether style sheet adoption is supported (that is, adopting
@@ -1756,34 +1794,27 @@ const isAdoptionSupported = isClient && !!(document as any).adoptedStyleSheets;
  * Activation context for constructable style sheets. In the client environment with constructable
  * style sheets supported, it is ConstructableActivationContext instance; otherwise, it is undefined.
  */
-const s_globalConstructableActivationContext = isAdoptionSupported ? new ConstructableActivationContext() : undefined;
+const globalConstructableActivationContext = isAdoptionSupported ? new ConstructableActivationContext() : undefined;
 
 /**
- * Activation context stack.
+ * Activation context stack. It is initialized to always have one element, whcih is never removed.
  */
-let s_activationContextStack: IMimcssActivationContext[] =
-    [s_globalClientActivationContext ? s_globalClientActivationContext : new DummyActivationContext()];
-
-/**
- * Map of adoption (or client if adoption is not supported) activation contexts per
- * DocumentOrShadowRoot objects.
- */
-let s_adoptionContexts = new Map<DocumentOrShadowRoot, IMimcssActivationContext>();
+let s_activationContextStack: IMimcssActivationContext[] = [globalClientActivationContext || new ServerActivationContext()];
 
 
 
 /**
  * Pushes the given activation context to the top of the stack
  */
-const s_pushActCtx = (ctx: IMimcssActivationContext): void =>
+const pushActCtx = (ctx: IMimcssActivationContext): void =>
 {
     s_activationContextStack.push( ctx as IMimcssActivationContext);
 }
 
 /**
- * Removes the activation context from the top of the stack.
+ * Removes the activation context from the top of the stack. We never removed the last element.
  */
-const s_popActCtx = (ctx: IMimcssActivationContext): void =>
+const popActCtx = (ctx: IMimcssActivationContext): void =>
 {
     let len = s_activationContextStack.length;
     if (len > 1 && s_activationContextStack[len-1] === ctx)
@@ -1806,49 +1837,106 @@ const getCurrentActivationContext = (): IMimcssActivationContext =>
 
 
 
-/**
- * Establishes an activation context corresponding to the given document or shadow root.
- */
-export const s_pushAdoptCtx = (root: DocumentOrShadowRoot): void =>
-{
-    let ctx = s_adoptionContexts.get(root);
-    if (!ctx)
-    {
-        ctx = isAdoptionSupported
-            ? new AdoptionActivationContext(root)
-            : new ClientActivationContext( root instanceof Document ? root.head : root as any as ParentNode);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Adoption of constructable style sheets.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-        s_adoptionContexts.set( root, ctx);
+class AdoptionRootInfo implements IAdoptionRootInfo
+{
+    constructor( root: DocumentOrShadowRoot)
+    {
+        this.root = root as any;
     }
 
-    s_pushActCtx(ctx);
+    public add( container: IMimcssContainer): void
+    {
+        let count = this.counts.get( container);
+        if (!count)
+        {
+            count = 1;
+            this.elms.add( container.elm as ConstructableStyleElement);
+        }
+        else
+            count++;
+
+        this.counts.set( container, count);
+    }
+
+    public remove( container: IMimcssContainer): void
+    {
+        let count = this.counts.get( container);
+        if (!count)
+            return;
+        else if (--count === 0)
+        {
+            this.counts.delete(container);
+            this.elms.delete(container.elm as ConstructableStyleElement);
+        }
+        else
+            this.counts.set( container, count);
+    }
+
+    public adopt(): void
+    {
+        this.root.adoptedStyleSheets =
+            Array.from(this.elms).map( (elm: ConstructableStyleElement) => elm.sheet as CSSStyleSheet);
+    }
+
+    /**
+     * The root property is an object that implements the DocumentOrShadowRoot interface - that is,
+     * it is either a document object or a shadow root of a custom Web element.
+     */
+    public readonly root: { adoptedStyleSheets: CSSStyleSheet[] };
+
+    /** Map of rule connector or embedding connector objects to their reference counts */
+    private counts = new Map<IMimcssContainer,number>();
+
+    /** Array of constructable elements adopted in this context */
+    private elms = new Set<ConstructableStyleElement>();
 }
 
 
 
 /**
- * Removes the activation context corresponding to the given document or shadow root established
- * by an earlier call to s_pushAdoptCtx.
+ * Map of root objects (documents and shadow roots) to objects that keep information about
+ * adoption of rule containers and embedding containers
  */
-export const s_popAdoptCtx = (root: DocumentOrShadowRoot): void =>
+const adoptionRootInfos = new Map<DocumentOrShadowRoot,AdoptionRootInfo>();
+
+
+
+const adopt = (container: IMimcssContainer, root: DocumentOrShadowRoot): void =>
 {
-    let ctx = s_adoptionContexts.get(root);
-    if (ctx)
-        s_popActCtx(ctx);
+    let info = adoptionRootInfos.get( root);
+    if (!info)
+    {
+        info = new AdoptionRootInfo(root);
+        adoptionRootInfos.set( root, info);
+    }
+
+    container.adopt( info);
+    info.adopt();
+}
+
+const unadopt = (container: IMimcssContainer, root: DocumentOrShadowRoot): void =>
+{
+    let info = adoptionRootInfos.get( root);
+    if (info)
+    {
+        container.unadopt( info);
+        info.adopt();
+    }
 }
 
 
 
-/**
- * Releases resources taken by the activation context established for the given document or shadow
- * root object by the first call to the s_pushAdoptCtx function.
- */
- export const s_releaseAdoptCtx = (root: DocumentOrShadowRoot): void =>
-{
-    s_adoptionContexts.delete(root);
-}
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// SSR and hydration support.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Scheduler type remembered upon starting SSR or hydration process. This will be used to restore
@@ -1863,7 +1951,7 @@ let s_rememberedSchedulerType = 0;
  */
 export const s_startSSR = (): void =>
 {
-    s_pushActCtx( new ServerActivationContext());
+    pushActCtx( new ServerActivationContext());
     s_rememberedSchedulerType = setDefaultScheduler( SchedulerType.Sync);
 }
 
@@ -1883,7 +1971,8 @@ export const s_stopSSR = (): string =>
     s_rememberedSchedulerType = 0;
 
     let s = ctx.serialize();
-    s_popActCtx(ctx);
+    ctx.clear();
+    popActCtx(ctx);
     return s;
 }
 
@@ -1896,7 +1985,7 @@ export const s_stopSSR = (): string =>
 export const s_startHydration = (): void =>
 {
     let ctx = getCurrentActivationContext();
-    if (ctx !== s_globalClientActivationContext)
+    if (ctx !== globalClientActivationContext)
     {
         /// #if DEBUG
         console.error("Attempt to set hydration on a non-client activation context");
@@ -1904,7 +1993,7 @@ export const s_startHydration = (): void =>
         return;
     }
 
-    s_globalClientActivationContext.hydrate = true;
+    globalClientActivationContext.hydrate = true;
     s_rememberedSchedulerType = setDefaultScheduler( SchedulerType.Sync);
 }
 
@@ -1914,10 +2003,10 @@ export const s_startHydration = (): void =>
 export const s_stopHydration = (): void =>
 {
     let ctx = getCurrentActivationContext();
-    if (ctx !== s_globalClientActivationContext)
+    if (ctx !== globalClientActivationContext)
         return;
 
-    s_globalClientActivationContext.hydrate = false;
+    globalClientActivationContext.hydrate = false;
 
     // restore scheduler type existed before we started SSR
     setDefaultScheduler( s_rememberedSchedulerType);

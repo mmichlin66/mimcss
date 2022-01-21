@@ -403,8 +403,10 @@ export interface IStyleDefinition<P extends IStyleDefinition = any>
 	 * Refers to the instance of the style definition class which is the parnt of this style
      * definition object in the chain of style definition classes. Through this member, all rules
      * and other members defined in the parent definition class can be accessed. For top-level
-     * style definitions, this property is always undefined. This property can also be undefined
-     * if it was not provided to the constructor when creating the style definition class manually.
+     * style definitions, this property is always undefined. It is defined for style definitions
+     * used for grouping rules - those created with [[$supports]] and [[$media]] methods of the
+     * [[StyleDefinition]] class. This property can also be undefined if it was not provided to
+     * the constructor when creating the style definition class manually.
 	 */
 	readonly $parent?: P;
 }
@@ -417,8 +419,8 @@ export interface IStyleDefinition<P extends IStyleDefinition = any>
 export interface IStyleDefinitionClass<T extends IStyleDefinition<P> = any,
     P extends IStyleDefinition = any>
 {
-	/** All style definition classes should conform to this constructor */
-	new( parent?: P): T;
+	/** Style definition classes can have constructors with arbitrary parameters */
+	new( ...args: any[]): T;
 }
 
 

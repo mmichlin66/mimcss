@@ -15,8 +15,7 @@ import {
 import {symRC} from "../rules/Rule";
 import {
     embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
-    s_startSSR, s_stopSSR, s_startHydration, s_stopHydration, s_popAdoptCtx, s_pushAdoptCtx,
-    s_releaseAdoptCtx
+    s_startSSR, s_stopSSR, s_startHydration, s_stopHydration, s_activate, s_construct, s_releaseShadow
 } from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule, PageRule} from "../rules/StyleRules"
 import {AnimationRule} from "../rules/AnimationRule"
@@ -101,13 +100,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     {
         this.$parent = parent;
 
-        // Style Definition instance points to rule container. Note that we use the second argumnet
-        // although the constuctor signature only has one argument. This is because we need to
-        // distinguish between when the style definition instance is created by processing the
-        // class versus by directly calling the new operator. The latter is required for "Styled
-        // Components" and they will never pass the second parameter. RuleContainer uses this
-        // second parameter to determine how to generate the name associated with the class.
-        let rc = new RuleContainer( this, arguments[1]);
+        let rc = new RuleContainer( this);
         this[symRC] = rc;
 
         // instead of returning an instance of our class, the constructor returns a proxy. This
@@ -964,10 +957,9 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
 
 
     /**
-     * Processes the given style definition class or instance and creates unique names for all named
+     * Processes the given style definition class and creates unique names for all named
      * entities. For a given style definition class only a single instance is created, no matter how
-     * many times this function is invoked. However, if an instance, which has not yet been processed,
-     * is passed, then a new set of unique names will be created for it.
+     * many times this function is invoked.
      *
      * The `$use` method is used to reference a style definition from another style definition, for
      * example:
@@ -996,13 +988,13 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * is activated, the rules will be in the DOM; as soon as all referencing style definitions are
      * deactivated, the rules from the referenced definition are removed from the DOM.
      *
-     * @param instOrClass Either style definition class or an instance of a style definition class.
+     * @param sdc Style definition class to be referenced.
      * @returns An instance of the style definition class, which will be activated and deactivated
      * along with the enclosing style definition.
      */
-    public $use<T extends StyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>): T
+    public $use<T extends StyleDefinition>( sdc: IStyleDefinitionClass<T>): T
     {
-        return processSD( instOrClass) as T;
+        return processSD( sdc) as T;
     }
 }
 
@@ -1149,9 +1141,76 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Activates the given style definition class or instance and inserts all its rules into DOM. If
- * the class is not yet associated with an instance, the instance is first created and processed.
- * Note that each style definition instance maintains a reference counter of how many times it was
+ * Creates an instance of the given style definition class so that its activation creates a
+ * *constructable style sheet*, which will be adopted by the given document or shadow root. This
+ * function is only needed when activating a style definition instance instead of a class (which is
+ * used only for styled components) and only when using it with custom Web elements.
+ *
+ * Note that when the instance returned from this method is activated, the same document or shadow
+ * root object must be passed to the [[activate]] function. It must also be assed to the
+ * [[deactivate]] function when deactivating the instance.
+ *
+ * **Example**
+ * ```typescript
+ * // Define two style definition classes - the second will reference the first.
+ * class Style1 extends css.StyleDefinition
+ * {
+ *     bgColor = this.$var( "color", "red")
+ * }
+ *
+ * class Style2 extends css.StyleDefinition
+ * {
+ *     // when referencing an instance of one style definition class from
+ *     // another, there is no need to use the `construct()` function -
+ *     // the instance can be created with `new`.
+ *     style1 = new Style1();
+ *
+ *     shadeColor = this.$class({ color: this.style1.bgColor })
+ * }
+ *
+ * // Define a custom Web element class.
+ * class MyCustomElm extends HTMLElement
+ * {
+ *     private styles: Style2;
+ *
+ *     constructor()
+ *     {
+ *         super();
+ *         this.shadow = this.attachShadow({mode: "open"});
+ *
+ *         // we pass the shadow root to both `construct()` and `activate()` functions
+ *         this.styles = css.activate( css.construct( Style2, this.shadow), this.shadow);
+ *     }
+ *
+ *     disconnectedCallback()
+ *     {
+ *         // we must pass the shadow root object to the `deactivate()` function too.
+ *         css.deactivate( this.styles, this.shadow);
+ *         css.releaseShadow( this.shadow);
+ *     }
+ * }
+ * ```
+ *
+ * @typeparam T Type representing the style definition class.
+ * @param sdc Style definition class
+ * @param root Document or shadow root object. If the browser supports constructable style sheets,
+ * the style definition will be adopted by the given root when activated. If the browser does
+ * not support constructable style sheets, the style definition will create a `<style>` element
+ * in the document's `<head>` or in the shadow root.
+ * @param args Parameters to be passed to the style definition constructor. The number and types
+ * of arguments are taken from the style definition's constructor. Note that since the
+ * `ConstructorParameters` conditional type is used, there is a limitation that the
+ * constuctors cannot be overloaded.
+ * @returns New instance of the style definition class.
+ */
+export const construct = <T extends IStyleDefinitionClass>( sdc: T,
+	root: DocumentOrShadowRoot, ...args: ConstructorParameters<T>): InstanceType<T> =>
+        s_construct( sdc, root, ...args)
+
+
+/**
+ * Activates the given style definition class or instance and inserts all its rules into DOM. Note
+ * that each style definition instance maintains a reference counter of how many times it was
  * activated and deactivated. The rules are inserted into DOM only upon first activation.
  *
  * Activating a class (as opposed to activating a directly created instance) is intended for
@@ -1163,7 +1222,7 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
  * ```typescript
  * class CommonStyles extends css.StyleDefinition
  * {
- *     red = this.$class({ color: red })
+ *     red = this.$class({ color: "red" })
  * }
  *
  * class MyComponent
@@ -1178,7 +1237,7 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
  * ```
  *
  * Activating an instance (as opposed to activating a class) is intended for "scoped" CSS entities -
- * that is, entities that apply to instances of certain components, a.k.a. *Styled Components*.
+ * that is, entities that apply to instances of certain components, a.k.a. *styled components*.
  * In this approach, every instance of a component creates its own instance of the style definition
  * class and Mimcss will create independent instances of CSS rules specific (*scoped*) to each
  * component instance.
@@ -1187,7 +1246,7 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
  * ```typescript
  * class MyStyles extends css.StyleDefinition
  * {
- *     red = this.$class({ color: red })
+ *     red = this.$class({ color: "red" })
  * }
  *
  * class MyComponent
@@ -1202,24 +1261,24 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
  * }
  * ```
  *
- * @typeparam T Type of the style definition class or instance passed to the function. This is
+ * If the style definition instance is intended to be used as a *constructable style sheet* and
+ * assigned to either a document or a shadow root, then, the instance should not be created using
+ * the `new` operator; instead, it should be created using the [[construct]] function.
+ *
+ * @typeparam T Type of the style definition instance passed to the function. This is
  * also the type, which is returned form the function.
- * @param instOrClass Style definition class or instance
+ * @param instOrClass Style definition class or instance to activate.
+ * @param root Optional document or shadow root object. If the root parameter is specified and
+ * the browser supports constructable style sheets, then the style definition will be adopted
+ * by the given root. If the browser does not supports constructable style sheets, the style
+ * definition will create a `<style>` element in the document's `<head>` or in the shadow root.
  * @param schedulerType Identifier of a pre-defined or registered scheduler. If not specified, the
  * scheduler set as default will be used.
- * @returns Instance of the style definition class - either created (if this was the first
- * activation of the class) or already associated with the class. If the input parameter is an
- * instance (as opposed to a class), the return value is the same instance.
+ * @returns The same style definition instance that was passed in.
  */
 export const activate = <T extends IStyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>,
-	schedulerType?: number): T =>
-{
-	let instance = processSD( instOrClass) as T;
-	if (instance)
-        getActivator(schedulerType).activate( instance);
-
-	return instance;
-}
+	root?: DocumentOrShadowRoot, schedulerType?: number): T =>
+        s_activate( instOrClass, root, schedulerType);
 
 
 
@@ -1232,8 +1291,9 @@ export const activate = <T extends IStyleDefinition>( instOrClass: T | IStyleDef
  * @param schedulerType Identifier of a pre-defined or registered scheduler. If not specified, the
  * scheduler set as default will be used.
  */
-export const deactivate = (sd: IStyleDefinition, schedulerType?: number): void =>
-	getActivator(schedulerType).deactivate( sd);
+export const deactivate = (sd: IStyleDefinition, root?: DocumentOrShadowRoot,
+    schedulerType?: number): void =>
+	    getActivator(schedulerType).deactivate( sd, root);
 
 
 
@@ -1250,47 +1310,19 @@ export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition
 
 
 /**
- * Establishes an activation context corresponding to the given document or shadow root, so that
- * styles definitions created and activated while this context is active will be "adopted" by the
- * given object. After this function is called and the style definitions are activated, the
- * [[popAdoptionContext]] function must be called.
+ * Releases internal resources that Mimcss created for the given shadow root object when activating
+ * style definitions. This function should be called from the *disconnectedCallback* of the custom
+ * Web element.
  *
- * For custom Web elements, the pair of `pushAdoptionContext` and [[popAdoptionContext]] functions
- * is usually called in the `connected` callback; however, they can be called whenever new style
- * definitions are activated. For example, they can be called when handling events within the
- * custom Web element's code.
- *
- * @param root Document or ShadowRoot object to which style definitions will be adopted
+ * @param root Shadow root of the custom Web element
  */
-export const pushAdoptionContext = (root: DocumentOrShadowRoot): void => s_pushAdoptCtx( root);
-
-
-
-/**
- * Removes the activation context corresponding to the given document or shadow root established
- * by an earlier call to the [[pushAdoptionCtx]] function. Each call to the [[pushAdoptionCtx]]
- * function must be eventually paired with the call to the `popAdoptionContext` functions.
- *
- * @param root Document or ShadowRoot object to which style definitions were adopted
- */
-export const popAdoptionContext = (root: DocumentOrShadowRoot): void => s_popAdoptCtx( root);
-
-
-
-/**
- * Releases resources taken by the activation context established for the given document or shadow
- * root object by the first call to the [[pushAdoptionContext]] function.
- *
- * For custom Web elements, this function should be called in the `disconnected` callback.
- * @param root Document or ShadowRoot object to which style definitions were adopted
- */
-export const releaseAdoptionContext = (root: DocumentOrShadowRoot): void => s_releaseAdoptCtx( root);
+export const releaseShadow = (root: ShadowRoot): void => s_releaseShadow( root);
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// SSR support.
+// SSR and hydration support.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

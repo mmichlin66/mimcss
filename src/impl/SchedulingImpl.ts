@@ -15,13 +15,13 @@ export interface IStyleActivator
 	 * Instructs to activate the given style definition instance. This method is called when the
 	 * activate function is called for this activation mechanism.
 	 */
-	activate( definition: IStyleDefinition): void;
+	activate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void;
 
 	/**
 	 * Instructs to deactivate the given style definition instance. This method is called when the
 	 * deactivate function is called for this activation mechanism.
 	 */
-	deactivate( definition: IStyleDefinition): void;
+	deactivate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void;
 
 	/**
 	 * Instructs to set the value of either a single property or a set of properties in the given
@@ -89,9 +89,9 @@ class SynchronousActivator implements IStyleActivator
 	 * activate function is called for this activation mechanism.
 	 * @param definition
 	 */
-	public activate( definition: IStyleDefinition): void
+	public activate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
 	{
-		activateSD( definition);
+		activateSD( definition, root);
 	}
 
 	/**
@@ -99,9 +99,9 @@ class SynchronousActivator implements IStyleActivator
 	 * deactivate function is called for this activation mechanism.
 	 * @param definition
 	 */
-	public deactivate( definition: IStyleDefinition): void
+	public deactivate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
 	{
-		deactivateSD( definition);
+		deactivateSD( definition, root);
 	}
 
 	/**
@@ -162,12 +162,12 @@ class SchedulingActivator implements IStyleActivator
 	/**
 	 * Instructs to activate the given style definition instance.
 	 */
-	public activate( definition: IStyleDefinition): void
+	public activate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
 	{
         if (this.isSchedulingNeeded)
             this.scheduler!.scheduleDOMUpdate();
 
-        this.actions.push( () => activateSD( definition));
+        this.actions.push( () => activateSD( definition, root));
 	}
 
 
@@ -175,12 +175,12 @@ class SchedulingActivator implements IStyleActivator
 	/**
 	 * Instructs to deactivate the given style definition instance.
 	 */
-	public deactivate( definition: IStyleDefinition): void
+	public deactivate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
 	{
         if (this.isSchedulingNeeded)
             this.scheduler!.scheduleDOMUpdate();
 
-        this.actions.push( () => deactivateSD( definition));
+        this.actions.push( () => deactivateSD( definition, root));
 	}
 
 

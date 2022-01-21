@@ -2,7 +2,7 @@ import * as css from "../../index"
 import * as dom from "../utils/dom"
 
 
-describe("activation:", () =>
+describe("activation", () =>
 {
 	beforeEach(() =>
 	{
@@ -24,7 +24,7 @@ describe("activation:", () =>
 		expect(elms.length).toEqual(1);
 		expect(elms[0].id).toEqual("MyStyles");
 
-		css.deactivate( myStyles!);
+		css.deactivate( myStyles);
 		dom.expectNoStylesInHead();
 	})
 
@@ -44,9 +44,9 @@ describe("activation:", () =>
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-		css.deactivate( myStyles1!);
-		css.deactivate( myStyles2!);
-		css.deactivate( myStyles3!);
+		css.deactivate( myStyles1);
+		css.deactivate( myStyles2);
+		css.deactivate( myStyles3);
 		dom.expectNoStylesInHead();
 	})
 
@@ -69,7 +69,7 @@ describe("activation:", () =>
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(2);
 
-		css.deactivate( b!);
+		css.deactivate( b);
 		dom.expectNoStylesInHead();
 	})
 
@@ -99,8 +99,8 @@ describe("activation:", () =>
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(3);
 
-		css.deactivate( b!);
-		css.deactivate( c!);
+		css.deactivate( b);
+		css.deactivate( c);
 		dom.expectNoStylesInHead();
 	})
 
@@ -122,7 +122,7 @@ describe("activation:", () =>
 		let elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-		css.deactivate( b!);
+		css.deactivate( b);
 		dom.expectNoStylesInHead();
 	})
 
@@ -150,11 +150,11 @@ describe("activation:", () =>
 		elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-        css.deactivate( styles1!);
+        css.deactivate( styles1);
 		elms = dom.getAllStylesFromHead();
 		expect(elms.length).toEqual(1);
 
-        css.deactivate( styles2!);
+        css.deactivate( styles2);
 		dom.expectNoStylesInHead();
 	})
 
@@ -182,10 +182,107 @@ describe("activation:", () =>
 		expect(rules.length).toEqual(2);
         expect(rules[0].cssText).not.toEqual(rules[1].cssText);
 
-		css.deactivate( styles1!);
-		css.deactivate( styles2!);
+		css.deactivate( styles1);
+		css.deactivate( styles2);
 		dom.expectNoStylesInHead();
 	})
+
+
+
+    describe("adoption by documents or shadow roots", () =>
+    {
+        it("adopting one class", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                red = this.$class({ color: "red" })
+            }
+
+            let a = css.activate( A, document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(1);
+            else
+                expect(dom.getAllStylesFromHead().length).toEqual(1);
+
+            css.deactivate( a, document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(0);
+            else
+                dom.expectNoStylesInHead();
+        })
+
+        it("adopting two classes with $use", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                red = this.$class({ color: "red" })
+            }
+
+            class B extends css.StyleDefinition
+            {
+                a = this.$use(A);
+                blue = this.$class({ color: "blue" })
+            }
+
+            let b = css.activate( B, document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(2);
+            else
+                expect(dom.getAllStylesFromHead().length).toEqual(2);
+
+            css.deactivate( b, document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(0);
+            else
+                dom.expectNoStylesInHead();
+        })
+
+        it("adopting constructed instance", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                red = this.$class({ color: "red" })
+            }
+
+            let a = css.activate( css.construct( A, document), document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(1);
+            else
+                expect(dom.getAllStylesFromHead().length).toEqual(1);
+
+            css.deactivate( a, document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(0);
+            else
+                dom.expectNoStylesInHead();
+        })
+
+        it("adopting constructed instance with referenced instance", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                red = this.$class({ color: "red" })
+            }
+
+            class B extends css.StyleDefinition
+            {
+                a = new A;
+                blue = this.$class({ color: "blue" })
+            }
+
+            let b = css.activate( css.construct( B, document), document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(2);
+            else
+                expect(dom.getAllStylesFromHead().length).toEqual(2);
+
+            css.deactivate( b, document);
+            if ("adoptedStyleSheets" in document)
+                expect((document as any).adoptedStyleSheets.length).toEqual(0);
+            else
+                dom.expectNoStylesInHead();
+        })
+    })
 })
 
 
