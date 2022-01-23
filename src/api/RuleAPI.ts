@@ -1336,7 +1336,7 @@ export const releaseShadow = (root: ShadowRoot): void => s_releaseShadow( root);
 export const startSSR = (): void => s_startSSR();
 
 /**
- * Stops server-side activation functionality and returns a string with serialized styles style
+ * Stops server-side activation functionality and returns a string with serialized style
  * definitions that were activated during application rendering. The string should be added to
  * the `<head>` element of the HTML page using `insertAdjacentHTML()` method.
  *
@@ -1358,7 +1358,7 @@ export const stopSSR = (): string => s_stopSSR();
 export const startHydration = (): void => s_startHydration();
 
 /**
- * Stops hydration activation functionality and restore the default activation context.
+ * Stops hydration activation functionality and restores the default activation context.
  */
 export const stopHydration = (): void => s_stopHydration();
 

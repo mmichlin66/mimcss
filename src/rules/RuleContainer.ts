@@ -1257,13 +1257,33 @@ abstract class ArrayBasedActivationContext<T extends IMimcssStyleElement> extend
 /**
  * ID of the style element that divides between theme and non-theme style elements.
  */
-const s_themePlaceholderElmID = "__mimcss_themes__";
+const themePlaceholderElmID = "__mimcss_themes__";
 
 
 
-// Inserts the given rule into the given parent grouping rule or stylesheet.
-const addDomRule = (ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule =>
-    parent.cssRules[parent.insertRule( ruleText, parent.cssRules.length)];
+/**
+ * Flag indicating that the client activation context should work in hydration mode; that is, it
+ * should try to find rules in already existing style elements instead of creating new ones.
+ */
+ let isInHydrationMode = false;
+
+
+
+ // Inserts the given rule into the given parent grouping rule or stylesheet.
+const addDomRule = (ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): CSSRule | null =>
+{
+    try
+    {
+        return parent.cssRules[parent.insertRule( ruleText, parent.cssRules.length)];
+    }
+    catch(x)
+    {
+        /// #if DEBUG
+        console.error( `'insertRule' failed for rule '${ruleText}'. Error = ${x.message}` );
+        /// #endif
+        return null;
+    }
+}
 
 
 
@@ -1283,9 +1303,9 @@ class ClientActivationContext extends ActivationContextBase implements IMimcssAc
         if (!this.themeElm)
         {
             let domElm: HTMLStyleElement | undefined;
-            if (this.hydrate)
+            if (isInHydrationMode)
             {
-                domElm = this.node.querySelector( `style[id=${s_themePlaceholderElmID}`) as HTMLStyleElement;
+                domElm = this.node.querySelector( `style[id=${themePlaceholderElmID}`) as HTMLStyleElement;
 
                 /// #if DEBUG
                 if (!domElm)
@@ -1297,7 +1317,7 @@ class ClientActivationContext extends ActivationContextBase implements IMimcssAc
             if (!domElm)
             {
                 domElm = document.createElement( "style");
-                domElm.id = s_themePlaceholderElmID;
+                domElm.id = themePlaceholderElmID;
                 this.node.insertBefore( domElm, document.head.firstElementChild);
             }
 
@@ -1310,19 +1330,17 @@ class ClientActivationContext extends ActivationContextBase implements IMimcssAc
     public createElm( container: IMimcssContainer, insertBefore?: IMimcssStyleElement): IMimcssStyleElement
     {
         let domElm: HTMLStyleElement | undefined;
-        if (this.hydrate)
+        if (isInHydrationMode)
         {
             domElm = this.node.querySelector( `style[id=${container.name}`) as HTMLStyleElement;
-            if (domElm)
-                return new HydrationStyleElement( domElm);
 
             /// #if DEBUG
-            else
+            if (!domElm)
                 console.error( `Style element with ID '${container.name}' was requested during hydration but was not found`);
             /// #endif
         }
 
-        // if we didn't find element, create one now
+        // if we didn't find the element, create one now
         if (!domElm)
         {
             domElm = document.createElement( "style");
@@ -1333,13 +1351,10 @@ class ClientActivationContext extends ActivationContextBase implements IMimcssAc
         return new ClientStyleElement( domElm);
     }
 
-    public removeElm( elm: ClientStyleElement | HydrationStyleElement): void
+    public removeElm( elm: ClientStyleElement): void
     {
         elm?.domElm?.remove();
     }
-
-    /** Flag indicating whether the context is currently working in hydration mode */
-    public hydrate = false;
 
     /** DOM node to which `<style>` element are added */
     private readonly node: ParentNode;
@@ -1362,21 +1377,42 @@ abstract class ClientRuleBag implements IMimcssRuleBag
 
     public add( ruleText: string): IMimcssRule
     {
-        return new ClientRule( addDomRule( ruleText, this.sheet));
+        let rule = this.get();
+        if (!rule)
+            rule = addDomRule( ruleText, this.sheet);
+
+        return new ClientRule( rule);
     }
 
     public addGroup( selector: string): IMimcssGroupingRule
     {
-        return new ClientGroupingRule( addDomRule( `${selector} {}`, this.sheet) as CSSGroupingRule);
+        let rule = this.get();
+        if (!rule)
+            rule = addDomRule( `${selector} {}`, this.sheet);
+
+        return new ClientGroupingRule( rule as CSSGroupingRule);
     }
 
     public addKeyframes( name: string): IMimcssKeyframesRule
     {
-        return new ClientKeyframesRule( addDomRule( `@keyframes ${name} {}`, this.sheet));
+        let rule = this.get();
+        if (!rule)
+            rule = addDomRule( `@keyframes ${name} {}`, this.sheet);
+
+        return new ClientKeyframesRule( rule);
+    }
+
+    private get(): CSSRule | null
+    {
+        return isInHydrationMode ? this.sheet.cssRules[this.index++] : null;
     }
 
     // either stylesheet or a grouping rule under which rules should be added
     public sheet: CSSStyleSheet | CSSGroupingRule;
+
+    // index of the rule in the list of rules under the stylesheet or grouping rule if we are
+    // operating in the hydration mode
+    private index = 0;
 }
 
 
@@ -1427,12 +1463,19 @@ class ClientKeyframesRule extends ClientRule implements IMimcssKeyframesRule
     public addFrame( frameText: string): IMimcssRule
     {
         let cssKeyframesRule = this.cssRule as CSSKeyframesRule;
-        cssKeyframesRule.appendRule( frameText);
-        let cssFrameRule = cssKeyframesRule.cssRules.item(
-            cssKeyframesRule.cssRules.length - 1);
+        let rule = isInHydrationMode ? cssKeyframesRule.cssRules[this.index++] : null;
+        if (!rule)
+        {
+            cssKeyframesRule.appendRule( frameText);
+            rule = cssKeyframesRule.cssRules.item( cssKeyframesRule.cssRules.length - 1);
+        }
 
-        return new ClientRule( cssFrameRule);
+        return new ClientRule( rule);
     }
+
+    // index of the frame in the list of frames under the keyframes rule if we are operating in
+    // the hydration mode
+    private index = 0;
 }
 
 
@@ -1562,7 +1605,7 @@ class ServerActivationContext extends ArrayBasedActivationContext<ServerStyleEle
     /** Method that is responsible for creating an instance of IMimcssStyleElement interface */
     protected newElm( container?: IMimcssContainer): ServerStyleElement
     {
-        return new ServerStyleElement( container ? container.name : s_themePlaceholderElmID);
+        return new ServerStyleElement( container ? container.name : themePlaceholderElmID);
     }
 
     public serialize(): string
@@ -1679,90 +1722,6 @@ class ServerKeyframesRule implements IMimcssKeyframesRule
     }
 
     private frames: ServerRule[] = [];
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Hydration-side rendering implementation
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Hydration-side implementation of an object to which rules can be added.
- */
-abstract class HydrationRuleBag implements IMimcssRuleBag
-{
-    constructor( sheet: CSSStyleSheet | CSSGroupingRule)
-    {
-        this.sheet = sheet;
-    }
-
-    public add( ruleText: string): IMimcssRule
-    {
-        return new ClientRule( this.sheet.cssRules[this.index++]);
-    }
-
-    public addGroup( selector: string): IMimcssGroupingRule
-    {
-        return new HydrationGroupingRule( this.sheet.cssRules[this.index++] as CSSGroupingRule);
-    }
-
-    public addKeyframes( name: string): IMimcssKeyframesRule
-    {
-        return new HydrationKeyframesRule( this.sheet.cssRules[this.index++]);
-    }
-
-    // either stylesheet or a grouping rule under which rules should be added
-    public sheet: CSSStyleSheet | CSSGroupingRule;
-
-    // index of the rule in the list of rules under the stylesheet or grouping rule
-    private index = 0;
-}
-
-
-
-/**
- * Hydration-side implementation of a style element.
- */
-class HydrationStyleElement extends HydrationRuleBag implements IMimcssStyleElement
-{
-    constructor( public domElm: HTMLStyleElement)
-    {
-        super( domElm.sheet!);
-    }
-}
-
-
-
-/**
- * Hydration-side implementation of a grouping rule to which rules can be added.
- */
-class HydrationGroupingRule extends HydrationRuleBag implements IMimcssGroupingRule
-{
-    constructor( cssRule: CSSGroupingRule)
-    {
-        super( cssRule);
-    }
-
-    public get cssRule(): CSSGroupingRule { return this.sheet as CSSGroupingRule};
-}
-
-
-
-/**
- * Hydration-side implementation of keyframes rule to which frames can be added.
- */
-class HydrationKeyframesRule extends ClientRule
-{
-    public addFrame( frameText: string): IMimcssRule
-    {
-        return new ClientRule( (this.cssRule as CSSKeyframesRule).cssRules[this.index++]);
-    }
-
-    // index of the frame in the list of frames under the keyframes rule
-    private index = 0;
 }
 
 
@@ -1993,7 +1952,7 @@ export const s_startHydration = (): void =>
         return;
     }
 
-    globalClientActivationContext.hydrate = true;
+    isInHydrationMode = true;
     s_rememberedSchedulerType = setDefaultScheduler( SchedulerType.Sync);
 }
 
@@ -2006,7 +1965,7 @@ export const s_stopHydration = (): void =>
     if (ctx !== globalClientActivationContext)
         return;
 
-    globalClientActivationContext.hydrate = false;
+    isInHydrationMode = false;
 
     // restore scheduler type existed before we started SSR
     setDefaultScheduler( s_rememberedSchedulerType);
