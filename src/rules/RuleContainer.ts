@@ -19,11 +19,20 @@ import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
  * style definition class (and thus the RuleContainer object) and is set back to false after
  * it is used in the RuleContainer constructor.
  */
- let s_processingStyleDefinitionClass = false;
+let s_processingStyleDefinitionClass = false;
 
 
 
- /**
+/**
+ * If the style definition was created from processClass() function (as opposed to directly via
+ * new), the class keeps a map of rule (property) names to generated unique names. This is
+ * necessary so that different instances created for the same class in different activation
+ * contexts use the same generated names.
+ */
+const symRNs = Symbol("ruleNames");
+
+
+/**
  * The RuleContainer class is a shadow structure that accompanies every processed style definition
  * object. Since StyleDefinition class is an exported class visible to developers, we don't want
  * to have a lot of functionality in it. The RuleContainer object is a proxy handler for the
@@ -49,21 +58,31 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         if (this.psd)
             this.pc = this.psd[symRC];
 
+        // remember whether the style definition was created from class or its instance was
+        // created using the new operator. If it was created from class, then ensure that it has
+        // a map from property "paths" to generated rule names. In the presence of hierarchy of
+        // style definition classes, each class has its own map.
+        if (s_processingStyleDefinitionClass)
+        {
+            s_processingStyleDefinitionClass = false;
+            this.fromClass = true;
+            if (!this.sdc.hasOwnProperty( symRNs))
+                this.sdc[symRNs] = new Map<string,string>();
+        }
+
         // set the name for our container. For optimized name generation mode, generate unique
-        // name. Otherwise, if the container is created for a class from the
-        // processClass function, then the flag s_processingStyleDefinitionClass is defined
-        // and the name is generated depending on the current generation method. If this flag is
-        // false, that means that the container is created from a direct "new" call on the style
-        // definition class and the name is generated uniquely.
+        // name. Otherwise, if the style definition object is created for a class from the
+        // processClass function, then the name is generated depending on the current generation
+        // method. If the style definition is created from a direct "new" call the name is
+        // generated uniquely.
         if (s_nameGeneratonMethod === NameGenerationMethod.Optimized)
             this.name = generateUniqueName();
         else
         {
             let className = this.sdc.name;
             let name = className ? "" : generateUniqueName();
-            if (s_processingStyleDefinitionClass)
+            if (this.fromClass)
             {
-                s_processingStyleDefinitionClass = false;
                 name = !className
                     ? generateUniqueName()
                     : s_nameGeneratonMethod === NameGenerationMethod.UniqueScoped
@@ -167,27 +186,37 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	 */
 	public getScopedName( ruleName: string, nameOverride?: string | INamedEntity): string
 	{
+        let name: string | undefined;
+
+        // if the style definition was created from processClass() function (as opposed to directly
+        // via new), the class keeps a map of rule name to generated unique names. If it already
+        // exists for our rule name, just use it. in the presence of style definition class
+        // hierarchy we lookup the rule name in each class's map. Note also that if the
+        // overriding property uses name override, the name override will be ignored.
+        if (this.fromClass)
+        {
+            for( let sdc = this.sdc; sdc !== StyleDefinition && sdc !== ThemeDefinition; sdc = Object.getPrototypeOf( sdc))
+            {
+                name = (sdc[symRNs] as Map<string,string>).get( ruleName);
+                if (name)
+                    return name;
+            }
+        }
+
         if (nameOverride)
-            return typeof nameOverride === "string" ? nameOverride : nameOverride.name;
-		else if (!ruleName)
-			return generateUniqueName();
-		else if (ruleName in this.sd && "name" in this.sd[ruleName])
-            // this handles cases when a "named" rule already exists in the style definition;
-            // for example when a derived class overrides the value of a base class
-			return this.sd[ruleName].name;
-		else
-		{
-			// find out if there is a rule with this name defined in a stylesheet instance created
-            // for a class from the prototype chain of the style definition class. Otherwise, if
-            // there is a parent container, recurse to it; otherwise, generate the name.
-			let existingName = findNameForRuleInPrototypeChain( this.ctx, this.sdc, ruleName);
-            if (existingName)
-                return existingName;
-            else if (this.pc)
-                return this.pc.getScopedName( ruleName);
-            else
-			    return generateName( this.name, ruleName);
-		}
+            name = typeof nameOverride === "string" ? nameOverride : nameOverride.name;
+        else if (this.pc)
+            name = this.pc.getScopedName( ruleName);
+        else
+            name = generateName( this.name, ruleName);
+
+        // if the style definition was created from processClass() function (as opposed to directly
+        // via new), remember the created name in the class's map of rule names to generated unique
+        // names.
+        if (this.fromClass)
+            (this.sdc[symRNs] as Map<string,string>).set( ruleName, name!);
+
+        return name!;
 	}
 
 
@@ -395,9 +424,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	/** Activation context in which this object has been created. */
 	public ctx: IMimcssActivationContext;
 
-	// /** Activation reference count. */
-	// public actCount = 0;
-
 	/**
      * Activation context-specific object representing a stylesheet. For regular client context,
      * it points to a DOM style element; for SSR context, it handles serialization.
@@ -423,7 +449,14 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      */
 	private pc?: RuleContainer;
 
-	/** List of references to other style definitions creaed via the $use function. */
+    /**
+     * Flag indicating that the style definitionof this rule container was created not directly
+     * (as for styled components) but from the processClass function. This affects whether the rule
+     * names are remembered in the class and are used by other processClass-created instances.
+     */
+     private fromClass: boolean;
+
+     /** List of references to other style definitions creaed via the $use function. */
 	private refs: StyleDefinition[] = [];
 
 	/** List of @import rules */
@@ -501,9 +534,9 @@ const generateName = (sheetName: string, ruleName: string): string =>
 {
 	switch( s_nameGeneratonMethod)
     {
-		case NameGenerationMethod.UniqueScoped: return `${sheetName}_${ruleName}_${s_nextUniqueID++}`;
 		case NameGenerationMethod.Optimized: return generateUniqueName();
         case NameGenerationMethod.Scoped: return `${sheetName}_${ruleName}`;
+		case NameGenerationMethod.UniqueScoped: return `${sheetName}_${ruleName}_${s_nextUniqueID++}`;
     }
 }
 
@@ -515,29 +548,6 @@ const generateName = (sheetName: string, ruleName: string): string =>
  */
 const generateUniqueName = (prefix?: string): string =>
 	(prefix ? prefix : s_uniqueStyleNamesPrefix) + s_nextUniqueID++;
-
-
-
-// Looks up a property with the given name in the prototype chain of the given style definition
-// class. If found and if the property is a rule, then returns the name assigned for it.
-const findNameForRuleInPrototypeChain = (ctx: IMimcssActivationContext,
-    definitionClass: IStyleDefinitionClass, ruleName: string): string | null =>
-{
-	// loop over prototypes
-    for( let baseClass = Object.getPrototypeOf( definitionClass);
-            baseClass !== StyleDefinition && baseClass !== ThemeDefinition;
-                baseClass = Object.getPrototypeOf( baseClass))
-	{
-		// check if the base class already has an associated instance; if yes, check whether
-		// it has a property with the given rule name. If yes, then use this rule's already
-        // generated name (if exists).
-        let baseInst = ctx.getClassSD( baseClass);
-        if (baseInst &&  baseInst[ruleName] != null && "name" in baseInst[ruleName])
-            return baseInst[ruleName].name;
-	}
-
-	return null;
-}
 
 
 
