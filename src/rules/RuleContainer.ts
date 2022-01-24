@@ -597,7 +597,7 @@ const processClassInContext = (ctx: IMimcssActivationContext, sdc: IStyleDefinit
     // as their own and so these rules will be activated as part of the derived class.
     let baseClass = Object.getPrototypeOf( sdc);
     if (baseClass !== StyleDefinition && baseClass !== ThemeDefinition)
-        processClass( baseClass, parent);
+        processClassInContext( ctx, baseClass, parent);
 
     // create the instance of the definition class. We pass the second argument (which is not
     // part of the StyleDefinition constructor signature) in order to indicate that the instance
@@ -629,23 +629,21 @@ export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionCl
 
 
 /**
- * Creates an instance of the given style definition class so that its activation creates a
- * *constructable style sheet", which will be adopted by the given document or shadow root.
- * @param sdc Style definition class
- * @param root Document or shadow root object. If the browser supports constructable style sheets,
- * the style definition will be adopted by the given root when activated. If the the browser does
- * not supports constructable style sheets, the style definition will create a `<style>` element
- * in the document's `<head>` or in the shadow root.
- * @param args Parameters to be passed to the style definition constructor.
- * @returns New instance of the style definition class.
+ * Processes the given style definition instance or class and schedules its activation. If the root
+ * parameter is specified and the browser supports constructable style sheets, then it uses the
+ * constructable activation context for processing the style definition. After activation, the
+ * style sheet will be adopted by the given root.
  */
- export const s_construct = <T extends IStyleDefinitionClass>( sdc: T,
-	root: DocumentOrShadowRoot, ...args: ConstructorParameters<T>): InstanceType<T> =>
+export const s_activate = <T extends IStyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>,
+    schedulerType?: number): T =>
 {
-    return callWithRootContext( root, () => new sdc( ...args));
+    // if style sheet adoption is not supported, we want to pass undefined in the root parameter
+    // when we schedule activation. Thus, when the activateSD function is invoked, we will not
+    // call the adopt method.
+    let sd = processSD( instOrClass) as T;
+    getActivator(schedulerType).activate( sd, isAdoptionSupported ? getCurrentRoot() : undefined);
+    return sd;
 }
-
-
 
 /**
  * Processes the given style definition instance or class and schedules its activation. If the root
@@ -653,52 +651,17 @@ export const getVarsFromSD = (instOrClass: IStyleDefinition | IStyleDefinitionCl
  * constructable activation context for processing the style definition. After activation, the
  * style sheet will be adopted by the given root.
  */
-export const s_activate = <T extends IStyleDefinition>( instOrClass: T | IStyleDefinitionClass<T>,
-    root?: DocumentOrShadowRoot, schedulerType?: number): T =>
-{
+export const s_deactivate = <T extends IStyleDefinition>( sd: T, schedulerType?: number): void =>
     // if style sheet adoption is not supported, we want to pass undefined in the root parameter
-    // when we schedule activation. Thus, when the activateSD function is invoked, we will not
-    // call the adopt method.
-    return callWithRootContext( root, () => {
-        let sd = processSD( instOrClass) as T;
-        if (sd)
-            getActivator(schedulerType).activate( sd, isAdoptionSupported ? root : undefined);
-
-        return sd;
-    });
-}
-
-
-
-/**
- * Calls the given function after optionally establishing an activation context for the given root.
- * If the root parameter is specified and the browser supports constructable style sheets, it sets
- * the constructable activation context for processing the style definition. If the root parameter
- * is specified, but the broser does not support constructable style sheets, it creates a regular
- * client context for the document.head or shadow root element. If the root parameter is not
- * defined, it doesn't establish any activation context and the function is called using the
- * current activation context.
- */
-const callWithRootContext = <T extends () => any>(root: DocumentOrShadowRoot | undefined, func: T): ReturnType<T> =>
-{
-    let newCtx = root && (isAdoptionSupported ? globalConstructableActivationContext : getClientContext( root));
-    newCtx && pushActCtx( newCtx);
-
-    try
-    {
-        return func();
-    }
-    finally
-    {
-        newCtx && popActCtx( newCtx);
-    }
-}
+    // when we schedule activation. Thus, when the deactivateSD function is invoked, we will not
+    // call the unadopt method.
+    getActivator(schedulerType).deactivate( sd, isAdoptionSupported ? getCurrentRoot() : undefined);
 
 
 
 /**
  * Activates the given style definition and inserts all its rules into DOM. If root parameter
- * is defined, we will also
+ * is defined, we will also have the root to adopt the corresponding stylesheet.
  */
 export const activateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot): void =>
 {
@@ -710,10 +673,10 @@ export const activateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot): v
     let ctx = container.ctx;
     ctx.activate( container);
 
-    // if the activation context is constructable, then adopt this style definition by
-    // the given root (which is guaranteed to be defined)
-    if (ctx === globalConstructableActivationContext)
-        adopt( container, root!);
+    // if the root is defined, then the activation context is constructable, then adopt this style
+    // definition by the root
+    if (root)
+        adopt( container, root);
 }
 
 
@@ -730,10 +693,10 @@ export const deactivateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot):
 	let container: IMimcssContainer = ruleContainer.ec || ruleContainer;
     let ctx = container.ctx;
 
-    // if the activation context is constructable, then unadopt this style definition by
-    // the given root (which is guaranteed to be defined)
-    if (ctx === globalConstructableActivationContext)
-        unadopt( container, root!);
+    // if the root is defined, then the activation context is constructable, so unadopt this style
+    // definition by the root
+    if (root)
+        unadopt( container, root);
 
     ctx.deactivate( container);
 }
@@ -1265,7 +1228,7 @@ const themePlaceholderElmID = "__mimcss_themes__";
  * Flag indicating that the client activation context should work in hydration mode; that is, it
  * should try to find rules in already existing style elements instead of creating new ones.
  */
- let isInHydrationMode = false;
+let isInHydrationMode = false;
 
 
 
@@ -1501,6 +1464,44 @@ const getClientContext = (root: DocumentOrShadowRoot): ClientActivationContext =
 
     return ctx;
 }
+
+
+
+/**
+ * Stack of DocumentOrShadowRoot objects. Roots are pushed and popped by code under shadow roots
+ * and the object from the top of the stack is used for activation.
+ */
+const documentOrShadowRootStack: DocumentOrShadowRoot[] = [];
+
+/**
+ * Returns the document or shadow root from the top of the stack.
+ */
+const getCurrentRoot = (): DocumentOrShadowRoot | undefined =>
+    documentOrShadowRootStack.length > 0 ? documentOrShadowRootStack[documentOrShadowRootStack.length-1] : undefined;
+
+/**
+ * Pushes the given document or shadow root to the top of the stack.
+ */
+export const s_pushRoot = (root: DocumentOrShadowRoot): void =>
+{
+    documentOrShadowRootStack.push( root);
+    pushActCtx( isAdoptionSupported ? globalConstructableActivationContext! : getClientContext( root));
+}
+
+/**
+ * Removes the document or shadow root from the top of the stack.
+ */
+export const s_popRoot = (root: DocumentOrShadowRoot): void =>
+{
+    let currRoot = getCurrentRoot();
+    if (currRoot === root)
+    {
+        documentOrShadowRootStack.pop();
+        popActCtx( isAdoptionSupported ? globalConstructableActivationContext! : getClientContext( root));
+    }
+}
+
+
 
 /**
  * Deletes client activation context for the given document or shadow root object.
@@ -1747,7 +1748,7 @@ const globalClientActivationContext = isClient ? new ClientActivationContext() :
  * Helper constant that determines whether style sheet adoption is supported (that is, adopting
  * constructable style sheets).
  */
-const isAdoptionSupported = isClient && !!(document as any).adoptedStyleSheets;
+const isAdoptionSupported = isClient && "adoptedStyleSheets" in document;
 
 /**
  * Activation context for constructable style sheets. In the client environment with constructable
@@ -1756,7 +1757,7 @@ const isAdoptionSupported = isClient && !!(document as any).adoptedStyleSheets;
 const globalConstructableActivationContext = isAdoptionSupported ? new ConstructableActivationContext() : undefined;
 
 /**
- * Activation context stack. It is initialized to always have one element, whcih is never removed.
+ * Activation context stack. It is initialized to always have one element, which is never removed.
  */
 let s_activationContextStack: IMimcssActivationContext[] = [globalClientActivationContext || new ServerActivationContext()];
 

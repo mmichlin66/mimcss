@@ -198,13 +198,17 @@ describe("activation", () =>
                 red = this.$class({ color: "red" })
             }
 
-            let a = css.activate( A, document);
+            css.pushAdoptionContext(document);
+            let a = css.activate( A);
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(1);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(1);
 
-            css.deactivate( a, document);
+            css.pushAdoptionContext(document);
+            css.deactivate( a);
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else
@@ -224,40 +228,49 @@ describe("activation", () =>
                 blue = this.$class({ color: "blue" })
             }
 
-            let b = css.activate( B, document);
+            css.pushAdoptionContext(document);
+            let b = css.activate( B);
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(2);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(2);
 
-            css.deactivate( b, document);
+            css.pushAdoptionContext(document);
+            css.deactivate( b);
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else
                 dom.expectNoStylesInHead();
         })
 
-        it("adopting constructed instance", () =>
+        it("adopting an instance", () =>
         {
             class A extends css.StyleDefinition
             {
                 red = this.$class({ color: "red" })
             }
 
-            let a = css.activate( css.construct( A, document), document);
+            css.pushAdoptionContext(document);
+            let a = new A();
+            css.activate( a);
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(1);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(1);
 
-            css.deactivate( a, document);
+            css.pushAdoptionContext(document);
+            css.deactivate( a);
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else
                 dom.expectNoStylesInHead();
         })
 
-        it("adopting constructed instance with referenced instance", () =>
+        it("adopting an instance with referenced instance", () =>
         {
             class A extends css.StyleDefinition
             {
@@ -270,13 +283,17 @@ describe("activation", () =>
                 blue = this.$class({ color: "blue" })
             }
 
-            let b = css.activate( css.construct( B, document), document);
+            css.pushAdoptionContext(document);
+            let b = css.activate( new B());
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(2);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(2);
 
-            css.deactivate( b, document);
+            css.pushAdoptionContext(document);
+            css.deactivate( b);
+            css.popAdoptionContext(document);
             if ("adoptedStyleSheets" in document)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else
