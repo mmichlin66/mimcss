@@ -29,7 +29,7 @@ let s_processingStyleDefinitionClass = false;
  * necessary so that different instances created for the same class in different activation
  * contexts use the same generated names.
  */
-const symRNs = Symbol("ruleNames");
+const symRuleNames = Symbol("RNs");
 
 
 /**
@@ -66,8 +66,8 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         {
             s_processingStyleDefinitionClass = false;
             this.fromClass = true;
-            if (!this.sdc.hasOwnProperty( symRNs))
-                this.sdc[symRNs] = new Map<string,string>();
+            if (!this.sdc.hasOwnProperty( symRuleNames))
+                this.sdc[symRuleNames] = new Map<string,string>();
         }
 
         // set the name for our container. For optimized name generation mode, generate unique
@@ -193,11 +193,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         // exists for our rule name, just use it. in the presence of style definition class
         // hierarchy we lookup the rule name in each class's map. Note also that if the
         // overriding property uses name override, the name override will be ignored.
-        if (this.fromClass)
+        if (this.fromClass && ruleName)
         {
             for( let sdc = this.sdc; sdc !== StyleDefinition && sdc !== ThemeDefinition; sdc = Object.getPrototypeOf( sdc))
             {
-                name = (sdc[symRNs] as Map<string,string>).get( ruleName);
+                name = (sdc[symRuleNames] as Map<string,string>).get( ruleName);
                 if (name)
                     return name;
             }
@@ -206,7 +206,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         if (nameOverride)
             name = typeof nameOverride === "string" ? nameOverride : nameOverride.name;
         else if (this.pc)
+        {
+            // sub-rules of grouping rules (these are the style definitions with parents) always
+            // get their name from the top-level class.
             name = this.pc.getScopedName( ruleName);
+        }
         else
             name = generateName( this.name, ruleName);
 
@@ -214,7 +218,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         // via new), remember the created name in the class's map of rule names to generated unique
         // names.
         if (this.fromClass)
-            (this.sdc[symRNs] as Map<string,string>).set( ruleName, name!);
+            (this.sdc[symRuleNames] as Map<string,string>).set( ruleName, name!);
 
         return name!;
 	}
@@ -588,7 +592,7 @@ const processClass = (sdc: IStyleDefinitionClass, parent?: IStyleDefinition): IS
 /**
  * Processes the given style definition class by creating its instance and associating a rule
  * container object with it. The class will be associated with the instance in the given context.
- * The parent parameter is a reference to the parent style defiition object or null if the given
+ * The parent parameter is a reference to the parent style definition object or null if the given
  * class is itself a top-level class (that is, is not a class that defines rules within nested
  * grouping rules).
  */

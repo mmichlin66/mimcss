@@ -271,6 +271,66 @@ describe("activation", () =>
             css.deactivate( a2);
             css.popAdoptionContext(document);
         })
+
+        it("should use top-level class name as prefix for property under grouping rule", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                ifNarrow = this.$media( {maxWidth: 400},
+                    class extends css.StyleDefinition{
+                        colored = this.$class({ color: "orange" })
+                    }
+                )
+            }
+
+            let a = css.activate(A);
+
+            expect(a.ifNarrow.gsd.colored.name).toEqual("A_colored");
+
+            css.deactivate(a);
+        })
+
+        it("should create same name for same-named property in top-level class and under grouping rule", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                colored = this.$class({ color: "red" })
+                ifNarrow = this.$media( {maxWidth: 400},
+                    class extends css.StyleDefinition{
+                        colored = this.$class({ color: "orange" })
+                    }
+                )
+            }
+
+            let a = css.activate(A);
+
+            expect(a.colored.name).toEqual(a.ifNarrow.gsd.colored.name);
+
+            css.deactivate(a);
+        })
+
+        it("should create same name for same-named property in two grouping rules", () =>
+        {
+            class A extends css.StyleDefinition
+            {
+                ifNarrow = this.$media( {maxWidth: 400},
+                    class extends css.StyleDefinition{
+                        colored = this.$class({ color: "orange" })
+                    }
+                )
+                ifWide = this.$media( {minWidth: 1000},
+                    class extends css.StyleDefinition{
+                        colored = this.$class({ color: "brown" })
+                    }
+                )
+            }
+
+            let a = css.activate(A);
+
+            expect(a.ifWide.gsd.colored.name).toEqual(a.ifNarrow.gsd.colored.name);
+
+            css.deactivate(a);
+        })
 	})
 
 

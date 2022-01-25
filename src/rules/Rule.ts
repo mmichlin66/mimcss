@@ -89,8 +89,8 @@ export interface IRuleContainer extends IMimcssContainer
 
 
 /**
- * Represents an object that accompanies and is associated with
- * a style definition object.
+ * Represents an object that "embeds" references to several style definition classes and creates
+ * a single stylesheet when activated.
  */
 export interface IEmbeddingContainer extends IMimcssContainer
 {
