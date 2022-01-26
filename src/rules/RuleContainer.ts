@@ -29,7 +29,15 @@ let s_processingStyleDefinitionClass = false;
  * necessary so that different instances created for the same class in different activation
  * contexts use the same generated names.
  */
-const symRuleNames = Symbol("RNs");
+const symRuleNames = Symbol("rns");
+
+
+
+/**
+ * Symbol used in style definition classes to point to an embedding category objects
+ */
+const symEmbeddingContainer = Symbol("ec");
+
 
 
 /**
@@ -238,7 +246,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// activate referenced style definitions
 		for( let ref of this.refs)
-			this.ctx.activate( ref[symRC], this.elm);
+			(ref[symRC] as RuleContainer).activate( this.elm);
 
 		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)
@@ -266,7 +274,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// deactivate imported stylesheets
 		for( let ref of this.refs)
-			this.ctx.deactivate( ref[symRC]);
+			(ref[symRC] as RuleContainer).deactivate();
 	}
 
 
@@ -280,6 +288,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      */
 	public activate( insertBefore?: IMimcssStyleElement): void
 	{
+        if (++this.actCount > 1)
+            return;
+
         // activation context may not exist if the code is executing on a server and SSR has
         // not been started
         let ctx = this.ctx;
@@ -318,7 +329,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             {
                 let currInstance = getCurrentTheme( themeClass);
                 if (currInstance && currInstance !== this.sd)
-                    ctx.deactivate( currInstance[symRC] as RuleContainer);
+                    (currInstance[symRC] as RuleContainer).deactivate();
 
                 setCurrentTheme( this.sd);
             }
@@ -336,6 +347,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	/** Removes this stylesheet from DOM. */
 	public deactivate(): void
 	{
+        if (--this.actCount > 0)
+            return;
+
         let ctx = this.ctx;
 
         /// #if DEBUG
@@ -480,6 +494,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 	/** ":root" rule where all custom CSS properties defined in this container are defined. */
 	private varRootRule: CSSStyleRule | undefined;
+
+    /** Activation reference count. */
+	private actCount = 0;
 }
 
 
@@ -684,8 +701,7 @@ export const activateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot): v
     // if this container has an embedding container, activate the embedding container; otherwise,
     // activate the rule container itself.
 	let container: IMimcssContainer = ruleContainer.ec || ruleContainer;
-    let ctx = container.ctx;
-    ctx.activate( container);
+    container.activate();
 
     // if the root is defined, then the activation context is constructable, then adopt this style
     // definition by the root
@@ -705,14 +721,13 @@ export const deactivateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot):
     // if this container has an embedding container, deactivate the embedding container; otherwise,
     // deactivate the rule container itself.
 	let container: IMimcssContainer = ruleContainer.ec || ruleContainer;
-    let ctx = container.ctx;
 
     // if the root is defined, then the activation context is constructable, so unadopt this style
     // definition by the root
     if (root)
         unadopt( container, root);
 
-    ctx.deactivate( container);
+    container.deactivate();
 }
 
 
@@ -723,11 +738,6 @@ export const deactivateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot):
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Symbol used in style definition classes to point to an embedding container */
-let symEmbeddingContainer = Symbol("ec");
-
-
-
 /**
  * The EmbeddingContainer class contains multiple style definition classes, which are activated and
  * deactivated together under a single `<style>` node. Style definition classes are added to the
@@ -735,23 +745,6 @@ let symEmbeddingContainer = Symbol("ec");
  */
 class EmbeddingContainer implements IEmbeddingContainer
 {
-    /** ID to use for the `<style>` element */
-    public name: string;
-
-	/** Activation context in which this object has been created. */
-	public ctx: IMimcssActivationContext;
-
-	// /** Activation reference count. */
-	// public actCount = 0;
-
-	/** DOM style elemnt */
-	public elm?: IMimcssStyleElement;
-
-    /** Collection of style definition classes "embedded" in this container */
-    private sdcs: Set<IStyleDefinitionClass>;
-
-
-
     public constructor( name: string)
     {
         this.name = name;
@@ -788,6 +781,9 @@ class EmbeddingContainer implements IEmbeddingContainer
      */
 	public activate(): void
 	{
+        if (++this.actCount > 1)
+            return;
+
         // activation context may not exist if the code is executing on a server and SSR has
         // not been started
         let ctx = this.ctx;
@@ -800,7 +796,7 @@ class EmbeddingContainer implements IEmbeddingContainer
             // definition class may be already associated with an instance; if not -
             // process it now.
             let sd = processClassInContext( ctx, sdc);
-            ctx.activate(sd[symRC] as RuleContainer);
+            (sd[symRC] as RuleContainer).activate();
         }
 	}
 
@@ -809,6 +805,9 @@ class EmbeddingContainer implements IEmbeddingContainer
      */
 	public deactivate(): void
 	{
+        if (--this.actCount > 0)
+            return;
+
         // only if this is the last deactivation call, remove the style element and remove all
         // rules from all the style definition classes.
         let ctx = this.ctx;
@@ -838,7 +837,7 @@ class EmbeddingContainer implements IEmbeddingContainer
             /// #endif
 
             // (sd[symRC] as RuleContainer).deactivate();
-            ctx.deactivate(sd[symRC] as RuleContainer);
+            (sd[symRC] as RuleContainer).deactivate();
         }
 	}
 
@@ -875,6 +874,23 @@ class EmbeddingContainer implements IEmbeddingContainer
             sd && (sd[symRC] as RuleContainer).unadopt( rootInfo);
         }
     }
+
+
+
+    /** ID to use for the `<style>` element */
+    public name: string;
+
+	/** Activation context in which this object has been created. */
+	public ctx: IMimcssActivationContext;
+
+	/** DOM style elemnt */
+	public elm?: IMimcssStyleElement;
+
+    /** Collection of style definition classes "embedded" in this container */
+    private sdcs: Set<IStyleDefinitionClass>;
+
+    /** Activation reference count. */
+	private actCount = 0;
 }
 
 
@@ -1120,40 +1136,6 @@ abstract class ActivationContextBase implements IMimcssActivationContext
     public setClassSD( sdc: IStyleDefinitionClass, sd: IStyleDefinition): void
     {
         this.sds.set( sdc, sd);
-    }
-
-    /**
-     * Activates the given container and its related containers in this context.
-     */
-    activate( container: IMimcssContainer, insertBefore?: IMimcssStyleElement): void
-    {
-        let count = this.counts.get( container);
-        if (!count)
-        {
-            container.activate( insertBefore);
-            count = 1;
-        }
-        else
-            count++;
-
-        this.counts.set( container, count);
-    }
-
-    /**
-     * Deactivates the given container and its related containers in this context;
-     */
-    deactivate( container: IMimcssContainer): void
-    {
-        let count = this.counts.get( container);
-        if (!count)
-            return;
-        else if (--count === 0)
-        {
-            container.deactivate();
-            this.counts.delete(container);
-        }
-        else
-            this.counts.set( container, count);
     }
 
     public abstract getThemeElm(): IMimcssStyleElement;
@@ -1587,7 +1569,7 @@ class ConstructableActivationContext extends ArrayBasedActivationContext<Constru
 
 
 /**
- * Client-side implementation of a style element.
+ * Constructable implementation of a style element.
  */
 class ConstructableStyleElement extends ClientRuleBag implements IMimcssStyleElement
 {
