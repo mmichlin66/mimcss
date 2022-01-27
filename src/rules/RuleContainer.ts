@@ -36,7 +36,7 @@ const symRuleNames = Symbol("rns");
 /**
  * Symbol used in style definition classes to point to an embedding category objects
  */
-const symEmbeddingContainer = Symbol("ec");
+const symEmbeddingCategory = Symbol("ec");
 
 
 
@@ -53,18 +53,19 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	{
 		this.sd = sd;
 
-        // activation context can be undefined if the style definition instance was created via
-        // the new operator (as for styled components). In this case, the context will be set
-        // externally when the style definition is passed to the activate() function.
-        this.ctx = getCurrentActivationContext();
+        let psd = sd.$parent;
+        let pc = psd && psd[symRC];
+        let sdc = sd.constructor as IStyleDefinitionClass;
+        let ctx = getCurrentActivationContext();
 
-        this.sdc = sd.constructor as IStyleDefinitionClass;
-        this.psd = sd.$parent;
-		this.ec = this.sdc[symEmbeddingContainer];
+        this.sdc = sdc;
+        this.ctx = ctx;
+        this.psd = psd;
+        this.pc = pc;
 
-        // get parent and top level containers
-        if (this.psd)
-            this.pc = this.psd[symRC];
+        // if the class has embedding category, then the embedding container must have already
+        // been created for this context (see processClass).
+        this.ec = (sdc[symEmbeddingCategory] as EmbeddingCategory)?.getEC( ctx);
 
         // remember whether the style definition was created from class or its instance was
         // created using the new operator. If it was created from class, then ensure that it has
@@ -74,8 +75,8 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         {
             s_processingStyleDefinitionClass = false;
             this.fromClass = true;
-            if (!this.sdc.hasOwnProperty( symRuleNames))
-                this.sdc[symRuleNames] = new Map<string,string>();
+            if (!sdc.hasOwnProperty( symRuleNames))
+                sdc[symRuleNames] = new Map<string,string>();
         }
 
         // set the name for our container. For optimized name generation mode, generate unique
@@ -87,7 +88,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             this.name = generateUniqueName();
         else
         {
-            let className = this.sdc.name;
+            let className = sdc.name;
             let name = className ? "" : generateUniqueName();
             if (this.fromClass)
             {
@@ -105,7 +106,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             }
 
             // if our container has parent container, prefix our name with the upper one
-            this.name = this.pc ? `${this.pc.name}_${name}` : name;
+            this.name = pc ? `${pc.name}_${name}` : name;
         }
 	}
 
@@ -448,7 +449,8 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      */
 	public elm?: IMimcssStyleElement;
 
-	/** Embedding Container that is embedding our instance (that is, the instance corresponding
+	/**
+     * Embedding Container that is embedding our instance (that is, the instance corresponding
      * to our container). If defined, this container's `<style>` element is used to insert CSS
      * rules into instead of topLevelContainer.
      */
@@ -472,7 +474,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      * (as for styled components) but from the processClass function. This affects whether the rule
      * names are remembered in the class and are used by other processClass-created instances.
      */
-     private fromClass: boolean;
+    private fromClass: boolean;
 
      /** List of references to other style definitions creaed via the $use function. */
 	private refs: StyleDefinition[] = [];
@@ -595,14 +597,30 @@ export const processSD = (instOrClass: IStyleDefinition | IStyleDefinitionClass,
 
 
 /**
- * Processes the given style definition class by creating its instance and associating a
- * rule container object with it. The class will be associated with the instance using a
- * Symbol property. The parent parameter is a reference to the parent style defiition
- * object or null if the given class is itself a top-level class (that is, is not a class
- * that defines rules within nested grouping rules).
+ * Processes the given style definition class by creating its instance and associating a rule
+ * container object with it. The class will be associated with the instance for the current
+ * context. The parent parameter is a reference to the parent style definition object or udefined
+ * if the given class is itself a top-level class (that is, is not a class that defines rules
+ * within nested grouping rules).
  */
 const processClass = (sdc: IStyleDefinitionClass, parent?: IStyleDefinition): IStyleDefinition =>
-    processClassInContext( getCurrentActivationContext(), sdc, parent);
+{
+    // if parent parameter is defined we just create a new instance - regardless of the context
+    // and whether there is already instance of this class in this context.
+    if (parent)
+        return new sdc(parent);
+
+    // check whether the class belongs to an embedding category. If yes, we process the category
+    // object, which in turn processes all the classes (if they are not processed yet)
+    let ctx = getCurrentActivationContext();
+    if (sdc.hasOwnProperty(symEmbeddingCategory))
+    {
+        (sdc[symEmbeddingCategory] as EmbeddingCategory).process( ctx);
+        return ctx.getClassSD(sdc)!;
+    }
+
+    return processClassInContext( ctx, sdc);
+}
 
 
 
@@ -613,12 +631,9 @@ const processClass = (sdc: IStyleDefinitionClass, parent?: IStyleDefinition): IS
  * class is itself a top-level class (that is, is not a class that defines rules within nested
  * grouping rules).
  */
-const processClassInContext = (ctx: IMimcssActivationContext, sdc: IStyleDefinitionClass,
-    parent?: IStyleDefinition): IStyleDefinition =>
+const processClassInContext = (ctx: IMimcssActivationContext, sdc: IStyleDefinitionClass): IStyleDefinition =>
 {
-    // check whether this definition class is already associated with an instance. Note that we
-    // use hasOwnProperty() because otherwise, this could return instance for the base style
-    // definition class.
+    // check whether this definition class is already associated with an instance in the given context.
 	let sd = ctx.getClassSD(sdc);
 	if (sd)
         return sd;
@@ -628,15 +643,14 @@ const processClassInContext = (ctx: IMimcssActivationContext, sdc: IStyleDefinit
     // as their own and so these rules will be activated as part of the derived class.
     let baseClass = Object.getPrototypeOf( sdc);
     if (baseClass !== StyleDefinition && baseClass !== ThemeDefinition)
-        processClassInContext( ctx, baseClass, parent);
+        processClassInContext( ctx, baseClass);
 
-    // create the instance of the definition class. We pass the second argument (which is not
-    // part of the StyleDefinition constructor signature) in order to indicate that the instance
-    // is created by processing a class and not directly by callers via the "new" invocation.
+    // create the instance of the definition class and indicate that the instance is created by
+    // processing a class and not directly by callers via the "new" invocation.
     try
     {
         s_processingStyleDefinitionClass = true;
-        sd = new sdc( parent);
+        sd = new sdc();
     }
     finally
     {
@@ -739,20 +753,15 @@ export const deactivateSD = (sd: IStyleDefinition, root?: DocumentOrShadowRoot):
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The EmbeddingContainer class contains multiple style definition classes, which are activated and
+ * The EmbeddingCategory class contains multiple style definition classes, which are activated and
  * deactivated together under a single `<style>` node. Style definition classes are added to the
  * embedding container by being decorated with the `@embedded` decorator.
  */
-class EmbeddingContainer implements IEmbeddingContainer
+class EmbeddingCategory
 {
     public constructor( name: string)
     {
         this.name = name;
-
-        // get the current activation context, which will be the context under which this object
-        // will operate
-        this.ctx = getCurrentActivationContext();
-
         this.sdcs = new Set<IStyleDefinitionClass>();
     }
 
@@ -762,19 +771,81 @@ class EmbeddingContainer implements IEmbeddingContainer
      * Adds the given style definition class to the list of embedded classes. If the container is
      * currently activated, the class will be activated too.
      */
-    public add( cls: IStyleDefinitionClass): void
+    public add( sdc: IStyleDefinitionClass): void
     {
         // add the class to our container
-        this.sdcs.add( cls);
+        this.sdcs.add( sdc);
 
         // set the symbol on our class to point to the container
-        cls[symEmbeddingContainer] = this;
+        sdc[symEmbeddingCategory] = this;
 
-        // if the embedding container is currently activated, we need to activate the added
-        // style definition class using the currently default activator
-        if (this.elm)
-            getActivator().activate( processClassInContext( this.ctx, cls)!);
+        // process class in all contexts where this category is already processed
+        this.ecs.forEach( (container, ctx) =>
+        {
+            let sd = processClassInContext( ctx, sdc);
+
+            // if the container is active, activate the class
+            if (container.elm)
+                (sd[symRC] as RuleContainer).activate();
+        });
     }
+
+
+
+    /** Gets embedding container for the given activation context */
+    public getEC( ctx: IMimcssActivationContext): EmbeddingContainer | undefined
+    {
+        return this.ecs.get(ctx);
+    }
+
+
+
+    /**
+     * Creates embedding container for the given activation context (if not created yet) and
+     * processes all classes in this context.
+     */
+    public process( ctx: IMimcssActivationContext): void
+    {
+        if (!this.ecs.has(ctx))
+        {
+            this.ecs.set( ctx, new EmbeddingContainer( this, ctx));
+            for( let sdc of this.sdcs)
+                processClassInContext( ctx, sdc);
+        }
+    }
+
+
+
+    /** ID to use for the `<style>` element */
+    public name: string;
+
+    /** Collection of style definition classes "embedded" in this container */
+    public sdcs: Set<IStyleDefinitionClass>;
+
+    /**
+     * Map of embedding containers per activation context objects. When a style definition class
+     * belonging to an embedding category is activated in a context, an embedding container
+     * instance is created for this context and is put into this map.
+     */
+	private ecs = new Map<IMimcssActivationContext,EmbeddingContainer>();
+}
+
+
+
+/**
+ * The EmbeddingContainer class contains multiple style definition classes, which are activated and
+ * deactivated together under a single `<style>` node. Style definition classes are added to the
+ * embedding container by being decorated with the `@embedded` decorator.
+ */
+class EmbeddingContainer implements IEmbeddingContainer
+{
+    public constructor( category: EmbeddingCategory, ctx: IMimcssActivationContext)
+    {
+        this.category = category;
+        this.ctx = ctx;
+    }
+
+
 
 	/**
      * Inserts all style definitions in this container into DOM.
@@ -791,11 +862,11 @@ class EmbeddingContainer implements IEmbeddingContainer
         // create the style element and insert all rules from all the style definition classes.
         this.elm = ctx.createElm( this);
 
-        for( let sdc of this.sdcs)
+        for( let sdc of this.category.sdcs)
         {
             // definition class may be already associated with an instance; if not -
             // process it now.
-            let sd = processClassInContext( ctx, sdc);
+            let sd = ctx.getClassSD(sdc)!;
             (sd[symRC] as RuleContainer).activate();
         }
 	}
@@ -823,7 +894,7 @@ class EmbeddingContainer implements IEmbeddingContainer
         /// #endif
 
 
-        for( let cls of this.sdcs)
+        for( let cls of this.category.sdcs)
         {
             // definition class must be already associated with an instance
             let sd = ctx.getClassSD( cls);
@@ -836,7 +907,6 @@ class EmbeddingContainer implements IEmbeddingContainer
             }
             /// #endif
 
-            // (sd[symRC] as RuleContainer).deactivate();
             (sd[symRC] as RuleContainer).deactivate();
         }
 	}
@@ -852,10 +922,10 @@ class EmbeddingContainer implements IEmbeddingContainer
         rootInfo.add( this);
 
         // adopt referenced style definitions
-        for( let sdc of this.sdcs)
+        for( let sdc of this.category.sdcs)
         {
-            let sd = this.ctx.getClassSD( sdc);
-            sd && (sd[symRC] as RuleContainer).adopt( rootInfo);
+            let sd = this.ctx.getClassSD( sdc)!;
+            (sd[symRC] as RuleContainer).adopt( rootInfo);
         }
     }
 
@@ -868,26 +938,25 @@ class EmbeddingContainer implements IEmbeddingContainer
         rootInfo.remove( this);
 
         // unadopt referenced style definitions
-        for( let sdc of this.sdcs)
+        for( let sdc of this.category.sdcs)
         {
-            let sd = this.ctx.getClassSD( sdc);
-            sd && (sd[symRC] as RuleContainer).unadopt( rootInfo);
+            let sd = this.ctx.getClassSD( sdc)!;
+            (sd[symRC] as RuleContainer).unadopt( rootInfo);
         }
     }
 
 
 
-    /** ID to use for the `<style>` element */
-    public name: string;
+    public get name(): string { return this.category.name; }
+
+    /** EmbeddingCategory object to which this container belongs */
+    public category: EmbeddingCategory;
 
 	/** Activation context in which this object has been created. */
 	public ctx: IMimcssActivationContext;
 
 	/** DOM style elemnt */
 	public elm?: IMimcssStyleElement;
-
-    /** Collection of style definition classes "embedded" in this container */
-    private sdcs: Set<IStyleDefinitionClass>;
 
     /** Activation reference count. */
 	private actCount = 0;
@@ -896,12 +965,10 @@ class EmbeddingContainer implements IEmbeddingContainer
 
 
 /**
- * Map of category names to embedding container objects containing style definitions for the given
- * category.
+ * Map of category names to EmbeddingCategory objects containing style definition classes for the
+ * given category.
  */
-let s_embeddingContainers = new Map<string,EmbeddingContainer>();
-
-
+const embeddingCategories = new Map<string,EmbeddingCategory>();
 
 /**
  * Decorator function for style definition classes that will be embedded into an embedding
@@ -910,14 +977,13 @@ let s_embeddingContainers = new Map<string,EmbeddingContainer>();
  */
 export const embeddedDecorator = (category: string, target: IStyleDefinitionClass): any =>
 {
-    // check whether we already have container for this category; if not, add it
-    let ec = s_embeddingContainers.get( category);
+    // check whether we already have object for this category; if not, add it
+    let ec = embeddingCategories.get( category);
     if (!ec)
     {
         // generate unique ID for our container, which will be the ID of the `<style>` element
-        let id = `${category}_${s_nextUniqueID++}`;
-        ec = new EmbeddingContainer( id);
-        s_embeddingContainers.set( category, ec);
+        ec = new EmbeddingCategory( `${category}_${s_nextUniqueID++}`);
+        embeddingCategories.set( category, ec);
     }
 
     // add our class to the container
@@ -1144,9 +1210,6 @@ abstract class ActivationContextBase implements IMimcssActivationContext
 
     /** Map of style definition classes to style definition instances in this context */
     protected sds = new Map<IStyleDefinitionClass,IStyleDefinition>();
-
-    /** Map of rule connector or embedding connector objects to their reference counts */
-    protected counts = new Map<IMimcssContainer,number>();
 }
 
 

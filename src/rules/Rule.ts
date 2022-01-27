@@ -171,16 +171,6 @@ export interface IMimcssActivationContext
     /** Associates style definition instance with the given class in this context. */
     setClassSD( sdc: IStyleDefinitionClass, sd: IStyleDefinition): void;
 
-    // /**
-    //  * Activates the given container and its related containers in this context.
-    //  */
-    // activate( container: IMimcssContainer, insertBefore?: IMimcssStyleElement): void;
-
-    // /**
-    //  * Deactivates the given container and its related containers in this context;
-    //  */
-    // deactivate( container: IMimcssContainer): void;
-
     /** Creates theme placeholder style element */
     getThemeElm(): IMimcssStyleElement;
 
