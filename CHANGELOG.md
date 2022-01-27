@@ -1,3 +1,8 @@
+# 0.11.11
+
+1. Add support for constructable style sheets and adoption of them by Document and ShadowRoot objects.
+
+
 # 0.11.10
 
 1. IClassRule and IIDRule interfaces now extend the IPrefixedNamedEntity interface.
