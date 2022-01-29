@@ -15,7 +15,7 @@ import {
 import {symRC} from "../rules/Rule";
 import {
     embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
-    s_pushRoot, s_popRoot, s_releaseShadow, s_startSSR, s_stopSSR,
+    s_pushRoot, s_popRoot, s_startSSR, s_stopSSR,
     s_startHydration, s_stopHydration, s_activate, s_deactivate
 } from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule, PageRule} from "../rules/StyleRules"
@@ -1101,6 +1101,9 @@ export const chooseClass = (...classProps: ClassPropType[]): string =>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @deprecated This decorator is deprecated as all rules defined in style definition classes are
+ * always virtualized.
+ *
  * Decorator that should be applied to a rule if it is defined and used in the same style
  * definition class but then is overridden in a derived style definition class. The problem
  * this solves is this: when a rule is defined in a base class and then overridden in a derived
@@ -1113,9 +1116,6 @@ export const chooseClass = (...classProps: ClassPropType[]): string =>
  * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
  * rule, the first rule will see the overridden value of the rule when accessed in the
  * post-constructor code.
- *
- * @deprecated This decorator is deprecated as all rules defined in style definition classes are
- * always virtualized.
  */
 export const virtual = (target: any, name: string): void => {};
 
@@ -1265,17 +1265,6 @@ export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition
   * @param root Document or ShadowRoot object to which style definitions were adopted
   */
  export const popAdoptionContext = (root: DocumentOrShadowRoot): void => s_popRoot( root);
-
-
-
- /**
- * Releases internal resources that Mimcss created for the given shadow root object when activating
- * style definitions. This function should be called from the *disconnectedCallback* of the custom
- * Web element.
- *
- * @param root Shadow root of the custom Web element
- */
-export const releaseShadow = (root: ShadowRoot): void => s_releaseShadow( root);
 
 
 

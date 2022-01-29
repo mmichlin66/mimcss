@@ -1317,7 +1317,15 @@ class ClientActivationContext extends ActivationContextBase implements IMimcssAc
     constructor( parent?: ParentNode)
     {
         super();
-        this.node = parent ?? document.head;
+        let node = parent ?? document.head;
+        this.node = node;
+
+        let parentNode = (node as ShadowRoot)?.host?.parentElement;
+        if (parentNode)
+        {
+            this.observer = new MutationObserver( onShadowRootRemoved);
+            this.observer.observe( parentNode, {childList: true})
+        }
     }
 
     public getThemeElm(): IMimcssStyleElement
@@ -1383,6 +1391,9 @@ class ClientActivationContext extends ActivationContextBase implements IMimcssAc
 
     /** Theme placeholder element */
     private themeElm?: IMimcssStyleElement;
+
+    /** Mutation observer - only needed for custom elements if adoption is not supported */
+    private observer?: MutationObserver;
 }
 
 
@@ -1527,6 +1538,25 @@ const getClientContext = (root: DocumentOrShadowRoot): ClientActivationContext =
 
 
 /**
+ * Mutation observer callback to detect deletions of shadow roots.
+ */
+const onShadowRootRemoved = (records: MutationRecord[], observer: MutationObserver) =>
+{
+    for( let record of records)
+    {
+        record.removedNodes?.forEach( (elm: Element) => {
+            let shadow = elm.shadowRoot;
+            if (shadow && shadow instanceof ShadowRoot)
+                clientContextsForRoots.delete( shadow);
+        });
+    }
+
+    observer.disconnect();
+}
+
+
+
+/**
  * Stack of DocumentOrShadowRoot objects. Roots are pushed and popped by code under shadow roots
  * and the object from the top of the stack is used for activation.
  */
@@ -1558,16 +1588,6 @@ export const s_popRoot = (root: DocumentOrShadowRoot): void =>
         documentOrShadowRootStack.pop();
         popActCtx( isAdoptionSupported ? globalConstructableActivationContext! : getClientContext( root));
     }
-}
-
-
-
-/**
- * Deletes client activation context for the given document or shadow root object.
- */
-export const s_releaseShadow = (root: ShadowRoot): void =>
-{
-    clientContextsForRoots.delete( root);
 }
 
 
