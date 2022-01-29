@@ -8,7 +8,7 @@
     "hideGenerator": true,
     "includeVersion": true,
 	"includes": "./typedoc",
-	"out": "./reference",
+	"out": "./web/reference",
     "entryPointStrategy": "expand",
 	"entryPoints": [
 		"./src/api/"

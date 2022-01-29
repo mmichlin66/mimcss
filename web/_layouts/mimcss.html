@@ -1,0 +1,46 @@
+---
+layout: default
+---
+
+<div class="wide-container elastic">
+	<div class="left-sidebar">
+		<div class="left-sidebar-title">
+			Mimcss
+		</div>
+
+		<div style="padding: 8px">
+			<a class="menuitem" href="{{page.rootpath}}/motivation.html">Motivation</a><br/><br/>
+			<b>Guide</b>
+			<ul>
+			{% for item in site.data.mimcssGuide %}
+				<li><a href="{{page.rootpath}}/guide/{{ item.file }}">{{ item.title }}</a></li>
+			{% endfor %}
+			</ul>
+			<b>Reference</b>
+			<ul>
+                <li><a href="{{page.rootpath}}/typedoc.html">Typedoc Reference</a></li>
+                <!-- <li><a href="{{page.rootpath}}/ref/style-properties.html">Style Properties</a></li> -->
+			</ul>
+			<b>Playground</b>
+			<ul>
+                <li><a href="{{page.rootpath}}/demo/playground.html">Playground</a></li>
+			</ul>
+			<b>Other</b>
+			<ul>
+                <li><a href="https://www.npmjs.com/package/mimcss" target="NPM">NPM Page</a></li>
+                <li><a href="https://github.com/mmichlin66/mimcss" target="GitHub">GitHub Page</a></li>
+			</ul>
+        </div>
+
+        <div class="left-sidebar-bottom">
+            <a href="https://www.npmjs.com/package/mimcss">
+                <img src="https://img.shields.io/npm/v/mimcss.svg?&style=flat-square&color=success"
+                alt="Mimcss npm version">
+            </a>
+        </div>
+	</div>
+
+	<div class="content-container">
+		{{ content }}
+	</div>
+</div>

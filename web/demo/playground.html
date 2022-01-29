@@ -1,0 +1,13 @@
+---
+layout: default
+title: Mimcss Playground
+description: Play with Mimcss library online. Try provided examples, change their code or write your own code and immedeiately see the results.
+comments: false
+rootpath: ".."
+---
+
+<iframe id="iframe" style="width:100%; height:100%"></iframe>
+
+<script>
+    iframe.src = `./playground-internal.html${location.search}${location.hash}`
+</script>

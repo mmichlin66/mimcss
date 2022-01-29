@@ -13,7 +13,7 @@
             "priority": 1
         },
         {
-            "text": "mimcss test",
+            "text": "test",
             "color": "yellow",
             "commandType": "script",
             "command": "build-tests",
@@ -21,10 +21,26 @@
             "priority": 1
         },
         {
-            "text": "mimcss doc",
+            "text": "typedoc",
             "color": "pink",
             "commandType": "script",
             "command": "typedoc",
+            "alignment": "left",
+            "priority": 1
+        },
+        {
+            "text": "build libs",
+            "color": "white",
+            "commandType": "exec",
+            "command": "node web/_tools/buildLibs.js",
+            "alignment": "left",
+            "priority": 1
+        },
+        {
+            "text": "copy libs",
+            "color": "yellow",
+            "commandType": "exec",
+            "command": "node web/_tools/copyLibs.js",
             "alignment": "left",
             "priority": 1
         }

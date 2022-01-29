@@ -1,0 +1,10 @@
+{%		assign depth = page.url | split: '/' | size | minus: 1
+%}{%	if size == 0
+%}{%		assign pathToRoot = './'
+%}{%	else
+%}{%		assign pathToRoot = ''
+%}{%		for i in (1..depth)
+%}{%			assign pathToRoot = pathToRoot | append: '../'
+%}{%		endfor
+%}{%	endif
+%}

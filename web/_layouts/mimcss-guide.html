@@ -1,0 +1,54 @@
+---
+layout: mimcss
+---
+
+
+<div class="content">
+    <div class="hbox">
+        {% if page.unit > 0 %}
+            {% assign prevUnit = page.unit | minus: 1 %}
+            {% assign prevItem = site.data.mimcssGuide[prevUnit] %}
+            <span class="prevlink">Previous Unit: <a href="{{ prevItem.file }}">{{ prevItem.title }}</a></span>
+        {% endif %}
+        {% assign lastUnit = site.data.mimcssGuide | size | minus: 1 %}
+        {% if page.unit < lastUnit %}
+            {% assign nextUnit = page.unit | plus: 1 %}
+            {% assign nextItem = site.data.mimcssGuide[nextUnit] %}
+            <span class="nextlink">Next Unit: <a href="{{ nextItem.file }}">{{ nextItem.title }}</a></span>
+        {% endif %}
+    </div>
+    {{ content }}
+    <br/>
+    <div class="hbox prevnext">
+        {% if page.unit > 0 %}
+            {% assign prevUnit = page.unit | minus: 1 %}
+            {% assign prevItem = site.data.mimcssGuide[prevUnit] %}
+            <span class="prevlink">Previous Unit: <a href="{{ prevItem.file }}">{{ prevItem.title }}</a></span>
+        {% endif %}
+        {% assign lastUnit = site.data.mimcssGuide | size | minus: 1 %}
+        {% if page.unit < lastUnit %}
+            {% assign nextUnit = page.unit | plus: 1 %}
+            {% assign nextItem = site.data.mimcssGuide[nextUnit] %}
+            <span class="nextlink">Next Unit: <a href="{{ nextItem.file }}">{{ nextItem.title }}</a></span>
+        {% endif %}
+    </div>
+
+    <!--
+    <footer>
+        <h4>Mimcss Guide Units</h4>
+        <ul>
+        {% for item in site.data.mimcssGuide %}
+            <li><a href="{{ item.file }}">{{ item.title }}</a></li>
+        {% endfor %}
+        </ul>
+    </footer>
+    -->
+
+    <!--
+    {%- if site.disqus.shortname -%}
+    {%- include disqus_comments.html -%}
+    {%- endif -%}
+    -->
+
+    <!-- <a class="u-url" href="{{ page.url | relative_url }}" hidden></a> -->
+</div>

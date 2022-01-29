@@ -1,0 +1,19 @@
+<html style="height: 100%;">
+
+<body style="height: 100%; margin: 0" onload="loadPlayground()">
+    <script src="/lib/mimcss.js"></script>
+    <script src="/lib/mimbl.js"></script>
+    <script src="/lib/mimcl.js"></script>
+    <script src="mim-tsplay.js"></script>
+    <script src="mimcss-demo.js"></script>
+    <script>
+        function loadPlayground()
+        {
+            let qsp = new URL(location.href).searchParams;
+            let file = qsp && qsp.get("file");
+            window.mountPlayground(document.body, "playground-config.json", file ? `examples/${file}` : undefined);
+        }
+    </script>
+</body>
+
+</html>

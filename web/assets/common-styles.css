@@ -1,0 +1,442 @@
+* {
+	box-sizing: border-box;
+	position: relative;
+}
+
+h6 { font-size: 12px; font-weight: bold; margin-bottom: 6px; }
+h5 { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+h4 { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
+h3 { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+h2 { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+h1 { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	margin: 0px;
+	font-family: "Segoe UI", Verdana, Geneva, Tahoma, sans-serif;
+	font-size: 15px;
+}
+
+pre, code, code > span {
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 12px;
+	margin: 0px;
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+p {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.vbox {
+	display: flex;
+	flex-direction: column;
+}
+
+.hbox {
+	display: flex;
+	flex-direction: row;
+    align-items: center;
+}
+
+.vbox > *,
+.hbox > *
+{
+	flex: 0 0 auto; /* will not grow or shrink and will stay their set size or the size of their content  */
+}
+
+.vbox > .elastic,
+.hbox > .elastic
+{
+	flex: 1 1 0; /* will grow and shrink to occupy all available space between non-elastic items */
+	overflow: auto; /* without this it will still grow beyond the box if content is big enough */
+}
+
+.vbox.spacing > * {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.hbox.spacing > * {
+	margin-left: 8px;
+    margin-right: 8px;
+}
+
+/* .vbox.spacing > a:nth-child(n) {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.hbox.spacing > a:nth-child(n) {
+	margin-left: 8px;
+	margin-right: 8px;
+} */
+
+.mainHeader {
+	position: sticky;
+	width: 100%;
+	top: 0px;
+	padding: 0.5em 1em;
+	/*border-bottom: 1px solid gray;*/
+    /* background-color: #F5CBA7; */
+    background-image: linear-gradient( to right, #36d1dc, #5b86e5);
+    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.2);
+    justify-content: space-between;
+	z-index: 1;
+}
+
+.page-title {
+    font-size: x-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: darkorchid
+}
+
+.main-container {
+	width: 100%;
+	min-width: 400px;
+	display: flex;
+	flex-direction:column;
+	margin: 0 auto 0 0;
+}
+
+.simple-container {
+	width: 100%;
+	min-width: 400px;
+	max-width: 1000px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	padding: 8px;
+	margin: 0 auto;
+	box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
+}
+
+.wide-container {
+	width: 100%;
+	min-width: 400px;
+	/* max-width: 1400px; */
+	display: flex;
+	flex-direction: row;
+	/* align-items: flex-start; */
+	margin: 0 auto 0 0;
+}
+
+.left-sidebar {
+	width: 20%;
+	min-width: 200px;
+	max-width: 300px;
+	display: flex;
+	flex-direction: column;
+	margin-left: 1em;
+	margin-right: 1em;
+	margin-top: 1em;
+	margin-bottom: auto;
+	border-radius: 8px;
+	box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
+}
+
+.left-sidebar-title {
+	width: 100%;
+	/* padding: 0.5em 1em; */
+    background-color: dodgerblue;
+    /* background-image: linear-gradient( to right, #36d1dc, #5b86e5, #36d1dc); */
+    /* background-image: linear-gradient( to right,#de6262, #ffb88c, #de6262); */
+    color: white;
+	/* font-weight: 900; */
+	font-size: 1.3em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+}
+
+.left-sidebar-bottom {
+	width: 100%;
+	padding-block-start: 4px;
+    background-color: dodgerblue;
+    /* background-image: linear-gradient( to right, #36d1dc, #5b86e5, #36d1dc); */
+    /* background-image: linear-gradient( to right,#de6262, #ffb88c, #de6262); */
+    display: flex;
+	justify-content: center;
+	align-items: center;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.content-container {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.content {
+	/* height: 100%;
+	overflow: auto; */
+	width: 80%;
+	min-width: 300px;
+	max-width: 1000px;
+    min-height: 100%;
+    flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	padding: 8px;
+	margin-left: 0.5em;
+	/* margin-right: auto; */
+	box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.2);
+}
+
+.reference {
+	min-width: 500px;
+	/* max-width: 99%; */
+    min-height: 100%;
+    flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	padding: 8px;
+	margin-left: 0.5em;
+	/* margin-right: auto; */
+	box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.2);
+}
+
+.typedoc-reference {
+	width: 100%;
+	min-width: 300px;
+	height: 100%;
+	padding: 8px;
+	margin-left: 0.5em;
+	/* margin-right: auto; */
+	box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.2);
+}
+
+.buttonLink {
+	padding: 4px;
+	background-color: aliceblue;
+	margin-left: 16px;
+	font-size: 14px;
+}
+
+a:link, a:visited {
+	color: royalblue;
+	text-decoration: none;
+}
+
+a:hover, a:active {
+	color: mediumblue;
+	text-decoration: underline;
+}
+
+a.postref {
+	font-size: 1.5em;
+}
+
+
+
+.prevnext {
+	justify-content: space-between;
+}
+
+.prevlink {
+	margin-right: auto;
+}
+
+.nextlink {
+	margin-left: auto;
+}
+
+
+
+/* Menu handling */
+.menubar {
+	display: flex;
+	flex-direction: row;
+}
+
+.menuitem, a.menuitem, a.menuitem:hover, .menuitemContent {
+	cursor: pointer;
+	position: relative;
+}
+
+/* .menubar > .menuitem, .menubar > a.menuitem, .menubar > a.menuitem:hover, */
+.menu > .menuitem, .menu > a.menuitem, .menu > a.menuitem:hover {
+	font-size: 18px;
+	color: blue;
+	padding: 0.3em 1em;
+}
+
+.menuitem > .menuitemContent {
+	font-size: 18px;
+	color: blue;
+}
+
+.menuitem:hover {
+	background-color: deepskyblue;
+	/*background-color: #F5CBA7;*/
+	text-decoration: none;
+}
+
+.menu .menuitem:hover {
+	background-color: #e5e5e5;
+	/* background-color: lightskyblue; */
+	/*background-color: #F5CBA7;*/
+	text-decoration: none;
+}
+
+.menu {
+	display: none;
+	position: absolute;
+	z-index: 1000000;
+	width: max-content;
+	max-width: 300px;
+	min-width: 100px;
+	background-color: #f9f9f9;
+	/*border: 1px solid gray;*/
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.2);
+}
+
+.menu > .menuitem {
+	display: flex;
+	flex-direction: row;
+	padding: 0.2em;
+}
+
+.menuitem:hover > .menu {
+	display: flex;
+	flex-direction: column;
+}
+
+.menubar > .menuitem > .menu {
+	left: 0px;
+	top: 100%;
+}
+
+.menu > .menuitem > .menu {
+	left: 100%;
+	top: 0px;
+}
+
+.mainHeader > .menubar > a,
+.mainHeader > .menubar > .menuitem > .menuitemContent {
+    color: white;
+    font-size: 18px;
+    padding: 0.3em 1em;
+}
+
+
+
+/* Code blocks (blocks fenced by 3 backticks or tildes) */
+div.highlighter-rouge {
+	/* background-color: #efefef; */
+	background-color: #f8f8f8;
+	margin-left: 16px;
+	margin-right: 16px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	padding: 8px;
+	border: 1px solid blue;
+}
+
+/* Inline code elements (fenced by a single backtick) */
+code.highlighter-rouge {
+	/* background-color: #efefef; */
+	/* color: darkgreen; */
+	background-color: #f8f8f8;
+	padding: 0px 2px;
+	font-size: 13px;
+	border: 1px dotted lightgrey;
+}
+
+/* Code blocks and syntax highlighting */
+.highlight .c  { color: green }		/* Comment */
+.highlight .cm { color: green }		/* Comment.Multiline */
+.highlight .cp { color: green }		/* Comment.Preproc */
+.highlight .c1 { color: green }		/* Comment.Single */
+.highlight .cs { color: green }		/* Comment.Special */
+
+.highlight .k  { color: blue }		/* Keyword */
+.highlight .kc { color: blue }		/* Keyword.Constant */
+.highlight .kd { color: blue }		/* Keyword.Declaration */
+.highlight .kn { color: blue }		/* Keyword.Namespace */
+.highlight .kp { color: blue }		/* Keyword.Pseudo */
+.highlight .kr { color: blue }		/* Keyword.Reserved */
+.highlight .kt { color: blue }		/* Keyword.Type */
+
+.highlight .o  { color: black }		/* Operator */
+.highlight .ow { color: black }		/* Operator.Word */
+
+.highlight .p  { color: black }		/* Punctuation */
+.highlight .po { color: black }		/* Parenthesis Outer */
+.highlight .pi { color: black }		/* Parenthesis Inner */
+
+.highlight .s  { color: coral }		/* Literal.String */
+.highlight .s1 { color: coral }		/* Literal.String.Single */
+.highlight .s2 { color: crimson }		/* Literal.String.Double */
+.highlight .sb { color: coral }		/* Literal.String.Backtick */
+.highlight .sc { color: coral }		/* Literal.String.Char */
+.highlight .sd { color: coral }		/* Literal.String.Doc */
+.highlight .se { color: coral }		/* Literal.String.Escape */
+.highlight .sh { color: coral }		/* Literal.String.Heredoc */
+.highlight .si { color: black }		/* Literal.String.Interpol */
+.highlight .sx { color: coral }		/* Literal.String.Other */
+.highlight .sr { color: coral }		/* Literal.String.Regex */
+.highlight .ss { color: coral }		/* Literal.String.Symbol */
+.highlight .dl { color: coral }		/* ??? Delimiter ??? */
+
+.highlight .m  { color: maroon }	/* Literal.Number */
+.highlight .mi { color: maroon }	/* Literal.Number */
+.highlight .mf { color: maroon }	/* Literal.Number.Float */
+.highlight .mh { color: maroon }	/* Literal.Number.Hex */
+.highlight .mi { color: maroon }	/* Literal.Number.Integer */
+.highlight .mo { color: maroon }	/* Literal.Number.Oct */
+.highlight .il { color: maroon }	/* Literal.Number.Integer.Long */
+
+.highlight .na { color: orchid }	/* Name.Attribute */
+.highlight .nb { color: #366 }		/* Name.Builtin */
+.highlight .nc { color: teal }		/* Name.Class */
+.highlight .no { color: #360 }		/* Name.Constant */
+.highlight .nd { color: teal }		/* Name.Decorator */
+.highlight .ni { color: teal }		/* Name.Entity */
+.highlight .ne { color: teal }		/* Name.Exception */
+.highlight .nf { color: teal }		/* Name.Function */
+.highlight .nl { color: teal }		/* Name.Label */
+.highlight .nt { color: brown }		/* Name.Tag */
+.highlight .nn { color: #0cf }		/* Name.Namespace */
+.highlight .nv { color: #033 }		/* Name.Variable */
+.highlight .vc { color: #033 }		/* Name.Variable.Class */
+.highlight .vg { color: #033 }		/* Name.Variable.Global */
+.highlight .vi { color: #033 }		/* Name.Variable.Instance */
+.highlight .bp { color: #366 }		/* Name.Builtin.Pseudo */
+.highlight .nx { color: black; }	/* Name.Other */
+
+.highlight .w  { color: #bbb }		/* Text.Whitespace */
+
+.highlight .gr { color: #f00 }		/* Generic.Error */
+.highlight .gh { color: #030 }		/* Generic.Heading */
+.highlight .go { color: #aaa }		/* Generic.Output */
+.highlight .gp { color: #009 }		/* Generic.Prompt */
+.highlight .gu { color: #030 }		/* Generic.Subheading */
+.highlight .gt { color: #9c6 }		/* Generic.Traceback */
+.highlight .gs { }					/* Generic.Strong */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gd { background-color: #fcc; border: 1px solid #c00 } /* Generic.Deleted */
+.highlight .gi { background-color: #cfc; border: 1px solid #0c0 } /* Generic.Inserted */
+
+.highlight .hll { background-color: #ffc; }
+.highlight .err { color: #a00; background-color: #fff } /* Error */
+
+.css .o,
+.css .o + .nt,
+.css .nt + .nt { color: #999; }
+
+

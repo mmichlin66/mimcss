@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>{{page.title}}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="yy_qgazbi49O1tKrQiincY6VFN9ZBxEa-SbNumL4M7o" />
+    <meta name="description" content="{{page.description}}">
+    <link href="{{page.rootpath}}/assets/common-styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="vbox" style="height: 100%">
+        <div class="hbox mainHeader">
+            <div class="hbox">
+                <img src="{{page.rootpath}}/assets/mim-logo.png" style="margin: auto 0.5em 0">
+                <!-- <img src="{{page.rootpath}}/assets/css.png"> -->
+            </div>
+            <div class="page-title">
+                {{page.title}}
+            </div>
+            <div class="menubar" style="justify-content:flex-start; align-items:center">
+                <a class="menuitem" href="{{page.rootpath}}/index.html">Home</a>
+                <a class="menuitem" href="{{page.rootpath}}/guide/introduction.html">Documentation</a>
+                <a class="menuitem" href="{{page.rootpath}}/typedoc.html">Reference</a>
+                <a class="menuitem" href="{{page.rootpath}}/demo/playground.html">Playground</a>
+            </div>
+            <div class="menubar">
+                <!-- <a class="menuitem" href="{{page.rootpath}}/blog/blog.html">Blog</a> -->
+                <span></span>
+            </div>
+        </div>
+        <div class="main-container elastic vbox">
+            {{ content }}
+        </div>
+    </div>
+</body>
+
+</html>

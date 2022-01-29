@@ -1,0 +1,196 @@
+﻿{
+    "wellcomeMessage": "Wellcome to Mimcss Playground!",
+
+    "extraLibs": [{
+            "libName": "mimcss",
+            "url": "/lib/mimcss",
+            "files": [
+                "index.d.ts",
+                "api/CoreTypes.d.ts",
+                "api/CoreAPI.d.ts",
+                "api/NumericTypes.d.ts",
+                "api/NumericAPI.d.ts",
+                "api/ColorTypes.d.ts",
+                "api/ColorAPI.d.ts",
+                "api/CounterTypes.d.ts",
+                "api/FontTypes.d.ts",
+                "api/ShapeTypes.d.ts",
+                "api/ShapeAPI.d.ts",
+                "api/MediaTypes.d.ts",
+                "api/RuleTypes.d.ts",
+                "api/RuleAPI.d.ts",
+                "api/SchedulingTypes.d.ts",
+                "api/SchedulingAPI.d.ts",
+                "api/StyleTypes.d.ts",
+                "api/Stylesets.d.ts",
+                "api/StyleAPI.d.ts"
+            ],
+            "rootPath": "types/mimcss/"
+        },
+
+        {
+            "libName": "mimbl",
+            "url": "/lib/mimbl",
+            "files": [
+                "index.d.ts",
+                "utils/EventSlot.d.ts",
+                "utils/TriggerWatcher.d.ts",
+                "api/UtilAPI.d.ts",
+                "api/HtmlTypes.d.ts",
+                "api/SvgTypes.d.ts",
+                "api/mim.d.ts"
+            ],
+            "rootPath": "types/mimbl/"
+        }
+    ],
+
+    "examples": [
+        { "name": "Templates" },
+
+        {
+            "name": "Basic Template",
+            "path": "examples/basic-template.tsx",
+            "description": "Empty style definition and component classes."
+        },
+
+        { "name": "Basic" },
+
+        {
+            "name": "Hello World!",
+            "path": "examples/hello-world.tsx",
+            "description": "Simple but real example of defining styles."
+        },
+        {
+            "name": "Selectors",
+            "path": "examples/selectors.tsx",
+            "description": "Demonstrates different types of style rule selectors."
+        },
+        {
+            "name": "Numeric Properties",
+            "path": "examples/numeric-properties.tsx",
+            "description": "Demonstrates defining styles that include units of different dimensions."
+        },
+        {
+            "name": "Gradients",
+            "path": "examples/gradients.tsx",
+            "description": "Demonstrates creating CSS gradients."
+        },
+        {
+            "name": "Shapes",
+            "path": "examples/shapes.tsx",
+            "description": "Demonstrates defining clip-path with shape functions."
+        },
+        {
+            "name": "Filters",
+            "path": "examples/filters.tsx",
+            "description": "Demonstrates CSS filter functions."
+        },
+        {
+            "name": "Transforms",
+            "path": "examples/transforms.tsx",
+            "description": "Demonstrates CSS transform functions."
+        },
+        {
+            "name": "Animations",
+            "path": "examples/animations.tsx",
+            "description": "Demonstrates CSS animations."
+        },
+
+        { "name": "Theming" },
+
+        {
+            "name": "Themes",
+            "path": "examples/themes.tsx",
+            "description": "Demonstrates changing themes using style definition inheritance."
+        },
+        {
+            "name": "Two Themes",
+            "path": "examples/two-themes.tsx",
+            "description": "Demonstrates using two themes at the same time."
+        },
+
+        { "name": "Advanced" },
+
+        {
+            "name": "Dynamic CSS Properties",
+            "path": "examples/custom-props-animation.tsx",
+            "description": "Demonstrates defining CSS properties and setting their values dynamically."
+        },
+        {
+            "name": "Offset Animation",
+            "path": "examples/shape-offset-animation.tsx",
+            "description": "Demonstrates moving and rotating shape along a path."
+        },
+        {
+            "name": "Media rules",
+            "path": "examples/media-rules.tsx",
+            "description": "Demonstrates responsve layout using media queries."
+        },
+        {
+            "name": "Scheduling",
+            "path": "examples/scheduling.tsx",
+            "description": "Demonstrates custom scheduler."
+        }
+    ],
+
+    "firstExample": "examples/hello-world.tsx",
+
+    "codeSnippets": [{
+            "category": "Style Rules",
+            "name": "Class Rule",
+            "description": "Defines styleset for CSS class",
+            "template": "{name} = this.$class({\n})\n",
+            "params": [{
+                "id": "name",
+                "name": "Property name",
+                "description": "Name of the property to hold the rule",
+                "isRequired": true
+            }]
+        },
+        {
+            "category": "Style Rules",
+            "name": "ID Rule",
+            "description": "Defines styleset for element ID",
+            "template": "{name} = this.$id({\n})\n",
+            "params": [{
+                "id": "name",
+                "name": "Property name",
+                "description": "Name of the property to hold the rule",
+                "isRequired": true
+            }]
+        },
+        {
+            "category": "Style Rules",
+            "name": "Generic Rule",
+            "description": "Defines styleset for arbitrary CSS selector",
+            "template": "{name} = this.$style( \"{selector}\", {\n})\n",
+            "params": [{
+                    "id": "name",
+                    "name": "Property name",
+                    "description": "Name of the property to hold the rule",
+                    "isRequired": true
+                },
+                {
+                    "id": "selector",
+                    "name": "Rule selector",
+                    "description": "Selector string for the style rule",
+                    "isRequired": false
+                }
+            ]
+        },
+
+        {
+            "category": "Conditional Rules",
+            "name": "Media Rule",
+            "description": "Defines conditional media rule",
+            "template": "{name} = this.$media( {},\n\tclass extends css.StyleDefinition\n\t{\n\t}\n)\n",
+            "params": [{
+                "id": "name",
+                "name": "Property name",
+                "description": "Name of the property to hold the rule",
+                "isRequired": true
+            }]
+        }
+    ]
+
+}
