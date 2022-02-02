@@ -103,7 +103,7 @@ class MyClass extends css.StyleDefinition
 ```
 
 ## Specifying multiple property values
-CSS allows the same property multiple times in a single ruleset, so that the latest valid value wins. It is usually used when there are features that are not yet supported across all browsers. In this case, you would specify the property with the widely supported value first and the less supported value last.For example:
+CSS allows the same property to appear multiple times in a single ruleset, so that the latest valid value wins. It is usually used when there are features that are not yet supported across all browsers. In this case, you would specify the property with the widely supported value first and the less supported value last.For example:
 
 ```css
 .bg
@@ -118,10 +118,9 @@ In Mimcss, rulesets are modeled by plain JavaScript objects and it is not possib
 ```tsx
 class MyClass extends css.StyleDefinition
 {
-    // .isNotImportant { min-width: 20px; }
     bg = this.$class({
         background: {"[]":[
-            beige",
+            "beige",
             css.crossFade( [css.url("yellow.png"), 35], [css.url("green.png"), 65])
         ]}
     })
@@ -133,7 +132,6 @@ Alternatively, Mimcss allows specifying an array of stylesets wherever a single 
 ```tsx
 class MyClass extends css.StyleDefinition
 {
-    // .isNotImportant { min-width: 20px; }
     bg = this.$class([
         {background: "beige"},
         {background: css.crossFade( [css.url("yellow.png"), 35], [css.url("green.png"), 65])}

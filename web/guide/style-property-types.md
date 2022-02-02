@@ -33,6 +33,8 @@ When deciding what type to use for each individual style property, in addition t
 - All properties accept the standard keyword values `initial`, `unset`, `inherit` and `revert`.
 - All properties can accept the value of a custom CSS property using the `var()` CSS function.
 - Number-based properties must support the numeric functions, such as `min()` and `calc()`.
+- All properties can accept the `!important` modifier
+- For all properties, there should be a way to specify their value as a string - kind of an escape hatch for situations where the string value is available as a result of some calculations/manipulations.
 
 ## General approach
 The goal of Mimcss is to boost the developers' productivity by increasing convenience and decreasing the number of errors. These two requirements are somewhat contradictory: the fastest and most convenient way to specify property values is to use strings but it is the most error-prone way too. The least error-prone way is to use the strictest types possible, but this is often inconvenient. Mimcss has to make a certain trade off balancing between the convenience and type strictness and here is the general approach that Mimcss has settled on:
