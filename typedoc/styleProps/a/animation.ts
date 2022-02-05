@@ -1,11 +1,4 @@
-The **animation** shorthand CSS property applies an animation between styles. It is a shorthand for [[animationName]], [[animationDuration]], [[animationTimingFunction]], [[animationDelay]], [[animationIterationCount]], [[animationDirection]], [[animationFillMode]], and [[animationPlayState]].
-
-The values for this property can be either a string or an object of type [[Animation_Single]] or an array of either strings or [[Animation_Single]] objects.
-
-**Example**
-
-```typescript
-import * as css from "mimcss"
+import * as css from "../../../src/index"
 
 class MyStyles extends css.StyleDefinition
 {
@@ -23,11 +16,11 @@ class MyStyles extends css.StyleDefinition
     }})
 
     // Animation name can point to a keyframes rule
-    rotate360 = this.$keframes({
-        "from": { transform: css.rotate(0) }
-        "to": { transform: css.rotate(360) }
-    })
-    cls2 = this.$class({ animation: {
+    rotate360 = this.$keyframes([
+        ["from", { transform: css.rotate(0) }],
+        ["to", { transform: css.rotate(360) }]
+    ])
+    cls3 = this.$class({ animation: {
         name: this.rotate360,
         duration: 2000,
         func: "linear",
@@ -55,7 +48,7 @@ class MyStyles extends css.StyleDefinition
     varFunc = this.$var( "animationTimingFunction", "linear")
     varDelay = this.$var( "animationDelay", 1000)
     varCount = this.$var( "animationIterationCount", "infinite")
-    varDirection = this.$var( "animationDirection", "alternate)
+    varDirection = this.$var( "animationDirection", "alternate")
     cls5 = this.$class({ animation: {
         name: this.varName,
         duration:  this.varDuration,
@@ -65,10 +58,3 @@ class MyStyles extends css.StyleDefinition
         direction:  this.varDirection
     }})
 }
-```
-
-**See Also:**
-- <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation" target="mdn">MDN Page</a>
-- <a href="https://css-tricks.com/almanac/properties/a/animation" target="css-tricks">CSS-Tricks Almanac</a>
-- <a href="https://www.mimcss.com/demo/playground.html?file=animations.tsx" target="playground">Mimcss Playground</a>
-

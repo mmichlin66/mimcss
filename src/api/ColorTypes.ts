@@ -186,7 +186,7 @@ export type CssColorSeparation = number | string | CssPercent;
  */
 export interface ICssColorFunc extends ICssFuncObject
 {
-    fn: "rgb" | "hsl" | "lab" | "lch" | "color-mix" | "color-contrast" | "alpha";
+    fn: "rgb" | "hsl" | "hwb" | "lab" | "lch" | "color-mix" | "color-contrast" | "alpha";
 }
 
 
@@ -296,6 +296,29 @@ export interface IHslFunc extends ICssColorFunc
 
     /** Lightness value */
     l: Extended<CssPercent>;
+
+    /** Alpha channel value */
+    a?: Extended<CssPercent>;
+}
+
+
+
+/**
+ * Represents an invocation of the CSS `hwb()` function. This interface is returned from the
+ * [[hwb]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface IHwbFunc extends ICssColorFunc
+{
+    fn: "hwb";
+
+    /** Hue value */
+    h: Extended<CssAngle>;
+
+    /** Whiteness value */
+    w: Extended<CssPercent>;
+
+    /** Blackness value */
+    b: Extended<CssPercent>;
 
     /** Alpha channel value */
     a?: Extended<CssPercent>;

@@ -1,9 +1,4 @@
-The CSS **align-content** property sets the distribution of space between and around content items along a flexbox's cross-axis or a grid's block axis.
-
-**Example**
-
-```typescript
-import * as css from "mimcss"
+import * as css from "../../../src/index"
 
 class MyStyles extends css.StyleDefinition
 {
@@ -20,9 +15,3 @@ class MyStyles extends css.StyleDefinition
     // Using with global values
     cls4 = this.$class({ alignContent: "initial" })
 }
-```
-
-**See Also:**
-- <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-content" target="mdn">MDN Page</a>
-- <a href="https://css-tricks.com/almanac/properties/a/align-content" target="css-tricks">CSS-Tricks Almanac</a>
-

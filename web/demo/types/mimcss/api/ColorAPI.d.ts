@@ -1,6 +1,6 @@
 import { Extended } from "./CoreTypes";
 import { CssAngle, CssPercent } from "./NumericTypes";
-import { CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorMixBuilder, IHslFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc } from "./ColorTypes";
+import { CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc } from "./ColorTypes";
 /**
  * Object whose property names are the well-known Web color names while values correspond to the
  * hexadecimal representation of the RGB separations (without an alpha mask). The properties of
@@ -72,6 +72,34 @@ export declare const rgb: (r: Extended<CssColorSeparation>, g: Extended<CssColor
  */
 export declare const hsl: (h: Extended<CssAngle>, s: Extended<CssPercent>, l: Extended<CssPercent>, a?: Extended<CssPercent> | undefined) => IHslFunc;
 /**
+ * Converts the color specified as hue-whiteness-blackness components and an optional alpha
+ * mask to a CSS color representation. This method should be used when defining CSS color
+ * values in styleset properties.
+ *
+ * The Hue component is treated as the CSS `<angle>` type. Numbers are considered degrees.
+ *
+ * The Whiteness and Blackness components are treated as percentages:
+ *   - The sign is ignored; that is, only the absolute value is considered.
+ *   - Floating number 0 to 1 inclusive are multiplied by 100 and treated as percentage.
+ *   - Integer or floating number 1 to 100 are treated as percentage. Floating numbers will be
+ *     rounded. Numbers beyond this range will be clamped to 100.
+ *
+ * The alpha mask can be one of the following:
+ *   - Floating number 0 to 1 inclusive.
+ *   - Integer or floating number 1 to 100, which is divided by 100. Floating numbers will be
+ *     rounded. Numbers beyond this range will be clamped.
+ *   - The sign of alpha is ignored; that is, only the absolute value is considered.
+ *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl()
+ *
+ * @param h Hue component as an angle value.
+ * @param w Whiteness coponent as a percentage value.
+ * @param b Blackness component as a percentage value.
+ * @param a Optional alpha mask as a percentage value.
+ * @return The `IHwbFunc` object representing the invocation of the `hwb()` CSS function
+ */
+export declare const hwb: (h: Extended<CssAngle>, w: Extended<CssPercent>, b: Extended<CssPercent>, a?: Extended<CssPercent> | undefined) => IHwbFunc;
+/**
  * Converts the color specified as L\*a\*b\* components and an optional alpha
  * mask to a CSS color representation. This method should be used when defining CSS color
  * values in styleset properties.
@@ -113,7 +141,7 @@ export declare const colorContrast: (c: Extended<CssColor>, ...vs: Extended<CssC
 /**
  * Implements the `color-mix()` CSS property.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-nix()
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix()
  *
  * **Examples**
  *

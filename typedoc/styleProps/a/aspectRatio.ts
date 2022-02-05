@@ -1,9 +1,4 @@
-The **aspect-ratio** CSS property sets a preferred aspect ratio for the box, which will be used in the calculation of auto sizes and some other layout functions.
-
-**Example**
-
-```typescript
-import * as css from "mimcss"
+import * as css from "../../../src/index"
 
 class MyStyles extends css.StyleDefinition
 {
@@ -14,7 +9,7 @@ class MyStyles extends css.StyleDefinition
     cls2 = this.$class({ aspectRatio: css.ratio( 16, 9)})
 
     // using a single number
-    cls4 = this.$media({ aspectRatio: 1.33 }, ...)
+    cls4 = this.$media({ aspectRatio: 1.33 }, class extends css.StyleDefinition {})
 
     // Using custom property
     varRatio = this.$var( "aspectRatio", "185/100")
@@ -26,9 +21,3 @@ class MyStyles extends css.StyleDefinition
     // Using with global values
     cls7 = this.$class({ aspectRatio: "initial" })
 }
-```
-
-**See Also:**
-- <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio" target="mdn">MDN Page</a>
-- <a href="https://css-tricks.com/almanac/properties/a/aspect-ratio" target="css-tricks">CSS-Tricks Almanac</a>
-
