@@ -374,9 +374,20 @@ export interface IStyleset
     backgroundClip?: st.BackgroundClip_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-color
+     * The **background-color** CSS property sets the background color of an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#backgroundColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundColor.ts]]
+     * ```
      */
-    backgroundColor?: CssColor;
+     backgroundColor?: CssColor;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
@@ -444,7 +455,22 @@ export interface IStyleset
     borderBlock?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-color
+     * The **border-block-color** CSS property defines the color of the logical block borders
+     * of an element, which maps to a physical border color depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]] and
+     * [[borderBottomColor]], or [[borderRightColor]] and [[borderLeftColor]] property depending
+     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockColor.ts]]
+     * ```
      */
     borderBlockColor?: OneOrPair<CssColor>;
 
@@ -454,7 +480,22 @@ export interface IStyleset
     borderBlockEnd?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-color
+     * The **border-block-end-color** CSS property defines the color of the logical block-end border
+     * of an element, which maps to a physical border color depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
+     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-end-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockEndColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockEndColor.ts]]
+     * ```
      */
     borderBlockEndColor?: CssColor;
 
@@ -474,7 +515,22 @@ export interface IStyleset
     borderBlockStart?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-color
+     * The **border-block-start-color** CSS property defines the color of the logical block-end border
+     * of an element, which maps to a physical border color depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
+     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-start-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockStartColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockStartColor.ts]]
+     * ```
      */
     borderBlockStartColor?: CssColor;
 
@@ -504,7 +560,19 @@ export interface IStyleset
     borderBottom?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-cottom-color
+     * The **border-bottom-color** CSS property sets the color of an element's bottom border. It
+     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderBottom]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-bottom-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBottomColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBottomColor.ts]]
+     * ```
      */
     borderBottomColor?: CssColor;
 
@@ -534,7 +602,18 @@ export interface IStyleset
     borderCollapse?: st.BorderColapse_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-color
+     * The **border-color** shorthand CSS property sets the color of an element's border. It can
+     * specify 1, 2, 3 or 4 color values.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderColor.ts]]
+     * ```
      */
     borderColor?: st.BorderColor_StyleType;
 
@@ -584,7 +663,22 @@ export interface IStyleset
     borderInline?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color
+     * The **border-inline-color** CSS property defines the color of the logical block borders
+     * of an element, which maps to a physical border color depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]] and
+     * [[borderBottomColor]], or [[borderRightColor]] and [[borderLeftColor]] property depending
+     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineColor.ts]]
+     * ```
      */
     borderInlineColor?: OneOrPair<CssColor>;
 
@@ -594,7 +688,22 @@ export interface IStyleset
     borderInlineEnd?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-color
+     * The **border-inline-end-color** CSS property defines the color of the logical inline-end border
+     * of an element, which maps to a physical border color depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
+     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-end-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineEndColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineEndColor.ts]]
+     * ```
      */
     borderInlineEndColor?: CssColor;
 
@@ -614,7 +723,22 @@ export interface IStyleset
     borderInlineStart?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-color
+     * The **border-inline-start-color** CSS property defines the color of the logical inline-start border
+     * of an element, which maps to a physical border color depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
+     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-start-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineStartColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineStartColor.ts]]
+     * ```
      */
     borderInlineStartColor?: CssColor;
 
@@ -644,7 +768,19 @@ export interface IStyleset
     borderLeft?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-color
+     * The **border-left-color** CSS property sets the color of an element's left border. It
+     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderLeft]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-left-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderLeftColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderLeftColor.ts]]
+     * ```
      */
     borderLeftColor?: CssColor;
 
@@ -669,7 +805,19 @@ export interface IStyleset
     borderRight?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-color
+     * The **border-right-color** CSS property sets the color of an element's right border. It
+     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderLeft]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-right-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderRightColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderRightColor.ts]]
+     * ```
      */
     borderRightColor?: CssColor;
 
@@ -709,7 +857,19 @@ export interface IStyleset
     borderTop?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-color
+     * The **border-top-color** CSS property sets the color of an element's top border. It
+     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderLeft]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-top-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderTopColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderTopColor.ts]]
+     * ```
      */
     borderTopColor?: CssColor;
 
@@ -784,7 +944,25 @@ export interface IStyleset
     captionSide?: st.CaptionSide_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color
+     * The **caret-color** CSS property sets the color of the insertion caret, the visible marker
+     * where the next character typed will be inserted. This is sometimes referred to as the text
+     * input cursor. The caret appears in elements such as `<input>` or those with the
+     * `contenteditable` attribute. The caret is typically a thin vertical line that flashes to help
+     * make it more noticeable. By default, it is black, but its color can be altered with this
+     * property.
+     *
+     * The property allows the `"auto"` keyword value in addition to standard [[CssColor]] type.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/caret-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#caretColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/c/caretColor.ts]]
+     * ```
      */
     caretColor?: st.CaretColor_StyleType;
 
@@ -810,7 +988,21 @@ export interface IStyleset
     clipRule?: st.ClipRule_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color
+     * The **color** CSS property sets the foreground color value of an element's text and text
+     * decorations, and sets the `<currentcolor>` value. `currentcolor` may be used as an
+     * indirect value on other properties and is the default for other color properties, such
+     * as [[borderColor]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#color)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/c/color.ts]]
+     * ```
      */
     color?: CssColor;
 
@@ -855,7 +1047,19 @@ export interface IStyleset
     columnRule?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-color
+     * The **column-rule-color** CSS property sets the color of the line drawn between columns
+     * in a multi-column layout.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/column-rule-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#columnRuleColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/c/columnRuleColor.ts]]
+     * ```
      */
     columnRuleColor?: CssColor;
 
@@ -1000,7 +1204,18 @@ export interface IStyleset
     float?: st.Float_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/flood-color
+     * The **flood-color** SVG attribute indicates what color to use to flood the current filter
+     * primitive subregion. As a presentation attribute, **flood-color** can be used as a CSS property.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#floodColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/f/floodColor.ts]]
+     * ```
      */
     floodColor?: CssColor;
 
@@ -1625,7 +1840,18 @@ export interface IStyleset
     outline?: st.Border_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color
+     * The **outline-color** CSS property sets the color of an element's outline.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/o/outline-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#outlineColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/o/outlineColor.ts]]
+     * ```
      */
     outlineColor?: CssColor;
 
@@ -2030,7 +2256,18 @@ export interface IStyleset
     shapeRendering?: st.ShapeRendering_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/stop-color
+     * The **stop-color** attribute indicates what color to use at a gradient stop. As a
+     * presentation attribute, **stop-color** can be used as a CSS property.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/stop-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#stopColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/s/stopColor.ts]]
+     * ```
      */
     stopColor?: CssColor;
 
@@ -2116,7 +2353,21 @@ export interface IStyleset
     textDecoration?: st.TextDecoration_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-color
+     * The **text-decoration-color** CSS property sets the color of decorations added to text by
+     * text-decoration-line. The color applies to decorations, such as underlines, overlines,
+     * strikethroughs, and wavy lines like those used to mark misspellings, in the scope of the
+     * property's value.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-decoration-color)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textDecorationColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/t/textDecorationColor.ts]]
+     * ```
      */
     textDecorationColor?: CssColor;
 
@@ -2146,7 +2397,19 @@ export interface IStyleset
     textEmphasis?: st.TextEmphasis_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-color
+     * The **text-emphasis-color** CSS property sets the color of emphasis marks. This value can
+     * also be set using the [[textEmphasis]] shorthand.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-emphasis)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textEmphasisColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/t/textEmphasisColor.ts]]
+     * ```
      */
     textEmphasisColor?: CssColor;
 
@@ -2161,7 +2424,19 @@ export interface IStyleset
     textEmphasisStyle?: st.TextEmphasisStyle_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/text-fill-color
+     * The **text-fill-color** CSS property specifies the fill color of characters of text.
+     * If this property is not set, the value of the [[color]] property is used.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-fill-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/adding-stroke-to-web-text/)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textFillColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/t/textFillColor.ts]]
+     * ```
      */
     textFillColor?: CssColor;
 
@@ -2216,7 +2491,19 @@ export interface IStyleset
     textStroke: st.TextStroke_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/text-stroke-color
+     * The **text-stroke-color** CSS property specifies the stroke color of characters of text.
+     * If this property is not set, the value of the [[color]] property is used.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke-color)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-stroke/)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textStrokeColor)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/t/textStrokeColor.ts]]
+     * ```
      */
     textStrokeColor?: CssColor;
 
