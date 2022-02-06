@@ -2,7 +2,7 @@ import * as css from "../../../src/index"
 
 class MyStyles extends css.StyleDefinition
 {
-    // Using floating point number to indicate seconds: 5s
+    // Using floating point number to indicate seconds: 0.5s
     cls1 = this.$class({ animationDelay: 0.5 })
 
     // Using integer number to indicate milliseconds: 300s
