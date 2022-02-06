@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ accentColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "accentColor", "blue")
-    cls9 = this.$class({ accentColor: this.defaultColor })
+    customVar = this.$var( "accentColor", "blue")
+    cls9 = this.$class({ accentColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ accentColor: {"!": "brown"} })

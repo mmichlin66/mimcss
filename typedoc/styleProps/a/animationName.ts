@@ -14,9 +14,9 @@ class MyStyles extends css.StyleDefinition
     cls2 = this.$class({ animationName: "slidein" })
 
     // Using custom property
-    varName = this.$var( "animationName", this.move)
-    cls3 = this.$class({ animationName: this.varName })
+    customVar = this.$var( "animationName", this.move)
+    cls3 = this.$class({ animationName: this.customVar })
 
     // Multiple values
-    cls4 = this.$class({ animationName: [this.move, "slidein", this.varName] })
+    cls4 = this.$class({ animationName: [this.move, "slidein", this.customVar] })
 }

@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ textStrokeColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "textStrokeColor", "blue")
-    cls9 = this.$class({ textStrokeColor: this.defaultColor })
+    customVar = this.$var( "textStrokeColor", "blue")
+    cls9 = this.$class({ textStrokeColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ textStrokeColor: {"!": "brown"} })

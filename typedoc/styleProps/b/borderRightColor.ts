@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ borderRightColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "borderRightColor", "blue")
-    cls9 = this.$class({ borderRightColor: this.defaultColor })
+    customVar = this.$var( "borderRightColor", "blue")
+    cls9 = this.$class({ borderRightColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ borderRightColor: {"!": "brown"} })

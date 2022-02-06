@@ -6,8 +6,8 @@ class MyStyles extends css.StyleDefinition
     cls1 = this.$class({ alignContent: "stretch" })
 
     // Using custom property
-    defaultAlignContent = this.$var( "alignContent", "first baseline")
-    cls2 = this.$class({ alignContent: this.defaultAlignContent })
+    customVar = this.$var( "alignContent", "first baseline")
+    cls2 = this.$class({ alignContent: this.customVar })
 
     // Using with "!important" flag
     cls3 = this.$class({ alignContent: {"!": "safe center"} })

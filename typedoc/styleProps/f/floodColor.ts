@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ floodColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "floodColor", "blue")
-    cls9 = this.$class({ floodColor: this.defaultColor })
+    customVar = this.$var( "floodColor", "blue")
+    cls9 = this.$class({ floodColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ floodColor: {"!": "brown"} })

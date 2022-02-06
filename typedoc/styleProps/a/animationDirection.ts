@@ -6,8 +6,8 @@ class MyStyles extends css.StyleDefinition
     cls1 = this.$class({ animationDirection: "reverse" })
 
     // Using custom property
-    varDirection = this.$var( "animationDirection", "normal")
-    cls2 = this.$class({ animationDirection: this.varDirection })
+    customVar = this.$var( "animationDirection", "normal")
+    cls2 = this.$class({ animationDirection: this.customVar })
 
     // Using with "!important" flag
     cls3 = this.$class({ animationDirection: {"!": "alternate"} })
@@ -16,5 +16,5 @@ class MyStyles extends css.StyleDefinition
     cls4 = this.$class({ animationDirection: "initial" })
 
     // Multiple values
-    cls5 = this.$class({ animationDirection: ["normal", "alternate", this.varDirection] })
+    cls5 = this.$class({ animationDirection: ["normal", "alternate", this.customVar] })
 }

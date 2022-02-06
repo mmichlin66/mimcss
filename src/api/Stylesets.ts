@@ -309,7 +309,7 @@ export interface IStyleset
      * In Mimcss, the **appearance** property has the type of `string` and thus accepts any string
      * value. Although the latest standard only lists several string literals as possible values,
      * the browser vendors used to support numerous other string literals. In order to allow all
-     * thee values to be specified, Mimcss decided to use the `string` type. Note, however, that
+     * these values to be specified, Mimcss decided to use the `string` type. Note, however, that
      * this disables any compile-time checking so you should be extra cautious when assigning
      * values to this property.
      *
@@ -344,12 +344,38 @@ export interface IStyleset
     aspectRatio?: st.AspectRatio_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
+     * The **backdrop-filter** CSS property lets you apply graphical effects such as blurring or
+     * color shifting to the area behind an element. Because it applies to everything behind the
+     * element, to see the effect you must make the element or its background at least partially
+     * transparent.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/backdrop-filter)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#backdropFilter)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backdropFilter.ts]]
+     * ```
      */
     backdropFilter?: st.Filter_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
+     * The **backface-visibility** CSS property sets whether the back face of an element is
+     * visible when turned towards the user.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/backface-visibility)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#backfaceVisibility)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backfaceVisibility.ts]]
+     * ```
      */
     backfaceVisibility?: st.BackfaceVisibilityMode_StyleType;
 
@@ -387,7 +413,7 @@ export interface IStyleset
      * [[include: styleProps/b/backgroundColor.ts]]
      * ```
      */
-     backgroundColor?: CssColor;
+    backgroundColor?: CssColor;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
@@ -1159,7 +1185,21 @@ export interface IStyleset
     fillRule?: FillRule;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
+     * The **filter** CSS property applies graphical effects like blur or color shift to an
+     * element. Filters are commonly used to adjust the rendering of images, backgrounds, and
+     * borders. Included in the CSS standard are several functions that achieve predefined effects.
+     * You can also reference an SVG filter with a URL to an SVG filter element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/filter)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/f/filter)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#filter)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/f/filter.ts]]
+     * ```
      */
     filter?: st.Filter_StyleType;
 

@@ -15,13 +15,13 @@ class MyStyles extends css.StyleDefinition
     cls4 = this.$class({ animationDelay: css.ms(-500) })
 
     // Using custom property
-    varDelay = this.$var( "animationDelay", 1000)
-    cls5 = this.$class({ animationDelay: this.varDelay })
+    customVar = this.$var( "animationDelay", 1000)
+    cls5 = this.$class({ animationDelay: this.customVar })
 
     // Using min() CSS function
-    cls6 = this.$class({ animationDelay: css.Time.min( 2000, this.varDelay) })
+    cls6 = this.$class({ animationDelay: css.Time.min( 2000, this.customVar) })
 
     // Multiple values
-    cls7 = this.$class({ animationDelay: [0.5, -300, this.varDelay] })
+    cls7 = this.$class({ animationDelay: [0.5, -300, this.customVar] })
 }
 

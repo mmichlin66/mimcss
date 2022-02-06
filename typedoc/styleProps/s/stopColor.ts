@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ stopColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "stopColor", "blue")
-    cls9 = this.$class({ stopColor: this.defaultColor })
+    customVar = this.$var( "stopColor", "blue")
+    cls9 = this.$class({ stopColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ stopColor: {"!": "brown"} })

@@ -6,8 +6,8 @@ class MyStyles extends css.StyleDefinition
     cls1 = this.$class({ appearance: "none" })
 
     // Using custom property
-    varAppearance = this.$var( "appearance", "auto")
-    cls2 = this.$class({ appearance: this.varAppearance })
+    customVar = this.$var( "appearance", "auto")
+    cls2 = this.$class({ appearance: this.customVar })
 
     // Using with "!important" flag
     cls3 = this.$class({ appearance: {"!": "textfield"} })

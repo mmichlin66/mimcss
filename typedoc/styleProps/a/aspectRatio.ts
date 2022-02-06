@@ -12,8 +12,8 @@ class MyStyles extends css.StyleDefinition
     cls4 = this.$media({ aspectRatio: 1.33 }, class extends css.StyleDefinition {})
 
     // Using custom property
-    varRatio = this.$var( "aspectRatio", "185/100")
-    cls5 = this.$class({ aspectRatio: this.varRatio })
+    customVar = this.$var( "aspectRatio", "185/100")
+    cls5 = this.$class({ aspectRatio: this.customVar })
 
     // Using with "!important" flag
     cls6 = this.$class({ aspectRatio: {"!": 1} })

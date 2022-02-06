@@ -6,8 +6,8 @@ class MyStyles extends css.StyleDefinition
     cls1 = this.$class({ alignmentBaseline: "middle" })
 
     // Using custom property
-    defaultAlignmentBaseline = this.$var( "alignmentBaseline", "mathematical")
-    cls2 = this.$class({ alignmentBaseline: this.defaultAlignmentBaseline })
+    customVar = this.$var( "alignmentBaseline", "mathematical")
+    cls2 = this.$class({ alignmentBaseline: this.customVar })
 
     // Using with "!important" flag
     cls3 = this.$class({ alignmentBaseline: {"!": "after-edge"} })

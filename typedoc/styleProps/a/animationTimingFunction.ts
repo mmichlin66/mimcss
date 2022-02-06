@@ -12,12 +12,12 @@ class MyStyles extends css.StyleDefinition
     cls3 = this.$class({ animationTimingFunction: css.cubicBezier(0.1, 0.7, 1.0, 0.1) })
 
     // Using custom property
-    varFunc = this.$var( "animationTimingFunction", css.steps(6, "start"))
-    cls4 = this.$class({ animationTimingFunction: this.varFunc })
+    customVar = this.$var( "animationTimingFunction", css.steps(6, "start"))
+    cls4 = this.$class({ animationTimingFunction: this.customVar })
 
     // Using with global values
     cls5 = this.$class({ animationTimingFunction: "initial" })
 
     // Multiple values
-    cls6 = this.$class({ animationTimingFunction: ["ease-in-out", css.cubicBezier(0.1, 0.7, 1.0, 0.1), this.varFunc] })
+    cls6 = this.$class({ animationTimingFunction: ["ease-in-out", css.cubicBezier(0.1, 0.7, 1.0, 0.1), this.customVar] })
 }

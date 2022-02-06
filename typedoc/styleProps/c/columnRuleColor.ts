@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ columnRuleColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "columnRuleColor", "blue")
-    cls9 = this.$class({ columnRuleColor: this.defaultColor })
+    customVar = this.$var( "columnRuleColor", "blue")
+    cls9 = this.$class({ columnRuleColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ columnRuleColor: {"!": "brown"} })

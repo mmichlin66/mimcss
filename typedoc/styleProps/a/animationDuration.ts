@@ -15,12 +15,12 @@ class MyStyles extends css.StyleDefinition
     cls4 = this.$class({ animationDuration: css.ms(-500) })
 
     // Using custom property
-    varDuration = this.$var( "animationDuration", 1000)
-    cls5 = this.$class({ animationDuration: this.varDuration })
+    customVar = this.$var( "animationDuration", 1000)
+    cls5 = this.$class({ animationDuration: this.customVar })
 
     // Using min() CSS function
-    cls6 = this.$class({ animationDuration: css.Time.min( 2000, this.varDuration) })
+    cls6 = this.$class({ animationDuration: css.Time.min( 2000, this.customVar) })
 
     // Multiple values
-    cls7 = this.$class({ animationDuration: [0.5, -300, this.varDuration] })
+    cls7 = this.$class({ animationDuration: [0.5, -300, this.customVar] })
 }

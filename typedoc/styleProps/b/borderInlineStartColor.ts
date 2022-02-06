@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ borderInlineStartColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "borderInlineStartColor", "blue")
-    cls9 = this.$class({ borderInlineStartColor: this.defaultColor })
+    customVar = this.$var( "borderInlineStartColor", "blue")
+    cls9 = this.$class({ borderInlineStartColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ borderInlineStartColor: {"!": "brown"} })

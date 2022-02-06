@@ -30,8 +30,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ caretColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "caretColor", "blue")
-    cls9 = this.$class({ caretColor: this.defaultColor })
+    customVar = this.$var( "caretColor", "blue")
+    cls9 = this.$class({ caretColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ caretColor: {"!": "brown"} })

@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ outlineColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "outlineColor", "blue")
-    cls9 = this.$class({ outlineColor: this.defaultColor })
+    customVar = this.$var( "outlineColor", "blue")
+    cls9 = this.$class({ outlineColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ outlineColor: {"!": "brown"} })

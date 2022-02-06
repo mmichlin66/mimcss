@@ -27,8 +27,8 @@ class MyStyles extends css.StyleDefinition
     cls8 = this.$class({ backgroundColor: css.alpha( "orange", 0.75) })
 
     // Using custom property
-    defaultColor = this.$var( "backgroundColor", "blue")
-    cls9 = this.$class({ backgroundColor: this.defaultColor })
+    customVar = this.$var( "backgroundColor", "blue")
+    cls9 = this.$class({ backgroundColor: this.customVar })
 
     // Specifying "!important" flag
     cls10 = this.$class({ backgroundColor: {"!": "brown"} })

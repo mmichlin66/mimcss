@@ -762,7 +762,7 @@ export type EmptyCells_StyleType = "show" | "hide";
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
  *
  */
-export type Filter_StyleType = OneOrMany<IUrlFunc | FilterFuncs>;
+export type Filter_StyleType = "none" | OneOrMany<IUrlFunc | FilterFuncs>;
 
 
 
