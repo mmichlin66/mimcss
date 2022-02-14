@@ -146,7 +146,7 @@ export type AspectRatio_StyleType = CssAspectRatio | "auto";
 /**
  * Keywords used for the [[backfaceVisibilityMode]] style property
  */
-export type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
+export type BackfaceVisibilityModeKeywords = "visible" | "hidden";
 
 
 
@@ -160,9 +160,9 @@ export type Background_Single = string | CssColor | CssImage |
         position?: Extended<CssPosition>,
         size?: Extended<BackgroundSize>,
         repeat?: Extended<BackgroundRepeat>,
-        attachment?: Extended<BackgroundAttachment>,
-        origin?: Extended<BackgroundOrigin>,
-        clip?: Extended<BackgroundClip>,
+        attachment?: Extended<BackgroundAttachmentKeywords>,
+        origin?: Extended<BackgroundOriginKeywords>,
+        clip?: Extended<BackgroundClipKeywords>,
     };
 
 /**
@@ -175,12 +175,7 @@ export type Background_StyleType = OneOrMany<Background_Single>;
 /**
  * Keywords used for the [[backgroundAttachment]] style property
  */
-export type BackgroundAttachment = "scroll" | "fixed" | "local";
-
-/**
- * Type for [[backgroundAttachment]] style property
- */
-export type BackgroundAttachment_StyleType = OneOrMany<BackgroundAttachment>;
+export type BackgroundAttachmentKeywords = "scroll" | "fixed" | "local";
 
 
 
@@ -198,12 +193,7 @@ export type BlendModeKeywords = "normal" | "multiply" | "screen" | "overlay" | "
  * Keywords used for the [[backgroundClip]] property
  *
  */
-export type BackgroundClip = "border-box" | "padding-box" | "content-box" | "text";
-
-/**
- * Type for [[backgroundClip]] style property
- */
-export type BackgroundClip_StyleType = OneOrMany<BackgroundClip>;
+export type BackgroundClipKeywords = "border-box" | "padding-box" | "content-box" | "text";
 
 
 
@@ -218,12 +208,7 @@ export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
  * Keywords used for the [[backgroundOrigin]] property
  *
  */
-export type BackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text";
-
-/**
- * Type for [[backgroundOrigin]] style property
- */
-export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin>;
+export type BackgroundOriginKeywords = "border-box" | "padding-box" | "content-box" | "text";
 
 
 
@@ -233,10 +218,15 @@ export type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin>;
 export type BackgroundRepeatKeywords = "repeat" | "space" | "round" | "no-repeat";
 
 /**
+ * Keywords for axis-specific background repeat
+ */
+export type BackgroundRepeatAxisKeywords = "repeat-x" | "repeat-y";
+
+/**
  * Type for single background repeat
  *
  */
-export type BackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeywords>;
+export type BackgroundRepeat = BackgroundRepeatAxisKeywords | OneOrPair<BackgroundRepeatKeywords>;
 
 /**
  * Type for [[backgroundRepeat]] style property
@@ -263,7 +253,7 @@ export type BackgroundSize = "cover" | "contain" | OneOrPair<CssLengthOrAuto>;
  * Thus [100,200] will be interpreted as "100px, 200px" and not "100px 200px"; that is, it will
  * define two sizes each with a width instead of one size with both width and height. If you need
  * to specify both width and height you must use array within array - even for a single size:
- * [[100,200]] wll be interpreted as "100px 200px".
+ * [[100,200]] will be interpreted as "100px 200px".
  *
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
  *

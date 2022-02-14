@@ -406,11 +406,14 @@ export type CssPositionItem = HorizontalPositionKeyword | VerticalPositionKeywor
 /** Type describing `<position>` CSS type consisting of 1 to 4 values using touples */
 export type CssPositionTuple =
     [Extended<HorizontalPosition>, Extended<VerticalPosition>] |
+    [Extended<HorizontalPosition>, Extended<VerticalPositionKeyword>, Extended<CssLength>] |
+    [Extended<HorizontalPositionKeyword>,  Extended<CssLength>, Extended<VerticalPosition>] |
+    [Extended<HorizontalPositionKeyword>, Extended<CssLength>, Extended<VerticalPositionKeyword>, Extended<CssLength>] |
+
     [Extended<VerticalPosition>, Extended<HorizontalPosition>] |
-    [Extended<HorizontalPositionKeyword>, Extended<VerticalPositionKeyword>, Extended<CssLength>] |
-    [Extended<HorizontalPositionKeyword>, Extended<CssLength>, Extended<VerticalPositionKeyword>, Extended<CssLength>?] |
-    [Extended<VerticalPositionKeyword>, Extended<HorizontalPositionKeyword>, Extended<CssLength>] |
-    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPositionKeyword>, Extended<CssLength>?];
+    [Extended<VerticalPosition>, Extended<HorizontalPositionKeyword>, Extended<CssLength>] |
+    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPosition>] |
+    [Extended<VerticalPositionKeyword>, Extended<CssLength>, Extended<HorizontalPositionKeyword>, Extended<CssLength>];
 
 /** Type describing `<position>` CSS type consisting of up to 4 values */
 export type CssPosition = CssPositionItem | CssPositionTuple;

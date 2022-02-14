@@ -4,7 +4,7 @@ import {
     CssFrequency, CssPosition, LengthUnits, PercentUnits, AngleUnits, TimeUnits,
     ResolutionUnits, FrequencyUnits, CssNumber, CssPercent, CssRadius, BorderRadius
 } from "../api/NumericTypes";
-import {a2s, NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
+import {NumberToStringFunc, tag2s, v2s, wkf, WKF} from "./Utils";
 
 
 
