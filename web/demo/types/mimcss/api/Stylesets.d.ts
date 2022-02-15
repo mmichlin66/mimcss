@@ -18,7 +18,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/accent-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/accent-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#accent-color)
      *
      * **Usage in Mimcss:**
      *
@@ -34,7 +33,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/align-content)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/align-content)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#alignContent)
      *
      * **Usage in Mimcss:**
      *
@@ -51,7 +49,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/align-items)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/align-items)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#alignItems)
      *
      * **Usage in Mimcss:**
      *
@@ -67,7 +64,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/align-self)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/align-self)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#alignSelf)
      *
      * **Usage in Mimcss:**
      *
@@ -85,7 +81,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/alignment-baseline)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#alignmentBaseline)
      *
      * **Usage in Mimcss:**
      *
@@ -116,7 +111,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animation)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -137,7 +131,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-delay)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationDelay)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -154,7 +147,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationDirection)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -174,7 +166,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-duration)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationDuration)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -191,7 +182,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationFillMode)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -211,7 +201,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationIterationCount)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -231,7 +220,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-name)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationName)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -247,7 +235,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationPlayState)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -264,7 +251,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timing-function)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/animation)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#animationTimingFunction)
      * - [Mimcss Playground](https://www.mimcss.com/demo/playground.html?file=animations.tsx)
      *
      * **Usage in Mimcss:**
@@ -281,14 +267,13 @@ export interface IStyleset {
      * In Mimcss, the **appearance** property has the type of `string` and thus accepts any string
      * value. Although the latest standard only lists several string literals as possible values,
      * the browser vendors used to support numerous other string literals. In order to allow all
-     * thee values to be specified, Mimcss decided to use the `string` type. Note, however, that
+     * these values to be specified, Mimcss decided to use the `string` type. Note, however, that
      * this disables any compile-time checking so you should be extra cautious when assigning
      * values to this property.
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/appearance)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/appearance)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#appearance)
      *
      * **Usage in Mimcss:**
      *
@@ -304,7 +289,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/a/aspect-ratio)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#aspectRatio)
      *
      * **Usage in Mimcss:**
      *
@@ -314,36 +298,110 @@ export interface IStyleset {
      */
     aspectRatio?: st.AspectRatio_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
+     * The **backdrop-filter** CSS property lets you apply graphical effects such as blurring or
+     * color shifting to the area behind an element. Because it applies to everything behind the
+     * element, to see the effect you must make the element or its background at least partially
+     * transparent.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/backdrop-filter)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backdropFilter.ts]]
+     * ```
      */
     backdropFilter?: st.Filter_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
+     * The **backface-visibility** CSS property sets whether the back face of an element is
+     * visible when turned towards the user.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/backface-visibility)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backfaceVisibility.ts]]
+     * ```
      */
-    backfaceVisibility?: st.BackfaceVisibilityMode_StyleType;
+    backfaceVisibility?: st.BackfaceVisibilityModeKeywords;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background
+     * The **background** shorthand CSS property sets all background style properties at once,
+     * such as color, image, origin and size, or repeat method.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background)
+     *
+     * **Usage in Mimcss:**
+     *
+     * In Mimcss, the `background` property can be specified in one of the following ways:
+     * - a string value - note that you are responsible to provide correct value.
+     * - a color value
+     * - an image value
+     * - an object with fields for longhand properties
+     * - an array of the above types
+     *
+     * ```typescript
+     * [[include: styleProps/b/background.ts]]
+     * ```
      */
     background?: st.Background_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
+     * The **background-attachment** CSS property sets whether a background image's position is
+     * fixed within the viewport, or scrolls with its containing block.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-attachment)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundAttachment.ts]]
+     * ```
      */
-    backgroundAttachment?: st.BackgroundAttachment_StyleType;
+    backgroundAttachment?: OneOrMany<st.BackgroundAttachmentKeywords>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode
+     * The **background-blend-mode** CSS property sets how an element's background images should
+     * blend with each other and with the element's background color.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-blend-mode)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundBlendMode.ts]]
+     * ```
      */
     backgroundBlendMode?: OneOrMany<st.BlendModeKeywords>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip
+     * The **background-clip** CSS property sets whether an element's background extends underneath
+     * its border box, padding box, or content box.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-clip)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundClip.ts]]
+     * ```
      */
-    backgroundClip?: st.BackgroundClip_StyleType;
+    backgroundClip?: OneOrMany<st.BackgroundClipKeywords>;
     /**
      * The **background-color** CSS property sets the background color of an element.
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#backgroundColor)
      *
      * **Usage in Mimcss:**
      *
@@ -353,39 +411,141 @@ export interface IStyleset {
      */
     backgroundColor?: CssColor;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
+     * The **background-image** CSS property sets one or more background images on an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-image)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-image)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundImage.ts]]
+     * ```
      */
     backgroundImage?: st.BackgroundImage_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
+     * The **background-origin** CSS property sets the background's origin: from the border start,
+     * inside the border, or inside the padding.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-origin)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundOrigin.ts]]
+     * ```
      */
-    backgroundOrigin?: st.BackgroundOrigin_StyleType;
+    backgroundOrigin?: OneOrMany<st.BackgroundOriginKeywords>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
+     * The **background-position** CSS property sets the initial position for each background
+     * image. The position is relative to the position layer set by [[backgroundOrigin]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-position)
+     *
+     * **Usage in Mimcss:**
+     *
+     * In Mimcss, the `backgroundPosition` property can be set with one of the following values:
+     * - As a single keyword "left", "right", "top", "bottom" or "center".
+     * - As a single number specifying either length or percentage of the X coordinate.
+     * - As a tuple with 2 to 4 mixed keywords and numbers.
+     * - As an array of the above tuples. Each item in this array will apply to one image.
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundPosition.ts]]
+     * ```
      */
     backgroundPosition?: CssMultiPosition;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position-x
+     * The **background-position-x** CSS property sets the initial horizontal position for each
+     * background image. The position is relative to the position layer set by [[backgroundOrigin]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position-x)
+     *
+     * **Usage in Mimcss:**
+     *
+     * In Mimcss, the `backgroundPositionX` property can be set with one of the following values:
+     * - As a single keyword "left", "right" or "center".
+     * - As a single number specifying either length or percentage of the X coordinate.
+     * - As a tuple with a keyword and a number.
+     * - As an array of the above tuples. Each item in this array will apply to one image.
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundPositionX.ts]]
+     * ```
      */
     backgroundPositionX?: CssMultiPositionX;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position-y
+     * The **background-position-y** CSS property sets the initial vertical position for each
+     * background image. The position is relative to the position layer set by [[backgroundOrigin]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position-y)
+     *
+     * **Usage in Mimcss:**
+     *
+     * In Mimcss, the `backgroundPositionY` property can be set with one of the following values:
+     * - As a single keyword "top", "bottom" or "center".
+     * - As a single number specifying either length or percentage of the Y coordinate.
+     * - As a tuple with a keyword and a number.
+     * - As an array of the above tuples. Each item in this array will apply to one image.
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundPositionY.ts]]
+     * ```
      */
     backgroundPositionY?: CssMultiPositionY;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
+     * The **background-repeat** CSS property sets how background images are repeated. A background
+     * image can be repeated along the horizontal and vertical axes, or not repeated at all.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-repeat)
+     *
+     * **Usage in Mimcss:**
+     *
+     * In Mimcss, we model the property the following way:
+     * - if the value is a string, that's the only value;
+     * - if the value is an array, then it is a list of several sizes. Each element in this array is
+     *   either a keyword or an array of two elements.
+     * Thus ["round","space"] will be interpreted as "round, space" and not "round space"; that is, it will
+     * define values for two images instead of values fro X and Y axes for one image. If you need
+     * to specify values fro both axes you must use array within array - even for a single size:
+     * [["round","space"]] will be interpreted as "round space".
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundRepeat.ts]]
+     * ```
      */
     backgroundRepeat?: st.BackgroundRepeat_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat-x
-     */
-    backgroundRepeatX?: st.DefaultStyleType;
-    /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat-y
-     */
-    backgroundRepeatY?: st.DefaultStyleType;
-    /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
+     * The **background-size** CSS property sets the size of the element's background image. The
+     * image can be left to its natural size, stretched, or constrained to fit the available space.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/background-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * In Mimcss, we model the property the following way:
+     * - if the value is a string or a number, that's the only value;
+     * - if the value is an array, then it is a list of several sizes. Each element in this array is
+     *   either a keyword or a length or an array of two elements.
+     * Thus [100,200] will be interpreted as "100px, 200px" and not "100px 200px"; that is, it will
+     * define two sizes each with a width instead of one size with both width and height. If you need
+     * to specify both width and height you must use array within array - even for a single size:
+     * [[100,200]] will be interpreted as "100px 200px".
+     *
+     * ```typescript
+     * [[include: styleProps/b/backgroundSize.ts]]
+     * ```
      */
     backgroundSize?: st.BackgroundSize_StyleType;
     /**
@@ -1007,7 +1167,21 @@ export interface IStyleset {
      */
     fillRule?: FillRule;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
+     * The **filter** CSS property applies graphical effects like blur or color shift to an
+     * element. Filters are commonly used to adjust the rendering of images, backgrounds, and
+     * borders. Included in the CSS standard are several functions that achieve predefined effects.
+     * You can also reference an SVG filter with a URL to an SVG filter element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/filter)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/f/filter)
+     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#filter)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/f/filter.ts]]
+     * ```
      */
     filter?: st.Filter_StyleType;
     /**

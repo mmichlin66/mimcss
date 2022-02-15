@@ -77,7 +77,7 @@ export declare type AspectRatio_StyleType = CssAspectRatio | "auto";
 /**
  * Keywords used for the [[backfaceVisibilityMode]] style property
  */
-export declare type BackfaceVisibilityMode_StyleType = "visible" | "hidden";
+export declare type BackfaceVisibilityModeKeywords = "visible" | "hidden";
 /**
  * Type for single background value
  */
@@ -87,9 +87,9 @@ export declare type Background_Single = string | CssColor | CssImage | {
     position?: Extended<CssPosition>;
     size?: Extended<BackgroundSize>;
     repeat?: Extended<BackgroundRepeat>;
-    attachment?: Extended<BackgroundAttachment>;
-    origin?: Extended<BackgroundOrigin>;
-    clip?: Extended<BackgroundClip>;
+    attachment?: Extended<BackgroundAttachmentKeywords>;
+    origin?: Extended<BackgroundOriginKeywords>;
+    clip?: Extended<BackgroundClipKeywords>;
 };
 /**
  * Type for [[background]] style property
@@ -98,11 +98,7 @@ export declare type Background_StyleType = OneOrMany<Background_Single>;
 /**
  * Keywords used for the [[backgroundAttachment]] style property
  */
-export declare type BackgroundAttachment = "scroll" | "fixed" | "local";
-/**
- * Type for [[backgroundAttachment]] style property
- */
-export declare type BackgroundAttachment_StyleType = OneOrMany<BackgroundAttachment>;
+export declare type BackgroundAttachmentKeywords = "scroll" | "fixed" | "local";
 /**
  *Keywords used for the [[backgroundBlendMode]] and [[mixBlendMode]] properties
  *
@@ -112,11 +108,7 @@ export declare type BlendModeKeywords = "normal" | "multiply" | "screen" | "over
  * Keywords used for the [[backgroundClip]] property
  *
  */
-export declare type BackgroundClip = "border-box" | "padding-box" | "content-box" | "text";
-/**
- * Type for [[backgroundClip]] style property
- */
-export declare type BackgroundClip_StyleType = OneOrMany<BackgroundClip>;
+export declare type BackgroundClipKeywords = "border-box" | "padding-box" | "content-box" | "text";
 /**
  * Type for [[backgroundImage]] style property
  */
@@ -125,20 +117,20 @@ export declare type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
  * Keywords used for the [[backgroundOrigin]] property
  *
  */
-export declare type BackgroundOrigin = "border-box" | "padding-box" | "content-box" | "text";
-/**
- * Type for [[backgroundOrigin]] style property
- */
-export declare type BackgroundOrigin_StyleType = OneOrMany<BackgroundOrigin>;
+export declare type BackgroundOriginKeywords = "border-box" | "padding-box" | "content-box" | "text";
 /**
  * Keywords for single background repeat
  */
 export declare type BackgroundRepeatKeywords = "repeat" | "space" | "round" | "no-repeat";
 /**
+ * Keywords for axis-specific background repeat
+ */
+export declare type BackgroundRepeatAxisKeywords = "repeat-x" | "repeat-y";
+/**
  * Type for single background repeat
  *
  */
-export declare type BackgroundRepeat = "repeat-x" | "repeat-y" | OneOrPair<BackgroundRepeatKeywords>;
+export declare type BackgroundRepeat = BackgroundRepeatAxisKeywords | OneOrPair<BackgroundRepeatKeywords>;
 /**
  * Type for [[backgroundRepeat]] style property
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
@@ -160,7 +152,7 @@ export declare type BackgroundSize = "cover" | "contain" | OneOrPair<CssLengthOr
  * Thus [100,200] will be interpreted as "100px, 200px" and not "100px 200px"; that is, it will
  * define two sizes each with a width instead of one size with both width and height. If you need
  * to specify both width and height you must use array within array - even for a single size:
- * [[100,200]] wll be interpreted as "100px 200px".
+ * [[100,200]] will be interpreted as "100px 200px".
  *
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
  *
@@ -535,7 +527,7 @@ export declare type EmptyCells_StyleType = "show" | "hide";
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
  *
  */
-export declare type Filter_StyleType = OneOrMany<IUrlFunc | FilterFuncs>;
+export declare type Filter_StyleType = "none" | OneOrMany<IUrlFunc | FilterFuncs>;
 /**
  * Type for [[flex]] style property
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/flex

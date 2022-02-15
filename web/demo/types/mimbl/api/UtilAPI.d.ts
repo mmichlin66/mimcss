@@ -3,12 +3,12 @@
  * or any other from SVG.
  * @param elm Element to test
  */
-export declare function isSvg(elm: Element): boolean;
+export declare const isSvg: (elm: Element) => boolean;
 /**
  * Determines whether the given element is the <svg> element.
  * @param elm  Element to test
  */
-export declare function isSvgSvg(elm: Element): boolean;
+export declare const isSvgSvg: (elm: Element) => boolean;
 /**
  * Type that extends the Promise class with the resolve and reject methods so that the promise can
  * be created in one place and resolved or rejected in a different place.

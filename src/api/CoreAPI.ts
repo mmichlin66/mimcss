@@ -351,8 +351,6 @@ fdo["nstag"] = (v: INSTagFunc) => {
 
 /**
  * Returns a function representing an invocation of the CSS `steps()` function.
- *
- * @category Transition and Animation
  */
  export const steps = (n: Extended<number>, j?: TimingFunctionJumpTerm): IStepsFunc =>
  ({ fn: "steps", n, j });
@@ -363,8 +361,6 @@ fdo.steps = ["n", "j"]
 
 /**
 * Returns a function representing an invocation of the CSS `cubic-bezier()` function.
-*
-* @category Transition and Animation
 */
 export const cubicBezier = (n1: Extended<number>, n2: Extended<number>, n3: Extended<number>,
  n4: Extended<number>): ICubicBezierFunc => ({ fn: "cubic-bezier", n1, n2, n3, n4 });
@@ -404,7 +400,7 @@ export const media = (parts: TemplateStringsArray, ...params: ExtendedMediaFeatu
 
 /**
  * Tag function that represents a supports query. This function allows expressing supports
- * queries in a natural string form while embedding media feature values in type safe manner. The
+ * queries in a natural string form while embedding styleset objects in type safe manner. The
  * string can contain any supports expressions while the embedded objects must be of type
  * Styleset. Multiple properties in the styleset will be expanded into clauses combined with the
  * "or" operator.

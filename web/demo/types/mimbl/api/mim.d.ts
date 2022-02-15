@@ -35,10 +35,29 @@ export interface IComponentClass<TProps = {}, TChildren = any> {
  * - two-item tuple - the first items is the name of the element to create and attach a  shadow
  *   root to; the second item specifies the shadow root initialization prameters.
  */
-export declare type ComponentShadowParams = boolean | string | ShadowRootInit | [
-    tagName: string,
+export declare type ComponentShadowOptions = boolean | string | ShadowRootInit | [
+    tag: string,
     init: ShadowRootInit
 ];
+/**
+ * Decorator function for components that allows them to use shadow DOM.
+ *
+ * **Example:**
+ * ```typescript
+ * // A `<div>` element will be created with shadow DOM in open mode
+ * @css.withShadow
+ * class MyComponent extends mim.Component {...}
+ *
+ * // A `<span>` element will be created with shadow DOM in open mode
+ * @css.embedded("span")
+ * class SecondWidgetStyles extends css.StyleDefinition {...}
+ *
+ * // A `<span>` element will be created with shadow DOM in open mode
+ * @css.embedded("span")
+ * class SecondWidgetStyles extends css.StyleDefinition {...}
+ * ```
+ */
+export declare const withShadow: (options: Function | ComponentShadowOptions) => any;
 /**
  * Interface that must be implemented by all components. Although it has many methods that
  * components can implement, in practice, there is only one mandatory method - `render()`.
@@ -62,12 +81,6 @@ export interface IComponent<TProps = {}, TChildren = any> {
      * the virtual node is attached to the component.
      */
     readonly displayName?: string;
-    /**
-     * Flag indicating whether the component uses shadow DOM and optional parameters defining how
-     * the shadow DOM is created. The property is read once right before the component is mounted
-     * and stays the same during the component's life time.
-     */
-    readonly shadow?: ComponentShadowParams;
     /**
      * Sets, gets or clears the virtual node object of the component. This property is set twice:
      *  1. Before the component is rendered for the first time: the component must remember the

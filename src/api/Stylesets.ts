@@ -594,12 +594,32 @@ export interface IStyleset
     backgroundSize?: st.BackgroundSize_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/baseline-shift
+     * The **baseline-shift** attribute allows repositioning of the dominant-baseline relative to
+     * the dominant-baseline of the parent text content element. The shifted object might be a
+     * sub- or superscript.
+     * Note: As a presentation attribute baseline-shift can be used as a CSS property.
+     * Note: This property is going to be deprecated and authors are advised to use vertical-align
+     * instead..
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseline-shift)
      */
     baselineShift?: st.BaselineShift_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/block-size
+     * The **block-size** CSS property defines the horizontal or vertical size of an element's
+     * block, depending on its writing mode. It corresponds to either the [[width]] or the [[height]]
+     * property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/block-size)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/block-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/blockSize.ts]]
+     * ```
      */
     blockSize?: CssSize;
 
@@ -1603,7 +1623,19 @@ export interface IStyleset
     hangingPunctuation?: st.DefaultStyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/height
+     * The **height** CSS property specifies the height of an element. By default, the property
+     * defines the height of the content area. If [[boxSizing]] is set to `border-box`, however,
+     * it instead determines the height of the border area.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/height)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/h/height)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/h/height.ts]]
+     * ```
      */
     height?: CssSize;
 
@@ -1628,7 +1660,19 @@ export interface IStyleset
     initialLetter?: st.InitialLetter_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inline-size
+     * The **inline-size** CSS property defines the horizontal or vertical size of an element's
+     * block, depending on its writing mode. It corresponds to either the [[width]] or the [[height]]
+     * property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inline-size)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inline-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/inlineSize.ts]]
+     * ```
      */
     inlineSize?: CssSize;
 
@@ -1908,42 +1952,136 @@ export interface IStyleset
     mathStyle?: st.MathStyle_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-block-size
+     * The **max-block-size** CSS property specifies the maximum size of an element in the
+     * direction opposite that of the writing direction as specified by [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-block-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxBlockSize.ts]]
+     * ```
      */
     maxBlockSize?: CssSize;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-height
+     * The **max-height** CSS property sets the maximum height of an element. It prevents the
+     * used value of the [[height]] property from becoming larger than the value specified
+     * for **max-height**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-height)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/max-height)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxHeight.ts]]
+     * ```
      */
     maxHeight?: CssSize;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-inline-size
+     * The **max-inline-size** CSS property defines the horizontal or vertical maximum size of an
+     * element's block, depending on its writing mode. It corresponds to either the [[maxWidth]]
+     * or the [[maxHeight]] property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-inline-size)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/max-inline-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxInlineSize.ts]]
+     * ```
      */
     maxInlineSize?: CssSize;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
      */
+    /**
+     * The **max-width** CSS property sets the maximum width of an element. It prevents the used
+     * value of the [[width]] property from becoming larger than the value specified by **max-width**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-width)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/max-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxWidth.ts]]
+     * ```
+     */
     maxWidth?: CssSize;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-block-size
+     * The **min-block-size** CSS property defines the minimum horizontal or vertical size of an
+     * element's block, depending on its writing mode. It corresponds to either the [[minWidth]]
+     * or the [[minHeight]] property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-block-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minBlockSize.ts]]
+     * ```
      */
     minBlockSize?: CssSize;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-height
+     * The **min-height** CSS property sets the minimum height of an element. It prevents the
+     * used value of the [[height]] property from becoming smaller than the value specified
+     * for **min-height**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-height)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/min-height)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minHeight.ts]]
+     * ```
      */
     minHeight?: CssSize;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-inline-size
+     * The **min-inline-size** CSS property defines the horizontal or vertical minimal size of an
+     * element's block, depending on its writing mode. It corresponds to either the [[minWidth]]
+     * or the [[minHeight]] property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-inline-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minInlineSize.ts]]
+     * ```
      */
     minInlineSize?: CssSize;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-width
+     * The **min-width** CSS property sets the minimum width of an element. It prevents the used
+     * value of the [[width]] property from becoming smaller than the value specified for
+     * **min-width**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-width)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/min-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minWidth.ts]]
+     * ```
      */
     minWidth?: CssSize;
 

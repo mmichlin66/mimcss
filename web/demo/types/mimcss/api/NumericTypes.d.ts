@@ -278,26 +278,34 @@ export declare type CssPositionTuple = [
     Extended<HorizontalPosition>,
     Extended<VerticalPosition>
 ] | [
+    Extended<HorizontalPosition>,
+    Extended<VerticalPositionKeyword>,
+    Extended<CssLength>
+] | [
+    Extended<HorizontalPositionKeyword>,
+    Extended<CssLength>,
+    Extended<VerticalPosition>
+] | [
+    Extended<HorizontalPositionKeyword>,
+    Extended<CssLength>,
+    Extended<VerticalPositionKeyword>,
+    Extended<CssLength>
+] | [
     Extended<VerticalPosition>,
     Extended<HorizontalPosition>
 ] | [
-    Extended<HorizontalPositionKeyword>,
-    Extended<VerticalPositionKeyword>,
-    Extended<CssLength>
-] | [
-    Extended<HorizontalPositionKeyword>,
-    Extended<CssLength>,
-    Extended<VerticalPositionKeyword>,
-    Extended<CssLength>?
-] | [
-    Extended<VerticalPositionKeyword>,
+    Extended<VerticalPosition>,
     Extended<HorizontalPositionKeyword>,
     Extended<CssLength>
 ] | [
     Extended<VerticalPositionKeyword>,
     Extended<CssLength>,
+    Extended<HorizontalPosition>
+] | [
+    Extended<VerticalPositionKeyword>,
+    Extended<CssLength>,
     Extended<HorizontalPositionKeyword>,
-    Extended<CssLength>?
+    Extended<CssLength>
 ];
 /** Type describing `<position>` CSS type consisting of up to 4 values */
 export declare type CssPosition = CssPositionItem | CssPositionTuple;
