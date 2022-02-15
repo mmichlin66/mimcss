@@ -643,7 +643,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockColor)
      *
      * **Usage in Mimcss:**
      *
@@ -668,7 +667,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-end-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockEndColor)
      *
      * **Usage in Mimcss:**
      *
@@ -703,7 +701,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-start-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockStartColor)
      *
      * **Usage in Mimcss:**
      *
@@ -745,7 +742,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-bottom-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBottomColor)
      *
      * **Usage in Mimcss:**
      *
@@ -786,7 +782,6 @@ export interface IStyleset
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderColor)
      *
      * **Usage in Mimcss:**
      *
@@ -851,7 +846,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineColor)
      *
      * **Usage in Mimcss:**
      *
@@ -876,7 +870,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-end-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineEndColor)
      *
      * **Usage in Mimcss:**
      *
@@ -911,7 +904,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-start-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineStartColor)
      *
      * **Usage in Mimcss:**
      *
@@ -953,7 +945,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-left-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderLeftColor)
      *
      * **Usage in Mimcss:**
      *
@@ -990,7 +981,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-right-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderRightColor)
      *
      * **Usage in Mimcss:**
      *
@@ -1042,7 +1032,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-top-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderTopColor)
      *
      * **Usage in Mimcss:**
      *
@@ -1135,7 +1124,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/caret-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#caretColor)
      *
      * **Usage in Mimcss:**
      *
@@ -1175,7 +1163,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#color)
      *
      * **Usage in Mimcss:**
      *
@@ -1232,7 +1219,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/column-rule-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#columnRuleColor)
      *
      * **Usage in Mimcss:**
      *
@@ -1346,7 +1332,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/filter)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/f/filter)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#filter)
      *
      * **Usage in Mimcss:**
      *
@@ -1402,7 +1387,6 @@ export interface IStyleset
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#floodColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2156,7 +2140,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/o/outline-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#outlineColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2572,7 +2555,6 @@ export interface IStyleset
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/stop-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#stopColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2672,7 +2654,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-decoration-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textDecorationColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2714,7 +2695,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-emphasis)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textEmphasisColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2741,7 +2721,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-fill-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/adding-stroke-to-web-text/)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textFillColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2808,7 +2787,6 @@ export interface IStyleset
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-stroke/)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textStrokeColor)
      *
      * **Usage in Mimcss:**
      *
