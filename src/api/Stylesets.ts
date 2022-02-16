@@ -1661,37 +1661,132 @@ export interface IStyleset
     inlineSize?: CssSize;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset
+     * The inset CSS property is a shorthand that corresponds to the [[top]], [[right]],
+     * [[bottom]], and/or left properties.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/inset.ts]]
+     * ```
      */
     inset?: OneOrBox<CssLengthOrAuto>;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block
+     * The **inset-block** CSS property defines the logical block start and end offsets of an
+     * element, which maps to physical offsets depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[top]] and [[bottom]],
+     * or [[right]] and [[left]] properties depending on the values defined for [[writingMode]],
+     * [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-block)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetBlock.ts]]
+     * ```
      */
     insetBlock?: OneOrPair<CssLengthOrAuto>;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-end
+     * The **inset-block-end** CSS property defines the logical block end offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-block-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetBlockEnd.ts]]
+     * ```
      */
     insetBlockEnd?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-start
+     * The **inset-block-start** CSS property defines the logical block start offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-block-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetBlockStart.ts]]
+     * ```
      */
     insetBlockStart?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline
+     * The **inset-inline** CSS property defines the logical inline start and end offsets of an
+     * element, which maps to physical offsets depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[top]] and [[bottom]],
+     * or [[right]] and [[left]] properties depending on the values defined for [[writingMode]],
+     * [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-inline)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetInline.ts]]
+     * ```
      */
     insetInline?: OneOrPair<CssLengthOrAuto>;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-end
+     * The **inset-inline-end** CSS property defines the logical inline end offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-inline-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetInlineEnd.ts]]
+     * ```
      */
     insetInlineEnd?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-start
+     * The **inset-inline-start** CSS property defines the logical inline start offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-inline-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetInlineStart.ts]]
+     * ```
      */
     insetInlineStart?: CssLengthOrAuto;
 
@@ -1766,57 +1861,186 @@ export interface IStyleset
     listStyleType?: st.ListStyleType_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin
+     * The **margin** CSS shorthand property sets the margin area on all four sides of an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/margin.ts]]
+     * ```
      */
     margin?: OneOrBox<CssLengthOrAuto>;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block
+     * The **margin-block** CSS shorthand property defines the logical block start and end margins
+     * of an element, which maps to physical margins depending on the element's writing mode,
+     * directionality, and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-block)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBlock.ts]]
+     * ```
      */
     marginBlock?: OneOrPair<CssLengthOrAuto>;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-end
+     * The **margin-block-end** CSS property defines the logical block end margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-block-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBlockEnd.ts]]
+     * ```
      */
     marginBlockEnd?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-start
+     * The **margin-block-start** CSS property defines the logical block start margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-block-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBlockStart.ts]]
+     * ```
      */
     marginBlockStart?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom
+     * The **margin-bottom** CSS property sets the margin area on the bottom side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBottom.ts]]
+     * ```
      */
     marginBottom?: CssLengthOrAuto;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline
      */
+    /**
+     * The **margin-block** CSS shorthand property defines the logical inline start and end margins
+     * of an element, which maps to physical margins depending on the element's writing mode,
+     * directionality, and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-inline)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginInline.ts]]
+     * ```
+     */
     marginInline?: OneOrPair<CssLengthOrAuto>;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-end
+     * The **margin-inline-end** CSS property defines the logical inline end margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-inline-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginInlineEnd.ts]]
+     * ```
      */
     marginInlineEnd?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-start
+     * The **margin-inline-start** CSS property defines the logical inline start margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-inline-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginInlineStart.ts]]
+     * ```
      */
     marginInlineStart?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-left
+     * The **margin-left** CSS property sets the margin area on the left side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-left)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginLeft.ts]]
+     * ```
      */
     marginLeft?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-right
+     * The **margin-right** CSS property sets the margin area on the right side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-right)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginRight.ts]]
+     * ```
      */
     marginRight?: CssLengthOrAuto;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top
+     * The **margin-top** CSS property sets the margin area on the top side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginTop.ts]]
+     * ```
      */
     marginTop?: CssLengthOrAuto;
 

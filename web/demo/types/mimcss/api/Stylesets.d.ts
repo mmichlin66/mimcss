@@ -549,11 +549,31 @@ export interface IStyleset {
      */
     backgroundSize?: st.BackgroundSize_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/baseline-shift
+     * The **baseline-shift** attribute allows repositioning of the dominant-baseline relative to
+     * the dominant-baseline of the parent text content element. The shifted object might be a
+     * sub- or superscript.
+     * Note: As a presentation attribute baseline-shift can be used as a CSS property.
+     * Note: This property is going to be deprecated and authors are advised to use vertical-align
+     * instead..
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseline-shift)
      */
     baselineShift?: st.BaselineShift_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/block-size
+     * The **block-size** CSS property defines the horizontal or vertical size of an element's
+     * block, depending on its writing mode. It corresponds to either the [[width]] or the [[height]]
+     * property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/block-size)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/block-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/blockSize.ts]]
+     * ```
      */
     blockSize?: CssSize;
     /**
@@ -574,7 +594,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockColor)
      *
      * **Usage in Mimcss:**
      *
@@ -597,7 +616,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-end-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockEndColor)
      *
      * **Usage in Mimcss:**
      *
@@ -628,7 +646,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-start-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBlockStartColor)
      *
      * **Usage in Mimcss:**
      *
@@ -664,7 +681,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-bottom-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderBottomColor)
      *
      * **Usage in Mimcss:**
      *
@@ -699,7 +715,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderColor)
      *
      * **Usage in Mimcss:**
      *
@@ -754,7 +769,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineColor)
      *
      * **Usage in Mimcss:**
      *
@@ -777,7 +791,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-end-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineEndColor)
      *
      * **Usage in Mimcss:**
      *
@@ -808,7 +821,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-start-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderInlineStartColor)
      *
      * **Usage in Mimcss:**
      *
@@ -844,7 +856,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-left-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderLeftColor)
      *
      * **Usage in Mimcss:**
      *
@@ -876,7 +887,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-right-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderRightColor)
      *
      * **Usage in Mimcss:**
      *
@@ -920,7 +930,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-top-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#borderTopColor)
      *
      * **Usage in Mimcss:**
      *
@@ -998,7 +1007,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/caret-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#caretColor)
      *
      * **Usage in Mimcss:**
      *
@@ -1033,7 +1041,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#color)
      *
      * **Usage in Mimcss:**
      *
@@ -1081,7 +1088,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/c/column-rule-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#columnRuleColor)
      *
      * **Usage in Mimcss:**
      *
@@ -1175,7 +1181,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/filter)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/f/filter)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#filter)
      *
      * **Usage in Mimcss:**
      *
@@ -1222,7 +1227,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#floodColor)
      *
      * **Usage in Mimcss:**
      *
@@ -1400,7 +1404,19 @@ export interface IStyleset {
      */
     hangingPunctuation?: st.DefaultStyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/height
+     * The **height** CSS property specifies the height of an element. By default, the property
+     * defines the height of the content area. If [[boxSizing]] is set to `border-box`, however,
+     * it instead determines the height of the border area.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/height)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/h/height)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/h/height.ts]]
+     * ```
      */
     height?: CssSize;
     /**
@@ -1420,35 +1436,142 @@ export interface IStyleset {
      */
     initialLetter?: st.InitialLetter_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inline-size
+     * The **inline-size** CSS property defines the horizontal or vertical size of an element's
+     * block, depending on its writing mode. It corresponds to either the [[width]] or the [[height]]
+     * property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inline-size)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inline-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/inlineSize.ts]]
+     * ```
      */
     inlineSize?: CssSize;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset
+     * The inset CSS property is a shorthand that corresponds to the [[top]], [[right]],
+     * [[bottom]], and/or left properties.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/inset.ts]]
+     * ```
      */
     inset?: OneOrBox<CssLengthOrAuto>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block
+     * The **inset-block** CSS property defines the logical block start and end offsets of an
+     * element, which maps to physical offsets depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[top]] and [[bottom]],
+     * or [[right]] and [[left]] properties depending on the values defined for [[writingMode]],
+     * [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-block)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetBlock.ts]]
+     * ```
      */
     insetBlock?: OneOrPair<CssLengthOrAuto>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-end
+     * The **inset-block-end** CSS property defines the logical block end offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-block-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetBlockEnd.ts]]
+     * ```
      */
     insetBlockEnd?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-start
+     * The **inset-block-start** CSS property defines the logical block start offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-block-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetBlockStart.ts]]
+     * ```
      */
     insetBlockStart?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline
+     * The **inset-inline** CSS property defines the logical inline start and end offsets of an
+     * element, which maps to physical offsets depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[top]] and [[bottom]],
+     * or [[right]] and [[left]] properties depending on the values defined for [[writingMode]],
+     * [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-inline)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetInline.ts]]
+     * ```
      */
     insetInline?: OneOrPair<CssLengthOrAuto>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-end
+     * The **inset-inline-end** CSS property defines the logical inline end offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-inline-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetInlineEnd.ts]]
+     * ```
      */
     insetInlineEnd?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-start
+     * The **inset-inline-start** CSS property defines the logical inline start offset of an element,
+     * which maps to a physical inset depending on the element's writing mode, directionality,
+     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/i/inset-inline-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/i/insetInlineStart.ts]]
+     * ```
      */
     insetInlineStart?: CssLengthOrAuto;
     /**
@@ -1508,47 +1631,176 @@ export interface IStyleset {
      */
     listStyleType?: st.ListStyleType_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin
+     * The **margin** CSS shorthand property sets the margin area on all four sides of an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/margin.ts]]
+     * ```
      */
     margin?: OneOrBox<CssLengthOrAuto>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block
+     * The **margin-block** CSS shorthand property defines the logical block start and end margins
+     * of an element, which maps to physical margins depending on the element's writing mode,
+     * directionality, and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-block)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBlock.ts]]
+     * ```
      */
     marginBlock?: OneOrPair<CssLengthOrAuto>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-end
+     * The **margin-block-end** CSS property defines the logical block end margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-block-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBlockEnd.ts]]
+     * ```
      */
     marginBlockEnd?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-start
+     * The **margin-block-start** CSS property defines the logical block start margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-block-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBlockStart.ts]]
+     * ```
      */
     marginBlockStart?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom
+     * The **margin-bottom** CSS property sets the margin area on the bottom side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginBottom.ts]]
+     * ```
      */
     marginBottom?: CssLengthOrAuto;
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline
      */
+    /**
+     * The **margin-block** CSS shorthand property defines the logical inline start and end margins
+     * of an element, which maps to physical margins depending on the element's writing mode,
+     * directionality, and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-inline)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginInline.ts]]
+     * ```
+     */
     marginInline?: OneOrPair<CssLengthOrAuto>;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-end
+     * The **margin-inline-end** CSS property defines the logical inline end margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-end)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-inline-end)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginInlineEnd.ts]]
+     * ```
      */
     marginInlineEnd?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-start
+     * The **margin-inline-start** CSS property defines the logical inline start margin of an element,
+     * which maps to a physical margin depending on the element's writing mode, directionality,
+     * and text orientation.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline-start)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/margin-inline-start)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginInlineStart.ts]]
+     * ```
      */
     marginInlineStart?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-left
+     * The **margin-left** CSS property sets the margin area on the left side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-left)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginLeft.ts]]
+     * ```
      */
     marginLeft?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-right
+     * The **margin-right** CSS property sets the margin area on the right side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-right)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginRight.ts]]
+     * ```
      */
     marginRight?: CssLengthOrAuto;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top
+     * The **margin-top** CSS property sets the margin area on the top side of an element.
+     * A positive value places it farther from its neighbors, while a negative value places
+     * it closer.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/marginTop.ts]]
+     * ```
      */
     marginTop?: CssLengthOrAuto;
     /**
@@ -1644,35 +1896,129 @@ export interface IStyleset {
      */
     mathStyle?: st.MathStyle_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-block-size
+     * The **max-block-size** CSS property specifies the maximum size of an element in the
+     * direction opposite that of the writing direction as specified by [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-block-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxBlockSize.ts]]
+     * ```
      */
     maxBlockSize?: CssSize;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-height
+     * The **max-height** CSS property sets the maximum height of an element. It prevents the
+     * used value of the [[height]] property from becoming larger than the value specified
+     * for **max-height**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-height)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/max-height)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxHeight.ts]]
+     * ```
      */
     maxHeight?: CssSize;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-inline-size
+     * The **max-inline-size** CSS property defines the horizontal or vertical maximum size of an
+     * element's block, depending on its writing mode. It corresponds to either the [[maxWidth]]
+     * or the [[maxHeight]] property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-inline-size)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/max-inline-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxInlineSize.ts]]
+     * ```
      */
     maxInlineSize?: CssSize;
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
      */
+    /**
+     * The **max-width** CSS property sets the maximum width of an element. It prevents the used
+     * value of the [[width]] property from becoming larger than the value specified by **max-width**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/max-width)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/max-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/maxWidth.ts]]
+     * ```
+     */
     maxWidth?: CssSize;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-block-size
+     * The **min-block-size** CSS property defines the minimum horizontal or vertical size of an
+     * element's block, depending on its writing mode. It corresponds to either the [[minWidth]]
+     * or the [[minHeight]] property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-block-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minBlockSize.ts]]
+     * ```
      */
     minBlockSize?: CssSize;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-height
+     * The **min-height** CSS property sets the minimum height of an element. It prevents the
+     * used value of the [[height]] property from becoming smaller than the value specified
+     * for **min-height**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-height)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/min-height)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minHeight.ts]]
+     * ```
      */
     minHeight?: CssSize;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-inline-size
+     * The **min-inline-size** CSS property defines the horizontal or vertical minimal size of an
+     * element's block, depending on its writing mode. It corresponds to either the [[minWidth]]
+     * or the [[minHeight]] property, depending on the value of [[writingMode]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-inline-size)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minInlineSize.ts]]
+     * ```
      */
     minInlineSize?: CssSize;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/min-width
+     * The **min-width** CSS property sets the minimum width of an element. It prevents the used
+     * value of the [[width]] property from becoming smaller than the value specified for
+     * **min-width**.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/min-width)
+     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/m/min-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/m/minWidth.ts]]
+     * ```
      */
     minWidth?: CssSize;
     /**
@@ -1733,7 +2079,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/o/outline-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#outlineColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2068,7 +2413,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/stop-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#stopColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2150,7 +2494,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-decoration-color)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textDecorationColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2186,7 +2529,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-emphasis)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textEmphasisColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2210,7 +2552,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-fill-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/adding-stroke-to-web-text/)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textFillColor)
      *
      * **Usage in Mimcss:**
      *
@@ -2266,7 +2607,6 @@ export interface IStyleset {
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke-color)
      * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/t/text-stroke/)
-     * - [Mimcss Examples](https://www.mimcss.com/typedoc.html?path=interfaces/Stylesets.IStyleset.html#textStrokeColor)
      *
      * **Usage in Mimcss:**
      *

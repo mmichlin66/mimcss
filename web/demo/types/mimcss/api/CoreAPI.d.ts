@@ -85,14 +85,10 @@ export declare const sel: (...items: CssSelector[]) => ISelectorBuilder;
 export declare const nstag: (ns: string | INamespaceRule, tags: "*" | ElementTagName | ElementTagName[], comb?: SelectorCombinator) => INSTagFunc;
 /**
  * Returns a function representing an invocation of the CSS `steps()` function.
- *
- * @category Transition and Animation
  */
 export declare const steps: (n: Extended<number>, j?: TimingFunctionJumpTerm | undefined) => IStepsFunc;
 /**
 * Returns a function representing an invocation of the CSS `cubic-bezier()` function.
-*
-* @category Transition and Animation
 */
 export declare const cubicBezier: (n1: Extended<number>, n2: Extended<number>, n3: Extended<number>, n4: Extended<number>) => ICubicBezierFunc;
 /**
@@ -116,7 +112,7 @@ export declare const cubicBezier: (n1: Extended<number>, n2: Extended<number>, n
 export declare const media: (parts: TemplateStringsArray, ...params: ExtendedMediaFeatureset[]) => IMediaQueryProxy;
 /**
  * Tag function that represents a supports query. This function allows expressing supports
- * queries in a natural string form while embedding media feature values in type safe manner. The
+ * queries in a natural string form while embedding styleset objects in type safe manner. The
  * string can contain any supports expressions while the embedded objects must be of type
  * Styleset. Multiple properties in the styleset will be expanded into clauses combined with the
  * "or" operator.

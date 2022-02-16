@@ -20,11 +20,11 @@ class MyStyles extends css.StyleDefinition
     // Using the `fitContent()` function
     cls6 = this.$class({ minWidth: css.fitContent(200) })
 
-    // Using the `min()` function ( min( 200px, 23%) )
     // Using custom property
     customVar = this.$var( "minWidth", 30)
     cls7 = this.$class({ minWidth: this.customVar })
 
+    // Using the `min()` function ( min( 200px, 23%) )
     cls8 = this.$class({ minWidth: css.Len.min( 200, css.percent(23)) })
 
     // Using the `calc()` tag function ( calc( (100% - var(--customVar)) / 2) )
