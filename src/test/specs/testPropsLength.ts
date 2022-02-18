@@ -74,7 +74,52 @@ describe("style properties of type <length>:", () =>
 
 
 
-	describe("math functions:", () =>
+	describe("line width:", () =>
+	{
+		it("borderBlockEndWidth, number", () =>
+		{
+			dom.testLonghandProp( "borderBlockEndWidth", 8, "8px");
+		})
+
+		it("borderInlineStartWidth, keyword", () =>
+		{
+			dom.testLonghandProp( "borderInlineStartWidth", "thick", "thick");
+		})
+
+		it("borderBlockWidth, single number", () =>
+		{
+			dom.testLonghandProp( "borderBlockWidth", 0.2, "0.2em");
+		})
+
+		it("borderInlineWidth, two values", () =>
+		{
+			dom.testLonghandProp( "borderInlineWidth", [0.2, "thin"], "0.2em thin");
+		})
+
+		it("borderWidth, single number", () =>
+		{
+			dom.testLonghandProp( "borderWidth", 0.2, "0.2em");
+		})
+
+		it("borderWidth, two values", () =>
+		{
+			dom.testLonghandProp( "borderWidth", [0.2, "thin"], "0.2em thin");
+		})
+
+		it("borderWidth, three values", () =>
+		{
+			dom.testLonghandProp( "borderWidth", [0.2, "thin", css.Len.min( 4, css.vmin(1))], "0.2em thin min(4px, 1vmin)");
+		})
+
+		it("borderWidth, four values", () =>
+		{
+			dom.testLonghandProp( "borderWidth", [0.2, "thin", 0, css.cm(0.1)], "0.2em thin 0px 0.1cm");
+		})
+	})
+
+
+
+    describe("math functions:", () =>
 	{
 		it("min", () =>
 		{

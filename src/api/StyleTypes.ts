@@ -403,16 +403,10 @@ export type Border_StyleType = LineWidth | BorderStyle | CssNonNumericColor |
  * Type used for several style properties that allow defining line width as a `<length>` CSS
  * type as well as keywords such as `thin` and `thick`. For example, see the [[borderWidth]]
  * property.
- *
- */
-export type LineWidth = "thin" | "medium" | "thick" | CssLength;
-
-/**
- * Type for [[borderWidth]] style property
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
  *
  */
-export type BorderWidth_StyleType = OneOrBox<LineWidth>;
+export type LineWidth = "thin" | "medium" | "thick" | CssLength;
 
 
 

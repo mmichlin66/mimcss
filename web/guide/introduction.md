@@ -12,7 +12,7 @@ Mimcss is a CSS-in-JS library that allows authoring CSS styles without creating 
 
 * [Features](#features)
 * [Installation](#installation)
-* [Quick Sstart](#quick-start)
+* [Quick Start](#quick-start)
 
 ## Features
 The goal of the Mimcss library is to support all CSS features in a type-safe and easy-to-use manner. Mimcss provides the following capabilities:
@@ -59,7 +59,7 @@ Mimcss contains many exported types and functions; therefore, it is recommended 
 import * as css from "mimcss"
 ```
 
-Mimcss provides [Reference](../typedoc.html) documents for developers, which undergoes constant improvements. Mimcss also provides a [Playground](../demo/playground.html), where you can explore Mimcss examples as well as write your own TypeScript code using Mimcss features and immediately see the results.
+Mimcss provides [Reference](../typedoc.html) documents for developers, which undergo constant improvements. Mimcss also provides a [Playground](../demo/playground.html), where you can explore Mimcss examples as well as write your own TypeScript code using Mimcss features and immediately see the results.
 
 ## Quick start
 Let's assume that you need to create simple styles for a class and an element ID. With CSS you would create a CSS file:

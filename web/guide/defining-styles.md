@@ -103,7 +103,7 @@ class MyClass extends css.StyleDefinition
 ```
 
 ## Specifying multiple property values
-CSS allows the same property to appear multiple times in a single ruleset, so that the latest valid value wins. It is usually used when there are features that are not yet supported across all browsers. In this case, you would specify the property with the widely supported value first and the less supported value last.For example:
+CSS allows the same property to appear multiple times in a single ruleset, so that the latest valid value wins. It is usually used when there are features that are not yet supported across all browsers. In this case, you would specify the property with the widely supported value first and the less supported value last, for example:
 
 ```css
 .bg
@@ -234,7 +234,7 @@ This will translate to the following CSS (in reality, class names are auto-gener
 .emphasized.redFG.whiteBG { fontWeight: 700; }
 ```
 
-When the `MyStyles` class is activated and the `emphasized` property is applied to an HTML element, the class name will be not just "emphasized", but "emphasized redFG whiteBG". That is, the following rendering function
+When the `MyStyles` class is activated and the `emphasized` class is applied to an HTML element, the class name will be not just "emphasized", but "emphasized redFG whiteBG". That is, the following rendering function
 
 ```tsx
 let styles = css.activate(MyStyles);
@@ -325,7 +325,7 @@ class MyClass extends css.StyleDefinition
 ```
 
 ## Complex dependent selectors
-To support complex selectors, Mimcss uses a special property `"&"`, which specifies an array of two-element tuples, where the first element is a selector and the second element is a styleset assigned to this selector. Every occurrence of the ampersand symbol in the selector string will be replaced with the selector one level above - a.k.a. parent selector.
+To support complex dependent selectors, Mimcss uses a special property `"&"`, which specifies an array of two-element tuples, where the first element is a selector and the second element is a styleset assigned to this selector. Every occurrence of the ampersand symbol in the selector string will be replaced with the selector one level above - a.k.a. parent selector.
 
 The selector in the first element of each tuple can be of several types: all of them are used to produce a selector string within which any occurrence of the ampersand symbol will be replaced with the parent selector.
 
