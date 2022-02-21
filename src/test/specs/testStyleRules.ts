@@ -245,7 +245,7 @@ describe("style rules:", () =>
 	it("create multiple name:value pairs for the same property using \"[]\"", () =>
 	{
         let s = css.stylesetToString( {color: {"[]": ["red", "blue"]} });
-        expect(s).toEqual( "{color:red;color:blue;}");
+        expect(s).toEqual( "color:red;color:blue;");
     })
 
 
