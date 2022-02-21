@@ -593,7 +593,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-color)
-     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-color)
      *
      * **Usage in Mimcss:**
      *
@@ -615,7 +614,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-color)
-     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-end-color)
      *
      * **Usage in Mimcss:**
      *
@@ -629,7 +627,21 @@ export interface IStyleset {
      */
     borderBlockEndStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-width
+     * The **border-block-end-width** CSS property defines the width of the logical block-end
+     * border of an element, which maps to a physical border width depending on the element's
+     * writing mode, directionality, and text orientation. It corresponds to the
+     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockEndWidth.ts]]
+     * ```
      */
     borderBlockEndWidth?: st.LineWidth;
     /**
@@ -645,7 +657,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-color)
-     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-block-start-color)
      *
      * **Usage in Mimcss:**
      *
@@ -659,7 +670,21 @@ export interface IStyleset {
      */
     borderBlockStartStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-width
+     * The **border-block-start-width** CSS property defines the width of the logical block-start
+     * border of an element, which maps to a physical border width depending on the element's
+     * writing mode, directionality, and text orientation. It corresponds to the
+     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockStartWidth.ts]]
+     * ```
      */
     borderBlockStartWidth?: st.LineWidth;
     /**
@@ -667,9 +692,22 @@ export interface IStyleset {
      */
     borderBlockStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-width
+     * The **border-block-width** CSS property defines the width of the logical block borders of
+     * an element, which maps to a physical border width depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[borderTopWidth]] and
+     * [[borderBottomWidth]], or [[borderLeftWidth]], and [[borderRightWidth]] property depending
+     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockWidth.ts]]
+     * ```
      */
-    borderBlockWidth?: st.LineWidth;
+    borderBlockWidth?: OneOrPair<st.LineWidth>;
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom
      */
@@ -680,7 +718,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-color)
-     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-bottom-color)
      *
      * **Usage in Mimcss:**
      *
@@ -702,7 +739,16 @@ export interface IStyleset {
      */
     borderBottomStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-width
+     * The **border-bottom-width** CSS property sets the width of the bottom border of an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBottomWidth.ts]]
+     * ```
      */
     borderBottomWidth?: st.LineWidth;
     /**
@@ -768,7 +814,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color)
-     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-color)
      *
      * **Usage in Mimcss:**
      *
@@ -790,7 +835,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-color)
-     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-end-color)
      *
      * **Usage in Mimcss:**
      *
@@ -804,7 +848,21 @@ export interface IStyleset {
      */
     borderInlineEndStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-width
+     * The **border-inline-end-width** CSS property defines the width of the logical inline-end
+     * border of an element, which maps to a physical border width depending on the element's
+     * writing mode, directionality, and text orientation. It corresponds to the
+     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineEndWidth.ts]]
+     * ```
      */
     borderInlineEndWidth?: st.LineWidth;
     /**
@@ -820,7 +878,6 @@ export interface IStyleset {
      *
      * **See Also:**
      * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-color)
-     * - [CSS-Tricks Almanac](https://css-tricks.com/almanac/properties/b/border-inline-start-color)
      *
      * **Usage in Mimcss:**
      *
@@ -834,7 +891,21 @@ export interface IStyleset {
      */
     borderInlineStartStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-width
+     * The **border-inline-start-width** CSS property defines the width of the logical inline-start
+     * border of an element, which maps to a physical border width depending on the element's
+     * writing mode, directionality, and text orientation. It corresponds to the
+     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
+     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineStartWidth.ts]]
+     * ```
      */
     borderInlineStartWidth?: st.LineWidth;
     /**
@@ -842,9 +913,22 @@ export interface IStyleset {
      */
     borderInlineStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-width
+     * The **border-inline-width** CSS property defines the width of the logical inline borders of
+     * an element, which maps to a physical border width depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[borderTopWidth]] and
+     * [[borderBottomWidth]], or [[borderLeftWidth]], and [[borderRightWidth]] property depending
+     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineWidth.ts]]
+     * ```
      */
-    borderInlineWidth?: st.LineWidth;
+    borderInlineWidth?: OneOrPair<st.LineWidth>;
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-left
      */
@@ -869,7 +953,16 @@ export interface IStyleset {
      */
     borderLeftStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-width
+     * The **border-left-width** CSS property sets the width of the left border of an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderLeftWidth.ts]]
+     * ```
      */
     borderLeftWidth?: st.LineWidth;
     /**
@@ -900,7 +993,16 @@ export interface IStyleset {
      */
     borderRightStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-width
+     * The **border-right-width** CSS property sets the width of the right border of an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderRightWidth.ts]]
+     * ```
      */
     borderRightWidth?: st.LineWidth;
     /**
@@ -951,13 +1053,31 @@ export interface IStyleset {
      */
     borderTopStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-width
+     * The **border-top-width** CSS property sets the width of the top border of an element.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderTopWidth.ts]]
+     * ```
      */
     borderTopWidth?: st.LineWidth;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
+     * The **border-width** shorthand CSS property sets the width of an element's border.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/border-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderWidth.ts]]
+     * ```
      */
-    borderWidth?: st.BorderWidth_StyleType;
+    borderWidth?: OneOrBox<st.LineWidth>;
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/bottom
      */
@@ -1101,7 +1221,17 @@ export interface IStyleset {
      */
     columnRuleStyle?: st.BorderStyle;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-width
+     * The **column-rule-width** CSS property sets the width of the line drawn between columns
+     * in a multi-column layout.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/c/columnRuleWidth.ts]]
+     * ```
      */
     columnRuleWidth?: st.LineWidth;
     /**
@@ -2096,7 +2226,17 @@ export interface IStyleset {
      */
     outlineStyle?: st.BorderStyle_StyleType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
+     * The CSS **outline-width** property sets the thickness of an element's outline. An outline
+     * is a line that is drawn around an element, outside the [[border]].
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/o/outlineWidth.ts]]
+     * ```
      */
     outlineWidth?: st.LineWidth;
     /**
@@ -2616,7 +2756,20 @@ export interface IStyleset {
      */
     textStrokeColor?: CssColor;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/text-stroke-width
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke-width
+     */
+    /**
+     * The **text-stroke-width** CSS property specifies the width of the stroke for text. It is
+     * available with the `-webkit-` prefix.
+     *
+     * **See Also:**
+     * - [MDN Page](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke-width)
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/t/textStrokeWidth.ts]]
+     * ```
      */
     textStrokeWidth?: st.LineWidth;
     /**

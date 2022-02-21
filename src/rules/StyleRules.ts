@@ -136,7 +136,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Converts the rule to CSS string representing the rule.
 	public toCss(): string
 	{
-		return this.selectorText + s2s( this.styleset);
+		return `${this.selectorText}{${s2s( this.styleset)}}`;
 	}
 
 

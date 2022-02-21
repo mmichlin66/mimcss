@@ -1,6 +1,7 @@
 import { Styleset, IIDRule, ClassPropType } from "mimcss";
 import { IHtmlIntrinsicElements } from "./HtmlTypes";
 import { ISvgIntrinsicElements } from "./SvgTypes";
+import { ITrigger } from "../internal";
 /**
  * Type used to define properties that can be passed to a manged component.
  *
@@ -194,10 +195,9 @@ export declare type UpdateStrategy = {
 /** Type defining the information that can be supplied for a callback to be wrapped */
 export interface CallbackWrappingParams<T extends Function = Function> {
     func: T;
-    funcThisArg?: any;
+    thisArg: any;
     arg?: any;
     schedulingType?: TickSchedulingType;
-    creator?: any;
 }
 /**
  * Wraps the given callback and returns a function with identical signature.
@@ -205,24 +205,37 @@ export interface CallbackWrappingParams<T extends Function = Function> {
  */
 export declare function wrapCallback<T extends Function>(params?: CallbackWrappingParams<T>): T;
 /**
- * Retrieves the argument that was passed when a callback was wrapped. This function can only be
- * called from the callback itself while it is executing.
- */
-export declare function getCallbackArg(): any;
-/**
  * Type of event handler function for DOM events of type T.
  * @typeparam T DOM event type, e.g. MouseEvent
  */
 export declare type EventFuncType<T extends Event = Event> = (e: T) => void;
-/** Type defining the information that can be supplied for an event listener */
+/**
+ * Type defining a tuple that can be supplied for an event listener.
+ * @typeparam T DOM event type, e.g. MouseEvent
+ */
+export declare type EventTupleType<T extends Event = Event> = [
+    func: EventFuncType<T>,
+    thisArg: any,
+    arg?: any,
+    schedulingType?: TickSchedulingType,
+    useCapture?: boolean
+];
+/**
+ * Type defining an object that can be supplied for an event listener.
+ * @typeparam T DOM event type, e.g. MouseEvent
+ */
 export interface EventObjectType<T extends Event> extends CallbackWrappingParams<EventFuncType<T>> {
+    /**
+     * Flag indicating whether this event should be used as Capturing or Bubbling. The default
+     * value is `false`, that is, Bubbling.
+     */
     useCapture?: boolean;
 }
 /**
  * Union type that can be passed to an Element's event.
  * @typeparam T DOM event type, e.g. MouseEvent
  */
-export declare type EventPropType<T extends Event = Event> = EventFuncType<T> | EventObjectType<T>;
+export declare type EventPropType<T extends Event = Event> = EventFuncType<T> | EventTupleType<T> | EventObjectType<T>;
 /**
  * Type for defining the id property of HTML elements
  */
@@ -248,6 +261,9 @@ export declare type FormmethodPropType = "get" | "post" | "dialog";
 export declare type FormtargetPropType = string | "_self" | "_blank" | "_parent" | "_top";
 export declare type ReferrerPolicyPropType = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "unsafe-url";
 export declare type DropzonePropType = "copy" | "move" | "link";
+export declare type ExtendedElementProps<T extends IElementProps> = {
+    [K in keyof T]?: T[K] | ITrigger<T[K]>;
+};
 /**
  * The IElementProps interface defines standard properties (attributes and event listeners)
  * that can be used on all HTML and SVG elements.
@@ -445,17 +461,19 @@ export declare type RefFunc<T = any> = (newRef: T) => void;
  * attributes and services.
  */
 export declare class Ref<T = any> {
-    /** Event that is fired when the referenced value changes */
-    private changedEvent;
-    constructor(listener?: RefFunc<T>, initialReferene?: T);
+    constructor(listener?: RefFunc<T>, initialReference?: T);
     /** Adds a callback that will be invoked when the value of the reference changes. */
-    addListener(listener: RefFunc<T>): void;
+    attach(listener: RefFunc<T>): void;
     /** Removes a callback that was added with addListener. */
-    removeListener(listener: RefFunc<T>): void;
+    detach(listener: RefFunc<T>): void;
     /** Get accessor for the reference value */
     get r(): T;
     /** Set accessor for the reference value */
     set r(v: T);
+    /** Current referenced value */
+    private v;
+    /** Event that is fired when the referenced value changes */
+    private e;
 }
 /**
  * The ElmRef class represents a reference to the element virtual node. Such objects
@@ -605,46 +623,6 @@ export interface IClassCompVN extends IVNode {
      *   is already bound or is an arrow function.
      */
     callMe(func: ScheduledFuncType, beforeUpdate: boolean, funcThisArg?: any): void;
-    /**
-     * Creates a wrapper function with the same signature as the given callback so that if the original
-     * callback throws an exception, it is processed by the Mimbl error handling mechanism so that the
-     * exception bubbles from this component up the hierarchy until a component that knows to
-     * handle errors is found.
-     *
-     * Use this method before passing callbacks to document and window event handlers as well as
-     * non-DOM objects that use callbacks, e.g. fetch, Promise, setTimeout, etc. For example:
-     *
-     * ```typescript
-     *	class ResizeMonitor extends mim.Component
-     *	{
-     *		private onWindowResize(e: Event): void {};
-     *
-     * 		wrapper: (e: Event): void;
-     *
-     * 		public startResizeMonitoring()
-     *		{
-     *			this.wrapper = this.wrapCallback( this.onWindowResize);
-     *			window.addEventListener( "resize", this.wrapper);
-     *		}
-     *
-     * 		public stopResizeMonitoring()
-     *		{
-     *			window.removeEventListener( "resize", this.wrapper);
-     *			this.wrapper = undefined;
-     *		}
-     *	}
-     * ```
-     *
-     * @param func Method/function to be wrapped
-     * @param funcThisArg Optional value of "this" to bind the callback to. If this parameter is
-     * undefined, the component instance will be used. This parameter will be ignored if the the
-     * function is already bound or is an arrow function.
-     * @param schedulingType Type determining whether and how a Mimbl tick should be scheduled
-     * after callback invocation.
-     * @returns Function that has the same signature as the given callback and that should be used
-     *     instead of the original callback
-     */
-    wrapCallback<T extends Function>(func: T, funcThisArg?: any, schedulingType?: TickSchedulingType): T;
 }
 /**
  * The IManagedCompVN interface represents a virtual node for a JSX-based component.
@@ -765,7 +743,7 @@ export interface IElmVN<T extends Element = Element> extends IVNode {
  */
 export interface ITextVN extends IVNode {
     /** Text of the node. */
-    readonly text: string;
+    readonly text: string | ITrigger<string>;
     /** Text DOM node. */
     readonly textNode: Text;
     /**
@@ -774,7 +752,7 @@ export interface ITextVN extends IVNode {
      * @param schedulingType Type determining whether the operation is performed immediately or
      * is scheduled to a Mimbl tick.
      */
-    setText(text: string, schedulingType?: TickSchedulingType): void;
+    setText(text: string | ITrigger<string>, schedulingType?: TickSchedulingType): void;
 }
 /**
  * Creates text virtual node, which can be used to update the text without re-rendering parent
@@ -837,14 +815,15 @@ export declare function registerCustomAttribute<T>(attrName: string, handlerClas
  */
 export declare function registerCustomEvent(eventName: string): void;
 export declare const enum TickSchedulingType {
-    /** No tick is scheduled */
-    None = 1,
-    /** The tick is executed right away in a synchronous manner */
-    Sync = 2,
+    /**
+     * The tick is executed right away in a synchronous manner. If this scheduled type is specified
+     * for a callback, the tick is executed right after the callback returns.
+     */
+    Sync = 1,
     /** A microtask is scheduled for executing the tick */
-    Microtask = 3,
+    Microtask = 2,
     /** An animation frame is scheduled for executing the tick */
-    AnimationFrame = 4
+    AnimationFrame = 3
 }
 /**
  * Base class for components. Components that derive from this class must implement the render
@@ -915,46 +894,6 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      *   is already bound or is an arrow function.
      */
     protected callMeAfterUpdate(func: ScheduledFuncType, funcThisArg?: any): void;
-    /**
-     * Creates a wrapper function with the same signature as the given callback so that if the original
-     * callback throws an exception, it is processed by the Mimbl error handling mechanism so that the
-     * exception bubbles from this component up the hierarchy until a component that knows to
-     * handle errors is found.
-     *
-     * Use this method before passing callbacks to document and window event handlers as well as
-     * non-DOM objects that use callbacks, e.g. fetch, Promise, setTimeout, etc. For example:
-     *
-     * ```typescript
-     *	class ResizeMonitor extends mim.Component
-     *	{
-     *		private onWindowResize(e: Event): void {};
-     *
-     * 		wrapper: (e: Event): void;
-     *
-     * 		public startResizeMonitoring()
-     *		{
-     *			this.wrapper = this.wrapCallback( this.onWindowResize);
-     *			window.addEventListener( "resize", this.wrapper);
-     *		}
-     *
-     * 		public stopResizeMonitoring()
-     *		{
-     *			window.removeEventListener( "resize", this.wrapper);
-     *			this.wrapper = undefined;
-     *		}
-     *	}
-     * ```
-     *
-     * @param func Method/function to be wrapped
-     * @param funcThisArg Optional value of "this" to bind the callback to. If this parameter is
-     * undefined, the component instance will be used. This parameter will be ignored if the the
-     * function is already bound or is an arrow function.
-     * @param schedulingType Type determining whether and how a Mimbl tick should be scheduled
-     * after callback invocation.
-     * @returns Function that has the same signature as the given callback and that should be used
-     *     instead of the original callback
-     */
-    protected wrapCallback<T extends Function>(func: T, funcThisArg?: any, schedulingType?: TickSchedulingType): T;
 }
 /**
  * An artificial "Fragment" component that is only used as a temporary collection of other items
@@ -1094,3 +1033,4 @@ export declare function noWatcher(target: any, name: string, propDescr: Property
  * @deprecated - use `@trigger`
  */
 export declare function updatable(target: any, name: string): void;
+//# sourceMappingURL=mim.d.ts.map

@@ -5,3 +5,4 @@ export * from "./api/HtmlTypes";
 export * from "./api/SvgTypes";
 export * from "./api/mim";
 export declare let mimblStyleSchedulerType: number;
+//# sourceMappingURL=index.d.ts.map

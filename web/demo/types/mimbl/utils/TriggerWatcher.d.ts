@@ -4,14 +4,22 @@ export declare type AnyAnyFunc = (...args: any[]) => any;
 export declare type NoneTypeFunc<T> = () => T;
 /** Type for functions that accept no parameters and don't return any value */
 export declare type NoneVoidFunc = () => void;
+/** Type for functions that accept one parameter of the given type and don't return any value */
+export declare type TypeVoidFunc<T> = (v: T) => void;
 /**
  * The ITrigger interface represents an object that keeps a value and notifies all attached wathers
  * when this value changes.
  * @typeparam T Type of the trigger value.
  */
 export interface ITrigger<T = any> {
+    /** Retrieves the current value */
     get(): T;
+    /** Sets a new value */
     set(v: T): void;
+    /** Adds a callback that will be invoked when the value of the reference changes. */
+    attach(listener: TypeVoidFunc<T>): void;
+    /** Removes a callback that was added with addListener. */
+    detach(listener: TypeVoidFunc<T>): void;
 }
 /**
  * Creates a trigger object of the given depth with the given initial value.
@@ -21,6 +29,12 @@ export interface ITrigger<T = any> {
  * @param v Optional initial value
  */
 export declare function createTrigger<T = any>(depth: number, v?: T): ITrigger<T>;
+/**
+ * Checks whether the given object is a trigger.
+ * @param obj Object to check whether it is a trigger
+ * @returns True if the object is a trigger and false otherwise
+ */
+export declare const isTrigger: (obj: object) => obj is ITrigger<any>;
 /**
  * The IWatcher interface represents a callable object that wraps a function and has the same
  * signature as this function. When a watcher is called it calls the wrapped function and attaches
@@ -83,3 +97,4 @@ export declare const trigger: (targetOrDepth: any, name?: string) => any;
  * be notified to respond.
  */
 export declare const computed: (target: any, name: string, propDescr: PropertyDescriptor) => void;
+//# sourceMappingURL=TriggerWatcher.d.ts.map

@@ -228,9 +228,9 @@ export const sp2s = (propName: string, propVal: any): string =>
 export const s2s = (styleset: Styleset): string =>
 {
     if (!styleset)
-        return "{}";
+        return "";
 
-    let s = "{";
+    let s = "";
 
     // enumerate all styleset properties retrieving also vendor-prefixed variants
 	forAllPropsInStylset(
@@ -243,7 +243,7 @@ export const s2s = (styleset: Styleset): string =>
         }
     );
 
-    return s + "}";
+    return s;
 }
 
 

@@ -213,14 +213,14 @@ HTMLElement.prototype.setStyleset = SVGElement.prototype.setStyleset =
  * by libraries that allow specifying [[MediaStatement]] for the `media` attribute of elements
  * such as `<link>`, `<style>` and `<source>`
  */
-export const mediaToString = (query: MediaStatement): string => media2s( query);
+export const mediaToString = (query: MediaStatement): string => query ? media2s( query) : "";
 
 
 
 /**
  * Converts the given supports query value to the CSS supports query string.
  */
-export const supportsToString = (query: SupportsStatement): string => supports2s( query);
+export const supportsToString = (query: SupportsStatement): string => query ? supports2s( query) : "";
 
 
 

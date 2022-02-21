@@ -31,3 +31,4 @@ export declare class Defer<T = any> extends Promise<T> {
     resolve: (value?: T | PromiseLike<T>) => void;
     reject: (reason?: any) => void;
 }
+//# sourceMappingURL=UtilAPI.d.ts.map
