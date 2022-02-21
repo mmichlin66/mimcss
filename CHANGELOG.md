@@ -1,3 +1,10 @@
+# 0.11.12
+
+1. Add support for `hwb()` color function.
+2. The `stylesetToString()` function returns string without curly braces, so that it can be directly used in a `style` HTML property.
+3. Add typedoc comments for style properties of color, background, size and width types.
+
+
 # 0.11.11
 
 1. Add support for constructable style sheets and adoption of them by Document and ShadowRoot objects.
