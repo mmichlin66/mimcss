@@ -3,7 +3,7 @@ import {
     IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType,
-    NameGenerationMethod, ICounterStyleRule, IStyleDefinition
+    NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
@@ -23,9 +23,10 @@ import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule, PropertyRule} from "../rules/VarRule"
 import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
-import {FontFaceRule, ImportRule, NamespaceRule, ClassNameRule} from "../rules/MiscRules"
+import {FontFaceRule, ImportRule, NamespaceRule, ClassNameRule, ColorProfileRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {v2s} from "../impl/Utils";
+import { ColorProfileRenderingIntent } from "./ColorTypes";
 
 
 
@@ -893,6 +894,36 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     }
 
 
+
+    /**
+     * Creates a new `@color-profile` rule.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // deefine color profile
+     *     coated = this.$colorProfile( "https://example.org/SWOP2006_Coated5v2.icc")
+     *
+     *     // use color profile name in the `color()` function
+     *     cls = this.$class({ color: css.color( this.coated, 10, 20, 30)})
+     * }
+     * ```
+     *
+     * @param url URL to the color-profile file
+     * @param intent Rendering intent
+     * @param nameOverride String or another `IColorProfileRule` object that determines the name of the
+     * color profile. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism. This might be useful if there is a need for the name to match a name of
+     * existing color profile.
+     * @returns `IColorProfileRule` object representing the `@color-profile` at-rule.
+     */
+    public $colorProfile( url: string, intent?: ColorProfileRenderingIntent,
+        nameOverride?: IColorProfileRule | string): IColorProfileRule
+    {
+        return new ColorProfileRule( this, url, intent, nameOverride);
+    }
 
     /**
      * Creates a new `@supports` rule.

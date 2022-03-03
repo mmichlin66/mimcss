@@ -260,7 +260,7 @@ describe("style rules:", () =>
             ])
 		}
 
-        let s = serialize(A);
+        let s = dom.serialize(A);
         expect(s).toEqual( "<style id=\"A\">.A_cls{color:red;color:blue;}</style>");
     })
 
@@ -274,7 +274,7 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: "blue" })
 		}
 
-        let s = serialize(A);
+        let s = dom.serialize(A);
 		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;}</style>");
     })
 
@@ -288,7 +288,7 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: {"[]": ["blue", "green"]} })
 		}
 
-        let s = serialize(A);
+        let s = dom.serialize(A);
 		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:green;}</style>");
     })
 
@@ -302,7 +302,7 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: "green" })
 		}
 
-        let s = serialize(A);
+        let s = dom.serialize(A);
 		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:green;}</style>");
     })
 
@@ -316,7 +316,7 @@ describe("style rules:", () =>
 			cls = this.$class({ "+": this.abstr, color: {"[]": ["green", "yellow"]} })
 		}
 
-        let s = serialize(A);
+        let s = dom.serialize(A);
 		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:green;color:yellow;}</style>");
     })
 
@@ -334,7 +334,7 @@ describe("style rules:", () =>
             })
 		}
 
-        let s = serialize(A);
+        let s = dom.serialize(A);
 		expect(s).toEqual("<style id=\"A\">.A_cls{color:brown;color:orange;color:red;color:blue;color:green;color:yellow;}</style>");
     })
 
@@ -353,19 +353,10 @@ describe("style rules:", () =>
             ])
 		}
 
-        let s = serialize(A);
+        let s = dom.serialize(A);
 		expect(s).toEqual("<style id=\"A\">.A_cls{color:red;color:blue;color:brown;color:orange;color:green;color:yellow;}</style>");
     })
 })
-
-
-
-function serialize( cls: css.IStyleDefinitionClass): string
-{
-    css.startSSR();
-    css.activate( cls);
-    return css.stopSSR();
-}
 
 
 

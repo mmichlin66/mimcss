@@ -1,10 +1,11 @@
-import {IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition} from "../api/RuleTypes";
+import {IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition, IColorProfileRule} from "../api/RuleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
 import {Rule, RuleLike, IMimcssRuleBag} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {symV2S} from "../impl/Utils";
+import { ColorProfileRenderingIntent } from "..";
 
 
 
@@ -176,6 +177,51 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
     public cssName: string;
 
     private classes: (IClassRule | IClassNameRule | string)[];
+}
+
+
+
+/**
+ * The ColorProfileRule class represents the CSS @color-profile rule.
+ */
+export class ColorProfileRule extends Rule implements IColorProfileRule
+{
+	public constructor( sd: IStyleDefinition, url: string, intent?: ColorProfileRenderingIntent,
+        nameOverride?: IColorProfileRule | string)
+	{
+		super(sd);
+		this.url = url;
+        this.intent = intent;
+        this.nameOverride = nameOverride;
+	}
+
+
+
+	// Processes the given rule.
+	public process( ruleName: string | null): void
+	{
+        this.name = "--" + this.rc.getScopedName( ruleName, this.nameOverride);
+    }
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( ruleBag: IMimcssRuleBag): void
+	{
+		this.cssRule = ruleBag.add( `@color-profile ${this.name} {src:url('${this.url}');` +
+            (this.intent ? `rendering-intent:${this.intent};}` : "}")).cssRule;
+	}
+
+    // Implementation of the toString method returns the profile name.
+	public toString(): string { return this.name; }
+
+    /** Name of the color profile rule that can be used in the [[color]] function. */
+    public get profileName(): string { return this.name; }
+
+    /** Profile name */
+    public name: string;
+
+    private url: string;
+    private intent?: ColorProfileRenderingIntent;
+    private nameOverride?: IColorProfileRule | string;
 }
 
 

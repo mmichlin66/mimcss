@@ -124,3 +124,14 @@ export function testPropPriority<K extends keyof Styleset>( propName: K, propVal
 
 
 
+export function serialize( cls: css.IStyleDefinitionClass): string
+{
+    css.startSSR();
+    let sd = css.activate( cls);
+    let s = css.stopSSR();
+    css.deactivate(sd);
+    return s;
+}
+
+
+

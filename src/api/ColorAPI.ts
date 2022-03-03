@@ -1,8 +1,8 @@
 ﻿import {Extended, OneOrMany} from "./CoreTypes";
 import {CssAngle, CssPercent} from "./NumericTypes";
 import {
-    ColorSpace, CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorMixBuilder,
-    IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc
+    ColorProfile, ColorSpace, CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorFunc,
+    IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc
 } from "./ColorTypes";
 import {a2s, fdo, mv2s, v2s, wkf, WKF} from "../impl/Utils";
 
@@ -513,6 +513,43 @@ fdo["color-mix"] = [
     ["c1", v => mv2s( [[v[0], WKF.Color], [v[1], WKF.Percent]])],
     ["c2", v => mv2s( [[v[0], WKF.Color], [v[1], WKF.Percent]])],
 ];
+
+
+
+/**
+ * Creates color representation in the given color profile. This method should be used when
+ * defining CSS color values in styleset properties.
+ *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color()
+ *
+ * **Examples**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefnition
+ * {
+ *     // color(display-p3 1 50% 0 / .5)
+ *     cls1 = this.$class({
+ *         color: css.color("display-p3, [1, "50%", 0], 0.5);
+ *     })
+ * }
+ * ```
+ *
+ * @param cp Name of the color profile
+ * @param vs Array of color component values. Contains either numbers or strings denoting percents
+ * or the `"none"` keyword.
+ * @param a Optional alpha mask as a percentage value.
+ * @returns The `IColorFunc` object representing the invocation of the `color()` CSS function
+ */
+ export const color = (cp: Extended<ColorProfile>, vs: Extended<number | string>[] | Extended<string>,
+    a?: Extended<CssPercent>): IColorFunc =>
+{
+    return { fn: "color", cp, vs, a };
+}
+
+fdo.color = {
+    p: [ "cp", "vs", ["a", WKF.Percent, "/"] ],
+    s: " "
+};
 
 
 

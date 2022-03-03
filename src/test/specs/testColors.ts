@@ -129,6 +129,32 @@ describe("Colors", () =>
 			dom.testLonghandProp( "color", "negativeColorWithAlpha", "rgba(237, 203, 169, 0.25)");
 		})
 	})
+
+
+
+	describe("color() function", () =>
+	{
+		it("pre-defined color profile", () =>
+		{
+            let s = css.stylesetToString( {color: css.color( "display-p3", [10, "20%", 30], 0.5)});
+            expect(s).toEqual( "color:color(display-p3 10 20% 30 / 50%);");
+		})
+
+		it("@color-profile at-rule", () =>
+		{
+            class A extends css.StyleDefinition
+            {
+                cp = this.$colorProfile( "file.icc", "saturation")
+                cls = this.$class({ color: css.color( this.cp, [10, 20, 30])})
+            }
+
+            let s = dom.serialize(A);
+            expect(s).toEqual("<style id=\"A\">" +
+                "@color-profile --A_cp {src:url('file.icc');rendering-intent:saturation;}" +
+                ".A_cls{color:color(--A_cp 10 20 30);}" +
+            "</style>");
+		})
+	})
 })
 
 

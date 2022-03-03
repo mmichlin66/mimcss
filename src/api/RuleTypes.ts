@@ -113,7 +113,7 @@ export interface IStyleRule extends IRule, IRuleWithSelector
 
 /**
  * The `IClassRule` interface represents a style rule where the selector is a single class name.
- * This interface is returned from the [[$class]] function.
+ * This interface is returned from the [[$class]] method.
  */
 export interface IClassRule extends IStyleRule, IPrefixedNamedEntity
 {
@@ -126,7 +126,7 @@ export interface IClassRule extends IStyleRule, IPrefixedNamedEntity
 /**
  * The `IClassNameRule` interface represents a combination of two or more class names. It can be
  * used to make it easier to create elements with more than one CSS class. This interface is
- * returned from the [[$classname]] function.
+ * returned from the [[$classname]] method.
  *
  * Objects implementing the `IClassNameRule` interface have the `name` property that contains the
  * combined class name, e.g. `"class1 class2"`. The `cssClassName` property contains the combined
@@ -144,8 +144,8 @@ export interface IClassNameRule extends IPrefixedNamedEntity, IRuleWithSelector
  * Type for defining the `class` property of HTML elements. It can be expressed in one of the
  * following ways:
  * - as a string.
- * - as a class rule returned form the [[$class]] function.
- * - as a class name rule returned form the [[$classname]] function.
+ * - as a class rule returned form the [[$class]] method.
+ * - as a class name rule returned form the [[$classname]] method.
  * - as an array of the above.
  */
 export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType[];
@@ -154,7 +154,7 @@ export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType
 
 /**
  * The `IIDRule` interface represents a style rule where the selector is a single element ID.
- * This interface is returned from the [[$id]] function.
+ * This interface is returned from the [[$id]] method.
  */
 export interface IIDRule extends IStyleRule, IPrefixedNamedEntity
 {
@@ -179,7 +179,7 @@ export type AnimationFrame = [AnimationWaypoint, AnimationStyleset | AnimationSt
 
 /**
  * The IAnimationRule interface represents the `@keyframes` rule.
- * Objects implementing this interface are returned from the [[$keyframes]] function.
+ * Objects implementing this interface are returned from the [[$keyframes]] method.
  */
 export interface IAnimationRule extends IRule, INamedEntity
 {
@@ -206,7 +206,7 @@ export interface IAnimationFrameRule extends IStyleRule
 
 /**
  * The IVarRule interface represents a CSS custom property definition. Objects implementing this
- * interface are returned from the [[$var]] and [[$property]] function.
+ * interface are returned from the [[$var]] and [[$property]] methods.
  */
 export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedNamedEntity, ICustomVar<VarValue<K>>
 {
@@ -244,7 +244,7 @@ export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedName
  * [[IVarRule]] interface), they cannot participate in the cascade and cannot be redefined under
  * elements. Constant can, however, use any expression that satisfies the type defined by the
  * `template` parameter including other constants, custom properties and functions.
- * Objects implementing this interface are returned from the [[$const]] function.
+ * Objects implementing this interface are returned from the [[$const]] method.
  */
 export interface IConstRule<K extends VarTemplateName = any> extends IConstant<VarValue<K>>
 {
@@ -267,7 +267,7 @@ export interface IConstRule<K extends VarTemplateName = any> extends IConstant<V
  * counter objects that can be used in counter-increment, counter-reset and counter-set style
  * properties. No CSS rule is created for counters - they are needed only to provide type-safe
  * counter definitions.
- * Objects implementing this interface are returned from the [[$counter]] function.
+ * Objects implementing this interface are returned from the [[$counter]] method.
  */
 export interface ICounterRule extends INamedEntity
 {
@@ -284,7 +284,7 @@ export interface ICounterRule extends INamedEntity
 
 /**
  * The ICounterRule interface represents the `@counter-style` rule.
- * Objects implementing this interface are returned from the [[$counterStyle]] function.
+ * Objects implementing this interface are returned from the [[$counterStyle]] method.
  */
 export interface ICounterStyleRule extends IRule, INamedEntity
 {
@@ -296,7 +296,7 @@ export interface ICounterStyleRule extends IRule, INamedEntity
 
 /**
  * The IImportRule interface represents the CSS `@import` rule.
- * Objects implementing this interface are returned from the [[$import]] function.
+ * Objects implementing this interface are returned from the [[$import]] method.
  */
 export interface IImportRule extends IRule
 {
@@ -308,7 +308,7 @@ export interface IImportRule extends IRule
 
 /**
  * The IFontFaceRule interface represents the CSS `@font-face` rule.
- * Objects implementing this interface are returned from the [[$fontface]] function.
+ * Objects implementing this interface are returned from the [[$fontface]] method.
  */
 export interface IFontFaceRule extends IRule
 {
@@ -320,7 +320,7 @@ export interface IFontFaceRule extends IRule
 
 /**
  * The INamespaceRule interface represents the CSS `@namespace` rule.
- * Objects implementing this interface are returned from the [[$namespace]] function.
+ * Objects implementing this interface are returned from the [[$namespace]] method.
  */
 export interface INamespaceRule extends IRule
 {
@@ -338,7 +338,7 @@ export interface INamespaceRule extends IRule
 
 /**
  * The IPageRule interface represents the CSS `@page` rule.
- * Objects implementing this interface are returned from the [[$page]] function.
+ * Objects implementing this interface are returned from the [[$page]] method.
  */
 export interface IPageRule extends IStyleRule
 {
@@ -353,8 +353,8 @@ export interface IPageRule extends IStyleRule
 
 /**
  * The IGridLineRule interface represents a definition of a named grid line.
- * Objects implementing this interface are returned from the [[$gridline]] function or created
- * when a grid area is defined using the [[$gridarea]] function.
+ * Objects implementing this interface are returned from the [[$gridline]] method or created
+ * when a grid area is defined using the [[$gridarea]] method.
  */
 export interface IGridLineRule extends INamedEntity
 {
@@ -377,7 +377,7 @@ export interface IGridLineRule extends INamedEntity
 /**
  * The IGridAreaRule interface represents a definition of a named grid are. Grid area rule
  * defines two line rules: for its start and end lines.
- * Objects implementing this interface are returned from the [[$gridarea]] function.
+ * Objects implementing this interface are returned from the [[$gridarea]] method.
  */
 export interface IGridAreaRule extends INamedEntity
 {
@@ -386,6 +386,19 @@ export interface IGridAreaRule extends INamedEntity
 
     /** End line of the area. */
     readonly endLine: IGridLineRule;
+}
+
+
+
+/**
+ * The IColorProfileRule interface represents a `@color-profile` at rule. This rule generates a
+ * color profile name, which can be later used in the [[color]] function.
+ * Objects implementing this interface are returned from the [[$colorProfile]] method.
+ */
+export interface IColorProfileRule extends INamedEntity
+{
+    /** Name of the color profile rule that can be used in the [[color]] function. */
+    readonly profileName: string;
 }
 
 
