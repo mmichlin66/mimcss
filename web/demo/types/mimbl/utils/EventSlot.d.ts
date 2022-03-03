@@ -10,8 +10,8 @@ export interface IEventSlot<TFunc extends Function = Function> {
     attach(listener: TFunc): void;
     /** Removes the given function as a listener to the event. */
     detach(listener: TFunc): void;
-    /** Returns the number of currently attached listeners. */
-    readonly count: number;
+    /** Determines whether this event slot has any listeners. */
+    has(): boolean;
 }
 export declare type EventSlotFunc = (...args: any[]) => void;
 /**
@@ -44,11 +44,16 @@ export declare class EventSlot<TFunc extends EventSlotFunc = any> implements IEv
     attach(listener: TFunc): void;
     /** Removes the given function as a listener to the event. */
     detach(listener: TFunc): void;
-    /** Returns the number of currently attached listeners. */
-    get count(): number;
+    /** Determines whether this event slot has any listeners. */
+    has(): boolean;
     /** Removes all listeners to the event. */
     clear(): void;
-    private listeners;
+    /**
+     * The first listener function. Since many times there is only one listener to an event, we
+     * optimize by not creating a set of listeners.
+     */
+    private listener?;
+    private listeners?;
 }
 /**
  * The MultiEventSlot type represents an object that for each property from the template type T

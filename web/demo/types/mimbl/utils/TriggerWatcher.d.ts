@@ -1,3 +1,4 @@
+import { IEventSlot } from "../internal";
 /** Type for functions that accept any number of parameters and return any type */
 export declare type AnyAnyFunc = (...args: any[]) => any;
 /** Type for functions that accept no parameters and return values of any type */
@@ -11,15 +12,11 @@ export declare type TypeVoidFunc<T> = (v: T) => void;
  * when this value changes.
  * @typeparam T Type of the trigger value.
  */
-export interface ITrigger<T = any> {
+export interface ITrigger<T = any> extends IEventSlot<TypeVoidFunc<T>> {
     /** Retrieves the current value */
     get(): T;
     /** Sets a new value */
     set(v: T): void;
-    /** Adds a callback that will be invoked when the value of the reference changes. */
-    attach(listener: TypeVoidFunc<T>): void;
-    /** Removes a callback that was added with addListener. */
-    detach(listener: TypeVoidFunc<T>): void;
 }
 /**
  * Creates a trigger object of the given depth with the given initial value.
@@ -28,7 +25,7 @@ export interface ITrigger<T = any> {
  * arrays, maps, sets and objects should trigger changes.
  * @param v Optional initial value
  */
-export declare function createTrigger<T = any>(depth: number, v?: T): ITrigger<T>;
+export declare function createTrigger<T = any>(v?: T, depth?: number): ITrigger<T>;
 /**
  * Checks whether the given object is a trigger.
  * @param obj Object to check whether it is a trigger
