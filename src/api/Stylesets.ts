@@ -1259,12 +1259,6 @@ export interface IStyleset
     clear?: st.Clear_StyleType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/clip
-     * @deprecated The CSS `clip` property and `rect()` function are deprecated.
-     */
-    clip?: st.Clip_StyleType;
-
-    /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path
      */
     clipPath?: st.ClipPath_StyleType;
@@ -1401,17 +1395,17 @@ export interface IStyleset
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/counter-increment
      */
-    counterIncrement?: st.CssCounter;
+    counterIncrement?: st.Counter_StyleType;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/counter-reset
      */
-    counterReset?: st.CssCounter;
+    counterReset?: st.Counter_StyleType;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/counter-set
      */
-    counterSet?: st.CssCounter;
+    counterSet?: st.Counter_StyleType;
 
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
@@ -2649,6 +2643,11 @@ export interface IStyleset
     paddingTop?: CssLength;
 
     /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/page
+     */
+    page?: st.Page_StyleType;
+
+    /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/page-break-after
      */
     pageBreakAfter?: st.BreakAfter_StyleType;
@@ -3335,20 +3334,6 @@ export type ExtendedIStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStylese
 
 
 /**
- * The `IPageStyleset` interface defines properties that can be used in the `@page` rule in
- * addition to regular style properties.
- */
-export interface IPageStyleset
-{
-    /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@page/size
-     */
-    size?: st.Size_StyleType;
-}
-
-
-
-/**
  * The `ISyntaxTypeStyleset` interface maps CSS syntax names to the types, which can be used for
  * defining custom CSS properties (a.k.a. variables) using the [[$property]] and [[$var]] methods.
  *
@@ -3481,7 +3466,7 @@ export interface ICustomTypeStyleset
  * combines serveral "styleset" interfaces into one thus defining the names and corresponding
  * types that can be used in [[$var]] and [[$property]] methods.
  */
-export interface IVarTemplateStyleset extends IStyleset, IPageStyleset,
+export interface IVarTemplateStyleset extends IStyleset,
     ISyntaxTypeStyleset, ICustomTypeStyleset {}
 
 
@@ -3609,9 +3594,90 @@ export type StringStyleset = { [K: string]: string | null | undefined }
 
 
 
-export type PageRuleStyleset = Styleset &
-    { [K in keyof IPageStyleset]?: ExtendedProp<IPageStyleset[K]> } &
+/** Type listing names of style properties that are allowed in the page boxes */
+export type PageBoxProperties = "direction" | "unicodeBidi" |
+    "background" | "backgroundColor" | "backgroundImage" | "backgroundRepeat" | "backgroundAttachment" | "backgroundPosition" |
+    "border" | "borderColor" | "borderWidth" |
+        "borderBlock" | "borderBlockColor" | "borderBlockStyle" | "borderBlockWidth" |
+        "borderBlockEnd" | "borderBlockEndColor" | "borderBlockEndStyle" | "borderBlockEndWidth" |
+        "borderBlockStart" | "borderBlockStartColor" | "borderBlockStartStyle" | "borderBlockStartWidth" |
+        "borderInline" | "borderInlineColor" | "borderInlineStyle" | "borderInlineWidth" |
+        "borderInlineEnd" | "borderInlineEndColor" | "borderInlineEndStyle" | "borderInlineEndWidth" |
+        "borderInlineStart" | "borderInlineStartColor" | "borderInlineStartStyle" | "borderInlineStartWidth" |
+        "borderBottom" | "borderBottomColor" | "borderBottomStyle" | "borderBottomWidth" |
+        "borderLeft" | "borderLeftColor" | "borderLeftStyle" | "borderLeftWidth" |
+        "borderRight" | "borderRightColor" | "borderRightStyle" | "borderRightWidth" |
+        "borderTop" | "borderTopColor" | "borderTopStyle" | "borderTopWidth" |
+        "borderRadius" | "borderStartStartRadius" | "borderStartEndRadius" | "borderEndStartRadius" | "borderEndEndRadius" |
+        "borderBottomLeftRadius" | "borderBottomRightRadius" | "borderTopLeftRadius" | "borderTopRightRadius" |
+    "counterReset" | "counterIncrement" | "counterSet" |
+    "color" | "content" |
+    "font" | "fontFamily" | "fontSize" | "fontStyle" | "fontVariant" | "fontWeight" |
+    "height" | "minHeight" | "maxHeight" | "width" | "minWidth" | "maxWidth" |
+    "lineHeight" |
+    "margin" | "marginBlock" | "marginBlockStart" | "marginBlockEnd" | "marginInlineStart" | "marginInlineEnd" |
+        "marginBottom" | "marginLeft" | "marginRight" | "marginTop" |
+    "outline" | "outlineColor" | "outlineStyle" | "outlineWidth" |
+    "padding" | "paddingTop" | "paddingBottom" | "paddingLeft" | "paddingRight" |
+    "paddingBlock" | "paddingBlockEnd" | "paddingBlockEnd" | "paddingInline" | "paddingInlineStart" | "paddingInlineEnd" |
+    "quotes" | "letterSpacing" | "visibility" | "verticalAlign" | "zIndex" |
+    "textAlign" | "textDecoration" | "textIndent" | "textTransform" | "whiteSpace" | "wordSpacing";
+
+/**
+ * Defines type that contains properties that can be specified for any of the page boxes - the
+ * main page box as well as margin boxes. It contains the following kinds of properties:
+ * - page-relevant style properties
+ * - "--" property for specifying custom CSS variables
+ * - "+" property for reusing existing style rules
+ */
+export type PageBoxStyleset =
+    { [K in PageBoxProperties]?: ExtendedProp<IStyleset[K]> } &
+    { "--"?: CustomVar_StyleType[] } &
     { "+"?: IStyleRule | IStyleRule[] };
+
+/**
+ * The `IPageRuleStyleset` interface defines properties that can be used in the `@page` at-rule in
+ * addition to regular style properties.
+ */
+export interface IPageRuleStyleset
+{
+    /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@page/bleed
+     */
+    bleed?: CssLengthOrAuto;
+
+    /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@page/marks
+     */
+    marks?: st.Marks_StyleType;
+
+    /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@page/page-orientation
+     */
+    pageOrientation?: st.PageOrientation;
+
+    /**
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@page/size
+     */
+    size?: st.Size_StyleType;
+}
+
+/**
+ * Defines type that can be passed to the [[$page]] method that creates a `@page` at-rule. This
+ * type allows:
+ * - page-relevant style properties
+ * - "--" property for specifying custom CSS variables
+ * - "+" property for reusing existing style rules
+ * - margin-box properties.
+ */
+export type PageRuleStyleset = PageBoxStyleset &
+    { [K in keyof IPageRuleStyleset]?: ExtendedProp<IPageRuleStyleset[K]> } &
+    {
+        [P in "@top-left-corner" | "@top-left" | "@top-center" | "@top-right" | "@top-right-corner" |
+            "@bottom-left-corner" | "@bottom-left" | "@bottom-center" | "@bottom-right" | "@bottom-right-corner" |
+            "@left-top" | "@left-middle" | "@left-bottom" | "@right-top" | "@right-middle" | "@right-bottom"
+        ]?: PageBoxStyleset
+    };
 
 
 

@@ -1,10 +1,11 @@
-import { Extended, OneOrPair, OneOrBox, OneOrMany, CssString, CssImage, ICursorFunc, IUrlFunc, TimingFunction } from "./CoreTypes";
-import { CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, HorizontalPositionKeyword, VerticalPositionKeyword, IFitContentProxy, ILengthProxy, CssAspectRatio, IRectProxy, CssLengthOrAuto, AngleUnits, FrequencyUnits, LengthUnits, PercentUnits, ResolutionUnits, TimeUnits } from "./NumericTypes";
+import { Extended, OneOrPair, OneOrBox, OneOrMany, CssString, CssImage, ICursorFunc, IUrlFunc, TimingFunction, IStringProxy } from "./CoreTypes";
+import { CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, HorizontalPositionKeyword, VerticalPositionKeyword, IFitContentProxy, ILengthProxy, CssAspectRatio, CssLengthOrAuto, AngleUnits, FrequencyUnits, LengthUnits, PercentUnits, ResolutionUnits, TimeUnits } from "./NumericTypes";
 import { CssColor, CssNonNumericColor } from "./ColorTypes";
 import { FontStretchKeyword, FontStyle, FontWeight, SystemFont } from "./FontTypes";
 import { BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs, IRayFunc, TransformFuncs } from "./ShapeTypes";
 import { IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule } from "./RuleTypes";
 import { IStyleset } from "./Stylesets";
+import { IPageNameRule } from "..";
 /**
  * Type representing keywords used to define a type used in the CSS `attr()` function.
  */
@@ -360,13 +361,6 @@ export declare type CaretColor_StyleType = "auto" | CssColor;
  */
 export declare type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start" | "inline-end";
 /**
- * Type for [[IStyleset.clip|clip]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/clip
- *
- * @deprecated The CSS `clip` property and `rect()` function are deprecated.
- */
-export declare type Clip_StyleType = "auto" | IRectProxy;
-/**
  * Type representing the boundaries of a box
  *
  */
@@ -487,7 +481,12 @@ export declare type ContentVisibility_StyleType = "auto" | "visible" | "hidden";
  * Type for [[counterIncrement]], [[counterReset]] and [[counterSet]] style properties
  *
  */
-export declare type CssCounter = "none" | OneOrMany<ICounterRule | string | [ICounterRule | string, Extended<number>]>;
+export declare type CssCounter = ICounterRule | "page" | "pages" | IStringProxy;
+/**
+ * Type for [[counterIncrement]], [[counterReset]] and [[counterSet]] style properties
+ *
+ */
+export declare type Counter_StyleType = "none" | OneOrMany<CssCounter | [Extended<CssCounter>, Extended<number>]>;
 /**
  * Type for cursor pre-defined names
  *
@@ -799,6 +798,15 @@ export declare type MarginTrim_StyleType = "none" | "in-flow" | "all";
  */
 export declare type Marker_StyleType = "none" | IIDRule;
 /**
+ * Type for the [[marks]] style property for the `@page` at-rule
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/marker-start
+ *
+ */
+export declare type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross crop" | [
+    "crop",
+    "cross"?
+] | ["cross", "crop"?];
+/**
  * Type for the [[maskBorder]] style properties
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/mask-border
  *
@@ -945,6 +953,12 @@ export declare type PageOrientation = "portrait" | "landscape";
  *
  */
 export declare type Size_StyleType = "auto" | OneOrPair<CssLength> | PageSizeKeyword | PageOrientation | [PageSizeKeyword, PageOrientation];
+/**
+ * Type for the [[page]] style property
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/page
+ *
+ */
+export declare type Page_StyleType = "auto" | IPageNameRule | string;
 /**
  * Type for the paint-order style property
  *

@@ -342,11 +342,21 @@ export interface INamespaceRule extends IRule
  */
 export interface IPageRule extends IStyleRule
 {
-	/** Optional name of the page pseudo style (e.g. "":first") */
-	readonly pseudoClass?: PagePseudoClass | undefined;
-
 	/** CSSOM page rule */
 	readonly cssRule: CSSPageRule | null;
+}
+
+
+
+/**
+ * The IPageNameRule interface represents a definition of a named page that can be later used in
+ * the CSS `@page` rule.
+ * Objects implementing this interface are returned from the [[$pageName]] method.
+ */
+export interface IPageNameRule extends INamedEntity
+{
+    /** Name of the page. */
+    readonly pageName: string;
 }
 
 

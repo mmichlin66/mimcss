@@ -1,8 +1,8 @@
-import {IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition, IColorProfileRule} from "../api/RuleTypes";
+import {IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition, IColorProfileRule, IPageNameRule} from "../api/RuleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {fontFace2s} from "../impl/MiscImpl"
-import {Rule, RuleLike, IMimcssRuleBag} from "./Rule";
+import {Rule, IMimcssRuleBag, NamedRuleLike} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {symV2S} from "../impl/Utils";
 import { ColorProfileRenderingIntent } from "..";
@@ -135,7 +135,7 @@ export class FontFaceRule extends MiscRule<CSSFontFaceRule> implements IFontFace
 /**
  * The PageRule class represents the CSS @page rule.
  */
-export class ClassNameRule extends RuleLike implements IClassNameRule
+export class ClassNameRule extends NamedRuleLike implements IClassNameRule
 {
 	public constructor( sd: IStyleDefinition, classes: (IClassRule | IClassNameRule | string)[])
 	{
@@ -162,16 +162,6 @@ export class ClassNameRule extends RuleLike implements IClassNameRule
         this.name = this.classes.map( v => typeof v === "string" ? v : v.name).join(" ");
         this.cssName = "." + this.name.replace( / /g, ".");
     }
-
-    // Implementation of the toString method returns the combined name of the classes (without
-    // the CSS prefixes).
-	public toString(): string
-	{
-		return this.name;
-	}
-
-    /** All class names concatenated with space */
-    public name: string;
 
     /** All class CSS names (with dots) concatenated together */
     public cssName: string;
@@ -226,3 +216,23 @@ export class ColorProfileRule extends Rule implements IColorProfileRule
 
 
 
+
+
+
+/**
+ * The PageNameRule class describes a named page definition. No CSS rule is created for these
+ * rules - they are needed only to provide type-safe name definitions.
+ */
+export class PageNameRule extends NamedRuleLike implements IPageNameRule
+{
+    // if the nameOverride is an area rule object, the isStartEndOrNone flag is always defined
+    // because this constructor can only be invoked for the start and end lines of the GridAreaRule
+    // object.
+    public constructor( sd: IStyleDefinition, nameOverride?: string | IPageNameRule)
+	{
+        super( sd, nameOverride);
+	}
+
+    /** Name of the page. */
+    public get pageName(): string { return this.name; }
+}

@@ -1,3 +1,4 @@
+import { IPageNameRule } from "..";
 import { IIDRule, INamespaceRule } from "./RuleTypes";
 /**
  * Style values that can be used for any CSS property.
@@ -349,6 +350,25 @@ export declare type DependentRuleCombinator = "&" | "&," | "& " | "&>" | "&+" | 
  * ```
  */
 export declare type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
+/**
+ * Represents print-related pseudo classes - those that can be specified with the `@page` CSS rule
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     pageName = this.$pageName()
+ *     page1 = this.$page( this.pageName, { margin: "auto" })
+ *     page2 = this.$page( ":left", { margin: "auto" })
+ *     page3 = this.$page( [this.pageName, ":left"], { margin: "auto" })
+ * }
+ * ```
+ */
+export declare type PageSelector = IPageNameRule | PagePseudoClass | [
+    IPageNameRule | PagePseudoClass,
+    ...PagePseudoClass[]
+];
 /**
  * Represents pseudo classes that can be used as properties in the [[CombinedStyleset]] object to
  * define dependent rules. Note that this type only contains pseudo classes that don't require

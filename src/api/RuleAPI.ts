@@ -1,9 +1,9 @@
-﻿import {CssSelector, PagePseudoClass, ElementTagName, ExtendedProp} from "./CoreTypes";
+﻿import {CssSelector, PagePseudoClass, ElementTagName, ExtendedProp, PageSelector} from "./CoreTypes";
 import {
     IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType,
-    NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule
+    NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
@@ -23,7 +23,7 @@ import {AnimationRule} from "../rules/AnimationRule"
 import {VarRule, ConstRule, PropertyRule} from "../rules/VarRule"
 import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
-import {FontFaceRule, ImportRule, NamespaceRule, ClassNameRule, ColorProfileRule} from "../rules/MiscRules"
+import {FontFaceRule, ImportRule, NamespaceRule, ClassNameRule, ColorProfileRule, PageNameRule} from "../rules/MiscRules"
 import {SupportsRule, MediaRule} from "../rules/GroupRules"
 import {v2s} from "../impl/Utils";
 import { ColorProfileRenderingIntent } from "./ColorTypes";
@@ -878,19 +878,58 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * ```typescript
      * class MyStyles extends css.StyleDefinition
      * {
-     *     init = [
-     *         this.$page( ":first", { margin: "auto" })
-     *     ]
+     *     firstPage = this.$page( ":first", { margin: "auto" })
      * }
      * ```
      *
-     * @param pseudoClass Optional name of the page pseudo style.
+     * @param pageSelector Optional selector of the page, whcih can be either a page name rule or a
+     * page pseudo class or an array of the above.
      * @param styleset Styles to apply.
      * @returns The `IPageRule` object that represents the page rule.
      */
-    public $page( pseudoClass?: PagePseudoClass, styleset?: PageRuleStyleset): IPageRule
+    public $page( pageSelector?: PageSelector, styleset?: PageRuleStyleset): IPageRule
     {
-        return new PageRule( this, pseudoClass, styleset);
+        return new PageRule( this, pageSelector, styleset);
+    }
+
+
+
+    /**
+     * Creates a new page name rule. The page name will be created when the rule is processed as
+     * part of the style definition class. The name can be also overridden by providing either an
+     * explicit name or another page name rule. The page name rules are used in the `@page` at-rules.
+     *
+     * No CSS rule is created for page name rules - these objects are solely used for creating
+     * names, which can be type-safely referred to from the page rules.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     standoutPageName = this.$pageName();
+     *
+     *     standoutPage = this.$page( this.standoutPageName, {
+     *         margin: css.inch(1.5),
+     *         borderColor: "red",
+     *     })
+     *
+     *     firstStandoutPage = this.$page( [this.standoutPageName, ":first"], {
+     *         "+": this.standoutPage,
+     *         size: "landscape",
+     *     })
+     * }
+     * ```
+     *
+     * @param nameOverride String or another `IPageNameRule` object that determines the name of the
+     * page. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism. This might be useful if there is a need for the name to match a name of
+     * existing page.
+     * @returns The `IPageNameRule` object that represents the page name.
+     */
+    public $pageName( nameOverride?: string | IPageNameRule): IPageNameRule
+    {
+        return new PageNameRule( this, nameOverride);
     }
 
 

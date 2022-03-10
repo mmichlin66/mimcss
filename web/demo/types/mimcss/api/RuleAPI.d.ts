@@ -1,9 +1,10 @@
-import { CssSelector, PagePseudoClass, ElementTagName, ExtendedProp } from "./CoreTypes";
-import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition } from "./RuleTypes";
+import { CssSelector, ElementTagName, ExtendedProp, PageSelector } from "./CoreTypes";
+import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule } from "./RuleTypes";
 import { MediaStatement, SupportsStatement } from "./MediaTypes";
 import { ExtendedFontFace } from "./FontTypes";
 import { ExtendedCounterStyleset } from "./CounterTypes";
 import { VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset, ISyntaxTypeStyleset, PageRuleStyleset } from "./Stylesets";
+import { ColorProfileRenderingIntent } from "./ColorTypes";
 /**
  * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
  * Style definition classes are regular TypeScript classes and as such can have any fields and
@@ -716,17 +717,75 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * ```typescript
      * class MyStyles extends css.StyleDefinition
      * {
-     *     init = [
-     *         this.$page( ":first", { margin: "auto" })
-     *     ]
+     *     firstPage = this.$page( ":first", { margin: "auto" })
      * }
      * ```
      *
-     * @param pseudoClass Optional name of the page pseudo style.
+     * @param pageSelector Optional selector of the page, whcih can be either a page name rule or a
+     * page pseudo class or an array of the above.
      * @param styleset Styles to apply.
      * @returns The `IPageRule` object that represents the page rule.
      */
-    $page(pseudoClass?: PagePseudoClass, styleset?: PageRuleStyleset): IPageRule;
+    $page(pageSelector?: PageSelector, styleset?: PageRuleStyleset): IPageRule;
+    /**
+     * Creates a new page name rule. The page name will be created when the rule is processed as
+     * part of the style definition class. The name can be also overridden by providing either an
+     * explicit name or another page name rule. The page name rules are used in the `@page` at-rules.
+     *
+     * No CSS rule is created for page name rules - these objects are solely used for creating
+     * names, which can be type-safely referred to from the page rules.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     standoutPageName = this.$pageName();
+     *
+     *     standoutPage = this.$page( this.standoutPageName, {
+     *         margin: css.inch(1.5),
+     *         borderColor: "red",
+     *     })
+     *
+     *     firstStandoutPage = this.$page( [this.standoutPageName, ":first"], {
+     *         "+": this.standoutPage,
+     *         size: "landscape",
+     *     })
+     * }
+     * ```
+     *
+     * @param nameOverride String or another `IPageNameRule` object that determines the name of the
+     * page. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism. This might be useful if there is a need for the name to match a name of
+     * existing page.
+     * @returns The `IPageNameRule` object that represents the page name.
+     */
+    $pageName(nameOverride?: string | IPageNameRule): IPageNameRule;
+    /**
+     * Creates a new `@color-profile` rule.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // deefine color profile
+     *     coated = this.$colorProfile( "https://example.org/SWOP2006_Coated5v2.icc")
+     *
+     *     // use color profile name in the `color()` function
+     *     cls = this.$class({ color: css.color( this.coated, 10, 20, 30)})
+     * }
+     * ```
+     *
+     * @param url URL to the color-profile file
+     * @param intent Rendering intent
+     * @param nameOverride String or another `IColorProfileRule` object that determines the name of the
+     * color profile. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism. This might be useful if there is a need for the name to match a name of
+     * existing color profile.
+     * @returns `IColorProfileRule` object representing the `@color-profile` at-rule.
+     */
+    $colorProfile(url: string, intent?: ColorProfileRenderingIntent, nameOverride?: IColorProfileRule | string): IColorProfileRule;
     /**
      * Creates a new `@supports` rule.
      *

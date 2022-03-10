@@ -1,3 +1,4 @@
+import { IColorProfileRule, IStringProxy } from "..";
 import { Extended, ICssFuncObject } from "./CoreTypes";
 import { CssAngle, CssPercent } from "./NumericTypes";
 /**
@@ -171,7 +172,7 @@ export declare type CssColorSeparation = number | string | CssPercent;
  * that returns this interface wherever [[CssColor]] is accepted.
  */
 export interface ICssColorFunc extends ICssFuncObject {
-    fn: "rgb" | "hsl" | "hwb" | "lab" | "lch" | "color-mix" | "color-contrast" | "alpha";
+    fn: "rgb" | "hsl" | "hwb" | "lab" | "lch" | "color-mix" | "color-contrast" | "color" | "alpha";
 }
 /**
  * Type for CSS color. Color can be represented using the following types:
@@ -183,7 +184,8 @@ export interface ICssColorFunc extends ICssFuncObject {
  *     ignored.
  *   - floating point part of the number is treated as percents of alpha channel. If there is no
  *     floating part, alpha is 1.
- * - functions: [[rgb]], [[hsl]], [[lch]], [[lab]], [[alpha]].
+ * - functions: [[rgb]], [[hsl]], [[hwb]], [[lab]], [[lch]], [[color-mix]], [[color-contrast]],
+ *   [[color]], [[alpha]].
  *
  * **Examples:**
  *
@@ -219,7 +221,7 @@ export interface ICssColorFunc extends ICssFuncObject {
  * }
  * ```
  */
-export declare type CssColor = number | keyof INamedColors | "transparent" | "currentcolor" | SystemColors | ICssColorFunc;
+export declare type CssColor = number | keyof INamedColors | "transparent" | "currentcolor" | SystemColors | IRgbFunc | IHslFunc | IHwbFunc | ILabFunc | ILchFunc | IColorMixFunc | IColorContrastFunc | IColorFunc | IAlphaFunc;
 /**
 * Type for CSS color that exclude numeric color representation. Color can be represented using
 * the following types:
@@ -357,6 +359,23 @@ export interface IColorMixBuilder extends IColorMixFunc {
     in(cs: Extended<ColorSpace>): this;
 }
 /**
+ * Represents predefined color profiles that CSS works with.
+ */
+export declare type ColorProfile = "srgb" | "srgb-linear" | "display-p3" | "a98-rgb" | "prophoto-rgb" | "rec2020" | IColorProfileRule | IStringProxy;
+/**
+ * Represents an invocation of the CSS `color()` function. This interface is returned from the
+ * [[color]] function. Developers can use this structure wherever [[CssColor]] is accepted.
+ */
+export interface IColorFunc extends ICssColorFunc {
+    fn: "color";
+    /** CIE lightness value */
+    cp: Extended<ColorProfile>;
+    /** Value components according to the profile */
+    vs: Extended<number | string>[] | Extended<string>;
+    /** Alpha channel value */
+    a?: Extended<CssPercent>;
+}
+/**
  * Represents an invocation of the [[alpha]] function. Developers can use this structure wherever
  * CssColor is accepted.
  */
@@ -365,4 +384,9 @@ export interface IAlphaFunc extends ICssColorFunc {
     c: number | keyof INamedColors;
     a: number;
 }
+/**
+ * Rendering intent that can be specified in the color profile and indicated in the @color-profile
+ * at-rule.
+ */
+export declare type ColorProfileRenderingIntent = "relative-colorimetric" | "absolute-colorimetric" | "perceptual" | "saturation";
 //# sourceMappingURL=ColorTypes.d.ts.map

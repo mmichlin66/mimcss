@@ -4,7 +4,7 @@
     ICubicBezierFunc, IStepsFunc, INSTagFunc, ElementTagName, SelectorCombinator,
 } from "./CoreTypes"
 import {ICounterRule, IIDRule, INamespaceRule, IVarRule} from "./RuleTypes";
-import {AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType} from "./StyleTypes";
+import {AttrTypeKeyword, AttrUnitKeyword, CssCounter, ListStyleType_StyleType} from "./StyleTypes";
 import {ExtendedVarValue, Styleset, VarTemplateName} from "./Stylesets";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy} from "./MediaTypes";
 import {sp2s} from "../impl/StyleImpl";
@@ -506,7 +506,7 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
  * @param c Counter name or counter rule object
  * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
  */
- export const counter = (counterObj: Extended<ICounterRule | string>,
+ export const counter = (counterObj: Extended<CssCounter>,
 	style?: Extended<ListStyleType_StyleType>): IStringProxy =>
     () => f2s( "counter", [counterObj, style]);
 
@@ -521,7 +521,7 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
  * @param style Counter style
  * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
  */
-export const counters = (counterObj: Extended<ICounterRule | string>,
+export const counters = (counterObj: Extended<CssCounter>,
 	sep: Extended<string>, style?: Extended<ListStyleType_StyleType>): IStringProxy =>
     () => f2s( "counters", [counterObj, [sep, WKF.Quoted], style]);
 

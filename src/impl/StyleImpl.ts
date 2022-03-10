@@ -4,7 +4,7 @@ import {
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
     BoxShadow_StyleType, BoxShadow_Single,
 } from "../api/StyleTypes";
-import { CustomVar_StyleType, IStyleset, StringStyleset, Styleset, VarTemplateName } from "../api/Stylesets";
+import { CustomVar_StyleType, IStyleset, StringStyleset, Styleset} from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
 import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 import {getVarsFromSD} from "../rules/RuleContainer";
@@ -409,7 +409,7 @@ export const s_registerSP = (name: string, toStringFunc: AnyToStringFunc) =>
  * Map of property names to the V2SOptions objects describing custom actions necessary to
  * convert the property value to the CSS-compliant string.
  */
-const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
+const stylePropertyInfos: { [K: string]: V2SOptions } =
 {
     animation: {
         any: { obj: [
@@ -467,9 +467,6 @@ const stylePropertyInfos: { [K in VarTemplateName]?: V2SOptions } =
     bottom: WKF.Length,
     boxShadow: WKF.BoxShadow,
 
-    clip:  {
-        arr: v => `rect(${wkf[WKF.MultiLengthWithSpace](v)}`
-    },
     columnGap: WKF.Length,
     columnRule: WKF.Border,
     content: {

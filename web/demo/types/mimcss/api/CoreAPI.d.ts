@@ -1,6 +1,6 @@
 import { CssSelector, ISelectorProxy, IRawProxy, Extended, IUrlFunc, ICursorFunc, IStringProxy, ISelectorBuilder, TimingFunctionJumpTerm, ICubicBezierFunc, IStepsFunc, INSTagFunc, ElementTagName, SelectorCombinator } from "./CoreTypes";
-import { ICounterRule, IIDRule, INamespaceRule, IVarRule } from "./RuleTypes";
-import { AttrTypeKeyword, AttrUnitKeyword, ListStyleType_StyleType } from "./StyleTypes";
+import { IIDRule, INamespaceRule, IVarRule } from "./RuleTypes";
+import { AttrTypeKeyword, AttrUnitKeyword, CssCounter, ListStyleType_StyleType } from "./StyleTypes";
 import { ExtendedVarValue, Styleset } from "./Stylesets";
 import { ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy } from "./MediaTypes";
 /**
@@ -182,7 +182,7 @@ export declare const attr: (attrName: Extended<string>, typeOrUnit?: Extended<At
  * @param c Counter name or counter rule object
  * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
  */
-export declare const counter: (counterObj: Extended<ICounterRule | string>, style?: Extended<ListStyleType_StyleType> | undefined) => IStringProxy;
+export declare const counter: (counterObj: Extended<CssCounter>, style?: Extended<ListStyleType_StyleType> | undefined) => IStringProxy;
 /**
  * Returns a representation of the CSS `counters()` function with the given separator and
  * an optional counter style.
@@ -192,7 +192,7 @@ export declare const counter: (counterObj: Extended<ICounterRule | string>, styl
  * @param style Counter style
  * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
  */
-export declare const counters: (counterObj: Extended<ICounterRule | string>, sep: Extended<string>, style?: Extended<ListStyleType_StyleType> | undefined) => IStringProxy;
+export declare const counters: (counterObj: Extended<CssCounter>, sep: Extended<string>, style?: Extended<ListStyleType_StyleType> | undefined) => IStringProxy;
 /**
  * Returns a function representing the invocation of the `var()` CSS function for the given custom
  * CSS property with optional fallbacks. Usually, when you want to refer to a custom CSS property

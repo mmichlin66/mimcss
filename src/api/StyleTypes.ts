@@ -1,9 +1,9 @@
 ﻿import {
-    Extended, OneOrPair, OneOrBox, OneOrMany, CssString, CssImage, ICursorFunc, IUrlFunc, TimingFunction
+    Extended, OneOrPair, OneOrBox, OneOrMany, CssString, CssImage, ICursorFunc, IUrlFunc, TimingFunction, IStringProxy
 } from "./CoreTypes"
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, HorizontalPositionKeyword,
-    VerticalPositionKeyword, IFitContentProxy, ILengthProxy, CssAspectRatio, IRectProxy, CssLengthOrAuto,
+    VerticalPositionKeyword, IFitContentProxy, ILengthProxy, CssAspectRatio, CssLengthOrAuto,
     AngleUnits, FrequencyUnits, LengthUnits, PercentUnits, ResolutionUnits, TimeUnits
 } from "./NumericTypes"
 import {CssColor, CssNonNumericColor} from "./ColorTypes";
@@ -16,6 +16,7 @@ import {
     IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule
 } from "./RuleTypes";
 import {IStyleset} from "./Stylesets";
+import { IPageNameRule } from "..";
 
 
 
@@ -511,16 +512,6 @@ export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start
 
 
 /**
- * Type for [[IStyleset.clip|clip]] style property
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/clip
- *
- * @deprecated The CSS `clip` property and `rect()` function are deprecated.
- */
-export type Clip_StyleType = "auto" | IRectProxy;
-
-
-
-/**
  * Type representing the boundaries of a box
  *
  */
@@ -682,7 +673,13 @@ export type ContentVisibility_StyleType = "auto" | "visible" | "hidden";
  * Type for [[counterIncrement]], [[counterReset]] and [[counterSet]] style properties
  *
  */
-export type CssCounter = "none" | OneOrMany<ICounterRule | string | [ICounterRule | string, Extended<number>]>;
+export type CssCounter = ICounterRule | "page" | "pages" | IStringProxy;
+
+/**
+ * Type for [[counterIncrement]], [[counterReset]] and [[counterSet]] style properties
+ *
+ */
+export type Counter_StyleType = "none" | OneOrMany<CssCounter | [Extended<CssCounter>, Extended<number>]>;
 
 
 
@@ -1136,6 +1133,16 @@ export type Marker_StyleType = "none" | IIDRule;
 
 
 /**
+ * Type for the [[marks]] style property for the `@page` at-rule
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/marker-start
+ *
+ */
+export type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross crop" |
+    ["crop", "cross"?] | ["cross", "crop"?];
+
+
+
+/**
  * Type for the [[maskBorder]] style properties
  * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/mask-border
  *
@@ -1338,6 +1345,15 @@ export type PageOrientation = "portrait" | "landscape";
  */
 export type Size_StyleType = "auto" | OneOrPair<CssLength> |
     PageSizeKeyword | PageOrientation | [PageSizeKeyword, PageOrientation];
+
+
+
+/**
+ * Type for the [[page]] style property
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/page
+ *
+ */
+export type Page_StyleType = "auto" | IPageNameRule | string;
 
 
 

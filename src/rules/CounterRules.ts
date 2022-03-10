@@ -1,7 +1,7 @@
 import {ExtendedCounterStyleset} from "../api/CounterTypes";
 import {ICounterRule, ICounterStyleRule, IStyleDefinition} from "../api/RuleTypes"
 import {counterStyleset2s} from "../impl/MiscImpl";
-import {IMimcssRuleBag, Rule, RuleLike} from "./Rule";
+import {IMimcssRuleBag, NamedRuleLike, Rule} from "./Rule";
 
 
 
@@ -11,41 +11,15 @@ import {IMimcssRuleBag, Rule, RuleLike} from "./Rule";
  * properties. No CSS rule is created for counters - they are needed only to provide type-safe
  * counter definitions.
  */
-export class CounterRule extends RuleLike implements ICounterRule
+export class CounterRule extends NamedRuleLike implements ICounterRule
 {
 	public constructor( sd: IStyleDefinition, nameOverride?: string | ICounterRule)
 	{
-        super(sd);
-		this.nameOverride = nameOverride;
+        super( sd, nameOverride);
 	}
-
-
-    // This function is used when the object is specified as a value of a style property.
-    // We return the counter name.
-    public toString(): string { return this.name; }
-
-
-	// Processes the given rule.
-	public process( ruleName: string | null): void
-	{
-		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
-	}
-
-
-
-	/**
-	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
-	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
-	 * properties (--).
-	 */
-	public name: string;
 
     /** Name of the counter */
 	public get counterName(): string { return this.name; }
-
-	// Name or named object that should be used to create a name for this rule. If this property
-	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | ICounterRule;
 }
 
 

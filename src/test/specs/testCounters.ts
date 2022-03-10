@@ -43,7 +43,7 @@ describe("counters", () =>
 			class A extends css.StyleDefinition
 			{
 				counter = this.$counter( "cntr");
-				c = this.$class( { counterIncrement: ["cntr", 1] })
+				c = this.$class( { counterIncrement: [this.counter, 1] })
 			}
 
 			let a = css.activate( A);

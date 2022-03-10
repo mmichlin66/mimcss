@@ -18,6 +18,7 @@ module.exports = [
             "./lib/test/specs/testBackgrounds.js",
             "./lib/test/specs/testSelectors.js",
             "./lib/test/specs/testSSR.js",
+            "./lib/test/specs/testPageRules.js",
         ],
 
         output: {

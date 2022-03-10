@@ -7,9 +7,9 @@ import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
     CombinedStyleset, ParentClassType, IStyleset, PageRuleStyleset
 } from "../api/Stylesets"
-import {CssSelector, IParameterizedPseudoEntityFunc, PagePseudoClass} from "../api/CoreTypes"
+import {CssSelector, IParameterizedPseudoEntityFunc, PagePseudoClass, PageSelector} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
-import {camelToDash, fdo2s, symV2S} from "../impl/Utils";
+import {camelToDash, fdo2s, symV2S, v2s} from "../impl/Utils";
 import {s2s, sp2s} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
@@ -136,7 +136,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Converts the rule to CSS string representing the rule.
 	public toCss(): string
 	{
-		return `${this.selectorText}{${s2s( this.styleset)}}`;
+		return `${this.selectorText}{${s2s(this.styleset)}${this.getAux()}}`;
 	}
 
 
@@ -215,6 +215,10 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 	// Returns the selector part of the style rule.
 	protected abstract getSel(): string;
+
+ 	// Returns the additional part of the style rule beyond the styleset. For majority of style
+    // rules it is empty.
+	protected getAux(): string { return ""; }
 
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If false is returned, the property with the given name will not be added to the styleset.
@@ -354,7 +358,7 @@ class DepRule extends StyleRule
 
 
 	// Returns the selector part of the style rule.
-	public getSel(): string
+	protected getSel(): string
 	{
 		let parentSelector = this.parent!.selectorText;
 		if (this.param)
@@ -406,7 +410,7 @@ export class AbstractRule extends StyleRule
 	public clear(): void {}
 
     // Returns the selector part of the style rule.
-	public getSel(): string { return ""; }
+	protected getSel(): string { return ""; }
 }
 
 
@@ -434,7 +438,7 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 	}
 
 	// Returns the selector part of the style rule.
-	public getSel(): string
+	protected getSel(): string
 	{
 		return this.cssName;
 	}
@@ -539,7 +543,7 @@ export class SelectorRule extends StyleRule
 	}
 
 	// Returns the selector part of the style rule.
-	public getSel(): string
+	protected getSel(): string
 	{
 		return selector2s( this.selector);
 	}
@@ -555,23 +559,51 @@ export class SelectorRule extends StyleRule
  */
 export class PageRule extends StyleRule implements IPageRule
 {
-    public constructor( sd: IStyleDefinition, pseudoClass?: PagePseudoClass, style?: PageRuleStyleset)
+    public constructor( sd: IStyleDefinition, pageSelector?: PageSelector, style?: PageRuleStyleset)
     {
         super( sd, style);
-        this.pseudoClass = pseudoClass;
+        this.pageSelector = pageSelector;
     }
 
-    // Returns the selector part of the style rule.
-    public getSel(): string
+    // Allows the derived classes to process style properties that the StyleRule doesn't know about.
+    // If returns false, the property with the given name will not be added to the styleset.
+	protected parseSP( propName: string, propVal: any): boolean
     {
-        return `@page ${this.pseudoClass ? this.pseudoClass : ""}`;
+        if (propName.startsWith("@"))
+        {
+            if (!this.marginBoxes)
+                this.marginBoxes = new Map<string,Styleset>();
+
+            this.marginBoxes.set( propName, propVal)
+            return false;
+        }
+
+        return super.parseSP( propName, propVal);
+    }
+
+    // Returns the CSS string representing the style rule's selector.
+    protected getSel(): string
+    {
+        return `@page ${v2s( this.pageSelector, {sep: ""})}`;
+    }
+
+ 	// Returns the additional part of the style rule beyond the styleset. This rule adds the
+    // margin boxes.
+	protected getAux(): string
+    {
+        let s = "";
+        this.marginBoxes?.forEach( (boxStyleset, boxName) => s += `${boxName}{${s2s(boxStyleset)}}`);
+        return s;
     }
 
     /** SOM page rule */
     public cssRule: CSSPageRule;
 
-    /** Optional name of the page pseudo style (e.g. "":first") */
-    public pseudoClass?: PagePseudoClass;
+    /** Optional page seclector name of the page pseudo style (e.g. "":first") */
+    public pageSelector?: PageSelector;
+
+    /** Map of margin box names to their stylesets */
+    private marginBoxes: Map<string,Styleset>;
 }
 
 

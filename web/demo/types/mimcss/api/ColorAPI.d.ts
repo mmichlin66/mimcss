@@ -1,6 +1,6 @@
 import { Extended } from "./CoreTypes";
 import { CssAngle, CssPercent } from "./NumericTypes";
-import { CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc } from "./ColorTypes";
+import { ColorProfile, CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorFunc, IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc } from "./ColorTypes";
 /**
  * Object whose property names are the well-known Web color names while values correspond to the
  * hexadecimal representation of the RGB separations (without an alpha mask). The properties of
@@ -164,6 +164,31 @@ export declare const colorContrast: (c: Extended<CssColor>, ...vs: Extended<CssC
  * @returns The `IColorMixBuilder` object that allows adding colors and optional percentages to mix
  */
 export declare const colorMix: (c: Extended<CssColor>, p?: Extended<CssPercent> | undefined) => IColorMixBuilder;
+/**
+ * Creates color representation in the given color profile. This method should be used when
+ * defining CSS color values in styleset properties.
+ *
+ * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color()
+ *
+ * **Examples**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefnition
+ * {
+ *     // color(display-p3 1 50% 0 / .5)
+ *     cls1 = this.$class({
+ *         color: css.color("display-p3, [1, "50%", 0], 0.5);
+ *     })
+ * }
+ * ```
+ *
+ * @param cp Name of the color profile
+ * @param vs Array of color component values. Contains either numbers or strings denoting percents
+ * or the `"none"` keyword.
+ * @param a Optional alpha mask as a percentage value.
+ * @returns The `IColorFunc` object representing the invocation of the `color()` CSS function
+ */
+export declare const color: (cp: Extended<ColorProfile>, vs: Extended<number | string>[] | Extended<string>, a?: Extended<CssPercent> | undefined) => IColorFunc;
 /**
  * Converts the given color and the alpha mask to the CSS Color representation. This
  * method should be used when defining CSS color values in styleset properties.
