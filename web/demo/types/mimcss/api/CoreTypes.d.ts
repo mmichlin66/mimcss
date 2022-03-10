@@ -351,7 +351,7 @@ export declare type DependentRuleCombinator = "&" | "&," | "& " | "&>" | "&+" | 
  */
 export declare type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
 /**
- * Represents print-related pseudo classes - those that can be specified with the `@page` CSS rule
+ * Represents a page selector that can be specified with the `@page` CSS rule.
  *
  * **Example:**
  *
@@ -365,8 +365,8 @@ export declare type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
  * }
  * ```
  */
-export declare type PageSelector = IPageNameRule | PagePseudoClass | [
-    IPageNameRule | PagePseudoClass,
+export declare type PageSelector = IPageNameRule | PagePseudoClass | string | [
+    IPageNameRule | PagePseudoClass | string,
     ...PagePseudoClass[]
 ];
 /**
@@ -386,7 +386,7 @@ export declare type PageSelector = IPageNameRule | PagePseudoClass | [
  * }
  * ```
  */
-export declare type PseudoClass = PagePseudoClass | ":active" | ":any-link" | ":autofill" | ":blank" | ":checked" | ":default" | ":defined" | ":disabled" | ":empty" | ":enabled" | ":first-child" | ":first-of-type" | ":fullscreen" | ":focus" | ":focus-visible" | ":focus-within" | ":host" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" | ":last-child" | ":last-of-type" | ":left" | ":link" | ":only-child" | ":only-of-type" | ":optional" | ":out-of-range" | ":paused" | ":placeholder-shown" | ":read-only" | ":read-write" | ":required" | ":right" | ":root" | ":scope" | ":target" | ":valid" | ":visited";
+export declare type PseudoClass = ":active" | ":any-link" | ":autofill" | ":blank" | ":checked" | ":default" | ":defined" | ":disabled" | ":empty" | ":enabled" | ":first-child" | ":first-of-type" | ":fullscreen" | ":focus" | ":focus-visible" | ":focus-within" | ":host" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" | ":last-child" | ":last-of-type" | ":left" | ":link" | ":only-child" | ":only-of-type" | ":optional" | ":out-of-range" | ":paused" | ":placeholder-shown" | ":read-only" | ":read-write" | ":required" | ":right" | ":root" | ":scope" | ":target" | ":valid" | ":visited";
 /**
  * Represents pseudo elements that can be used as properties in the [[CombinedStyleset]] object to
  * define dependent rules. Note that this type only contains pseudo elements that don't require

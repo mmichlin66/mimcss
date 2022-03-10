@@ -425,7 +425,7 @@ export type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
 
 
 /**
- * Represents print-related pseudo classes - those that can be specified with the `@page` CSS rule
+ * Represents a page selector that can be specified with the `@page` CSS rule.
  *
  * **Example:**
  *
@@ -439,8 +439,8 @@ export type PagePseudoClass = ":blank" | ":first" | ":left" | ":right";
  * }
  * ```
  */
-export type PageSelector = IPageNameRule | PagePseudoClass |
-    [IPageNameRule | PagePseudoClass, ...PagePseudoClass[]];
+export type PageSelector = IPageNameRule | PagePseudoClass | string |
+    [IPageNameRule | PagePseudoClass | string, ...PagePseudoClass[]];
 
 
 
@@ -461,7 +461,7 @@ export type PageSelector = IPageNameRule | PagePseudoClass |
  * }
  * ```
  */
-export type PseudoClass = PagePseudoClass |
+export type PseudoClass =
 	":active" | ":any-link" | ":autofill" | ":blank" | ":checked" | ":default" | ":defined" | ":disabled" |
 	":empty" | ":enabled" | ":first-child" | ":first-of-type" | ":fullscreen" | ":focus" |
 	":focus-visible" | ":focus-within" | ":host" | ":hover" | ":indeterminate" | ":in-range" | ":invalid" |

@@ -6,6 +6,18 @@ import {activateSD, deactivateSD} from "../rules/RuleContainer";
 
 
 /**
+ * The IObjectWithStyle interface represents an object which has the style property of the
+ * CSSStyleDeclaration type. This interface shape is implemented by CSSStyleRule,
+ * CSSPageRule and ElementCSSInlineStyle
+ */
+export interface IObjectWithStyle
+{
+    readonly style: CSSStyleDeclaration;
+}
+
+
+
+/**
  * The IActivator interface represents an object responsible for a certain type of activation
  * mechanism.
  */
@@ -27,7 +39,7 @@ export interface IStyleActivator
 	 * Instructs to set the value of either a single property or a set of properties in the given
      * CSS style object.
 	 */
-    updateStyle( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    updateStyle( ruleOrElm: IObjectWithStyle, name: string | null,
         value?: string | StringStyleset | null, important?: boolean): void;
 
 	/**
@@ -51,12 +63,12 @@ export interface IStyleActivator
  * Set the value of either a single property or a set of properties in the given
  * CSS style object.
  */
-const updateStyleProperty = (ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+const updateStyleProperty = (ruleOrElm: IObjectWithStyle, name: string | null,
     value?: string | StringStyleset | null, important?: boolean): void =>
 {
     if (!name && value == null)
     {
-        if (ruleOrElm instanceof CSSStyleRule)
+        if (ruleOrElm instanceof CSSRule)
             ruleOrElm.cssText = "";
         else
             (ruleOrElm as any as Element).removeAttribute( "style");
@@ -108,7 +120,7 @@ class SynchronousActivator implements IStyleActivator
 	 * Instructs to set the value of either a single property or a set of properties in the given
      * CSS style object.
 	 */
-    public updateStyle( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    public updateStyle( ruleOrElm: IObjectWithStyle, name: string | null,
         value?: string | StringStyleset | null, important?: boolean): void
 	{
         updateStyleProperty( ruleOrElm, name, value, important);
@@ -189,7 +201,7 @@ class SchedulingActivator implements IStyleActivator
 	 * Instructs to set the value of either a single property or a set of properties in the given
      * CSS style object.
 	 */
-    public updateStyle( ruleOrElm: CSSStyleRule | ElementCSSInlineStyle, name: string | null,
+    public updateStyle( ruleOrElm: IObjectWithStyle, name: string | null,
         value?: string | StringStyleset | null, important?: boolean): void
 	{
 		if (this.isSchedulingNeeded)

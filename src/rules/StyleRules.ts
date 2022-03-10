@@ -20,7 +20,7 @@ import {selector2s} from "../impl/CoreImpl";
  * The StyleRule class is used as a base class for rules that contain a style rule. This class
  * implements the parsing of the CombinedStyleset object.
  */
-export abstract class StyleRule extends Rule implements IStyleRule
+export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleRule> extends Rule implements IStyleRule<R>
 {
 	// The styleset can be an CombinedStyleset for many rules; however, for some it is just
 	// of the Styleset type.
@@ -52,8 +52,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
      * The `toString()` method is used whenever there is the need to convert the object to string.
      * In `v2s` context, the `toString()` method has lower precedence than the `symV2S` property
      * and this allows the `toString()` to be overridden in derived classes without changing the
-     * `syV2S` functionality. For example, the `toString()` for class and ID rules will return
-     * the clas and ID names (without the prefixes) respectively, while the basic (this)
+     * `symV2S` functionality. For example, the `toString()` for class and ID rules will return
+     * the class and ID names (without the prefixes) respectively, while the basic (this)
      * implementation returns the selector text.
      */
     public toString(): string { return this.selectorText; }
@@ -136,7 +136,7 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Converts the rule to CSS string representing the rule.
 	public toCss(): string
 	{
-		return `${this.selectorText}{${s2s(this.styleset)}${this.getAux()}}`;
+		return `${this.selectorText}{${s2s(this.styleset)}}`;
 	}
 
 
@@ -144,8 +144,8 @@ export abstract class StyleRule extends Rule implements IStyleRule
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( ruleBag: IMimcssRuleBag): void
 	{
-		if (Object.keys(this.styleset).length > 0)
-			this.cssRule = ruleBag.add( this.toCss())?.cssRule as CSSStyleRule;
+		if (this.hasRules())
+			this.cssRule = ruleBag.add( this.toCss())?.cssRule as R;
 
         // insert dependent rules under the same parent
         this.forEachDepRule( (depRule: DepRule) => depRule.insert( ruleBag));
@@ -187,13 +187,13 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	// Copies dependent rules from another style rule object.
-	protected copyDepRules( src: StyleRule): void
+	protected copyDepRules( src: StyleRule<R>): void
 	{
         let srsDepRules = src.dependentRules;
         let thisDepRules = this.dependentRules;
 		for( let propName in srsDepRules)
 		{
-			let srcRuleOrArr = srsDepRules[propName] as DepRule | DepRule[];
+			let srcRuleOrArr = srsDepRules[propName] as DepRule<R> | DepRule<R>[];
 			if (Array.isArray(srcRuleOrArr))
 			{
                 if (srcRuleOrArr.length > 0)
@@ -213,12 +213,12 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 
-	// Returns the selector part of the style rule.
-	protected abstract getSel(): string;
-
  	// Returns the additional part of the style rule beyond the styleset. For majority of style
     // rules it is empty.
-	protected getAux(): string { return ""; }
+	protected hasRules(): boolean { return Object.keys(this.styleset).length > 0; }
+
+	// Returns the selector part of the style rule.
+	protected abstract getSel(): string;
 
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If false is returned, the property with the given name will not be added to the styleset.
@@ -301,14 +301,14 @@ export abstract class StyleRule extends Rule implements IStyleRule
 
 
 	/** SOM style rule */
-	public cssRule: CSSStyleRule;
+	public cssRule: R;
 
 	/**
 	 * Object containing dependent rules. Property names are taken from special properties
 	 * of the CombinedStyleset. This object allows callers to access dependent rules to change
 	 * style property values programmatically.
 	 */
-	public dependentRules: DependentRules;
+	public dependentRules: DependentRules<R>;
 
 	// Resultant object defining properties to be inserted into DOM.
 	protected styleset: Styleset;
@@ -325,14 +325,14 @@ export abstract class StyleRule extends Rule implements IStyleRule
  * is used for pseudo classes, pseudo elements, combinators and other selectors that combine the
  * containing rule's selector with additional selector items.
  */
-class DepRule extends StyleRule
+class DepRule<R extends CSSStyleRule | CSSPageRule = CSSStyleRule> extends StyleRule<R>
 {
 	// for regular selectors, pseudo classes and pseudo elements, the selector already contains
 	// the ampersand and the selectorParam is undefined. For parameterized pseudo classes, pseudo
 	// elements and combinators, the selectorParam is defined and the selector is just the entity
 	// name.
 	public constructor( sd: IStyleDefinition, selector: CssSelector, param?: any, styleset?: CombinedStyleset | CombinedStyleset[],
-		parent?: StyleRule)
+		parent?: StyleRule<R>)
 	{
 		super( sd, styleset);
 		this.selector = selector;
@@ -343,7 +343,7 @@ class DepRule extends StyleRule
 
 
 	// Creates a copy of the rule but with new parent (containing rule).
-	public clone( containingRule: StyleRule): DepRule
+	public clone( containingRule: StyleRule<R>): DepRule<R>
 	{
 		let newRule = new DepRule( this.sd, this.selector, this.param, undefined, containingRule);
 
@@ -385,7 +385,7 @@ class DepRule extends StyleRule
 
 
 	// Parent style rule of which this rule is dependent.
-	public parent?: StyleRule;
+	public parent?: StyleRule<R>;
 
 	// Partial selector that should be appended to the parent selector.
 	private selector: CssSelector;
@@ -581,19 +581,28 @@ export class PageRule extends StyleRule implements IPageRule
         return super.parseSP( propName, propVal);
     }
 
+	// Inserts this rule into the given parent rule or stylesheet.
+	public insert( ruleBag: IMimcssRuleBag): void
+	{
+        super.insert( ruleBag);
+		if (this.marginBoxes && this.cssRule?.insertRule)
+        {
+            this.marginBoxes?.forEach( (boxStyleset, boxName) =>
+                this.cssRule.insertRule( `${boxName}{${s2s(boxStyleset)}}`));
+        }
+	}
+
+ 	// Returns the additional part of the style rule beyond the styleset. For majority of style
+    // rules it is empty.
+	protected hasRules(): boolean
+    {
+        return super.hasRules() || this.marginBoxes?.size !== 0;
+    }
+
     // Returns the CSS string representing the style rule's selector.
     protected getSel(): string
     {
         return `@page ${v2s( this.pageSelector, {sep: ""})}`;
-    }
-
- 	// Returns the additional part of the style rule beyond the styleset. This rule adds the
-    // margin boxes.
-	protected getAux(): string
-    {
-        let s = "";
-        this.marginBoxes?.forEach( (boxStyleset, boxName) => s += `${boxName}{${s2s(boxStyleset)}}`);
-        return s;
     }
 
     /** SOM page rule */

@@ -57,10 +57,10 @@ export interface IPrefixedNamedEntity extends INamedEntity
 /**
  * Type representing an object that contains dependent rules of a style rule
  */
-export type DependentRules =
-	{ [K in PseudoEntity]?: IStyleRule } &
-	{ [K in DependentRuleCombinator]?: IStyleRule[] } &
-	{ [K in keyof IParameterizedPseudoEntity]?: IStyleRule[] };
+export type DependentRules<R extends CSSStyleRule | CSSPageRule = CSSStyleRule> =
+	{ [K in PseudoEntity]?: IStyleRule<R> } &
+	{ [K in DependentRuleCombinator]?: IStyleRule<R>[] } &
+	{ [K in keyof IParameterizedPseudoEntity]?: IStyleRule<R>[] };
 
 
 
@@ -72,17 +72,17 @@ export type DependentRules =
  * from which it inherits. A styleset combines all the properties from its own property block as
  * well as from all of style rules it inherites from.
  */
-export interface IStyleRule extends IRule, IRuleWithSelector
+export interface IStyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleRule> extends IRule, IRuleWithSelector
 {
 	/** CSSOM style rule */
-	readonly cssRule: CSSStyleRule | null;
+	readonly cssRule: R | null;
 
 	/**
 	 * Object containing dependent rules. Property names are taken from special properties
 	 * of the CombinedStyleset. This object allows callers to access dependent rules to change
 	 * style property values programmatically.
 	 */
-	readonly dependentRules: DependentRules;
+	readonly dependentRules: DependentRules<R>;
 
 	/**
 	 * Adds/replaces/removes the value of the given CSS property in this rule.
@@ -467,7 +467,7 @@ export interface IGroupRule<T extends IStyleDefinition = any, R extends CSSGroup
 
 /**
  * The ISupportsRule interface represents the CSS @supports rule.
- * Objects implementing this interface are returned from the [[$supports]] function.
+ * Objects implementing this interface are returned from the [[$supports]] method.
  */
 export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSSupportsRule>
 {
@@ -479,7 +479,7 @@ export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupR
 
 /**
  * The IMediaRule interface represents the CSS @media rule.
- * Objects implementing this interface are returned from the [[$media]] function.
+ * Objects implementing this interface are returned from the [[$media]] method.
  */
 export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSMediaRule>
 {
@@ -488,6 +488,47 @@ export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule
      * the media statement and also allows listening to its `change` event
      */
     readonly queryList: MediaQueryList | undefined;
+}
+
+
+
+/**
+ * The ILayerNameRule interface represents a variant of the `@layer` at-rule, whcih just declares
+ * a name of a layer. This rule generates a layer name, which can be later used in other variants
+ * of the `@layer` at-rule or in the `@import` at-rules. Objects implementing this interface are
+ * returned from the [[$layerName]] method.
+ */
+export interface ILayerNameRule extends INamedEntity
+{
+    /** Name of the layer. */
+    readonly layerName: string;
+}
+
+
+
+/**
+ * The ILayerOrderRule interface contains a list of layer names representing their order. This
+ * corresponds to the `@layer` statement at-rule as opposed to the `@layer` block at-rule, which
+ * contains stylesheet definition and which is expressed in Mimcss by the [[ILayerRule]] interface.
+ * Objects implementing this interface are returned from the [[$layerOrder]] method.
+ */
+export interface ILayerOrderRule extends IRule
+{
+    /** Names of the layers representing their order. */
+    readonly layers: string[];
+
+	/** CSSOM grouping rule */
+	readonly cssRule: CSSRule /*CSSLayerStatementRule*/ | null;
+}
+
+
+
+/**
+ * The ILayerRule interface represents the CSS `@layer` block at-rule.
+ * Objects implementing this interface are returned from the [[$layer]] method.
+ */
+export interface ILayerRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSGroupingRule/*CSSLayerBlockRule*/>
+{
 }
 
 
