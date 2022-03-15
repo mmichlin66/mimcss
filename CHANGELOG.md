@@ -1,3 +1,11 @@
+# 0.11.13
+
+1. Support for `color()` function and `@color-profile` at-rule.
+2. Improve support of the `@page` at-rule including named pages and margin boxes.
+3. Implement `@layer` at-rule.
+4. Support 'layer' in `@import` at-rule.
+
+
 # 0.11.12
 
 1. Add support for `hwb()` color function.
