@@ -537,7 +537,7 @@ export declare const path: (fillRule?: FillRule | undefined) => IPathBuilder;
  *
  * @category Basic Shape
  */
-export declare const ray: (angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength> | undefined, contain?: boolean | undefined) => IRayFunc;
+export declare const ray: (angle: Extended<CssAngle>, size?: Extended<CssLength | ExtentKeyword> | undefined, contain?: boolean | undefined) => IRayFunc;
 /**
 * Returns an IMinMax function representing the `minmax()` CSS function.
 *

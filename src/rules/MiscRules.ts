@@ -1,11 +1,14 @@
-import {IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition, IColorProfileRule, IPageNameRule} from "../api/RuleTypes";
+import {
+    IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition,
+    IColorProfileRule, IPageNameRule, ILayerNameRule, ILayerBlockRule, ILayerOrderRule, LayerMoniker, ImportRuleOptions
+} from "../api/RuleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
+import {ColorProfileRenderingIntent} from "../api/ColorTypes";
 import {fontFace2s} from "../impl/MiscImpl"
 import {Rule, IMimcssRuleBag, NamedRuleLike} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
-import {symV2S} from "../impl/Utils";
-import { ColorProfileRenderingIntent } from "..";
+import {a2s, symV2S, v2s} from "../impl/Utils";
 
 
 
@@ -39,14 +42,12 @@ abstract class MiscRule<T extends CSSRule> extends Rule
  */
 export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 {
-	public constructor( sd: IStyleDefinition, url: string, mediaStatement?: MediaStatement,
-        supportsStatement?: string | SupportsStatement)
+	public constructor( sd: IStyleDefinition, url: string, options?: ImportRuleOptions)
 	{
 		super(sd);
 
 		this.url = url;
-		this.mediaStatement = mediaStatement;
-		this.supportsStatement = supportsStatement;
+		this.options = options;
 	}
 
 	// Returns CSS string for this rule.
@@ -58,22 +59,30 @@ export class ImportRule extends MiscRule<CSSImportRule> implements IImportRule
 		else
 			url = `url(${this.url})`;
 
-		let supportsQueryString = !this.supportsStatement ? "" : supports2s( this.supportsStatement);
-		if (supportsQueryString && !supportsQueryString.startsWith( "supports"))
-		    supportsQueryString = `supports( ${supportsQueryString} )`;
+		let layerString = this.options?.layer;
+		if (layerString == null)
+            layerString = "";
+        else
+        {
+            layerString = v2s( layerString);
+            if (layerString === "")
+                layerString = `layer`;
+            else
+                layerString = `layer(${layerString})`;
+        }
 
-		let mediaQueryString = !this.mediaStatement ? "" : media2s( this.mediaStatement);
-		return `@import ${url} ${supportsQueryString} ${mediaQueryString}`;
+		let supportsString = supports2s( this.options?.supports);
+		if (supportsString)
+		    supportsString = `supports(${supportsString})`;
+
+		return `@import ${url} ${layerString} ${supportsString} ${media2s( this.options?.media)};`;
     }
 
 	// URL to import from.
 	public url: string;
 
 	// Optional media query for this rule.
-	public mediaStatement?: MediaStatement;
-
-	// Optional supports query for this rule.
-	public supportsStatement?: string | SupportsStatement;
+	private options?: ImportRuleOptions;
 }
 
 
@@ -95,14 +104,14 @@ export class NamespaceRule extends MiscRule<CSSNamespaceRule> implements INamesp
     protected toCss(): string
     {
 		let url = this.namespace.startsWith( "url(") ? this.namespace : `url(${this.namespace})`;
-		return `@namespace ${this.prefix ? this.prefix : ""} ${url}`;
+		return `@namespace ${this.prefix ?? ""} ${url}`;
     }
 
 	/** Namespace string for the rule */
 	public namespace: string;
 
 	/** Optional prefix for the rule */
-	public prefix: string | undefined;
+	public prefix?: string;
 
 }
 
@@ -216,18 +225,12 @@ export class ColorProfileRule extends Rule implements IColorProfileRule
 
 
 
-
-
-
 /**
  * The PageNameRule class describes a named page definition. No CSS rule is created for these
  * rules - they are needed only to provide type-safe name definitions.
  */
 export class PageNameRule extends NamedRuleLike implements IPageNameRule
 {
-    // if the nameOverride is an area rule object, the isStartEndOrNone flag is always defined
-    // because this constructor can only be invoked for the start and end lines of the GridAreaRule
-    // object.
     public constructor( sd: IStyleDefinition, nameOverride?: string | IPageNameRule)
 	{
         super( sd, nameOverride);
@@ -236,3 +239,80 @@ export class PageNameRule extends NamedRuleLike implements IPageNameRule
     /** Name of the page. */
     public get pageName(): string { return this.name; }
 }
+
+
+
+/**
+ * The LayerNameRule class describes a named layer definition.
+ */
+export class LayerNameRule extends MiscRule<CSSRule/*CSSLayerStatementRule*/> implements ILayerNameRule
+{
+	public constructor( sd: IStyleDefinition, nameOverride?: LayerMoniker)
+	{
+        super(sd);
+		this.nameOverride = nameOverride;
+	}
+
+
+    // This function is used when the object is specified as a value of a style property.
+    // We return the counter name.
+    public toString(): string { return this.name; }
+
+	// Processes the given rule.
+	public process( ruleName: string | null): void
+	{
+		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
+	}
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	protected toCss(): string
+	{
+		return `@layer ${this.name};`;
+	}
+
+    /** Name of the page. */
+    public get layerName(): string { return this.name; }
+
+
+
+    /**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	// Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	protected nameOverride?: string | ILayerNameRule | ILayerBlockRule;
+}
+
+
+
+/**
+ * The LayerNameRule class describes a named layer definition.
+ */
+export class LayerOrderRule extends MiscRule<CSSRule/*CSSLayerStatementRule*/> implements ILayerOrderRule
+{
+	public constructor( sd: IStyleDefinition, ...names: LayerMoniker[])
+	{
+        super(sd);
+		this.names = names;
+	}
+
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	protected toCss(): string
+	{
+		return `@layer ${a2s(this.names, undefined, ",")};`;
+	}
+
+
+
+	// Name or named object that should be used to create a name for this rule. If this property
+	// is not defined, the name will be uniquely generated.
+	protected names: LayerMoniker[];
+}
+
+
+

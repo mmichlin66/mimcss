@@ -146,7 +146,6 @@ export abstract class NamedRuleLike extends RuleLike implements INamedEntity
     // We return the counter name.
     public toString(): string { return this.name; }
 
-
 	// Processes the given rule.
 	public process( ruleName: string | null): void
 	{

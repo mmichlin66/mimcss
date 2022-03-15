@@ -1,4 +1,7 @@
-import {IStyleDefinitionClass, IStyleDefinition, IGroupRule, IMediaRule, ISupportsRule} from "../api/RuleTypes"
+import {
+    IStyleDefinitionClass, IStyleDefinition, IGroupRule, IMediaRule, ISupportsRule,
+    ILayerBlockRule, LayerMoniker
+} from "../api/RuleTypes"
 import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {processSD} from "./RuleContainer"
 import {IRuleContainer, Rule, symRC, IMimcssRuleBag} from "./Rule"
@@ -24,8 +27,6 @@ export abstract class GroupRule<T extends IStyleDefinition, R extends CSSGroupin
 	// Processes the given rule.
 	public process( ruleName: string | null)
 	{
-		super.process( ruleName);
-
         // container to which our grouping rule belongs becomes the parent container for the
         // style definition instance
 		this.gsd = processSD( this.instOrClass, this.sd) as T;
@@ -168,6 +169,67 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T,CSSMediaR
 
 	// media statement for this rule.
 	private stmt: MediaStatement;
+}
+
+
+
+/**
+ * The LayerRule class describes a layer definition.
+ */
+export class LayerBlockRule<T extends IStyleDefinition> extends GroupRule<T,CSSGroupingRule>
+    implements ILayerBlockRule<T>
+{
+    public constructor( sd: IStyleDefinition, nameOverride: undefined | LayerMoniker,
+        instOrClass: T | IStyleDefinitionClass<T>)
+    {
+        super( sd, "layer", instOrClass);
+        this.nameOverride = nameOverride;
+    }
+
+    // This function is used when the object is specified as a value of a style property.
+    // We return the counter name.
+    public toString(): string { return this.name; }
+
+	// Processes the given rule.
+	public process( ruleName: string | null): void
+	{
+		super.process( ruleName);
+        this.name = this.rc.getScopedName( ruleName, this.nameOverride);
+
+        // // if the name specified in the constructor is undefined, we generate a unique name;
+        // // if it is the layer object, we get its name; otherwise (if the name is a string
+        // // including an empty string), we just use it.
+        // let name = this.nameOverride;
+        // if (name == null)
+        //     name = this.rc.getScopedName( ruleName);
+        // else if (typeof name === "object")
+        //     name = name.layerName;
+
+		// this.name = name;
+	}
+
+	// Returns the condition string of this grouping rule.
+	protected getCond(): string | null
+    {
+        return this.layerName;
+    }
+
+
+
+    /** Name of the layer. */
+    public get layerName(): string { return this.name; }
+
+    /**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	/**
+	 * Layer name or layer object used to create the name of this layer.
+	 */
+	private nameOverride: undefined | LayerMoniker;
 }
 
 

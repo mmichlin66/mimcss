@@ -3,7 +3,7 @@ layout: default
 ---
 
     <style>
-        #propertySearchDropdown {
+        #propertySearchDropdown, #ruleSearchDropdown {
             padding: 2px;
             color: blue;
             outline: unset;
@@ -27,6 +27,11 @@ layout: default
 			<b>Reference</b>
 			<ul>
                 <li><a href="{{page.rootpath}}/typedoc.html">Typedoc Reference</a></li>
+                <li>Rules:
+                    <select id="ruleSearchDropdown" onchange="gotoSelectedRule();">
+                        <option value="ruleSearchPlaceholder">--Choose rule method--</option>
+                    </select>
+                </li>
                 <li>Styles:
                     <select id="propertySearchDropdown" onchange="gotoSelectedStyleProperty();">
                         <option value="propertySearchPlaceholder">--Choose style property--</option>
@@ -59,8 +64,59 @@ layout: default
 </div>
 
 <script>
-    var propertySearchPlaceholder = "propertySearchPlaceholder";
+    var ruleSearchPlaceholder = "ruleSearchPlaceholder";
+    var rules = [
+        "$abstract",
+        "$class",
+        "$classname",
+        "$colorProfile",
+        "$const",
+        "$counter",
+        "$counterStyle",
+        "$fontface",
+        "$gridarea",
+        "$gridline",
+        "$id",
+        "$import",
+        "$keyframes",
+        "$layer",
+        "$media",
+        "$namespace",
+        "$page",
+        "$pageName",
+        "$property",
+        "$style",
+        "$supports",
+        "$tag",
+        "$use",
+        "$var",
+    ];
 
+    // add options to the search dropdown
+    for( let prop of rules)
+    {
+        var elmOption = document.createElement( "option")
+        elmOption.innerText = prop;
+        ruleSearchDropdown.appendChild( elmOption);
+    }
+
+    function gotoSelectedRule()
+    {
+        var rule = ruleSearchDropdown.value.replace("$", "_");
+        if (rule && rule != ruleSearchPlaceholder)
+        {
+            // ruleSearchDropdown.value = ruleSearchPlaceholder;
+            if (location.href.includes("typedoc.html?path=classes/RuleAPI.StyleDefinition.html#"))
+            {
+                location.hash = rule;
+                referenceFrame.src = "/reference/classes/RuleAPI.StyleDefinition.html#" + rule;
+            }
+            else
+                location.href = "/typedoc.html?path=classes/RuleAPI.StyleDefinition.html#" + rule;
+        }
+    }
+
+    var propertySearchPlaceholder = "propertySearchPlaceholder";
     var styleProperties = [
         "accent-color",
         "align-content",

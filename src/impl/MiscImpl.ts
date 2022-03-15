@@ -15,7 +15,7 @@ import {ExtendedCounterStyleset, ICounterStyleset} from "../api/CounterTypes";
 /**
  * Converts the given media query object to the CSS media query string
  */
-export const media2s = (statement: MediaStatement): string =>
+export const media2s = (statement?: MediaStatement): string =>
     v2s( statement, {
         any: mediaQuery2s,
         sep: ","
@@ -24,7 +24,7 @@ export const media2s = (statement: MediaStatement): string =>
 /**
  * Converts the given media query object to the CSS media query string
  */
-const mediaQuery2s = (query: MediaQuery): string =>
+const mediaQuery2s = (query?: MediaQuery): string =>
     propSet2s( query, mediaFeatureInfos, {
         separator: " and ",
         propFunc: mediaFeature2s,
@@ -92,14 +92,14 @@ const mediaFeatureDefaultValues = new Map<string,any>([
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Converts the given supports statement to its string representation */
-export const supports2s = (statement: SupportsStatement): string =>
+export const supports2s = (statement?: SupportsStatement): string =>
     v2s( statement, {
         any: supportsQuery2s,
         sep: " or "
     });
 
 /** Converts the given supports query to its string representation */
-const supportsQuery2s = (query: SupportsQuery): string =>
+const supportsQuery2s = (query?: SupportsQuery): string =>
     v2s( query, {
         obj: (v: Exclude<SupportsQuery,string>) => {
             let propNames = Object.keys( v);
@@ -107,7 +107,7 @@ const supportsQuery2s = (query: SupportsQuery): string =>
                 return "";
 
             return `(${propNames.map( (propName) =>
-                `${camelToDash(propName)}:${sp2s( propName, query[propName])}`).join( ") and (")})`;
+                `${camelToDash(propName)}:${sp2s( propName, query?.[propName])}`).join( ") and (")})`;
         }
     });
 

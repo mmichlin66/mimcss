@@ -1,10 +1,10 @@
 import { CssSelector, ElementTagName, ExtendedProp, PageSelector } from "./CoreTypes";
-import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule } from "./RuleTypes";
+import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule, ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions } from "./RuleTypes";
 import { MediaStatement, SupportsStatement } from "./MediaTypes";
 import { ExtendedFontFace } from "./FontTypes";
+import { ColorProfileRenderingIntent } from "./ColorTypes";
 import { ExtendedCounterStyleset } from "./CounterTypes";
 import { VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset, ISyntaxTypeStyleset, PageRuleStyleset } from "./Stylesets";
-import { ColorProfileRenderingIntent } from "./ColorTypes";
 /**
  * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
  * Style definition classes are regular TypeScript classes and as such can have any fields and
@@ -678,18 +678,48 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * ```typescript
      * class MyStyles extends css.StyleDefinition
      * {
+     *     layer1 = this.$layer();
      *     importedCssFiles = [
-     *         this.$import( "common-3rdparty.css"),
-     *         this.$import( "small-screen-3rdparty.css", {maxWidth: 600}),
+     *         this.$import( "small-screen.css", {media: {maxWidth: 600}}),
+     *         this.$import( "grids-3rdparty.css", {supports: {display: "grid"}}),
+     *         this.$import( "layered-3rdparty.css", {layer: this.layer1}),
      *     ]
      * }
      * ```
      *
      * @param url URL to the CSS file. Relative URLs are resolved relative to the base URL of the
      * page where the Mimcss library is invoked.
+     * @param options Options defining conditions under which the CSS file should be downloeded and what layer
+     * should apply to the file's content.
      * @returns The `IImportRule` object that represents the `@import` rule.
      */
-    $import(url: string, mediaQuery?: string | MediaStatement, supportsQuery?: string | SupportsStatement): IImportRule;
+    $import(url: string, options: ImportRuleOptions): IImportRule;
+    /**
+     * Creates a new `@import` rule referencing the given CSS file.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     layer1 = this.$layer();
+     *     importedCssFiles = [
+     *         this.$import( "common.css"),
+     *         this.$import( "small-screen.css", {maxWidth: 600}),
+     *         this.$import( "grids-3rdparty.css", undefined, {display: "grid"}),
+     *         this.$import( "layered-3rdparty.css", undefined, undefined, this.layer1),
+     *     ]
+     * }
+     * ```
+     *
+     * @param url URL to the CSS file. Relative URLs are resolved relative to the base URL of the
+     * page where the Mimcss library is invoked.
+     * @param media Optional media statement providing conditions when the CSS file should be downloaded
+     * @param supports Optional supports statement providing conditions when the CSS file should be downloaded
+     * @param layer Optional layer name defining which layer (if any) should apply for the CSS file content
+     * @returns The `IImportRule` object that represents the `@import` rule.
+     */
+    $import(url: string, media?: MediaStatement, supports?: SupportsStatement, layer?: LayerMoniker): IImportRule;
     /**
      * Creates new `@namespace` rule.
      *
@@ -834,6 +864,86 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * @returns `IMediaRule` object representing the media rule
      */
     $media<T extends StyleDefinition<StyleDefinition<P>>>(statement: MediaStatement, instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>;
+    /**
+     * Creates a new layer name rule. The layer name will be created when the rule is processed as
+     * part of the style definition class. The name can be also overridden by providing either an
+     * explicit name or another layer rule.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     layer1 = this.$layer();
+     *
+     *     external = this.$import( "external.css", { layer: this.layer1 }
+     *
+     *     layer2 = this.$layer( undefined, { color: "blue" })
+     *
+     *     layerOrder = this.$layer( this.layer2, this.layer1)
+     * }
+     * ```
+     *
+     * @param nameOverride String or another layer object that determines the name of the
+     * layer. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism.
+     * @returns The `ILayerNameRule` object that represents the layer name.
+     */
+    $layer(nameOverride?: LayerMoniker): ILayerNameRule;
+    /**
+     * Creates a new layer ordering rule. The method accepts two or more rules.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     layer1 = this.$layer();
+     *
+     *     external = this.$import( "external.css", { layer: this.layer1 }
+     *
+     *     layer2 = this.$layer( undefined, { color: "blue" })
+     *
+     *     layerOrder = this.$layer( this.layer2, this.layer1)
+     * }
+     * ```
+     *
+     * @param layers List of layers represented either by explicit layer names or by references
+     * to layer rules.
+     * @returns The `ILayerOrderRule` object that represents the page name.
+     */
+    $layer(layer1: LayerMoniker, layer2: LayerMoniker, ...moreLayers: LayerMoniker[]): ILayerOrderRule;
+    /**
+    * Creates a new layer block rule. The layer name will be created when the rule is processed as
+    * part of the style definition class. The layer name can be provided explicitly (as a string
+    * or as a reference to another layer rule) or it can be generated uniquely by the Mimcss name
+    * assignment mechanism. Normally, the style definition is also provied, which defines the
+    * style rules under this layer; however, it can be omitted. In this case, only the layer
+    * name will be created using the `@layer name` CSS rule.
+    *
+    * **Example:**
+    *
+    * ```typescript
+    * class MyStyles extends css.StyleDefinition
+    * {
+    *     baseLayer = this.$layer( null,
+    *         class extends css.StyleDefinition<MyStyles>
+    *         {
+    *             cls = this.$class({ color: "pink"})
+    *         }
+    *     )
+    *
+    *     import = this.$import( "external.css", { layer: baseLayer })
+    * }
+    * ```
+    *
+    * @param name String or another `ILayerRule` object that determines the name of the
+    * layer. If the name is undefined, the name is auto-generated by Mimcss. To create an
+    * anonymous layer, pass in the empty string.
+    * @param instOrClass Either style definition class or an instance of a style defintion class.
+    * @returns The `ILayerBlockRule` object that represents the layer.
+    */
+    $layer<T extends StyleDefinition<StyleDefinition<P>>>(nameOverride: undefined | LayerMoniker, instOrClass: T | IStyleDefinitionClass<T>): ILayerBlockRule;
     /**
      * Processes the given style definition class and creates unique names for all named
      * entities. For a given style definition class only a single instance is created, no matter how

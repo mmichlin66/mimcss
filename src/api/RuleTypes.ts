@@ -1,7 +1,8 @@
 ﻿import {
-    ICustomVar, PseudoEntity, PagePseudoClass, IParameterizedPseudoEntity,
+    ICustomVar, PseudoEntity, IParameterizedPseudoEntity,
     DependentRuleCombinator, IConstant, IRuleWithSelector
 } from "./CoreTypes";
+import {MediaStatement, SupportsStatement} from "./MediaTypes";
 import {ExtendedIStyleset, VarTemplateName, VarValue, ExtendedVarValue, AnimationStyleset, IStyleset} from "./Stylesets";
 
 
@@ -328,7 +329,7 @@ export interface INamespaceRule extends IRule
 	readonly namespace: string;
 
 	/** Optional prefix for the rule */
-	readonly prefix: string | undefined;
+	readonly prefix?: string | undefined;
 
 	/** CSSOM namespace rule */
 	readonly cssRule: CSSNamespaceRule | null;
@@ -405,7 +406,7 @@ export interface IGridAreaRule extends INamedEntity
  * color profile name, which can be later used in the [[color]] function.
  * Objects implementing this interface are returned from the [[$colorProfile]] method.
  */
-export interface IColorProfileRule extends INamedEntity
+export interface IColorProfileRule extends IRule, INamedEntity
 {
     /** Name of the color profile rule that can be used in the [[color]] function. */
     readonly profileName: string;
@@ -498,7 +499,21 @@ export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule
  * of the `@layer` at-rule or in the `@import` at-rules. Objects implementing this interface are
  * returned from the [[$layerName]] method.
  */
-export interface ILayerNameRule extends INamedEntity
+export interface ILayerNameRule extends IRule, INamedEntity
+{
+    /** Name of the layer. */
+    readonly layerName: string;
+}
+
+
+
+/**
+ * The ILayerRule interface represents the CSS `@layer` block at-rule. This rule generates a layer
+ * name, which can be later used in other variants of the `@layer` at-rule or in the `@import`
+ * at-rules. Objects implementing this interface are returned from the [[$layer]] method.
+ */
+export interface ILayerBlockRule<T extends IStyleDefinition = any> extends INamedEntity,
+    IGroupRule<T,CSSGroupingRule/*CSSLayerBlockRule*/>
 {
     /** Name of the layer. */
     readonly layerName: string;
@@ -514,22 +529,28 @@ export interface ILayerNameRule extends INamedEntity
  */
 export interface ILayerOrderRule extends IRule
 {
-    /** Names of the layers representing their order. */
-    readonly layers: string[];
-
 	/** CSSOM grouping rule */
 	readonly cssRule: CSSRule /*CSSLayerStatementRule*/ | null;
 }
 
 
 
-/**
- * The ILayerRule interface represents the CSS `@layer` block at-rule.
- * Objects implementing this interface are returned from the [[$layer]] method.
- */
-export interface ILayerRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSGroupingRule/*CSSLayerBlockRule*/>
-{
-}
+/** Defines possible ways to define a layer name */
+export type LayerMoniker = string | ILayerNameRule | ILayerBlockRule;
+
+
+
+/** Defines options passed to the [[$import]] method defining the `@import` at-rule */
+export type ImportRuleOptions = {
+    /** Optional media statement */
+    media?: MediaStatement;
+
+    /** Optional supports statement */
+    supports?: SupportsStatement;
+
+    /** Opional layer name */
+    layer?: LayerMoniker;
+};
 
 
 

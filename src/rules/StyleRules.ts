@@ -136,7 +136,7 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 	// Converts the rule to CSS string representing the rule.
 	public toCss(): string
 	{
-		return `${this.selectorText}{${s2s(this.styleset)}}`;
+		return `${this.selectorText}{${s2s(this.styleset)}${this.getAux()}}`;
 	}
 
 
@@ -219,6 +219,10 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 
 	// Returns the selector part of the style rule.
 	protected abstract getSel(): string;
+
+ 	// Returns the additional part of the style rule beyond the styleset. For majority of style
+    // rules it is empty.
+	protected getAux(): string { return ""; }
 
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If false is returned, the property with the given name will not be added to the styleset.
@@ -477,7 +481,7 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 /**
  * The ClassRule class describes a styleset that applies to elements identified by a CSS class.
  */
-export class ClassRule extends NamedStyleRule implements IClassRule, IPrefixedNamedEntity
+export class ClassRule extends NamedStyleRule implements IClassRule
 {
 	// Prefix for CSS classes.
 	public prefix: "." = ".";
@@ -522,7 +526,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule, IPrefixedNa
 /**
  * The IDRule class describes a styleset that applies to elements identified by an ID.
  */
-export class IDRule extends NamedStyleRule implements IIDRule, IPrefixedNamedEntity
+export class IDRule extends NamedStyleRule implements IIDRule
 {
 	// Prefix for CSS element identifiers.
 	public prefix: "#" = "#";
@@ -557,7 +561,7 @@ export class SelectorRule extends StyleRule
 /**
  * The PageRule class represents the CSS @page rule.
  */
-export class PageRule extends StyleRule implements IPageRule
+export class PageRule extends StyleRule<CSSPageRule> implements IPageRule
 {
     public constructor( sd: IStyleDefinition, pageSelector?: PageSelector, style?: PageRuleStyleset)
     {
@@ -581,17 +585,6 @@ export class PageRule extends StyleRule implements IPageRule
         return super.parseSP( propName, propVal);
     }
 
-	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( ruleBag: IMimcssRuleBag): void
-	{
-        super.insert( ruleBag);
-		if (this.marginBoxes && this.cssRule?.insertRule)
-        {
-            this.marginBoxes?.forEach( (boxStyleset, boxName) =>
-                this.cssRule.insertRule( `${boxName}{${s2s(boxStyleset)}}`));
-        }
-	}
-
  	// Returns the additional part of the style rule beyond the styleset. For majority of style
     // rules it is empty.
 	protected hasRules(): boolean
@@ -605,13 +598,26 @@ export class PageRule extends StyleRule implements IPageRule
         return `@page ${v2s( this.pageSelector, {sep: ""})}`;
     }
 
+ 	// Returns the additional part of the style rule beyond the styleset. This rule adds the
+    // margin boxes.
+	protected getAux(): string
+    {
+        let s = "";
+        this.marginBoxes?.forEach( (boxStyleset, boxName) => s += `${boxName}{${s2s(boxStyleset)}}`);
+        return s;
+    }
+
     /** SOM page rule */
     public cssRule: CSSPageRule;
 
     /** Optional page seclector name of the page pseudo style (e.g. "":first") */
     public pageSelector?: PageSelector;
 
-    /** Map of margin box names to their stylesets */
+    /**
+     * Map of margin box names to their stylesets. We cannot create the Map object here because it
+     * is being used by the parseSP method that is invoked from the StyleRule (parent class)
+     * constuctor - before this class initialization is performed.
+     */
     private marginBoxes: Map<string,Styleset>;
 }
 
