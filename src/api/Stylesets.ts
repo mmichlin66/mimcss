@@ -39,7 +39,7 @@ export interface IStyleset
      * [[include: styleProps/a/accentColor.ts]]
      * ```
      */
-    accentColor?: CssColor;
+    accentColor?: "auto" | CssColor;
 
     /**
      * The CSS **align-content** property sets the distribution of space between and around content

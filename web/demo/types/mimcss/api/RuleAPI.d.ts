@@ -160,7 +160,6 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * ```typescript
      * class MyStyles extends css.StyleDefinition
      * {
-     *     // declare class - just to be used later
      *     spaced = css.class({gap: 8})
      *
      *     vbox = this.$class({
@@ -184,7 +183,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * }
      * ```
      *
-     * @param ...classes List of class names specified either as a string or [[IClassRule]] or
+     * @param classes List of class names specified either as a string or [[IClassRule]] or
      * [[IClassNameRule]] objects.
      * @returns `IClassNameRule` object whose `name` property contains the combined class name, e.g.
      * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
@@ -192,11 +191,11 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $classname(...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule;
     /**
-     * Creates a new ID rule. The ID name will be created when the rule is processed as part of
-     * the style definition class. The name can be also overridden by providing either an explicit
-     * name or another ID rule. The function can be called without parameters just to "declare"
-     * the ID. Such ID can be later used either in conditional grouping rules or in derived
-     * style definition classes.
+     * Creates a new element identifier rule. The identifier name will be created when the rule is
+     * processed as part of the style definition class. The name can be also overridden by
+     * providing either an explicit name or another ID rule. The function can be called without
+     * parameters just to "declare" the ID. Such ID can be later used either in conditional
+     * grouping rules or in derived style definition classes.
      *
      * The returned [[IIDRule]] interface has the `name` property that should be used to assign
      * the ID to an HTML element.
@@ -308,11 +307,11 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $style(selector: CssSelector, styleset: CombinedStyleset | CombinedStyleset[]): IStyleRule;
     /**
-     * Creates new animation rule. The animation name will be created when the rule is processed as
-     * part of the style definition class. The name can be also overridden by providing either an
-     * explicit name or another animation rule. The function can be called without parameters just to
-     * "declare" the animation. Such animation can be later used either in conditional grouping rules
-     * or in derived style definition classes.
+     * Creates a new `@keyframes` at-rule. The animation name will be created when the rule is
+     * processed as part of the style definition class. The name can be also overridden by
+     * providing either an explicit name or another animation rule. The function can be called
+     * without parameters just to "declare" the animation. Such animation can be later used either
+     * in conditional grouping rules or in derived style definition classes.
      *
      * The returned [[IAnimationRule]] interface represents an object that should be used when
      * using the keyframes name in the `animation-name` or `animation` style properties.
@@ -343,7 +342,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $keyframes(frames?: AnimationFrame[], nameOverride?: string | IAnimationRule): IAnimationRule;
     /**
-     * Creates new custom variable object that defines a custom CSS property. The variable name will
+     * Creates a new custom variable object that defines a custom CSS property. The variable name will
      * be created when the rule is processed as part of the style definition class. The name can be
      * also overridden by providing either an explicit name or another custom variable rule. The
      * function can be called without specifying the value just to "declare" the variable. Such
@@ -385,7 +384,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $var<K extends VarTemplateName>(template: K, value?: ExtendedVarValue<K>, nameOverride?: string | IVarRule<K>): IVarRule<K>;
     /**
-     * Creates new `@property` rule. The property name will be created when the rule is processed
+     * Creates a new `@property` at-rule. The property name will be created when the rule is processed
      * as part of the style definition class. The name can be also overridden by providing either
      * an explicit name or another custom variable rule.
      *
@@ -426,7 +425,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $property<K extends keyof ISyntaxTypeStyleset>(syntax: K, initValue: ExtendedVarValue<K>, inherits: boolean, nameOverride?: string | IVarRule<K>): IVarRule<K>;
     /**
-     * Creates new `@property` rule. The property name will be created when the rule is processed
+     * Creates a new `@property` at-rule. The property name will be created when the rule is processed
      * as part of the style definition class. The name can be also overridden by providing either
      * an explicit name or another custom variable rule.
      *
@@ -474,9 +473,10 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * satisfies the type defined by the `template` parameter including other constants, custom
      * properties and functions.
      *
-     * No CSS rules are created for constants and, due to this fact, constants are preferable to custom
-     * properties unless the intention is to change the variable value at run-time or to redefine its
-     * value under different style rules.
+     * No CSS rules are created for constants; their value is resolved when the style definition
+     * class is processed. Constants shold be used instead of the custom properties unless the
+     * intention is to change the variable value at run-time or to redefine its value under
+     * different style rules.
      *
      * **Example:**
      *
@@ -500,7 +500,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $const<K extends VarTemplateName>(template: K, value?: ExtendedVarValue<K>): IConstRule;
     /**
-     * Creates new counter object. The counter name will be created when the rule is processed as
+     * Creates a new counter object. The counter name will be created when the rule is processed as
      * part of the style definition class. The name can be also overridden by providing either an
      * explicit name or another counter rule.
      *
@@ -530,7 +530,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $counter(nameOverride?: string | ICounterRule): ICounterRule;
     /**
-     * Creates new counter style rule. The counter style name will be created when the rule is
+     * Creates a new `@counter-style` at-rule. The counter style name will be created when the rule is
      * processed as part of the style definition class. The name can be also overridden by providing
      * either an explicit name or another counter style rule.
      *
@@ -609,7 +609,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * can be type-safely referred to from style rules.
      *
      * Every grid area defines two grid line rules in each direction, which can be accessed using the
-     * [[IGridAreaRule.startLine]] and [[IGridAreaRule.endLine]] properties.
+     * [[IGridAreaRule.startLine|startLine]] and [[IGridAreaRule.endLine|endLine]] properties.
      *
      * **Example:**
      *
@@ -623,12 +623,15 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      *         display: "grid",
      *         gridTemplateColumns: "1fr",
      *         gridTemplateRows: ["3em", "1fr"],
+     *
+     *         // use grid arae object to define grid template
      *         gridTemplateAreas: [
      *             [this.headerArea, 1,1, 1,1],
      *             [this.mainArea, 2,1, 2,1],
      *         ],
      *     })
      *
+     *     // use grid arae objects to place elements into the areas
      *     header = this.$class({
      *         gridArea: this.headerArea,
      *         backgroundColor: "blue"
@@ -649,7 +652,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $gridarea(nameOverride?: string | IGridAreaRule): IGridAreaRule;
     /**
-     * Creates a new `@font-face` rule.
+     * Creates a new `@font-face` at-rule.
      *
      * **Example:**
      *
@@ -665,13 +668,13 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * }
      * ```
      *
-     * @param fontface Object implementing the `IFontFace` interface defining the parameter of the
+     * @param fontface Object implementing the [[IFontFace]] interface defining the parameter of the
      * font to use.
-     * @returns The `IFontFaceRule` object that represents the @font-face rule.
+     * @returns The `IFontFaceRule` object that represents the `@font-face` at-rule.
      */
     $fontface(fontface: ExtendedFontFace): IFontFaceRule;
     /**
-     * Creates a new `@import` rule referencing the given CSS file.
+     * Creates a new `@import` at-rule referencing the given CSS file.
      *
      * **Example:**
      *
@@ -681,21 +684,21 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      *     layer1 = this.$layer();
      *     importedCssFiles = [
      *         this.$import( "small-screen.css", {media: {maxWidth: 600}}),
-     *         this.$import( "grids-3rdparty.css", {supports: {display: "grid"}}),
-     *         this.$import( "layered-3rdparty.css", {layer: this.layer1}),
+     *         this.$import( "grids.css", {supports: {display: "grid"}}),
+     *         this.$import( "3rdparty.css", {layer: this.layer1}),
      *     ]
      * }
      * ```
      *
      * @param url URL to the CSS file. Relative URLs are resolved relative to the base URL of the
      * page where the Mimcss library is invoked.
-     * @param options Options defining conditions under which the CSS file should be downloeded and what layer
+     * @param options Options defining conditions under which the CSS file should be downloaded and what layer
      * should apply to the file's content.
-     * @returns The `IImportRule` object that represents the `@import` rule.
+     * @returns The `IImportRule` object that represents the `@import` at-rule.
      */
     $import(url: string, options: ImportRuleOptions): IImportRule;
     /**
-     * Creates a new `@import` rule referencing the given CSS file.
+     * Creates a new `@import` at-rule referencing the given CSS file.
      *
      * **Example:**
      *
@@ -706,8 +709,8 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      *     importedCssFiles = [
      *         this.$import( "common.css"),
      *         this.$import( "small-screen.css", {maxWidth: 600}),
-     *         this.$import( "grids-3rdparty.css", undefined, {display: "grid"}),
-     *         this.$import( "layered-3rdparty.css", undefined, undefined, this.layer1),
+     *         this.$import( "grids.css", undefined, {display: "grid"}),
+     *         this.$import( "3rdparty.css", undefined, undefined, this.layer1),
      *     ]
      * }
      * ```
@@ -717,11 +720,11 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * @param media Optional media statement providing conditions when the CSS file should be downloaded
      * @param supports Optional supports statement providing conditions when the CSS file should be downloaded
      * @param layer Optional layer name defining which layer (if any) should apply for the CSS file content
-     * @returns The `IImportRule` object that represents the `@import` rule.
+     * @returns The `IImportRule` object that represents the `@import` at-rule.
      */
     $import(url: string, media?: MediaStatement, supports?: SupportsStatement, layer?: LayerMoniker): IImportRule;
     /**
-     * Creates new `@namespace` rule.
+     * Creates a new `@namespace` at-rule.
      *
      * **Example:**
      *
@@ -740,7 +743,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $namespace(namespace: string, prefix?: string): INamespaceRule;
     /**
-     * Creates new `@page` rule.
+     * Creates a new `@page` at-rule.
      *
      * **Example:**
      *
@@ -792,7 +795,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $pageName(nameOverride?: string | IPageNameRule): IPageNameRule;
     /**
-     * Creates a new `@color-profile` rule.
+     * Creates a new `@color-profile` at-rule.
      *
      * **Example:**
      *
@@ -841,7 +844,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $supports<T extends StyleDefinition<StyleDefinition<P>>>(statement: SupportsStatement, instOrClass: T | IStyleDefinitionClass<T>): ISupportsRule<T>;
     /**
-     * Creates new `@media` rule.
+     * Creates a new `@media` at-rule.
      *
      * **Example:**
      *
@@ -865,7 +868,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $media<T extends StyleDefinition<StyleDefinition<P>>>(statement: MediaStatement, instOrClass: T | IStyleDefinitionClass<T>): IMediaRule<T>;
     /**
-     * Creates a new layer name rule. The layer name will be created when the rule is processed as
+     * Creates a new `@layer` name at-rule. The layer name will be created when the rule is processed as
      * part of the style definition class. The name can be also overridden by providing either an
      * explicit name or another layer rule.
      *
@@ -875,12 +878,10 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * class MyStyles extends css.StyleDefinition
      * {
      *     layer1 = this.$layer();
-     *
      *     external = this.$import( "external.css", { layer: this.layer1 }
      *
-     *     layer2 = this.$layer( undefined, { color: "blue" })
-     *
-     *     layerOrder = this.$layer( this.layer2, this.layer1)
+     *     layer2 = this.$layer( "extras")
+     *     external = this.$import( "extras.css", { layer: this.layer2 }
      * }
      * ```
      *
@@ -891,7 +892,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      */
     $layer(nameOverride?: LayerMoniker): ILayerNameRule;
     /**
-     * Creates a new layer ordering rule. The method accepts two or more rules.
+     * Creates a new `@layer` ordering at-rule. The method accepts two or more rules.
      *
      * **Example:**
      *
@@ -899,27 +900,25 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * class MyStyles extends css.StyleDefinition
      * {
      *     layer1 = this.$layer();
-     *
-     *     external = this.$import( "external.css", { layer: this.layer1 }
-     *
-     *     layer2 = this.$layer( undefined, { color: "blue" })
-     *
+     *     layer2 = this.$layer( "extras")
      *     layerOrder = this.$layer( this.layer2, this.layer1)
      * }
      * ```
      *
-     * @param layers List of layers represented either by explicit layer names or by references
-     * to layer rules.
-     * @returns The `ILayerOrderRule` object that represents the page name.
+     * @param layer1 First layer represented either by explicit layer names or by references
+     * @param layer2 Second layer represented either by explicit layer names or by references
+     * @param moreLayers List of additional layers represented either by explicit layer names or
+     * by references to layer rules.
+     * @returns The `ILayerOrderRule` object that represents the layer statement at-rule defining the
+     * layer ordering.
      */
     $layer(layer1: LayerMoniker, layer2: LayerMoniker, ...moreLayers: LayerMoniker[]): ILayerOrderRule;
     /**
-    * Creates a new layer block rule. The layer name will be created when the rule is processed as
+    * Creates a new `@layer` block at-rule. The layer name will be created when the rule is processed as
     * part of the style definition class. The layer name can be provided explicitly (as a string
     * or as a reference to another layer rule) or it can be generated uniquely by the Mimcss name
-    * assignment mechanism. Normally, the style definition is also provied, which defines the
-    * style rules under this layer; however, it can be omitted. In this case, only the layer
-    * name will be created using the `@layer name` CSS rule.
+    * assignment mechanism. The style definition must be provied, which defines the style rules
+    * under this layer.
     *
     * **Example:**
     *
@@ -937,7 +936,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
     * }
     * ```
     *
-    * @param name String or another `ILayerRule` object that determines the name of the
+    * @param nameOverride String or another `ILayerRule` object that determines the name of the
     * layer. If the name is undefined, the name is auto-generated by Mimcss. To create an
     * anonymous layer, pass in the empty string.
     * @param instOrClass Either style definition class or an instance of a style defintion class.
