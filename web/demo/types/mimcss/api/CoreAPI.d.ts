@@ -219,7 +219,7 @@ export declare const counters: (counterObj: Extended<CssCounter>, sep: Extended<
  * custom CSS property and of the fallback value.
  * @param varObj Custom CSS property object created using the [[$var]] function.
  * @param fallback Fallback value that will be used if the custom CSS property isnt set.
- * @returns The `IRawProxy` callable interface, whcih allows the `usevar` function to be called
+ * @returns The `IRawProxy` callable interface, which allows the `usevar` function to be called
  * in any context.
  */
 export declare const usevar: <K extends keyof import("./Stylesets").IVarTemplateStyleset>(varObj: IVarRule<K>, fallback?: ExtendedVarValue<K> | undefined) => IRawProxy;

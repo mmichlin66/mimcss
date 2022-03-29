@@ -494,7 +494,7 @@ export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule
 
 
 /**
- * The ILayerNameRule interface represents a variant of the `@layer` at-rule, whcih just declares
+ * The ILayerNameRule interface represents a variant of the `@layer` at-rule, which just declares
  * a name of a layer. This rule generates a layer name, which can be later used in other variants
  * of the `@layer` at-rule or in the `@import` at-rules. Objects implementing this interface are
  * returned from the [[$layerName]] method.

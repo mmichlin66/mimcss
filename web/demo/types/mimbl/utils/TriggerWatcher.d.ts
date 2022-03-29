@@ -21,7 +21,7 @@ export interface ITrigger<T = any> extends IEventSlot<TypeVoidFunc<T>> {
 /**
  * Creates a trigger object of the given depth with the given initial value.
  * @typeparam T Type of the trigger value.
- * @param depth Depth of the trigger, whcih determines how many levels of nested properties of
+ * @param depth Depth of the trigger, which determines how many levels of nested properties of
  * arrays, maps, sets and objects should trigger changes.
  * @param v Optional initial value
  */

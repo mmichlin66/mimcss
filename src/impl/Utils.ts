@@ -118,7 +118,7 @@ export type P2SOptions = P2SOption[];
 
 
 /**
- * Defines options to process tuples. Property names are actually integer numbers, whcih are
+ * Defines options to process tuples. Property names are actually integer numbers, which are
  * compared to the tuples' lengths.
  */
 export type T2SOptions = { [N: number]: V2SOptions[], any?: V2SOptions[] };

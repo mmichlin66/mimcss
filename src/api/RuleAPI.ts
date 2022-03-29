@@ -926,7 +926,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param pageSelector Optional selector of the page, whcih can be either a page name rule or a
+     * @param pageSelector Optional selector of the page, which can be either a page name rule or a
      * page pseudo class or an array of the above.
      * @param styleset Styles to apply.
      * @returns The `IPageRule` object that represents the page rule.
