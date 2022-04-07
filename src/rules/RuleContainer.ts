@@ -281,8 +281,12 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		this.rules.forEach( rule => rule.clear());
 
 		// deactivate imported stylesheets
+        let thisIsThemeDefinition = this.sd instanceof ThemeDefinition;
 		for( let ref of this.refs)
-			(ref[symRC] as RuleContainer).deactivate();
+        {
+			if (thisIsThemeDefinition || !(ref instanceof ThemeDefinition))
+			    (ref[symRC] as RuleContainer).deactivate();
+        }
 	}
 
 
