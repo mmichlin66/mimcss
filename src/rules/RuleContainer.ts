@@ -245,9 +245,16 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 			this.namespaces.forEach( rule => rule.insert( ruleBag));
 		}
 
-		// activate referenced style definitions
+		// activate referenced style definitions. If the reference is for a ThemeDefinition, we
+        // activate it only if `this` style definition is also a theme definition. That means that
+        // if a regular style definition references a theme definition, the theme definition will
+        // not be activated. This implies that theme definitions must be activated implicitly.
+        let thisIsThemeDefinition = this.sd instanceof ThemeDefinition;
 		for( let ref of this.refs)
-			(ref[symRC] as RuleContainer).activate( this.elm);
+        {
+            if (thisIsThemeDefinition || !(ref instanceof ThemeDefinition))
+			    (ref[symRC] as RuleContainer).activate( this.elm);
+        }
 
 		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)

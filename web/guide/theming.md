@@ -12,6 +12,7 @@ rootpath: ".."
 * [Theme declaration and implementation](#theme-declaration-and-implementation)
 * [Referencing themes](#referencing-themes)
 * [Multiple themes on one page](#multiple-themes-on-one-page)
+* [ThemeDefinition vs. StyleDefinition](#themedefinition-vs-styledefinition)
 
 Style definition classes are regular TypeScript classes and thus support inheritance. Mimcss uses the inheritance mechanism to implement theming, which allows changing entire style theme with very little code.
 
@@ -310,4 +311,19 @@ class MyStyles extends css.StyleDefinition
 Just as we did previously, we reference our `ColorTheme` declaration class. Then we define a helper `block` CSS class, which sets the foreground and background colors using the custom CSS properties from the theme. Then we define the top and bottom classes and use the `"++"` property to indicate that they inherit from the block class. Mimcss supports several methods of style inheritance; the `"++"` property simply appends the name of the referenced class to our class name. That is, the value returned by the styles.top.name is `"top block"` where we’re combining the two CSS classes (the actual names are randomly generated, so it would be something like `"n153 n459"`).
 
 Then we use the `"--"` property to set values of the custom CSS variables. Mimcss supports several methods of redefining custom CSS properties in a ruleset; in our case, we just reference a corresponding theme definition class. This causes Mimcss to redefine all custom CSS properties found in the theme class with their corresponding values.
+
+## ThemeDefinition vs. StyleDefinition
+From the style definitions perspective, the `ThemeDefinition` class doesn't bring anything new to the `StyleDefinition` class; however, there are some significant differences in how these classes are managed:
+
+### Single Active Theme Implementation
+Only a single instance of a *theme implementation* class can be activated at the same time for every *theme declaration* class. As a reminder, *theme declaration* is a class directly deriving from the `ThemeDefinition` class, while *theme implementation* is a class directly or indirectly deriving from theme declaration.
+
+This rule implies that when a new theme implementation is activated the currently active theme implementation for the same theme declaration, will be deactivated.
+
+### No Activation by Reference from Non-Themes
+If a theme class is referenced from another style definition class, which is not itself a theme, using the `$use` method, the referenced theme class is NOT activated when the referencing class is activated.
+
+Note that for regular non-theme style definitions (e.g. class A), if they reference another regular style definition class (e.g. class B), then the class B will be activated when the class A is activated. This rule is explicitly broken when a regular style definition references a theme definition. The reason behind this is that we want the themes to be activated explicitly.
+
+Note also that if a theme definition (e.g. class X) references another theme definition (e.g. class Y), then class Y ***will*** be activated when class X is activated. This is because we consider this activation "explicit".
 
