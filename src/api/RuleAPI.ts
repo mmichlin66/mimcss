@@ -1442,11 +1442,10 @@ export const deactivate = (sd: IStyleDefinition, schedulerType?: number): void =
  * Returns the theme definition object, which is currently active for the given theme declaration
  * class.
  * @param themeClass Theme declaration class
- * @returns Theme instance, which is currently active for the given theme class or undefined
- * if no instance is currently active.
+ * @returns Theme instance, which is currently active for the given theme class.
  */
-export const getActiveTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
-    getCurrentTheme( themeClass);
+export const getActiveTheme = <T extends ThemeDefinition>(themeClass: IStyleDefinitionClass<T>): T =>
+    getCurrentTheme( themeClass, true);
 
 
 

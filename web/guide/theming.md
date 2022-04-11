@@ -315,15 +315,7 @@ Then we use the `"--"` property to set values of the custom CSS variables. Mimcs
 ## ThemeDefinition vs. StyleDefinition
 From the style definitions perspective, the `ThemeDefinition` class doesn't bring anything new to the `StyleDefinition` class; however, there are some significant differences in how these classes are managed:
 
-### Single Active Theme Implementation
 Only a single instance of a *theme implementation* class can be activated at the same time for every *theme declaration* class. As a reminder, *theme declaration* is a class directly deriving from the `ThemeDefinition` class, while *theme implementation* is a class directly or indirectly deriving from theme declaration.
 
 This rule implies that when a new theme implementation is activated the currently active theme implementation for the same theme declaration, will be deactivated.
-
-### No Activation by Reference from Non-Themes
-If a theme class is referenced from another style definition class, which is not itself a theme, using the `$use` method, the referenced theme class is NOT activated when the referencing class is activated.
-
-Note that for regular non-theme style definitions (e.g. class A), if they reference another regular style definition class (e.g. class B), then the class B will be activated when the class A is activated. This rule is explicitly broken when a regular style definition references a theme definition. The reason behind this is that we want the themes to be activated explicitly.
-
-Note also that if a theme definition (e.g. class X) references another theme definition (e.g. class Y), then class Y ***will*** be activated when class X is activated. This is because we consider this activation "explicit".
 

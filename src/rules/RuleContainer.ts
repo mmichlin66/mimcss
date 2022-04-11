@@ -63,6 +63,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         this.psd = psd;
         this.pc = pc;
 
+        // remember whether this SD is a theme
+        this.isTheme = sd instanceof ThemeDefinition;
+        this.isThemeDecl = Object.getPrototypeOf(sdc) === ThemeDefinition;
+        this.isThemeImpl = this.isTheme && !this.isThemeDecl;
+
         // if the class has embedding category, then the embedding container must have already
         // been created for this context (see processClass).
         this.ec = (sdc[symEmbeddingCategory] as EmbeddingCategory)?.getEC( ctx);
@@ -245,14 +250,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 			this.namespaces.forEach( rule => rule.insert( ruleBag));
 		}
 
-		// activate referenced style definitions. If the reference is for a ThemeDefinition, we
-        // activate it only if `this` style definition is also a theme definition. That means that
-        // if a regular style definition references a theme definition, the theme definition will
-        // not be activated. This implies that theme definitions must be activated implicitly.
-        let thisIsThemeDefinition = this.sd instanceof ThemeDefinition;
+		// activate referenced style definitions. Note that we don't activate references that are
+        // theme declarations.
 		for( let ref of this.refs)
         {
-            if (thisIsThemeDefinition || !(ref instanceof ThemeDefinition))
+			if (!this.isThemeDecl)
 			    (ref[symRC] as RuleContainer).activate( this.elm);
         }
 
@@ -280,11 +282,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		this.rules.forEach( rule => rule.clear());
 
-		// deactivate imported stylesheets
-        let thisIsThemeDefinition = this.sd instanceof ThemeDefinition;
+		// deactivate referenced style definitions. Note that we don't deactivate references that
+        // are theme declarations.
 		for( let ref of this.refs)
         {
-			if (thisIsThemeDefinition || !(ref instanceof ThemeDefinition))
+			if (!this.isThemeDecl)
 			    (ref[symRC] as RuleContainer).deactivate();
         }
 	}
@@ -321,7 +323,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             {
                 // themes are inserted before the special placeholder element, which is created
                 // at the top of the '<head>' element
-                if (this.sd instanceof ThemeDefinition)
+                if (this.isTheme)
                     insertBefore = ctx.getThemeElm();
 
                 this.elm = ctx.createElm( this, insertBefore);
@@ -334,16 +336,16 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         // one for its theme base class. If no, then deactivate the theme instance currently set
         // as active. In any case, set our new instance as the currently active one. We ignore
         // theme declaration classes - those that directly derive from ThemeDefinition
-        if (isThemeImplementation(this.sd))
+        if (this.isThemeImpl)
         {
             let themeClass = this.sdc as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
-                let currInstance = getCurrentTheme( themeClass);
+                let currInstance = getCurrentTheme( themeClass, false);
                 if (currInstance && currInstance !== this.sd)
                     (currInstance[symRC] as RuleContainer).deactivate();
 
-                setCurrentTheme( this.sd);
+                setCurrentTheme( this.sd as ThemeDefinition);
             }
         }
 
@@ -388,12 +390,12 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
         // if this is a theme class deactivation, check whether the instance is set as the current
         // one for its theme base class. If yes, remove it as the currently active one.
-        if (isThemeImplementation(this.sd))
+        if (this.isThemeImpl)
         {
             let themeClass = this.sdc as unknown as IStyleDefinitionClass<ThemeDefinition>;
             if (themeClass)
             {
-                let currInstance = getCurrentTheme( themeClass);
+                let currInstance = getCurrentTheme( themeClass, false);
                 if (currInstance === this.sd)
                     removeCurrentTheme( themeClass);
             }
@@ -466,6 +468,15 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      * rules into instead of topLevelContainer.
      */
 	public ec?: EmbeddingContainer;
+
+	/** Flag indicating whether this style defnition is a theme definition. */
+	private isTheme?: boolean;
+
+	/** Flag indicating whether this style defnition is a theme declaration. */
+	private isThemeDecl?: boolean;
+
+	/** Flag indicating whether this style defnition is a theme implementation. */
+	private isThemeImpl?: boolean;
 
 	/**
      * Parent Style Definition - instance of the parent style definition class in the chain of
@@ -1110,31 +1121,25 @@ class VirtHandler implements ProxyHandler<any>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Map of them definition classes to the instances that are currently active for these classes.
+ * Map of theme declaration classes to the instances that are currently active for these classes.
  */
 let s_themeInstanceMap = new Map<IStyleDefinitionClass<ThemeDefinition>,ThemeDefinition>();
 
-
-
 /**
- * Determines whether this style definition class is an implementatin of a theme - that is, it is
- * an instance of ThemeDefinition class but doesn't derive directly from ThemeDefinition. It can
- * serve as type guard.
- *
- * @param sd Style definition instance
- * @returns boolean
+ * Map of theme declaration classes to the theme declaration instances. This is sometimes needed
+ * when we were asked for the active theme instance and it is not set. In this case we wil create
+ * the instance of the theme declaration and return it.
  */
-const isThemeImplementation = (sd: IStyleDefinition): sd is ThemeDefinition =>
-    sd instanceof ThemeDefinition && Object.getPrototypeOf(sd.constructor) !== ThemeDefinition;
+let s_themeDeclInstanceMap = new Map<IStyleDefinitionClass<ThemeDefinition>,ThemeDefinition>();
 
 
 
 /**
- * Returns the theme base class for the given theme class.
+ * Returns the theme declaration class for the given theme class.
  * @param themeClass ThemeDefinition-derived class
- * @returns Theme base class.
+ * @returns Theme declaration class.
  */
-const getThemeBaseClass = (themeClass: IStyleDefinitionClass<ThemeDefinition>): IStyleDefinitionClass<ThemeDefinition> | undefined =>
+const getThemeDeclClass = (themeClass: IStyleDefinitionClass<ThemeDefinition>): IStyleDefinitionClass<ThemeDefinition> | undefined =>
 {
     // make sure we are not passed the ThemeDefinition class itself
     if (themeClass === ThemeDefinition)
@@ -1142,25 +1147,45 @@ const getThemeBaseClass = (themeClass: IStyleDefinitionClass<ThemeDefinition>): 
 
     // loop over prototypes until we find the class, which derives directly from ThemeDefinition.
     // This is the theme base class
-    let themeBaseClass = themeClass;
+    let themeDeclClass = themeClass;
     for( let cls = Object.getPrototypeOf( themeClass); cls !== ThemeDefinition; cls = Object.getPrototypeOf( cls))
-        themeBaseClass = cls;
+        themeDeclClass = cls;
 
-    return themeBaseClass;
+    return themeDeclClass;
 }
 
 
 
 /**
- * Returns the theme definition object, which is currently activated for the given theme.
+ * Returns the theme definition object, which is currently activated for the given theme. If no
+ * theme is currently activated for the given theme class, the theme declaration class is processed
+ * and its instance is returned. Thus, this function never returns null or undefined.
  * @param themeClass Theme definition class
- * @returns Theme instance, which is currently activated for the given theme class or null
- * if no istance is currently activated.
+ * @param returnThemeDecl Flag indicating that if there is no currently active theme we should
+ * return the instance of the theme declaration class.
+ * @returns Theme instance, which is currently activated for the given theme class.
  */
-export const getCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): ThemeDefinition | undefined =>
+export const getCurrentTheme = <T extends ThemeDefinition>( themeClass: IStyleDefinitionClass<T>,
+    returnThemeDecl: boolean): T =>
 {
-    let themeBaseClass = getThemeBaseClass(themeClass)
-    return themeBaseClass && s_themeInstanceMap.get( themeBaseClass);
+    let themeDeclClass = getThemeDeclClass(themeClass);
+    if (!themeDeclClass)
+        throw new Error(`Class ${themeClass} doesn't derive from ThemeDefinition`);
+
+    let currentTheme = s_themeInstanceMap.get( themeDeclClass) as T;
+    if (!currentTheme && returnThemeDecl)
+    {
+        // check whether we already have an instance of theme declaration class; if not, create
+        // it now, remember and return.
+        currentTheme = s_themeDeclInstanceMap.get( themeDeclClass) as T;
+        if (!currentTheme)
+        {
+            currentTheme = processClass( themeDeclClass) as T;
+            s_themeDeclInstanceMap.set( themeDeclClass, currentTheme);
+        }
+    }
+
+    return currentTheme;
 }
 
 
@@ -1172,7 +1197,7 @@ export const getCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinitio
  */
 const setCurrentTheme = (theme: ThemeDefinition): void =>
 {
-    let themeBaseClass = getThemeBaseClass( theme.constructor as IStyleDefinitionClass<ThemeDefinition>);
+    let themeBaseClass = getThemeDeclClass( theme.constructor as IStyleDefinitionClass<ThemeDefinition>);
     themeBaseClass && s_themeInstanceMap.set( themeBaseClass, theme);
 }
 
@@ -1185,7 +1210,7 @@ const setCurrentTheme = (theme: ThemeDefinition): void =>
  */
 const removeCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): void =>
 {
-    let themeBaseClass = getThemeBaseClass( themeClass);
+    let themeBaseClass = getThemeDeclClass( themeClass);
     themeBaseClass && s_themeInstanceMap.delete( themeBaseClass);
 }
 
