@@ -3,7 +3,7 @@
     ISelectorBuilder, NthExpression, AttrComparisonOperation, TimingFunctionJumpTerm,
     ICubicBezierFunc, IStepsFunc, INSTagFunc, ElementTagName, SelectorCombinator,
 } from "./CoreTypes"
-import {ICounterRule, IIDRule, INamespaceRule, IVarRule} from "./RuleTypes";
+import {IIDRule, INamespaceRule, IVarRule} from "./RuleTypes";
 import {AttrTypeKeyword, AttrUnitKeyword, CssCounter, ListStyleType_StyleType} from "./StyleTypes";
 import {ExtendedVarValue, Styleset, VarTemplateName} from "./Stylesets";
 import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy} from "./MediaTypes";

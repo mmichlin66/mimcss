@@ -153,7 +153,7 @@ export class ClassNameRule extends NamedRuleLike implements IClassNameRule
 	}
 
 	// Prefix for CSS classes.
-	public prefix: ".";
+	public get prefix(): "." { return "."; }
 
     // This function is used when the object is specified as a value of a style property.
     // We return the CSS class name.

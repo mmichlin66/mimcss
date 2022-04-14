@@ -124,26 +124,27 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             t[p] = v;
         else
         {
-            // we only virtualize rule-like objects. We don't virtualize arrays because there
-            // is no trap for isArray() method, which we use later in the processProperty()
-            // method. We also don't virtualize primitive types because there is no trap for
-            // typeof operation (needed when converting values to strings). We also don't
-            // virtualize style definition instances (results of $use() method invocations).
             let isRuleLike = v instanceof RuleLike;
             if (p in t)
             {
+                t[p] = v;
                 if (isRuleLike)
                     v.process( p);
-
-                t[p] = v;
+                else
+                    this.initStructProperty( p, v);
             }
             else
             {
+                // we only virtualize rule-like objects. We don't virtualize arrays because there
+                // is no trap for isArray() method, which we use later in the processProperty()
+                // method. We also don't virtualize primitive types because there is no trap for
+                // typeof operation (needed when converting values to strings). We also don't
+                // virtualize style definition instances (results of $use() method invocations).
                 if (isRuleLike)
                     virtualize( t, p);
 
                 t[p] = v;
-                this.processProperty( p, t[p]);
+                this.initProperty( p, t[p]);
             }
         }
 
@@ -154,24 +155,14 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 	// Processes the properties of the style definition instance. This creates names for classes,
 	// IDs, animations and custom variables.
-	private processProperty( propName: string | null, propVal: any): void
+	private initProperty( propName: string | null, propVal: any): void
 	{
-		if (propVal instanceof StyleDefinition)
-            this.refs.push( propVal);
-        // else if (propVal instanceof Array)
-        else if (Array.isArray(propVal))
+        if (propVal instanceof RuleLike)
         {
-            // loop over array elements and recursively process them. Index becomes part of the
-            // rule name.
-            let i = 0;
-            for( let item of propVal)
-                this.processProperty( `${propName}_${i++}`, item);
-        }
-        else
-        {
-            if (propVal instanceof RuleLike)
-                propVal.process( propName);
+            // process all rule-like properties
+            propVal.process( propName);
 
+            // push rules into different buckets
             if (propVal instanceof VarRule)
                 this.vars.push( propVal);
             else if (propVal instanceof ImportRule)
@@ -181,6 +172,32 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             else if (propVal instanceof Rule)
                 this.rules.push( propVal);
         }
+        else if (propVal instanceof StyleDefinition)
+            this.refs.push( propVal);
+        else
+            this.initStructProperty( propName, propVal);
+	}
+
+
+
+	// Processes the "structured" property - that is, array or plain object.
+	private initStructProperty( propName: string | null, propVal: any): void
+	{
+		if (Array.isArray(propVal))
+        {
+            // loop over array elements and recursively process them. Index becomes part of the
+            // rule name.
+            let i = 0;
+            for( let item of propVal)
+                this.initProperty( `${propName}_${i++}`, item);
+        }
+        else if (propVal.constructor === Object)
+        {
+            // for plain objects, loop over their properties and recursively process them.
+            // Property names become part of the rule name.
+            for( let subPropName in propVal)
+                this.initProperty( `${propName}_${subPropName}`, propVal[subPropName]);
+        }
 	}
 
 
@@ -189,7 +206,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	public setVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
 		if (this.varRootRule)
-        getActivator(schedulerType).updateStyle( this.varRootRule, name, value, important);
+            getActivator(schedulerType).updateStyle( this.varRootRule, name, value, important);
 	}
 
 
@@ -253,10 +270,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		// activate referenced style definitions. Note that we don't activate references that are
         // theme declarations.
 		for( let ref of this.refs)
-        {
-			if (!this.isThemeDecl)
-			    (ref[symRC] as RuleContainer).activate( this.elm);
-        }
+            (ref[symRC] as RuleContainer).activate( this.elm);
 
 		// insert our custom variables into the ":root" rule
 		if (this.vars.length > 0)
@@ -285,10 +299,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		// deactivate referenced style definitions. Note that we don't deactivate references that
         // are theme declarations.
 		for( let ref of this.refs)
-        {
-			if (!this.isThemeDecl)
-			    (ref[symRC] as RuleContainer).deactivate();
-        }
+            (ref[symRC] as RuleContainer).deactivate();
 	}
 
 
@@ -302,7 +313,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      */
 	public activate( insertBefore?: IMimcssStyleElement): void
 	{
-        if (++this.actCount > 1)
+        if (this.isThemeDecl || ++this.actCount > 1)
             return;
 
         // activation context may not exist if the code is executing on a server and SSR has
@@ -361,7 +372,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	/** Removes this stylesheet from DOM. */
 	public deactivate(): void
 	{
-        if (--this.actCount > 0)
+        if (this.isThemeDecl || --this.actCount > 0)
             return;
 
         let ctx = this.ctx;

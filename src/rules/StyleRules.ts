@@ -455,7 +455,7 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 
 	// Returns prefix that is put before the entity name to create a CSS name used in style rule
 	// selectors.
-	public prefix: "." | "#";
+	public abstract get prefix(): "." | "#";
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -484,7 +484,7 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 export class ClassRule extends NamedStyleRule implements IClassRule
 {
 	// Prefix for CSS classes.
-	public prefix: "." = ".";
+	public get prefix(): "." { return "."; }
 
     // Allows the derived classes to process style properties that the StyleRule doesn't know about.
     // If returns false, the property with the given name will not be added to the styleset.
@@ -529,7 +529,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 export class IDRule extends NamedStyleRule implements IIDRule
 {
 	// Prefix for CSS element identifiers.
-	public prefix: "#" = "#";
+	public get prefix(): "#" { return "#"; }
 }
 
 

@@ -1141,10 +1141,9 @@ export declare const deactivate: (sd: IStyleDefinition, schedulerType?: number |
  * Returns the theme definition object, which is currently active for the given theme declaration
  * class.
  * @param themeClass Theme declaration class
- * @returns Theme instance, which is currently active for the given theme class or undefined
- * if no instance is currently active.
+ * @returns Theme instance, which is currently active for the given theme class.
  */
-export declare const getActiveTheme: (themeClass: IStyleDefinitionClass<ThemeDefinition>) => ThemeDefinition | undefined;
+export declare const getActiveTheme: <T extends ThemeDefinition<any>>(themeClass: IStyleDefinitionClass<T, any>) => T;
 /**
  * Establishes an activation context corresponding to the given document or shadow root, so that
  * styles definitions created and activated while this context is active will be "adopted" by the

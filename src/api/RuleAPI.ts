@@ -2,7 +2,7 @@
 import {
     IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
-    IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType,
+    IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker,
     NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule,
     ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions
 } from "./RuleTypes";
@@ -1137,7 +1137,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      *         }
      *     )
      *
-     *     import = this.$import( "external.css", { layer: baseLayer })
+     *     import = this.$import( "external.css", { layer: this.baseLayer })
      * }
      * ```
      *
@@ -1271,7 +1271,7 @@ export const configNameGeneration = (method: NameGenerationMethod, prefix?: stri
  * @param classProps Variable argument list of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
  */
-export const classes = (...classProps: ClassPropType[]): string =>
+export const classes = (...classProps: ClassMoniker[]): string =>
 	v2s( classProps, {
 		obj: (v: IClassRule | IClassNameRule) => v.name,
 		item: classes
@@ -1285,7 +1285,7 @@ export const classes = (...classProps: ClassPropType[]): string =>
  * @param classProps Variable argument list of either class names or class rule objects.
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export const chooseClass = (...classProps: ClassPropType[]): string =>
+export const chooseClass = (...classProps: ClassMoniker[]): string =>
 {
     for( let classProp of classProps)
     {

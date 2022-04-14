@@ -20,9 +20,7 @@ rootpath: ".."
 ## Style definitions
 In regular CSS, a unit of style definition is a rule. There are regular style rules that define a selector followed by a styleset, and at-rules: @import, @font-face, @keyframes, @media, @supports and others. Rules such as @media and @support are conditional grouping rules; that is, they define a condition and a set of nested rules, which, in turn, might be style rules or at-rules. Multiple rules are combined into a CSS file, which is sometimes called a stylesheet.
 
-In Mimcss, a stylesheet is represented by a class - called a Style Definition Class. Individual rules are defined as properties of a style definition class. More precisely, a property of a style definition class can either define a single rule or be an array of rules. If the property defines a single rule, it is called a named rule because the property name allows referring to the rule by the property name. If a property is an array of rules, those rules are called unnamed rules because there is no property by which individual rules can be addressed.
-
-There are some rule types that are almost always defined as named rules: classes, IDs, custom properties, animations, counters, grid lines and areas. The property names, to which these rules are assigned, become the names by which these rules are referred to from the HTML rendering code. Other rules, such as tags, media and supports rules can be defined in an array without an explicit property associated with the rule. Note, however, that even for these rules it can be beneficial to be assigned to a property as each rule can be accessed at run time to manipulate the CSS styles the rule defines. Note also, that even rules defined in an array can be accessed via array indexes - this is a regular TypeScript class after all.
+In Mimcss, a stylesheet is represented by a class - called a Style Definition Class. Individual rules are defined as properties of a style definition class. For rules producing names (such as classes, IDs, custom properties, animations, etc.), the property names, to which these rules are assigned, become the names by which these rules are referred to from the HTML rendering code. Rules can also be defined using arrays or plain objects of arbitrary structure.
 
 Let's create a simple style definition class:
 
@@ -33,9 +31,12 @@ class MyStyles extends css.StyleDefinition
 {
     vbox = this.$class({ display: "flex", flexDirection: "column" })
 
-    standout = this.$id({ boxShadow: {color: "red", blur: 4} });
+    standout = this.$id({ boxShadow: {color: "red", blur: 4} })
 
-    defaultColor = this.$var({ "color", "black" });
+    defaultColors = {
+        background: this.$var({ "color", "white" }),
+        foreground: this.$var({ "color", "black" })
+    }
 
     move = this.$keyframes([
         [ "from", { top: 0} ],
@@ -57,7 +58,7 @@ The rules that require names are assigned to the class's properties. The names o
 
 Note that we didn't specify the name of the class (nor of the ID, animation or custom property). This is because we usually don't define the names that will be used in HTML; instead, we will use the properties to refer to the class and other entities. This is a fundamental aspect of Mimcss: names are hidden from the developers, so that the developers never have a chance to misspell the names. Mimcss mechanism generates the names that will be used in HTML and makes sure that the properties, to which the rules are assigned, refer to these names. If there is a need for a rule to have a pre-defined name, it can be specified as an optional parameter to `$class`, `$id` or `$var()` methods - this will override the name-generation mechanism.
 
-## Rule Ttypes
+## Rule types
 Mimcss supports all CSS rules except @charset - the latter is not needed because developers don't actually write text-based CSS files. This section gives a brief description of `StyleDefinition` methods that create the rules.
 
 - [$class()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_class) - creates CSS style rule with a class selector.
@@ -75,6 +76,7 @@ Mimcss supports all CSS rules except @charset - the latter is not needed because
 - [$import()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_import) - creates CSS @import rule referencing a CSS file.
 - [$namespace()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_namespace) - creates CSS @namespace rule.
 - [$page()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_media) - creates CSS @page rule that specifies styles used for printing.
+- [$layer()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_layer) - creates CSS @layer rule that specifies styles used for printing.
 - [$counterStyle()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_counterStyle) - creates CSS @counter-style rule.
 - [$counter()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_counter) - creates counter name that can be used with style properties such as `counter-increment` and `counter-reset` as well as with CSS functions such as `counter()` and `counters()`. This method doesn't create any CSS rule but is used to generate a unique counter name.
 - [$gridarea()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_gridarea) - creates grid area name that can be used with style properties such as `grid-area`. This method doesn't create any CSS rule but is used to generate a unique grid area name.

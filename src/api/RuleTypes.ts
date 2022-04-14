@@ -148,8 +148,19 @@ export interface IClassNameRule extends IPrefixedNamedEntity, IRuleWithSelector
  * - as a class rule returned form the [[$class]] method.
  * - as a class name rule returned form the [[$classname]] method.
  * - as an array of the above.
+ * @deprecated Use [[ClassMoniker]] type
  */
 export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType[];
+
+/**
+ * Type for specifying a CSS class, which can be used in the `class` property of HTML elements.
+ * It can be expressed in one of the following ways:
+ * - as a string.
+ * - as a class rule returned form the [[$class]] method.
+ * - as a class name rule returned form the [[$classname]] method.
+ * - as an array of the above.
+ */
+export type ClassMoniker = string | IClassRule | IClassNameRule | ClassMoniker[];
 
 
 

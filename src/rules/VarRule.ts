@@ -76,7 +76,7 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     public template: K;
 
 	// Prefix for CSS classes.
-	public prefix: "--" = "--";
+	public get prefix(): "--" { return "--"; }
 
     /**
      * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
