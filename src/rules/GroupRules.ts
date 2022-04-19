@@ -195,17 +195,6 @@ export class LayerBlockRule<T extends IStyleDefinition> extends GroupRule<T,CSSG
 	{
 		super.process( ruleName);
         this.name = this.rc.getScopedName( ruleName, this.nameOverride);
-
-        // // if the name specified in the constructor is undefined, we generate a unique name;
-        // // if it is the layer object, we get its name; otherwise (if the name is a string
-        // // including an empty string), we just use it.
-        // let name = this.nameOverride;
-        // if (name == null)
-        //     name = this.rc.getScopedName( ruleName);
-        // else if (typeof name === "object")
-        //     name = name.layerName;
-
-		// this.name = name;
 	}
 
 	// Returns the condition string of this grouping rule.

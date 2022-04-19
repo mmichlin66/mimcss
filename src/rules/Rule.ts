@@ -117,6 +117,11 @@ export abstract class RuleLike
      */
 	public process( propName: string | null): void {}
 
+	/**
+     * Copies the internal data from the given object.
+     */
+	public copy( other: any): void {}
+
 
 
 	/** Style Definition object to which this rule belongs. */

@@ -109,7 +109,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
         this[symRC] = rc;
 
         // instead of returning an instance of our class, the constructor returns a proxy. This
-        // allows creating proxies for all properties defined in the class.
+        // allows creating proxies for all rule properties defined in the class.
         return new Proxy<StyleDefinition<P>>( this, rc);
     }
 

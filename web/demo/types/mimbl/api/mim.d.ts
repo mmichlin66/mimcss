@@ -1,4 +1,4 @@
-import { Styleset, IIDRule, ClassPropType } from "mimcss";
+import { Styleset, IIDRule, ClassMoniker } from "mimcss";
 import { IHtmlIntrinsicElements } from "./HtmlTypes";
 import { ISvgIntrinsicElements } from "./SvgTypes";
 import { EventSlot, ITrigger, IEventSlot } from "../internal";
@@ -295,8 +295,8 @@ export interface IElementProps<TRef extends Element = Element, TChildren = any> 
     xmlns?: string;
     id?: ExtendedElementAttr<IDPropType>;
     lang?: ExtendedElementAttr<string>;
-    class?: ExtendedElementAttr<ClassPropType>;
-    className?: ExtendedElementAttr<ClassPropType>;
+    class?: ExtendedElementAttr<ClassMoniker>;
+    className?: ExtendedElementAttr<ClassMoniker>;
     style?: ExtendedElementAttr<string | Styleset>;
     tabindex?: ExtendedElementAttr<number>;
     tabIndex?: ExtendedElementAttr<number>;

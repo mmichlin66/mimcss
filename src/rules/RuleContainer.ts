@@ -124,28 +124,13 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             t[p] = v;
         else
         {
-            let isRuleLike = v instanceof RuleLike;
+            // if the property is already in the object it means that it is already virtualized
+            // and the set accessor will be called for it.
             if (p in t)
-            {
                 t[p] = v;
-                if (isRuleLike)
-                    v.process( p);
-                else
-                    this.initStructProperty( p, v);
-            }
             else
-            {
-                // we only virtualize rule-like objects. We don't virtualize arrays because there
-                // is no trap for isArray() method, which we use later in the processProperty()
-                // method. We also don't virtualize primitive types because there is no trap for
-                // typeof operation (needed when converting values to strings). We also don't
-                // virtualize style definition instances (results of $use() method invocations).
-                if (isRuleLike)
-                    virtualize( t, p);
+                this.virtProp( p, t, p, v);
 
-                t[p] = v;
-                this.initProperty( p, t[p]);
-            }
         }
 
         return true;
@@ -153,52 +138,197 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
 
-	// Processes the properties of the style definition instance. This creates names for classes,
-	// IDs, animations and custom variables.
-	private initProperty( propName: string | null, propVal: any): void
+    /**
+     * Substitutes a field with the given name in the given object with a property with get and set
+     * accessors in order to trap assignments to this fields. The problem
+     * this solves is this: when a rule is defined in a base class and then overridden in a derived
+     * class, when an instance of the derived class is created, the rules that are created in the
+     * base and derived classes see different values of the rule. Since our rules are defined as
+     * part of the constructor, the base class constructor's code only sees the value assigned in that
+     * code. If another rule in the base class uses this first rule, this value is remembered.
+     *
+     * The `virtProp` method creates a Proxy object for the rule with the handler that keeps the
+     * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
+     * rule, the first rule will see the overridden value of the rule when accessed in the
+     * post-constructor code.
+     * @param ruleName
+     * @param obj
+     * @param propName
+     * @param initVal
+     */
+    private virtProp( ruleName: string, obj: any, propName: string | number, initVal: any): void
+    {
+        // don't virtualize primitive types
+        if (!isVirt(initVal))
+        {
+            obj[propName] = initVal;
+            return;
+        }
+
+        // we may directly create the handler and the proxy because this function will be invoked
+        // for every StyleDefinition instance (as opposed to once per class).
+        let handler = new VirtHandler();
+        handler.x = new Proxy( {}, handler);
+
+        // store the current value.
+        handler.t = initVal;
+
+        // remember the reference to our rule container object - we will use it inside the setter
+        // because "this" means something different there.
+        let rc = this;
+
+        // initialize the property
+        if (initVal != null)
+            rc.initRule( ruleName, initVal);
+
+        Object.defineProperty( obj, propName, {
+            enumerable: true,
+
+            // simply return the current value
+            get(): any { return handler.x; },
+
+            // set the new value to the handler so that it will use it from now on.
+            set( newVal: any): void
+            {
+                handler.t = rc.updateRule( ruleName, handler.t, newVal);
+            }
+        });
+    }
+
+
+
+    /**
+     * Given the old and the new value of the property with the given rule name adds, deletes
+     * or updates the property and returns either the old (updated) or the new (replaced)
+     * value.
+     * @param ruleName
+     * @param oldVal
+     * @param newVal
+     * @returns
+     */
+    private updateRule( ruleName: string, oldVal: any, newVal: any): any
+    {
+        if (oldVal !== newVal)
+        {
+            if (oldVal == null)
+                this.initRule( ruleName, newVal);
+            else if (newVal == null)
+                this.deleteRule( ruleName, oldVal);
+            else if (newVal instanceof StyleDefinition || newVal instanceof RuleLike)
+            {
+                this.deleteRule( ruleName, oldVal);
+                this.initRule( ruleName, newVal);
+            }
+            else if (typeof oldVal === "object" && typeof newVal === "object")
+            {
+                // for objects (including arrays), loop over their properties and recursively process
+                // them. Property names (or indexes) become part of the rule name.
+                for( let subPropName in newVal)
+                {
+                    let newItem = newVal[subPropName];
+                    if (subPropName in oldVal)
+                    {
+                        // this will call the updateRule method through Proxy handler's `set` recursively
+                        oldVal[subPropName] = newItem;
+                    }
+                    else
+                    {
+                        // this will call the initRule method
+                        this.virtProp( `${ruleName}_${subPropName}`, oldVal, subPropName, newItem);
+                    }
+                }
+
+                return oldVal;
+            }
+        }
+
+        return newVal;
+    }
+
+
+
+    /**
+     * Processes a rule (property) with the given name and value. This creates names for classes,
+     * IDs, animations and custom variables. This also pushes different types of rules into
+     * different buckets (references to style definitions, custom property rules, import rules,
+     * namespace rules and all other rules)
+     * @param ruleName Name of the rule, which is the "path" consisting of underscore-separated
+     * property names starting with a property of the style definition object.
+     * @param val Property value
+     */
+	private initRule( ruleName: string, val: any): void
 	{
-        if (propVal instanceof RuleLike)
+        /// #if DEBUG
+        if (val == null)
+            throw new Error("RuleContainer.initRule was called with val == null");
+        /// #endif
+
+        if (val instanceof RuleLike)
         {
             // process all rule-like properties
-            propVal.process( propName);
+            val.process( ruleName);
 
             // push rules into different buckets
-            if (propVal instanceof VarRule)
-                this.vars.push( propVal);
-            else if (propVal instanceof ImportRule)
-                this.imports.push( propVal);
-            else if (propVal instanceof NamespaceRule)
-                this.namespaces.push( propVal);
-            else if (propVal instanceof Rule)
-                this.rules.push( propVal);
+            if (val instanceof VarRule)
+                this.vars.set( ruleName, val);
+            else if (val instanceof ImportRule)
+                this.imports.set( ruleName, val);
+            else if (val instanceof NamespaceRule)
+                this.namespaces.set( ruleName, val);
+            else if (val instanceof Rule)
+                this.rules.set( ruleName, val);
         }
-        else if (propVal instanceof StyleDefinition)
-            this.refs.push( propVal);
-        else
-            this.initStructProperty( propName, propVal);
+        else if (val instanceof StyleDefinition)
+            this.refs.set( ruleName, val);
+        else if (val && typeof val === "object")
+        {
+            // for objects (including arrays), loop over their properties and recursively
+            // virtualize them. Property names become part of the rule name.
+            for( let subPropName in val)
+                this.virtProp( `${ruleName}_${subPropName}`, val, subPropName, val[subPropName]);
+        }
 	}
 
 
 
-	// Processes the "structured" property - that is, array or plain object.
-	private initStructProperty( propName: string | null, propVal: any): void
-	{
-		if (Array.isArray(propVal))
+    /**
+     * Removes the given rule and all it's descendants from the rule container.
+     * @param ruleName Name of the rule, which is the "path" consisting of underscore-separated
+     * property names starting with a property of the style definition object.
+     * @param val Property value
+     */
+    private deleteRule( ruleName: string, val: any): void
+    {
+        /// #if DEBUG
+        if (val == null)
+            throw new Error("RuleContainer.deleteRule was called with val == null");
+        /// #endif
+
+        if (val instanceof RuleLike)
         {
-            // loop over array elements and recursively process them. Index becomes part of the
-            // rule name.
-            let i = 0;
-            for( let item of propVal)
-                this.initProperty( `${propName}_${i++}`, item);
+            if (val instanceof VarRule)
+                this.vars.delete( ruleName);
+            else if (val instanceof ImportRule)
+                this.imports.delete( ruleName);
+            else if (val instanceof NamespaceRule)
+                this.namespaces.delete( ruleName);
+            else if (val instanceof Rule)
+                this.rules.delete( ruleName);
         }
-        else if (propVal.constructor === Object)
+        else if (val instanceof StyleDefinition)
+            this.refs.delete( ruleName);
+        else if (typeof val === "object")
         {
-            // for plain objects, loop over their properties and recursively process them.
-            // Property names become part of the rule name.
-            for( let subPropName in propVal)
-                this.initProperty( `${propName}_${subPropName}`, propVal[subPropName]);
+            // for objects, loop over their properties and recursively delete the rules.
+            // Property names are part of the rule name.
+            for( let subPropName in val)
+            {
+                let item = val[subPropName];
+                if (item != null)
+                    this.deleteRule( `${ruleName}_${subPropName}`, item);
+            }
         }
-	}
+    }
 
 
 
@@ -269,12 +399,16 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// activate referenced style definitions. Note that we don't activate references that are
         // theme declarations.
-		for( let ref of this.refs)
-            (ref[symRC] as RuleContainer).activate( this.elm);
+		this.refs.forEach( ref => (ref[symRC] as RuleContainer).activate());
+		// for( let ref of this.refs.values())
+        //     (ref[symRC] as RuleContainer).activate( this.elm);
 
 		// insert our custom variables into the ":root" rule
-		if (this.vars.length > 0)
-			this.varRootRule = ruleBag.add( getRootCssForVars( this.vars))?.cssRule as CSSStyleRule;
+		if (this.vars.size > 0)
+        {
+            let rootRule = `:root {${this.getVars().map( varObj => varObj.toCss()).filter( v => !!v).join(";")}}`;
+            this.varRootRule = ruleBag.add( rootRule)?.cssRule as CSSStyleRule;
+        }
 
 		// insert all other rules
 		this.rules.forEach( rule => rule.insert( ruleBag));
@@ -298,8 +432,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// deactivate referenced style definitions. Note that we don't deactivate references that
         // are theme declarations.
-		for( let ref of this.refs)
-            (ref[symRC] as RuleContainer).deactivate();
+		this.refs.forEach( ref => (ref[symRC] as RuleContainer).deactivate());
+		// for( let ref of this.refs)
+        //     (ref[symRC] as RuleContainer).deactivate();
 	}
 
 
@@ -429,8 +564,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             rootInfo.add( this);
 
 		// adopt referenced style definitions
-		for( let ref of this.refs)
-			(ref[symRC] as RuleContainer).adopt( rootInfo);
+		this.refs.forEach( ref => (ref[symRC] as RuleContainer).adopt(rootInfo));
+		// for( let ref of this.refs)
+		// 	(ref[symRC] as RuleContainer).adopt( rootInfo);
     }
 
     /**
@@ -443,8 +579,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
             rootInfo.remove( this);
 
 		// unadopt referenced style definitions
-		for( let ref of this.refs)
-			(ref[symRC] as RuleContainer).unadopt( rootInfo);
+		this.refs.forEach( ref => (ref[symRC] as RuleContainer).unadopt(rootInfo));
+		// for( let ref of this.refs)
+		// 	(ref[symRC] as RuleContainer).unadopt( rootInfo);
     }
 
 
@@ -510,22 +647,22 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
     private fromClass: boolean;
 
      /** List of references to other style definitions creaed via the $use function. */
-	private refs: StyleDefinition[] = [];
+	private refs = new Map<string,StyleDefinition>();
 
 	/** List of @import rules */
-	private imports: ImportRule[] = [];
+	private imports = new Map<string,ImportRule>();
 
 	/** List of @namespace rules */
-	private namespaces: NamespaceRule[] = [];
+	private namespaces = new Map<string,NamespaceRule>();
 
 	/** List of custom variable rules. */
-	private vars: VarRule[] = [];
-    public getVars(): VarRule[] { return this.vars; }
+	private vars = new Map<string,VarRule>();
+    public getVars(): VarRule[] { return Array.from(this.vars.values()); }
 
 	/**
      * List of rules that are not imports, namespaces, custom vars, references or grouping rules.
      */
-	private rules: Rule[] = [];
+	private rules = new Map<string,Rule>();
 
 	/** ":root" rule where all custom CSS properties defined in this container are defined. */
 	private varRootRule: CSSStyleRule | undefined;
@@ -536,9 +673,84 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
 
-const getRootCssForVars = (vars: VarRule[]): string =>
-    `:root {${vars.map( varObj => varObj.toCss()).filter( v => !!v).join(";")}}`;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Rule virtualization.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Determines whether the given value is "virtualizable" that is a proxy should be created for it
+ * when this value is used for a style definition property. We virtualize rules and rule-like
+ * objects as well as arrays and plain objects.
+ */
+const isVirt = (val: any) =>
+    val != null && (
+        val instanceof RuleLike || val instanceof StyleDefinition ||
+        val.constructor === Array || val.constructor === Object
+    );
+
+
+
+/**
+ * Handler for the proxy created by the `virtualize` function. It keeps the current value of a
+ * rule so that the most recent value is used whenever the proxy is accessed.
+ */
+class VirtHandler implements ProxyHandler<any>
+{
+    // Proxy object, which works with this handler
+    public x: any;
+
+    // the latest target object to use for all proxy handler operations
+    public t: any;
+
+    // interesting things happen in the get method
+    get( t: any, p: PropertyKey, r: any): any
+    {
+        // if our value is null or undefined and the requested property is a well-known symbol
+        // toPrimitive we return a function that returns either null or undefined. This will help
+        // if our proxy either participate in an arithmetic expression or is combined with a
+        // string.
+        if (this.t == null && p === Symbol.toPrimitive)
+            return () => this.t;
+
+        // get the value of the request property; if the value is null or undefined, an exception
+        // will be thrown - which is expected.
+        let pv = Reflect.get( this.t, p, r);
+
+        // if the requested property is a function, bind the original method to the target object
+        return typeof pv === "function" ? pv.bind( this.t) : pv;
+    }
+
+    // the rest of the methods mostly delegate the calls to the latest target instead of the
+    // original target. In some cases, we check whether the target is null or undefined so that
+    // we don't throw exceptions where we can avoid it.
+
+    getPrototypeOf( t: any): object | null
+        { return this.t == null ? null : Reflect.getPrototypeOf( this.t); }
+    // setPrototypeOf(t: any, v: any): boolean
+    //     { return Reflect.setPrototypeOf( this.t, v); }
+    // isExtensible(t: any): boolean
+    //     { return this.t == null ? false : Reflect.isExtensible( this.t); }
+    // preventExtensions(t: any): boolean
+    //     { return this.t == null ? false : Reflect.preventExtensions( this.t); }
+    getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
+        { return Reflect.getOwnPropertyDescriptor( this.t, p); }
+    has(t: any, p: PropertyKey): boolean
+        { return this.t == null ? false : Reflect.has( this.t, p); }
+    set( t: any, p: PropertyKey, v: any, r: any): boolean
+        { return Reflect.set( this.t, p, v, r); }
+    deleteProperty(t: any, p: PropertyKey): boolean
+        { return Reflect.deleteProperty( this.t, p); }
+    defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
+        { return Reflect.defineProperty( this.t, p, attrs); }
+    ownKeys(t: any): ArrayLike<string | symbol>
+        { return Reflect.ownKeys( this.t); }
+    // apply(t: any, thisArg: any, args?: any): any
+    //     { return Reflect.apply( this.t, thisArg, args); }
+    // construct(t: any, args: any, newTarget?: any): object
+    //     { return Reflect.construct( this.t, args, newTarget); }
+}
 
 
 
@@ -1021,106 +1233,6 @@ export const embeddedDecorator = (category: string, target: IStyleDefinitionClas
 
     // add our class to the container
     ec.add( target);
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Rule virtualization.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Function that should be applied to a rule if it is defined and used in the same style
- * definition class but then is overridden in a derived style definition class. The problem
- * this solves is this: when a rule is defined in a base class and then overridden in a derived
- * class, when an instance of the derived class is created, the rules that are created in the
- * base and derived classes see different values of the rule. Since our rules are defined as
- * part of the constructor, the base class constructor's code only sees the value assigned in that
- * code. If another rule in the base class uses this first rule, this value is remembered.
- *
- * The `virtualize` function creates a Proxy object for the rule with the handler that keeps the
- * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
- * rule, the first rule will see the overridden value of the rule when accessed in the
- * post-constructor code.
- */
-const virtualize = (target: any, name: string): void =>
-{
-    // we may directly create the handler and the proxy because this function will be invoked
-    // for every StyleDefinition instance (as opposed to once per class).
-    let handler = new VirtHandler();
-    handler.x = new Proxy( {}, handler);
-
-    Object.defineProperty( target, name, {
-        enumerable: true,
-
-        // return the proxy object
-        get(): any { return handler.x; },
-
-        // set the new value to the handler so that it will use it from now on.
-        set(v): void { handler.t = v; }
-    });
-}
-
-/**
- * Handler for the proxy created by the `virtualize` function. It keeps the current value of a
- * rule so that the most recent value is used whenever the proxy is accessed.
- */
-class VirtHandler implements ProxyHandler<any>
-{
-    // Proxy object, which works with this handler
-    public x: any;
-
-    // the latest target object to use for all proxy handler operations
-    public t: any;
-
-    // interesting things happen in the get method
-    get( t: any, p: PropertyKey, r: any): any
-    {
-        // if our value is null or undefined and the requested property is a well-known symbol
-        // toPrimitive we return a function that returns either null or undefined. This will help
-        // if our proxy either participate in an arithmetic expression or is combined with a
-        // string.
-        if (this.t == null && p === Symbol.toPrimitive)
-            return () => this.t;
-
-        // get the value of the request property; if the value is null or undefined, an exception
-        // will be thrown - which is expected.
-        let pv = Reflect.get( this.t, p, r);
-
-        // if the requested property is a function, bind the original method to the target object
-        return typeof pv === "function" ? pv.bind( this.t) : pv;
-    }
-
-    // the rest of the methods mostly delegate the calls to the latest target instead of the
-    // original target. In some cases, we check whether the target is null or undefined so that
-    // we don't throw exceptions where we can avoid it.
-
-    getPrototypeOf( t: any): object | null
-        { return this.t == null ? null : Reflect.getPrototypeOf( this.t); }
-    // setPrototypeOf(t: any, v: any): boolean
-    //     { return Reflect.setPrototypeOf( this.t, v); }
-    // isExtensible(t: any): boolean
-    //     { return this.t == null ? false : Reflect.isExtensible( this.t); }
-    // preventExtensions(t: any): boolean
-    //     { return this.t == null ? false : Reflect.preventExtensions( this.t); }
-    getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
-        { return Reflect.getOwnPropertyDescriptor( this.t, p); }
-    has(t: any, p: PropertyKey): boolean
-        { return this.t == null ? false : Reflect.has( this.t, p); }
-    set( t: any, p: PropertyKey, v: any, r: any): boolean
-        { return Reflect.set( this.t, p, v, r); }
-    deleteProperty(t: any, p: PropertyKey): boolean
-        { return Reflect.deleteProperty( this.t, p); }
-    defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
-        { return Reflect.defineProperty( this.t, p, attrs); }
-    ownKeys(t: any): ArrayLike<string | symbol>
-        { return Reflect.ownKeys( this.t); }
-    // apply(t: any, thisArg: any, args?: any): any
-    //     { return this.t.apply( thisArg, args); }
-    // construct(t: any, args: any, newTarget?: any): object
-    //     { return Reflect.construct( this.t, args, newTarget); }
 }
 
 

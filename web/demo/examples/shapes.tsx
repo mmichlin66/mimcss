@@ -19,22 +19,22 @@ class MyStyles extends css.StyleDefinition
 	});
 
 	polygon = this.$class({
-		"+": this.colorBox,
+		"++": this.colorBox,
 		clipPath: css.polygon( [20,20], [180,20], [20, 180], [180,180]).fill( "nonzero"),
 	})
 
 	ellipse = this.$class({
-		"+": this.colorBox,
+		"++": this.colorBox,
 		clipPath: css.ellipse( 75, 50).at( ["center", css.percent(35)]),
 	})
 
 	circle = this.$class({
-		"+": this.colorBox,
+		"++": this.colorBox,
 		clipPath: css.circle( "closest-side").at( [ 130, css.percent(65)]),
 	})
 
 	inset = this.$class({
-		"+": this.colorBox,
+		"++": this.colorBox,
 		clipPath: css.inset( css.percent(15)).round( 8),
 	})
 

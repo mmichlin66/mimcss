@@ -1,5 +1,5 @@
 import { CssSelector, ElementTagName, ExtendedProp, PageSelector } from "./CoreTypes";
-import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassPropType, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule, ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions } from "./RuleTypes";
+import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule, ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions } from "./RuleTypes";
 import { MediaStatement, SupportsStatement } from "./MediaTypes";
 import { ExtendedFontFace } from "./FontTypes";
 import { ColorProfileRenderingIntent } from "./ColorTypes";
@@ -932,7 +932,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
     *         }
     *     )
     *
-    *     import = this.$import( "external.css", { layer: baseLayer })
+    *     import = this.$import( "external.css", { layer: this.baseLayer })
     * }
     * ```
     *
@@ -1021,7 +1021,7 @@ export declare const configNameGeneration: (method: NameGenerationMethod, prefix
  * @param classProps Variable argument list of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
  */
-export declare const classes: (...classProps: ClassPropType[]) => string;
+export declare const classes: (...classProps: ClassMoniker[]) => string;
 /**
  * Chooses the first non-empty name from the given list of classes. This is useful when an element
  * should have a single class applied to it while the class can be chosen from an ordered list or
@@ -1030,7 +1030,7 @@ export declare const classes: (...classProps: ClassPropType[]) => string;
  * @param classProps Variable argument list of either class names or class rule objects.
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export declare const chooseClass: (...classProps: ClassPropType[]) => string;
+export declare const chooseClass: (...classProps: ClassMoniker[]) => string;
 /**
  * @deprecated This decorator is deprecated as all rules defined in style definition classes are
  * always virtualized.

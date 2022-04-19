@@ -51,7 +51,7 @@ export class GridLineRule extends NamedRuleLike implements IGridLineRule
             let nameHasEnd = name.endsWith("-end");
             if (nameHasStart)
             {
-                this.isStartEndOrNone = true;
+                isStartEndOrNone = true;
                 areaName = name.substr( 0, name.length - 6 /* "-start".length */);
             }
             else if (nameHasEnd)
