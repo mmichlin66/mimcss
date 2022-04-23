@@ -11,7 +11,7 @@ import * as css from "mimcss"
 export class DelayScheduler implements css.IScheduler
 {
     // you can change the value (in milliseconds) to play with the delay
-    private static delay = 1000;
+    private static delay = 500;
 
     // Handle returned by setTimeout function.
 	private timeoutHandle = 0;
@@ -68,7 +68,7 @@ let delaySchedulerID = css.registerScheduler( new DelayScheduler());
 // Declare styles for our themes and define several themes
 class ThemeBase extends css.StyleDefinition
 {
-    @css.virtual clr = this.$const("color")
+    clr = this.$const("color")
 
     happy = this.$class({
         fontSize: 40,
@@ -82,14 +82,14 @@ class ThemeBase extends css.StyleDefinition
 }
 
 // Define several themes
-class BlueTheme extends ThemeBase { clr = this.$const("color", "dodgerblue") }
-class GreenTheme extends ThemeBase { clr = this.$const("color", "darkgreen") }
-class OrangeTheme extends ThemeBase { clr = this.$const("color", "orange") }
-class RedTheme extends ThemeBase { clr = this.$const("color", "red") }
-class BrownTheme extends ThemeBase { clr = this.$const("color", "brown") }
-class PurpleTheme extends ThemeBase { clr = this.$const("color", "purple") }
-
-let themes = [BlueTheme, GreenTheme, OrangeTheme, RedTheme, BrownTheme, PurpleTheme];
+let themes = [
+    class BlueTheme extends ThemeBase { clr = this.$const("color", "dodgerblue") },
+    class OrangeTheme extends ThemeBase { clr = this.$const("color", "orange") },
+    class RedTheme extends ThemeBase { clr = this.$const("color", "red") },
+    class GreenTheme extends ThemeBase { clr = this.$const("color", "green") },
+    class BrownTheme extends ThemeBase { clr = this.$const("color", "brown") },
+    class PurpleTheme extends ThemeBase { clr = this.$const("color", "purple") },
+];
 
 
 

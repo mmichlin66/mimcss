@@ -10,6 +10,7 @@ import {
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
 import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
+import { IPropVirtController, virtProp } from "../impl/Virt"
 
 
 
@@ -47,7 +48,7 @@ const symEmbeddingCategory = Symbol("ec");
  * StyleDefinition object symbol. It contains all the functionality for parsing rule definitions,
  * name assignment and activation/deactivation.
  */
-export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefinition>
+export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContainer, IPropVirtController
 {
 	constructor( sd: IStyleDefinition)
 	{
@@ -120,18 +121,10 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
     // ProxyHandler method, which virtualizes all RuleLike properties
     set( t: StyleDefinition, p: PropertyKey, v: any, r: any): boolean
     {
-        if (typeof p !== "string" || typeof v !== "object")
+        if (typeof p !== "string")
             t[p] = v;
         else
-        {
-            // if the property is already in the object it means that it is already virtualized
-            // and the set accessor will be called for it.
-            if (p in t)
-                t[p] = v;
-            else
-                this.virtProp( p, t, p, v);
-
-        }
+            virtProp( t, p, v, [p], this);
 
         return true;
     }
@@ -139,110 +132,13 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 
     /**
-     * Substitutes a field with the given name in the given object with a property with get and set
-     * accessors in order to trap assignments to this fields. The problem
-     * this solves is this: when a rule is defined in a base class and then overridden in a derived
-     * class, when an instance of the derived class is created, the rules that are created in the
-     * base and derived classes see different values of the rule. Since our rules are defined as
-     * part of the constructor, the base class constructor's code only sees the value assigned in that
-     * code. If another rule in the base class uses this first rule, this value is remembered.
-     *
-     * The `virtProp` method creates a Proxy object for the rule with the handler that keeps the
-     * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
-     * rule, the first rule will see the overridden value of the rule when accessed in the
-     * post-constructor code.
-     * @param ruleName
-     * @param obj
-     * @param propName
-     * @param initVal
+     * Determines whether the given value is "virtualizable" that is a proxy should be created for it
+     * when this value is used for a style definition property. We virtualize rules and rule-like
+     * objects as well as arrays and plain objects.
      */
-    private virtProp( ruleName: string, obj: any, propName: string | number, initVal: any): void
+    public shouldVirtProp( val: any, path: PropertyKey[])
     {
-        // don't virtualize primitive types
-        if (!isVirt(initVal))
-        {
-            obj[propName] = initVal;
-            return;
-        }
-
-        // we may directly create the handler and the proxy because this function will be invoked
-        // for every StyleDefinition instance (as opposed to once per class).
-        let handler = new VirtHandler();
-        handler.x = new Proxy( {}, handler);
-
-        // store the current value.
-        handler.t = initVal;
-
-        // remember the reference to our rule container object - we will use it inside the setter
-        // because "this" means something different there.
-        let rc = this;
-
-        // initialize the property
-        if (initVal != null)
-            rc.initRule( ruleName, initVal);
-
-        Object.defineProperty( obj, propName, {
-            enumerable: true,
-
-            // simply return the current value
-            get(): any { return handler.x; },
-
-            // set the new value to the handler so that it will use it from now on.
-            set( newVal: any): void
-            {
-                handler.t = rc.updateRule( ruleName, handler.t, newVal);
-            }
-        });
-    }
-
-
-
-    /**
-     * Given the old and the new value of the property with the given rule name adds, deletes
-     * or updates the property and returns either the old (updated) or the new (replaced)
-     * value.
-     * @param ruleName
-     * @param oldVal
-     * @param newVal
-     * @returns
-     */
-    private updateRule( ruleName: string, oldVal: any, newVal: any): any
-    {
-        if (oldVal !== newVal)
-        {
-            if (oldVal == null)
-                this.initRule( ruleName, newVal);
-            else if (newVal == null)
-                this.deleteRule( ruleName, oldVal);
-            else if (newVal instanceof StyleDefinition || newVal instanceof RuleLike)
-            {
-                this.deleteRule( ruleName, oldVal);
-                this.initRule( ruleName, newVal);
-            }
-            else if (typeof oldVal === "object" && typeof newVal === "object")
-            {
-                // for objects (including arrays), loop over their properties and recursively process
-                // them. Property names (or indexes) become part of the rule name.
-                for( let subPropName in newVal)
-                {
-                    let newItem = newVal[subPropName];
-                    if (subPropName in oldVal)
-                    {
-                        // this will call the updateRule method through Proxy handler's `set` recursively
-                        oldVal[subPropName] = newItem;
-                    }
-                    else
-                    {
-                        // this will call the initRule method
-                        this.virtProp( `${ruleName}_${subPropName}`, oldVal, subPropName, newItem);
-                    }
-                }
-
-                return oldVal;
-            }
-        }
-
-        return newVal;
+        return val instanceof RuleLike || val instanceof StyleDefinition;
     }
 
 
@@ -256,13 +152,14 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      * property names starting with a property of the style definition object.
      * @param val Property value
      */
-	private initRule( ruleName: string, val: any): void
+	public addVirtProp( val: any, path: PropertyKey[]): void
 	{
         /// #if DEBUG
         if (val == null)
             throw new Error("RuleContainer.initRule was called with val == null");
         /// #endif
 
+        let ruleName = propPathToRuleName(path);
         if (val instanceof RuleLike)
         {
             // process all rule-like properties
@@ -280,13 +177,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         }
         else if (val instanceof StyleDefinition)
             this.refs.set( ruleName, val);
-        else if (val && typeof val === "object")
-        {
-            // for objects (including arrays), loop over their properties and recursively
-            // virtualize them. Property names become part of the rule name.
-            for( let subPropName in val)
-                this.virtProp( `${ruleName}_${subPropName}`, val, subPropName, val[subPropName]);
-        }
 	}
 
 
@@ -297,13 +187,14 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      * property names starting with a property of the style definition object.
      * @param val Property value
      */
-    private deleteRule( ruleName: string, val: any): void
+    public deleteVirtProp( val: any, path: PropertyKey[]): void
     {
         /// #if DEBUG
         if (val == null)
             throw new Error("RuleContainer.deleteRule was called with val == null");
         /// #endif
 
+        let ruleName = propPathToRuleName(path);
         if (val instanceof RuleLike)
         {
             if (val instanceof VarRule)
@@ -317,22 +208,11 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         }
         else if (val instanceof StyleDefinition)
             this.refs.delete( ruleName);
-        else if (typeof val === "object")
-        {
-            // for objects, loop over their properties and recursively delete the rules.
-            // Property names are part of the rule name.
-            for( let subPropName in val)
-            {
-                let item = val[subPropName];
-                if (item != null)
-                    this.deleteRule( `${ruleName}_${subPropName}`, item);
-            }
-        }
     }
 
 
 
-	// Sets the given value for the custom CSS roperty with the given name.
+	/** Sets the given value for the custom CSS roperty with the given name. */
 	public setVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
 		if (this.varRootRule)
@@ -400,8 +280,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		// activate referenced style definitions. Note that we don't activate references that are
         // theme declarations.
 		this.refs.forEach( ref => (ref[symRC] as RuleContainer).activate());
-		// for( let ref of this.refs.values())
-        //     (ref[symRC] as RuleContainer).activate( this.elm);
 
 		// insert our custom variables into the ":root" rule
 		if (this.vars.size > 0)
@@ -433,8 +311,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 		// deactivate referenced style definitions. Note that we don't deactivate references that
         // are theme declarations.
 		this.refs.forEach( ref => (ref[symRC] as RuleContainer).deactivate());
-		// for( let ref of this.refs)
-        //     (ref[symRC] as RuleContainer).deactivate();
 	}
 
 
@@ -448,17 +324,20 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
      */
 	public activate( insertBefore?: IMimcssStyleElement): void
 	{
+        // we don't activate theme declarations because they are only referenced (via $use) to
+        // obtain rule names. The rules are inserted into DOM when a theme implementation (that
+        // is, a sub-class) is activated. We also don't activate any style definition more
+        // than once.
         if (this.isThemeDecl || ++this.actCount > 1)
             return;
-
-        // activation context may not exist if the code is executing on a server and SSR has
-        // not been started
-        let ctx = this.ctx;
 
         /// #if DEBUG
         let timeLabel = `Activating style definition '${this.name}'`;
         console.time( timeLabel);
         /// #endif
+
+        // activation context always exists
+        let ctx = this.ctx;
 
         // only the top-level not-embedded style definitions create the `<style>` element
         if (!this.pc)
@@ -480,8 +359,7 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
         // if this is a theme class activation, check whether the instance is set as the current
         // one for its theme base class. If no, then deactivate the theme instance currently set
-        // as active. In any case, set our new instance as the currently active one. We ignore
-        // theme declaration classes - those that directly derive from ThemeDefinition
+        // as active. In any case, set our new instance as the currently active one.
         if (this.isThemeImpl)
         {
             let themeClass = this.sdc as unknown as IStyleDefinitionClass<ThemeDefinition>;
@@ -507,10 +385,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	/** Removes this stylesheet from DOM. */
 	public deactivate(): void
 	{
+        // we don't deactivate theme declarations because we don't activate them
         if (this.isThemeDecl || --this.actCount > 0)
             return;
-
-        let ctx = this.ctx;
 
         /// #if DEBUG
         let timeLabel = `Deactivating style definition '${this.name}'`;
@@ -518,6 +395,9 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
         /// #endif
 
         this.clear();
+
+        // activation context always exists
+        let ctx = this.ctx;
 
         // only the top-level not-embedded style definitions create the `<style>` element
         if (!this.psd && !this.ec)
@@ -565,8 +445,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// adopt referenced style definitions
 		this.refs.forEach( ref => (ref[symRC] as RuleContainer).adopt(rootInfo));
-		// for( let ref of this.refs)
-		// 	(ref[symRC] as RuleContainer).adopt( rootInfo);
     }
 
     /**
@@ -580,8 +458,6 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 
 		// unadopt referenced style definitions
 		this.refs.forEach( ref => (ref[symRC] as RuleContainer).unadopt(rootInfo));
-		// for( let ref of this.refs)
-		// 	(ref[symRC] as RuleContainer).unadopt( rootInfo);
     }
 
 
@@ -671,86 +547,12 @@ export class RuleContainer implements IRuleContainer, ProxyHandler<StyleDefiniti
 	private actCount = 0;
 }
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Rule virtualization.
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
- * Determines whether the given value is "virtualizable" that is a proxy should be created for it
- * when this value is used for a style definition property. We virtualize rules and rule-like
- * objects as well as arrays and plain objects.
+ * Helper function to convert property path to rule name by joining the property names in the
+ * path with underscores.
  */
-const isVirt = (val: any) =>
-    val != null && (
-        val instanceof RuleLike || val instanceof StyleDefinition ||
-        val.constructor === Array || val.constructor === Object
-    );
+const propPathToRuleName = (path: PropertyKey[]) => path.join("_");
 
-
-
-/**
- * Handler for the proxy created by the `virtualize` function. It keeps the current value of a
- * rule so that the most recent value is used whenever the proxy is accessed.
- */
-class VirtHandler implements ProxyHandler<any>
-{
-    // Proxy object, which works with this handler
-    public x: any;
-
-    // the latest target object to use for all proxy handler operations
-    public t: any;
-
-    // interesting things happen in the get method
-    get( t: any, p: PropertyKey, r: any): any
-    {
-        // if our value is null or undefined and the requested property is a well-known symbol
-        // toPrimitive we return a function that returns either null or undefined. This will help
-        // if our proxy either participate in an arithmetic expression or is combined with a
-        // string.
-        if (this.t == null && p === Symbol.toPrimitive)
-            return () => this.t;
-
-        // get the value of the request property; if the value is null or undefined, an exception
-        // will be thrown - which is expected.
-        let pv = Reflect.get( this.t, p, r);
-
-        // if the requested property is a function, bind the original method to the target object
-        return typeof pv === "function" ? pv.bind( this.t) : pv;
-    }
-
-    // the rest of the methods mostly delegate the calls to the latest target instead of the
-    // original target. In some cases, we check whether the target is null or undefined so that
-    // we don't throw exceptions where we can avoid it.
-
-    getPrototypeOf( t: any): object | null
-        { return this.t == null ? null : Reflect.getPrototypeOf( this.t); }
-    // setPrototypeOf(t: any, v: any): boolean
-    //     { return Reflect.setPrototypeOf( this.t, v); }
-    // isExtensible(t: any): boolean
-    //     { return this.t == null ? false : Reflect.isExtensible( this.t); }
-    // preventExtensions(t: any): boolean
-    //     { return this.t == null ? false : Reflect.preventExtensions( this.t); }
-    getOwnPropertyDescriptor(t: any, p: PropertyKey): PropertyDescriptor | undefined
-        { return Reflect.getOwnPropertyDescriptor( this.t, p); }
-    has(t: any, p: PropertyKey): boolean
-        { return this.t == null ? false : Reflect.has( this.t, p); }
-    set( t: any, p: PropertyKey, v: any, r: any): boolean
-        { return Reflect.set( this.t, p, v, r); }
-    deleteProperty(t: any, p: PropertyKey): boolean
-        { return Reflect.deleteProperty( this.t, p); }
-    defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
-        { return Reflect.defineProperty( this.t, p, attrs); }
-    ownKeys(t: any): ArrayLike<string | symbol>
-        { return Reflect.ownKeys( this.t); }
-    // apply(t: any, thisArg: any, args?: any): any
-    //     { return Reflect.apply( this.t, thisArg, args); }
-    // construct(t: any, args: any, newTarget?: any): object
-    //     { return Reflect.construct( this.t, args, newTarget); }
-}
 
 
 
