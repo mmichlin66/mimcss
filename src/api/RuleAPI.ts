@@ -30,7 +30,7 @@ import {
     LayerNameRule, LayerOrderRule
 } from "../rules/MiscRules"
 import {SupportsRule, MediaRule, LayerBlockRule} from "../rules/GroupRules"
-import {v2s} from "../impl/Utils";
+import {a2s} from "../impl/Utils";
 
 
 
@@ -1263,19 +1263,35 @@ export const configNameGeneration = (method: NameGenerationMethod, prefix?: stri
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Concatenates the names of the given classes into a single string that can be assigned to a
- * `class` property of an HTML element. This can be useful when an element should have multiple
- * classes assigned to it and some of these classes are specified as [[IClassRule]] or
- * [[IClassNameRule]] while others are specified as strings.
+ * Returns class name for the given moniker. If the moniker is an array (of other monikers),
+ * concatenates the class names corresponding to the monikers form the array into a single string
+ * that can be assigned to a `class` property of an HTML element. This can be useful when an
+ * element should have multiple classes assigned to it and some of these classes are specified as
+ * [[IClassRule]] or [[IClassNameRule]] while others are specified as strings.
  *
  * @param monikers One or more of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
  */
-export const classes = (monikers: ClassMoniker): string =>
-	v2s( monikers, {
-		obj: (v: IClassRule | IClassNameRule) => v.name,
-		item: classes
-	});
+export const className = (...monikers: ClassMoniker[]): string =>
+	a2s( monikers, moniker =>
+        typeof moniker === "string" ? moniker :
+        Array.isArray(moniker) ? className( ...moniker) :
+        moniker && moniker.name
+    );
+
+/**
+ * @deprecated Use the [[className]] function.
+ *
+ * Returns class name for the given moniker. If the moniker is an array (of other monikers),
+ * concatenates the class names corresponding to the monikers form the array into a single string
+ * that can be assigned to a `class` property of an HTML element. This can be useful when an
+ * element should have multiple classes assigned to it and some of these classes are specified as
+ * [[IClassRule]] or [[IClassNameRule]] while others are specified as strings.
+ *
+ * @param monikers One or more of either class names or class rule objects.
+ * @returns The string that combines all class names (separated with space) from the input array.
+ */
+export const classes = className;
 
 /**
  * Chooses the first non-empty name from the given list of classes. This is useful when an element
@@ -1285,24 +1301,22 @@ export const classes = (monikers: ClassMoniker): string =>
  * @param monikers One or more of either class names or class rule objects.
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export const chooseClass = (monikers: ClassMoniker): string =>
-    v2s( monikers, {
-        arr: v => {
-            for( let classProp of v)
-            {
-                let name =
-                    typeof classProp === "string" ? classProp :
-                    Array.isArray(classProp) ? chooseClass( classProp) :
-                    classProp && classProp.name;
+export const chooseClass = (...monikers: ClassMoniker[]): string =>
+{
+    for( let moniker of monikers)
+    {
+        let name =
+            typeof moniker === "string" ? moniker :
+            Array.isArray(moniker) ? chooseClass( ...moniker) :
+            moniker && moniker.name;
 
-                // if non-null and non-empty name - return it
-                if (name)
-                    return name;
-            }
+        // if non-null and non-empty name - return it
+        if (name)
+            return name;
+    }
 
-            return "";
-        }
-    });
+    return "";
+}
 
 
 

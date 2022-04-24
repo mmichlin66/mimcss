@@ -1013,15 +1013,29 @@ export declare const embedded: (category: string) => ClassDecorator;
  */
 export declare const configNameGeneration: (method: NameGenerationMethod, prefix?: string | undefined) => void;
 /**
- * Concatenates the names of the given classes into a single string that can be assigned to a
- * `class` property of an HTML element. This can be useful when an element should have multiple
- * classes assigned to it and some of these classes are specified as [[IClassRule]] or
- * [[IClassNameRule]] while others are specified as strings.
+ * Returns class name for the given moniker. If the moniker is an array (of other monikers),
+ * concatenates the class names corresponding to the monikers form the array into a single string
+ * that can be assigned to a `class` property of an HTML element. This can be useful when an
+ * element should have multiple classes assigned to it and some of these classes are specified as
+ * [[IClassRule]] or [[IClassNameRule]] while others are specified as strings.
  *
  * @param monikers One or more of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
  */
-export declare const classes: (monikers: ClassMoniker) => string;
+export declare const className: (...monikers: ClassMoniker[]) => string;
+/**
+ * @deprecated Use the [[className]] function.
+ *
+ * Returns class name for the given moniker. If the moniker is an array (of other monikers),
+ * concatenates the class names corresponding to the monikers form the array into a single string
+ * that can be assigned to a `class` property of an HTML element. This can be useful when an
+ * element should have multiple classes assigned to it and some of these classes are specified as
+ * [[IClassRule]] or [[IClassNameRule]] while others are specified as strings.
+ *
+ * @param monikers One or more of either class names or class rule objects.
+ * @returns The string that combines all class names (separated with space) from the input array.
+ */
+export declare const classes: (...monikers: ClassMoniker[]) => string;
 /**
  * Chooses the first non-empty name from the given list of classes. This is useful when an element
  * should have a single class applied to it while the class can be chosen from an ordered list or
@@ -1030,7 +1044,7 @@ export declare const classes: (monikers: ClassMoniker) => string;
  * @param monikers One or more of either class names or class rule objects.
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export declare const chooseClass: (monikers: ClassMoniker) => string;
+export declare const chooseClass: (...monikers: ClassMoniker[]) => string;
 /**
  * @deprecated This decorator is deprecated as all rules defined in style definition classes are
  * always virtualized.
