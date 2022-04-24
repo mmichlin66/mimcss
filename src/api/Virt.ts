@@ -362,3 +362,40 @@ class VirtHandler implements ProxyHandler<any>
 
 
 
+/**
+ * Recursively merges properties of the given list of objects to the given target. If the target
+ * is not specified a POJO is created and returned; otherwise, the input target object is returned.
+ * @param target Object to merge properties to. If undefined or null, a plain object is created as
+ * target.
+ * @param objects List of objects to merge properties from
+ * @returns The target object with merged properties.
+ */
+export const mergeVirtObjects = ( target: any, ...objects: any[]): any =>
+{
+    if (target == null)
+        target = {};
+    else if (typeof target !== "object")
+        return target;
+
+    for( let obj of objects)
+    {
+        obj = getvv(obj);
+        if (obj == null || typeof obj !== "object")
+            continue;
+
+        // loop over properties of the current object and merge them with the result
+        for( let key in obj)
+        {
+            let oldVal = target[key];
+            let newVal = getvv(obj[key]);
+            if (!isPOJO(newVal))
+                target[key] = newVal;
+            else if (isPOJO(oldVal))
+                mergeVirtObjects( oldVal, newVal);
+            else
+                target[key] = mergeVirtObjects( {}, newVal);
+        }
+    }
+
+    return target;
+}

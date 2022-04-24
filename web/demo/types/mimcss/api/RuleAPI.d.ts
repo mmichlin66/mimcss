@@ -1,5 +1,5 @@
 import { CssSelector, ElementTagName, ExtendedProp, PageSelector } from "./CoreTypes";
-import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule, ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions } from "./RuleTypes";
+import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IKeyframesRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule, ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions } from "./RuleTypes";
 import { MediaStatement, SupportsStatement } from "./MediaTypes";
 import { ExtendedFontFace } from "./FontTypes";
 import { ColorProfileRenderingIntent } from "./ColorTypes";
@@ -313,7 +313,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * without parameters just to "declare" the animation. Such animation can be later used either
      * in conditional grouping rules or in derived style definition classes.
      *
-     * The returned [[IAnimationRule]] interface represents an object that should be used when
+     * The returned [[IKeyframesRule]] interface represents an object that should be used when
      * using the keyframes name in the `animation-name` or `animation` style properties.
      *
      * **Example:**
@@ -334,13 +334,13 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      *
      * @param frames Array of [[AnimationFrame]] objects. Each animation frame contains a waypoint
      * and a styleset.
-     * @param nameOverride String or another `IAnimationRule` object that determines the name of the
+     * @param nameOverride String or another `IKeyframesRule` object that determines the name of the
      * animation. If this optional parameter is defined, the name will override the Mimcss name
      * assignment mechanism. This might be useful if there is a need for the name to match a name of
      * another animation.
-     * @returns `IAnimationRule` object that should be used for getting the animation name.
+     * @returns `IKeyframesRule` object that should be used for getting the animation name.
      */
-    $keyframes(frames?: AnimationFrame[], nameOverride?: string | IAnimationRule): IAnimationRule;
+    $keyframes(frames?: AnimationFrame[], nameOverride?: string | IKeyframesRule): IKeyframesRule;
     /**
      * Creates a new custom variable object that defines a custom CSS property. The variable name will
      * be created when the rule is processed as part of the style definition class. The name can be
@@ -1018,19 +1018,19 @@ export declare const configNameGeneration: (method: NameGenerationMethod, prefix
  * classes assigned to it and some of these classes are specified as [[IClassRule]] or
  * [[IClassNameRule]] while others are specified as strings.
  *
- * @param classProps Variable argument list of either class names or class rule objects.
+ * @param monikers One or more of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
  */
-export declare const classes: (...classProps: ClassMoniker[]) => string;
+export declare const classes: (monikers: ClassMoniker) => string;
 /**
  * Chooses the first non-empty name from the given list of classes. This is useful when an element
  * should have a single class applied to it while the class can be chosen from an ordered list or
  * hierarchy of possible choices.
  *
- * @param classProps Variable argument list of either class names or class rule objects.
+ * @param monikers One or more of either class names or class rule objects.
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export declare const chooseClass: (...classProps: ClassMoniker[]) => string;
+export declare const chooseClass: (monikers: ClassMoniker) => string;
 /**
  * @deprecated This decorator is deprecated as all rules defined in style definition classes are
  * always virtualized.

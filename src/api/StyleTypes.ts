@@ -13,7 +13,7 @@ import {
     IRayFunc, TransformFuncs
 } from "./ShapeTypes";
 import {
-    IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule
+    IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule
 } from "./RuleTypes";
 import {IStyleset} from "./Stylesets";
 import { IPageNameRule } from "..";
@@ -119,7 +119,7 @@ export type AnimationIterationCount_Single = "infinite" | CssNumber;
 /**
  * Type for [[animationName]] style property
  */
-export type AnimationName_Single = "none" | string | IAnimationRule;
+export type AnimationName_Single = "none" | string | IKeyframesRule;
 
 
 

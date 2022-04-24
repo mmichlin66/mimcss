@@ -12,7 +12,7 @@ import {IIDRule, INamespaceRule} from "./RuleTypes";
 /**
  * Style values that can be used for any CSS property.
  */
-export type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
+export type Global_StyleType = "inherit" | "initial" | "unset" | "revert" | "revert-layer";
 
 
 

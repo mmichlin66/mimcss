@@ -140,23 +140,36 @@ export declare type AnimationWaypoint = "from" | "to" | number | ("from" | "to" 
  */
 export declare type AnimationFrame = [AnimationWaypoint, AnimationStyleset | AnimationStyleset[]];
 /**
- * The IAnimationRule interface represents the `@keyframes` rule.
+ * The IKeyframesRule interface represents the `@keyframes` rule.
  * Objects implementing this interface are returned from the [[$keyframes]] method.
  */
-export interface IAnimationRule extends IRule, INamedEntity {
+export interface IKeyframesRule extends IRule, INamedEntity {
     /** CSSOM keyframes rule */
     readonly cssRule: CSSKeyframesRule | null;
     /** List of style rules representing animation frames */
-    readonly frameRules: IAnimationFrameRule[];
+    readonly frameRules: IKeyframeRule[];
 }
 /**
- * The IAnimationFrameRule interface represents a single frame in the `@keyframes` rule.
+ * The IAnimationRule interface represents the `@keyframes` rule.
+ * Objects implementing this interface are returned from the [[$keyframes]] method.
+ * @deprecated Use the IKeyframesRule interface.
  */
-export interface IAnimationFrameRule extends IStyleRule {
+export interface IAnimationRule extends IKeyframesRule {
+}
+/**
+ * The IKeyrameRule interface represents a single frame in the `@keyframes` rule.
+ */
+export interface IKeyframeRule extends IStyleRule {
     /** Identifier of the waypoint */
     readonly waypoint: AnimationWaypoint;
     /** CSSOM keyframe rule */
     readonly cssKeyframeRule: CSSKeyframeRule;
+}
+/**
+ * The IAnimationFrameRule interface represents a single frame in the `@keyframes` rule.
+ * @deprecated Use the IKeyframeRule interface.
+ */
+export interface IAnimationFrameRule extends IKeyframeRule {
 }
 /**
  * The IVarRule interface represents a CSS custom property definition. Objects implementing this

@@ -1,6 +1,6 @@
 ﻿import {CssSelector, ElementTagName, ExtendedProp, PageSelector} from "./CoreTypes";
 import {
-    IStyleRule, IClassRule, IIDRule, AnimationFrame, IAnimationRule, IVarRule,
+    IStyleRule, IClassRule, IIDRule, AnimationFrame, IKeyframesRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker,
     NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule,
@@ -21,7 +21,7 @@ import {
     s_startHydration, s_stopHydration, s_activate, s_deactivate
 } from "../rules/RuleContainer";
 import {AbstractRule, ClassRule, IDRule, SelectorRule, PageRule} from "../rules/StyleRules"
-import {AnimationRule} from "../rules/AnimationRule"
+import {KeyframesRule} from "../rules/KeyframesRule"
 import {VarRule, ConstRule, PropertyRule} from "../rules/VarRule"
 import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
@@ -397,7 +397,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * without parameters just to "declare" the animation. Such animation can be later used either
      * in conditional grouping rules or in derived style definition classes.
      *
-     * The returned [[IAnimationRule]] interface represents an object that should be used when
+     * The returned [[IKeyframesRule]] interface represents an object that should be used when
      * using the keyframes name in the `animation-name` or `animation` style properties.
      *
      * **Example:**
@@ -418,15 +418,15 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      *
      * @param frames Array of [[AnimationFrame]] objects. Each animation frame contains a waypoint
      * and a styleset.
-     * @param nameOverride String or another `IAnimationRule` object that determines the name of the
+     * @param nameOverride String or another `IKeyframesRule` object that determines the name of the
      * animation. If this optional parameter is defined, the name will override the Mimcss name
      * assignment mechanism. This might be useful if there is a need for the name to match a name of
      * another animation.
-     * @returns `IAnimationRule` object that should be used for getting the animation name.
+     * @returns `IKeyframesRule` object that should be used for getting the animation name.
      */
-    public $keyframes( frames?: AnimationFrame[], nameOverride?: string | IAnimationRule): IAnimationRule
+    public $keyframes( frames?: AnimationFrame[], nameOverride?: string | IKeyframesRule): IKeyframesRule
     {
-        return new AnimationRule( this, frames, nameOverride);
+        return new KeyframesRule( this, frames, nameOverride);
     }
 
 
@@ -1268,11 +1268,11 @@ export const configNameGeneration = (method: NameGenerationMethod, prefix?: stri
  * classes assigned to it and some of these classes are specified as [[IClassRule]] or
  * [[IClassNameRule]] while others are specified as strings.
  *
- * @param classProps Variable argument list of either class names or class rule objects.
+ * @param monikers One or more of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
  */
-export const classes = (...classProps: ClassMoniker[]): string =>
-	v2s( classProps, {
+export const classes = (monikers: ClassMoniker): string =>
+	v2s( monikers, {
 		obj: (v: IClassRule | IClassNameRule) => v.name,
 		item: classes
 	});
@@ -1282,25 +1282,27 @@ export const classes = (...classProps: ClassMoniker[]): string =>
  * should have a single class applied to it while the class can be chosen from an ordered list or
  * hierarchy of possible choices.
  *
- * @param classProps Variable argument list of either class names or class rule objects.
+ * @param monikers One or more of either class names or class rule objects.
  * @returns The first non-empty class name from the input array or null if all inputs are empty.
  */
-export const chooseClass = (...classProps: ClassMoniker[]): string =>
-{
-    for( let classProp of classProps)
-    {
-        let name =
-            typeof classProp === "string" ? classProp :
-            Array.isArray(classProp) ? chooseClass( classProp) :
-            classProp && classProp.name;
+export const chooseClass = (monikers: ClassMoniker): string =>
+    v2s( monikers, {
+        arr: v => {
+            for( let classProp of v)
+            {
+                let name =
+                    typeof classProp === "string" ? classProp :
+                    Array.isArray(classProp) ? chooseClass( classProp) :
+                    classProp && classProp.name;
 
-        // if non-null and non-empty name - return it
-        if (name)
-            return name;
-    }
+                // if non-null and non-empty name - return it
+                if (name)
+                    return name;
+            }
 
-	return "";
-}
+            return "";
+        }
+    });
 
 
 

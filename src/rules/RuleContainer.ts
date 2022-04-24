@@ -10,7 +10,7 @@ import {
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
 import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
-import { IPropVirtController, virtProp } from "../impl/Virt"
+import { IPropVirtController, virtProp } from "../api/Virt"
 
 
 

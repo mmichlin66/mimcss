@@ -3141,7 +3141,7 @@ export interface IStyleset
     /**
      * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/text-stroke
      */
-    textStroke: st.TextStroke_StyleType;
+    textStroke?: st.TextStroke_StyleType;
 
     /**
      * The **text-stroke-color** CSS property specifies the stroke color of characters of text.

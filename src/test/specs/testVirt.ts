@@ -1,6 +1,6 @@
 import {
     isArray, isEmpty, isFunction, isNull, isObject, isObjectOrNull, isPOJO, isProxy, isUndefined, virt
-} from "../../impl/Virt"
+} from "../../api/Virt"
 
 
 describe("virtualization proxy", () =>

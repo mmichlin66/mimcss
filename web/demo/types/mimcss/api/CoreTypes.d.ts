@@ -3,7 +3,7 @@ import { IIDRule, INamespaceRule } from "./RuleTypes";
 /**
  * Style values that can be used for any CSS property.
  */
-export declare type Global_StyleType = "inherit" | "initial" | "unset" | "revert";
+export declare type Global_StyleType = "inherit" | "initial" | "unset" | "revert" | "revert-layer";
 /**
  * The IGenericProxy interface represents a callable interface implemented by functions that
  * accept an optional parameter of a generic type and return a string. This interface is used as a

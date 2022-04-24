@@ -1,4 +1,4 @@
-import {IAnimationRule, AnimationFrame, AnimationWaypoint, IAnimationFrameRule, IStyleDefinition} from "../api/RuleTypes"
+import {IKeyframesRule, AnimationFrame, AnimationWaypoint, IKeyframeRule, IStyleDefinition} from "../api/RuleTypes"
 import {AnimationStyleset} from "../api/Stylesets";
 import {Rule, IMimcssRuleBag} from "./Rule"
 import {StyleRule} from "./StyleRules";
@@ -7,17 +7,17 @@ import {v2s, WKF} from "../impl/Utils";
 
 
 /**
- * The AnimationRule class describes a @keyframes CSS rule.
+ * The IKeyframesRule class describes a @keyframes CSS rule.
  */
-export class AnimationRule extends Rule implements IAnimationRule
+export class KeyframesRule extends Rule implements IKeyframesRule
 {
 	public constructor( sd: IStyleDefinition, frames?: AnimationFrame[],
-        nameOverride?: string | IAnimationRule)
+        nameOverride?: string | IKeyframesRule)
 	{
 		super(sd);
 
 		if (frames)
-			this.frameRules = frames.map( frame => new AnimationFrameRule( sd, frame[0], frame[1]));
+			this.frameRules = frames.map( frame => new KeyframeRule( sd, frame[0], frame[1]));
 
 		this.nameOverride = nameOverride;
 	}
@@ -34,8 +34,11 @@ export class AnimationRule extends Rule implements IAnimationRule
 
 		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 
-		for( let keyframeRule of this.frameRules)
-			keyframeRule.process( null);
+        if (this.frameRules)
+        {
+            for( let keyframeRule of this.frameRules)
+                keyframeRule.process( null);
+        }
 	}
 
 
@@ -72,11 +75,11 @@ export class AnimationRule extends Rule implements IAnimationRule
 	public name: string;
 
 	/** List of style rules representing animation frames */
-	public frameRules: AnimationFrameRule[];
+	public frameRules: KeyframeRule[];
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
-	private nameOverride?: string | IAnimationRule;
+	private nameOverride?: string | IKeyframesRule;
 }
 
 
@@ -84,7 +87,7 @@ export class AnimationRule extends Rule implements IAnimationRule
 /**
  * The AnimationFrameRule class represents a single keyframe clause in the animation rule.
  */
-class AnimationFrameRule extends StyleRule implements IAnimationFrameRule
+class KeyframeRule extends StyleRule implements IKeyframeRule
 {
 	public constructor( sd: IStyleDefinition, waypoint: AnimationWaypoint,
         styleset?: AnimationStyleset | AnimationStyleset[])

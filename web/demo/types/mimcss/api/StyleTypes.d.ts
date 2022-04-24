@@ -3,7 +3,7 @@ import { CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, Horiz
 import { CssColor, CssNonNumericColor } from "./ColorTypes";
 import { FontStretchKeyword, FontStyle, FontWeight, SystemFont } from "./FontTypes";
 import { BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs, IRayFunc, TransformFuncs } from "./ShapeTypes";
-import { IVarRule, IAnimationRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule } from "./RuleTypes";
+import { IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule } from "./RuleTypes";
 import { IStyleset } from "./Stylesets";
 import { IPageNameRule } from "..";
 /**
@@ -62,7 +62,7 @@ export declare type AnimationIterationCount_Single = "infinite" | CssNumber;
 /**
  * Type for [[animationName]] style property
  */
-export declare type AnimationName_Single = "none" | string | IAnimationRule;
+export declare type AnimationName_Single = "none" | string | IKeyframesRule;
 /**
  * Keywords used for the [[animationPlayState]] style property
  */
