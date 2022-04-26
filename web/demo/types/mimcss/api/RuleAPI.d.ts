@@ -1153,9 +1153,10 @@ export declare const activate: <T extends IStyleDefinition<any>>(instOrClass: T 
 export declare const deactivate: (sd: IStyleDefinition, schedulerType?: number | undefined) => void;
 /**
  * Returns the theme definition object, which is currently active for the given theme declaration
- * class.
+ * class. If a them implementation has not been set for this them, then this function returnes an
+ * instance of the theme declaration class, so that the return value is always defined.
  * @param themeClass Theme declaration class
- * @returns Theme instance, which is currently active for the given theme class.
+ * @returns Theme instance, which is currently active for the given theme class hierarchy.
  */
 export declare const getActiveTheme: <T extends ThemeDefinition<any>>(themeClass: IStyleDefinitionClass<T, any>) => T;
 /**

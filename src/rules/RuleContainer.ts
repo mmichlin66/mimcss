@@ -361,17 +361,7 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
         // one for its theme base class. If no, then deactivate the theme instance currently set
         // as active. In any case, set our new instance as the currently active one.
         if (this.isThemeImpl)
-        {
-            let themeClass = this.sdc as unknown as IStyleDefinitionClass<ThemeDefinition>;
-            if (themeClass)
-            {
-                let currInstance = getCurrentTheme( themeClass, false);
-                if (currInstance && currInstance !== this.sd)
-                    (currInstance[symRC] as RuleContainer).deactivate();
-
-                setCurrentTheme( this.sd as ThemeDefinition);
-            }
-        }
+            setCurrentTheme( this.sd as ThemeDefinition);
 
         this.insert( this.elm!);
 
@@ -414,18 +404,9 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
 
         }
 
-        // if this is a theme class deactivation, check whether the instance is set as the current
-        // one for its theme base class. If yes, remove it as the currently active one.
+        // if this is a theme class deactivation, remove it as the currently active one (if it is active).
         if (this.isThemeImpl)
-        {
-            let themeClass = this.sdc as unknown as IStyleDefinitionClass<ThemeDefinition>;
-            if (themeClass)
-            {
-                let currInstance = getCurrentTheme( themeClass, false);
-                if (currInstance === this.sd)
-                    removeCurrentTheme( themeClass);
-            }
-        }
+            removeCurrentTheme( this.sd as ThemeDefinition);
 
         /// #if DEBUG
         console.timeEnd( timeLabel);
@@ -1045,33 +1026,27 @@ export const embeddedDecorator = (category: string, target: IStyleDefinitionClas
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Map of theme declaration classes to the instances that are currently active for these classes.
- */
-let s_themeInstanceMap = new Map<IStyleDefinitionClass<ThemeDefinition>,ThemeDefinition>();
-
-/**
- * Map of theme declaration classes to the theme declaration instances. This is sometimes needed
- * when we were asked for the active theme instance and it is not set. In this case we wil create
- * the instance of the theme declaration and return it.
- */
-let s_themeDeclInstanceMap = new Map<IStyleDefinitionClass<ThemeDefinition>,ThemeDefinition>();
+/** Helper type for shorter reference to theme definition classes */
+type IThemeDefinitionClass<T extends ThemeDefinition = ThemeDefinition> = IStyleDefinitionClass<T>;
 
 
 
 /**
- * Returns the theme declaration class for the given theme class.
- * @param themeClass ThemeDefinition-derived class
- * @returns Theme declaration class.
+ * Returns the theme declaration class for the given theme class. If the class is theme declaration,
+ * undefined is returned.
  */
-const getThemeDeclClass = (themeClass: IStyleDefinitionClass<ThemeDefinition>): IStyleDefinitionClass<ThemeDefinition> | undefined =>
+const getThemeDeclaration = (themeInstOrClass: ThemeDefinition | IThemeDefinitionClass): IThemeDefinitionClass | undefined =>
 {
+    let themeClass = typeof themeInstOrClass === "function"
+        ? themeInstOrClass
+        : themeInstOrClass.constructor as IThemeDefinitionClass;
+
     // make sure we are not passed the ThemeDefinition class itself
     if (themeClass === ThemeDefinition)
         return undefined;
 
     // loop over prototypes until we find the class, which derives directly from ThemeDefinition.
-    // This is the theme base class
+    // This is the theme declaration class
     let themeDeclClass = themeClass;
     for( let cls = Object.getPrototypeOf( themeClass); cls !== ThemeDefinition; cls = Object.getPrototypeOf( cls))
         themeDeclClass = cls;
@@ -1082,61 +1057,100 @@ const getThemeDeclClass = (themeClass: IStyleDefinitionClass<ThemeDefinition>): 
 
 
 /**
- * Returns the theme definition object, which is currently activated for the given theme. If no
- * theme is currently activated for the given theme class, the theme declaration class is processed
- * and its instance is returned. Thus, this function never returns null or undefined.
+ * Information kept for every theme declaration class using the symThemeInfo symbol
+ */
+type ThemeClassInfo =
+{
+    /**
+     * Theme declaration class.
+     */
+    declClass: IThemeDefinitionClass;
+
+    /**
+     * Current active theme implementation. If we are asked for the active theme instance and it
+     * is not set, we will create the instance of the theme declaration and keep it here. Although
+     * theme declarations are never activated, they have the names of all the rules.
+     */
+    active?: ThemeDefinition;
+}
+
+
+
+/** Symbol under which theme declaration class keeps the ThemeClassInfo stucture */
+const symThemeInfo = Symbol("themeInfo");
+
+
+
+const getThemeInfo = (themeInstOrClass: ThemeDefinition | IThemeDefinitionClass): ThemeClassInfo | null =>
+{
+    let declClass = getThemeDeclaration(themeInstOrClass);
+    if (!declClass)
+        return null;
+
+    let info = declClass[symThemeInfo] as ThemeClassInfo;
+    if (!info)
+    {
+        info = { declClass };
+        declClass[symThemeInfo] = info;
+    }
+
+    return info;
+}
+
+
+
+/**
+ * Returns the theme definition object, which is currently activated for the given theme.
  * @param themeClass Theme definition class
  * @param returnThemeDecl Flag indicating that if there is no currently active theme we should
  * return the instance of the theme declaration class.
  * @returns Theme instance, which is currently activated for the given theme class.
  */
-export const getCurrentTheme = <T extends ThemeDefinition>( themeClass: IStyleDefinitionClass<T>,
+export const getCurrentTheme = <T extends ThemeDefinition>( themeClass: IThemeDefinitionClass<T>,
     returnThemeDecl: boolean): T =>
 {
-    let themeDeclClass = getThemeDeclClass(themeClass);
-    if (!themeDeclClass)
+    let info = getThemeInfo( themeClass);
+    if (!info)
         throw new Error(`Class ${themeClass} doesn't derive from ThemeDefinition`);
 
-    let currentTheme = s_themeInstanceMap.get( themeDeclClass) as T;
-    if (!currentTheme && returnThemeDecl)
+    // if there is no active theme implementation, check whether we already have an instance of
+    // theme declaration class; if not, create it now and set as active.
+    if (!info.active && returnThemeDecl)
+        info.active = processClass( info.declClass) as ThemeDefinition;
+
+    return info.active as T;
+}
+
+
+
+/**
+ * Sets the theme definition object as the currently active implementation for its
+ * corresponding base theme class.
+ */
+const setCurrentTheme = (themeInst: ThemeDefinition): void =>
+{
+    let info = getThemeInfo( themeInst);
+    if (info)
     {
-        // check whether we already have an instance of theme declaration class; if not, create
-        // it now, remember and return.
-        currentTheme = s_themeDeclInstanceMap.get( themeDeclClass) as T;
-        if (!currentTheme)
+        if (info.active !== themeInst)
         {
-            currentTheme = processClass( themeDeclClass) as T;
-            s_themeDeclInstanceMap.set( themeDeclClass, currentTheme);
+            (info.active?.[symRC] as RuleContainer)?.deactivate();
+            info.active = themeInst;
         }
     }
-
-    return currentTheme;
 }
 
 
 
 /**
- * Sets the theme definition object as the instance that is currently activated for the
- * corresponding base theme class.
- * @param theme theme instance to set as current for the corresponding base theme class
+ * Removes the given theme definition object if it is currentlu set as the active instance for the
+ * corresponding theme declaration class.
  */
-const setCurrentTheme = (theme: ThemeDefinition): void =>
+const removeCurrentTheme = (themeInst: ThemeDefinition): void =>
 {
-    let themeBaseClass = getThemeDeclClass( theme.constructor as IStyleDefinitionClass<ThemeDefinition>);
-    themeBaseClass && s_themeInstanceMap.set( themeBaseClass, theme);
-}
-
-
-
-/**
- * Removes a theme definition object set as the instance that is currently activated for the
- * corresponding base theme class.
- * @param themeClass Theme definition class
- */
-const removeCurrentTheme = (themeClass: IStyleDefinitionClass<ThemeDefinition>): void =>
-{
-    let themeBaseClass = getThemeDeclClass( themeClass);
-    themeBaseClass && s_themeInstanceMap.delete( themeBaseClass);
+    let info = getThemeInfo( themeInst);
+    if (info?.active === themeInst)
+        info.active = undefined;
 }
 
 

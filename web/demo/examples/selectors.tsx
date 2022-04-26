@@ -52,7 +52,7 @@ class MyStyles extends css.StyleDefinition
         color: "white",
     })
 
-    // all <p> elements, which are the last in the list of <p> elements, will be lightgreen
+    //every other <p> element will have italic text
     everyOther = this.$style( css.sel(this.container).child("p").nthChild( 2, 1), {
         fontStyle: "italic"
     })
