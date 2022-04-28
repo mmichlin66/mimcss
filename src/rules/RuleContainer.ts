@@ -1143,7 +1143,7 @@ const setCurrentTheme = (themeInst: ThemeDefinition): void =>
 
 
 /**
- * Removes the given theme definition object if it is currentlu set as the active instance for the
+ * Removes the given theme definition object if it is currently set as the active instance for the
  * corresponding theme declaration class.
  */
 const removeCurrentTheme = (themeInst: ThemeDefinition): void =>

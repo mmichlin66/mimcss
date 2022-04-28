@@ -1,5 +1,5 @@
 ﻿// This example demonstrates a custom scheduler that will apply style changes after a certain
-// delay. Although the scheduler as written doesn't makes much sense, it does demonstrates how
+// delay. Although the scheduler as written doesn't makes much sense, it demonstrates how
 // developers can create their own custom schedulers
 
 import * as mim from "mimbl";

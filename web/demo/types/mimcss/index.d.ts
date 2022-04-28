@@ -16,5 +16,4 @@ export * from "./api/ShapeAPI";
 export * from "./api/RuleAPI";
 export * from "./api/SchedulingAPI";
 export * from "./api/StyleAPI";
-export * from "./api/Virt";
 //# sourceMappingURL=index.d.ts.map

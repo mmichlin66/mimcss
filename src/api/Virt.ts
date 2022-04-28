@@ -370,7 +370,7 @@ class VirtHandler implements ProxyHandler<any>
  * @param objects List of objects to merge properties from
  * @returns The target object with merged properties.
  */
-export const mergeVirtObjects = ( target: any, ...objects: any[]): any =>
+export const virtMerge = (target: any, ...objects: any[]): any =>
 {
     if (target == null)
         target = {};
@@ -391,11 +391,14 @@ export const mergeVirtObjects = ( target: any, ...objects: any[]): any =>
             if (!isPOJO(newVal))
                 target[key] = newVal;
             else if (isPOJO(oldVal))
-                mergeVirtObjects( oldVal, newVal);
+                virtMerge( oldVal, newVal);
             else
-                target[key] = mergeVirtObjects( {}, newVal);
+                target[key] = virtMerge( {}, newVal);
         }
     }
 
     return target;
 }
+
+
+

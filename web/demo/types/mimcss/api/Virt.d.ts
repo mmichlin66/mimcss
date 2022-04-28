@@ -91,5 +91,5 @@ export declare const virtProp: (obj: any, key: PropertyKey, val: any, path: Prop
  * @param objects List of objects to merge properties from
  * @returns The target object with merged properties.
  */
-export declare const mergeVirtObjects: (target: any, ...objects: any[]) => any;
+export declare const virtMerge: (target: any, ...objects: any[]) => any;
 //# sourceMappingURL=Virt.d.ts.map

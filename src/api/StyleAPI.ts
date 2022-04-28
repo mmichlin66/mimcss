@@ -3,6 +3,7 @@ import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Styleset
 import {sp2s, s_registerSP, s2ss, s2s} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
+import { virtMerge } from "./Virt";
 
 
 
@@ -149,6 +150,31 @@ export const diffStylesets = (oldStyleset: Styleset, newStyleset: Styleset): Str
 
 	return updateVal;
 }
+
+
+
+/**
+ * Recursively merges properties of the given list of objects to the given target. If the target
+ * is not specified, a plain object is created, to which all other objects are merged, and
+ * returned; otherwise, the input target object is returned.
+ *
+ * When merging a source object to a target, all properties defined in the source will replace the
+ * same-named properties in the target. The target properties that are not defined in the source,
+ * will remain intact. If the source has properties with the null or undefined values, the
+ * same-named properties will be removed from the target. When the same-named properties in the
+ * source and in the target are both plain objects, the process continues to merge their properties
+ * recursively.
+ *
+ * Although the types of objects in the funtion signature are specified as `any`, the primary
+ * use of this function is to merge style definition objects. This can be used by components to
+ * override their default styles with caller provided styles.
+ *
+ * @param target Object to merge properties to. If undefined or null, a plain object is created as
+ * target.
+ * @param objects List of objects to merge properties from
+ * @returns The target object with merged properties.
+ */
+export const mergeStylesheets = (target: any, ...objects: any[]): any => virtMerge( target, ...objects);
 
 
 

@@ -483,7 +483,6 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * ```typescript
      * class MyStyles extends css.StyleDefinition
      * {
-     *     // defining and using custom CSS property
      *     defaultTextColor = this.$const( "color", "red")
      *     para = this.$style( "p", {
      *         color: this.defaultTextColor

@@ -54,7 +54,6 @@
         "lib/api/SchedulingAPI.d.ts",
         "lib/api/StyleTypes.d.ts",
         "lib/api/Stylesets.d.ts",
-        "lib/api/StyleAPI.d.ts",
-        "lib/api/Virt.d.ts"
+        "lib/api/StyleAPI.d.ts"
     ]
 }
