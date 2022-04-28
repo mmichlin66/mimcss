@@ -1236,19 +1236,20 @@ export const embedded = (category: string): ClassDecorator =>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sets the method uses to generate names of CSS entities. If yes, the names will be created by
- * appending a unique number to the given prefix. If the prefix is not specified, the standard
- * prefix "n" will be used.
+ * Sets the method used to generate names of CSS entities. If the method is [[Optimized]], the
+ * names will be created by appending a unique number to the given prefix. If the prefix is not
+ * specified, the standard prefix `"n"` will be used.
  *
- * By default the development version of the library (mimcss.dev.js) uses the [[UniqueScoped]]
+ * By default, the development version of the library (mimcss.dev.js) uses the [[Scoped]]
  * method and the production version (mimcss.js) uses the [[Optimized]] method. This function can
  * be called to switch to the alternative method of name generation in either the development or
  * the production builds.
  *
  * @param method Indicates what method to use.
  * @param prefix Optional string that will serve as a prefix to which unique numbers will be added
- * to generate optimized names. Ignored if the `method` parameter is anything other than
- * [[NameGenerationMethod.Optimized]].
+ * to generate optimized names. Normally ignored if the `method` parameter is anything other than
+ * [[NameGenerationMethod.Optimized]]; however can be used in some special circumstances like
+ * style definitions created using anonymous classes..
  */
 export const configNameGeneration = (method: NameGenerationMethod, prefix?: string): void =>
 	configNames( method, prefix);

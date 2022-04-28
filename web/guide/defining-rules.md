@@ -33,11 +33,6 @@ class MyStyles extends css.StyleDefinition
 
     standout = this.$id({ boxShadow: {color: "red", blur: 4} })
 
-    defaultColors = {
-        background: this.$var({ "color", "white" }),
-        foreground: this.$var({ "color", "black" })
-    }
-
     move = this.$keyframes([
         [ "from", { top: 0} ],
         [ 50, { top: css.percent(50) } ],
@@ -49,6 +44,16 @@ class MyStyles extends css.StyleDefinition
         this.$tag( ["html", "body"], { height: "100%", margin: 0 }),
         this.$style( "a:hover", { color: "navy" }),
     ]
+
+    specialColors = {
+        background: this.$var({ "color", "cyan" }),
+        foreground: this.$var({ "color", "magenta" }),
+    }
+
+    special = this.$class({
+        backgroundColor: this.specialColors.background,
+        color: this.specialColors.foreground,
+    })
 }
 ```
 
@@ -56,7 +61,9 @@ Hopefully, the rules defined above are more or less self-explanatory. The `$tag`
 
 The rules that require names are assigned to the class's properties. The names of these properties will be later used as names of the corresponding CSS entities (classes, IDs, etc.) when writing JSX code. Rules that don't require names - such as simple tag rules or a universal rule (*) - are gathered into an array. The array does get assigned to a property, but this is only because the language's syntax requires it; this property name is usually not used in any way.
 
-Note that we didn't specify the name of the class (nor of the ID, animation or custom property). This is because we usually don't define the names that will be used in HTML; instead, we will use the properties to refer to the class and other entities. This is a fundamental aspect of Mimcss: names are hidden from the developers, so that the developers never have a chance to misspell the names. Mimcss mechanism generates the names that will be used in HTML and makes sure that the properties, to which the rules are assigned, refer to these names. If there is a need for a rule to have a pre-defined name, it can be specified as an optional parameter to `$class`, `$id` or `$var()` methods - this will override the name-generation mechanism.
+Rules can be grouped using plain objects as we did in the `specialColors` property. This is done mostly for convenience to group rules of similar meaning or belonging to the same category. When applying these rules to elements in JSX or when referencing them internally their dotted path is used - as we did in the `special` property.
+
+Note that we didn't specify the name of the classes (nor of the ID, animation or custom property). This is because we usually don't define the names that will be used in HTML; instead, we will use the properties to refer to the class and other entities. This is a fundamental aspect of Mimcss: names are hidden from the developers, so that the developers never have a chance to misspell the names. Mimcss mechanism generates the names that will be used in HTML and makes sure that the properties, to which the rules are assigned, refer to these names. If there is a need for a rule to have a pre-defined name, it can be specified as an optional parameter to `$class`, `$id` or `$var()` methods - this will override the name-generation mechanism.
 
 ## Rule types
 Mimcss supports all CSS rules except @charset - the latter is not needed because developers don't actually write text-based CSS files. This section gives a brief description of `StyleDefinition` methods that create the rules.
@@ -76,7 +83,7 @@ Mimcss supports all CSS rules except @charset - the latter is not needed because
 - [$import()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_import) - creates CSS @import rule referencing a CSS file.
 - [$namespace()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_namespace) - creates CSS @namespace rule.
 - [$page()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_media) - creates CSS @page rule that specifies styles used for printing.
-- [$layer()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_layer) - creates CSS @layer rule that specifies styles used for printing.
+- [$layer()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_layer) - creates CSS @layer rule.
 - [$counterStyle()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_counterStyle) - creates CSS @counter-style rule.
 - [$counter()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_counter) - creates counter name that can be used with style properties such as `counter-increment` and `counter-reset` as well as with CSS functions such as `counter()` and `counters()`. This method doesn't create any CSS rule but is used to generate a unique counter name.
 - [$gridarea()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_gridarea) - creates grid area name that can be used with style properties such as `grid-area`. This method doesn't create any CSS rule but is used to generate a unique grid area name.
@@ -84,7 +91,7 @@ Mimcss supports all CSS rules except @charset - the latter is not needed because
 - [$classname()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_media) - creates class name by combining several class names. This allows using a single property whenever an element should have more than one CSS class applied to it. This method doesn't create any CSS rule but is used for convenience only.
 - [$const()](../typedoc.html?path=classes/RuleAPI.StyleDefinition.html#_const) - creates a *constant* corresponding to a certain type, which can be used wherever values of this type can be used. This rule doesn't create any CSS rule and is used to substitute custom CSS properties if the value is not going to change during the application life time and if the specific characteristics of CSS custom properties such as cascading are not required. For more information see [Custom Properties vs. Constants](custom-properties.html#custom-properties-vs-constants).
 
-Under the CSS specification, @import and @namespace rules should precede all style rules in the style sheet. Mimcss doesn't impose such a restriction: when Mimcss inserts the CSS rules into the DOM, it creates the @import statements first and the @namespace rules second, followed by other rules - regardless of their position in the style definition class. Mimcss will ignore any @import and @namespace rules specified under the nested grouping rules, such as @media and @supports - also in accordance with the CSS specification.
+Under the CSS specification, @import and @namespace rules should precede all style rules in the style sheet. Mimcss doesn't impose such a restriction: when Mimcss inserts the CSS rules into the DOM, it creates the @import statements first and the @namespace rules second, followed by other rules - regardless of their position in the style definition class. Note that the order of all other rules is preserved. Mimcss will ignore any @import and @namespace rules specified under the nested grouping rules, such as @media and @supports - also in accordance with the CSS specification.
 
 ## Rules activation
 By now we have defined our rules with a TypeScript class, but how do we insert the rules into the DOM so that they start applying to the HTML? This process is called "activation" and is accomplished using the [activate](../typedoc.html?path=modules/RuleAPI.html#activate) function.
@@ -270,4 +277,4 @@ Properties can refer to other properties defined in the same class using the `th
 Depending on the method used to initialize a property, it has a type that may allow some actions on the property value after the style definition has been activated (and thus there is an instance of the style definition class). For example, all style rules have a method `setProp`, which allows setting a value of a style property at run-time. You can also create methods in the style definition class that manipulate property values. This can be useful, for example, if you want to change values of multiple properties at once.
 
 ## Style definition instances
-In all of the examples above, we never instantiated the style definition classes directly; instead, the instances were created by Mimcss upon activation of style definition classes. In fact it is possible to created style definition instances directly using the `new` operator and then activate or reference these instances using the `activate()` function and `$use()` method respectively. In this case, the names for CSS entities will be generated uniquely for each instance. This is the basis for creating *styled components* and this will be discussed in more details in the [Styled Components](styled-components) unit.
+In all of the examples above, we never instantiated the style definition classes directly; instead, the instances were created by Mimcss upon activation of style definition classes. In fact it is possible to created style definition instances directly using the `new` operator and then activate these instances using the `activate()` function. In this case, the names for CSS entities will be generated uniquely for each instance. This is the basis for creating *styled components* and this will be discussed in more details in the [Styled Components](styled-components) unit.
