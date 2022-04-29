@@ -267,7 +267,7 @@ export declare const hz: (n: number) => IFrequencyProxy;
 export declare const khz: (n: number) => IFrequencyProxy;
 /**
  * Returns an [[IFitContentProxy]] function representing the `fit-content()` CSS function
- * ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content())).
+ * (<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content()" target="mdn">MDN Page</a>).
  */
 export declare const fitContent: (size: Extended<CssLength>) => IFitContentProxy;
 /**

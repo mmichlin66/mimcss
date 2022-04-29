@@ -4,7 +4,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ICssFuncObject, NthExpression } from "../api/CoreTypes";
+import { ICssFuncObject } from "../api/CoreTypes";
+import { ClassMoniker } from "../api/RuleTypes";
 
 /**
  * Converts dashe-case to camelCase, e.g. font-size to fontSize.
@@ -85,6 +86,7 @@ export const enum WKF
     ColorSeparation,
     Marker,
     Colors,
+    ClassMoniker,
 
     // indicates the length of the array needed to keep conversion functions. This is used when
     // we create this array below. Any new enumeration members must be added before this.
@@ -255,13 +257,6 @@ export const v2s = (val: any, options?: V2SOptions): string =>
         return v2s( val, newOptions);
     }
 }
-
-
-
-wkf[WKF.Default] = v2s;
-wkf[WKF.OneOrManyWithComma] = v => v2s( v, { sep: "," });
-wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { sep: "/" });
-wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
 
 
 
@@ -549,3 +544,13 @@ const goOverProps = (val: ICssFuncObject, options?: V2SOptions, sep?: string): s
 
 
 
+wkf[WKF.Default] = v2s;
+wkf[WKF.OneOrManyWithComma] = v => v2s( v, { sep: "," });
+wkf[WKF.OneOrManyWithSlash] = v => v2s( v, { sep: "/" });
+wkf[WKF.Quoted] = v => typeof v === "string" ? `"${v}"` : v2s(v);
+wkf[WKF.ClassMoniker] = (moniker: ClassMoniker) =>
+	v2s( moniker, v =>
+        typeof v === "string" ? v :
+        Array.isArray(v) ? a2s( v, wkf[WKF.ClassMoniker]) :
+        v && v.name
+    );

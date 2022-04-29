@@ -122,77 +122,77 @@ export type FontSrc_FontFaceType = FontSrc | FontSrc[];
 /**
  * Interface representing the properties of the `@font-face` CSS rule.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
+ * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face" target="mdn">MDN Page</a>
  */
 export interface IFontFace
 {
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/ascent-override
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/ascent-override" target="mdn">MDN Page</a>
      */
     ascentOverride?: FontFaceMetricOverride;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/descent-override
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/descent-override" target="mdn">MDN Page</a>
      */
     descentOverride?: FontFaceMetricOverride;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display" target="mdn">MDN Page</a>
      */
     fontDisplay?: FontDisplay_FontFaceType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family" target="mdn">MDN Page</a>
      */
     fontFamily?: string;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/font-feature-settings
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-feature-settings" target="mdn">MDN Page</a>
      */
     fontFeatureSettings?: string;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-stretch
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-stretch" target="mdn">MDN Page</a>
      */
     fontStretch?: FontStretch_FontFaceType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-style
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-style" target="mdn">MDN Page</a>
      */
     fontStyle?: FontStyle_FontFaceType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-variant
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-variant" target="mdn">MDN Page</a>
      */
     fontVariant?: string;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-variation-settings
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-variation-settings" target="mdn">MDN Page</a>
      */
     fontVariationSettings?: string;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-weight
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-weight" target="mdn">MDN Page</a>
      */
     fontWeight?: FontWeight_FontFaceType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/line-gap-override
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/line-gap-override" target="mdn">MDN Page</a>
      */
     lineGapOverride?: FontFaceMetricOverride;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src" target="mdn">MDN Page</a>
      */
     src?: FontSrc_FontFaceType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/size-adjust
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/size-adjust" target="mdn">MDN Page</a>
      */
     sizeAdjust?: CssPercent;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/unicode-range
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/unicode-range" target="mdn">MDN Page</a>
      */
     unicodeRange?: string;
 }

@@ -41,7 +41,7 @@ const gradientStopsOrHintsToString = (val: GradientStopOrHint<any>[], math: WKF.
 /**
  * Function returning the ILinearGradientBuilder interface representing the `linear-gradient` CSS functions.
  *
- * *Examples:*
+ * **Examples:**
  *
  * ```typescript
  * backgroundImage: linearGradient( "red", "blue")
@@ -72,7 +72,7 @@ fdo["linear-gradient"] = {
 /**
  * Function returning the IRadialGradient interface representing the `radial-gradient` CSS functions.
  *
- * *Examples:*
+ * **Examples:**
  *
  * ```typescript
  * backgroundImage: radialGradient( "red", "blue")
@@ -105,7 +105,7 @@ fdo["radial-gradient"] = {
 /**
  * Function returning the IConicGradient interface representing the `radial-gradient` CSS functions.
  *
- * *Examples:*
+ * **Examples:**
  *
  * ```typescript
  * backgroundImage: conicGradient( "red", "blue")
@@ -244,7 +244,7 @@ export function crossFade( old: [Extended<CssImage>, Extended<CssImage>, Extende
  */
 export function crossFade( ...images: (Extended<CssImage> | [Extended<CssImage>, Extended<CssPercent>])[]): ICrossFadeBuilder;
 
-/** Implementation */
+// Implementation
 export function crossFade(): ICrossFadeBuilder
 {
     return new CrossFadeBuilder( ...arguments);
@@ -350,6 +350,8 @@ fdo["image-set"] = [
  * @param name Worklet name
  * @param syntax Tuple containing syntax definitions for worklet arguments.
  * @param url URL to the worklet module. If specified, the module will be automatically added.
+ *
+ * @category Image
  */
 export const registerPaintWorklet = async <K extends keyof IPaintWorklets>( name: K,
     syntax: IPaintWorklets[K] = [], url?: string): Promise<void> =>
@@ -927,7 +929,7 @@ fdo.translate3d = {
 /**
  * Returns an IInsetBuilder object representing the `inset()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: inset( css.percent(15))
@@ -955,7 +957,7 @@ fdo.inset = {
 /**
  * Returns an ICircleBuilder object representing the `circle()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: circle( 100)
@@ -981,7 +983,7 @@ fdo.circle = {
 /**
  * Returns an IEllipseBuilder object representing the `ellipse()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: ellipse().at( ["top", "50%"])
@@ -994,7 +996,7 @@ export function ellipse(): IEllipseBuilder;
 /**
  * Returns an IEllipseBuilder object representing the `ellipse()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: ellipse( 100, 50)
@@ -1025,7 +1027,7 @@ fdo.ellipse = {
 /**
  * Returns an IPolygon object representing the `polygon()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: css.polygon( [0,100], [50,0], [100,100])

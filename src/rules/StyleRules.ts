@@ -1,15 +1,16 @@
 import {
     IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IStyleDefinition,
     IPageRule,
-    IPrefixedNamedEntity
+    IPrefixedNamedEntity,
+    ClassMoniker
 } from "../api/RuleTypes";
 import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
-    CombinedStyleset, ParentClassType, IStyleset, PageRuleStyleset
+    CombinedStyleset, IStyleset, PageRuleStyleset
 } from "../api/Stylesets"
-import {CssSelector, IParameterizedPseudoEntityFunc, PagePseudoClass, PageSelector} from "../api/CoreTypes"
+import {CssSelector, IParameterizedPseudoEntityFunc, PageSelector} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
-import {camelToDash, fdo2s, symV2S, v2s} from "../impl/Utils";
+import {camelToDash, fdo2s, symV2S, v2s, WKF, wkf} from "../impl/Utils";
 import {s2s, sp2s} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
@@ -492,7 +493,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
     {
         if (propName == "++")
         {
-            let rules = propVal as ParentClassType | ParentClassType[];
+            let rules = propVal as ClassMoniker;
             if (rules)
                 this.parents = Array.isArray(rules) ? rules : [rules];
 
@@ -512,13 +513,13 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         // referenced class rules and append them to the name.
         if (this.parents)
         {
-            this.name += " " + this.parents.map( v => typeof v === "string" ? v : v.name).join(" ");
+            this.name += " " + this.parents.map( v => typeof v === "string" ? v : wkf[WKF.ClassMoniker](v)).join(" ");
             this.cssName = "." + this.name.replace( / /g, ".");
         }
 	}
 
     // remembered value of the "++" property of the input styleset
-    private parents?: ParentClassType[];
+    private parents?: ClassMoniker[];
 }
 
 

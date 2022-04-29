@@ -343,7 +343,7 @@ export const khz = (n: number): IFrequencyProxy => toUnitsProxy( n, "khz");
 
 /**
  * Returns an [[IFitContentProxy]] function representing the `fit-content()` CSS function
- * ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content())).
+ * (<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content()" target="mdn">MDN Page</a>).
  */
 export const fitContent = (size: Extended<CssLength>): IFitContentProxy =>
     () => f2s( "fit-content", [[size, WKF.Length]]);
