@@ -2,7 +2,7 @@
 import {
     BorderImage_Object, Border_StyleType, GridTemplateAreas_StyleType,
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
-    BoxShadow_StyleType, BoxShadow_Single,
+    BoxShadow_StyleType, BoxShadow_Single, BorderTuple,
 } from "../api/StyleTypes";
 import { CustomVar_StyleType, IStyleset, StringStyleset, Styleset} from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
@@ -59,13 +59,36 @@ wkf[WKF.BoxShadow] = (val: BoxShadow_StyleType) => v2s( val, {
 
 
 wkf[WKF.Border] = (val: Extended<Border_StyleType>): string => v2s( val, {
-    num: WKF.Length,
-    arr: arr => {
-        let numbersProcessed = 0;
-        return a2s( arr, item => typeof item === "number"
-            ? v2s( item, numbersProcessed++ ? WKF.Color : WKF.Length)
-            : v2s(item)
-        );
+    // single number is interpreted as line width. Also the style "solid" is added because
+    // otherwise style defaults to "none".
+    num: v => wkf[WKF.Length](v) + " solid",
+    // if the single string doesn't indicate style, then the style keyword "solid" is added
+    // because otherwise style defaults to "none".
+    str: v => ["none", "hidden", "dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "outset"].includes(v) ? v : v + " solid",
+    obj: [
+        ["width", WKF.Length],
+        "style",
+        ["color", WKF.Color]
+    ],
+    // first number in a tuple is interpreted as line width, unless line width has already been
+    // specified as a keyword
+    arr: tuple => {
+        let widthEncountered = false;
+        return a2s( tuple, item => {
+            if (typeof item === "number")
+            {
+                let ret = v2s( item, widthEncountered ? WKF.Color : WKF.Length)
+                widthEncountered = true;
+                return ret;
+            }
+            else
+            {
+                if (["thin", "medium", "thick"].includes(item))
+                    widthEncountered = true;
+
+                return v2s(item);
+            }
+        });
     },
 });
 

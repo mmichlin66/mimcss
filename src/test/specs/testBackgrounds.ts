@@ -60,15 +60,6 @@ describe("backgrounds:", () =>
 		})
 
 	})
-
-	describe("timing function", () =>
-	{
-		it("animation-timing-function: steps(4)", () =>
-		{
-            let s = css.getStylePropValue( "animationTimingFunction", css.steps(4));
-            expect(s).toEqual( "steps(4)");
-		})
-	})
 })
 
 

@@ -29,5 +29,5 @@ class MyStyles extends css.StyleDefinition
     cls7 = this.$class({ backdropFilter: "initial" })
 
     // Don't apply any backdrop filter
-    cls8 = this.$class({ filter: "none" })
+    cls8 = this.$class({ backdropFilter: "none" })
 }

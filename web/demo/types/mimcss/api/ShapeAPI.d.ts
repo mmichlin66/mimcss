@@ -7,7 +7,7 @@ import { MappedSyntaxTypes } from "./Stylesets";
 /**
  * Function returning the ILinearGradientBuilder interface representing the `linear-gradient` CSS functions.
  *
- * *Examples:*
+ * **Examples:**
  *
  * ```typescript
  * backgroundImage: linearGradient( "red", "blue")
@@ -26,7 +26,7 @@ export declare const linearGradient: (...stops: GradientStopOrHint<CssLength>[])
 /**
  * Function returning the IRadialGradient interface representing the `radial-gradient` CSS functions.
  *
- * *Examples:*
+ * **Examples:**
  *
  * ```typescript
  * backgroundImage: radialGradient( "red", "blue")
@@ -47,7 +47,7 @@ export declare const radialGradient: (...stops: GradientStopOrHint<CssLength>[])
 /**
  * Function returning the IConicGradient interface representing the `radial-gradient` CSS functions.
  *
- * *Examples:*
+ * **Examples:**
  *
  * ```typescript
  * backgroundImage: conicGradient( "red", "blue")
@@ -95,6 +95,8 @@ export declare const imageSet: (...items: ImageSetItem[]) => IImageSetFunc;
  * @param name Worklet name
  * @param syntax Tuple containing syntax definitions for worklet arguments.
  * @param url URL to the worklet module. If specified, the module will be automatically added.
+ *
+ * @category Image
  */
 export declare const registerPaintWorklet: <K extends string | number>(name: K, syntax?: IPaintWorklets[K], url?: string | undefined) => Promise<void>;
 /**
@@ -461,7 +463,7 @@ export declare const translate3d: (x: Extended<CssLength>, y: Extended<CssLength
 /**
  * Returns an IInsetBuilder object representing the `inset()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: inset( css.percent(15))
@@ -475,7 +477,7 @@ export declare const inset: (o1: Extended<CssLength>, o2?: Extended<CssLength> |
 /**
  * Returns an ICircleBuilder object representing the `circle()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: circle( 100)
@@ -489,7 +491,7 @@ export declare const circle: (r?: ShapeRadius | undefined) => ICircleBuilder;
 /**
  * Returns an IEllipseBuilder object representing the `ellipse()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: ellipse().at( ["top", "50%"])
@@ -501,7 +503,7 @@ export declare function ellipse(): IEllipseBuilder;
 /**
  * Returns an IEllipseBuilder object representing the `ellipse()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: ellipse( 100, 50)
@@ -515,7 +517,7 @@ export declare function ellipse(rx: ShapeRadius, ry: ShapeRadius): IEllipseBuild
 /**
  * Returns an IPolygon object representing the `polygon()` CSS function.
  *
- * *Example:*
+ * **Examples:**
  *
  * ```typescript
  * clipPath: css.polygon( [0,100], [50,0], [100,100])

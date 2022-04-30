@@ -1,5 +1,5 @@
 import { IVarRule } from "../../api/RuleTypes"
-import { isEmpty } from "../../api/Virt";
+import { isEmpty } from "../../impl/Virt";
 import * as css from "../../index"
 
 

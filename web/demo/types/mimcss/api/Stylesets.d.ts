@@ -577,11 +577,35 @@ export interface IStyleset {
      */
     blockSize?: CssSize;
     /**
+     * The **border** shorthand CSS property sets an element's border. It sets the values of
+     * [[borderWidth]], [[borderStyle]], and [[borderColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border" target="mdn">MDN Page</a>
+     * - <a href="https://css-tricks.com/almanac/properties/b/border" target="css_tricks">CSS-Tricks Almanac</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/border.ts]]
+     * ```
      */
     border?: st.Border_StyleType;
     /**
+     * The **border-block** CSS property is a shorthand property for setting the individual logical
+     * block border property values in a single place in the style sheet. It can be used to set the
+     * values for one or more of [[borderBlockWidth]], [[borderBlockStyle]], and
+     * [[borderBlockColor]] setting both the start and end in the block dimension at once.
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block" target="mdn">MDN Page</a>
+     * - <a href="https://css-tricks.com/almanac/properties/b/border-block" target="css_tricks">CSS-Tricks Almanac</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlock.ts]]
+     * ```
      */
     borderBlock?: st.Border_StyleType;
     /**
@@ -602,7 +626,19 @@ export interface IStyleset {
      */
     borderBlockColor?: OneOrPair<CssColor>;
     /**
+     * The **border-block-end** CSS property is a shorthand property for setting the individual
+     * logical block-end border property values in a single place in the style sheet. It can be
+     * used to set the values for one or more of [[borderBlockEndWidth]], [[borderBlockEndStyle]],
+     * and [[borderBlockEndColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockEnd.ts]]
+     * ```
      */
     borderBlockEnd?: st.Border_StyleType;
     /**
@@ -623,7 +659,20 @@ export interface IStyleset {
      */
     borderBlockEndColor?: CssColor;
     /**
+     * The **border-block-end-style** CSS property defines the style of the logical block-end border
+     * of an element, which maps to a physical border style depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
+     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockEndStyle.ts]]
+     * ```
      */
     borderBlockEndStyle?: st.BorderStyle;
     /**
@@ -645,7 +694,19 @@ export interface IStyleset {
      */
     borderBlockEndWidth?: st.LineWidth;
     /**
+     * The **border-block-start** CSS property is a shorthand property for setting the individual
+     * logical block-start border property values in a single place in the style sheet. It can be
+     * used to set the values for one or more of [[borderBlockStartWidth]], [[borderBlockStartStyle]],
+     * and [[borderBlockStartColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockStart.ts]]
+     * ```
      */
     borderBlockStart?: st.Border_StyleType;
     /**
@@ -666,7 +727,20 @@ export interface IStyleset {
      */
     borderBlockStartColor?: CssColor;
     /**
+     * The **border-block-start-style** CSS property defines the style of the logical block-start border
+     * of an element, which maps to a physical border style depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
+     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockStartStyle.ts]]
+     * ```
      */
     borderBlockStartStyle?: st.BorderStyle;
     /**
@@ -688,7 +762,20 @@ export interface IStyleset {
      */
     borderBlockStartWidth?: st.LineWidth;
     /**
+     * The **border-block-style** CSS property defines the style of the logical block borders of
+     * an element, which maps to a physical border style depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[borderTopStyle]],
+     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on
+     * the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBlockStyle.ts]]
+     * ```
      */
     borderBlockStyle?: st.BorderStyle;
     /**
@@ -709,7 +796,17 @@ export interface IStyleset {
      */
     borderBlockWidth?: OneOrPair<st.LineWidth>;
     /**
+     * The **border-bottom** shorthand CSS property sets an element's bottom border. It sets the
+     * values of [[borderBottomWidth]], [[borderBottomStyle]] and [[borderBottomColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBottom.ts]]
+     * ```
      */
     borderBottom?: st.Border_StyleType;
     /**
@@ -735,7 +832,16 @@ export interface IStyleset {
      */
     borderBottomRightRadius?: CssRadius;
     /**
+     * The **border-bottom-style** CSS property sets the line style of an element's bottom border.
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderBottomStyle.ts]]
+     * ```
      */
     borderBottomStyle?: st.BorderStyle;
     /**
@@ -802,7 +908,20 @@ export interface IStyleset {
      */
     borderImageWidth?: st.BorderImageWidth_StyleType;
     /**
+     * The **border-inline** CSS property is a shorthand property for setting the individual logical
+     * inline border property values in a single place in the style sheet. It can be used to set the
+     * values for one or more of [[borderInlineWidth]], [[borderInlineStyle]], and
+     * [[borderInlineColor]] setting both the start and end in the inline dimension at once.
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline" target="mdn">MDN Page</a>
+     * - <a href="https://css-tricks.com/almanac/properties/b/border-inline" target="css_tricks">CSS-Tricks Almanac</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInline.ts]]
+     * ```
      */
     borderInline?: st.Border_StyleType;
     /**
@@ -823,7 +942,19 @@ export interface IStyleset {
      */
     borderInlineColor?: OneOrPair<CssColor>;
     /**
+    * The **border-inline-end** CSS property is a shorthand property for setting the individual
+    * logical inline-end border property values in a single place in the style sheet. It can be
+    * used to set the values for one or more of [[borderInlineEndWidth]], [[borderInlineEndStyle]],
+    * and [[borderInlineEndColor]].
+    *
+    * **See Also:**
     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end" target="mdn">MDN Page</a>
+    *
+    * **Usage in Mimcss:**
+    *
+    * ```typescript
+    * [[include: styleProps/b/borderInlineEnd.ts]]
+    * ```
     */
     borderInlineEnd?: st.Border_StyleType;
     /**
@@ -844,7 +975,20 @@ export interface IStyleset {
      */
     borderInlineEndColor?: CssColor;
     /**
+     * The **border-inline-end-style** CSS property defines the style of the logical inline-end border
+     * of an element, which maps to a physical border style depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
+     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineEndStyle.ts]]
+     * ```
      */
     borderInlineEndStyle?: st.BorderStyle;
     /**
@@ -866,7 +1010,19 @@ export interface IStyleset {
      */
     borderInlineEndWidth?: st.LineWidth;
     /**
+     * The **border-inline-start** CSS property is a shorthand property for setting the individual
+     * logical inline-start border property values in a single place in the style sheet. It can be
+     * used to set the values for one or more of [[borderInlineStartWidth]], [[borderInlineStartStyle]],
+     * and [[borderInlineStartColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineStart.ts]]
+     * ```
      */
     borderInlineStart?: st.Border_StyleType;
     /**
@@ -887,7 +1043,20 @@ export interface IStyleset {
      */
     borderInlineStartColor?: CssColor;
     /**
+     * The **border-inline-start-style** CSS property defines the style of the logical inline-start border
+     * of an element, which maps to a physical border style depending on the element's writing
+     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
+     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
+     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineStartStyle.ts]]
+     * ```
      */
     borderInlineStartStyle?: st.BorderStyle;
     /**
@@ -909,7 +1078,20 @@ export interface IStyleset {
      */
     borderInlineStartWidth?: st.LineWidth;
     /**
+     * The **border-inline-style** CSS property defines the style of the logical inline borders of
+     * an element, which maps to a physical border style depending on the element's writing mode,
+     * directionality, and text orientation. It corresponds to the [[borderTopStyle]],
+     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on
+     * the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderInlineStyle.ts]]
+     * ```
      */
     borderInlineStyle?: st.BorderStyle;
     /**
@@ -930,7 +1112,17 @@ export interface IStyleset {
      */
     borderInlineWidth?: OneOrPair<st.LineWidth>;
     /**
+     * The **border-left** shorthand CSS property sets an element's left border. It sets the
+     * values of [[borderLeftWidth]], [[borderLeftStyle]] and [[borderLeftColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-left" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderLeft.ts]]
+     * ```
      */
     borderLeft?: st.Border_StyleType;
     /**
@@ -949,7 +1141,16 @@ export interface IStyleset {
      */
     borderLeftColor?: CssColor;
     /**
+     * The **border-left-style** CSS property sets the line style of an element's left border.
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderLeftStyle.ts]]
+     * ```
      */
     borderLeftStyle?: st.BorderStyle;
     /**
@@ -970,7 +1171,17 @@ export interface IStyleset {
      */
     borderRadius?: BorderRadius;
     /**
+     * The **border-right** shorthand CSS property sets an element's right border. It sets the
+     * values of [[borderRightWidth]], [[borderRightStyle]] and [[borderRightColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-right" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderRight.ts]]
+     * ```
      */
     borderRight?: st.Border_StyleType;
     /**
@@ -989,7 +1200,16 @@ export interface IStyleset {
      */
     borderRightColor?: CssColor;
     /**
+     * The **border-right-style** CSS property sets the line style of an element's right border.
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderRightStyle.ts]]
+     * ```
      */
     borderRightStyle?: st.BorderStyle;
     /**
@@ -1018,11 +1238,31 @@ export interface IStyleset {
      */
     borderStartStartRadius?: CssRadius;
     /**
+     * The **border-style** shorthand CSS property sets the line style for all four sides of an
+     * element's border.
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderStyle.ts]]
+     * ```
      */
     borderStyle?: st.BorderStyle_StyleType;
     /**
+     * The **border-top** shorthand CSS property sets an element's top border. It sets the
+     * values of [[borderTopWidth]], [[borderTopStyle]] and [[borderTopColor]].
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-top" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderTop.ts]]
+     * ```
      */
     borderTop?: st.Border_StyleType;
     /**
@@ -1049,7 +1289,16 @@ export interface IStyleset {
      */
     borderTopRightRadius?: CssRadius;
     /**
+     * The **border-top-style** CSS property sets the line style of an element's top border.
+     *
+     * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-style" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/b/borderTopStyle.ts]]
+     * ```
      */
     borderTopStyle?: st.BorderStyle;
     /**
@@ -3264,7 +3513,7 @@ export declare type CombinedStyleset = Styleset & {
  * will generate the following HTML:
  *
  * ```html
- * <div className="emphasized redFG whiteBG">Important stuff</div>
+ * <div class="emphasized redFG whiteBG">Important stuff</div>
  * ```
  */
 export declare type CombinedClassStyleset = CombinedStyleset & {

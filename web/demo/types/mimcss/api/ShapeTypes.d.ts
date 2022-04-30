@@ -334,6 +334,7 @@ export interface IImageSetFunc extends ICssImageFunc {
  * }
  * ```
  *
+ * @category Image
  */
 export interface IPaintWorklets {
     [P: string]: SyntaxKey[];

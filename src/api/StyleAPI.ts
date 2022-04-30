@@ -3,7 +3,7 @@ import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Styleset
 import {sp2s, s_registerSP, s2ss, s2s} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
-import { virtMerge } from "./Virt";
+import { virtMerge } from "../impl/Virt";
 
 
 
