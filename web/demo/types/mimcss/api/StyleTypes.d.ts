@@ -8,26 +8,32 @@ import { IStyleset } from "./Stylesets";
 import { IPageNameRule } from "..";
 /**
  * Type representing keywords used to define a type used in the CSS `attr()` function.
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/attr" target="mdn">MDN Page</a>
  */
 export declare type AttrTypeKeyword = "string" | "color" | "url" | "integer" | "number" | "length" | "angle" | "time" | "frequency";
 /**
  * Type representing keywords used to define a unit used in the CSS `attr()` function.
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/attr" target="mdn">MDN Page</a>
  */
 export declare type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnits | ResolutionUnits | FrequencyUnits;
 /**
  * Keywords used for the [[alignContent]] style property.
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-content" target="mdn">MDN Page</a>
  */
-export declare type AlignContentKeywords = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" | "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center" | "space-between" | "space-around" | "space-evenly";
+export declare type AlignContentKeywords = "normal" | "baseline" | "first baseline" | "last baseline" | "space-between" | "space-around" | "space-evenly" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" | "safe center" | "safe start" | "safe end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right";
 /**
  * Keywords used for the [[alignItems]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-items" target="mdn">MDN Page</a>
  */
-export declare type AlignItemsKeywords = "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" | "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center";
+export declare type AlignItemsKeywords = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" | "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end";
 /**
  * Keywords used for the [[alignSelf]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-self" target="mdn">MDN Page</a>
  */
-export declare type AlignSelfKeywords = "auto" | "normal" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" | "self-start" | "self-end" | "baseline" | "first baseline" | "last baseline" | "safe center" | "unsafe center";
+export declare type AlignSelfKeywords = "auto" | AlignItemsKeywords;
 /**
  * Keywords used for the [[alignmentBaseline]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline" target="mdn">MDN Page</a>
  */
 export declare type AlignmentBaselineKeywords = "auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "top" | "center" | "bottom";
 /**
@@ -45,42 +51,52 @@ export declare type Animation_Single = {
 };
 /**
  * Type for [[animation]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation" target="mdn">MDN Page</a>
  */
 export declare type Animation_StyleType = OneOrMany<string | Animation_Single>;
 /**
  * Keywords used for the [[animationDirection]] style property.
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction" target="mdn">MDN Page</a>
  */
 export declare type AnimationDirectionKeywords = "normal" | "reverse" | "alternate" | "alternate-reverse";
 /**
  * Keywords used for the [[animationFillMode]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode" target="mdn">MDN Page</a>
  */
 export declare type AnimationFillModeKeywords = "none" | "forwards" | "backwards" | "both";
 /**
  * Type for [[animationIterationCount]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count" target="mdn">MDN Page</a>
  */
 export declare type AnimationIterationCount_Single = "infinite" | CssNumber;
 /**
  * Type for [[animationName]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-name" target="mdn">MDN Page</a>
  */
 export declare type AnimationName_Single = "none" | string | IKeyframesRule;
 /**
  * Keywords used for the [[animationPlayState]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state" target="mdn">MDN Page</a>
  */
 export declare type AnimationPlayStateKeywords = "paused" | "running";
 /**
  * Keywords used for the [[appearance]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/appearance" target="mdn">MDN Page</a>
  */
 export declare type AppearanceKeywords = "none" | "auto" | "textfield" | "menulist-button";
 /**
  * Type for [[aspectRatio]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ration" target="mdn">MDN Page</a>
  */
 export declare type AspectRatio_StyleType = CssAspectRatio | "auto";
 /**
- * Keywords used for the [[backfaceVisibilityMode]] style property
+ * Keywords used for the [[backfaceVisibility]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility" target="mdn">MDN Page</a>
  */
-export declare type BackfaceVisibilityModeKeywords = "visible" | "hidden";
+export declare type BackfaceVisibilityKeywords = "visible" | "hidden";
 /**
  * Type for single background value
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background" target="mdn">MDN Page</a>
  */
 export declare type Background_Single = string | CssColor | CssImage | {
     color?: Extended<CssColor>;
@@ -94,48 +110,52 @@ export declare type Background_Single = string | CssColor | CssImage | {
 };
 /**
  * Type for [[background]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background" target="mdn">MDN Page</a>
  */
 export declare type Background_StyleType = OneOrMany<Background_Single>;
 /**
  * Keywords used for the [[backgroundAttachment]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment" target="mdn">MDN Page</a>
  */
 export declare type BackgroundAttachmentKeywords = "scroll" | "fixed" | "local";
 /**
  *Keywords used for the [[backgroundBlendMode]] and [[mixBlendMode]] properties
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode" target="mdn">MDN Page</a>
  */
 export declare type BlendModeKeywords = "normal" | "multiply" | "screen" | "overlay" | "darken" | "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" | "exclusion" | "hue" | "saturation" | "color" | "luminosity";
 /**
  * Keywords used for the [[backgroundClip]] property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip" target="mdn">MDN Page</a>
  */
 export declare type BackgroundClipKeywords = "border-box" | "padding-box" | "content-box" | "text";
 /**
  * Type for [[backgroundImage]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-image" target="mdn">MDN Page</a>
  */
 export declare type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
 /**
  * Keywords used for the [[backgroundOrigin]] property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin" target="mdn">MDN Page</a>
  */
 export declare type BackgroundOriginKeywords = "border-box" | "padding-box" | "content-box" | "text";
 /**
  * Keywords for single background repeat
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
 export declare type BackgroundRepeatKeywords = "repeat" | "space" | "round" | "no-repeat";
 /**
  * Keywords for axis-specific background repeat
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
 export declare type BackgroundRepeatAxisKeywords = "repeat-x" | "repeat-y";
 /**
  * Type for single background repeat
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
 export declare type BackgroundRepeat = BackgroundRepeatAxisKeywords | OneOrPair<BackgroundRepeatKeywords>;
 /**
  * Type for [[backgroundRepeat]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
- *
  */
 export declare type BackgroundRepeat_StyleType = OneOrMany<BackgroundRepeat>;
 /**
@@ -714,37 +734,31 @@ export declare type ImageRendering_StyleType = "auto" | "crisp-edges" | "pixelat
 /**
  * Type for [[initialLetter]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/initial-letter" target="mdn">MDN Page</a>
- *
  */
 export declare type InitialLetter_StyleType = OneOrPair<CssNumber>;
 /**
  * Type for [[isolation]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/isolation" target="mdn">MDN Page</a>
- *
  */
 export declare type Isolation_StyleType = "auto" | "isolate";
 /**
  * Type for [[justifyContent]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content" target="mdn">MDN Page</a>
- *
  */
 export declare type JustifyContent_StyleType = "normal" | "space-between" | "space-around" | "space-evenly" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" | "left" | "right" | "safe center" | "safe start" | "safe end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right";
 /**
  * Type for [[justifyItems]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items" target="mdn">MDN Page</a>
- *
  */
 export declare type JustifyItems_StyleType = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" | "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" | "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right" | "legacy" | "legacy left" | "legacy right" | "legacy center";
 /**
  * Type for [[justifySelf]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self" target="mdn">MDN Page</a>
- *
  */
 export declare type JustifySelf_StyleType = "auto" | "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" | "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "left" | "right" | "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right";
 /**
  * Type for [[letterSpacing]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/letter-spacing" target="mdn">MDN Page</a>
- *
  */
 export declare type LetterSpacing_StyleType = "normal" | CssLength;
 /**

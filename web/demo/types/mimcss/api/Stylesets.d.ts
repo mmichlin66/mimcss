@@ -80,7 +80,7 @@ export interface IStyleset {
      * name as the computed value of the alignment-baseline property.
      *
      * **See Also:**
-     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/alignment-baseline" target="mdn">MDN Page</a>
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline" target="mdn">MDN Page</a>
      *
      * **Usage in Mimcss:**
      *
@@ -328,7 +328,7 @@ export interface IStyleset {
      * [[include: styleProps/b/backfaceVisibility.ts]]
      * ```
      */
-    backfaceVisibility?: st.BackfaceVisibilityModeKeywords;
+    backfaceVisibility?: st.BackfaceVisibilityKeywords;
     /**
      * The **background** shorthand CSS property sets all background style properties at once,
      * such as color, image, origin and size, or repeat method.
