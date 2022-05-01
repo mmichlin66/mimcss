@@ -27,8 +27,8 @@ export type OneOrRange<T> = T | [ExtendedFeature<T>, ExtendedFeature<T>?];
 
 
 /**
- * Interface representing the type of objects that can be assigned to the style property of HTML
- * and SVG elements.
+ * Representing the type of objects used to create media queries in the [[StyleDefinition.$media]]
+ * method.
  */
 export interface IMediaFeatureset
 {

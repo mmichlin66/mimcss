@@ -166,15 +166,13 @@ export interface IPercentProxy extends IGenericProxy<PercentUnits> {};
 
 /**
  * Type for style properties of the `<percentage>` CSS type. Values of this type can be specifed as:
- * - one of pre-defined strings like `"100%"`
+ * - strings that have a number followed by the percent sign, like `"83%"`
  * - return value from the [[percent]] function
  * - a number:
  *   - if the number is an integer, it is taken as is and a percent sign is appended to it
  *   - if the number is a floating point, it is multiplied by 100 and a percent sign is appended to it
  */
-export type CssPercent = number | IPercentProxy |
-    "5%" | "10%" | "15%" | "20%" | "25%" | "30%" | "35%" | "40%" | "45%" | "50%" |
-    "55%" | "60%" | "65%" | "70%" | "75%" | "80%" | "85%" | "90%" | "95%" | "100%";
+export type CssPercent = number | IPercentProxy | `${number}${PercentUnits}`;
 
 /**
  * The `IPercentMath` interface contains methods that implement CSS mathematic functions on the
@@ -193,8 +191,8 @@ export interface IPercentMath extends INumericMath<CssPercent, PercentUnits>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Units of length */
-export type LengthUnits = "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" | "mm" | "pc" |
-                "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "fr";
+export type LengthUnits = PercentUnits |"Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" |
+    "mm" | "pc" | "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "fr";
 
 /** Proxy interface that represents values of the `<length>` CSS type */
 export interface ILengthProxy extends IGenericProxy<LengthUnits> {};
@@ -202,15 +200,13 @@ export interface ILengthProxy extends IGenericProxy<LengthUnits> {};
 /**
  * Type for single style property of the `<length> | <percentage>` CSS type. Values of this type
  * can be specifed as:
- * - one of pre-defined strings like `"100vh"` or `"1fr"`
+ * - strings that have a number followed by one of the length units, like `"100vh"` or `"1fr"`
  * - return value from the length unit functions such as [[rem]], [[vh]], [[vmin]], [[percent]], etc.
  * - a number:
  *   - if the number is an integer, it is interpreted as `"px"` units
  *   - if the number is a floating point, it is interpreted as `"em"` units
  */
-export type CssLength = CssPercent | ILengthProxy |
-    "100vh" | "100vw" |
-    "1fr" | "2fr" | "3fr" | "4fr" | "5fr" | "6fr" | "7fr" | "8fr" | "9fr" | "10fr" | "11fr" | "12fr";
+export type CssLength = CssPercent | ILengthProxy | `${number}${LengthUnits}`;
 
 /**
  * Type that combines [[CssLength]] and the string literal `"auto"`. This type is often used when a
@@ -223,7 +219,7 @@ export type CssLengthOrAuto = CssLength | "auto";
  * The `ILengthMath` interface contains methods that implement CSS mathematic functions on the
  * `<length>` CSS types. This interface is implemented by the [[Len]] object.
  */
-export interface ILengthMath extends INumericMath<CssLength, LengthUnits | PercentUnits>
+export interface ILengthMath extends INumericMath<CssLength, LengthUnits>
 {
 }
 
@@ -236,26 +232,26 @@ export interface ILengthMath extends INumericMath<CssLength, LengthUnits | Perce
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Units of angle */
-export type AngleUnits = "deg" | "rad" | "grad" | "turn";
+export type AngleUnits = PercentUnits | "deg" | "rad" | "grad" | "turn";
 
 /** Proxy interface that represents values of the `<angle>` CSS type */
 export interface IAngleProxy extends IGenericProxy<AngleUnits> {};
 
 /** Type for single style property of the `<angle>` CSS type */
-export type CssAngle = number | IAngleProxy;
+export type CssAngle = number | IAngleProxy | `${number}${AngleUnits}`;
 
 /**
  * The `IAngleMath` interface contains methods that implement CSS mathematic functions on the
  * `<angle>` CSS types. This interface is implemented by the [[Angle]] object.
- * Type for single style property of the `<length> | <percentage>` CSS type. Values of this type
+ * Type for single style property of the `<angle> | <percentage>` CSS type. Values of this type
  * can be specifed as:
- * - one of pre-defined strings like `"100vh"` or `"1fr"`
+ * - strings that have a number followed by one of the angle units, like `"100vh"` or `"1fr"`
  * - return value from the length unit functions such as [[rem]], [[vh]], [[vmin]], [[percent]], etc.
  * - a number:
  *   - if the number is an integer, it is interpreted as `"deg"` units
  *   - if the number is a floating point, it is interpreted as `"turn"` units
  */
-export interface IAngleMath extends INumericMath<CssAngle, AngleUnits | PercentUnits>
+export interface IAngleMath extends INumericMath<CssAngle, AngleUnits>
 {
 }
 
@@ -274,7 +270,7 @@ export type TimeUnits = "s" | "ms";
 export interface ITimeProxy extends IGenericProxy<TimeUnits> {};
 
 /** Type for single style property of the `<time>` CSS type */
-export type CssTime = number | ITimeProxy;
+export type CssTime = number | ITimeProxy | `${number}${TimeUnits}`;
 
 /**
  * The `ITimeMath` interface contains methods that implement CSS mathematic functions on the
@@ -299,9 +295,7 @@ export type ResolutionUnits = "dpi" | "dpcm" | "dppx" | "x";
 export interface IResolutionProxy extends IGenericProxy<ResolutionUnits> {};
 
 /** Type for single style property of the `<resolution>` CSS type */
-export type CssResolution = number | IResolutionProxy |
-    "1x" | "2x" | "3x" | "4x" | "5x" | "6x" | "7x" | "8x" | "9x" | "10x" |
-    "1dppx" | "2dppx" | "3dppx" | "4dppx" | "5dppx" | "6dppx" | "7dppx" | "8dppx" | "9dppx" | "10dppx";
+export type CssResolution = number | IResolutionProxy | `${number}${ResolutionUnits}`;
 
 /**
  * The `IResolutionMath` interface contains methods that implement CSS mathematic functions on the
@@ -326,7 +320,7 @@ export type FrequencyUnits = "Hz" | "kHz";
 export interface IFrequencyProxy extends IGenericProxy<FrequencyUnits> {};
 
 /** Type for single style property of the `<frequency>` CSS type */
-export type CssFrequency = number | IFrequencyProxy;
+export type CssFrequency = number | IFrequencyProxy | `${number}${FrequencyUnits}`;
 
 /**
  * The `IFrequencyMath` interface contains methods that implement CSS mathematic functions on the
@@ -471,7 +465,7 @@ export interface IAspectRatioProxy extends IGenericProxy<"aspect-ratio"> {}
  * }
  * ```
  */
-export type CssAspectRatio = CssNumber | IAspectRatioProxy | "1/1" | "4/3" | "16/9" | "185/100" | "239/100";
+export type CssAspectRatio = CssNumber | IAspectRatioProxy | `${number}/${number}`;
 
 
 

@@ -45,9 +45,9 @@ The goal of Mimcss is to boost the developers' productivity by increasing conven
     export type Visibility_StyleType = "visible" | "hidden" | "collapse";
     ```
 
-- For number-based types (such as `<length>`, `<angle>`, etc.) the type is defined as a `number` and a callable interface that is implemented by "unit functions" such as `css.percent(100)` or `css.inch(0.5)`. In addition, Mimcss allows a few string literals for such frequently used values as `"100%"` and `"1fr"`. For every numeric type, Mimcss defines a default unit to be used with integer numbers and another unit to be used with floating point numbers. For example, Mimcss defines the `CssLength` type for values of the CSS `<length>` type. When integer numbers are used for the `CssLength` values, they are interpreted as pixels; that is, having the unit suffix of `"px"`. For floating point numbers of the `CssLength` type, the suffix is `"em"`.
+- For number-based types (such as `<length>`, `<angle>`, etc.) the type is defined as either a `number` or a string literal with allowed units (e.g. `"1vmin"`) and a callable interface that is implemented by "unit functions" such as `css.percent(100)` or `css.inch(0.5)`. For every numeric type, Mimcss defines a default unit to be used with integer numbers and another unit to be used with floating point numbers. For example, Mimcss defines the `CssLength` type for values of the CSS `<length>` type. When integer numbers are used for the `CssLength` values, they are interpreted as pixels; that is, having the unit suffix of `"px"`. For floating point numbers of the `CssLength` type, the suffix is `"em"`. For each number-based CSS type, Mimcss allows using string literals in the form of a number followed by the unit, for example `"10%"` or `"45deg"`. Note that Mimcss defines template literal types in such a way that only appropriate units will be allowed for the corresponding types. That is trying to assign `"45deg"` to a `padding` property will cause compiler error.
 
-- For color properties, the `CssColor` type includes string literals for all the named colors. It also allows specifying colors as numbers and provides `css.rgb()` and `css.hsl()` functions. The `string` type is not part of the `CssColor` type definition.
+- For color properties, the `CssColor` type includes string literals for all the named colors. It also allows specifying colors as numbers and provides functions such as `css.rgb()` and `css.hsl()`. The `string` type is not part of the `CssColor` type definition. Mimcss also provides a number of function that mimic the CSS functions that produce color such as `colorMix()`.
 
 - For complex properties Mimcss uses arrays, tuples, functions and objects to provide the type-safe and convenient way to specify values. For most complex short-hand properties such as `background`, `animation`, etc. object type with fields corresponding to the long-hand properties is allowed. Most fields in such object types are optional and thus can be omitted.
 
@@ -97,16 +97,20 @@ For each of the above numeric types, Mimcss also provides an object that impleme
 - `Resolution` for working with the `CssResolution` type.
 - `Frequency` for working with the `CssFrequency` type.
 
-Mimcss also implements functions named after every unit allowed for the above CSS types. For example, the functions `rem()`, `inch()` and `cm()` work with the `<length>` CSS type. Similarly, the functions `deg()` and `rad()` work with the `<angle>` CSS type. The types returned from these functions make it impossible to assign a value of the wrong type to a property.
+Mimcss also implements functions named after every unit allowed for the above CSS types. For example, the functions `rem()`, `inch()` and `cm()` work with the `<length>` CSS type. Similarly, the functions `deg()` and `rad()` work with the `<angle>` CSS type. The types returned from these functions make it impossible to assign a value of the wrong type to a property. Note that this functions are only necessary when you pass a numeric variable to them. If you know the value at develop time, it is much easier to use string literals such as `"1rem"` or `"35%"`.
 
 ```tsx
 class MyStyles extends css.StyleDefinition
 {
-    // This will work because the 'cm()' function returns type compatible with the 'left' property
-    cls1 = this.$class({ left: css.cm(1.5) })
+    // This will work because the liter string "1.5cm" is compatible with and the 'cm()'
+    // function returns type compatible with the 'left' property
+    cls1 = this.$class({ left: "1.5cm" })
+    cls1a = this.$class({ left: css.cm(1.5) })
 
-    // This will NOT compile because the 'rad()' function returns type incompatible with the 'left' property
-    cls2 = this.$class({ left: css.rad(1) })
+    // This will NOT compile because the liter string "1rad" is incompatible with and
+    // the 'rad()' function returns type incompatible with the 'left' property
+    cls2 = this.$class({ left: "1rad" })
+    cls2a = this.$class({ left: css.rad(1) })
 }
 ```
 
@@ -119,10 +123,10 @@ The `min()` and `max()` functions accept a variable number of parameters of the 
 class MyStyles extends css.StyleDefinition
 {
     // This will work because the 'Len.min()' function returns type compatible with the 'left' property
-    cls1 = this.$class({ left: css.Len.min( 100, 10.5, css.inch(1.5), css.percent(50)) })
+    cls1 = this.$class({ left: css.Len.min( 100, 10.5, "1.5in", "50%") })
 
     // This will NOT compile because the 'Angle.min()' function returns type incompatible with the 'left' property
-    cls2 = this.$class({ left: css.Angle.min( 45, 0.25, css.rad(1)) })
+    cls2 = this.$class({ left: css.Angle.min( 45, 0.25, "1rad") })
 }
 ```
 
@@ -132,10 +136,10 @@ The `clamp()` function accepts three parameters of the corresponding numeric typ
 class MyStyles extends css.StyleDefinition
 {
     // This will work because the 'Len.clamp()' function returns type compatible with the 'left' property
-    cls1 = this.$class({ left: css.Len.clamp( 100,  css.inch(1.5), css.percent(50)) })
+    cls1 = this.$class({ left: css.Len.clamp( 100, "1.5in", "50%") })
 
     // This will NOT compile because the 'Angle.min()' function returns type incompatible with the 'left' property
-    cls2 = this.$class({ left: css.Angle.clamp( 45, 0.25, css.rad(1)) })
+    cls2 = this.$class({ left: css.Angle.clamp( 45, 0.25, "1rad") })
 }
 ```
 
@@ -145,14 +149,14 @@ The `calc()` function is a tag function accepting a template string with embedde
 class MyStyles extends css.StyleDefinition
 {
     // This will work because the 'Len.calc()' function returns type compatible with the 'left' property
-    cls1 = this.$class({ left: css.Len.calc`(100% - ${100} - ${css.Len.cm(2)}) / 2` })
+    cls1 = this.$class({ left: css.Len.calc`(100% - ${100} - ${css.cm(2)}) / 2` })
 
     // This will NOT work because the type of the second parameter is not compatible with the 'Len.calc()'
     // function parameter type
-    cls2 = this.$class({ left: css.Len.calc`(100% - ${100} - ${css.Angle.deg(30)}) / 2` })
+    cls2 = this.$class({ left: css.Len.calc`(100% - ${100} - ${css.deg(30)}) / 2` })
 
     // This will NOT compile because the 'Angle.calc()' function returns type incompatible with the 'left' property
-    cls3 = this.$class({ left: css.Angle.calc`(100% - ${100} - ${css.Angle.deg(30)}) / 2` })
+    cls3 = this.$class({ left: css.Angle.calc`(100% - ${100} - ${css.deg(30)}) / 2` })
 }
 ```
 

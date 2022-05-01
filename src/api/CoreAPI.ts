@@ -429,7 +429,7 @@ export const supports = (parts: TemplateStringsArray, ...params: Styleset[]): IS
 
 /**
  * The `raw` function allows specifying arbitrary text for properties whose type normally doesn't
- * allow strings.This function is a tag function and must be invoked with the template string
+ * allow strings. This function is a tag function and must be invoked with the template string
  * without parentheses. The `raw` function can be used for any style property. Note, however, that
  * no validation checks are performed on the structure of the string. If the string isn't valid
  * for the style property, the property will not become part of the style rule inserted into the

@@ -12,14 +12,14 @@ class MyStyles extends css.StyleDefinition
         padding: 1.5,
 
         // values of CSS <angle> type use "deg" for integer numbers and "turn" for floating point numbers
-        fontStyle: 45,
+        fontStyle: 15,
+
+        // using unit literals
+        width: "95%",
+        height: "2in",
 
         // Mimcss provides functions with names corresponding to units
         margin: css.cm(0.5),
-
-        // using unit functions
-        width: css.percent(95),
-        height: css.inch(2),
 
         border: [1, "solid", "black"],
         overflow: "auto",
@@ -50,7 +50,7 @@ class MyStyles extends css.StyleDefinition
 
         // padding can be specified as an array of 2 to 4 elements:
         // 10px 1.4em 0.5cm 1%
-        padding: [10, 1.4, css.cm(0.5), css.percent(1)],
+        padding: [10, 1.4, "0.5cm", "1%"],
     })
 
     init = [

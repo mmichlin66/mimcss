@@ -22,9 +22,9 @@ class MyStyles extends css.StyleDefinition
 
     mover = this.$class({
         // define propeties common for all "movers"
-        width: css.vmin(15),
-        height: css.vmin(15),
-        borderRadius: css.percent(10),
+        width: "15vmin",
+        height: "15vmin",
+        borderRadius: "10%",
 
         // define transform using the custom properties whose values are controled by user
         transform: [
@@ -65,9 +65,9 @@ class MyStyles extends css.StyleDefinition
 
     controls = this.$id({
         position: "absolute",
-        right: css.rem(1),
-        bottom: css.percent(50),
-        transform: css.translateY( css.percent(50)),
+        right: "1rem",
+        bottom: "50%",
+        transform: css.translateY( "50%"),
         display: "flex",
         flexDirection: "column",
     })
@@ -78,7 +78,7 @@ class MyStyles extends css.StyleDefinition
             class extends css.StyleDefinition<MyStyles>
             {
                 controls = this.$id({
-                    right: css.percent(50),
+                    right: "50%",
                     bottom: 0,
                     transform: css.translateX( css.percent(50))
                 })
@@ -86,7 +86,7 @@ class MyStyles extends css.StyleDefinition
         ),
 
         this.$tag( "input", {
-            width: css.rem(12),
+            width: "12rem",
             marginBottom: css.rem(1)
         }),
 
@@ -94,7 +94,7 @@ class MyStyles extends css.StyleDefinition
             display: "flex",
             justifyContent: "space-between",
             color: "white",
-            fontSize: css.rem(0.85),
+            fontSize: "0.85rem",
             fontFamily: "system-ui, -apple-system, sans-serif"
         })
     ]

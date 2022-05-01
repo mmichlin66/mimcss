@@ -175,6 +175,10 @@ export interface ICssColorFunc extends ICssFuncObject {
     fn: "rgb" | "hsl" | "hwb" | "lab" | "lch" | "color-mix" | "color-contrast" | "color" | "alpha";
 }
 /**
+ * Type representing all possible color keywords; that is, colors that can be expressed as a string
+ */
+export declare type ColorKeywords = keyof INamedColors | "transparent" | "currentcolor" | SystemColors;
+/**
  * Type for CSS color. Color can be represented using the following types:
  * - keywords: any string that is a name of a property in the [[INamedColors]] interface or of the
  *   [[SystemColors]] type.
@@ -221,7 +225,7 @@ export interface ICssColorFunc extends ICssFuncObject {
  * }
  * ```
  */
-export declare type CssColor = number | keyof INamedColors | "transparent" | "currentcolor" | SystemColors | IRgbFunc | IHslFunc | IHwbFunc | ILabFunc | ILchFunc | IColorMixFunc | IColorContrastFunc | IColorFunc | IAlphaFunc;
+export declare type CssColor = number | ColorKeywords | IRgbFunc | IHslFunc | IHwbFunc | ILabFunc | ILchFunc | IColorMixFunc | IColorContrastFunc | IColorFunc | IAlphaFunc;
 /**
 * Type for CSS color that exclude numeric color representation. Color can be represented using
 * the following types:

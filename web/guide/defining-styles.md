@@ -53,7 +53,7 @@ class MyStyles extends css.StyleDefinition
 
     button3 = this.$class({
         backgroundColor: 0xFF00,            // green
-        padding: [4, css.inch(0.1)],        // 4px top and bottom, 0.1in left and right
+        padding: [4, "0.1in"],        // 4px top and bottom, 0.1in left and right
         border: [1, "solid", "brown"],      // defined as a three element tuple
         transform: css.rotate(30),          // rotate(30deg)
     })

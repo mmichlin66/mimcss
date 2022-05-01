@@ -6,7 +6,7 @@ import {
     VerticalPositionKeyword, IFitContentProxy, ILengthProxy, CssAspectRatio, CssLengthOrAuto,
     AngleUnits, FrequencyUnits, LengthUnits, PercentUnits, ResolutionUnits, TimeUnits
 } from "./NumericTypes"
-import {CssColor, CssNonNumericColor} from "./ColorTypes";
+import {ColorKeywords, CssColor, CssNonNumericColor} from "./ColorTypes";
 import {FontStretchKeyword, FontStyle, FontWeight, SystemFont} from "./FontTypes";
 import {
     BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs,
@@ -367,6 +367,26 @@ export type BorderSpacing_StyleType = OneOrPair<CssLength>;
 
 
 
+// !!!!!!!!!!!!!!! The following is a correct template litral type, but it causes the compiler
+// !!!!!!!!!!!!!!! to almost hang because of bit number combintaions.
+// /**
+//  * Type for specifying [[border]] style property value as an object
+//  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border" target="mdn">MDN Page</a>
+//  */
+// export type BorderLiteral =
+//     `${number}${LengthUnits} ${BorderStyle}` |
+//     `${number}${LengthUnits} ${ColorKeywords}` |
+//     `${BorderStyle} ${number}${LengthUnits}` |
+//     `${BorderStyle} ${ColorKeywords}` |
+//     `${ColorKeywords} ${number}${LengthUnits}` |
+//     `${ColorKeywords} ${BorderStyle}` |
+//     `${number}${LengthUnits} ${BorderStyle} ${ColorKeywords}` |
+//     `${number}${LengthUnits} ${ColorKeywords} ${BorderStyle}` |
+//     `${BorderStyle} ${number}${LengthUnits} ${ColorKeywords}` |
+//     `${BorderStyle} ${ColorKeywords} ${number}${LengthUnits}` |
+//     `${ColorKeywords} ${number}${LengthUnits} ${BorderStyle}` |
+//     `${ColorKeywords} ${BorderStyle} ${number}${LengthUnits}`;
+
 /**
  * Type for specifying [[border]] style property value as an object
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border" target="mdn">MDN Page</a>
@@ -392,7 +412,7 @@ export type BorderTuple =
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border" target="mdn">MDN Page</a>
  */
 export type Border_StyleType = LineWidth | BorderStyle | CssNonNumericColor |
-    BorderTuple | BorderObject;
+    BorderTuple | BorderObject /*BorderLiteral*/;
 
 
 
