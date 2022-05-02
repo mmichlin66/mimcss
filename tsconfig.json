@@ -20,7 +20,11 @@
 		"target": "esnext",
 		"lib": [ "esnext", "dom" ],
 		"rootDir": "src",
-		"outDir": "./lib"
+		"outDir": "./lib",
+        "baseUrl": ".",
+        "paths": {
+            "mimcss": ["src/index.ts"]
+        }
 	},
 
 	"include": [

@@ -1,6 +1,5 @@
-import { IVarRule } from "../../api/RuleTypes"
-import { isEmpty } from "../../impl/Virt";
 import * as css from "../../index"
+import { isEmpty } from "../../impl/Virt";
 
 
 describe("style definition", () =>
@@ -9,11 +8,11 @@ describe("style definition", () =>
     {
         interface IA
         {
-            a1?: IVarRule<"color">;
+            a1?: css.IVarRule<"color">;
             a2?: {
-                a21?: IVarRule<"color">;
-                a22?: IVarRule<"color">;
-                a23?: IVarRule<"color">;
+                a21?: css.IVarRule<"color">;
+                a22?: css.IVarRule<"color">;
+                a23?: css.IVarRule<"color">;
             }
         }
 
