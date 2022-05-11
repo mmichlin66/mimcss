@@ -1,5 +1,5 @@
 import { CssColor, MediaStatement, IIDRule } from "mimcss";
-import { IElementProps, ReferrerPolicyPropType, FormtargetPropType, CrossoriginPropType, FormenctypePropType, FormmethodPropType, ExtendedElementAttr } from "./mim";
+import { IElementProps, ReferrerPolicyPropType, FormtargetPropType, CrossoriginPropType, FormenctypePropType, FormmethodPropType, ExtendedElementAttr } from "./CompTypes";
 /**
  * Contains global HTML attributes
  */

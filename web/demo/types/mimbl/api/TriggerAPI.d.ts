@@ -1,23 +1,4 @@
-import { IEventSlot } from "../api/EventSlotTypes";
-/** Type for functions that accept any number of parameters and return any type */
-export declare type AnyAnyFunc = (...args: any[]) => any;
-/** Type for functions that accept no parameters and return values of any type */
-export declare type NoneTypeFunc<T> = () => T;
-/** Type for functions that accept no parameters and don't return any value */
-export declare type NoneVoidFunc = () => void;
-/** Type for functions that accept one parameter of the given type and don't return any value */
-export declare type TypeVoidFunc<T> = (v: T) => void;
-/**
- * The ITrigger interface represents an object that keeps a value and notifies all attached wathers
- * when this value changes.
- * @typeparam T Type of the trigger value.
- */
-export interface ITrigger<T = any> extends IEventSlot<TypeVoidFunc<T>> {
-    /** Retrieves the current value */
-    get(): T;
-    /** Sets a new value */
-    set(v: T): void;
-}
+import { AnyAnyFunc, ITrigger, IWatcher, NoneTypeFunc, NoneVoidFunc } from "./TriggerTypes";
 /**
  * Creates a trigger object of the given depth with the given initial value.
  * @typeparam T Type of the trigger value.
@@ -32,20 +13,6 @@ export declare function createTrigger<T = any>(v?: T, depth?: number): ITrigger<
  * @returns True if the object is a trigger and false otherwise
  */
 export declare const isTrigger: (obj: object) => obj is ITrigger<any>;
-/**
- * The IWatcher interface represents a callable object that wraps a function and has the same
- * signature as this function. When a watcher is called it calls the wrapped function and attaches
- * to all triggers whose values were read during the course of the call. When values of these
- * triggers change, a responder function is called. The responder function is provided when the
- * watcher is created, but it can be changed later.
- * @typeparam T Type (signature) of the function to be watched.
- */
-export interface IWatcher<T extends AnyAnyFunc = any> {
-    /** This is a callable interface, which is implement as a function. */
-    (...args: Parameters<T>): ReturnType<T>;
-    /** Clears internal resources. */
-    dispose(): void;
-}
 /**
  * Creates a watcher function with the same signature as the given regular function. When the
  * watcher function is invoked it invokes the original function and it notices all trigger objects
@@ -94,4 +61,4 @@ export declare const trigger: (targetOrDepth: any, name?: string) => any;
  * be notified to respond.
  */
 export declare const computed: (target: any, name: string, propDescr: PropertyDescriptor) => void;
-//# sourceMappingURL=TriggerWatcher.d.ts.map
+//# sourceMappingURL=TriggerAPI.d.ts.map

@@ -7,8 +7,8 @@
         {
             "text": "mimcss build",
             "color": "white",
-            "commandType": "script",
-            "command": "build",
+            "commandType": "exec",
+            "command": "tsc -b && webpack --no-color",
             "alignment": "left",
             "priority": 1
         },

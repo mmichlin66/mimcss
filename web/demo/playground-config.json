@@ -33,9 +33,13 @@
             "url": "/lib/mimbl",
             "files": [
                 "index.d.ts",
-                "utils/EventSlot.d.ts",
-                "utils/TriggerWatcher.d.ts",
                 "api/UtilAPI.d.ts",
+                "utils/EventSlotTypes.d.ts",
+                "utils/EventSlotAPI.d.ts",
+                "utils/TriggerTypes.d.ts",
+                "utils/TriggerAPI.d.ts",
+                "api/CompTypes.d.ts",
+                "api/CompAPI.d.ts",
                 "api/HtmlTypes.d.ts",
                 "api/SvgTypes.d.ts",
                 "api/mim.d.ts"

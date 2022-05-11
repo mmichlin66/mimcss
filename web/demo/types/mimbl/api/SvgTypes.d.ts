@@ -1,5 +1,9 @@
-import { IElementProps, ReferrerPolicyPropType, FormtargetPropType, CrossoriginPropType, ExtendedElementAttr } from "./mim";
 import { MediaStatement } from "mimcss";
+import { IElementProps, ReferrerPolicyPropType, FormtargetPropType, CrossoriginPropType, ExtendedElementAttr } from "./CompTypes";
+/**
+ * The ISvgElementProps interface defines standard properties (attributes and event listeners)
+ * that can be used on all SVG elements.
+ */
 export interface ISvgElementProps extends IElementProps<SVGElement> {
 }
 export declare type PreserveAspectRatioPropType = "none" | "xMinYMin" | "xMidYMin" | "xMaxYMin" | "xMinYMid" | "xMidYMid" | "xMaxYMid" | "xMinYMax" | "xMidYMax" | "xMaxYMax" | "meet" | "slice";
