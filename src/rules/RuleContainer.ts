@@ -129,6 +129,18 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
         return true;
     }
 
+    // has to implement the defineProperty trap because it will be called instead of the set method
+    //if the the "target" field in tsconfig.json is set to ESNext.
+    defineProperty(t: any, p: PropertyKey, attrs: PropertyDescriptor): boolean
+    {
+
+        if (typeof p !== "string" || !attrs.configurable || !attrs.writable)
+            return Reflect.defineProperty( t, p, attrs);
+
+        virtProp( t, p, attrs.value, [p], this);
+        return true;
+    }
+
 
 
     /**

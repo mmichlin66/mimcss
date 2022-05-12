@@ -215,6 +215,7 @@ export const virtProp = (obj: any, key: PropertyKey, val: any,
     // define enumerable property with get and set
     Object.defineProperty( obj, key,
     {
+        configurable: true,
         enumerable: true,
 
         get(): any { return proxy; },
