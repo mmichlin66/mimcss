@@ -59,6 +59,8 @@ Mimcss contains many exported types and functions; therefore, it is recommended 
 import * as css from "mimcss"
 ```
 
+> **Note**: if the `target` field in your `tsconfig.json` file is `ES2022` or higher including `ESNext`, then set the `useDefineForClassFields` field to `false`; otherwise, Type Script decorators will not work properly.
+
 Mimcss provides [Reference](../typedoc.html) documents for developers, which undergo constant improvements. Mimcss also provides a [Playground](../demo/playground.html), where you can explore Mimcss examples as well as write your own TypeScript code using Mimcss features and immediately see the results.
 
 ## Quick start
