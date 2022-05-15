@@ -75,7 +75,6 @@ export declare function registerCustomEvent(eventName: string): void;
  * method.
  */
 export declare abstract class Component<TProps = {}, TChildren = any> implements IComponent<TProps, TChildren> {
-    constructor(props?: CompProps<TProps, TChildren>);
     /**
      * Remembered virtual node object through which the component can request services. This
      * is undefined in the component's costructor but will be defined before the call to the
@@ -87,11 +86,18 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * components and is usually undefined for independent components.
      */
     props: CompProps<TProps, TChildren>;
+    constructor(props?: CompProps<TProps, TChildren>);
     /**
      * Returns the component's content that will be ultimately placed into the DOM tree. This
      * method is abstract because it must be implemented by every component.
      */
     abstract render(): any;
+    /**
+     * Stores the new properties in the [[props]] field. If the component overrides this method
+     * it must call the parent's implementation.
+     * @param newProps
+     */
+    updateProps(newProps: CompProps<TProps, TChildren>): void;
     displayName?: string;
     willMount?(): void;
     didMount?(): void;
@@ -111,12 +117,9 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * provided, the entire component is requested to be updated. If arguments are provided, they
      * indicate what rendering functions should be updated.
      * @param func Optional rendering function to invoke
-     * @param thisArg Optional value to use as "this" when invoking the rendering function. If
-     * undefined, the component's "this" will be used.
-     * @param key Optional key which distinguishes between multiple uses of the same function. This
-     * can be either the "arg" or the "key" property originally passed to the FunProxy component.
+     * @param arg Optional argument to pass to the rendering function.
      */
-    protected updateMe(func?: RenderMethodType, thisArg?: any, key?: any): void;
+    protected updateMe(func?: RenderMethodType, arg?: any): void;
     /**
      * Schedules the given function to be called before any components scheduled to be updated in
      * the Mimbl tick are updated.

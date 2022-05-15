@@ -25,6 +25,10 @@ export declare class EventSlot<TFunc extends EventSlotFunc = any> implements IEv
      * optimize by not creating a set of listeners.
      */
     private listener?;
+    /**
+     * Reference counter of the listener function.
+     */
+    private rc;
     private listeners?;
 }
 /**

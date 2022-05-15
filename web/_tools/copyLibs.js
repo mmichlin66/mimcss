@@ -26,9 +26,8 @@ exec("xcopy ..\\..\\mimcss\\lib\\api\\*.d.ts               demo\\types\\mimcss\\
 
 console.log("Copy mimbl types to " + p.join(ps.cwd(), "demo/types/mimbl"));
 exec("xcopy ..\\..\\mimbl\\lib\\index.d.ts                 demo\\types\\mimbl\\ /i /y /d");
-exec("xcopy ..\\..\\mimbl\\lib\\utils\\EventSlot.d.ts      demo\\types\\mimbl\\utils\\ /i /y /d");
-exec("xcopy ..\\..\\mimbl\\lib\\utils\\TriggerWatcher.d.ts demo\\types\\mimbl\\utils\\ /i /y /d");
 exec("xcopy ..\\..\\mimbl\\lib\\api\\*.d.ts                demo\\types\\mimbl\\api\\ /i /y /d");
+exec("xcopy ..\\..\\mimbl\\lib\\jsx\\*.d.ts                demo\\types\\mimbl\\jsx\\ /i /y /d");
 
 console.log("copyLibs.js script has finished");
 

@@ -34,15 +34,15 @@
             "files": [
                 "index.d.ts",
                 "api/UtilAPI.d.ts",
-                "utils/EventSlotTypes.d.ts",
-                "utils/EventSlotAPI.d.ts",
-                "utils/TriggerTypes.d.ts",
-                "utils/TriggerAPI.d.ts",
+                "api/EventSlotTypes.d.ts",
+                "api/EventSlotAPI.d.ts",
+                "api/TriggerTypes.d.ts",
+                "api/TriggerAPI.d.ts",
                 "api/CompTypes.d.ts",
                 "api/CompAPI.d.ts",
                 "api/HtmlTypes.d.ts",
                 "api/SvgTypes.d.ts",
-                "api/mim.d.ts"
+                "jsx/mim.d.ts"
             ],
             "rootPath": "types/mimbl/"
         }
