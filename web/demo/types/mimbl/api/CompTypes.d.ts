@@ -32,7 +32,7 @@ export interface IComponentClass<TProps = {}, TChildren = any> {
  *   it with mode "open".
  * - ShadowRootInit - a `<div>` element will be created and shadow root attached to
  *   it with the given initialization prameters.
- * - two-item tuple - the first items is the name of the element to create and attach a  shadow
+ * - two-item tuple - the first item is the name of the element to create and attach a shadow
  *   root to; the second item specifies the shadow root initialization prameters.
  */
 export declare type ComponentShadowOptions = boolean | string | ShadowRootInit | [
@@ -44,6 +44,9 @@ export declare type ComponentShadowOptions = boolean | string | ShadowRootInit |
  * components can implement, in practice, there is only one mandatory method - `render()`.
  * Components should be ready to have the `vn` property set, although they don't have to declare
  * it.
+ *
+ * Note that you normally don't need to implement this interface because your components will
+ * usually derive from the [[Component]] class that implements it.
  *
  * @typeparam TProps Type defining properties that can be passed to this class-based component.
  *		Default type is an empty object (no properties).
@@ -87,13 +90,13 @@ export interface IComponent<TProps = {}, TChildren = any> {
     /**
      * This method is only used by independent components.
      *
-     * Notifies the component that it replaced the given old component. This allows the new
+     * Notifies the component that it replaced the given component. This allows the new
      * component to copy whatever internal state it needs from the old component.
      */
     didReplace?(oldComp: IComponent<TProps, TChildren>): void;
     /**
      * Notifies that the component's content is going to be removed from the DOM tree. After
-     * this method returns the component is destroyed.
+     * this method returns, a managed component is destroyed.
      */
     willUnmount?(): void;
     /**
@@ -214,21 +217,29 @@ export declare type IDPropType = string | number | IIDRule;
 /**
  * The ICommonProps interface defines standard properties that can be used on all JSX elements -
  * intrinsic (HTML and SVG) as well as functional and class-based managed components.
+ * @typeparam TRef Type of the element or component used as a reference type.
  */
 export interface ICommonProps<TRef = any> {
     /** Unique key that distinguishes this JSX element from its siblings. The key can be of any type. */
-    key?: any;
+    readonly key?: any;
     readonly ref?: RefPropType<TRef>;
 }
+/** Type for `crossorigin` attribute used for some HTML and SVG elements */
 export declare type CrossoriginPropType = "anonymous" | "use-credentials";
+/** Type for `formenctype` attribute used for some HTML and SVG elements */
 export declare type FormenctypePropType = "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
+/** Type for `formmethod` attribute used for some HTML and SVG elements */
 export declare type FormmethodPropType = "get" | "post" | "dialog";
+/** Type for `formtarget` attribute used for some HTML and SVG elements */
 export declare type FormtargetPropType = string | "_self" | "_blank" | "_parent" | "_top";
+/** Type for `referrerpolicy` attribute used for some HTML and SVG elements */
 export declare type ReferrerPolicyPropType = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "unsafe-url";
+/**
+ * Type that allows defining attributes of HTML and SVG elements in terms of simple types (e.g.
+ * `string`), but allowing to pass triggers of this type to them. This is used to optimize
+ * re-rendering when the value of the attribute changes.
+ */
 export declare type ExtendedElementAttr<T> = T | ITrigger<T>;
-export declare type ExtendedElementProps<T extends IElementEvents> = {
-    [K in keyof T]?: T[K] | ITrigger<T[K]>;
-};
 /** Global events that are common to all kind of HTML entities */
 export declare type IGlobalEvents = {
     [K in keyof GlobalEventHandlersEventMap]?: EventPropType<GlobalEventHandlersEventMap[K]>;
@@ -244,6 +255,9 @@ export declare type IDocumentAndElementEvents = {
 /**
  * The IElementProps interface defines standard properties (attributes and event listeners)
  * that can be used on all HTML and SVG elements.
+ * @typeparam TRef Type of the element used as a reference type.
+ * @typeparam TChildren Type of the children the element can have. By default, elements can have
+ * any children.
  */
 export interface IElementProps<TRef extends Element = Element, TChildren = any> extends ICommonProps<TRef>, IGlobalEvents, IElementEvents, IDocumentAndElementEvents {
     /**
@@ -360,6 +374,28 @@ export interface IVNode {
      */
     readonly name?: string;
     /**
+     * Schedules the given function to be called either before any components scheduled to be
+     * updated in the Mimbl tick are updated or after all components have been updated.
+     * @param func Function to be called
+     * @param beforeUpdate Flag indicating whether the function will be called just before the Mimbl
+     * tick (true) or right after (false)
+     * @param thisArg Object that will be used as "this" value when the function is called. If this
+     *   parameter is undefined, the component instance will be used (which allows scheduling
+     *   regular unbound components' methods). This parameter will be ignored if the function
+     *   is already bound or is an arrow function.
+     */
+    callMe(func: ScheduledFuncType, beforeUpdate: boolean, thisArg?: any): void;
+    /**
+     *
+     * @param func Callback function to be wrapped
+     * @param thisArg Object to be used as `this` when calling the callback
+     * @param arg Optional argument to be passed to the callback in addition to the original
+     * callback arguments.
+     * @param schedulingType Type of scheduling the Mimbl tick after the callback function returns.
+     * @returns Wrapped callback that will run the original callback in the proper context.
+     */
+    wrap<T extends Function>(func: T, thisArg: any, arg?: any, schedulingType?: TickSchedulingType): T;
+    /**
      * Registers an object of any type as a service with the given ID that will be available for
      * consumption by descendant components.
      */
@@ -402,6 +438,11 @@ export interface IVNode {
 export interface IClassCompVN extends IVNode {
     /** Gets the component instance. */
     readonly comp: IComponent;
+    /**
+     * Object that is used mainly by the managed components. It keeps the properties first passed
+     * to the componet's constructor and then changed when the component is updated through its
+     * parent updates.
+     */
     readonly props: any;
     /**
      * If the component specifies the [[shadow]] property, the `shadowRoot` property will be set
@@ -412,19 +453,7 @@ export interface IClassCompVN extends IVNode {
      */
     readonly shadowRoot?: ShadowRoot;
     /** This method is called by the component when it needs to be updated. */
-    updateMe(func?: RenderMethodType, funcThisArg?: any, key?: any): void;
-    /**
-     * Schedules the given function to be called before any components scheduled to be updated in
-     * the Mimbl tick are updated.
-     * @param func Function to be called
-     * @beforeUpdate Flag indicating whether the function will be called just before the Mimbl
-     * tick (true) or right after (false)
-     * @param funcThisArg Object that will be used as "this" value when the function is called. If this
-     *   parameter is undefined, the component instance will be used (which allows scheduling
-     *   regular unbound components' methods). This parameter will be ignored if the function
-     *   is already bound or is an arrow function.
-     */
-    callMe(func: ScheduledFuncType, beforeUpdate: boolean, funcThisArg?: any): void;
+    updateMe(func?: RenderMethodType, thisArg?: any, key?: any): void;
 }
 /**
  * The IManagedCompVN interface represents a virtual node for a JSX-based component.
@@ -628,27 +657,9 @@ export declare const enum TickSchedulingType {
     AnimationFrame = 3
 }
 /**
- * Definition of type of  method that renders content.
+ * Definition of type of method that renders content.
  */
-export declare type RenderMethodType = (arg: any) => any;
-/**
- * Properties to be used with the FuncProxy component. FuncProxy component cannot have children.
- */
-export interface FuncProxyProps extends ICommonProps {
-    /** Function that renders content. */
-    func: RenderMethodType;
-    /**
-     * Value to be used as "this" when invoking the function. If this value is undefined, the
-     * class based component that rendered the FuncProxy component will be used (which is the
-     * most common case).
-     */
-    thisArg?: any;
-    /**
-     * Arguments to be passed to the function. Whenever the FuncProxy component is rendered, this
-     * parameter is used when calling the wrapped function.
-     */
-    arg?: any;
-}
+export declare type RenderMethodType = (arg?: any) => any;
 /**
  * Properties to be used with the PromiseProxy component.
  */

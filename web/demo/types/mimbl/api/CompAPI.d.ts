@@ -1,4 +1,4 @@
-import { CallbackWrappingParams, ComponentShadowOptions, CompProps, FuncProxyProps, IClassCompVN, IComponent, ICustomAttributeHandlerClass, IRef, ITextVN, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, UpdateStrategy } from "./CompTypes";
+import { CallbackWrappingParams, ComponentShadowOptions, CompProps, IClassCompVN, IComponent, ICustomAttributeHandlerClass, IRef, ITextVN, IVNode, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, TickSchedulingType, UpdateStrategy } from "./CompTypes";
 import { EventSlot } from "./EventSlotAPI";
 /**
  * Decorator function for components that allows them to use shadow DOM.
@@ -111,69 +111,77 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * provided, the entire component is requested to be updated. If arguments are provided, they
      * indicate what rendering functions should be updated.
      * @param func Optional rendering function to invoke
-     * @param funcThisArg Optional value to use as "this" when invoking the rendering function. If
+     * @param thisArg Optional value to use as "this" when invoking the rendering function. If
      * undefined, the component's "this" will be used.
      * @param key Optional key which distinguishes between multiple uses of the same function. This
      * can be either the "arg" or the "key" property originally passed to the FunProxy component.
      */
-    protected updateMe(func?: RenderMethodType, funcThisArg?: any, key?: any): void;
+    protected updateMe(func?: RenderMethodType, thisArg?: any, key?: any): void;
     /**
      * Schedules the given function to be called before any components scheduled to be updated in
      * the Mimbl tick are updated.
      * @param func Function to be called
-     * @param funcThisArg Object that will be used as "this" value when the function is called. If this
+     * @param thisArg Object that will be used as "this" value when the function is called. If this
      *   parameter is undefined, the component instance will be used (which allows scheduling
      *   regular unbound components' methods). This parameter will be ignored if the function
      *   is already bound or is an arrow function.
      */
-    protected callMeBeforeUpdate(func: ScheduledFuncType, funcThisArg?: any): void;
+    protected callMeBeforeUpdate(func: ScheduledFuncType, thisArg?: any): void;
     /**
      * Schedules the given function to be called after all components scheduled to be updated in
      * the Mimbl tick have already been updated.
      * @param func Function to be called
-     * @param funcThisArg Object that will be used as "this" value when the function is called. If this
+     * @param thisArg Object that will be used as "this" value when the function is called. If this
      *   parameter is undefined, the component instance will be used (which allows scheduling
      *   regular unbound components' methods). This parameter will be ignored if the the function
      *   is already bound or is an arrow function.
      */
-    protected callMeAfterUpdate(func: ScheduledFuncType, funcThisArg?: any): void;
+    protected callMeAfterUpdate(func: ScheduledFuncType, thisArg?: any): void;
+    /**
+     *
+     * @param func Callback function to be wrapped
+     * @param arg Optional argument to be passed to the callback in addition to the original
+     * callback arguments.
+     * @param thisArg Optional object to be used as `this` when calling the callback. If this
+     * parameter is not defined, the component instance is used, which allows wrapping regular
+     * unbound components' methods. This parameter will be ignored if the the function
+     *   is already bound or is an arrow function.
+     * @param schedulingType Type of scheduling the Mimbl tick after the callback function returns.
+     * @returns Wrapped callback that will run the original callback in the proper context.
+     */
+    wrap<T extends Function>(func: T, arg?: any, thisArg?: any, schedulingType?: TickSchedulingType): T;
 }
 /**
- * The FuncProxy component wraps a function that produces content. Proxies can wrap instance
- * methods of classes that have access to "this" thus allowing a single class to "host" multiple
- * components that can be updated separately. The FuncProxy component is not intended to be
- * created by developers; instead it is only used in its JSX form as the following:
+ * Creates a Function Proxy virtual node that wraps the given function with the given argument.
+ * This allows using the same component method with different arguments, for example:
  *
- * ```tsx
- * <FuncProxy func={this.renderSomething} key={...} args={...} thisArg={...} />
+ * ```typescript
+ * class ToDoList extends mim.Component
+ * {
+ *     // array of objects of some externally defined ToDo type
+ *     todos: ToDo[] = [];
+ *
+ *     render(): any
+ *     {
+ *         return <main>
+ *             {this.todos.map( todo => FuncProxy(renderTodo, todo))}
+ *         </main>
+ *     }
+ *
+ *     renderToDo( todo: ToDo): any
+ *     {
+ *         return <div>{todo.description}</div>
+ *     }
+ * }
  * ```
  *
- * There is a simpler method of specifying a rendering function in JSX, e.g.:
- *
- * ```tsx
- * <div>{this.renderSomething}</div>
- * ```
- *
- * The FuncProxy component is needed in the case where one (or more) of the following is true:
- * - There is a need to pass arguments to the function
- * - The same function is used multiple times and keys must be used to distinguish between the
- * invocations.
- * - The value of "this" inside the function is not the component that does the rendering. That
- * is, the function is not a method of this component.
- *
- * FuncProxy has a public static Update method that can be called to cause the rendering mechanism
- * to invoke the function wrapped by the FuncProxy.
+ * @param func Function (usually a component method) to be wrapped in a virtual node
+ * @param arg Argument distinguishing one function invocation from another
+ * @param thisArg Optional object to be used as `this` when invoking the function. If omitted,
+ * the component instance will be used.
+ * @returns
  */
-export declare class FuncProxy extends Component<FuncProxyProps, void> {
-    /**
-     * Instances of the FuncProxy component are never actually created; istead, the parameters
-     * passed to it via JSX are used by an internal virtual node that handles function
-     * invocation.
-     */
-    private constructor();
-    /** The render method of the FuncProxy component is never actually called */
-    render(): any;
-}
+export declare const FuncProxy: (func: RenderMethodType, arg?: any, thisArg?: any) => IVNode;
 /**
  * The PromiseProxy component wraps a Promise and replaces its content when the promise is settled.
  * Before the promise is settled, the component displays an optional "in-progress" content

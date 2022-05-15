@@ -2,7 +2,7 @@
 import {
     BorderImage_Object, Border_StyleType, GridTemplateAreas_StyleType,
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
-    BoxShadow_StyleType, BoxShadow_Single, BorderTuple,
+    BoxShadow_StyleType, BoxShadow,
 } from "../api/StyleTypes";
 import { CustomVar_StyleType, IStyleset, StringStyleset, Styleset} from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
@@ -30,8 +30,8 @@ const borderImageToString = (val: BorderImage_Object): string =>
     return o2s( valCopy, [
         "source",
         "slice",
-        ["width", undefined, "/"],
-        ["outset", undefined, "/"],
+        ["width", , "/"],
+        ["outset", , "/"],
         "repeat",
         "mode"
     ]);
@@ -39,11 +39,11 @@ const borderImageToString = (val: BorderImage_Object): string =>
 
 
 
-wkf[WKF.BoxShadowSingle] = (val: BoxShadow_Single) => v2s( val, {
+wkf[WKF.BoxShadowSingle] = (val: BoxShadow) => v2s( val, {
     obj:[
         ["inset", (v: boolean) => v ? "inset" : ""],
-        ["x", WKF.Length],
-        ["y", WKF.Length],
+        ["x", WKF.Length, , "0"],
+        ["y", WKF.Length, , "0"],
         ["blur", WKF.Length],
         ["spread", WKF.Length],
         ["color", WKF.Color]
@@ -515,7 +515,7 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
             "weight",
             "stretch",
             ["size", WKF.Length],
-            ["lineHeight", undefined, "/"],
+            ["lineHeight", , "/"],
             "family"
         ]
     },

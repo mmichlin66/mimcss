@@ -106,8 +106,10 @@ export let wkf: AnyToStringFunc[] = new Array( WKF.Last);
  * this property is converted to a string. The type is either a property name or a tuple
  * where the first element is the property name and the second element is the V2SOptions value.
  * If the tuple has a third string element it is placed before the converted property value.
+ * If the tuple has a fourth string element and the corresponding property in the object is not
+ * defined, the fourth element is used as the default value.
  */
-export type P2SOption = string | [string, V2SOptions?, string?];
+export type P2SOption = string | [string, V2SOptions?, string?, string?];
 
 /**
  * The P2SOptions type defines names of properties of an object along with the options of how
@@ -311,12 +313,19 @@ export const o2s = (val: {[p:string]: any}, options: P2SOptions, separator?: str
     let params: string[] = [];
     for( let nameOrTuple of options)
     {
+        let tuple = typeof nameOrTuple === "string" ? undefined : nameOrTuple;
+
         // get the name of the property in the value to be converted and the corresponding value;
-        // if the properties value is not defined, skip it.
-        let propName = typeof nameOrTuple === "string" ? nameOrTuple : nameOrTuple[0];
+        // if the properties value is not defined, use default value if defined or skip it.
+        let propName = tuple ? nameOrTuple[0] : (nameOrTuple as string);
         let propVal = val[propName];
         if (propVal == null)
+        {
+            if (tuple?.[3])
+                params.push(tuple[3]);
+
             continue;
+        }
 
         // check whether we have a prefix
         let prefix = typeof nameOrTuple === "string" ? defaultPrefix : nameOrTuple[2];

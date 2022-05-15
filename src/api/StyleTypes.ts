@@ -262,7 +262,7 @@ export type BackgroundRepeat_StyleType = OneOrMany<BackgroundRepeat>;
 
 /**
  * Type for background size
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-size" target="mdn">MDN Page</a>
  */
 export type BackgroundSize = "cover" | "contain" | OneOrPair<CssLengthOrAuto>;
 
@@ -279,7 +279,6 @@ export type BackgroundSize = "cover" | "contain" | OneOrPair<CssLengthOrAuto>;
  * [[100,200]] will be interpreted as "100px 200px".
  *
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-size" target="mdn">MDN Page</a>
- *
  */
 export type BackgroundSize_StyleType = OneOrMany<BackgroundSize>;
 
@@ -288,7 +287,6 @@ export type BackgroundSize_StyleType = OneOrMany<BackgroundSize>;
 /**
  * Type for [[baselineShift]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/baseline-shift" target="mdn">MDN Page</a>
- *
  */
 export type BaselineShift_StyleType = "sub" | "super" | CssLength;
 
@@ -297,7 +295,6 @@ export type BaselineShift_StyleType = "sub" | "super" | CssLength;
 /**
  * Type for [[borderCollapse]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-collapse" target="mdn">MDN Page</a>
- *
  */
 export type BorderColapse_StyleType = "collapse" | "separate";
 
@@ -306,7 +303,6 @@ export type BorderColapse_StyleType = "collapse" | "separate";
 /**
  * Type for [[borderColor]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-color" target="mdn">MDN Page</a>
- *
  */
 export type BorderColor_StyleType = OneOrBox<CssColor>;
 
@@ -314,7 +310,7 @@ export type BorderColor_StyleType = OneOrBox<CssColor>;
 
 /**
  * Type for border-image style property expressed as an object.
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image" target="mdn">MDN Page</a>
  */
 export type BorderImage_Object =
     {
@@ -328,7 +324,6 @@ export type BorderImage_Object =
 /**
  * Type for [[borderImage]] style property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image" target="mdn">MDN Page</a>
- *
  */
 export type BorderImage_StyleType = CssImage | BorderImage_Object | string;
 
@@ -336,20 +331,18 @@ export type BorderImage_StyleType = CssImage | BorderImage_Object | string;
  * Type for [[borderImageOutset]] style property. It is CssNumber and not CssLength because
  * border-image-outset can be specified as a unitless number.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-outset" target="mdn">MDN Page</a>
- *
  */
 export type BorderImageOutset_StyleType = OneOrBox<CssNumber | ILengthProxy>;
 
 /**
  * Type for border-image-repeat keywords
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-repeat" target="mdn">MDN Page</a>
  */
 export type BorderImageRepeatKeyword = "stretch" | "repeat" | "round" | "space";
 
 /**
  * Type for [[borderImageRepeat]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-repeat" target="mdn">MDN Page</a>
- *
  */
 export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeatKeyword>;
 
@@ -358,7 +351,6 @@ export type BorderImageRepeat_StyleType = OneOrPair<BorderImageRepeatKeyword>;
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-slice" target="mdn">MDN Page</a>
  *
  * Note: numeric values are treated as is - without appending the percent sign to them.
- *
  */
 export type BorderImageSlice_StyleType = OneOrBox<CssPercent | "fill"> |
     [Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, Extended<CssPercent>, "fill"];
@@ -366,7 +358,6 @@ export type BorderImageSlice_StyleType = OneOrBox<CssPercent | "fill"> |
 /**
  * Type for [[borderImageSource]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-source" target="mdn">MDN Page</a>
- *
  */
 export type BorderImageSource_StyleType = CssImage | "none";
 
@@ -374,7 +365,6 @@ export type BorderImageSource_StyleType = CssImage | "none";
  * Type for [[borderImageWidth]] style property. It is CssNumber and not CssLength because
  * border-image-width can be specified as a unitless number.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-width" target="mdn">MDN Page</a>
- *
  */
 export type BorderImageWidth_StyleType = OneOrBox<CssNumber | ILengthProxy | "auto">;
 
@@ -383,14 +373,13 @@ export type BorderImageWidth_StyleType = OneOrBox<CssNumber | ILengthProxy | "au
 /**
  * Type for [[borderSpacing]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-spacing" target="mdn">MDN Page</a>
- *
  */
 export type BorderSpacing_StyleType = OneOrPair<CssLength>;
 
 
 
 // !!!!!!!!!!!!!!! The following is a correct template litral type, but it causes the compiler
-// !!!!!!!!!!!!!!! to almost hang because of bit number combintaions.
+// !!!!!!!!!!!!!!! to almost hang because of big number of combintaions.
 // /**
 //  * Type for specifying [[border]] style property value as an object
 //  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border" target="mdn">MDN Page</a>
@@ -483,11 +472,18 @@ export type BoxDecorationBreak_StyleType = "slice" | "clone";
 /**
  * Type for single box shadow.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow" target="mdn">MDN Page</a>
+ * @deprecated Use [[BoxShadow]] type.
  */
-export type BoxShadow_Single = "none" |
+export type BoxShadow_Single = BoxShadow;
+
+/**
+ * Type for single box shadow.
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow" target="mdn">MDN Page</a>
+ */
+export type BoxShadow = "none" |
     {
-        x: Extended<CssLength>,
-        y: Extended<CssLength>,
+        x?: Extended<CssLength>,
+        y?: Extended<CssLength>,
         blur?: Extended<CssLength>,
         spread?: Extended<CssLength>,
         color?: Extended<CssColor>,
@@ -497,16 +493,14 @@ export type BoxShadow_Single = "none" |
 /**
  * Type for [[boxShadow]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow" target="mdn">MDN Page</a>
- *
  */
-export type BoxShadow_StyleType = OneOrMany<string | BoxShadow_Single>;
+export type BoxShadow_StyleType = OneOrMany<string | BoxShadow>;
 
 
 
 /**
  * Type for [[boxSizing]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing" target="mdn">MDN Page</a>
- *
  */
 export type BoxSizing_StyleType = "content-box" | "border-box";
 
@@ -515,7 +509,6 @@ export type BoxSizing_StyleType = "content-box" | "border-box";
 /**
  * Type for [[breakAfter]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/break-after" target="mdn">MDN Page</a>
- *
  */
 export type BreakAfter_StyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
     "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
@@ -526,7 +519,6 @@ export type BreakAfter_StyleType = "auto" | "avoid" | "always" | "all" | "avoid-
 /**
  * Type for [[breakBefore]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/break-before" target="mdn">MDN Page</a>
- *
  */
 export type BreakBefore_StyleType = "auto" | "avoid" | "always" | "all" | "avoid-page" | "page" |
     "left" | "right" | "recto" | "verso" | "avoid-column" | "column" |
@@ -537,7 +529,6 @@ export type BreakBefore_StyleType = "auto" | "avoid" | "always" | "all" | "avoid
 /**
  * Type for [[breakInside]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/break-inside" target="mdn">MDN Page</a>
- *
  */
 export type BreakInside_StyleType = "auto" | "avoid" | "avoid-page" | "avoid-column" | "avoid-region";
 
@@ -546,7 +537,6 @@ export type BreakInside_StyleType = "auto" | "avoid" | "avoid-page" | "avoid-col
 /**
  * Type for [[captionSide]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/caption-side" target="mdn">MDN Page</a>
- *
  */
 export type CaptionSide_StyleType = "top" | "bottom" | "block-start" | "block-end" | "inline-start" | "inline-end";
 
@@ -555,7 +545,6 @@ export type CaptionSide_StyleType = "top" | "bottom" | "block-start" | "block-en
 /**
  * Type for [[caretColor]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color" target="mdn">MDN Page</a>
- *
  */
 export type CaretColor_StyleType = "auto" | CssColor;
 
@@ -564,7 +553,6 @@ export type CaretColor_StyleType = "auto" | CssColor;
 /**
  * Type for [[clear]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/clear" target="mdn">MDN Page</a>
- *
  */
 export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start" | "inline-end";
 
@@ -572,7 +560,6 @@ export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start
 
 /**
  * Type representing the boundaries of a box
- *
  */
  export type GeometryBoxKeyword = "margin-box" | "border-box" | "padding-box" | "content-box" |
     "fill-box" | "stroke-box" | "view-box";
@@ -580,7 +567,6 @@ export type Clear_StyleType = "none" | "left" | "right" | "both" | "inline-start
 /**
  * Type for [[clipPath]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/clip-pat" target="mdn">MDN Page</a>
- *
  */
 export type ClipPath_StyleType = "none" | IUrlFunc | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
@@ -590,7 +576,6 @@ export type ClipPath_StyleType = "none" | IUrlFunc | BasicShape | GeometryBoxKey
 /**
  * Type for [[clipRule]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/clip-rule" target="mdn">MDN Page</a>
- *
  */
 export type ClipRule_StyleType = "nonzero" | "evenodd";
 
@@ -599,7 +584,6 @@ export type ClipRule_StyleType = "nonzero" | "evenodd";
 /**
  * Type for [[colorAdjust]] and color-adjust style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color-adjust" target="mdn">MDN Page</a>
- *
  */
 export type ColorAdjust_StyleType = "economy" | "exact";
 
@@ -608,7 +592,6 @@ export type ColorAdjust_StyleType = "economy" | "exact";
 /**
  * Type for [[colorInterpolation]] and color-interpolation-filters style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color-interpolation" target="mdn">MDN Page</a>
- *
  */
 export type ColorInterpolation_StyleType = "auto" | "sRGB" | "linearRGB";
 
@@ -617,7 +600,6 @@ export type ColorInterpolation_StyleType = "auto" | "sRGB" | "linearRGB";
 /**
  * Type for [[colorScheme]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color-count" target="mdn">MDN Page</a>
- *
  */
 export type ColorScheme_StyleType = "normal" | OneOrMany<"light" | "dark" | string>;
 
@@ -626,7 +608,6 @@ export type ColorScheme_StyleType = "normal" | OneOrMany<"light" | "dark" | stri
 /**
  * Type for [[columnCount]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/column-count" target="mdn">MDN Page</a>
- *
  */
 export type ColumnCount_StyleType = "auto" | CssNumber;
 
@@ -635,7 +616,6 @@ export type ColumnCount_StyleType = "auto" | CssNumber;
 /**
  * Type for [[columnFill]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/column-fill" target="mdn">MDN Page</a>
- *
  */
 export type ColumnFill_StyleType = "auto" | "balance" | "balance-all";
 
@@ -644,7 +624,6 @@ export type ColumnFill_StyleType = "auto" | "balance" | "balance-all";
 /**
  * Type for [[columnGap]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/column-gap" target="mdn">MDN Page</a>
- *
  */
 export type ColumnGap_StyleType = "normal" | CssLength;
 
@@ -653,7 +632,6 @@ export type ColumnGap_StyleType = "normal" | CssLength;
 /**
  * Type for [[columnSpan]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/column-span" target="mdn">MDN Page</a>
- *
  */
 export type ColumnSpan_StyleType = "none" | "all";
 
@@ -669,7 +647,6 @@ export type ColumnSpan_StyleType = "none" | "all";
  *   while another as the column width.
  *
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/columns" target="mdn">MDN Page</a>
- *
  */
 export type Columns_StyleType = "auto" | CssNumber | Exclude<CssLength,number> |
     ["auto" | Extended<CssNumber>, "auto" | Extended<Exclude<CssLength,number>>] |
@@ -682,21 +659,18 @@ export type Columns_StyleType = "auto" | CssNumber | Exclude<CssLength,number> |
 /**
  * Keywords that can be combined in the [[IStyleset.contain|contain]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/contain" target="mdn">MDN Page</a>
- *
  */
 export type ContainAtomKeyword = "size" | "layout" | "style" | "paint";
 
 /**
  * Keywords that can be only used as a sole value of the [[IStyleset.contain|contain]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/contain" target="mdn">MDN Page</a>
- *
  */
 export type ContainSoleKeyword = "none" | "strict" | "content";
 
 /**
  * Type for [[IStyleset.contain|contain]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/contain" target="mdn">MDN Page</a>
- *
  */
 export type Contain_StyleType = ContainSoleKeyword | OneOrMany<ContainAtomKeyword>[];
 
@@ -705,7 +679,6 @@ export type Contain_StyleType = ContainSoleKeyword | OneOrMany<ContainAtomKeywor
 /**
  * Type for [[content]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/content" target="mdn">MDN Page</a>
- *
  */
 export type ContentItem = "open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" |
     CssString | CssImage;
@@ -713,7 +686,6 @@ export type ContentItem = "open-quote" | "close-quote" | "no-open-quote" | "no-c
 /**
  * Type for [[content]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/content" target="mdn">MDN Page</a>
- *
  */
 export type Content_StyleType = string | "none" | "normal" | OneOrMany<ContentItem>;
 
@@ -722,7 +694,6 @@ export type Content_StyleType = string | "none" | "normal" | OneOrMany<ContentIt
 /**
  * Type for [[contentVisibility]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/content-visibility" target="mdn">MDN Page</a>
- *
  */
 export type ContentVisibility_StyleType = "auto" | "visible" | "hidden";
 
@@ -730,13 +701,11 @@ export type ContentVisibility_StyleType = "auto" | "visible" | "hidden";
 
 /**
  * Type for [[counterIncrement]], [[counterReset]] and [[counterSet]] style properties
- *
  */
 export type CssCounter = ICounterRule | "page" | "pages" | IStringProxy;
 
 /**
  * Type for [[counterIncrement]], [[counterReset]] and [[counterSet]] style properties
- *
  */
 export type Counter_StyleType = "none" | OneOrMany<CssCounter | [Extended<CssCounter>, Extended<number>]>;
 
@@ -744,7 +713,6 @@ export type Counter_StyleType = "none" | OneOrMany<CssCounter | [Extended<CssCou
 
 /**
  * Type for cursor pre-defined names
- *
  */
 export type CursorKeyword = "auto" | "default" | "none" | "context-menu" | "help" | "pointer" | "progress" |
     "wait" | "cell" | "crosshair" | "text" | "vertical-text" | "alias" | "copy" | "move" |
@@ -756,7 +724,6 @@ export type CursorKeyword = "auto" | "default" | "none" | "context-menu" | "help
 /**
  * Type for [[IStyleset.cursor|cursor]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/cursor" target="mdn">MDN Page</a>
- *
  */
 export type Cursor_StyleType = OneOrMany<CursorKeyword | IUrlFunc | ICursorFunc>;
 
@@ -765,7 +732,6 @@ export type Cursor_StyleType = OneOrMany<CursorKeyword | IUrlFunc | ICursorFunc>
 /**
  * Type for [[display]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/display" target="mdn">MDN Page</a>
- *
  */
 export type Display_StyleType = "block" | "inline" | "run-in" | "contents" | "none" |
     "inline-block" | "inline-list-item" | "inline-table" | "inline-flex" | "inline-grid" |
@@ -781,7 +747,6 @@ export type Display_StyleType = "block" | "inline" | "run-in" | "contents" | "no
 /**
  * Type for [[dominantBaseline]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/dominant-baseline" target="mdn">MDN Page</a>
- *
  */
 export type DominantBaseline_StyleType = "auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" |
     "central" | "mathematical" | "hanging" | "text-top";
@@ -791,7 +756,6 @@ export type DominantBaseline_StyleType = "auto" | "text-bottom" | "alphabetic" |
 /**
  * Type for [[emptyCells]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/empty-cells" target="mdn">MDN Page</a>
- *
  */
 export type EmptyCells_StyleType = "show" | "hide";
 
@@ -800,7 +764,6 @@ export type EmptyCells_StyleType = "show" | "hide";
 /**
  * Type for [[filter]] and [[backdropFilter]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/filter" target="mdn">MDN Page</a>
- *
  */
 export type Filter_StyleType = "none" | OneOrMany<IUrlFunc | FilterFuncs>;
 
@@ -809,7 +772,6 @@ export type Filter_StyleType = "none" | OneOrMany<IUrlFunc | FilterFuncs>;
 /**
  * Type for [[flex]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/flex" target="mdn">MDN Page</a>
- *
  */
 export type Flex_StyleType = FlexBasis_StyleType |
     [Extended<CssNumber>, Extended<CssNumber>, Extended<FlexBasis_StyleType>];
@@ -819,7 +781,6 @@ export type Flex_StyleType = FlexBasis_StyleType |
 /**
  * Type for [[flexBasis]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis" target="mdn">MDN Page</a>
- *
  */
 export type FlexBasis_StyleType = CssLengthOrAuto | "content" | "fill" | "max-content" | "min-content" | "fit-content";
 
@@ -828,7 +789,6 @@ export type FlexBasis_StyleType = CssLengthOrAuto | "content" | "fill" | "max-co
 /**
  * Type for [[flexDirection]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction" target="mdn">MDN Page</a>
- *
  */
 export type FlexDirection_StyleType = "row" | "row-reverse" | "column" | "column-reverse";
 
@@ -837,7 +797,6 @@ export type FlexDirection_StyleType = "row" | "row-reverse" | "column" | "column
 /**
  * Type for [[flexFlow]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/flex-flow" target="mdn">MDN Page</a>
- *
  */
 export type FlexFlow_StyleType = FlexDirection_StyleType | FlexWrap_StyleType |
     [Extended<FlexDirection_StyleType>, Extended<FlexWrap_StyleType>];
@@ -847,7 +806,6 @@ export type FlexFlow_StyleType = FlexDirection_StyleType | FlexWrap_StyleType |
 /**
  * Type for [[flexWrap]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/flex-wrap" target="mdn">MDN Page</a>
- *
  */
 export type FlexWrap_StyleType = "nowrap" | "wrap" | "wrap-reverse";
 
@@ -856,7 +814,6 @@ export type FlexWrap_StyleType = "nowrap" | "wrap" | "wrap-reverse";
 /**
  * Type for [[float]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/float" target="mdn">MDN Page</a>
- *
  */
 export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inline-end";
 
@@ -865,7 +822,6 @@ export type Float_StyleType = "left" | "right" | "none" | "inline-start" | "inli
 /**
  * Type for [[font]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font" target="mdn">MDN Page</a>
- *
  */
 export type Font_StyleType = SystemFont | [string, CssLength] | [CssLength, string] |
     {
@@ -883,7 +839,6 @@ export type Font_StyleType = SystemFont | [string, CssLength] | [CssLength, stri
 /**
  * Type for [[fontWeight]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight" target="mdn">MDN Page</a>
- *
  */
 export type FontWeight_StyleType = FontWeight | "bolder" | "lighter";
 
@@ -892,7 +847,6 @@ export type FontWeight_StyleType = FontWeight | "bolder" | "lighter";
 /**
  * Type for [[forcedColorAdjust]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/forced-color-adjust" target="mdn">MDN Page</a>
- *
  */
 export type ForcedColorAdjust_StyleType = "auto" | "none";
 
@@ -901,7 +855,6 @@ export type ForcedColorAdjust_StyleType = "auto" | "none";
 /**
  * Type for [[gap]] or [[gridGap]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/gap" target="mdn">MDN Page</a>
- *
  */
 export type Gap_StyleType = RowGap_StyleType | [RowGap_StyleType, ColumnGap_StyleType];
 
@@ -910,7 +863,6 @@ export type Gap_StyleType = RowGap_StyleType | [RowGap_StyleType, ColumnGap_Styl
 /**
  * Type for [[gridAutoColumns]] and [[gridAutoRows]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-columns" target="mdn">MDN Page</a>
- *
  */
 export type GridAutoAxis_StyleType = OneOrMany<GridTrackSize>;
 
@@ -919,7 +871,6 @@ export type GridAutoAxis_StyleType = OneOrMany<GridTrackSize>;
 /**
  * Type for [[gridAutoFlow]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-flow" target="mdn">MDN Page</a>
- *
  */
 export type GridAutoFlow_StyleType = "row" | "column" | "dense" | "row dense" | "column dense";
 
@@ -928,14 +879,12 @@ export type GridAutoFlow_StyleType = "row" | "column" | "dense" | "row dense" | 
 /**
  * Type for specifying either number of grid lines or name of grid line or area. This type is used
  * when defining grid-column-start/end and grid-row-start/end style properties.
- *
  */
 export type GridLineCountOrName = CssNumber | IGridAreaRule | IGridLineRule;
 
 /**
  * Type for [[gridColumnStart]], [[gridColumnEnd]], [[gridRowStart]] and [[gridRowEnd]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-start" target="mdn">MDN Page</a>
- *
  */
 export type GridAxisSide_StyleType = "auto" | GridLineCountOrName | IGridSpanFunc |
     [Extended<CssNumber>, IGridAreaRule | IGridLineRule];
@@ -945,7 +894,6 @@ export type GridAxisSide_StyleType = "auto" | GridLineCountOrName | IGridSpanFun
 /**
  * Type for [[gridColumn]] and [[gridRow]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column" target="mdn">MDN Page</a>
- *
  */
 export type GridAxis_StyleType = OneOrPair<GridAxisSide_StyleType>;
 
@@ -954,7 +902,6 @@ export type GridAxis_StyleType = OneOrPair<GridAxisSide_StyleType>;
 /**
  * Type for [[gridArea]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-area" target="mdn">MDN Page</a>
- *
  */
 export type GridArea_StyleType = OneOrBox<GridAxisSide_StyleType>;
 
@@ -963,7 +910,7 @@ export type GridArea_StyleType = OneOrBox<GridAxisSide_StyleType>;
 /**
  * Type for defining a single grid area position. The numbers are 1-based indices of the lines in
  * the following sequence: block start, inline start, block end, inline end.
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas" target="mdn">MDN Page</a>
  */
 export type GridTemplateAreaDefinition = [IGridAreaRule | Extended<string>,
     number, number, number, number];
@@ -971,7 +918,6 @@ export type GridTemplateAreaDefinition = [IGridAreaRule | Extended<string>,
 /**
  * Type for [[gridTemplateAreas]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas" target="mdn">MDN Page</a>
- *
  */
 export type GridTemplateAreas_StyleType = "none" | string[] | GridTemplateAreaDefinition[];
 
@@ -980,26 +926,22 @@ export type GridTemplateAreas_StyleType = "none" | string[] | GridTemplateAreaDe
 /**
  * Type for [[gridTemplateColumns]] and [[gridTemplateRows]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns" target="mdn">MDN Page</a>
- *
  */
 export type GridTemplateAxis_StyleType = "none" | OneOrMany<GridTrack> | "subgrid";
 
 /**
  * Type for a single track element of grid template axis
- *
  */
 export type GridTrack = GridTrackSize | GridTrackLine;
 
 /**
  * Type for a single template element defining name or names for a grid line in grid template.
  * This is always an array - even if a single name is given.
- *
  */
 export type GridTrackLine = (IGridLineRule | Extended<string>)[];
 
 /**
  * Type for a single template element defining track size in grid template
- *
  */
 export type GridTrackSize = CssLengthOrAuto | "min-content" | "max-content" |
     IFitContentProxy | IMinMaxFunc | IRepeatFunc;
@@ -1009,7 +951,6 @@ export type GridTrackSize = CssLengthOrAuto | "min-content" | "max-content" |
 /**
  * Type for [[hyphens]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/hyphens" target="mdn">MDN Page</a>
- *
  */
 export type Hyphens_StyleType = "none" | "manual" | "auto";
 
@@ -1018,7 +959,6 @@ export type Hyphens_StyleType = "none" | "manual" | "auto";
 /**
  * Type for [[imageOrientation]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/image-orientation" target="mdn">MDN Page</a>
- *
  */
 export type ImageOrientation_StyleType = "none" | "from-image";
 
@@ -1027,7 +967,6 @@ export type ImageOrientation_StyleType = "none" | "from-image";
 /**
  * Type for [[imageRendering]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/image-rendering" target="mdn">MDN Page</a>
- *
  */
 export type ImageRendering_StyleType = "auto" | "crisp-edges" | "pixelated";
 
@@ -1101,7 +1040,6 @@ export type LetterSpacing_StyleType = "normal" | CssLength;
 /**
  * Type for [[lineBreak]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/line-break" target="mdn">MDN Page</a>
- *
  */
 export type LineBreak_StyleType = "auto" | "loose" | "normal" | "strict" | "anywhere";
 
@@ -1110,7 +1048,6 @@ export type LineBreak_StyleType = "auto" | "loose" | "normal" | "strict" | "anyw
 /**
  * Type for [[lineClamp]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/line-clamp" target="mdn">MDN Page</a>
- *
  */
 export type LineClamp_StyleType = "none" | CssNumber | [Extended<CssNumber>, Extended<string>];
 
@@ -1119,7 +1056,6 @@ export type LineClamp_StyleType = "none" | CssNumber | [Extended<CssNumber>, Ext
 /**
  * Type for [[IStyleset.lineHeight|lineHeight]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/line-height" target="mdn">MDN Page</a>
- *
  */
 export type LineHeight_StyleType = CssNumber | ILengthProxy;
 
@@ -1128,7 +1064,6 @@ export type LineHeight_StyleType = CssNumber | ILengthProxy;
 /**
  * Type for [[listStyle]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/list-style" target="mdn">MDN Page</a>
- *
  */
 export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_StyleType | ListStyleImage_StyleType |
     [Extended<ListStyleImage_StyleType>, Extended<ListStylePosition_StyleType>] |
@@ -1141,7 +1076,6 @@ export type ListStyle_StyleType = ListStyleType_StyleType | ListStylePosition_St
 /**
  * Type for [[listStyleImage]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-image" target="mdn">MDN Page</a>
- *
  */
 export type ListStyleImage_StyleType = "none" | IUrlFunc;
 
@@ -1150,7 +1084,6 @@ export type ListStyleImage_StyleType = "none" | IUrlFunc;
 /**
  * Type for [[listStylePosition]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-position" target="mdn">MDN Page</a>
- *
  */
 export type ListStylePosition_StyleType = "inside" | "outside";
 
@@ -1159,7 +1092,6 @@ export type ListStylePosition_StyleType = "inside" | "outside";
 /**
  * Type for [[listStyleType]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type" target="mdn">MDN Page</a>
- *
  */
 export type ListStyleType_StyleType = ICounterStyleRule |
     "none" | "disc" | "circle" | "square" | "decimal" | "decimal-leading-zero" |
@@ -1177,7 +1109,6 @@ export type ListStyleType_StyleType = ICounterStyleRule |
 /**
  * Type for the [[marginTrim]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/margin-trim" target="mdn">MDN Page</a>
- *
  */
 export type MarginTrim_StyleType = "none" | "in-flow" | "all";
 
@@ -1186,7 +1117,6 @@ export type MarginTrim_StyleType = "none" | "in-flow" | "all";
 /**
  * Type for the [[markerStart]], [[markerMid]] and [[markerEnd]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marker-start" target="mdn">MDN Page</a>
- *
  */
 export type Marker_StyleType = "none" | IIDRule;
 
@@ -1195,7 +1125,6 @@ export type Marker_StyleType = "none" | IIDRule;
 /**
  * Type for the [[marks]] style property for the `@page` at-rule
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marker-start" target="mdn">MDN Page</a>
- *
  */
 export type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross crop" |
     ["crop", "cross"?] | ["cross", "crop"?];
@@ -1205,7 +1134,6 @@ export type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross 
 /**
  * Type for the [[maskBorder]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mask-border" target="mdn">MDN Page</a>
- *
  */
 export type MaskBorder_Object =
     {
@@ -1220,14 +1148,12 @@ export type MaskBorder_Object =
 /**
  * Type for [[maskBorder]] style property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mask-border" target="mdn">MDN Page</a>
- *
  */
 export type MaskBorder_StyleType = CssImage | MaskBorder_Object | string;
 
 /**
  * Type for [[maskBorderMode]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mask-border-mode" target="mdn">MDN Page</a>
- *
  */
 export type MaskBorderMode_StyleType = "luminance" | "alpha";
 
@@ -1236,7 +1162,6 @@ export type MaskBorderMode_StyleType = "luminance" | "alpha";
 /**
  * Type for the [[maskComposite]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mask-composite" target="mdn">MDN Page</a>
- *
  */
 export type MaskCompositeKeyword = "add" | "subtract" | "intersect" | "exclude";
 
@@ -1245,7 +1170,6 @@ export type MaskCompositeKeyword = "add" | "subtract" | "intersect" | "exclude";
 /**
  * Type for the [[maskMode]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mask-mode" target="mdn">MDN Page</a>
- *
  */
 export type MaskModeKeyword = "alpha" | "luminance" | "match-source";
 
@@ -1254,7 +1178,6 @@ export type MaskModeKeyword = "alpha" | "luminance" | "match-source";
 /**
  * Type for the [[maskType]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mask-type" target="mdn">MDN Page</a>
- *
  */
 export type MaskTypeKeyword = "alpha" | "luminance";
 
@@ -1263,7 +1186,6 @@ export type MaskTypeKeyword = "alpha" | "luminance";
 /**
  * Type for the [[mathStyle]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/math-style" target="mdn">MDN Page</a>
- *
  */
 export type MathStyle_StyleType = "normal" | "compact";
 
@@ -1272,7 +1194,6 @@ export type MathStyle_StyleType = "normal" | "compact";
 /**
  * Type for the [[objectFit]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit" target="mdn">MDN Page</a>
- *
  */
 export type ObjectFit_StyleType = "fill" | "contain" | "cover" | "none" | "scale-down";
 
@@ -1281,7 +1202,6 @@ export type ObjectFit_StyleType = "fill" | "contain" | "cover" | "none" | "scale
 /**
  * Type for the [[offset]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/offset" target="mdn">MDN Page</a>
- *
  */
 export type Offset_StyleType = OffsetPath_StyleType |
     {
@@ -1297,7 +1217,6 @@ export type Offset_StyleType = OffsetPath_StyleType |
 /**
  * Type for the [[offsetAnchor]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/offset-anchor" target="mdn">MDN Page</a>
- *
  */
 export type OffsetAnchor_StyleType = "auto" | CssPosition;
 
@@ -1306,7 +1225,6 @@ export type OffsetAnchor_StyleType = "auto" | CssPosition;
 /**
  * Type for [[offsetPath]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/offset-path" target="mdn">MDN Page</a>
- *
  */
 export type OffsetPath_StyleType = "none" | IRayFunc | IUrlFunc | BasicShape | GeometryBoxKeyword |
     [GeometryBoxKeyword, BasicShape];
@@ -1324,7 +1242,6 @@ export type OffsetPosition_StyleType = "auto" | CssPosition;
 /**
  * Type for the [[offsetRotate]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/offset-rotate" target="mdn">MDN Page</a>
- *
  */
 export type OffsetRotate_StyleType = "auto" | "reverse" | CssAngle | ["auto" | "reverse", CssAngle];
 
@@ -1332,14 +1249,13 @@ export type OffsetRotate_StyleType = "auto" | "reverse" | CssAngle | ["auto" | "
 
 /**
  * Type for the overflow-x/y style property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/overflow" target="mdn">MDN Page</a>
  */
 export type OverflowKeyword = "visible" | "hidden" | "clip" | "scroll" | "auto";
 
 /**
  * Type for the [[overflow]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/overflow" target="mdn">MDN Page</a>
- *
  */
 export type Overflow_StyleType = OneOrPair<OverflowKeyword>;
 
@@ -1348,7 +1264,6 @@ export type Overflow_StyleType = OneOrPair<OverflowKeyword>;
 /**
  * Type for the [[overflowAnchor]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-anchor" target="mdn">MDN Page</a>
- *
  */
 export type OverflowAnchor_StyleType = "auto" | "none";
 
@@ -1357,7 +1272,6 @@ export type OverflowAnchor_StyleType = "auto" | "none";
 /**
  * Type for the [[overflowClipMargin]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-clip-margin" target="mdn">MDN Page</a>
- *
  */
 export type OverflowClipMargin_StyleType = CssLength | "border-box" | "padding-box" | "content-box";
 
@@ -1366,7 +1280,6 @@ export type OverflowClipMargin_StyleType = CssLength | "border-box" | "padding-b
 /**
  * Type for the [[overflowWrap]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap" target="mdn">MDN Page</a>
- *
  */
 export type OverflowWrap_StyleType = "normal" | "break-word" | "anywhere";
 
@@ -1374,14 +1287,12 @@ export type OverflowWrap_StyleType = "normal" | "break-word" | "anywhere";
 
 /**
  * Type for the [[overscrollBehaviorX]] and [[overscrollBehaviorY]] style property
- *
  */
 export type OverscrollBehavior = "contain" | "none" | "auto";
 
 /**
  * Type for the [[overscrollBehavior]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior" target="mdn">MDN Page</a>
- *
  */
 export type OverscrollBehavior_StyleType = OneOrPair<OverscrollBehavior>;
 
@@ -1389,19 +1300,20 @@ export type OverscrollBehavior_StyleType = OneOrPair<OverscrollBehavior>;
 
 /**
  * Keywords for page sizes
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@page/size" target="mdn">MDN Page</a>
  */
 export type PageSizeKeyword = "A5" | "A4" | "A3" | "B5" | "B4" | "JIS-B5" | "JIS-B4" |
     "letter" | "legal" | "ledger";
 
 /**
  * Keywords for page orientations
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@page/size" target="mdn">MDN Page</a>
  */
 export type PageOrientation = "portrait" | "landscape";
 
 /**
  * Type for the [[size]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@page/size" target="mdn">MDN Page</a>
- *
  */
 export type Size_StyleType = "auto" | OneOrPair<CssLength> |
     PageSizeKeyword | PageOrientation | [PageSizeKeyword, PageOrientation];
@@ -1411,7 +1323,6 @@ export type Size_StyleType = "auto" | OneOrPair<CssLength> |
 /**
  * Type for the [[page]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/page" target="mdn">MDN Page</a>
- *
  */
 export type Page_StyleType = "auto" | IPageNameRule | string;
 
@@ -1419,14 +1330,13 @@ export type Page_StyleType = "auto" | IPageNameRule | string;
 
 /**
  * Type for the paint-order style property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/paint-order" target="mdn">MDN Page</a>
  */
 export type PaintOrderKeyword = "fill" | "stroke" | "markers";
 
 /**
  * Type for the [[paintOrder]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/paint-order" target="mdn">MDN Page</a>
- *
  */
 export type PaintOrder_StyleType = "normal" | PaintOrderKeyword |
     [PaintOrderKeyword, PaintOrderKeyword?, PaintOrderKeyword?];
@@ -1436,7 +1346,6 @@ export type PaintOrder_StyleType = "normal" | PaintOrderKeyword |
 /**
  * Type for the [[perspective]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/perspective" target="mdn">MDN Page</a>
- *
  */
 export type Perspective_StyleType = "none" | CssLength;
 
@@ -1445,7 +1354,6 @@ export type Perspective_StyleType = "none" | CssLength;
 /**
  * Type for the [[perspectiveOrigin]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/perspective-origin" target="mdn">MDN Page</a>
- *
  */
 export type PerspectiveOrigin_StyleType = HorizontalPositionKeyword | VerticalPositionKeyword | CssLength |
     [Extended<HorizontalPositionKeyword | CssLength>, Extended<VerticalPositionKeyword | CssLength>];
@@ -1455,7 +1363,6 @@ export type PerspectiveOrigin_StyleType = HorizontalPositionKeyword | VerticalPo
 /**
  * Type for the [[placeContent]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-content" target="mdn">MDN Page</a>
- *
  */
 export type PlaceContent_StyleType = AlignContentKeywords | [Extended<AlignContentKeywords>, Extended<JustifyContent_StyleType>];
 
@@ -1464,7 +1371,6 @@ export type PlaceContent_StyleType = AlignContentKeywords | [Extended<AlignConte
 /**
  * Type for the [[placeItems]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-items" target="mdn">MDN Page</a>
- *
  */
 export type PlaceItems_StyleType = AlignItemsKeywords | [Extended<AlignItemsKeywords>, Extended<JustifyItems_StyleType>];
 
@@ -1473,7 +1379,6 @@ export type PlaceItems_StyleType = AlignItemsKeywords | [Extended<AlignItemsKeyw
 /**
  * Type for the [[placeSelf]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-self" target="mdn">MDN Page</a>
- *
  */
 export type PlaceSelf_StyleType = AlignSelfKeywords | [Extended<AlignSelfKeywords>, Extended<JustifySelf_StyleType>];
 
@@ -1482,7 +1387,6 @@ export type PlaceSelf_StyleType = AlignSelfKeywords | [Extended<AlignSelfKeyword
 /**
  * Type for the [[pointerEvents]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events" target="mdn">MDN Page</a>
- *
  */
 export type PointerEvents_StyleType = "auto" | "none" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" |
     "painted" | "fill" | "stroke" | "all";
@@ -1492,7 +1396,6 @@ export type PointerEvents_StyleType = "auto" | "none" | "visiblePainted" | "visi
 /**
  * Type for the [[IStyleset.position|position]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/position" target="mdn">MDN Page</a>
- *
  */
 export type Position_StyleType = "static" | "relative" | "absolute" | "sticky" | "fixed";
 
@@ -1501,7 +1404,6 @@ export type Position_StyleType = "static" | "relative" | "absolute" | "sticky" |
 /**
  * Type for the [[quotes]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/quotes" target="mdn">MDN Page</a>
- *
  */
 export type Quotes_StyleType = "none" | "auto" | OneOrMany<[Extended<CssString>,Extended<CssString>]>;
 
@@ -1510,7 +1412,6 @@ export type Quotes_StyleType = "none" | "auto" | OneOrMany<[Extended<CssString>,
 /**
  * Type for the [[resize]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/resize" target="mdn">MDN Page</a>
- *
  */
 export type Resize_StyleType = "none" | "both" | "horizontal" | "vertical" | "block" | "inline";
 
@@ -1519,7 +1420,6 @@ export type Resize_StyleType = "none" | "both" | "horizontal" | "vertical" | "bl
 /**
  * Type for [[IStyleset.rotate|rotate]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/rotate" target="mdn">MDN Page</a>
- *
  */
 export type Rotate_StyleType = "none" | CssAngle | ["x" | "y" | "z", Extended<CssAngle>] |
     [Extended<CssNumber>, Extended<CssNumber>, Extended<CssNumber>, Extended<CssAngle>];
@@ -1529,7 +1429,6 @@ export type Rotate_StyleType = "none" | CssAngle | ["x" | "y" | "z", Extended<Cs
 /**
  * Type for [[rowGap]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/row-gap" target="mdn">MDN Page</a>
- *
  */
 export type RowGap_StyleType = CssLength;
 
@@ -1538,7 +1437,6 @@ export type RowGap_StyleType = CssLength;
 /**
  * Type for the [[IStyleset.scale|scale]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scale" target="mdn">MDN Page</a>
- *
  */
 export type Scale_StyleType = "none" | CssNumber |
     [Extended<CssNumber>, Extended<CssNumber>?, Extended<CssNumber>?];
@@ -1548,7 +1446,6 @@ export type Scale_StyleType = "none" | CssNumber |
 /**
  * Type for the [[scrollbarColor]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-color" target="mdn">MDN Page</a>
- *
  */
 export type ScrollbarColor_StyleType = "auto" | "dark" | "light" |
     [Extended<CssColor>, Extended<CssColor>];
@@ -1558,7 +1455,6 @@ export type ScrollbarColor_StyleType = "auto" | "dark" | "light" |
 /**
  * Type for the [[scrollbarGutter]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-gutter" target="mdn">MDN Page</a>
- *
  */
 export type ScrollbarGutter_StyleType = "auto" | "stable" | "stable both-edges";
 
@@ -1567,7 +1463,6 @@ export type ScrollbarGutter_StyleType = "auto" | "stable" | "stable both-edges";
 /**
  * Type for the [[scrollbarWidth]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-width" target="mdn">MDN Page</a>
- *
  */
 export type ScrollbarWidth_StyleType = "auto" | "thin" | "none";
 
@@ -1576,7 +1471,6 @@ export type ScrollbarWidth_StyleType = "auto" | "thin" | "none";
 /**
  * Type for the [[scrollBehavior]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-behavior" target="mdn">MDN Page</a>
- *
  */
 export type ScrollBehavior_StyleType = "auto" | "smooth";
 
@@ -1585,7 +1479,6 @@ export type ScrollBehavior_StyleType = "auto" | "smooth";
 /**
  * Type for the [[scrollSnapAlign]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-align" target="mdn">MDN Page</a>
- *
  */
 export type ScrollSnapAlign_StyleType = OneOrPair<"none" | "start" | "end" | "center">;
 
@@ -1594,7 +1487,6 @@ export type ScrollSnapAlign_StyleType = OneOrPair<"none" | "start" | "end" | "ce
 /**
  * Type for the [[scrollSnapStop]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-stop" target="mdn">MDN Page</a>
- *
  */
 export type ScrollSnapStop_StyleType = "normal" | "always";
 
@@ -1603,7 +1495,6 @@ export type ScrollSnapStop_StyleType = "normal" | "always";
 /**
  * Type for the [[scrollSnapType]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-type" target="mdn">MDN Page</a>
- *
  */
 export type ScrollSnapType_StyleType = "none" |
     [Extended<"x" | "y" | "block" | "inline" | "both">, Extended<"mandatory" | "proximity">];
@@ -1613,7 +1504,6 @@ export type ScrollSnapType_StyleType = "none" |
 /**
  * Type for [[shapeOutside]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/shape-outside" target="mdn">MDN Page</a>
- *
  */
 export type ShapeOutside_StyleType = IUrlFunc | BasicShape | GeometryBoxKeyword | CssImage;
 
@@ -1622,7 +1512,6 @@ export type ShapeOutside_StyleType = IUrlFunc | BasicShape | GeometryBoxKeyword 
 /**
  * Type for the [[shapeRendering]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/shape-rendering" target="mdn">MDN Page</a>
- *
  */
 export type ShapeRendering_StyleType = "auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision";
 
@@ -1631,14 +1520,12 @@ export type ShapeRendering_StyleType = "auto" | "optimizeSpeed" | "crispEdges" |
 /**
  * Type for the [[tabSize]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size" target="mdn">MDN Page</a>
- *
  */
 export type TabSize_StyleType = CssNumber | ILengthProxy;
 
 /**
  * Type for the [[tableLayout]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/table-layout" target="mdn">MDN Page</a>
- *
  */
 export type TableLayout_StyleType = "auto" | "fixed";
 
@@ -1647,7 +1534,6 @@ export type TableLayout_StyleType = "auto" | "fixed";
 /**
  * Type for the [[textAlign]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-align" target="mdn">MDN Page</a>
- *
  */
 export type TextAlign_StyleType = "start" | "end" | "left" | "right" | "center" | "justify" | "match-parent";
 
@@ -1656,7 +1542,6 @@ export type TextAlign_StyleType = "start" | "end" | "left" | "right" | "center" 
 /**
  * Type for the [[textAlignLast]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-align-last" target="mdn">MDN Page</a>
- *
  */
 export type TextAlignLast_StyleType = "auto" | "start" | "end" | "left" | "right" | "center" | "justify";
 
@@ -1665,7 +1550,6 @@ export type TextAlignLast_StyleType = "auto" | "start" | "end" | "left" | "right
 /**
  * Type for the [[textAnchor]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-anchor" target="mdn">MDN Page</a>
- *
  */
 export type TextAnchor_StyleType = "start" | "middle" | "end";
 
@@ -1674,7 +1558,6 @@ export type TextAnchor_StyleType = "start" | "middle" | "end";
 /**
  * Type for the [[textCombineUpright]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-combine-upright" target="mdn">MDN Page</a>
- *
  */
 export type TextCombineUpright_StyleType = "none" | "all" | "digits" | number;
 
@@ -1684,7 +1567,6 @@ export type TextCombineUpright_StyleType = "none" | "all" | "digits" | number;
  * Type for the [[textDecoration]] style property. If a number is specified, it will be interpreted
  * as color - not as thickness.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration" target="mdn">MDN Page</a>
- *
  */
 export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecorationStyle_StyleType |
     CssColor | TextDecorationThickness_StyleType |
@@ -1700,7 +1582,6 @@ export type TextDecoration_StyleType = TextDecorationLine_StyleType | TextDecora
 /**
  * Type for the [[textDecorationLine]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line" target="mdn">MDN Page</a>
- *
  */
 export type TextDecorationLine_StyleType = "none" | "spelling-error" | "grammar-error" |
     OneOrMany<"underline" | "overline" | "line-through">;
@@ -1710,7 +1591,6 @@ export type TextDecorationLine_StyleType = "none" | "spelling-error" | "grammar-
 /**
  * Type for the [[textDecorationStyle]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-style" target="mdn">MDN Page</a>
- *
  */
 export type TextDecorationStyle_StyleType = "solid" | "double" | "dotted" | "dashed" | "wavy";
 
@@ -1719,7 +1599,6 @@ export type TextDecorationStyle_StyleType = "solid" | "double" | "dotted" | "das
 /**
  * Type for the [[textDecorationSkipInk]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-skip-ink" target="mdn">MDN Page</a>
- *
  */
 export type TextDecorationSkipInk_StyleType = "none" | "auto" | "all";
 
@@ -1728,7 +1607,6 @@ export type TextDecorationSkipInk_StyleType = "none" | "auto" | "all";
 /**
  * Type for the [[textDecorationThickness]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-thickness" target="mdn">MDN Page</a>
- *
  */
 export type TextDecorationThickness_StyleType = "from-font" | CssLengthOrAuto;
 
@@ -1737,7 +1615,6 @@ export type TextDecorationThickness_StyleType = "from-font" | CssLengthOrAuto;
 /**
  * Type for the [[textEmphasis]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis" target="mdn">MDN Page</a>
- *
  */
 export type TextEmphasis_StyleType = TextEmphasisStyle_StyleType | CssColor |
     [Extended<TextEmphasisStyle_StyleType>, Extended<CssColor>];
@@ -1747,7 +1624,6 @@ export type TextEmphasis_StyleType = TextEmphasisStyle_StyleType | CssColor |
 /**
  * Type for the [[textEmphasisPosition]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-position" target="mdn">MDN Page</a>
- *
  */
 export type TextEmphasisPosition_StyleType = "over left" | "over right" | "under left" | "under right";
 
@@ -1755,20 +1631,19 @@ export type TextEmphasisPosition_StyleType = "over left" | "over right" | "under
 
 /**
  * Shape for the text-emphasis-style style property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-style" target="mdn">MDN Page</a>
  */
 export type TextEmphasisShape = "dot" | "circle" | "double-circle" | "triangle" | "sesame" | string;
 
 /**
  * Fill option for the text-emphasis-style style property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-style" target="mdn">MDN Page</a>
  */
 export type TextEmphasisFill = "filled" | "open";
 
 /**
  * Type for the [[textEmphasisStyle]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-style" target="mdn">MDN Page</a>
- *
  */
 export type TextEmphasisStyle_StyleType = "none" | TextEmphasisFill | TextEmphasisShape |
     [Extended<TextEmphasisFill>, Extended<TextEmphasisShape>];
@@ -1778,7 +1653,6 @@ export type TextEmphasisStyle_StyleType = "none" | TextEmphasisFill | TextEmphas
 /**
  * Type for the [[textIndent]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-inden" target="mdn">MDN Page</a>
- *
  */
 export type TextIndent_StyleType = CssLength |
     [Extended<CssLength>, OneOrMany<"each-line" | "hanging" | "each-line hanging">];
@@ -1788,7 +1662,6 @@ export type TextIndent_StyleType = CssLength |
 /**
  * Type for the [[textJustify]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-justify" target="mdn">MDN Page</a>
- *
  */
 export type TextJustify_StyleType = "auto" | "inter-character" | "inter-word" | "none";
 
@@ -1797,7 +1670,6 @@ export type TextJustify_StyleType = "auto" | "inter-character" | "inter-word" | 
 /**
  * Type for the [[textOrientation]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-orientation" target="mdn">MDN Page</a>
- *
  */
 export type TextOrientation_StyleType = "mixed" | "upright" | "sideways";
 
@@ -1806,7 +1678,6 @@ export type TextOrientation_StyleType = "mixed" | "upright" | "sideways";
 /**
  * Type for the [[textOverflow]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow" target="mdn">MDN Page</a>
- *
  */
 export type TextOverflow_StyleType = OneOrPair<"clip" | "ellipsis" | "fade" | string>;
 
@@ -1815,7 +1686,6 @@ export type TextOverflow_StyleType = OneOrPair<"clip" | "ellipsis" | "fade" | st
 /**
  * Type for the [[textRendering]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-rendering" target="mdn">MDN Page</a>
- *
  */
 export type TextRendering_StyleType = "auto" | "optimizeSpeed" | "optimizeLegibility" | "geometricPrecision";
 
@@ -1823,12 +1693,12 @@ export type TextRendering_StyleType = "auto" | "optimizeSpeed" | "optimizeLegibi
 
 /**
  * Type for the single value of the tex"t-shadow style property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow" target="mdn">MDN Page</a>
  */
 export type TextShadow = "none" |
     {
-        x: Extended<CssLength>,
-        y: Extended<CssLength>,
+        x?: Extended<CssLength>,
+        y?: Extended<CssLength>,
         blur?: Extended<CssLength>,
         color?: Extended<CssColor>,
     };
@@ -1836,7 +1706,6 @@ export type TextShadow = "none" |
 /**
  * Type for the [[textShadow]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow" target="mdn">MDN Page</a>
- *
  */
 export type TextShadow_StyleType = OneOrMany<TextShadow>;
 
@@ -1845,7 +1714,6 @@ export type TextShadow_StyleType = OneOrMany<TextShadow>;
 /**
  * Type for the [[textSizeAdjust]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust" target="mdn">MDN Page</a>
- *
  */
 export type TextSizeAdjust_StyleType = "none" | "auto" | CssPercent;
 
@@ -1854,7 +1722,6 @@ export type TextSizeAdjust_StyleType = "none" | "auto" | CssPercent;
 /**
  * Type for the [[textStroke]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-stroke" target="mdn">MDN Page</a>
- *
  */
 export type TextStroke_StyleType = LineWidth | CssNonNumericColor |
     [Extended<LineWidth>, Extended<CssColor>] |
@@ -1866,7 +1733,6 @@ export type TextStroke_StyleType = LineWidth | CssNonNumericColor |
 /**
  * Type for the [[textTransform]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform" target="mdn">MDN Page</a>
- *
  */
 export type TextTransform_StyleType = "none" | "capitalize" | "uppercase" | "lowercase" | "full-width" | "full-size-kana";
 
@@ -1875,7 +1741,6 @@ export type TextTransform_StyleType = "none" | "capitalize" | "uppercase" | "low
 /**
  * Type for the [[textUnderlinePosition]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-position" target="mdn">MDN Page</a>
- *
  */
 export type TextUnderlinePosition_StyleType = "auto" | "under" | "left" | "right" | "auto-pos" | "above" | "below";
 
@@ -1884,7 +1749,6 @@ export type TextUnderlinePosition_StyleType = "auto" | "under" | "left" | "right
 /**
  * Type for the [[touchAction]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action" target="mdn">MDN Page</a>
- *
  */
 export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
     "pan-x" | "pan-left" | "pan-right" | "pan-y" | "pan-up" | "pan-down" | "pinch-zoom" |
@@ -1898,7 +1762,6 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
 /**
  * Type for [[transform]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform" target="mdn">MDN Page</a>
- *
  */
 export type Transform_StyleType = "none" | OneOrMany<TransformFuncs>;
 
@@ -1907,7 +1770,6 @@ export type Transform_StyleType = "none" | OneOrMany<TransformFuncs>;
 /**
  * Type for [[transformBox]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform-box" target="mdn">MDN Page</a>
- *
  */
 export type TransformBox_StyleType = "content-box" | "border-box" | "fill-box" | "stroke-box" | "view-box";
 
@@ -1916,7 +1778,6 @@ export type TransformBox_StyleType = "content-box" | "border-box" | "fill-box" |
 /**
  * Type for [[transformOrigin]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin" target="mdn">MDN Page</a>
- *
  */
 export type TransformOrigin_StyleType = HorizontalPositionKeyword | VerticalPositionKeyword | CssLength |
     [Extended<HorizontalPositionKeyword | CssLength>, Extended<VerticalPositionKeyword | CssLength>, Extended<CssLength>?];
@@ -1926,7 +1787,6 @@ export type TransformOrigin_StyleType = HorizontalPositionKeyword | VerticalPosi
 /**
  * Type for [[transformStyle]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform-style" target="mdn">MDN Page</a>
- *
  */
 export type TransformStyle_StyleType = "flat" | "preserve-3d";
 
@@ -1934,7 +1794,7 @@ export type TransformStyle_StyleType = "flat" | "preserve-3d";
 
 /**
  * Type for single transition
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transition" target="mdn">MDN Page</a>
  */
 export type Transition_Single = string |
     {
@@ -1947,7 +1807,6 @@ export type Transition_Single = string |
 /**
  * Type for [[transition]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transition" target="mdn">MDN Page</a>
- *
  */
 export type Transition_StyleType = OneOrMany<Transition_Single>;
 
@@ -1955,14 +1814,13 @@ export type Transition_StyleType = OneOrMany<Transition_Single>;
 
 /**
  * Type for single [[transitionProperty]] style property
- *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property" target="mdn">MDN Page</a>
  */
 export type TransitionProperty = "none" | "all" | keyof IStyleset | IVarRule;
 
 /**
  * Type for [[transitionProperty]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property" target="mdn">MDN Page</a>
- *
  */
 export type TransitionProperty_StyleType = OneOrMany<TransitionProperty>;
 
@@ -1971,7 +1829,6 @@ export type TransitionProperty_StyleType = OneOrMany<TransitionProperty>;
 /**
  * Type for the [[IStyleset.translate|translate]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/translate" target="mdn">MDN Page</a>
- *
  */
 export type Translate_StyleType = "none" | CssLength |
     [Extended<CssLength>, Extended<CssLength>, Extended<CssLength>?];
@@ -1981,7 +1838,6 @@ export type Translate_StyleType = "none" | CssLength |
 /**
  * Type for the [[unicodeBidi]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/unicode-bidi" target="mdn">MDN Page</a>
- *
  */
 export type UnicodeBidi_StyleType = "normal" | "embed" | "isolate" | "bidi-override" | "isolate-override" | "plaintext";
 
@@ -1990,7 +1846,6 @@ export type UnicodeBidi_StyleType = "normal" | "embed" | "isolate" | "bidi-overr
 /**
  * Type for the [[userSelect]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/user-select" target="mdn">MDN Page</a>
- *
  */
 export type UserSelect_StyleType = "auto" | "text" | "none" | "contain" | "all";
 
@@ -1999,7 +1854,6 @@ export type UserSelect_StyleType = "auto" | "text" | "none" | "contain" | "all";
 /**
  * Type for the [[verticalAlign]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/vertical-align" target="mdn">MDN Page</a>
- *
  */
 export type VerticalAlign_StyleType = "baseline" | "sub" | "super" | "text-top" | "text-bottom" |
     "middle" | "top" | "bottom" | CssLength;
@@ -2009,7 +1863,6 @@ export type VerticalAlign_StyleType = "baseline" | "sub" | "super" | "text-top" 
 /**
  * Type for the [[visibility]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/visibility" target="mdn">MDN Page</a>
- *
  */
 export type Visibility_StyleType = "visible" | "hidden" | "collapse";
 
@@ -2018,7 +1871,6 @@ export type Visibility_StyleType = "visible" | "hidden" | "collapse";
 /**
  * Type for the [[vectorEffect]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/vector-effect" target="mdn">MDN Page</a>
- *
  */
 export type VectorEffect_StyleType = "none" | "non-scaling-stroke" | "non-scaling-size" | "non-rotation" | "fixed-position";
 
@@ -2027,7 +1879,6 @@ export type VectorEffect_StyleType = "none" | "non-scaling-stroke" | "non-scalin
 /**
  * Type for the [[whiteSpace]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/white-space" target="mdn">MDN Page</a>
- *
  */
 export type WhiteSpace_StyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "pre-line" | "break-spaces";
 
@@ -2036,7 +1887,6 @@ export type WhiteSpace_StyleType = "normal" | "pre" | "nowrap" | "pre-wrap" | "p
 /**
  * Type for [[willChange]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/will-change" target="mdn">MDN Page</a>
- *
  */
 export type WillChange_StyleType = "auto" | OneOrMany<"scroll-position" | "contents" | Exclude<keyof IStyleset,"willChange">>;
 
@@ -2045,7 +1895,6 @@ export type WillChange_StyleType = "auto" | OneOrMany<"scroll-position" | "conte
 /**
  * Type for the [[wordBreak]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/word-break" target="mdn">MDN Page</a>
- *
  */
 export type WordBreak_StyleType = "normal" | "break-all" | "keep-all" | "break-word";
 
@@ -2054,7 +1903,6 @@ export type WordBreak_StyleType = "normal" | "break-all" | "keep-all" | "break-w
 /**
  * Type for the [[wordSpacing]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing" target="mdn">MDN Page</a>
- *
  */
 export type WordSpacing_StyleType = "normal" | CssLength;
 
@@ -2063,7 +1911,6 @@ export type WordSpacing_StyleType = "normal" | CssLength;
 /**
  * Type for the [[writingMode]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode" target="mdn">MDN Page</a>
- *
  */
 export type WritingMode_StyleType = "horizontal-tb" | "vertical-rl" | "vertical-lr" | "sideways-rl" | "sideways-lr";
 
@@ -2072,7 +1919,6 @@ export type WritingMode_StyleType = "horizontal-tb" | "vertical-rl" | "vertical-
 /**
  * Type for the [[zIndex]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/z-index" target="mdn">MDN Page</a>
- *
  */
 export type ZIndex_StyleType = "auto" | CssNumber;
 
@@ -2090,7 +1936,6 @@ export type Zoom_StyleType = "normal" | "reset" | CssPercent;
 
 /**
  * Type for style properties for which there is no special type defined.
- *
  */
 export type DefaultStyleType = string;
 
