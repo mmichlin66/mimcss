@@ -34,7 +34,7 @@ class MyStyles extends css.StyleDefinition
         ],
 
         // redefine custom properties to give each block a different color and transition duration.
-        // The beauty of CSS-in-JS is that we can use the full power of JvaScript to create styles;
+        // The beauty of CSS-in-JS is that we can use the full power of JavaScript to create styles;
         // for example, the following line creates an array of custom CSS property re-definitions
         // for the ":nth-of-type" pseudo class. The commented out section below shows how to create
         // it manually.
@@ -129,18 +129,24 @@ class MyComponent extends mim.Component
 
     private onTranslateChanged( e: Event)
     {
-        styles.translate.setValue( css.vw( parseFloat( (e.currentTarget as HTMLInputElement).value)))
+        styles.translate.setValue( css.vw( getElementValueFromEvent(e)));
     }
 
     private onScaleChanged( e: Event)
     {
-        styles.scale.setValue( parseFloat((e.currentTarget as HTMLInputElement).value))
+        styles.scale.setValue( getElementValueFromEvent(e));
     }
 
     private onDegChanged( e: Event)
     {
-        styles.rotate.setValue( css.deg( parseFloat( (e.currentTarget as HTMLInputElement).value)))
+        styles.rotate.setValue( css.deg( getElementValueFromEvent(e)));
     }
+}
+
+/** Helper function to get value from the clicked range control */
+function getElementValueFromEvent(e: Event): number
+{
+    return parseFloat((e.currentTarget as HTMLInputElement).value);
 }
 
 

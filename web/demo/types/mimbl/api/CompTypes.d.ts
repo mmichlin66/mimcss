@@ -178,7 +178,7 @@ export interface CallbackWrappingParams<T extends Function = Function> {
     /** Argument that is supplied to the callback as a last parameter. */
     arg?: any;
     /** Component that will be set as a current component when the callback is invoked. */
-    comp?: IComponent;
+    comp?: IComponent | null;
     /** Type of scheduling the Mimbl tick after the callback function returns. */
     schedulingType?: TickSchedulingType;
 }
@@ -373,18 +373,18 @@ export declare type ElmRefPropType<T extends Element = Element> = RefPropType<IE
  */
 export interface IVNode {
     /** Gets node's parent. This is undefined for the top-level (root) nodes. */
-    readonly parent?: IVNode;
+    readonly parent?: IVNode | null;
     /** Level of nesting at which the node resides relative to the root node. */
     readonly depth?: number;
     /** Component that created this node in its render method (or undefined). */
-    readonly creator?: IComponent;
+    readonly creator?: IComponent | null;
     /**
      * Zero-based index of this node in the parent's list of sub-nodes. This is zero for the
      * root nodes that don't have parents.
      */
-    readonly index?: number;
+    readonly index: number;
     /** List of sub-nodes. */
-    readonly subNodes?: IVNode[];
+    readonly subNodes?: IVNode[] | null;
     /**
      * Gets node's display name. This is used mostly for tracing and error reporting. The name
      * can change during the lifetime of the virtual node; for example, it can reflect an "id"
@@ -455,7 +455,7 @@ export interface IVNode {
  */
 export interface IClassCompVN extends IVNode {
     /** Gets the component instance. */
-    readonly comp: IComponent;
+    readonly comp?: IComponent;
     /**
      * Object that is used mainly by the managed components. It keeps the properties first passed
      * to the componet's constructor and then changed when the component is updated through its
@@ -498,7 +498,7 @@ export interface IElmVN<T extends Element = Element> extends IVNode {
     /** Gets the DOM element name. */
     readonly elmName: string;
     /** Gets the DOM element object. */
-    readonly elm: Element;
+    readonly elm: Element | null;
     /**
      * Requests update of the element properties without re-rendering of its children.
      * @param props
@@ -600,7 +600,7 @@ export interface ITextVN extends IVNode {
     /** Text of the node. */
     readonly text: string | ITrigger<string>;
     /** Text DOM node. */
-    readonly textNode: Text;
+    readonly textNode: Text | null;
     /**
      * Requests update of the text.
      * @param text Text to set to the node.

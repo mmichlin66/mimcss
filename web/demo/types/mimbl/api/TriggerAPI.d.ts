@@ -53,7 +53,7 @@ export declare const exitMutationScope: () => void;
  * depending on the value type: Shallow for arrays, maps and sets and Deep for objects.
  * The form `@trigger(n)` designates a trigger decorator factory with the specified depth.
  */
-export declare const trigger: (targetOrDepth: any, name?: string) => any;
+export declare const trigger: (targetOrDepth: any, name?: string | undefined) => any;
 /**
  * Decorator function for defining "get" properties or functions retuning a value so that this
  * value will automatically recalculated if any triggers on which this value depends have their
