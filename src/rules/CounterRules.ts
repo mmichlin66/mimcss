@@ -61,7 +61,7 @@ export class CounterStyleRule extends Rule implements ICounterStyleRule
 
 
 	/** SOM counter-style rule */
-	public cssRule: CSSCounterStyleRule;
+	declare public cssRule: CSSCounterStyleRule;
 
     /**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name

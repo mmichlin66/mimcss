@@ -29,16 +29,9 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 	{
 		super(sd);
 
+        this.inputStyleset = inputStyleset;
 		this.styleset = {};
 		this.dependentRules = {};
-
-		if (inputStyleset)
-        {
-            if (Array.isArray( inputStyleset))
-                inputStyleset.forEach( v => this.parse( sd, v));
-            else
-			    this.parse( sd, inputStyleset);
-        }
 	}
 
 
@@ -58,6 +51,23 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
      * implementation returns the selector text.
      */
     public toString(): string { return this.selectorText; }
+
+
+
+	// Processes the given rule.
+	public process( ruleName: string | null): void
+	{
+        let inputStyleset = this.inputStyleset;
+		if (inputStyleset)
+        {
+            if (Array.isArray( inputStyleset))
+                inputStyleset.forEach( v => this.parse( this.sd, v));
+            else
+			    this.parse( this.sd, inputStyleset);
+        }
+
+        this.forEachDepRule( (depRule: DepRule) => depRule.process( null));
+	}
 
 
 
@@ -116,20 +126,12 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
                     });
                 }
             }
-			else if (this.parseSP( propName, propVal))
+			else if (!this.parseSP( propName, propVal))
 			{
 				// this is a regular CSS property: copy the property value to our internal styleset
                 mergePropValues( this.styleset, propName, propVal)
 			}
 		}
-	}
-
-
-
-	// Processes the given rule.
-	public process( ruleName: string | null): void
-	{
-        this.forEachDepRule( (depRule: DepRule) => depRule.process( null));
 	}
 
 
@@ -145,7 +147,7 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 	// Inserts this rule into the given parent rule or stylesheet.
 	public insert( ruleBag: IMimcssRuleBag): void
 	{
-		if (this.hasRules())
+		if (this.hasProps())
 			this.cssRule = ruleBag.add( this.toCss())?.cssRule as R;
 
         // insert dependent rules under the same parent
@@ -214,9 +216,8 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 
 
 
- 	// Returns the additional part of the style rule beyond the styleset. For majority of style
-    // rules it is empty.
-	protected hasRules(): boolean { return Object.keys(this.styleset).length > 0; }
+ 	// Determines whether this style rule has style properties (that is, is not empty).
+	protected hasProps(): boolean { return Object.keys(this.styleset).length > 0; }
 
 	// Returns the selector part of the style rule.
 	protected abstract getSel(): string;
@@ -225,9 +226,10 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
     // rules it is empty.
 	protected getAux(): string { return ""; }
 
-    // Allows the derived classes to process style properties that the StyleRule doesn't know about.
-    // If false is returned, the property with the given name will not be added to the styleset.
-	protected parseSP( propName: string, propVal: any): boolean { return true; }
+    // Allows the derived classes to process style properties that the StyleRule doesn't know
+    // about. If true is returned, the property with the given name is considered processed and
+    // will not be added to the styleset.
+	protected parseSP( propName: string, propVal: any): boolean { return false; }
 
 
 
@@ -306,7 +308,7 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 
 
 	/** SOM style rule */
-	public cssRule: R;
+	declare public cssRule: R;
 
 	/**
 	 * Object containing dependent rules. Property names are taken from special properties
@@ -318,7 +320,9 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 	// Resultant object defining properties to be inserted into DOM.
 	protected styleset: Styleset;
 
-	// Selector string cached after it is first obtained. Needed to not invoke getSelectorString
+    private inputStyleset?: Styleset | Styleset[];
+
+    // Selector string cached after it is first obtained. Needed to not invoke getSelectorString
 	// multiple times in the presence of dependent rules.
 	private _sel: string | null = null;
 }
@@ -487,22 +491,6 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 	// Prefix for CSS classes.
 	public get prefix(): "." { return "."; }
 
-    // Allows the derived classes to process style properties that the StyleRule doesn't know about.
-    // If returns false, the property with the given name will not be added to the styleset.
-	protected parseSP( propName: string, propVal: any): boolean
-    {
-        if (propName == "++")
-        {
-            let rules = propVal as ClassMoniker;
-            if (rules)
-                this.parents = Array.isArray(rules) ? rules : [rules];
-
-            return false;
-        }
-
-        return super.parseSP( propName, propVal);
-    }
-
 	// Processes the given rule.
 	public process( ruleName: string | null): void
 	{
@@ -517,6 +505,22 @@ export class ClassRule extends NamedStyleRule implements IClassRule
             this.cssName = "." + this.name.replace( / /g, ".");
         }
 	}
+
+    // Allows the derived classes to process style properties that the StyleRule doesn't know about.
+    // If returns false, the property with the given name will not be added to the styleset.
+	protected parseSP( propName: string, propVal: any): boolean
+    {
+        if (propName == "++")
+        {
+            let rules = propVal as ClassMoniker;
+            if (rules)
+                this.parents = Array.isArray(rules) ? rules : [rules];
+
+            return true;
+        }
+
+        return false;
+    }
 
     // remembered value of the "++" property of the input styleset
     private parents?: ClassMoniker[];
@@ -576,21 +580,18 @@ export class PageRule extends StyleRule<CSSPageRule> implements IPageRule
     {
         if (propName.startsWith("@"))
         {
-            if (!this.marginBoxes)
-                this.marginBoxes = new Map<string,Styleset>();
-
             this.marginBoxes.set( propName, propVal)
-            return false;
+            return true;
         }
 
-        return super.parseSP( propName, propVal);
+        return false;
     }
 
  	// Returns the additional part of the style rule beyond the styleset. For majority of style
     // rules it is empty.
-	protected hasRules(): boolean
+	protected hasProps(): boolean
     {
-        return super.hasRules() || this.marginBoxes?.size !== 0;
+        return super.hasProps() || this.marginBoxes.size !== 0;
     }
 
     // Returns the CSS string representing the style rule's selector.
@@ -604,22 +605,20 @@ export class PageRule extends StyleRule<CSSPageRule> implements IPageRule
 	protected getAux(): string
     {
         let s = "";
-        this.marginBoxes?.forEach( (boxStyleset, boxName) => s += `${boxName}{${s2s(boxStyleset)}}`);
+        this.marginBoxes.forEach( (boxStyleset, boxName) => s += `${boxName}{${s2s(boxStyleset)}}`);
         return s;
     }
 
     /** SOM page rule */
-    public cssRule: CSSPageRule;
+    declare public cssRule: CSSPageRule;
 
     /** Optional page seclector name of the page pseudo style (e.g. "":first") */
     public pageSelector?: PageSelector;
 
     /**
-     * Map of margin box names to their stylesets. We cannot create the Map object here because it
-     * is being used by the parseSP method that is invoked from the StyleRule (parent class)
-     * constuctor - before this class initialization is performed.
+     * Map of margin box names to their stylesets.
      */
-    private marginBoxes: Map<string,Styleset>;
+    private marginBoxes = new Map<string,Styleset>();
 }
 
 

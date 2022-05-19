@@ -81,7 +81,7 @@ export abstract class GroupRule<T extends IStyleDefinition, R extends CSSGroupin
 	public gsd: T;
 
 	/** SOM supports rule */
-	public cssRule: R | null;
+	declare public cssRule: R | null;
 
 	/** Name of the at-rule (e.g. "supports"). */
 	private rn: string;
@@ -111,15 +111,11 @@ export class SupportsRule<T extends IStyleDefinition> extends GroupRule<T,CSSSup
 		this.stmt = statement;
 	}
 
-
-
 	/** Flag indicated whether the browser supports this rule's query */
     public get isSupported(): boolean
     {
         return window && CSS.supports( this.condition);
     }
-
-
 
 	// Returns the condition string of this grouping rule.
 	protected getCond(): string | null
@@ -146,15 +142,11 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T,CSSMediaR
 		this.stmt = statement;
 	}
 
-
-
 	// Returns the condition string of this grouping rule.
 	protected getCond(): string | null
     {
         return media2s( this.stmt);
     }
-
-
 
     /**
      * Returns `MediaQueryList` object that allows programmatic checking whether the document matches

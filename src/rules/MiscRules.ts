@@ -32,7 +32,7 @@ abstract class MiscRule<T extends CSSRule> extends Rule
     protected abstract toCss(): string;
 
 	/** SOM font-face rule */
-	public cssRule: T;
+	declare public cssRule: T;
 }
 
 

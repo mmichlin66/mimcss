@@ -30,8 +30,6 @@ export class KeyframesRule extends Rule implements IKeyframesRule
 	// Processes the given rule.
 	public process( ruleName: string | null)
 	{
-		super.process( ruleName);
-
 		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
 
         if (this.frameRules)
@@ -65,7 +63,7 @@ export class KeyframesRule extends Rule implements IKeyframesRule
 
 
 	/** SOM keyframes rule */
-	public cssRule: CSSKeyframesRule;
+	declare public cssRule: CSSKeyframesRule;
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name

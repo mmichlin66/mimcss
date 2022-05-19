@@ -35,17 +35,6 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
         this.cssName = "--" + this.name;
     }
 
-	/**
-     * Copies the internal data from the given object.
-     */
-    public copy( other: any): void
-    {
-        if (other instanceof VarBaseRule)
-            this.value = other.value;
-    }
-
-
-
     /**
      * Gets the value of the property.
      */
