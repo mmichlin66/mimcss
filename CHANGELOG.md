@@ -1,3 +1,9 @@
+# 0.11.15
+
+1. Fix problems with using `ESNext` as a target (in `tsconfig.json`).
+1. Use zeros as default values for `x` and `y` coordinates in the `BoxShadow` and `TextShadow` style property types.
+
+
 # 0.11.14
 
 1. Do not activate *theme declarations* (classes that directly derive from `ThemeDefinition`) including when they are referenced from other style declaration classes via the `$use()` method. Theme declarations should not be activated on their own as all the rules they contain are inserted into the DOM when *theme implementations* (classes that derive from theme declarations) are activated.
