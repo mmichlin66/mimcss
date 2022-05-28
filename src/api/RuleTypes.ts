@@ -439,6 +439,22 @@ export interface IColorProfileRule extends IRule, INamedEntity
 
 
 /**
+ * The IScrollTimelineRule interface represents a `@scroll-timeline` at rule. This rule generates a
+ * timeline name, which can be later used in the [[animationTimeline]] style property.
+ * Objects implementing this interface are returned from the [[$scrollTimeline]] method.
+ */
+export interface IScrollTimelineRule extends IRule, INamedEntity
+{
+    /** Name of the scroll timeline rule that can be used in the [[animationTimeline]] style property. */
+    readonly timelineName: string;
+
+    // /** CSSOM scroll timeline rule rule (not defined yet) */
+	// readonly cssRule: CSSScrollTimelineRule | null;
+}
+
+
+
+/**
  * The `IStyleDefinition` interface represents a class that contain defininitions of CSS rules.
  * This interface is implemented by the [[StyleDefinition]] class and is not intended to be
  * implemented by developers

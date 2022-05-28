@@ -290,6 +290,21 @@ export interface IStyleset
     animationTimingFunction?: OneOrMany<TimingFunction>;
 
     /**
+     * The **animation-timeline** CSS property specifies the names of one or more `@scroll-timeline`
+     * at-rules describing the scroll animations to apply to the element.
+     *
+     * **See Also:**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timeline" target="mdn">MDN Page</a>
+     *
+     * **Usage in Mimcss:**
+     *
+     * ```typescript
+     * [[include: styleProps/a/animationTimeline.ts]]
+     * ```
+     */
+    animationTimeline?: OneOrMany<st.AnimationTimeline_Single>;
+
+    /**
      * The **appearance** CSS property is used to display an element using platform-native styling,
      * based on the operating system's theme.
      *
@@ -2421,11 +2436,6 @@ export interface IStyleset
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/margin-trim" target="mdn">MDN Page</a>
      */
     marginTrim?: st.MarginTrim_StyleType;
-
-    /**
-     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marker" target="mdn">MDN Page</a>
-     */
-    marker?: st.DefaultStyleType;
 
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marker-end" target="mdn">MDN Page</a>

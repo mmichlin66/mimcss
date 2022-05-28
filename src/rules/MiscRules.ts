@@ -1,14 +1,15 @@
 import {
     IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition,
-    IColorProfileRule, IPageNameRule, ILayerNameRule, ILayerBlockRule, ILayerOrderRule, LayerMoniker, ImportRuleOptions
+    IColorProfileRule, IPageNameRule, ILayerNameRule, ILayerBlockRule, ILayerOrderRule, LayerMoniker,
+    ImportRuleOptions, IScrollTimelineRule
 } from "../api/RuleTypes";
 import {ExtendedFontFace} from "../api/FontTypes"
-import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {ColorProfileRenderingIntent} from "../api/ColorTypes";
-import {fontFace2s} from "../impl/MiscImpl"
+import {fontFace2s, scrollTimeline2s} from "../impl/MiscImpl"
 import {Rule, IMimcssRuleBag, NamedRuleLike} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {a2s, symV2S, v2s} from "../impl/Utils";
+import { ExtendedScrollTimeline } from "../api/ScrollTimelineTypes";
 
 
 
@@ -183,7 +184,7 @@ export class ClassNameRule extends NamedRuleLike implements IClassNameRule
 /**
  * The ColorProfileRule class represents the CSS @color-profile rule.
  */
-export class ColorProfileRule extends Rule implements IColorProfileRule
+export class ColorProfileRule extends MiscRule<CSSRule> implements IColorProfileRule
 {
 	public constructor( sd: IStyleDefinition, url: string, intent?: ColorProfileRenderingIntent,
         nameOverride?: IColorProfileRule | string)
@@ -203,10 +204,10 @@ export class ColorProfileRule extends Rule implements IColorProfileRule
     }
 
 	// Inserts this rule into the given parent rule or stylesheet.
-	public insert( ruleBag: IMimcssRuleBag): void
+	public toCss(): string
 	{
-		this.cssRule = ruleBag.add( `@color-profile ${this.name} {src:url('${this.url}');` +
-            (this.intent ? `rendering-intent:${this.intent};}` : "}")).cssRule;
+		return `@color-profile ${this.name} {src:url('${this.url}');` +
+            (this.intent ? `rendering-intent:${this.intent};}` : "}");
 	}
 
     // Implementation of the toString method returns the profile name.
@@ -221,6 +222,49 @@ export class ColorProfileRule extends Rule implements IColorProfileRule
     private url: string;
     private intent?: ColorProfileRenderingIntent;
     private nameOverride?: IColorProfileRule | string;
+}
+
+
+
+/**
+ * The FontFaceRule class describes a @font-face CSS rule.
+ */
+export class ScrollTimelineRule extends MiscRule<CSSRule/*CSSScrollTimelineRule*/> implements IScrollTimelineRule
+{
+	public constructor( sd: IStyleDefinition, timeline: ExtendedScrollTimeline, nameOverride?: IScrollTimelineRule | string)
+	{
+		super(sd);
+
+		this.timeline = timeline;
+        this.nameOverride = nameOverride;
+	}
+
+	// Processes the given rule.
+	public process( ruleName: string | null): void
+	{
+        this.name = this.rc.getScopedName( ruleName, this.nameOverride);
+    }
+
+    // Implementation of the toString method returns the profile name.
+	public toString(): string { return this.name; }
+
+	// Returns CSS string for this rule.
+    protected toCss(): string
+    {
+		return `@scroll-timeline {${scrollTimeline2s( this.timeline)}}`;
+    }
+
+    /** Name of the scroll timeline rule that can be used in the [[animationTimeline]] style property. */
+    public get timelineName(): string { return this.name; }
+
+    /** Scroll timeline name */
+    public name: string;
+
+	/** Object defining scroll timeline properties. */
+	private timeline: ExtendedScrollTimeline;
+
+    /** String or another IScrollTimelineRule object overriding Mimcss name assignment mechanism */
+    private nameOverride?: IScrollTimelineRule | string;
 }
 
 

@@ -1,5 +1,6 @@
-import { CallbackWrappingParams, ComponentShadowOptions, CompProps, IClassCompVN, IComponent, ICustomAttributeHandlerClass, IRef, ITextVN, IVNode, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, TickSchedulingType, UpdateStrategy } from "./CompTypes";
+import { CallbackWrappingOptions, ComponentShadowOptions, CompProps, IComponent, ICustomAttributeHandlerClass, IPublication, IRef, IServiceDefinitions, ISubscription, ITextVN, IVNode, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, TickSchedulingType } from "./CompTypes";
 import { EventSlot } from "./EventSlotAPI";
+import { ClassCompVN } from "../core/ClassCompVN";
 import { DN } from "../core/VNTypes";
 /**
  * Decorator function for components that allows them to use shadow DOM.
@@ -23,9 +24,9 @@ import { DN } from "../core/VNTypes";
 export declare const withShadow: (options: Function | ComponentShadowOptions) => any;
 /**
  * Wraps the given callback and returns a function with identical signature.
- * @param params
+ * @param options
  */
-export declare function wrapCallback<T extends Function>(params?: CallbackWrappingParams<T>): T;
+export declare function wrapCallback<T extends Function>(func: T, options?: CallbackWrappingOptions): T;
 /**
  * Reference class to use whenever a reference to an object is needed - for example, with JSX `ref`
  * attributes and services.
@@ -81,7 +82,7 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * is undefined in the component's costructor but will be defined before the call to the
      * (optional) willMount method.
      */
-    vn: IClassCompVN;
+    vn: ClassCompVN;
     /**
      * Component properties passed to the constructor. This is normally used only by managed
      * components and is usually undefined for independent components.
@@ -99,14 +100,6 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * @param newProps
      */
     updateProps(newProps: CompProps<TProps, TChildren>): void;
-    displayName?: string;
-    willMount?(): void;
-    didMount?(): void;
-    didReplace?(oldComp: IComponent<TProps, TChildren>): void;
-    willUnmount?(): void;
-    shouldUpdate?(newProps: CompProps<TProps, TChildren>): boolean;
-    handleError?(err: any): any;
-    getUpdateStrategy?(): UpdateStrategy;
     /**
      * Determines whether the component is currently mounted. If a component has asynchronous
      * functionality (e.g. fetching data from a server), component's code may be executed after
@@ -116,7 +109,7 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
     /**
      * This method is called by the component to request to be updated. If no arguments are
      * provided, the entire component is requested to be updated. If arguments are provided, they
-     * indicate what rendering functions should be updated.
+     * indicate what rendering function should be updated.
      * @param func Optional rendering function to invoke
      * @param arg Optional argument to pass to the rendering function.
      */
@@ -137,7 +130,7 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * @param func Function to be called
      * @param thisArg Object that will be used as "this" value when the function is called. If this
      *   parameter is undefined, the component instance will be used (which allows scheduling
-     *   regular unbound components' methods). This parameter will be ignored if the the function
+     *   regular unbound components' methods). This parameter will be ignored if the function
      *   is already bound or is an arrow function.
      */
     protected callMeAfterUpdate(func: ScheduledFuncType, thisArg?: any): void;
@@ -154,6 +147,39 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * @returns Wrapped callback that will run the original callback in the proper context.
      */
     wrap<T extends Function>(func: T, arg?: any, thisArg?: any, schedulingType?: TickSchedulingType): T;
+    /**
+     * Registers the given value as a service with the given ID that will be available for
+     * consumption by descendant components.
+     * @param id Unique service identifier
+     * @param value Current value of the service
+     * @param depth Number of level to watch for changes. The default value is 1; that is, the
+     * subscribers will be notified if the service's value or the values of its properties have
+     * changed.
+     * @returns Publication object, which allows setting a new value of the service or changing
+     * values of its properties.
+     */
+    publishService<K extends keyof IServiceDefinitions>(id: K, value: IServiceDefinitions[K], depth?: number): IPublication<K>;
+    /**
+     * Subscribes to a service with the given ID. If the service with the given ID is registered
+     * by this or one of the ancestor components, the returned subscription object's `value`
+     * property will reference it; otherwise, the value will be set to the defaultValue (if
+     * specified) or will remain undefined. Whenever the value of the service that is registered by
+     * this or a closest ancestor component is changed, the subscription's `value` property will
+     * receive the new value.
+     *
+     * If the subscription object's `value` property is used in a component's rendering code, the
+     * component will be re-rendered every time the service value is changed.
+     *
+     * @param id Unique service identifier
+     * @param defaultValue Optional default value that will be assigned if the service is not
+     * published yet.
+     * @param useSelf Flag indicating whether the search for the service should start from the
+     * virtual node that calls this method. The default value is `false` meaning the search starts
+     * from the parent virtual node.
+     * @returns Subscription object, which provides the value of the service and allowes attaching
+     * to the event fired when the value is changed.
+     */
+    subscribeService<K extends keyof IServiceDefinitions>(id: K, defaultValue?: IServiceDefinitions[K], useSelf?: boolean): ISubscription<K>;
 }
 /**
  * Creates a Function Proxy virtual node that wraps the given function with the given argument.

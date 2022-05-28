@@ -13,7 +13,7 @@ import {
     IRayFunc, TransformFuncs
 } from "./ShapeTypes";
 import {
-    IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule
+    IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule, IScrollTimelineRule
 } from "./RuleTypes";
 import {IStyleset} from "./Stylesets";
 import { IPageNameRule } from "..";
@@ -125,6 +125,14 @@ export type AnimationFillModeKeywords = "none" | "forwards" | "backwards" | "bot
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count" target="mdn">MDN Page</a>
  */
 export type AnimationIterationCount_Single = "infinite" | CssNumber;
+
+
+
+/**
+ * Type for [[animationTimeline]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timeline" target="mdn">MDN Page</a>
+ */
+export type AnimationTimeline_Single = "none" | IScrollTimelineRule | string;
 
 
 

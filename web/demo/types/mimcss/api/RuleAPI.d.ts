@@ -1,10 +1,11 @@
 import { CssSelector, ElementTagName, ExtendedProp, PageSelector } from "./CoreTypes";
-import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IKeyframesRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule, ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions } from "./RuleTypes";
+import { IStyleRule, IClassRule, IIDRule, AnimationFrame, IKeyframesRule, IVarRule, ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule, IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker, NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule, ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions, IScrollTimelineRule } from "./RuleTypes";
 import { MediaStatement, SupportsStatement } from "./MediaTypes";
 import { ExtendedFontFace } from "./FontTypes";
 import { ColorProfileRenderingIntent } from "./ColorTypes";
 import { ExtendedCounterStyleset } from "./CounterTypes";
 import { VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset, ISyntaxTypeStyleset, PageRuleStyleset } from "./Stylesets";
+import { ExtendedScrollTimeline } from "./ScrollTimelineTypes";
 /**
  * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
  * Style definition classes are regular TypeScript classes and as such can have any fields and
@@ -818,6 +819,47 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * @returns `IColorProfileRule` object representing the `@color-profile` at-rule.
      */
     $colorProfile(url: string, intent?: ColorProfileRenderingIntent, nameOverride?: IColorProfileRule | string): IColorProfileRule;
+    /**
+     * Creates a new `@scroll-timeline` at-rule.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // define ID for scrolling container
+     *     id = this.$id();
+     *
+     *     // define animation
+     *     rotation = this.$keyframes([
+     *         ["from", {transform: css.rotate(0)}],
+     *         ["to", {transform: css.rotate(360)}],
+     *     ])
+     *
+     *     // define aniamtion scroll timeline
+     *     timeline = this.$scrollTimeline({
+     *         source: this.id,
+     *         orientation: "block",
+     *         scrollOffsets: [0, 300],
+     *     })
+     *
+     *     // use scroll timeline name in the `animation-timeline` style property
+     *     rotated = this.$class({
+     *         animationName: this.rotation,
+     *         animation-direction: "alternate",
+     *         animationTimeline: this.timeline
+     *     })
+     * }
+     * ```
+     *
+     * @param timeline URL to the color-profile file
+     * @param nameOverride String or another `IColorPrIScrollTimelineRuleofileRule` object that
+     * determines the name of the timeline. If this optional parameter is defined, the name will
+     * override the Mimcss name assignment mechanism. This might be useful if there is a need for
+     * the name to match a name of existing scroll timeline rule.
+     * @returns `IScrollTimelineRule` object representing the `@scroll-timeline` at-rule.
+     */
+    $scrollTimeline(timeline: ExtendedScrollTimeline, nameOverride?: IScrollTimelineRule | string): IScrollTimelineRule;
     /**
      * Creates a new `@supports` rule.
      *

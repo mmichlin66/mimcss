@@ -124,11 +124,15 @@ export interface IComponent<TProps = {}, TChildren = any> {
      * If this method is not implemented or if it throws an error, the error will be propagated up
      * the chain of components until it reaches a component that handles it. If none of the
      * components can handle the error, the entire tree will be unmounted.
-     * @param err An exception that was thrown during the component's own rendering or rendering
+     *
+     * This method should only change the internal state of the component so that the [[render]]
+     * method, which will be invoked right after the `handleError` method returns, will return
+     * content reflecting the error.
+     *
+     * @param err An error object that was thrown during the component's own rendering or rendering
      * of one of its descendants.
-     * @returns New content to be displayed for the component.
      */
-    handleError?(err: any): any;
+    handleError?(err: unknown): void;
     /**
      * Retrieves update strategy object that determines different aspects of component behavior
      * during updates.
@@ -169,10 +173,8 @@ export declare type UpdateStrategy = {
      */
     ignoreKeys?: boolean;
 };
-/** Type defining the information that can be supplied for a callback to be wrapped */
-export interface CallbackWrappingParams<T extends Function = Function> {
-    /** Callback function */
-    func: T;
+/** Type defining the options that can be supplied for a callback to be wrapped */
+export declare type CallbackWrappingOptions = {
     /** Object that will be referenced by "this" within the callback function */
     thisArg?: any;
     /** Argument that is supplied to the callback as a last parameter. */
@@ -181,7 +183,12 @@ export interface CallbackWrappingParams<T extends Function = Function> {
     comp?: IComponent | null;
     /** Type of scheduling the Mimbl tick after the callback function returns. */
     schedulingType?: TickSchedulingType;
-}
+};
+/** Type defining the information that can be supplied for a callback to be wrapped */
+export declare type CallbackWrappingParams<T extends Function = Function> = CallbackWrappingOptions & {
+    /** Callback function */
+    func: T;
+};
 /**
  * Type that can be passed as a callback to a component's property. It allows passing a callback
  * in one of the following forms:
@@ -313,25 +320,19 @@ export interface ICustomWebElements {
  */
 export interface IServiceDefinitions {
     /** Built-in error handling service. */
-    "StdErrorHandling": IErrorHandlingService;
-    /**
-     * Built-in service for lazy people - can be used for quick prototypes without the need to
-     * augment the interface.
-     */
-    "any": any;
+    "ErrorBoundary": IErrorBoundary;
 }
 /**
- * The IErrorHandlingService interface represents a service that can be invoked when an error -
+ * The IErrorBoundary interface represents a service that can be invoked when an error -
  * usually an exception - is encountered but cannot be handled locally. A component that implements
- * this service would normally remember the error and request to update itself, so that in its
- * render method it will present the error to the user.
+ * this service would normally remember the error and update itself, so that in its render method
+ * it will present the error to the user.
  *
- * The IErrorHandlingService is implemented by the Root Virtual Node as a last resort for error
- * handling. The Root VN will display a simple UI showing the error and will allow the user to
- * restart - in the hope that the error will not repeat itself.
+ * The IErrorBoundary is implemented by the Root Virtual Node as a last resort for error
+ * handling.
  */
-export interface IErrorHandlingService {
-    reportError(err: any): void;
+export interface IErrorBoundary {
+    reportError(err: unknown): void;
 }
 /**
  * Type of functions scheduled to be called either before or after the update cycle.
@@ -366,6 +367,35 @@ export declare type ElmRefType<T extends Element = Element> = RefType<IElmVN<T>>
  */
 export declare type ElmRefPropType<T extends Element = Element> = RefPropType<IElmVN<T>>;
 /**
+ * Represents a publication of a service.
+ */
+export interface IPublication<K extends keyof IServiceDefinitions> {
+    /** Returns the current value of the service */
+    value?: IServiceDefinitions[K];
+    /** Deletes this publication */
+    unpublish(): void;
+}
+/**
+ * Represents a subscription to a service. This interface allows getting the current value of the
+ * service and getting notifications on when the value is changed.
+ */
+export interface ISubscription<K extends keyof IServiceDefinitions> {
+    /** Returns the current value of the service */
+    readonly value?: IServiceDefinitions[K];
+    /**
+     * Attaches the given callback to the "change" event.
+     * @param callback Function that will be called when the value of the service changes.
+     */
+    attach(callback: (value?: IServiceDefinitions[K]) => void): void;
+    /**
+     * Detaches the given callback from the "change" event.
+     * @param callback Function that was attached to the "change" event by the [[aattach]] method.
+     */
+    detach(callback: (value?: IServiceDefinitions[K]) => void): void;
+    /** Deletes this subscription */
+    unsubscribe(): void;
+}
+/**
  * The IVNode interface represents a virtual node. Through this interface, callers can perform
  * most common actions that are available on every type of virtual node. Each type of virtual node
  * also implements a more specific interface through which the specific capabilities of the node
@@ -392,63 +422,17 @@ export interface IVNode {
      */
     readonly name?: string;
     /**
-     * Schedules the given function to be called either before any components scheduled to be
-     * updated in the Mimbl tick are updated or after all components have been updated.
-     * @param func Function to be called
-     * @param beforeUpdate Flag indicating whether the function will be called just before the Mimbl
-     * tick (true) or right after (false)
-     * @param thisArg Object that will be used as "this" value when the function is called. If this
-     *   parameter is undefined, the component instance will be used (which allows scheduling
-     *   regular unbound components' methods). This parameter will be ignored if the function
-     *   is already bound or is an arrow function.
-     */
-    callMe(func: ScheduledFuncType, beforeUpdate: boolean, thisArg?: any): void;
-    /**
-     *
-     * @param func Callback function to be wrapped
-     * @param thisArg Object to be used as `this` when calling the callback
-     * @param arg Optional argument to be passed to the callback in addition to the original
-     * callback arguments.
-     * @param schedulingType Type of scheduling the Mimbl tick after the callback function returns.
-     * @returns Wrapped callback that will run the original callback in the proper context.
-     */
-    wrap<T extends Function>(func: T, thisArg: any, arg?: any, schedulingType?: TickSchedulingType): T;
-    /**
-     * Registers an object of any type as a service with the given ID that will be available for
-     * consumption by descendant components.
-     */
-    publishService<K extends keyof IServiceDefinitions>(id: K, service: IServiceDefinitions[K]): void;
-    /** Unregisters a service with the given ID. */
-    unpublishService<K extends keyof IServiceDefinitions>(id: K): void;
-    /**
-     * Subscribes to a service with the given ID. If the service with the given ID is registered
-     * by this or one of the ancestor components, the passed Ref object will reference it;
-     * otherwise, the Ref object will be set to the defaultValue (if specified) or will remain
-     * undefined. Whenever the value of the service that is registered by this or a closest
-     * ancestor component is changed,the Ref object will receive the new value.
-     * The useSelf optional parameter determines whether the component can subscribe to the
-     * service published by itself. The default is false.
-     * @param id
-     * @param ref
-     * @param defaultService
-     * @param useSelf
-     */
-    subscribeService<K extends keyof IServiceDefinitions>(id: K, ref: RefPropType<IServiceDefinitions[K]>, defaultService?: IServiceDefinitions[K], useSelf?: boolean): void;
-    /**
-     * Unsubscribes from a service with the given ID. The Ref object that was used to subscribe
-     * will be set to undefined.
-     * @param id
-     */
-    unsubscribeService<K extends keyof IServiceDefinitions>(id: K): void;
-    /**
      * Retrieves the value for a service with the given ID registered by a closest ancestor
      * component or the default value if none of the ancestor components registered a service with
      * this ID. This method doesn't establish a subscription and only reflects the current state.
-     * @param id
-     * @param defaultService
-     * @param useSelf
+     * @param id Unique service identifier
+     * @param defaultValue Default value to return if no publish service is found.
+     * @param useSelf Flag indicating whether the search for the service should start from the
+     * virtual node that calls this method. The default value is `false` meaning the search starts
+     * from the parent virtual node.
+     * @returns Current value of the service or default value if no published service is found.
      */
-    getService<K extends keyof IServiceDefinitions>(id: K, defaultService?: IServiceDefinitions[K], useSelf?: boolean): IServiceDefinitions[K];
+    getService<K extends keyof IServiceDefinitions>(id: K, defaultValue?: IServiceDefinitions[K], useSelf?: boolean): IServiceDefinitions[K];
 }
 /**
  * The IClassCompVN interface represents a virtual node for a JSX-based component.
@@ -478,18 +462,29 @@ export interface IClassCompVN extends IVNode {
      * @param arg Optional argument to pass to the rendering function.
      */
     updateMe(func?: RenderMethodType, arg?: any): void;
-}
-/**
- * The IManagedCompVN interface represents a virtual node for a JSX-based component.
- */
-export interface IManagedCompVN extends IClassCompVN {
-    /** Gets the component class. */
-    readonly compClass: IComponentClass;
-}
-/**
- * The IIndependentCompVN interface represents a virtual node for an independent component.
- */
-export interface IIndependentCompVN extends IClassCompVN {
+    /**
+     * Schedules the given function to be called either before any components scheduled to be
+     * updated in the Mimbl tick are updated or after all components have been updated.
+     * @param func Function to be called
+     * @param beforeUpdate Flag indicating whether the function will be called just before the Mimbl
+     * tick (true) or right after (false)
+     * @param thisArg Object that will be used as "this" value when the function is called. If this
+     *   parameter is undefined, the component instance will be used (which allows scheduling
+     *   regular unbound components' methods). This parameter will be ignored if the function
+     *   is already bound or is an arrow function.
+     */
+    callMe(func: ScheduledFuncType, beforeUpdate: boolean, thisArg?: any): void;
+    /**
+     * Returns a function that wraps the given callback so that when the return function is called
+     * the original callback is invoked in a proper context.
+     * @param func Callback function to be wrapped
+     * @param thisArg Object to be used as `this` when calling the callback
+     * @param arg Optional argument to be passed to the callback in addition to the original
+     * callback arguments.
+     * @param schedulingType Type of scheduling the Mimbl tick after the callback function returns.
+     * @returns Wrapped callback that will run the original callback in the proper context.
+     */
+    wrap<T extends Function>(func: T, thisArg: any, arg?: any, schedulingType?: TickSchedulingType): T;
 }
 /**
  * The IElmVN interface represents a virtual node for a DOM element.

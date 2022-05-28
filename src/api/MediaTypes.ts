@@ -1,4 +1,4 @@
-﻿import {IConstant, IGenericProxy, IRawProxy} from "./CoreTypes";
+﻿import {IGenericProxy, RawExtended} from "./CoreTypes";
 import {CssAspectRatio, CssNumber, CssLength, CssResolution} from "./NumericTypes";
 import {Styleset} from "./Stylesets";
 
@@ -10,19 +10,10 @@ export type MediaType = "all" | "print" | "screen" | "speech";
 
 
 /**
- * Type that extends the given type with the following types:
- * - [[IConstant]] interface that allows using a constant value.
- * - [[IRawProxy]] interface that allows specifying raw string value.
- */
-export type ExtendedFeature<T> = T | IConstant<T> | IRawProxy | null | undefined;
-
-
-
-/**
  * Type for a media feature that can be specified either as a single value or as a range between
  * two values of the given type.
  */
-export type OneOrRange<T> = T | [ExtendedFeature<T>, ExtendedFeature<T>?];
+export type OneOrRange<T> = T | [RawExtended<T>, RawExtended<T>?];
 
 
 
@@ -83,7 +74,7 @@ export interface IMediaFeatureset
  * allowing [[StringProxy]] and [[IConstant]] interfaces to the type that is defined in the
  * [[IMediaFeatureset]] interface.
  */
-export type ExtendedMediaFeatureset = { [K in keyof IMediaFeatureset]?: ExtendedFeature<IMediaFeatureset[K]> }
+export type ExtendedMediaFeatureset = { [K in keyof IMediaFeatureset]?: RawExtended<IMediaFeatureset[K]> }
 
 
 

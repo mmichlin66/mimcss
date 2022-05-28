@@ -157,8 +157,14 @@ export type V2SOptions = WKF | AnyToStringFunc |
     // Options to use if value is an array and the first element of it is also an array
     arr2?: WKF | V2SOptions | ((val: any[]) => string);
 
-    // Options to use if value is an object
+    // Options to use if value is an object. Note that if the object has symV2S synbol defined,
+    // this property is ignored and the function defined by the symbol is invoked. Use obj2
+    // property to override this behavior
     obj?: V2SOptions | P2SOptions;
+
+    // Options to use if value is an object, whcih override the function defined by the symV2S
+    // symbol
+    obj2?: V2SOptions | P2SOptions;
 
     // Options to use if type-specific function is not defined except for null and string values.
     // This is also used for array elements if arrItemFunc is not defined.
@@ -235,7 +241,14 @@ export const v2s = (val: any, options?: V2SOptions): string =>
         }
         else if (typeof val === "object")
         {
-            if (typeof val[symV2S] === "function")
+            if (options.obj2)
+            {
+                if (Array.isArray(options.obj2))
+                    return o2s( val, options.obj2, options.sep);
+                else
+                    newOptions = options.obj2;
+            }
+            else if (typeof val[symV2S] === "function")
                 return val[symV2S]();
             else if (typeof val.fn === "string")
                 return fdo2s( val);

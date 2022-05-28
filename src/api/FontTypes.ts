@@ -1,12 +1,5 @@
-﻿import {IRawProxy} from "./CoreTypes";
+﻿import {RawExtended} from "./CoreTypes";
 import {CssAngle, CssLength, CssNumber, CssPercent} from "./NumericTypes";
-
-
-
-/**
- * Type that extends the given type with the [[IRawProxy]] interface that allows specifying raw string value.
- */
-export type FontFaceExtended<T> = T | IRawProxy;
 
 
 
@@ -88,19 +81,19 @@ export type FontDisplay_FontFaceType = "auto" | "block" | "swap" | "fallback" | 
 
 /** Type of [[IFontFace.fontStretch]] property */
 export type FontStretch_FontFaceType = FontStretch |
-    [FontFaceExtended<FontStretch>, FontFaceExtended<FontStretch>];
+    [RawExtended<FontStretch>, RawExtended<FontStretch>];
 
 
 
 /** Type of [[IFontFace.fontStyle]] property */
 export type FontStyle_FontFaceType = FontStyle |
-    [FontFaceExtended<CssAngle>, FontFaceExtended<CssAngle>];
+    [RawExtended<CssAngle>, RawExtended<CssAngle>];
 
 
 
 /** Type of [[IFontFace.fontWeight]] property */
 export type FontWeight_FontFaceType = FontWeight |
-    [FontFaceExtended<FontWeight>, FontFaceExtended<FontWeight>];
+    [RawExtended<FontWeight>, RawExtended<FontWeight>];
 
 
 
@@ -108,10 +101,10 @@ export type FontWeight_FontFaceType = FontWeight |
 export type FontSrcFormat = "woff" | "woff2" | "truetype" | "opentype" | "embedded-opentype" | "svg";
 
 /** Type of a single part of the [[IFontFace.src]] property */
-export type FontSrc = string | { local: FontFaceExtended<string> } |
+export type FontSrc = string | { local: RawExtended<string> } |
     {
-        url: FontFaceExtended<string>,
-        format?: FontFaceExtended<FontSrcFormat | FontSrcFormat[]>
+        url: RawExtended<string>,
+        format?: RawExtended<FontSrcFormat | FontSrcFormat[]>
     };
 
 /** Type of [[IFontFace.src]] property */
@@ -202,10 +195,10 @@ export interface IFontFace
 /**
  * The `ExtendedFontFace` type maps all @font-face properties defined in the [[IFontFace]]
  * interface to the "extended" versions of their types. These extended types are defined using the
- * [[FontFaceExtended]] generic type, which adds [[IRawProxy]] to the type
+ * [[RawExtended]] generic type, which adds [[IRawProxy]] to the type
  * that is defined in the [[IFontFace]] interface.
  */
-export type ExtendedFontFace = { [K in keyof IFontFace]: FontFaceExtended<IFontFace[K]> }
+export type ExtendedFontFace = { [K in keyof IFontFace]: RawExtended<IFontFace[K]> }
 
 
 

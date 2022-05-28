@@ -3,6 +3,8 @@ import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsSta
 import {sp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf, propSet2s} from "./Utils";
 import {ExtendedCounterStyleset, ICounterStyleset} from "../api/CounterTypes";
+import { ExtendedScrollTimeline, IScrollTimeline } from "../api/ScrollTimelineTypes";
+import { IIDRule } from "../api/RuleTypes";
 
 
 
@@ -168,41 +170,9 @@ const fontFacePropertyInfos: { [K in keyof IFontFace]?: V2SOptions } =
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts the given counter styleset property to the CSS style string. Property name can be in
- * either dash or camel form.
+ * Converts the given counter styleset object to the CSS string
  */
- const counterStylesetProp2s = (propName: string, propVal: any, includeName?: boolean): string =>
- {
-     if (!propName)
-         return "";
-
-     // convert the value to string based on the information object for the property (if defined)
-     let stringValue = v2s( propVal, counterStylePropertyInfos[dashToCamel(propName)]);
-
-     // if the resulting string is empty and the name should be included, then we return
-     // "name:; otherwise we will return an empty string.
-     if (!stringValue && includeName)
-         stringValue = "";
-
-     return includeName ? `${camelToDash( propName)}:${stringValue}` : stringValue;
- }
-
-/**
- * Converts the given counter styleset object to the CSS media query string
- */
- export const counterStyleset2s = (counterStyleset: ExtendedCounterStyleset): string =>
- {
-    if (!counterStyleset)
-        return "";
-
-    let s = "";
-	for( let name in counterStyleset)
-        s += counterStylesetProp2s( name, counterStyleset[name], true) + ";";
-
-    return s;
- }
-
-
+export const counterStyleset2s = (counterStyleset: ExtendedCounterStyleset): string => propSet2s( counterStyleset, counterStylePropertyInfos)
 
 
 
@@ -233,6 +203,47 @@ const counterStylePropertyInfos: { [K in keyof ICounterStyleset]?: V2SOptions } 
     additiveSymbols: {
         arr2: { item: { item: WKF.Quoted }, sep: "," },
         any: WKF.Quoted
+    },
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS @scroll-timeline rule.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the given scroll timeline object to the CSS string
+ */
+export const scrollTimeline2s = (scrollTimeline: ExtendedScrollTimeline): string =>
+    propSet2s( scrollTimeline, scrollTimelinePropertyInfos)
+
+
+
+const idRuleSelector2s = (v: IIDRule) => `selector(${v.cssName})`;
+
+
+
+/**
+ * Map of property names to the V2SOptions objects describing custom actions necessary to
+ * convert the property value to the CSS-compliant string.
+ */
+const scrollTimelinePropertyInfos: { [K in keyof IScrollTimeline]?: V2SOptions } =
+{
+    source: {
+        obj2: idRuleSelector2s,
+    },
+    scrollOffsets: {
+        item: {
+            obj2: idRuleSelector2s,
+            num: WKF.Length,
+            item: {
+                obj2: idRuleSelector2s,
+            },
+        },
+        sep: ","
     },
 }
 

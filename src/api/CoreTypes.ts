@@ -163,6 +163,22 @@ export interface IConstant<T = any>
 
 
 /**
+ * Type that extends the given type with the [[IRawProxy]] interface that allows specifying raw
+ * string values.
+ */
+export type RawExtended<T> = T | IRawProxy;
+
+
+
+/**
+ * Type that allows specifying either the given type or an array with elements of the extended
+ * variant of this type.
+ */
+export type RawOneOrMany<T> = T | RawExtended<T>[];
+
+
+
+/**
  * Type that extends the given type with the following types:
  * - [[ICustomVar]] interface that allows using a CSS custom property rule value.
  * - [[IConstant]] interface that allows using a constant rule value.

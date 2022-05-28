@@ -3,7 +3,7 @@ import { CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, Horiz
 import { CssColor, CssNonNumericColor } from "./ColorTypes";
 import { FontStretchKeyword, FontStyle, FontWeight, SystemFont } from "./FontTypes";
 import { BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs, IRayFunc, TransformFuncs } from "./ShapeTypes";
-import { IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule } from "./RuleTypes";
+import { IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule, IScrollTimelineRule } from "./RuleTypes";
 import { IStyleset } from "./Stylesets";
 import { IPageNameRule } from "..";
 /**
@@ -69,6 +69,11 @@ export declare type AnimationFillModeKeywords = "none" | "forwards" | "backwards
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count" target="mdn">MDN Page</a>
  */
 export declare type AnimationIterationCount_Single = "infinite" | CssNumber;
+/**
+ * Type for [[animationTimeline]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timeline" target="mdn">MDN Page</a>
+ */
+export declare type AnimationTimeline_Single = "none" | IScrollTimelineRule | string;
 /**
  * Type for [[animationName]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-name" target="mdn">MDN Page</a>

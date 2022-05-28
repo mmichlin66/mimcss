@@ -16,6 +16,7 @@ module.exports = [
             "./lib/test/specs/testPropsLength.js",
             "./lib/test/specs/testPropsPosition.js",
             "./lib/test/specs/testPropsRadius.js",
+            "./lib/test/specs/testScrollTimeline.js",
             "./lib/test/specs/testSelectors.js",
             "./lib/test/specs/testSSR.js",
             "./lib/test/specs/testStyleDefinition.js",

@@ -1,9 +1,5 @@
-import { IRawProxy } from "./CoreTypes";
+import { RawExtended } from "./CoreTypes";
 import { CssAngle, CssLength, CssNumber, CssPercent } from "./NumericTypes";
-/**
- * Type that extends the given type with the [[IRawProxy]] interface that allows specifying raw string value.
- */
-export declare type FontFaceExtended<T> = T | IRawProxy;
 /**
  * Type of the [[ascentOverride]], [[descentOverride]] and [[lineGapOverride]] properties.
  */
@@ -42,27 +38,27 @@ export declare type FontVariantPosition = "normal" | "sub" | "super";
 export declare type FontDisplay_FontFaceType = "auto" | "block" | "swap" | "fallback" | "optional";
 /** Type of [[IFontFace.fontStretch]] property */
 export declare type FontStretch_FontFaceType = FontStretch | [
-    FontFaceExtended<FontStretch>,
-    FontFaceExtended<FontStretch>
+    RawExtended<FontStretch>,
+    RawExtended<FontStretch>
 ];
 /** Type of [[IFontFace.fontStyle]] property */
 export declare type FontStyle_FontFaceType = FontStyle | [
-    FontFaceExtended<CssAngle>,
-    FontFaceExtended<CssAngle>
+    RawExtended<CssAngle>,
+    RawExtended<CssAngle>
 ];
 /** Type of [[IFontFace.fontWeight]] property */
 export declare type FontWeight_FontFaceType = FontWeight | [
-    FontFaceExtended<FontWeight>,
-    FontFaceExtended<FontWeight>
+    RawExtended<FontWeight>,
+    RawExtended<FontWeight>
 ];
 /** Possible named values for format part of the [[IFontFace.src]] property */
 export declare type FontSrcFormat = "woff" | "woff2" | "truetype" | "opentype" | "embedded-opentype" | "svg";
 /** Type of a single part of the [[IFontFace.src]] property */
 export declare type FontSrc = string | {
-    local: FontFaceExtended<string>;
+    local: RawExtended<string>;
 } | {
-    url: FontFaceExtended<string>;
-    format?: FontFaceExtended<FontSrcFormat | FontSrcFormat[]>;
+    url: RawExtended<string>;
+    format?: RawExtended<FontSrcFormat | FontSrcFormat[]>;
 };
 /** Type of [[IFontFace.src]] property */
 export declare type FontSrc_FontFaceType = FontSrc | FontSrc[];
@@ -132,10 +128,10 @@ export interface IFontFace {
 /**
  * The `ExtendedFontFace` type maps all @font-face properties defined in the [[IFontFace]]
  * interface to the "extended" versions of their types. These extended types are defined using the
- * [[FontFaceExtended]] generic type, which adds [[IRawProxy]] to the type
+ * [[RawExtended]] generic type, which adds [[IRawProxy]] to the type
  * that is defined in the [[IFontFace]] interface.
  */
 export declare type ExtendedFontFace = {
-    [K in keyof IFontFace]: FontFaceExtended<IFontFace[K]>;
+    [K in keyof IFontFace]: RawExtended<IFontFace[K]>;
 };
 //# sourceMappingURL=FontTypes.d.ts.map

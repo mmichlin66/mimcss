@@ -173,7 +173,7 @@ wkf[WKF.GridAxis] = (v: Extended<GridTemplateAxis_StyleType>) => v2s( v, {
 wkf[WKF.Marker] = (val: Extended<Marker_StyleType>): string =>
 {
     return v2s( val, {
-        obj: v => `url(#${(v as IIDRule).name})`
+        obj2: (v: IIDRule) => `url(${v.cssName})`
     });
 }
 

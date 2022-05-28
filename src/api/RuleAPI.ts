@@ -4,7 +4,7 @@ import {
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker,
     NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule,
-    ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions
+    ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions, IScrollTimelineRule
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace} from "./FontTypes";
@@ -27,10 +27,11 @@ import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {
     FontFaceRule, ImportRule, NamespaceRule, ClassNameRule, ColorProfileRule, PageNameRule,
-    LayerNameRule, LayerOrderRule
+    LayerNameRule, LayerOrderRule, ScrollTimelineRule
 } from "../rules/MiscRules"
 import {SupportsRule, MediaRule, LayerBlockRule} from "../rules/GroupRules"
 import {a2s} from "../impl/Utils";
+import { ExtendedScrollTimeline } from "./ScrollTimelineTypes";
 
 
 
@@ -1005,6 +1006,52 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
         nameOverride?: IColorProfileRule | string): IColorProfileRule
     {
         return new ColorProfileRule( this, url, intent, nameOverride);
+    }
+
+    /**
+     * Creates a new `@scroll-timeline` at-rule.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // define ID for scrolling container
+     *     id = this.$id();
+     *
+     *     // define animation
+     *     rotation = this.$keyframes([
+     *         ["from", {transform: css.rotate(0)}],
+     *         ["to", {transform: css.rotate(360)}],
+     *     ])
+     *
+     *     // define aniamtion scroll timeline
+     *     timeline = this.$scrollTimeline({
+     *         source: this.id,
+     *         orientation: "block",
+     *         scrollOffsets: [0, 300],
+     *     })
+     *
+     *     // use scroll timeline name in the `animation-timeline` style property
+     *     rotated = this.$class({
+     *         animationName: this.rotation,
+     *         animation-direction: "alternate",
+     *         animationTimeline: this.timeline
+     *     })
+     * }
+     * ```
+     *
+     * @param timeline Set of properties defining scroll timeline characteristics.
+     * @param nameOverride String or another `IScrollTimelineRule` object that determines the name
+     * of the timeline. If this optional parameter is defined, the name will override the Mimcss
+     * name assignment mechanism. This might be useful if there is a need for the name to match a
+     * name of existing scroll timeline rule.
+     * @returns `IScrollTimelineRule` object representing the `@scroll-timeline` at-rule.
+     */
+    public $scrollTimeline( timeline: ExtendedScrollTimeline,
+        nameOverride?: IScrollTimelineRule | string): IScrollTimelineRule
+    {
+        return new ScrollTimelineRule( this, timeline, nameOverride);
     }
 
     /**

@@ -1,24 +1,14 @@
-import { CssImage, IRawProxy } from "./CoreTypes";
+import { CssImage, IRawProxy, RawExtended, RawOneOrMany } from "./CoreTypes";
 import { ICounterStyleRule } from "./RuleTypes";
 import { ListStyleType_StyleType } from "./StyleTypes";
-/**
- * Type that extends the given type with the [[IRawProxy]] interface that allows specifying a raw
- * string value.
- */
-export declare type CounterExtended<T> = T | IRawProxy;
-/**
- * Type that allows specifying either the given type or an array with elements of the extended
- * variant of this type.
- */
-export declare type CounterOneOrMany<T> = T | CounterExtended<T>[];
 /**
  * Type for specifying counter [[system]] property.
  */
 export declare type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic" | "additive" | "fixed" | number | [ListStyleType_StyleType | IRawProxy];
 /**
- * Type for specifying counter[[negative]] property.
+ * Type for specifying counter [[negative]] property.
  */
-export declare type Negative_CounterType = string | [CounterExtended<string>, CounterExtended<string>?];
+export declare type Negative_CounterType = string | [RawExtended<string>, RawExtended<string>?];
 /**
  * Type for specifying counter [[prefix]] and [[suffix]] properties.
  */
@@ -26,7 +16,7 @@ export declare type PrefixSuffix_CounterType = string | CssImage;
 /**
  * Type for specifying counter [[range]] property.
  */
-export declare type Range_CounterType = "auto" | CounterOneOrMany<["infinite" | number, "infinite" | number]>;
+export declare type Range_CounterType = "auto" | RawOneOrMany<["infinite" | number, "infinite" | number]>;
 /**
  * Type for specifying counter [[pad]] property.
  */
@@ -38,11 +28,11 @@ export declare type Fallback_CounterType = ListStyleType_StyleType;
 /**
  * Type for specifying counter [[symbols]] property.
  */
-export declare type Symbols_CounterType = CounterOneOrMany<string>;
+export declare type Symbols_CounterType = RawOneOrMany<string>;
 /**
  * Type for specifying counter [[additiveSymbols]] property.
  */
-export declare type AdditiveSymbols_CounterType = CounterOneOrMany<[string | CssImage, number] | [number, string | CssImage]>;
+export declare type AdditiveSymbols_CounterType = RawOneOrMany<[string | CssImage, number] | [number, string | CssImage]>;
 /**
  * Type for specifying counter [[speakAs]] property.
  */
@@ -97,10 +87,10 @@ export interface ICounterStyleset {
 /**
  * The ExtendedCounterStyleset type maps all `@counter-style` properties defined in the [[ICounterStyleset]]
  * interface to the "extended" versions of their types. These extended types are defined using the
- * [[CounterExtended]] generic type, which adds [[IRawProxy]] to the type that is defined in the
- * IBaseCounterStyleset interface.
+ * [[RawExtended]] generic type, which adds [[IRawProxy]] to the type that is defined in the
+ * ICounterStyleset interface.
  */
 export declare type ExtendedCounterStyleset = {
-    [K in keyof ICounterStyleset]: CounterExtended<ICounterStyleset[K]>;
+    [K in keyof ICounterStyleset]: RawExtended<ICounterStyleset[K]>;
 };
 //# sourceMappingURL=CounterTypes.d.ts.map
