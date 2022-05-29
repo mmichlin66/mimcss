@@ -1,6 +1,7 @@
 import { Styleset, IIDRule, ClassMoniker } from "mimcss";
 import { ITrigger } from "./TriggerTypes";
 import { IEventSlot } from "./EventSlotTypes";
+export declare type DN = Node | null;
 /**
  * Type used to define properties that can be passed to a manged component.
  *
@@ -485,6 +486,39 @@ export interface IClassCompVN extends IVNode {
      * @returns Wrapped callback that will run the original callback in the proper context.
      */
     wrap<T extends Function>(func: T, thisArg: any, arg?: any, schedulingType?: TickSchedulingType): T;
+    /**
+     * Registers the given value as a service with the given ID that will be available for
+     * consumption by descendant components.
+     * @param id Unique service identifier
+     * @param value Current value of the service
+     * @param depth Number of level to watch for changes. The default value is 1; that is, the
+     * subscribers will be notified if the service's value or the values of its properties have
+     * changed.
+     * @returns Publication object, which allows setting a new value of the service or changing
+     * values of its properties.
+     */
+    publishService<K extends keyof IServiceDefinitions>(id: K, value: IServiceDefinitions[K], depth?: number): IPublication<K>;
+    /**
+     * Subscribes to a service with the given ID. If the service with the given ID is registered
+     * by this or one of the ancestor components, the returned subscription object's `value`
+     * property will reference it; otherwise, the value will be set to the defaultValue (if
+     * specified) or will remain undefined. Whenever the value of the service that is registered by
+     * this or a closest ancestor component is changed, the subscription's `value` property will
+     * receive the new value.
+     *
+     * If the subscription object's `value` property is used in a component's rendering code, the
+     * component will be re-rendered every time the service value is changed.
+     *
+     * @param id Unique service identifier
+     * @param defaultValue Optional default value that will be assigned if the service is not
+     * published yet.
+     * @param useSelf Flag indicating whether the search for the service should start from the
+     * virtual node that calls this method. The default value is `false` meaning the search starts
+     * from the parent virtual node.
+     * @returns Subscription object, which provides the value of the service and allowes attaching
+     * to the event fired when the value is changed.
+     */
+    subscribeService<K extends keyof IServiceDefinitions>(id: K, defaultValue?: IServiceDefinitions[K], useSelf?: boolean): ISubscription<K>;
 }
 /**
  * The IElmVN interface represents a virtual node for a DOM element.

@@ -1,7 +1,5 @@
-import { CallbackWrappingOptions, ComponentShadowOptions, CompProps, IComponent, ICustomAttributeHandlerClass, IPublication, IRef, IServiceDefinitions, ISubscription, ITextVN, IVNode, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, TickSchedulingType } from "./CompTypes";
+import { CallbackWrappingOptions, ComponentShadowOptions, CompProps, IClassCompVN, IComponent, ICustomAttributeHandlerClass, IPublication, IRef, IServiceDefinitions, ISubscription, ITextVN, IVNode, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, TickSchedulingType, DN } from "./CompTypes";
 import { EventSlot } from "./EventSlotAPI";
-import { ClassCompVN } from "../core/ClassCompVN";
-import { DN } from "../core/VNTypes";
 /**
  * Decorator function for components that allows them to use shadow DOM.
  *
@@ -82,7 +80,7 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * is undefined in the component's costructor but will be defined before the call to the
      * (optional) willMount method.
      */
-    vn: ClassCompVN;
+    vn: IClassCompVN;
     /**
      * Component properties passed to the constructor. This is normally used only by managed
      * components and is usually undefined for independent components.
