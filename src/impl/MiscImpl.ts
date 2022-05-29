@@ -222,6 +222,7 @@ export const scrollTimeline2s = (scrollTimeline: ExtendedScrollTimeline): string
 
 
 
+/** Converts IIDRule object to selector(#id) string */
 const idRuleSelector2s = (v: IIDRule) => `selector(${v.cssName})`;
 
 

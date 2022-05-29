@@ -42,10 +42,10 @@ describe("@scroll-timeline at-rule", () =>
         css.deactivate(a);
 
         let s = scrollTimeline2s({
-            scrollOffsets: [[a.id, "start", 0.1], [a.id, "end", 0.2]]
+            scrollOffsets: [a.id, [a.id, "end", 0.2]]
         });
 
-        expect(s).toEqual( "scroll-offsets:selector(#A_id) start 0.1,selector(#A_id) end 0.2");
+        expect(s).toEqual( "scroll-offsets:selector(#A_id),selector(#A_id) end 0.2");
     })
 
     it("scroll-offsets with mix of lengths and element offsets", () =>
