@@ -21,6 +21,7 @@
                 "api/RuleAPI.d.ts",
                 "api/SchedulingTypes.d.ts",
                 "api/SchedulingAPI.d.ts",
+                "api/ScrollTimelineTypes.d.ts",
                 "api/StyleTypes.d.ts",
                 "api/Stylesets.d.ts",
                 "api/StyleAPI.d.ts"
