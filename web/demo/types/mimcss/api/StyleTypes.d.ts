@@ -48,6 +48,7 @@ export declare type Animation_Single = {
     direction?: Extended<AnimationDirectionKeywords>;
     mode?: Extended<AnimationFillModeKeywords>;
     state?: Extended<AnimationPlayStateKeywords>;
+    timeline?: Extended<AnimationTimeline_Single>;
 };
 /**
  * Type for [[animation]] style property

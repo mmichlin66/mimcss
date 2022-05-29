@@ -443,7 +443,8 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
             "direction",
             "mode",
             "state",
-            "name"
+            "name",
+            "timeline",
         ]},
         sep: ",",
     },

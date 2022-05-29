@@ -95,6 +95,7 @@ export type Animation_Single =
         direction?: Extended<AnimationDirectionKeywords>;
         mode?: Extended<AnimationFillModeKeywords>;
         state?: Extended<AnimationPlayStateKeywords>;
+        timeline?: Extended<AnimationTimeline_Single>;
     };
 
 /**

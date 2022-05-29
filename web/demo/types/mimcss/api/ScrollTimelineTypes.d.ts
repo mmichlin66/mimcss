@@ -10,11 +10,11 @@ export declare type Source_ScrollTimelineType = "none" | "auto" | IIDRule;
  */
 export declare type Orientation_ScrollTimelineType = "auto" | "block" | "inline" | "horizontal" | "vertical";
 /**
- * Type for specifying scroll-timeline [[orientation]] descriptor.
+ * Type for specifying element edges for the scroll-timeline [[scrollOffsets]] descriptor.
  */
 export declare type ScrollElementOffsetEdge = "start" | "end";
 /**
- * Type for specifying a single element offset in the scroll-timeline [[scroll-offsets]] descriptor.
+ * Type for specifying an element offset in the scroll-timeline [[scrollOffsets]] descriptor.
  */
 export declare type ScrollElementOffset = IIDRule | [
     RawExtended<IIDRule>,
@@ -28,7 +28,7 @@ export declare type ScrollElementOffset = IIDRule | [
     number
 ];
 /**
- * Type for specifying scroll-timeline [[scroll-offsets]] descriptor.
+ * Type for specifying scroll-timeline [[scrollOffsets]] descriptor.
  */
 export declare type ScrollOffsets_ScrollTimelineType = "none" | ("auto" | CssLength | ScrollElementOffset)[];
 /**
@@ -38,15 +38,21 @@ export declare type ScrollOffsets_ScrollTimelineType = "none" | ("auto" | CssLen
  */
 export interface IScrollTimeline {
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/system
+     * The scrollable element whose scrolling position drives the progress of the timeline.
+     *
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline
      */
     source?: Source_ScrollTimelineType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/negative
+     * The scroll timeline's orientation.
+     *
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline
      */
     orientation?: Orientation_ScrollTimelineType;
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/prefix
+     * Determines the scroll timeline's scroll offsets.
+     *
+     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline
      */
     scrollOffsets?: ScrollOffsets_ScrollTimelineType;
 }

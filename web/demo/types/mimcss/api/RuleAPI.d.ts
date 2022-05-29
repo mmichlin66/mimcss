@@ -852,11 +852,11 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * }
      * ```
      *
-     * @param timeline URL to the color-profile file
-     * @param nameOverride String or another `IColorPrIScrollTimelineRuleofileRule` object that
-     * determines the name of the timeline. If this optional parameter is defined, the name will
-     * override the Mimcss name assignment mechanism. This might be useful if there is a need for
-     * the name to match a name of existing scroll timeline rule.
+     * @param timeline Set of properties defining scroll timeline characteristics.
+     * @param nameOverride String or another `IScrollTimelineRule` object that determines the name
+     * of the timeline. If this optional parameter is defined, the name will override the Mimcss
+     * name assignment mechanism. This might be useful if there is a need for the name to match a
+     * name of existing scroll timeline rule.
      * @returns `IScrollTimelineRule` object representing the `@scroll-timeline` at-rule.
      */
     $scrollTimeline(timeline: ExtendedScrollTimeline, nameOverride?: IScrollTimelineRule | string): IScrollTimelineRule;
