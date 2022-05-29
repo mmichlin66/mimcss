@@ -1,3 +1,8 @@
+# 0.11.16
+
+1. Implement `@scroll-timeline` at-rule and `animation-timeline` style property.
+
+
 # 0.11.15
 
 1. Fix problems with using `ESNext` as a target (in `tsconfig.json`).
