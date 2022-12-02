@@ -23,7 +23,6 @@ export declare type CompProps<TProps = {}, TChildren = any> = Readonly<TProps> &
  */
 export interface IComponentClass<TProps = {}, TChildren = any> {
     new (props?: CompProps<TProps>): IComponent<TProps, TChildren>;
-    render(): any;
 }
 /**
  * Type for the `shadow` property in the [[IComponent]] interface. This can be one of the following:
@@ -42,7 +41,7 @@ export declare type ComponentShadowOptions = boolean | string | ShadowRootInit |
 ];
 /**
  * Interface that must be implemented by all components. Although it has many methods that
- * components can implement, in practice, there is only one mandatory method - `render()`.
+ * components can implement, in practice, there is only one mandatory method - [[render]].
  * Components should be ready to have the `vn` property set, although they don't have to declare
  * it.
  *
@@ -141,6 +140,93 @@ export interface IComponent<TProps = {}, TChildren = any> {
     getUpdateStrategy?(): UpdateStrategy;
 }
 /**
+ * Represents component functionality that is implemented by the Mimbl built-in classes that
+ * implement component functionality. It contains convenience methods that can be called from the
+ * derived classes - regular comoponents and custom element implementations.
+ */
+export interface IComponentEx {
+    /**
+     * Determines whether the component is currently mounted. If a component has asynchronous
+     * functionality (e.g. fetching data from a server), component's code may be executed after
+     * it was alrady unmounted. This property allows the component to handle this situation.
+     */
+    readonly isMounted: boolean;
+    /**
+     * This method is called by the component to request to be updated. If no arguments are
+     * provided, the entire component is requested to be updated. If arguments are provided, they
+     * indicate what rendering function should be updated.
+     * @param func Optional rendering function to invoke
+     * @param arg Optional argument to pass to the rendering function.
+     */
+    updateMe(func?: RenderMethodType, arg?: any): void;
+    /**
+     * Schedules the given function to be called before any components scheduled to be updated in
+     * the Mimbl tick are updated.
+     * @param func Function to be called
+     * @param thisArg Object that will be used as "this" value when the function is called. If this
+     *   parameter is undefined, the component instance will be used (which allows scheduling
+     *   regular unbound components' methods). This parameter will be ignored if the function
+     *   is already bound or is an arrow function.
+     */
+    callMeBeforeUpdate(func: ScheduledFuncType, thisArg?: any): void;
+    /**
+     * Schedules the given function to be called after all components scheduled to be updated in
+     * the Mimbl tick have already been updated.
+     * @param func Function to be called
+     * @param thisArg Object that will be used as "this" value when the function is called. If this
+     *   parameter is undefined, the component instance will be used (which allows scheduling
+     *   regular unbound components' methods). This parameter will be ignored if the function
+     *   is already bound or is an arrow function.
+     */
+    callMeAfterUpdate(func: ScheduledFuncType, thisArg?: any): void;
+    /**
+     *
+     * @param func Callback function to be wrapped
+     * @param arg Optional argument to be passed to the callback in addition to the original
+     * callback arguments.
+     * @param thisArg Optional object to be used as `this` when calling the callback. If this
+     * parameter is not defined, the component instance is used, which allows wrapping regular
+     * unbound components' methods. This parameter will be ignored if the the function is already
+     * bound or is an arrow function.
+     * @param schedulingType Type of scheduling the Mimbl tick after the callback function returns.
+     * @returns Wrapped callback that will run the original callback in the proper context.
+     */
+    wrap<T extends Function>(func: T, arg?: any, thisArg?: any, schedulingType?: TickSchedulingType): T;
+    /**
+     * Registers the given value as a service with the given ID that will be available for
+     * consumption by descendant components.
+     * @param id Unique service identifier
+     * @param value Current value of the service
+     * @param depth Number of level to watch for changes. The default value is 1; that is, the
+     * subscribers will be notified if the service's value or the values of its properties have
+     * changed.
+     * @returns Publication object, which allows setting a new value of the service or changing
+     * values of its properties.
+     */
+    publishService<K extends keyof IServiceDefinitions>(id: K, value: IServiceDefinitions[K], depth?: number): IPublication<K>;
+    /**
+     * Subscribes to a service with the given ID. If the service with the given ID is registered
+     * by this or one of the ancestor components, the returned subscription object's `value`
+     * property will reference it; otherwise, the value will be set to the defaultValue (if
+     * specified) or will remain undefined. Whenever the value of the service that is registered by
+     * this or a closest ancestor component is changed, the subscription's `value` property will
+     * receive the new value.
+     *
+     * If the subscription object's `value` property is used in a component's rendering code, the
+     * component will be re-rendered every time the service value is changed.
+     *
+     * @param id Unique service identifier
+     * @param defaultValue Optional default value that will be assigned if the service is not
+     * published yet.
+     * @param useSelf Flag indicating whether the search for the service should start from the
+     * virtual node that calls this method. The default value is `false` meaning the search starts
+     * from the parent virtual node.
+     * @returns Subscription object, which provides the value of the service and allowes attaching
+     * to the event fired when the value is changed.
+     */
+    subscribeService<K extends keyof IServiceDefinitions>(id: K, defaultValue?: IServiceDefinitions[K], useSelf?: boolean): ISubscription<K>;
+}
+/**
  * The UpdateStrategy object specifies different aspects of update behavior of components and
  * elements.
  */
@@ -201,7 +287,10 @@ export declare type CallbackWrappingParams<T extends Function = Function> = Call
  * - an object with the properties `func` specifying the function to be called and `thisArg`
  *   specifying the value to be used as the `this` parameter.
  */
-export declare type CallbackPropType<T extends Function = Function> = T | [func: T, thisArg?: any] | [func: T, thisArg?: any];
+export declare type CallbackPropType<T extends Function = Function> = T | [func: T, thisArg?: any] | {
+    func: T;
+    thisArg?: any;
+};
 /**
  * Type of event handler function for DOM events of type T.
  * @typeparam T DOM event type, e.g. MouseEvent
@@ -261,31 +350,102 @@ export declare type FormtargetPropType = string | "_self" | "_blank" | "_parent"
 /** Type for `referrerpolicy` attribute used for some HTML and SVG elements */
 export declare type ReferrerPolicyPropType = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "unsafe-url";
 /**
- * Type that allows defining attributes of HTML and SVG elements in terms of simple types (e.g.
- * `string`), but allowing to pass triggers of this type to them. This is used to optimize
- * re-rendering when the value of the attribute changes.
+ * Internal type containing names of attributes that are not "triggerized" when applying
+ * the [[ExtendedAttrs]] type to the element attributes interface.
  */
-export declare type ExtendedElementAttr<T> = T | ITrigger<T>;
-/** Global events that are common to all kind of HTML entities */
-export declare type IGlobalEvents = {
-    [K in keyof GlobalEventHandlersEventMap]?: EventPropType<GlobalEventHandlersEventMap[K]>;
-};
-/** Events that are common to all kinds of elements */
-export declare type IElementEvents = {
-    [K in keyof ElementEventMap]?: EventPropType<ElementEventMap[K]>;
-};
-/** Events that are common to elements and documents */
-export declare type IDocumentAndElementEvents = {
-    [K in keyof DocumentAndElementEventHandlersEventMap]?: EventPropType<DocumentAndElementEventHandlersEventMap[K]>;
+export declare type NoTriggerAttrNames = "xmlns";
+/**
+ * Converts the given interface T to a type that maps an extended attribute type to each property
+ * of T. The extended property contains the property type, the [[ITrigger]] for this type as well as
+ * `null` and `undefined`. This is primarily useful for defining attributes of HTML elements - both
+ * built-in and custom.
+ *
+ * **Example:**
+ * ```typescript
+ * interface IMyAttrs
+ * {
+ *     foo: string;
+ *     bar: number;
+ * }
+ *
+ * type MyExtendedAttrs = ExtendedAttrs<IMyAttrs>;
+ *
+ * // the MyExtendedEvents is equivalent to the following interface
+ * interface MyExtendedAttrs
+ * {
+ *     foo: string | ITrigger<string> | null | undefined;
+ *     bar: number | ITrigger<number> | null | undefined;
+ * }
+ * ```
+ */
+export declare type ExtendedAttrs<T> = {
+    [K in keyof T]?: T[K] | null | undefined | (K extends NoTriggerAttrNames ? never : ITrigger<T[K]>);
 };
 /**
- * The IElementProps interface defines standard properties (attributes and event listeners)
- * that can be used on all HTML and SVG elements.
- * @typeparam TRef Type of the element used as a reference type.
- * @typeparam TChildren Type of the children the element can have. By default, elements can have
- * any children.
+ * Converts the given interface T to a type that maps an event type to each property of T. If
+ * the property is iself an event (that is, derives from the Event interface), this event
+ * becomes the type of the mapped property. Otherwise, the property is mapped to a CustomEvent
+ * type whose `detail` property is defined as the original property type.
+ *
+ * **Example:**
+ * ```typescript
+ * interface IMyEvents
+ * {
+ *     foo: string;
+ *     bar: number;
+ *     baz: MouseEvent;
+ * }
+ *
+ * type MyExtendedEvents = ExtendedEvents<IMyEvents>;
+ *
+ * // the MyExtendedEvents is equivalent to the following interface
+ * interface MyExtendedEvents
+ * {
+ *     foo: CustomEvent<string>;
+ *     bar: CustomEvent<number>;
+ *     baz: MouseEvent;
+ * }
+ * ```
  */
-export interface IElementProps<TRef extends Element = Element, TChildren = any> extends ICommonProps<TRef>, IGlobalEvents, IElementEvents, IDocumentAndElementEvents {
+export declare type ExtendedEvents<T> = {
+    [K in keyof T]?: T[K] extends Event ? EventPropType<T[K]> : EventPropType<CustomEvent<T[K]>>;
+};
+/**
+ * Represents standard element properties present on all HTML and SVG elements
+ */
+export interface IElementAttrs {
+    xmlns?: string;
+    id?: IDPropType;
+    lang?: string;
+    class?: ClassMoniker;
+    className?: ClassMoniker;
+    style?: string | Styleset;
+    tabindex?: number;
+    tabIndex?: number;
+    role?: string;
+    draggable?: "auto" | "true" | "false";
+}
+/**
+ * Represents standard element events that can be fired by all HTML and SVG elements.
+ */
+export interface IElementEvents extends GlobalEventHandlersEventMap, ElementEventMap, DocumentAndElementEventHandlersEventMap {
+}
+/**
+ * Represents an HTML or SVG element attributes and events known to Mimbl infrastucture. Each
+ * built-in or custom element is defined as a JSX intrinsic element using the `ExtendedElement`
+ * type by passing the correct attribute and event types.
+ *
+ * @typeparam TRef - Type that can be passed to the `ref` attribute to get a reference to the
+ * element.
+ * @typeparam TAttr Type listing element's attribute names mapped to attribute types.
+ * @typeparam TEvents Type listing element's event names mapped to event types. Most elements
+ * don't need to specify this type parameter as they only implement standard events; however,
+ * there are some elements - e.g. <video> - that define additional events. Custom Web elements
+ * can also define their own events - in this case, they must be specified here.
+ * @typeparam TChildren Type that determines what children are allowed under the element. It
+ * defaults to `any` and usually doesn't eed to be specified.
+ */
+export declare type ExtendedElement<TRef extends Element = Element, TAttrs extends IElementAttrs = IElementAttrs, TEvents extends IElementEvents = IElementEvents, TChildren = any> = ICommonProps<TRef> & ExtendedAttrs<TAttrs> & ExtendedEvents<TEvents> & {
     /**
      * Reference that will be set to the element's virtual node after it is created (mounted). The
      * reference will be set to undefined after the element is unmounted.
@@ -297,17 +457,7 @@ export interface IElementProps<TRef extends Element = Element, TChildren = any> 
     updateStrategy?: UpdateStrategy;
     /** Children that can be supplied to the element */
     children?: TChildren;
-    xmlns?: string;
-    id?: ExtendedElementAttr<IDPropType>;
-    lang?: ExtendedElementAttr<string>;
-    class?: ExtendedElementAttr<ClassMoniker>;
-    className?: ExtendedElementAttr<ClassMoniker>;
-    style?: ExtendedElementAttr<string | Styleset>;
-    tabindex?: ExtendedElementAttr<number>;
-    tabIndex?: ExtendedElementAttr<number>;
-    role?: ExtendedElementAttr<string>;
-    draggable?: ExtendedElementAttr<"auto" | "true" | "false">;
-}
+};
 /**
  * This interface is intended to be augmented in order to add to it names of custom Web elements
  * mapped to their corresponding property types.
@@ -534,7 +684,7 @@ export interface IElmVN<T extends Element = Element> extends IVNode {
      * @param schedulingType Type determining whether the operation is performed immediately or
      * is scheduled to a Mimbl tick.
      */
-    setProps(props: IElementProps<T>, schedulingType?: TickSchedulingType): void;
+    setProps(props: ExtendedElement<T>, schedulingType?: TickSchedulingType): void;
     /**
      * Replaces the given range of sub-nodes with the new content. The update parameter determines
      * whether the old sub-nodes are simply removed and the new added or the new content is used

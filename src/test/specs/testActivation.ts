@@ -261,15 +261,15 @@ describe("activation", () =>
 
             let a1 = css.activate(A);
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             let a2 = css.activate( A);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             expect(a1.red.name).toEqual(a2.red.name);
 
             css.deactivate(a1);
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             css.deactivate( a2);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
         })
 
         it("should use top-level class name as prefix for property under grouping rule", () =>
@@ -344,17 +344,17 @@ describe("activation", () =>
                 red = this.$class({ color: "red" })
             }
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             let a = css.activate( A);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(1);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(1);
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             css.deactivate( a);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else
@@ -374,17 +374,17 @@ describe("activation", () =>
                 blue = this.$class({ color: "blue" })
             }
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             let b = css.activate( B);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(2);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(2);
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             css.deactivate( b);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else
@@ -398,18 +398,18 @@ describe("activation", () =>
                 red = this.$class({ color: "red" })
             }
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             let a = new A();
             css.activate( a);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(1);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(1);
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             css.deactivate( a);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else
@@ -429,17 +429,17 @@ describe("activation", () =>
                 blue = this.$class({ color: "blue" })
             }
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             let b = css.activate( new B());
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(2);
             else
                 expect(dom.getAllStylesFromHead().length).toEqual(2);
 
-            css.pushAdoptionContext(document);
+            css.pushRootContext(document);
             css.deactivate( b);
-            css.popAdoptionContext(document);
+            css.popRootContext(document);
             if (isAdoptionSupported)
                 expect((document as any).adoptedStyleSheets.length).toEqual(0);
             else

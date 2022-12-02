@@ -1,4 +1,4 @@
-﻿import { IColorProfileRule, IPercentProxy, IStringProxy } from "..";
+﻿import { IColorProfileRule, IStringProxy } from "..";
 import {Extended, ICssFuncObject} from "./CoreTypes";
 import { CssAngle, CssPercent } from "./NumericTypes";
 

@@ -1,7 +1,6 @@
-﻿import {CssImage, RawExtended, RawOneOrMany} from "./CoreTypes";
-import { CssLength, CssNumber } from "./NumericTypes";
-import {ICounterStyleRule, IIDRule} from "./RuleTypes";
-import {ListStyleType_StyleType} from "./StyleTypes";
+﻿import {RawExtended} from "./CoreTypes";
+import { CssLength } from "./NumericTypes";
+import {IIDRule} from "./RuleTypes";
 
 
 

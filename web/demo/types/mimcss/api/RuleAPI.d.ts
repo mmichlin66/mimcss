@@ -1205,24 +1205,36 @@ export declare const getActiveTheme: <T extends ThemeDefinition<any>>(themeClass
  * Establishes an activation context corresponding to the given document or shadow root, so that
  * styles definitions created and activated while this context is active will be "adopted" by the
  * given object. After this function is called and the style definitions are activated, the
- * [[popAdoptionContext]] function must be called.
+ * [[popRootContext]] function must be called.
  *
- * For custom Web elements, the pair of `pushAdoptionContext` and [[popAdoptionContext]] functions
+ * For custom Web elements, the pair of `pushRootContext` and [[popRootContext]] functions
  * is usually called in the `connectedCallback` method; however, they should be called whenever new
  * style definitions are activated or deactivated. For example, they may need to be called when
  * handling events within the custom Web element's code.
  *
- * @param root Document or ShadowRoot object to which style definitions will be adopted
+ * Adopting style sheets means that a single instance of a style sheet is shared between multiple
+ * custom Web element instances (and maybe the document). Sometimes, however, custom Web elements
+ * don't want to share styles among instances, but to have a separate style sheet instance for
+ * every custom element instance. For example, this might be the case if the custom element wants
+ * to directly manipulate styles for layout or styling purposes. In this case, the parameter
+ * `useAdoption` must be set to `false`.
+ *
+ * @param root Document or ShadowRoot object to which style definitions will be adopted or created under
+ * @param useAdoption Flag indicating that stylesheets should be adopted by instead of
+ * created under the shadow root. The flag is ignored if the adoption is not supported.
  */
-export declare const pushAdoptionContext: (root: DocumentOrShadowRoot) => void;
+export declare const pushRootContext: (root: DocumentOrShadowRoot, useAdoption?: boolean) => void;
 /**
  * Removes the activation context corresponding to the given document or shadow root established
- * by an earlier call to the [[pushAdoptionCtx]] function. Each call to the [[pushAdoptionCtx]]
- * function must be eventually paired with the call to the `popAdoptionContext` functions.
+ * by an earlier call to the [[pushRootContext]] function. Each call to the [[pushRootContext]]
+ * function must be eventually paired with the call to the `popRootContext` functions.
  *
  * @param root Document or ShadowRoot object to which style definitions were adopted
+ * @param useAdoption Flag indicating that stylesheets should be adopted by instead of
+ * created under the shadow root. The flag is ignored if the adoption is not supported. The value
+ * of this flag must be the same as in the counterpart [[pushRootContext]] call.
  */
-export declare const popAdoptionContext: (root: DocumentOrShadowRoot) => void;
+export declare const popRootContext: (root: DocumentOrShadowRoot, useAdoption?: boolean) => void;
 /**
  * Starts server-side activation functionality. This function should be called before any style
  * definitions that are part of the application are activated.

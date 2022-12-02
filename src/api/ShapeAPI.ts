@@ -14,7 +14,7 @@ import {
 } from "./ShapeTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
 import {mv2s, WKF, v2s, wkf, a2s, fdo, f2s} from "../impl/Utils";
-import { MappedSyntaxTypes, SyntaxKey } from "./Stylesets";
+import { MappedSyntaxTypes } from "./Stylesets";
 import { sp2s } from "../impl/StyleImpl";
 
 

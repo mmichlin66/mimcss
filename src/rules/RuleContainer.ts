@@ -1515,7 +1515,7 @@ const getClientContext = (root: DocumentOrShadowRoot): ClientActivationContext =
     let ctx = clientContextsForRoots.get( root);
     if (!ctx)
     {
-        ctx = new ClientActivationContext( root instanceof Document ? root.head : root as any as ParentNode);
+        ctx = new ClientActivationContext( root instanceof Document ? root.head : root as ShadowRoot);
         clientContextsForRoots.set( root, ctx);
     }
 
@@ -1558,22 +1558,22 @@ const getCurrentRoot = (): DocumentOrShadowRoot | undefined =>
 /**
  * Pushes the given document or shadow root to the top of the stack.
  */
-export const s_pushRoot = (root: DocumentOrShadowRoot): void =>
+export const s_pushRoot = (root: DocumentOrShadowRoot, useAdoption = true): void =>
 {
     documentOrShadowRootStack.push( root);
-    pushActCtx( isAdoptionSupported ? globalConstructableActivationContext! : getClientContext( root));
+    pushActCtx( useAdoption && isAdoptionSupported ? globalConstructableActivationContext! : getClientContext( root));
 }
 
 /**
  * Removes the document or shadow root from the top of the stack.
  */
-export const s_popRoot = (root: DocumentOrShadowRoot): void =>
+export const s_popRoot = (root: DocumentOrShadowRoot, useAdoption = true): void =>
 {
     let currRoot = getCurrentRoot();
     if (currRoot === root)
     {
         documentOrShadowRootStack.pop();
-        popActCtx( isAdoptionSupported ? globalConstructableActivationContext! : getClientContext( root));
+        popActCtx( useAdoption && isAdoptionSupported ? globalConstructableActivationContext! : getClientContext( root));
     }
 }
 

@@ -1,4 +1,4 @@
-import { CallbackWrappingOptions, ComponentShadowOptions, CompProps, IClassCompVN, IComponent, ICustomAttributeHandlerClass, IPublication, IRef, IServiceDefinitions, ISubscription, ITextVN, IVNode, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, TickSchedulingType, DN } from "./CompTypes";
+import { CallbackWrappingOptions, ComponentShadowOptions, CompProps, IClassCompVN, IComponent, ICustomAttributeHandlerClass, IPublication, IRef, IServiceDefinitions, ISubscription, ITextVN, IVNode, PromiseProxyProps, RefFunc, RenderMethodType, ScheduledFuncType, TickSchedulingType, DN, IComponentEx } from "./CompTypes";
 import { EventSlot } from "./EventSlotAPI";
 /**
  * Decorator function for components that allows them to use shadow DOM.
@@ -74,7 +74,7 @@ export declare function registerCustomEvent(eventName: string): void;
  * Base class for components. Components that derive from this class must implement the render
  * method.
  */
-export declare abstract class Component<TProps = {}, TChildren = any> implements IComponent<TProps, TChildren> {
+export declare abstract class Component<TProps = {}, TChildren = any> implements IComponent<TProps, TChildren>, IComponentEx {
     /**
      * Remembered virtual node object through which the component can request services. This
      * is undefined in the component's costructor but will be defined before the call to the
@@ -111,7 +111,7 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      * @param func Optional rendering function to invoke
      * @param arg Optional argument to pass to the rendering function.
      */
-    protected updateMe(func?: RenderMethodType, arg?: any): void;
+    updateMe(func?: RenderMethodType, arg?: any): void;
     /**
      * Schedules the given function to be called before any components scheduled to be updated in
      * the Mimbl tick are updated.
@@ -121,7 +121,7 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      *   regular unbound components' methods). This parameter will be ignored if the function
      *   is already bound or is an arrow function.
      */
-    protected callMeBeforeUpdate(func: ScheduledFuncType, thisArg?: any): void;
+    callMeBeforeUpdate(func: ScheduledFuncType, thisArg?: any): void;
     /**
      * Schedules the given function to be called after all components scheduled to be updated in
      * the Mimbl tick have already been updated.
@@ -131,7 +131,7 @@ export declare abstract class Component<TProps = {}, TChildren = any> implements
      *   regular unbound components' methods). This parameter will be ignored if the function
      *   is already bound or is an arrow function.
      */
-    protected callMeAfterUpdate(func: ScheduledFuncType, thisArg?: any): void;
+    callMeAfterUpdate(func: ScheduledFuncType, thisArg?: any): void;
     /**
      *
      * @param func Callback function to be wrapped
