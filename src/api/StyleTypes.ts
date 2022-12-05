@@ -305,7 +305,7 @@ export type BaselineShift_StyleType = "sub" | "super" | CssLength;
  * Type for [[borderCollapse]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-collapse" target="mdn">MDN Page</a>
  */
-export type BorderColapse_StyleType = "collapse" | "separate";
+export type BorderCollapse_StyleType = "collapse" | "separate";
 
 
 
@@ -977,7 +977,8 @@ export type ImageOrientation_StyleType = "none" | "from-image";
  * Type for [[imageRendering]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/image-rendering" target="mdn">MDN Page</a>
  */
-export type ImageRendering_StyleType = "auto" | "crisp-edges" | "pixelated";
+export type ImageRendering_StyleType = "auto" | "smooth" | "high-quality" | "pixelated" | "crisp-edges" |
+    "optimizeQuality" | "optimizeSpeed ";
 
 
 
@@ -1523,6 +1524,30 @@ export type ShapeOutside_StyleType = IUrlFunc | BasicShape | GeometryBoxKeyword 
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/shape-rendering" target="mdn">MDN Page</a>
  */
 export type ShapeRendering_StyleType = "auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision";
+
+
+
+/**
+ * Type for the [[strokeDasharray]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray" target="mdn">MDN Page</a>
+ */
+export type StrokeDasharray_StyleType = "none" | OneOrMany<CssLength>;
+
+
+
+/**
+ * Type for the [[strokeLinecap]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linecap" target="mdn">MDN Page</a>
+ */
+export type StrokeLinecap_StyleType = "butt" | "round" | "square";
+
+
+
+/**
+ * Type for the [[strokeLinejoin]] style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin" target="mdn">MDN Page</a>
+ */
+export type StrokeLinejoin_StyleType = "arcs" | "bevel" | "miter" | "miter-clip" | "round";
 
 
 

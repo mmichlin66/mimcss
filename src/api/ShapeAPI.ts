@@ -1110,6 +1110,8 @@ class PathBuilder implements IPathBuilder
     public a( ...params: [number,number,number,0|1,0|1,number,number][]): this { return this.add( "a", params); }
 
     public z(): this { return this.add( "z"); }
+
+    public toString(): string { return `"${a2s(this.items)}"`; }
 }
 
 fdo.path = [ "rule", ["items", (v: PathCommand[]) => `"${a2s(v)}"`] ]
@@ -1121,7 +1123,7 @@ fdo.path = [ "rule", ["items", (v: PathCommand[]) => `"${a2s(v)}"`] ]
  *
  * @category Basic Shape
  */
- export const ray = (angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
+export const ray = (angle: Extended<CssAngle>, size?: Extended<ExtentKeyword | CssLength>,
     contain?: boolean): IRayFunc => ({ fn: "ray", angle, size, contain });
 
 fdo.ray = {
@@ -1141,7 +1143,7 @@ fdo.ray = {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
- /**
+/**
  * Returns an IMinMax function representing the `minmax()` CSS function.
  *
  * @category Grid

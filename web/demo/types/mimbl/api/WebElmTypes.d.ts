@@ -75,6 +75,14 @@ export declare type OnPropChangeHandlers<T> = {
 export interface IWebElm<TAttrs extends {} = {}, TEvents extends {} = {}> extends IComponent, IComponentEx {
     /**
      * Invokes the given function in the "style adoption context"; which allows all Mimcss style
+     * manipulations to be reflected in the adoption context of the element's shadow DOM.
+     *
+     * @param func Function that is called while Mimcss adoption context related to the element's
+     * shadow root is set.
+     */
+    processStyles(func: () => void): void;
+    /**
+     * Invokes the given function in the "style adoption context"; which allows all Mimcss style
      * manipulations to be reflected in the adoption context of the element's shadow DOM. The
      * `useAdoption` parameter can be set to false if the intention is to create styles under
      * the shadow root element instead of using adoption. This can be useful if the styles are
@@ -82,13 +90,14 @@ export interface IWebElm<TAttrs extends {} = {}, TEvents extends {} = {}> extend
      * custom element instance should have its own style sheet (while adoption allows sharing the
      * same style sheet between multiple instances of custom elements).
      *
-     * @param func Function that is called while Mimcss adoption context related to the element's
-     * shadow root is set.
      * @param useAdoption Flag indicating that stylesheets should be adopted by instead of
      * created under the shadow root. The flag is ignored if the adoption is not supported or if
-     * the shadow root does not exist. The default value is true.
+     * the shadow root does not exist.
+     * @param func Function that is called while Mimcss adoption context related to the element's
+     * shadow root is set.
      */
-    processStyles(func: () => void, useAdoption?: boolean): void;
+    processStyles(useAdoption: boolean, func: () => void): void;
+    processStyles(flagOrFunc: boolean | (() => void), func?: () => void): void;
     /**
      * Sets the value of the given attribute converting it to string if necessary.
      * @param attrName Attribute name, which is a key from the `TAttrs` type

@@ -191,7 +191,7 @@ export interface IPercentMath extends INumericMath<CssPercent, PercentUnits>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Units of length */
-export type LengthUnits = PercentUnits |"Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" |
+export type LengthUnits = PercentUnits | "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" |
     "mm" | "pc" | "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "fr";
 
 /** Proxy interface that represents values of the `<length>` CSS type */

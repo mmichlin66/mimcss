@@ -61,15 +61,10 @@ export declare function ref(target: any, name: string): void;
 export declare function createTextVN(text: string): ITextVN;
 /**
  * Registers custom attribute handler class for the given property name.
- * @param propName name of the custom attribute
- * @param factory custom attribute class
+ * @param attrName Name of the custom attribute
+ * @param handlerClass Class handling the custom attribute functionality
  */
 export declare function registerCustomAttribute<T>(attrName: string, handlerClass: ICustomAttributeHandlerClass<T>): void;
-/**
- * Registers custom event for the given property name.
- * @param propName name of the custom event
- */
-export declare function registerCustomEvent(eventName: string): void;
 /**
  * Base class for components. Components that derive from this class must implement the render
  * method.

@@ -14,11 +14,22 @@ import { Styleset, ExtendedIStyleset, StringStyleset, IStyleset } from "./Styles
 export declare const registerStyleProperty: (name: string, toStringFunc: (v: any) => string) => boolean;
 /**
  * Converts the given value corresponding to the given style property to a CSS string.
- * @param stylePropName Style property name that determines how the value should be converted
- * to a CSS compliant string.
- * @param stylePropValue Value to convert.
+ * @param name Style property name that determines how the value should be converted
+ * to a CSS compliant string. The name can be given in dash-case or camel-case form.
+ * @param value Value to convert.
+ * @returns String value of the style property.
  */
-export declare const getStylePropValue: <K extends keyof IStyleset>(stylePropName: K, stylePropValue: ExtendedIStyleset[K]) => string;
+export declare const getStylePropValue: <K extends keyof IStyleset>(name: K, value: ExtendedIStyleset[K]) => string;
+/**
+ * Converts the given value corresponding to the given style property to a CSS string. The caller
+ * is responsible for ensuring the value type is correct for the given style property. If the
+ * property name is not a valid CSS property, empty string is returned.
+ * @param name Style property name that determines how the value should be converted
+ * to a CSS compliant string. The name can be given in dash-case or camel-case form.
+ * @param value Value to convert.
+ * @returns String value of the style property.
+ */
+export declare const stylePropValueToString: (name: string, value: any) => string;
 /**
  * Sets values of the style properties from the given Styleset object to the `style` attribute
  * of the given HTML element.

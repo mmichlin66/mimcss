@@ -43,6 +43,7 @@
                 "api/CompAPI.d.ts",
                 "api/WebElmTypes.d.ts",
                 "api/WebElmAPI.d.ts",
+                "api/ElementTypes.d.ts",
                 "api/HtmlTypes.d.ts",
                 "api/SvgTypes.d.ts",
                 "jsx/mim.d.ts"

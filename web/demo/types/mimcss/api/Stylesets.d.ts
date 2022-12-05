@@ -2,7 +2,7 @@ import { CssImage, CssSelector, CssString, DependentRuleCombinator, Direction, E
 import { CssColor } from "./ColorTypes";
 import { BorderRadius, CssAngle, CssAspectRatio, CssFrequency, CssLength, CssLengthOrAuto, CssMultiPosition, CssMultiPositionX, CssMultiPositionY, CssNumber, CssPercent, CssPoint, CssPosition, CssRadius, CssResolution, CssSize, CssTime } from "./NumericTypes";
 import * as st from "./StyleTypes";
-import { FillRule, TransformFuncs } from "./ShapeTypes";
+import { FillRule, IPathBuilder, TransformFuncs } from "./ShapeTypes";
 import { FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis, FontVariantCaps, FontVariantPosition } from "./FontTypes";
 import { ClassMoniker, IStyleDefinition, IStyleDefinitionClass, IStyleRule, IVarRule } from "./RuleTypes";
 /**
@@ -874,7 +874,7 @@ export interface IStyleset {
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-collapse" target="mdn">MDN Page</a>
      */
-    borderCollapse?: st.BorderColapse_StyleType;
+    borderCollapse?: st.BorderCollapse_StyleType;
     /**
      * The **border-color** shorthand CSS property sets the color of an element's border. It can
      * specify 1, 2, 3 or 4 color values.
@@ -1533,6 +1533,10 @@ export interface IStyleset {
      */
     cursor?: st.Cursor_StyleType;
     /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d" target="mdn">MDN Page</a>
+     */
+    d?: "none" | IPathBuilder;
+    /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/direction" target="mdn">MDN Page</a>
      */
     direction?: Direction;
@@ -1658,7 +1662,7 @@ export interface IStyleset {
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size-adjust" target="mdn">MDN Page</a>
      */
-    fontSizeAdjust?: CssNumber;
+    fontSizeAdjust?: CssNumber | "none";
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-stretch" target="mdn">MDN Page</a>
      */
@@ -2830,31 +2834,31 @@ export interface IStyleset {
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/stroke-dasharray" target="mdn">MDN Page</a>
      */
-    strokeDasharray?: st.DefaultStyleType;
+    strokeDasharray?: st.StrokeDasharray_StyleType;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/stroke-dashoffset" target="mdn">MDN Page</a>
      */
-    strokeDashoffset?: st.DefaultStyleType;
+    strokeDashoffset?: CssLength;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/stroke-linecap" target="mdn">MDN Page</a>
      */
-    strokeLinecap?: st.DefaultStyleType;
+    strokeLinecap?: st.StrokeLinecap_StyleType;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/stroke-linejoin" target="mdn">MDN Page</a>
      */
-    strokeLinejoin?: st.DefaultStyleType;
+    strokeLinejoin?: st.StrokeLinejoin_StyleType;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/stroke-miterlimit" target="mdn">MDN Page</a>
      */
-    strokeMiterlimit?: st.DefaultStyleType;
+    strokeMiterlimit?: CssNumber;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/stroke-opacity" target="mdn">MDN Page</a>
      */
-    strokeOpacity?: st.DefaultStyleType;
+    strokeOpacity?: CssPercent;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/stroke-width" target="mdn">MDN Page</a>
      */
-    strokeWidth?: st.DefaultStyleType;
+    strokeWidth?: CssLength;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size" target="mdn">MDN Page</a>
      */

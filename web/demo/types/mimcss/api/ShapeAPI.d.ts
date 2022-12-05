@@ -541,10 +541,10 @@ export declare const path: (fillRule?: FillRule | undefined) => IPathBuilder;
  */
 export declare const ray: (angle: Extended<CssAngle>, size?: Extended<CssLength | ExtentKeyword> | undefined, contain?: boolean | undefined) => IRayFunc;
 /**
-* Returns an IMinMax function representing the `minmax()` CSS function.
-*
-* @category Grid
-*/
+ * Returns an IMinMax function representing the `minmax()` CSS function.
+ *
+ * @category Grid
+ */
 export declare const minmax: (min: GridTrackSize, max: GridTrackSize) => IMinMaxFunc;
 /**
  * Returns an IRepeat function representing the `repeat()` CSS function.

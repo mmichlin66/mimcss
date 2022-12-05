@@ -601,6 +601,12 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
 
     size: WKF.MultiLengthWithSpace,
     stroke: WKF.Color,
+    strokeDasharray: {
+        any: WKF.Length
+    },
+    strokeDashoffset: WKF.Length,
+    strokeOpacity: WKF.Percent,
+    strokeWidth: WKF.Length,
 
     textCombineUpright: {
         num: v => `digits ${v}`

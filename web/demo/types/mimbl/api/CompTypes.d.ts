@@ -1,6 +1,6 @@
-import { Styleset, IIDRule, ClassMoniker } from "mimcss";
 import { ITrigger } from "./TriggerTypes";
 import { IEventSlot } from "./EventSlotTypes";
+import { IElementAttrs, IElementEvents } from "./ElementTypes";
 export declare type DN = Node | null;
 /**
  * Type used to define properties that can be passed to a manged component.
@@ -326,10 +326,6 @@ export interface EventObjectType<T extends Event> extends CallbackWrappingParams
  */
 export declare type EventPropType<T extends Event = Event> = EventFuncType<T> | EventTupleType<T> | EventObjectType<T>;
 /**
- * Type for defining the id property of HTML elements
- */
-export declare type IDPropType = string | number | IIDRule;
-/**
  * The ICommonProps interface defines standard properties that can be used on all JSX elements -
  * intrinsic (HTML and SVG) as well as functional and class-based managed components.
  * @typeparam TRef Type of the element or component used as a reference type.
@@ -339,16 +335,6 @@ export interface ICommonProps<TRef = any> {
     readonly key?: any;
     readonly ref?: RefPropType<TRef>;
 }
-/** Type for `crossorigin` attribute used for some HTML and SVG elements */
-export declare type CrossoriginPropType = "anonymous" | "use-credentials";
-/** Type for `formenctype` attribute used for some HTML and SVG elements */
-export declare type FormenctypePropType = "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
-/** Type for `formmethod` attribute used for some HTML and SVG elements */
-export declare type FormmethodPropType = "get" | "post" | "dialog";
-/** Type for `formtarget` attribute used for some HTML and SVG elements */
-export declare type FormtargetPropType = string | "_self" | "_blank" | "_parent" | "_top";
-/** Type for `referrerpolicy` attribute used for some HTML and SVG elements */
-export declare type ReferrerPolicyPropType = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "unsafe-url";
 /**
  * Internal type containing names of attributes that are not "triggerized" when applying
  * the [[ExtendedAttrs]] type to the element attributes interface.
@@ -410,26 +396,6 @@ export declare type ExtendedAttrs<T> = {
 export declare type ExtendedEvents<T> = {
     [K in keyof T]?: T[K] extends Event ? EventPropType<T[K]> : EventPropType<CustomEvent<T[K]>>;
 };
-/**
- * Represents standard element properties present on all HTML and SVG elements
- */
-export interface IElementAttrs {
-    xmlns?: string;
-    id?: IDPropType;
-    lang?: string;
-    class?: ClassMoniker;
-    className?: ClassMoniker;
-    style?: string | Styleset;
-    tabindex?: number;
-    tabIndex?: number;
-    role?: string;
-    draggable?: "auto" | "true" | "false";
-}
-/**
- * Represents standard element events that can be fired by all HTML and SVG elements.
- */
-export interface IElementEvents extends GlobalEventHandlersEventMap, ElementEventMap, DocumentAndElementEventHandlersEventMap {
-}
 /**
  * Represents an HTML or SVG element attributes and events known to Mimbl infrastucture. Each
  * built-in or custom element is defined as a JSX intrinsic element using the `ExtendedElement`
