@@ -82,6 +82,8 @@ const updateStyleProperty = (ruleOrElm: IObjectWithStyle, name: string | null,
     }
     else
     {
+        // remove previous style properties (if any)
+        ruleOrElm.style.cssText = "";
         let styleset = value as StringStyleset;
         for( let propName in styleset)
             ruleOrElm.style[propName] = styleset[propName];
