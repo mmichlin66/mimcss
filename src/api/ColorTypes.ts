@@ -164,10 +164,17 @@ export interface INamedColors
 
 
 /**
+ * The `NamedColor` type defines keywords for all built-in Web colors.
+ */
+export type NamedColor = keyof INamedColors;
+
+
+
+/**
  * The `SystemColors` type defines keywords for system colors that are used in forced-color mode
  * (but can be also used in the regular mode).
  */
-export type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas" | "CanvasText" |
+export type SystemColor = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas" | "CanvasText" |
     "Field" | "FieldText" | "GrayText" | "Highlight" | "HighlightText" | "LinkText" | "VisitedText";
 
 
@@ -195,7 +202,7 @@ export interface ICssColorFunc extends ICssFuncObject
 /**
  * Type representing all possible color keywords; that is, colors that can be expressed as a string
  */
-export type ColorKeywords = keyof INamedColors | "transparent" | "currentcolor" | SystemColors;
+export type ColorKeyword = NamedColor | "transparent" | "currentcolor" | SystemColor;
 
 /**
  * Type for CSS color. Color can be represented using the following types:
@@ -244,7 +251,7 @@ export type ColorKeywords = keyof INamedColors | "transparent" | "currentcolor" 
  * }
  * ```
  */
-export type CssColor = number | ColorKeywords | IRgbFunc | IHslFunc | IHwbFunc | ILabFunc | ILchFunc |
+export type CssColor = number | ColorKeyword | IRgbFunc | IHslFunc | IHwbFunc | ILabFunc | ILchFunc |
     IColorMixFunc | IColorContrastFunc | IColorFunc | IAlphaFunc;
 
 /**
@@ -483,7 +490,7 @@ export interface IAlphaFunc extends ICssColorFunc
 {
     fn: "alpha";
 
-    c: number | keyof INamedColors;
+    c: number | NamedColor;
     a: number;
 }
 

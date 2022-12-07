@@ -2,7 +2,7 @@
 import {CssAngle, CssPercent} from "./NumericTypes";
 import {
     ColorProfile, ColorSpace, CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorFunc,
-    IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc
+    IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc, NamedColor
 } from "./ColorTypes";
 import {a2s, fdo, mv2s, v2s, wkf, WKF} from "../impl/Utils";
 
@@ -185,7 +185,7 @@ const customColors: { [P: string]: number } = {};
  * @param value Color value to assign to the given named color.
  * @returns Flag indicating whether the operation was successful.
  */
-export const registerColor = ( name: keyof INamedColors, value: number): boolean =>
+export const registerColor = ( name: NamedColor, value: number): boolean =>
 {
     if (!name || value == null)
         return false;
@@ -580,9 +580,9 @@ fdo.color = {
  * @param c Color value as either a number or a named color
  * @param a Alpha channel value
  */
-export const alpha = (c: number | keyof INamedColors, a: number): IAlphaFunc => ({ fn: "alpha", c, a });
+export const alpha = (c: number | NamedColor, a: number): IAlphaFunc => ({ fn: "alpha", c, a });
 
-const alpha2s = (c: number | keyof INamedColors, a: number): string =>
+const alpha2s = (c: number | NamedColor, a: number): string =>
 {
     // if the alpha is 0, return transparent color
     if (a === 0)

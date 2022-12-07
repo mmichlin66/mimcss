@@ -13,8 +13,6 @@ export declare type FormmethodPropType = "get" | "post" | "dialog";
 export declare type FormtargetPropType = string | "_self" | "_blank" | "_parent" | "_top";
 /** Type for `referrerpolicy` attribute used for some HTML and SVG elements */
 export declare type ReferrerPolicyPropType = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "unsafe-url";
-/** Type for `sandbox` attribute used for `<iframe>` elements */
-export declare type SandboxPropType = "allow-downloads-without-user-activation" | "allow-downloads" | "allow-forms" | "allow-modals" | "allow-orientation-lock" | "allow-pointer-lock" | "allow-popups" | "allow-popups-to-escape-sandbox" | "allow-presentation" | "allow-same-origin" | "allow-scripts" | "allow-storage-access-by-user-activation" | "allow-top-navigation" | "allow-top-navigation-by-user-activation";
 /** Type for `fetchpriority` attribute used for some HTML and SVG elements */
 export declare type FetchpriorityPropType = "high" | "low" | "auto";
 /**

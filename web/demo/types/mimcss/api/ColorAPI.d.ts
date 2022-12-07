@@ -1,6 +1,6 @@
 import { Extended } from "./CoreTypes";
 import { CssAngle, CssPercent } from "./NumericTypes";
-import { ColorProfile, CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorFunc, IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc } from "./ColorTypes";
+import { ColorProfile, CssColor, CssColorSeparation, IAlphaFunc, IColorContrastFunc, IColorFunc, IColorMixBuilder, IHslFunc, IHwbFunc, ILabFunc, ILchFunc, INamedColors, IRgbFunc, NamedColor } from "./ColorTypes";
 /**
  * Object whose property names are the well-known Web color names while values correspond to the
  * hexadecimal representation of the RGB separations (without an alpha mask). The properties of
@@ -17,7 +17,7 @@ export declare const Colors: INamedColors;
  * @param value Color value to assign to the given named color.
  * @returns Flag indicating whether the operation was successful.
  */
-export declare const registerColor: (name: keyof INamedColors, value: number) => boolean;
+export declare const registerColor: (name: NamedColor, value: number) => boolean;
 /**
  * Converts the color specified as red, green, blue separation values and an optional alpha
  * mask to a CSS color representation. Each color separation can be represented as a number with
@@ -216,5 +216,5 @@ export declare const color: (cp: Extended<ColorProfile>, vs: Extended<number | s
  * @param c Color value as either a number or a named color
  * @param a Alpha channel value
  */
-export declare const alpha: (c: number | keyof INamedColors, a: number) => IAlphaFunc;
+export declare const alpha: (c: number | NamedColor, a: number) => IAlphaFunc;
 //# sourceMappingURL=ColorAPI.d.ts.map

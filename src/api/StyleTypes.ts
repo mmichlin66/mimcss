@@ -6,7 +6,7 @@ import {
     VerticalPositionKeyword, IFitContentProxy, ILengthProxy, CssAspectRatio, CssLengthOrAuto,
     AngleUnits, FrequencyUnits, LengthUnits, PercentUnits, ResolutionUnits, TimeUnits
 } from "./NumericTypes"
-import {ColorKeywords, CssColor, CssNonNumericColor} from "./ColorTypes";
+import {CssColor, CssNonNumericColor} from "./ColorTypes";
 import {FontStretchKeyword, FontStyle, FontWeight, SystemFont} from "./FontTypes";
 import {
     BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs,

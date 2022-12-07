@@ -219,14 +219,22 @@ export const sp2s = (propName: string, propVal: any): string =>
     }
 
     // try to find information object for the property - either defined in stylePropertyInfos or
-    // matches a key in partialStylePropertyInfos
-    let camelPropName = dashToCamel(propName);
-    let options: V2SOptions = stylePropertyInfos[camelPropName];
+    // matches a key in partialStylePropertyInfos. First try the property as is; if not found, try
+    // to convert it to camel-case.
+    let options = stylePropertyInfos[propName];
+    let camelPropName: string;
+    if (!options)
+    {
+        camelPropName = dashToCamel(propName);
+        options = stylePropertyInfos[camelPropName];
+    }
+
     if (!options)
     {
         for( let tuple of partialStylePropertyProcessedInfos)
         {
-            if (tuple[0].test(camelPropName))
+            // camelPropName is defined if options is not
+            if (tuple[0].test(camelPropName!))
             {
                 options = tuple[1];
                 break;
