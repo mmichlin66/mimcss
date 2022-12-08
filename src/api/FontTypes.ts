@@ -24,16 +24,26 @@ export type FontStretch = FontStretchKeyword | CssPercent;
 
 
 /**
+ * Type for specfying keywords [[IStyleset.fontStyle]] properties.
+ */
+export type FontStyleKeyword = "normal" | "italic" | "oblique";
+
+/**
  * Type for specfying [[IStyleset.fontStyle]] properties.
  */
-export type FontStyle = "normal" | "italic" | "oblique" | CssAngle;
+export type FontStyle = FontStyleKeyword | CssAngle;
 
 
 
 /**
+ * Type for specfying keywords [[IStyleset.fontWeight]] properties.
+ */
+export type FontWeightKeyword = "normal" | "bold";
+
+/**
  * Type for specfying [[IStyleset.fontWeight]] properties.
  */
-export type FontWeight = "normal" | "bold" | CssNumber;
+export type FontWeight = FontWeightKeyword | CssNumber;
 
 
 
@@ -52,9 +62,14 @@ export type FontOpticalSizing = "auto" | "none";
 
 
 
+/**
+ * Type for specfying keywords [[IStyleset.fontSize]] properties.
+ */
+export type FontSizeKeyword = "xx-small" | "x-small" | "small" | "medium" | "large" |
+    "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller";
+
 /** Type for [[IStyleset.fontSize]] style property */
-export type FontSize = "xx-small" | "x-small" | "small" | "medium" | "large" |
-    "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller" | CssLength;
+export type FontSize = FontSizeKeyword | CssLength;
 
 
 

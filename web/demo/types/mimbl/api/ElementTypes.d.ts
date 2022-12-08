@@ -4,7 +4,7 @@ import { Styleset, IIDRule, ClassMoniker } from "mimcss";
  */
 export declare type IDPropType = string | number | IIDRule;
 /** Type for `crossorigin` attribute used for some HTML and SVG elements */
-export declare type CrossoriginPropType = "anonymous" | "use-credentials";
+export declare type CrossoriginPropType = "anonymous" | "use-credentials" | boolean;
 /** Type for `formenctype` attribute used for some HTML and SVG elements */
 export declare type FormenctypePropType = "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
 /** Type for `formmethod` attribute used for some HTML and SVG elements */

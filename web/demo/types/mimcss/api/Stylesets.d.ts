@@ -40,7 +40,7 @@ export interface IStyleset {
      * [[include: styleProps/a/alignContent.ts]]
      * ```
      */
-    alignContent?: st.AlignContentKeywords;
+    alignContent?: st.AlignContentKeyword;
     /**
      * The CSS **align-items** property sets the align-self value on all direct children as a
      * group. In Flexbox, it controls the alignment of items on the Cross Axis. In Grid Layout, it
@@ -56,7 +56,7 @@ export interface IStyleset {
      * [[include: styleProps/a/alignItems.ts]]
      * ```
      */
-    alignItems?: st.AlignItemsKeywords;
+    alignItems?: st.AlignItemsKeyword;
     /**
      * The **align-self** CSS property overrides a grid or flex item's align-items value. In Grid,
      * it aligns the item inside the grid area. In Flexbox, it aligns the item on the cross axis.
@@ -71,7 +71,7 @@ export interface IStyleset {
      * [[include: styleProps/a/alignSelf.ts]]
      * ```
      */
-    alignSelf?: st.AlignSelfKeywords;
+    alignSelf?: st.AlignSelfKeyword;
     /**
      * The **alignment-baseline** attribute specifies how an object is aligned with respect to its
      * parent. This property specifies which baseline of this element is to be aligned with the
@@ -88,7 +88,7 @@ export interface IStyleset {
      * [[include: styleProps/a/alignmentBaseline.ts]]
      * ```
      */
-    alignmentBaseline?: st.AlignmentBaselineKeywords;
+    alignmentBaseline?: st.AlignmentBaselineKeyword;
     /**
      * The **all** shorthand CSS property resets all of an element's properties except [[unicodeBidi]],
      * [[direction]], and CSS Custom Properties. It can set properties to their initial or inherited
@@ -155,7 +155,7 @@ export interface IStyleset {
      * [[include: styleProps/a/animationDirection.ts]]
      * ```
      */
-    animationDirection?: OneOrMany<st.AnimationDirectionKeywords>;
+    animationDirection?: OneOrMany<st.AnimationDirectionKeyword>;
     /**
      * The **animation-duration** CSS property sets the length of time that an animation takes
      * to complete one cycle.
@@ -190,7 +190,7 @@ export interface IStyleset {
      * [[include: styleProps/a/animationFillMode.ts]]
      * ```
      */
-    animationFillMode?: OneOrMany<st.AnimationFillModeKeywords>;
+    animationFillMode?: OneOrMany<st.AnimationFillModeKeyword>;
     /**
      * The **animation-iteration-count** CSS property sets the number of times an animation
      * sequence should be played before stopping.
@@ -295,7 +295,7 @@ export interface IStyleset {
      * [[include: styleProps/a/appearance.ts]]
      * ```
      */
-    appearance?: st.AppearanceKeywords | string;
+    appearance?: st.AppearanceKeyword | string;
     /**
      * The **aspect-ratio** CSS property sets a preferred aspect ratio for the box, which will
      * be used in the calculation of auto sizes and some other layout functions.
@@ -342,7 +342,7 @@ export interface IStyleset {
      * [[include: styleProps/b/backfaceVisibility.ts]]
      * ```
      */
-    backfaceVisibility?: st.BackfaceVisibilityKeywords;
+    backfaceVisibility?: st.BackfaceVisibilityKeyword;
     /**
      * The **background** shorthand CSS property sets all background style properties at once,
      * such as color, image, origin and size, or repeat method.
@@ -379,7 +379,7 @@ export interface IStyleset {
      * [[include: styleProps/b/backgroundAttachment.ts]]
      * ```
      */
-    backgroundAttachment?: OneOrMany<st.BackgroundAttachmentKeywords>;
+    backgroundAttachment?: OneOrMany<st.BackgroundAttachmentKeyword>;
     /**
      * The **background-blend-mode** CSS property sets how an element's background images should
      * blend with each other and with the element's background color.
@@ -394,7 +394,7 @@ export interface IStyleset {
      * [[include: styleProps/b/backgroundBlendMode.ts]]
      * ```
      */
-    backgroundBlendMode?: OneOrMany<st.BlendModeKeywords>;
+    backgroundBlendMode?: OneOrMany<st.BlendModeKeyword>;
     /**
      * The **background-clip** CSS property sets whether an element's background extends underneath
      * its border box, padding box, or content box.
@@ -409,7 +409,7 @@ export interface IStyleset {
      * [[include: styleProps/b/backgroundClip.ts]]
      * ```
      */
-    backgroundClip?: OneOrMany<st.BackgroundClipKeywords>;
+    backgroundClip?: OneOrMany<st.BackgroundClipKeyword>;
     /**
      * The **background-color** CSS property sets the background color of an element.
      *
@@ -452,7 +452,7 @@ export interface IStyleset {
      * [[include: styleProps/b/backgroundOrigin.ts]]
      * ```
      */
-    backgroundOrigin?: OneOrMany<st.BackgroundOriginKeywords>;
+    backgroundOrigin?: OneOrMany<st.BackgroundOriginKeyword>;
     /**
      * The **background-position** CSS property sets the initial position for each background
      * image. The position is relative to the position layer set by [[backgroundOrigin]].
@@ -2412,7 +2412,7 @@ export interface IStyleset {
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode" target="mdn">MDN Page</a>
      */
-    mixBlendMode?: st.BlendModeKeywords;
+    mixBlendMode?: st.BlendModeKeyword;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit" target="mdn">MDN Page</a>
      */

@@ -20,22 +20,22 @@ export declare type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | A
  * Keywords used for the [[alignContent]] style property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-content" target="mdn">MDN Page</a>
  */
-export declare type AlignContentKeywords = "normal" | "baseline" | "first baseline" | "last baseline" | "space-between" | "space-around" | "space-evenly" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" | "safe center" | "safe start" | "safe end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right";
+export declare type AlignContentKeyword = "normal" | "baseline" | "first baseline" | "last baseline" | "space-between" | "space-around" | "space-evenly" | "stretch" | "center" | "start" | "end" | "flex-start" | "flex-end" | "safe center" | "safe start" | "safe end" | "safe flex-start" | "safe flex-end" | "safe left" | "safe right" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe flex-start" | "unsafe flex-end" | "unsafe left" | "unsafe right";
 /**
  * Keywords used for the [[alignItems]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-items" target="mdn">MDN Page</a>
  */
-export declare type AlignItemsKeywords = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" | "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end";
+export declare type AlignItemsKeyword = "normal" | "stretch" | "baseline" | "first baseline" | "last baseline" | "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" | "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" | "safe flex-start" | "safe flex-end" | "unsafe center" | "unsafe start" | "unsafe end" | "unsafe self-start" | "unsafe self-end" | "unsafe flex-start" | "unsafe flex-end";
 /**
  * Keywords used for the [[alignSelf]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-self" target="mdn">MDN Page</a>
  */
-export declare type AlignSelfKeywords = "auto" | AlignItemsKeywords;
+export declare type AlignSelfKeyword = "auto" | AlignItemsKeyword;
 /**
  * Keywords used for the [[alignmentBaseline]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline" target="mdn">MDN Page</a>
  */
-export declare type AlignmentBaselineKeywords = "auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "top" | "center" | "bottom";
+export declare type AlignmentBaselineKeyword = "auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "top" | "center" | "bottom";
 /**
  * Type for single animation. Used by [[Animation_StyleType]] style property.
  */
@@ -45,8 +45,8 @@ export declare type Animation_Single = {
     func?: Extended<TimingFunction>;
     delay?: Extended<CssTime>;
     count?: Extended<AnimationIterationCount_Single>;
-    direction?: Extended<AnimationDirectionKeywords>;
-    mode?: Extended<AnimationFillModeKeywords>;
+    direction?: Extended<AnimationDirectionKeyword>;
+    mode?: Extended<AnimationFillModeKeyword>;
     state?: Extended<AnimationPlayStateKeywords>;
     timeline?: Extended<AnimationTimeline_Single>;
 };
@@ -59,12 +59,12 @@ export declare type Animation_StyleType = OneOrMany<string | Animation_Single>;
  * Keywords used for the [[animationDirection]] style property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction" target="mdn">MDN Page</a>
  */
-export declare type AnimationDirectionKeywords = "normal" | "reverse" | "alternate" | "alternate-reverse";
+export declare type AnimationDirectionKeyword = "normal" | "reverse" | "alternate" | "alternate-reverse";
 /**
  * Keywords used for the [[animationFillMode]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode" target="mdn">MDN Page</a>
  */
-export declare type AnimationFillModeKeywords = "none" | "forwards" | "backwards" | "both";
+export declare type AnimationFillModeKeyword = "none" | "forwards" | "backwards" | "both";
 /**
  * Type for [[animationIterationCount]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count" target="mdn">MDN Page</a>
@@ -89,7 +89,7 @@ export declare type AnimationPlayStateKeywords = "paused" | "running";
  * Keywords used for the [[appearance]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/appearance" target="mdn">MDN Page</a>
  */
-export declare type AppearanceKeywords = "none" | "auto" | "textfield" | "menulist-button";
+export declare type AppearanceKeyword = "none" | "auto" | "textfield" | "menulist-button";
 /**
  * Type for [[aspectRatio]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ration" target="mdn">MDN Page</a>
@@ -99,7 +99,7 @@ export declare type AspectRatio_StyleType = CssAspectRatio | "auto";
  * Keywords used for the [[backfaceVisibility]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility" target="mdn">MDN Page</a>
  */
-export declare type BackfaceVisibilityKeywords = "visible" | "hidden";
+export declare type BackfaceVisibilityKeyword = "visible" | "hidden";
 /**
  * Type for single background value
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background" target="mdn">MDN Page</a>
@@ -110,9 +110,9 @@ export declare type Background_Single = string | CssColor | CssImage | {
     position?: Extended<CssPosition>;
     size?: Extended<BackgroundSize>;
     repeat?: Extended<BackgroundRepeat>;
-    attachment?: Extended<BackgroundAttachmentKeywords>;
-    origin?: Extended<BackgroundOriginKeywords>;
-    clip?: Extended<BackgroundClipKeywords>;
+    attachment?: Extended<BackgroundAttachmentKeyword>;
+    origin?: Extended<BackgroundOriginKeyword>;
+    clip?: Extended<BackgroundClipKeyword>;
 };
 /**
  * Type for [[background]] style property
@@ -123,17 +123,17 @@ export declare type Background_StyleType = OneOrMany<Background_Single>;
  * Keywords used for the [[backgroundAttachment]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment" target="mdn">MDN Page</a>
  */
-export declare type BackgroundAttachmentKeywords = "scroll" | "fixed" | "local";
+export declare type BackgroundAttachmentKeyword = "scroll" | "fixed" | "local";
 /**
  *Keywords used for the [[backgroundBlendMode]] and [[mixBlendMode]] properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode" target="mdn">MDN Page</a>
  */
-export declare type BlendModeKeywords = "normal" | "multiply" | "screen" | "overlay" | "darken" | "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" | "exclusion" | "hue" | "saturation" | "color" | "luminosity";
+export declare type BlendModeKeyword = "normal" | "multiply" | "screen" | "overlay" | "darken" | "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" | "exclusion" | "hue" | "saturation" | "color" | "luminosity";
 /**
  * Keywords used for the [[backgroundClip]] property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip" target="mdn">MDN Page</a>
  */
-export declare type BackgroundClipKeywords = "border-box" | "padding-box" | "content-box" | "text";
+export declare type BackgroundClipKeyword = "border-box" | "padding-box" | "content-box" | "text";
 /**
  * Type for [[backgroundImage]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-image" target="mdn">MDN Page</a>
@@ -143,22 +143,22 @@ export declare type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
  * Keywords used for the [[backgroundOrigin]] property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin" target="mdn">MDN Page</a>
  */
-export declare type BackgroundOriginKeywords = "border-box" | "padding-box" | "content-box" | "text";
+export declare type BackgroundOriginKeyword = "border-box" | "padding-box" | "content-box" | "text";
 /**
  * Keywords for single background repeat
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
-export declare type BackgroundRepeatKeywords = "repeat" | "space" | "round" | "no-repeat";
+export declare type BackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat";
 /**
  * Keywords for axis-specific background repeat
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
-export declare type BackgroundRepeatAxisKeywords = "repeat-x" | "repeat-y";
+export declare type BackgroundRepeatAxisKeyword = "repeat-x" | "repeat-y";
 /**
  * Type for single background repeat
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
-export declare type BackgroundRepeat = BackgroundRepeatAxisKeywords | OneOrPair<BackgroundRepeatKeywords>;
+export declare type BackgroundRepeat = BackgroundRepeatAxisKeyword | OneOrPair<BackgroundRepeatKeyword>;
 /**
  * Type for [[backgroundRepeat]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
@@ -319,14 +319,14 @@ export declare type BorderStyle_StyleType = OneOrBox<BorderStyle>;
  * [[borderWidth]] property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-width" target="mdn">MDN Page</a>
  */
-export declare type LineWidthKeywords = "thin" | "medium" | "thick";
+export declare type LineWidthKeyword = "thin" | "medium" | "thick";
 /**
  * Type used for several style properties that allow defining line width as a `<length>` CSS
  * type as well as keywords such as `thin` and `thick`. For example, see the [[borderWidth]]
  * property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-width" target="mdn">MDN Page</a>
  */
-export declare type LineWidth = LineWidthKeywords | CssLength;
+export declare type LineWidth = LineWidthKeyword | CssLength;
 /**
  * Type for [[boxDecorationBreak]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break" target="mdn">MDN Page</a>
@@ -937,17 +937,17 @@ export declare type PerspectiveOrigin_StyleType = HorizontalPositionKeyword | Ve
  * Type for the [[placeContent]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-content" target="mdn">MDN Page</a>
  */
-export declare type PlaceContent_StyleType = AlignContentKeywords | [Extended<AlignContentKeywords>, Extended<JustifyContent_StyleType>];
+export declare type PlaceContent_StyleType = AlignContentKeyword | [Extended<AlignContentKeyword>, Extended<JustifyContent_StyleType>];
 /**
  * Type for the [[placeItems]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-items" target="mdn">MDN Page</a>
  */
-export declare type PlaceItems_StyleType = AlignItemsKeywords | [Extended<AlignItemsKeywords>, Extended<JustifyItems_StyleType>];
+export declare type PlaceItems_StyleType = AlignItemsKeyword | [Extended<AlignItemsKeyword>, Extended<JustifyItems_StyleType>];
 /**
  * Type for the [[placeSelf]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-self" target="mdn">MDN Page</a>
  */
-export declare type PlaceSelf_StyleType = AlignSelfKeywords | [Extended<AlignSelfKeywords>, Extended<JustifySelf_StyleType>];
+export declare type PlaceSelf_StyleType = AlignSelfKeyword | [Extended<AlignSelfKeyword>, Extended<JustifySelf_StyleType>];
 /**
  * Type for the [[pointerEvents]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events" target="mdn">MDN Page</a>

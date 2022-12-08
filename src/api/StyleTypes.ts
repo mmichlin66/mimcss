@@ -39,7 +39,7 @@ export type AttrUnitKeyword = PercentUnits | LengthUnits | TimeUnits | AngleUnit
  * Keywords used for the [[alignContent]] style property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-content" target="mdn">MDN Page</a>
  */
-export type AlignContentKeywords = "normal" |
+export type AlignContentKeyword = "normal" |
     "baseline" | "first baseline" | "last baseline" |
     "space-between" | "space-around" | "space-evenly" | "stretch" |
     "center" | "start" | "end" | "flex-start" | "flex-end" |
@@ -54,7 +54,7 @@ export type AlignContentKeywords = "normal" |
  * Keywords used for the [[alignItems]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-items" target="mdn">MDN Page</a>
  */
-export type AlignItemsKeywords = "normal" | "stretch" |
+export type AlignItemsKeyword = "normal" | "stretch" |
     "baseline" | "first baseline" | "last baseline" |
     "center" | "start" | "end" | "self-start" | "self-end" | "flex-start" | "flex-end" |
     "safe center" | "safe start" | "safe end" | "safe self-start" | "safe self-end" |
@@ -68,7 +68,7 @@ export type AlignItemsKeywords = "normal" | "stretch" |
  * Keywords used for the [[alignSelf]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/align-self" target="mdn">MDN Page</a>
  */
-export type AlignSelfKeywords = "auto" | AlignItemsKeywords;
+export type AlignSelfKeyword = "auto" | AlignItemsKeyword;
 
 
 
@@ -76,7 +76,7 @@ export type AlignSelfKeywords = "auto" | AlignItemsKeywords;
  * Keywords used for the [[alignmentBaseline]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline" target="mdn">MDN Page</a>
  */
-export type AlignmentBaselineKeywords = "auto" | "baseline" | "before-edge" | "text-before-edge" |
+export type AlignmentBaselineKeyword = "auto" | "baseline" | "before-edge" | "text-before-edge" |
     "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" |
     "hanging" | "mathematical" | "top" | "center" | "bottom";
 
@@ -92,8 +92,8 @@ export type Animation_Single =
         func?: Extended<TimingFunction>;
         delay?: Extended<CssTime>;
         count?: Extended<AnimationIterationCount_Single>;
-        direction?: Extended<AnimationDirectionKeywords>;
-        mode?: Extended<AnimationFillModeKeywords>;
+        direction?: Extended<AnimationDirectionKeyword>;
+        mode?: Extended<AnimationFillModeKeyword>;
         state?: Extended<AnimationPlayStateKeywords>;
         timeline?: Extended<AnimationTimeline_Single>;
     };
@@ -110,14 +110,14 @@ export type Animation_StyleType = OneOrMany<string | Animation_Single>;
  * Keywords used for the [[animationDirection]] style property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction" target="mdn">MDN Page</a>
  */
-export type AnimationDirectionKeywords = "normal" | "reverse" | "alternate" | "alternate-reverse";
+export type AnimationDirectionKeyword = "normal" | "reverse" | "alternate" | "alternate-reverse";
 
 
 /**
  * Keywords used for the [[animationFillMode]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode" target="mdn">MDN Page</a>
  */
-export type AnimationFillModeKeywords = "none" | "forwards" | "backwards" | "both";
+export type AnimationFillModeKeyword = "none" | "forwards" | "backwards" | "both";
 
 
 
@@ -157,7 +157,7 @@ export type AnimationPlayStateKeywords = "paused" | "running";
  * Keywords used for the [[appearance]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/appearance" target="mdn">MDN Page</a>
  */
-export type AppearanceKeywords = "none" | "auto" | "textfield" | "menulist-button";
+export type AppearanceKeyword = "none" | "auto" | "textfield" | "menulist-button";
 
 
 
@@ -173,7 +173,7 @@ export type AspectRatio_StyleType = CssAspectRatio | "auto";
  * Keywords used for the [[backfaceVisibility]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility" target="mdn">MDN Page</a>
  */
-export type BackfaceVisibilityKeywords = "visible" | "hidden";
+export type BackfaceVisibilityKeyword = "visible" | "hidden";
 
 
 
@@ -188,9 +188,9 @@ export type Background_Single = string | CssColor | CssImage |
         position?: Extended<CssPosition>,
         size?: Extended<BackgroundSize>,
         repeat?: Extended<BackgroundRepeat>,
-        attachment?: Extended<BackgroundAttachmentKeywords>,
-        origin?: Extended<BackgroundOriginKeywords>,
-        clip?: Extended<BackgroundClipKeywords>,
+        attachment?: Extended<BackgroundAttachmentKeyword>,
+        origin?: Extended<BackgroundOriginKeyword>,
+        clip?: Extended<BackgroundClipKeyword>,
     };
 
 /**
@@ -205,7 +205,7 @@ export type Background_StyleType = OneOrMany<Background_Single>;
  * Keywords used for the [[backgroundAttachment]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment" target="mdn">MDN Page</a>
  */
-export type BackgroundAttachmentKeywords = "scroll" | "fixed" | "local";
+export type BackgroundAttachmentKeyword = "scroll" | "fixed" | "local";
 
 
 
@@ -213,7 +213,7 @@ export type BackgroundAttachmentKeywords = "scroll" | "fixed" | "local";
  *Keywords used for the [[backgroundBlendMode]] and [[mixBlendMode]] properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode" target="mdn">MDN Page</a>
  */
-export type BlendModeKeywords = "normal" | "multiply" | "screen" | "overlay" | "darken" |
+export type BlendModeKeyword = "normal" | "multiply" | "screen" | "overlay" | "darken" |
     "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" |
     "exclusion" | "hue" | "saturation" | "color" | "luminosity";
 
@@ -223,7 +223,7 @@ export type BlendModeKeywords = "normal" | "multiply" | "screen" | "overlay" | "
  * Keywords used for the [[backgroundClip]] property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip" target="mdn">MDN Page</a>
  */
-export type BackgroundClipKeywords = "border-box" | "padding-box" | "content-box" | "text";
+export type BackgroundClipKeyword = "border-box" | "padding-box" | "content-box" | "text";
 
 
 
@@ -239,7 +239,7 @@ export type BackgroundImage_StyleType = "none" | OneOrMany<CssImage>;
  * Keywords used for the [[backgroundOrigin]] property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin" target="mdn">MDN Page</a>
  */
-export type BackgroundOriginKeywords = "border-box" | "padding-box" | "content-box" | "text";
+export type BackgroundOriginKeyword = "border-box" | "padding-box" | "content-box" | "text";
 
 
 
@@ -247,19 +247,19 @@ export type BackgroundOriginKeywords = "border-box" | "padding-box" | "content-b
  * Keywords for single background repeat
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
-export type BackgroundRepeatKeywords = "repeat" | "space" | "round" | "no-repeat";
+export type BackgroundRepeatKeyword = "repeat" | "space" | "round" | "no-repeat";
 
 /**
  * Keywords for axis-specific background repeat
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
-export type BackgroundRepeatAxisKeywords = "repeat-x" | "repeat-y";
+export type BackgroundRepeatAxisKeyword = "repeat-x" | "repeat-y";
 
 /**
  * Type for single background repeat
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat" target="mdn">MDN Page</a>
  */
-export type BackgroundRepeat = BackgroundRepeatAxisKeywords | OneOrPair<BackgroundRepeatKeywords>;
+export type BackgroundRepeat = BackgroundRepeatAxisKeyword | OneOrPair<BackgroundRepeatKeyword>;
 
 /**
  * Type for [[backgroundRepeat]] style property
@@ -388,7 +388,7 @@ export type BorderSpacing_StyleType = OneOrPair<CssLength>;
 
 
 // !!!!!!!!!!!!!!! The following is a correct template litral type, but it causes the compiler
-// !!!!!!!!!!!!!!! to almost hang because of big number of combintaions.
+// !!!!!!!!!!!!!!! to almost hang because of the big number of combintaions.
 // /**
 //  * Type for specifying [[border]] style property value as an object
 //  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border" target="mdn">MDN Page</a>
@@ -457,7 +457,7 @@ export type BorderStyle_StyleType = OneOrBox<BorderStyle>;
  * [[borderWidth]] property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-width" target="mdn">MDN Page</a>
  */
-export type LineWidthKeywords = "thin" | "medium" | "thick";
+export type LineWidthKeyword = "thin" | "medium" | "thick";
 
 /**
  * Type used for several style properties that allow defining line width as a `<length>` CSS
@@ -465,7 +465,7 @@ export type LineWidthKeywords = "thin" | "medium" | "thick";
  * property.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-width" target="mdn">MDN Page</a>
  */
-export type LineWidth = LineWidthKeywords | CssLength;
+export type LineWidth = LineWidthKeyword | CssLength;
 
 
 
@@ -1374,7 +1374,7 @@ export type PerspectiveOrigin_StyleType = HorizontalPositionKeyword | VerticalPo
  * Type for the [[placeContent]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-content" target="mdn">MDN Page</a>
  */
-export type PlaceContent_StyleType = AlignContentKeywords | [Extended<AlignContentKeywords>, Extended<JustifyContent_StyleType>];
+export type PlaceContent_StyleType = AlignContentKeyword | [Extended<AlignContentKeyword>, Extended<JustifyContent_StyleType>];
 
 
 
@@ -1382,7 +1382,7 @@ export type PlaceContent_StyleType = AlignContentKeywords | [Extended<AlignConte
  * Type for the [[placeItems]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-items" target="mdn">MDN Page</a>
  */
-export type PlaceItems_StyleType = AlignItemsKeywords | [Extended<AlignItemsKeywords>, Extended<JustifyItems_StyleType>];
+export type PlaceItems_StyleType = AlignItemsKeyword | [Extended<AlignItemsKeyword>, Extended<JustifyItems_StyleType>];
 
 
 
@@ -1390,7 +1390,7 @@ export type PlaceItems_StyleType = AlignItemsKeywords | [Extended<AlignItemsKeyw
  * Type for the [[placeSelf]] style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/place-self" target="mdn">MDN Page</a>
  */
-export type PlaceSelf_StyleType = AlignSelfKeywords | [Extended<AlignSelfKeywords>, Extended<JustifySelf_StyleType>];
+export type PlaceSelf_StyleType = AlignSelfKeyword | [Extended<AlignSelfKeyword>, Extended<JustifySelf_StyleType>];
 
 
 

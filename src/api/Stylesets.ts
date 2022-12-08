@@ -55,7 +55,7 @@ export interface IStyleset
      * [[include: styleProps/a/alignContent.ts]]
      * ```
      */
-    alignContent?: st.AlignContentKeywords;
+    alignContent?: st.AlignContentKeyword;
 
     /**
      * The CSS **align-items** property sets the align-self value on all direct children as a
@@ -72,7 +72,7 @@ export interface IStyleset
      * [[include: styleProps/a/alignItems.ts]]
      * ```
      */
-    alignItems?: st.AlignItemsKeywords;
+    alignItems?: st.AlignItemsKeyword;
 
     /**
      * The **align-self** CSS property overrides a grid or flex item's align-items value. In Grid,
@@ -88,7 +88,7 @@ export interface IStyleset
      * [[include: styleProps/a/alignSelf.ts]]
      * ```
      */
-    alignSelf?: st.AlignSelfKeywords;
+    alignSelf?: st.AlignSelfKeyword;
 
     /**
      * The **alignment-baseline** attribute specifies how an object is aligned with respect to its
@@ -106,7 +106,7 @@ export interface IStyleset
      * [[include: styleProps/a/alignmentBaseline.ts]]
      * ```
      */
-    alignmentBaseline?: st.AlignmentBaselineKeywords;
+    alignmentBaseline?: st.AlignmentBaselineKeyword;
 
     /**
      * The **all** shorthand CSS property resets all of an element's properties except [[unicodeBidi]],
@@ -177,7 +177,7 @@ export interface IStyleset
      * [[include: styleProps/a/animationDirection.ts]]
      * ```
      */
-    animationDirection?: OneOrMany<st.AnimationDirectionKeywords>;
+    animationDirection?: OneOrMany<st.AnimationDirectionKeyword>;
 
     /**
      * The **animation-duration** CSS property sets the length of time that an animation takes
@@ -214,7 +214,7 @@ export interface IStyleset
      * [[include: styleProps/a/animationFillMode.ts]]
      * ```
      */
-    animationFillMode?: OneOrMany<st.AnimationFillModeKeywords>;
+    animationFillMode?: OneOrMany<st.AnimationFillModeKeyword>;
 
     /**
      * The **animation-iteration-count** CSS property sets the number of times an animation
@@ -325,7 +325,7 @@ export interface IStyleset
      * [[include: styleProps/a/appearance.ts]]
      * ```
      */
-    appearance?: st.AppearanceKeywords | string;
+    appearance?: st.AppearanceKeyword | string;
 
     /**
      * The **aspect-ratio** CSS property sets a preferred aspect ratio for the box, which will
@@ -375,7 +375,7 @@ export interface IStyleset
      * [[include: styleProps/b/backfaceVisibility.ts]]
      * ```
      */
-    backfaceVisibility?: st.BackfaceVisibilityKeywords;
+    backfaceVisibility?: st.BackfaceVisibilityKeyword;
 
     /**
      * The **background** shorthand CSS property sets all background style properties at once,
@@ -414,7 +414,7 @@ export interface IStyleset
      * [[include: styleProps/b/backgroundAttachment.ts]]
      * ```
      */
-    backgroundAttachment?: OneOrMany<st.BackgroundAttachmentKeywords>;
+    backgroundAttachment?: OneOrMany<st.BackgroundAttachmentKeyword>;
 
     /**
      * The **background-blend-mode** CSS property sets how an element's background images should
@@ -430,7 +430,7 @@ export interface IStyleset
      * [[include: styleProps/b/backgroundBlendMode.ts]]
      * ```
      */
-    backgroundBlendMode?: OneOrMany<st.BlendModeKeywords>;
+    backgroundBlendMode?: OneOrMany<st.BlendModeKeyword>;
 
     /**
      * The **background-clip** CSS property sets whether an element's background extends underneath
@@ -446,7 +446,7 @@ export interface IStyleset
      * [[include: styleProps/b/backgroundClip.ts]]
      * ```
      */
-    backgroundClip?: OneOrMany<st.BackgroundClipKeywords>;
+    backgroundClip?: OneOrMany<st.BackgroundClipKeyword>;
 
     /**
      * The **background-color** CSS property sets the background color of an element.
@@ -492,7 +492,7 @@ export interface IStyleset
      * [[include: styleProps/b/backgroundOrigin.ts]]
      * ```
      */
-    backgroundOrigin?: OneOrMany<st.BackgroundOriginKeywords>;
+    backgroundOrigin?: OneOrMany<st.BackgroundOriginKeyword>;
 
     /**
      * The **background-position** CSS property sets the initial position for each background
@@ -2684,7 +2684,7 @@ export interface IStyleset
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode" target="mdn">MDN Page</a>
      */
-    mixBlendMode?: st.BlendModeKeywords;
+    mixBlendMode?: st.BlendModeKeyword;
 
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit" target="mdn">MDN Page</a>

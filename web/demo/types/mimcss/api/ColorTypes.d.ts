@@ -164,7 +164,7 @@ export declare type NamedColor = keyof INamedColors;
  * The `SystemColors` type defines keywords for system colors that are used in forced-color mode
  * (but can be also used in the regular mode).
  */
-export declare type SystemColors = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas" | "CanvasText" | "Field" | "FieldText" | "GrayText" | "Highlight" | "HighlightText" | "LinkText" | "VisitedText";
+export declare type SystemColor = "ActiveText" | "ButtonFace" | "ButtonText" | "Canvas" | "CanvasText" | "Field" | "FieldText" | "GrayText" | "Highlight" | "HighlightText" | "LinkText" | "VisitedText";
 /**
  * Represents a single color separation in the `rgb()` CSS function. It can be expressed as either
  * a number or a string. Strings are interprested as is and can be used to specify percentage
@@ -181,7 +181,7 @@ export interface ICssColorFunc extends ICssFuncObject {
 /**
  * Type representing all possible color keywords; that is, colors that can be expressed as a string
  */
-export declare type ColorKeywords = NamedColor | "transparent" | "currentcolor" | SystemColors;
+export declare type ColorKeyword = NamedColor | "transparent" | "currentcolor" | SystemColor;
 /**
  * Type for CSS color. Color can be represented using the following types:
  * - keywords: any string that is a name of a property in the [[INamedColors]] interface or of the
@@ -229,7 +229,7 @@ export declare type ColorKeywords = NamedColor | "transparent" | "currentcolor" 
  * }
  * ```
  */
-export declare type CssColor = number | ColorKeywords | IRgbFunc | IHslFunc | IHwbFunc | ILabFunc | ILchFunc | IColorMixFunc | IColorContrastFunc | IColorFunc | IAlphaFunc;
+export declare type CssColor = number | ColorKeyword | IRgbFunc | IHslFunc | IHwbFunc | ILabFunc | ILchFunc | IColorMixFunc | IColorContrastFunc | IColorFunc | IAlphaFunc;
 /**
 * Type for CSS color that exclude numeric color representation. Color can be represented using
 * the following types:

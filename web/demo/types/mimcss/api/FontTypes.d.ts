@@ -13,21 +13,33 @@ export declare type FontStretchKeyword = "normal" | "ultra-condensed" | "extra-c
  */
 export declare type FontStretch = FontStretchKeyword | CssPercent;
 /**
+ * Type for specfying keywords [[IStyleset.fontStyle]] properties.
+ */
+export declare type FontStyleKeyword = "normal" | "italic" | "oblique";
+/**
  * Type for specfying [[IStyleset.fontStyle]] properties.
  */
-export declare type FontStyle = "normal" | "italic" | "oblique" | CssAngle;
+export declare type FontStyle = FontStyleKeyword | CssAngle;
+/**
+ * Type for specfying keywords [[IStyleset.fontWeight]] properties.
+ */
+export declare type FontWeightKeyword = "normal" | "bold";
 /**
  * Type for specfying [[IStyleset.fontWeight]] properties.
  */
-export declare type FontWeight = "normal" | "bold" | CssNumber;
+export declare type FontWeight = FontWeightKeyword | CssNumber;
 /** Keywords specifying system fonts */
 export declare type SystemFont = "caption" | "icon" | "menu" | "message-box" | "small-caption" | "status-bar";
 /** Type for [[IStyleset.fontKerning]] style property */
 export declare type FontKerning = "auto" | "normal" | "none";
 /** Type for [[IStyleset.fontOpticalSizing]] style property */
 export declare type FontOpticalSizing = "auto" | "none";
+/**
+ * Type for specfying keywords [[IStyleset.fontSize]] properties.
+ */
+export declare type FontSizeKeyword = "xx-small" | "x-small" | "small" | "medium" | "large" | "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller";
 /** Type for [[IStyleset.fontSize]] style property */
-export declare type FontSize = "xx-small" | "x-small" | "small" | "medium" | "large" | "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller" | CssLength;
+export declare type FontSize = FontSizeKeyword | CssLength;
 /** Type for [[IStyleset.fontSynthesis]] style property */
 export declare type FontSynthesis = "none" | "weight" | "style" | "weight style";
 /** Type for [[IStyleset.fontVariantCaps]] style property */
