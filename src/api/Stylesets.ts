@@ -3859,7 +3859,8 @@ export type StringStyleset = { [K: string]: string | null | undefined }
 
 
 /** Type listing names of style properties that are allowed in the page boxes */
-export type PageBoxProperties = "direction" | "unicodeBidi" |
+export type PageBoxProperties =
+    "direction" |
     "background" | "backgroundColor" | "backgroundImage" | "backgroundRepeat" | "backgroundAttachment" | "backgroundPosition" |
     "border" | "borderColor" | "borderWidth" |
         "borderBlock" | "borderBlockColor" | "borderBlockStyle" | "borderBlockWidth" |
@@ -3874,18 +3875,22 @@ export type PageBoxProperties = "direction" | "unicodeBidi" |
         "borderTop" | "borderTopColor" | "borderTopStyle" | "borderTopWidth" |
         "borderRadius" | "borderStartStartRadius" | "borderStartEndRadius" | "borderEndStartRadius" | "borderEndEndRadius" |
         "borderBottomLeftRadius" | "borderBottomRightRadius" | "borderTopLeftRadius" | "borderTopRightRadius" |
-    "counterReset" | "counterIncrement" | "counterSet" |
-    "color" | "content" |
+    "counterReset" | "counterIncrement" | "counterSet" | "color" | "content" |
     "font" | "fontFamily" | "fontSize" | "fontStyle" | "fontVariant" | "fontWeight" |
-    "height" | "minHeight" | "maxHeight" | "width" | "minWidth" | "maxWidth" |
-    "lineHeight" |
+    "height" |
+    "minHeight" | "maxHeight" | "width" | "minWidth" | "maxWidth" |
+    "lineHeight" | "letterSpacing" |
     "margin" | "marginBlock" | "marginBlockStart" | "marginBlockEnd" | "marginInlineStart" | "marginInlineEnd" |
         "marginBottom" | "marginLeft" | "marginRight" | "marginTop" |
     "outline" | "outlineColor" | "outlineStyle" | "outlineWidth" |
-    "padding" | "paddingTop" | "paddingBottom" | "paddingLeft" | "paddingRight" |
-    "paddingBlock" | "paddingBlockEnd" | "paddingBlockEnd" | "paddingInline" | "paddingInlineStart" | "paddingInlineEnd" |
-    "quotes" | "letterSpacing" | "visibility" | "verticalAlign" | "zIndex" |
-    "textAlign" | "textDecoration" | "textIndent" | "textTransform" | "whiteSpace" | "wordSpacing";
+    "padding" | "paddingTop" | "paddingBottom" | "paddingLeft" | "paddingRight" | "paddingBlock" |
+    "paddingBlockStart" | "paddingBlockEnd" | "paddingInline" | "paddingInlineStart" | "paddingInlineEnd" |
+    "quotes" |
+    "textAlign" | "textDecoration" | "textIndent" | "textTransform" |
+    "unicodeBidi" |
+    "visibility" | "verticalAlign" |
+    "whiteSpace" | "wordSpacing" |
+    "zIndex";
 
 /**
  * Defines type that contains properties that can be specified for any of the page boxes - the

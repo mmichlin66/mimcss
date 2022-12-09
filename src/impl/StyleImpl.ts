@@ -229,19 +229,6 @@ export const sp2s = (propName: string, propVal: any): string =>
         options = stylePropertyInfos[camelPropName];
     }
 
-    if (!options)
-    {
-        for( let tuple of partialStylePropertyProcessedInfos)
-        {
-            // camelPropName is defined if options is not
-            if (tuple[0].test(camelPropName!))
-            {
-                options = tuple[1];
-                break;
-            }
-        }
-    }
-
     // convert the value to string based on the information object for the property (if defined)
     let stringValue = v2s( propVal, options);
     if (!stringValue)
@@ -442,6 +429,7 @@ export const s_registerSP = (name: string, toStringFunc: AnyToStringFunc) =>
  */
 const stylePropertyInfos: { [K: string]: V2SOptions } =
 {
+    accentColor: WKF.Color,
     animation: {
         any: { obj: [
             ["duration", WKF.Time],
@@ -456,10 +444,13 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
         ]},
         sep: ",",
     },
+    animationDelay: WKF.MultiTimeWithComma,
+    animationDuration: WKF.MultiTimeWithComma,
     animationIterationCount: WKF.OneOrManyWithComma,
     animationFillMode: WKF.OneOrManyWithComma,
     animationName: WKF.OneOrManyWithComma,
     animationPlayState: WKF.OneOrManyWithComma,
+    animationTimingFunction: WKF.OneOrManyWithComma,
 
     background: {
         num: WKF.Color,
@@ -481,8 +472,12 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
     backgroundAttachment: WKF.OneOrManyWithComma,
     backgroundBlendMode: WKF.OneOrManyWithComma,
     backgroundClip: WKF.OneOrManyWithComma,
+    backgroundColor: WKF.Color,
     backgroundImage: WKF.OneOrManyWithComma,
     backgroundOrigin: WKF.OneOrManyWithComma,
+    backgroundPosition: WKF.MultiPosition,
+    backgroundPositionX: WKF.MultiPosition,
+    backgroundPositionY: WKF.MultiPosition,
     backgroundRepeat: WKF.OneOrManyWithComma,
     backgroundSize: {
         num: WKF.Length,
@@ -491,16 +486,62 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
     },
     baselineShift: WKF.Length,
     blockSize: WKF.Length,
+    border: WKF.Border,
+    borderBlock: WKF.Border,
+    borderBlockColor: WKF.Color,
+    borderBlockEnd: WKF.Border,
+    borderBlockEndColor: WKF.Color,
+    borderBlockEndWidth: WKF.Length,
+    borderBlockStart: WKF.Border,
+    borderBlockStartColor: WKF.Color,
+    borderBlockStartWidth: WKF.Length,
+    borderBlockWidth: WKF.MultiLengthWithSpace,
+    borderBottom: WKF.Border,
+    borderBottomColor: WKF.Color,
+    borderBottomLeftRadius: WKF.Radius,
+    borderBottomRightRadius: WKF.Radius,
+    borderBottomWidth: WKF.Length,
+    borderColor: WKF.Color,
+    borderEndEndRadius: WKF.Radius,
+    borderEndStartRadius: WKF.Radius,
+    borderInline: WKF.Border,
+    borderInlineColor: WKF.Color,
+    borderInlineEnd: WKF.Border,
+    borderInlineEndColor: WKF.Color,
+    borderInlineEndWidth: WKF.Length,
+    borderInlineStart: WKF.Border,
+    borderInlineStartColor: WKF.Color,
+    borderInlineStartWidth: WKF.Length,
+    borderInlineWidth: WKF.MultiLengthWithSpace,
     borderImage: {
         obj: borderImageToString,
     },
+    borderLeft: WKF.Border,
+    borderLeftColor: WKF.Color,
+    borderLeftWidth: WKF.Length,
     borderRadius: WKF.BorderRadius,
+    borderRight: WKF.Border,
+    borderRightColor: WKF.Color,
+    borderRightWidth: WKF.Length,
     borderSpacing: WKF.MultiLengthWithSpace,
+    borderStartEndRadius: WKF.Radius,
+    borderStartStartRadius: WKF.Radius,
+    borderTop: WKF.Border,
+    borderTopColor: WKF.Color,
+    borderTopLeftRadius: WKF.Radius,
+    borderTopRightRadius: WKF.Radius,
+    borderTopWidth: WKF.Length,
+    borderWidth: WKF.MultiLengthWithSpace,
     bottom: WKF.Length,
     boxShadow: WKF.BoxShadow,
 
+    caretColor: WKF.Color,
+    color: WKF.Color,
     columnGap: WKF.Length,
     columnRule: WKF.Border,
+    columnRuleWidth: WKF.Length,
+    columnRuleColor: WKF.Color,
+    columnWidth: WKF.Length,
     content: {
         str: WKF.Quoted,
         item: WKF.Quoted
@@ -509,6 +550,7 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
 
     fill: WKF.Color,
     fillOpacity: WKF.Percent,
+    floodColor: WKF.Color,
     flex: {
         num: WKF.Length,
         arr: {
@@ -547,29 +589,59 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
 
     height: WKF.Length,
 
+    inset: WKF.MultiLengthWithSpace,
+    insetBlock: WKF.MultiLengthWithSpace,
+    insetBlockEnd: WKF.MultiLengthWithSpace,
+    insetBlockStart: WKF.MultiLengthWithSpace,
+    insetInline: WKF.MultiLengthWithSpace,
+    insetInlineEnd: WKF.MultiLengthWithSpace,
+    insetInlineStart: WKF.MultiLengthWithSpace,
     inlineSize: WKF.Length,
 
     left: WKF.Length,
     letterSpacing: WKF.Length,
+    lightingColor: WKF.Color,
 
+    margin: WKF.MultiLengthWithSpace,
+    marginBlock: WKF.MultiLengthWithSpace,
+    marginBlockEnd: WKF.Length,
+    marginBlockStart: WKF.Length,
+    marginBottom: WKF.Length,
+    marginInline: WKF.MultiLengthWithSpace,
+    marginInlineEnd: WKF.Length,
+    marginInlineStart: WKF.Length,
+    marginLeft: WKF.Length,
+    marginRight: WKF.Length,
+    marginTop: WKF.Length,
     markerEnd: WKF.Marker,
     markerMid: WKF.Marker,
     markerStart: WKF.Marker,
     maskBorder: {
         obj: borderImageToString,
     },
+    maskBorderWidth: WKF.MultiLengthWithSpace,
     maskClip: WKF.OneOrManyWithComma,
     maskComposite: WKF.OneOrManyWithComma,
     maskImage: WKF.OneOrManyWithComma,
     maskMode: WKF.OneOrManyWithComma,
     maskOrigin: WKF.OneOrManyWithComma,
+    maskPosition: WKF.MultiPosition,
     maskRepeat: WKF.OneOrManyWithComma,
     maskSize: {
         num: WKF.Length,
         item: { any: WKF.Length },
         sep: ","
     },
+    maxBlockSize: WKF.Length,
+    maxInlineSize: WKF.Length,
+    maxHeight: WKF.Length,
+    maxWidth: WKF.Length,
+    minBlockSize: WKF.Length,
+    minInlineSize: WKF.Length,
+    minHeight: WKF.Length,
+    minWidth: WKF.Length,
 
+    objectPosition: WKF.MultiPosition,
     offset: {
         obj: [
             ["position", WKF.Position],
@@ -581,12 +653,27 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
     },
     offsetAnchor: WKF.Position,
     offsetDistance: WKF.Length,
+    offsetPosition: WKF.Position,
     offsetRotate: {
         any: WKF.Angle
     },
     outline: WKF.Border,
+    outlineColor: WKF.Color,
     outlineOffset: WKF.Length,
+    outlineWidth: WKF.Length,
+    overflowClipMargin: WKF.MultiLengthWithSpace,
 
+    padding: WKF.MultiLengthWithSpace,
+    paddingBlock: WKF.MultiLengthWithSpace,
+    paddingBlockEnd: WKF.Length,
+    paddingBlockStart: WKF.Length,
+    paddingBottom: WKF.Length,
+    paddingInline: WKF.MultiLengthWithSpace,
+    paddingInlineEnd: WKF.Length,
+    paddingInlineStart: WKF.Length,
+    paddingLeft: WKF.Length,
+    paddingRight: WKF.Length,
+    paddingTop: WKF.Length,
     perspective: WKF.Length,
     perspectiveOrigin: WKF.MultiLengthWithSpace,
 
@@ -607,7 +694,32 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
     },
     rowGap: WKF.Length,
 
+    scrollbarColor: WKF.Color,
+    scrollMargin: WKF.MultiLengthWithSpace,
+    scrollMarginBlock: WKF.MultiLengthWithSpace,
+    scrollMarginBlockEnd: WKF.Length,
+    scrollMarginBlockStart: WKF.Length,
+    scrollMarginBottom: WKF.Length,
+    scrollMarginInline: WKF.MultiLengthWithSpace,
+    scrollMarginInlineEnd: WKF.Length,
+    scrollMarginInlineStart: WKF.Length,
+    scrollMarginLeft: WKF.Length,
+    scrollMarginRight: WKF.Length,
+    scrollMarginTop: WKF.Length,
+    scrollPadding: WKF.MultiLengthWithSpace,
+    scrollPaddingBlock: WKF.MultiLengthWithSpace,
+    scrollPaddingBlockEnd: WKF.Length,
+    scrollPaddingBlockStart: WKF.Length,
+    scrollPaddingBottom: WKF.Length,
+    scrollPaddingInline: WKF.MultiLengthWithSpace,
+    scrollPaddingInlineEnd: WKF.Length,
+    scrollPaddingInlineStart: WKF.Length,
+    scrollPaddingLeft: WKF.Length,
+    scrollPaddingRight: WKF.Length,
+    scrollPaddingTop: WKF.Length,
+    shapeMargin: WKF.MultiLengthWithSpace,
     size: WKF.MultiLengthWithSpace,
+    stopColor: WKF.Color,
     stroke: WKF.Color,
     strokeDasharray: {
         any: WKF.Length
@@ -628,11 +740,16 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
             ["thickness", WKF.Length],
         ]
     },
+    textDecorationColor: WKF.Color,
     textDecorationThickness: WKF.Length,
     textEmphasis: WKF.Color,
+    textEmphasisColor: WKF.Color,
+    textFillColor: WKF.Color,
     textIndent: WKF.MultiLengthWithSpace,
     textShadow: WKF.BoxShadow,
     textSizeAdjust: WKF.Percent,
+    textStrokeColor: WKF.Color,
+    textStrokeWidth: WKF.Length,
     top: WKF.Length,
     transformOrigin: WKF.MultiLengthWithSpace,
     transition: {
@@ -644,10 +761,14 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
         ]},
         sep: ",",
     },
+    transitionDelay: WKF.MultiTimeWithComma,
+    transitionDuration: WKF.MultiTimeWithComma,
+    transitionTimingFunction: WKF.OneOrManyWithComma,
     translate: WKF.MultiLengthWithSpace,
 
     verticalAlign: WKF.Length,
 
+    width: WKF.Length,
     willChange: {
         str: camelToDash
     },
@@ -700,47 +821,6 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
     "<radius>": WKF.Radius,
 };
 
-
-
-/**
- * Map of partial property names to the V2SOptions objects describing custom actions necessary to
- * convert the property value to the CSS-compliant string. This allows properties that have some
- * common pattern and common string serialization to not be listed individually in the
- * stylePropertyInfos object ssaving some space. The keys in this object are regular expressions.
- */
-const partialStylePropertyInfos: { [P: string]: V2SOptions } =
-{
-    // most style properties that have "color" at the end have a single color value; however, some
-    // allow multiple colors; therefore we specify the option as WKF.Colors (plural).
-    "[C|c]olor$": WKF.Colors,
-
-    // most style properties that have "width" at the end have a single length value; however, some
-    // allow multiple length separated by spaces.
-    "[W|w]idth$": WKF.MultiLengthWithSpace,
-
-    "[M|m]argin": WKF.MultiLengthWithSpace,
-    "[P|p]adding": WKF.MultiLengthWithSpace,
-    "Radius$": WKF.Radius,
-    "Position": WKF.MultiPosition,
-    "border(?!Image)": WKF.Border,  // "border" not followed by "Image"
-    "^inset": WKF.MultiLengthWithSpace,
-    "^max": WKF.Length,
-    "^min": WKF.Length,
-    "Delay$": WKF.MultiTimeWithComma,
-    "Duration$": WKF.MultiTimeWithComma,
-    "TimingFunction$": WKF.OneOrManyWithComma,
-}
-
-/**
- * Array of two element tuples which maps processed RegEx from `partialStylePropertyInfos` object
- * in the first element and the corresponding `V2SOptions` in the second. This is needed to only
- * create RegEx objects once for each key in `partialStylePropertyInfos` object;
- */
-const partialStylePropertyProcessedInfos: [RegExp, V2SOptions][] = [];
-
-// fill `partialStylePropertyProcessedInfos` based on `partialStylePropertyInfos`
-for( let key in partialStylePropertyInfos)
-    partialStylePropertyProcessedInfos.push([new RegExp(key), partialStylePropertyInfos[key]]);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
