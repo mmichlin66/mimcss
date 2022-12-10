@@ -414,12 +414,11 @@ fdo["paint"] = (v: IPaintFunc): string =>
         return `paint(${v.name})`;
 
     let info = registeredPaintWorkletInfos[v.name];
-    let buf: string[] = [];
-    for( let i = 0; i < v.args.length; i++)
+    let buf = v.args.map( (arg, i) =>
     {
         let syntax = info?.syntax[i];
-        buf.push( syntax ? sp2s( syntax, v.args[i]) : v2s( v.args[i]));
-    }
+        return syntax ? sp2s(syntax, arg) : v2s(arg);
+    });
 
     return `paint(${v.name},${buf.filter(v=>!!v).join(",")})`;
 }

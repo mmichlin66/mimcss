@@ -220,14 +220,10 @@ export const sp2s = (propName: string, propVal: any): string =>
 
     // try to find information object for the property - either defined in stylePropertyInfos or
     // matches a key in partialStylePropertyInfos. First try the property as is; if not found, try
-    // to convert it to camel-case.
+    // to convert it to camelCase.
     let options = stylePropertyInfos[propName];
-    let camelPropName: string;
-    if (!options)
-    {
-        camelPropName = dashToCamel(propName);
-        options = stylePropertyInfos[camelPropName];
-    }
+    if (!options && propName.includes("-"))
+        options = stylePropertyInfos[dashToCamel(propName)];
 
     // convert the value to string based on the information object for the property (if defined)
     let stringValue = v2s( propVal, options);

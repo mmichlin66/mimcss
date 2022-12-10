@@ -32,23 +32,28 @@ export const registerStyleProperty = (name: string, toStringFunc: (v: any) => st
 /**
  * Converts the given value corresponding to the given style property to a CSS string.
  * @param name Style property name that determines how the value should be converted
- * to a CSS compliant string. The name can be given in dash-case or camel-case form.
+ * to a CSS compliant string. The name can be given in dash-case or camelCase form.
  * @param value Value to convert.
  * @returns String value of the style property.
  */
-export const getStylePropValue = <K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K]): string =>
-    sp2s( name, value);
+export function getStylePropValue<K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K]): string;
 
 /**
  * Converts the given value corresponding to the given style property to a CSS string. The caller
  * is responsible for ensuring the value type is correct for the given style property. If the
  * property name is not a valid CSS property, empty string is returned.
  * @param name Style property name that determines how the value should be converted
- * to a CSS compliant string. The name can be given in dash-case or camel-case form.
+ * to a CSS compliant string. The name can be given in dash-case or camelCase form.
  * @param value Value to convert.
  * @returns String value of the style property.
  */
-export const stylePropValueToString = (name: string, value: any): string => sp2s( name, value);
+export function getStylePropValue(name: string, value: any): string;
+
+// Implementation
+export function getStylePropValue(name: string, value: any): string
+{
+    return sp2s( name, value);
+}
 
 
 

@@ -179,7 +179,7 @@ export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedName
     /**
      * Name of a non-custom CSS property whose type determines the type of the custom property
      * value. This name is a property of [[IVarTemplateStyleset]] interface; that is, it is either
-     * a name of a CSS style property (in camel-case) or a string corresponding to one of basic
+     * a name of a CSS style property (in camelCase) or a string corresponding to one of basic
      * Mimcss types such as `"CssLength"`, `"CssColor"`, etc.
      */
     readonly template: K;

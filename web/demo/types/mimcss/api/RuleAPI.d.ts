@@ -372,7 +372,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * }
      * ```
      *
-     * @param template Either a name of a style property (in camel-case) or a name of the property from
+     * @param template Either a name of a style property (in camelCase) or a name of the property from
      * the [[IVarTemplateStyleset]] interface. The type corresponding to this property defines the type
      * of the second parameter.
      * @param value The value assigned to the property.
@@ -491,7 +491,7 @@ export declare abstract class StyleDefinition<P extends StyleDefinition = any> i
      * }
      * ```
      *
-     * @param template Either a name of a style property (in camel-case) or a name of the property from
+     * @param template Either a name of a style property (in camelCase) or a name of the property from
      * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
      * of the second parameter.
      * @param value The value assigned to the constant.
