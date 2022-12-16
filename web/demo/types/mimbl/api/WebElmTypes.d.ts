@@ -68,11 +68,12 @@ export declare type OnPropChangeHandlers<T> = {
 };
 /**
  * Represents the Mimbl component side of the custom element implementation.
- * @typeparam TAttrs Type or interface mapping attribute names to attribute types.
- * @typeparam TEvents Type or interface mapping event names to the types of the `detail`
- * property of the `CustomEvent` objects for the events.
+ * @typeparam TAttrs Type that maps attribute names to attribute types.
+ * @typeparam TEvents Type that maps event names (a.k.a event types) to either Event-derived
+ * classes (e.g. MouseEvent) or any other type. The latter will be interpreted as a type of the
+ * `detail` property of a CustomEvent.
  */
-export interface IWebElm<TAttrs extends {} = {}, TEvents extends {} = {}> extends IComponent, IComponentEx {
+export interface IWebElm<TAttrs extends {} = {}, TEvents extends {} = {}> extends IComponent<{}, TEvents>, IComponentEx<TEvents> {
     /**
      * Invokes the given function in the "style adoption context"; which allows all Mimcss style
      * manipulations to be reflected in the adoption context of the element's shadow DOM.
@@ -87,7 +88,7 @@ export interface IWebElm<TAttrs extends {} = {}, TEvents extends {} = {}> extend
      * `useAdoption` parameter can be set to false if the intention is to create styles under
      * the shadow root element instead of using adoption. This can be useful if the styles are
      * intended to be manipulated directly by the custom element's code, in which case each
-     * custom element instance should have its own style sheet (while adoption allows sharing the
+     * custom element instance will have its own style sheet (while adoption allows sharing the
      * same style sheet between multiple instances of custom elements).
      *
      * @param useAdoption Flag indicating that stylesheets should be adopted by instead of
@@ -139,9 +140,10 @@ export interface IWebElm<TAttrs extends {} = {}, TEvents extends {} = {}> extend
  * Represents a constructor for the HTMLElement-derived classes.
  *
  * @typeparam TElm Class deriving from HTMLElement, from which the resulting class will inherit.
- * @typeparam TAttrs Type or interface mapping attribute names to attribute types.
- * @typeparam TEvents Type or interface mapping event names to the types of the `detail`
- * property of the `CustomEvent` objects for the events.
+ * @typeparam TAttrs Type that maps attribute names to attribute types.
+ * @typeparam TEvents Type that maps event names (a.k.a event types) to either Event-derived
+ * classes (e.g. MouseEvent) or any other type. The latter will be interpreted as a type of the
+ * `detail` property of a CustomEvent.
  */
 export interface WebElmConstructor<TElm extends HTMLElement = HTMLElement, TAttrs extends {} = {}, TEvents extends {} = {}> {
     new (): TElm & IWebElm<TAttrs, TEvents>;

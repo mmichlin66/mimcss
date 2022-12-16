@@ -2,7 +2,7 @@ import { WebElmAttrOptions, WebElmConstructor, WebElmFromHtmlConverter, WebElmOp
 /**
  * Structure defining options that determine an attribute behavior.
  */
-declare type WebElmAttrDefinition = {
+export declare type WebElmAttrDefinition = {
     /** Name of the element attribute */
     attrName?: string;
     /** Name of the element property */
@@ -15,7 +15,7 @@ declare type WebElmAttrDefinition = {
  * The class returned from this function inherits from the HTMLElement-derived class specified
  * as the parameter and implements the [[IComponent]] and [[IComponentEx]] interfaces.
  *
- * ## Usage: ##
+ * **Usage:**
  *
  * ```typescript
  * @mim.webElm("custom-button")
@@ -26,9 +26,10 @@ declare type WebElmAttrDefinition = {
  * ```
  *
  * @typeparam TElm Class deriving from HTMLElement, from which the resulting class will inherit.
- * @typeparam TAttrs Type or interface mapping attribute names to attribute types.
- * @typeparam TEvents Type or interface mapping event names to the types of the `detail`
- * property of the `CustomEvent` objects for the events.
+ * @typeparam TAttrs Type that maps attribute names to attribute types.
+ * @typeparam TEvents Type that maps event names (a.k.a event types) to either Event-derived
+ * classes (e.g. MouseEvent) or any other type. The latter will be interpreted as a type of the
+ * `detail` property of a CustomEvent.
  *
  * @param elmClass HTMLElement-derived class from which the returned class will derive.
  * @returns Class that inherits from the given HTMLElement-derived class that imlements all
@@ -40,9 +41,20 @@ export declare function WebElmEx<TElm extends HTMLElement = HTMLElement, TAttrs 
  * customize existing built-in elements) should inherit. The return class derives directly from
  * HTMLElement.
  *
- * @typeparam TAttrs Type or interface mapping attribute names to attribute types.
- * @typeparam TEvents Type or interface mapping event types (names) to the types of the `detail`
- * property of the `CustomEvent` objects for the events.
+ * **Usage:**
+ *
+ * ```typescript
+ * @mim.webElm("my-elelemnt")
+ * class MyCustomElement extends mim.WebElm()
+ * {
+ *    render(): any { return ... }
+ * }
+ * ```
+ *
+ * @typeparam TAttrs Type that maps attribute names to attribute types.
+ * @typeparam TEvents Type that maps event names (a.k.a event types) to either Event-derived
+ * classes (e.g. MouseEvent) or any other type. The latter will be interpreted as a type of the
+ * `detail` property of a CustomEvent.
  */
 export declare const WebElm: <TAttrs extends {} = {}, TEvents extends {} = {}>() => WebElmConstructor<HTMLElement, TAttrs, TEvents>;
 /**
@@ -98,5 +110,4 @@ export declare const IntConverter: WebElmFromHtmlConverter;
  * Built-in attribute converter that converts string value to a Boolean value.
  */
 export declare const BoolConverter: WebElmFromHtmlConverter;
-export {};
 //# sourceMappingURL=WebElmAPI.d.ts.map

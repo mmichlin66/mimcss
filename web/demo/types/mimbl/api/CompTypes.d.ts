@@ -2,43 +2,18 @@ import { ITrigger } from "./TriggerTypes";
 import { IEventSlot } from "./EventSlotTypes";
 import { IElementAttrs, IElementEvents } from "./ElementTypes";
 export declare type DN = Node | null;
-/**
- * Type used to define properties that can be passed to a manged component.
- *
- * @typeparam TProps Type defining properties that can be passed to the functional or class-based
- * component with these properties. Default type is an empty object (no properties).
- * @typeparam TChildren Type defining components, elements or other objects that can be used as
- * children for the component with these properties. Default is `any`.
- */
-export declare type CompProps<TProps = {}, TChildren = any> = Readonly<TProps> & {
-    readonly children?: TChildren;
+export declare type ComponentProps<TProps extends {} = {}, TEvents extends {} = {}> = Readonly<TProps> & {
+    [K in keyof TEvents & ""]?: EventPropType<TEvents[K] extends Event ? TEvents[K] : CustomEvent<TEvents[K]>>;
 };
 /**
  * Interface that defines constructor signature for components.
  *
  * @typeparam TProps Type defining properties that can be passed to the class-based component
  *		of this type. Default type is an empty object (no properties).
- * @typeparam TChildren Type defining components, elements or other objects that can be used
- *		as children for the class-based component of this type. Default is `any`.
  */
-export interface IComponentClass<TProps = {}, TChildren = any> {
-    new (props?: CompProps<TProps>): IComponent<TProps, TChildren>;
+export interface IComponentClass<TProps extends {} = {}, TEvents extends {} = {}> {
+    new (props?: ComponentProps<TProps, TEvents>): IComponent<TProps, TEvents>;
 }
-/**
- * Type for the `shadow` property in the [[IComponent]] interface. This can be one of the following:
- * - boolean - if the value is true, a `<div>` element will be created and shadow root attached to
- *   it with mode "open".
- * - string - an element with this name will be created and shadow root attached to
- *   it with mode "open".
- * - ShadowRootInit - a `<div>` element will be created and shadow root attached to
- *   it with the given initialization prameters.
- * - two-item tuple - the first item is the name of the element to create and attach a shadow
- *   root to; the second item specifies the shadow root initialization prameters.
- */
-export declare type ComponentShadowOptions = boolean | string | ShadowRootInit | [
-    tag: string,
-    init: ShadowRootInit
-];
 /**
  * Interface that must be implemented by all components. Although it has many methods that
  * components can implement, in practice, there is only one mandatory method - [[render]].
@@ -50,10 +25,8 @@ export declare type ComponentShadowOptions = boolean | string | ShadowRootInit |
  *
  * @typeparam TProps Type defining properties that can be passed to this class-based component.
  *		Default type is an empty object (no properties).
- * @typeparam TChildren Type defining components, elements or other objects that can be used
- *		as children for this class-based component. Default is `any`.
  */
-export interface IComponent<TProps = {}, TChildren = any> {
+export interface IComponent<TProps extends {} = {}, TEvents extends {} = {}> extends EventTarget {
     /**
      * Components can define display name for tracing purposes; if they don't the default name
      * used is the component's class constructor name. Note that this method can be called before
@@ -61,11 +34,16 @@ export interface IComponent<TProps = {}, TChildren = any> {
      */
     readonly displayName?: string;
     /**
+     * Component properties passed to the constructor. This is normally used only by managed
+     * components and is usually undefined for independent components.
+     */
+    readonly props?: ComponentProps<TProps, TEvents>;
+    /**
      * Sets, gets or clears the virtual node object of the component. This property is set twice:
      *  1. Before the component is rendered for the first time: the component must remember the
      *    passed object.
-     *  2. Before the component is destroyed: null is passed as a parameter and the component must
-     *    release the remembered object.
+     *  2. Before the component is destroyed: undefined is passed as a parameter and the component
+     *     must release the remembered object.
      */
     vn?: IClassCompVN;
     /** Returns the component's content that will be ultimately placed into the DOM tree. */
@@ -88,7 +66,7 @@ export interface IComponent<TProps = {}, TChildren = any> {
      * Notifies the component that it replaced the given component. This allows the new
      * component to copy whatever internal state it needs from the old component.
      */
-    didReplace?(oldComp: IComponent<TProps, TChildren>): void;
+    didReplace?(oldComp: IComponent<TProps>): void;
     /**
      * Notifies that the component's content is going to be removed from the DOM tree. After
      * this method returns, a managed component is destroyed.
@@ -99,15 +77,15 @@ export interface IComponent<TProps = {}, TChildren = any> {
      *
      * Informs the component that new properties have been specified. At the time of the call
      * this.props refers to the "old" properties. If the component returns true, then its render
-     * method will be called. At that time,the original props object that was passed into the
-     * component's constructor will have these new properties. If the component doesn't implement
-     * the shouldUpdate method it is as though true is returned. If the component returns
-     * false, the render method is not called and the DOM tree of the component remains unchanged.
-     * The properties of the component, however, still change.
+     * method will be called. If the component doesn't implement the `shouldUpdate` method it is
+     * as though true is returned. If the component returns false, the render method is not
+     * called and the DOM tree of the component remains unchanged. The component, however, will
+     * still be informed about the new properties via the call to the [[updateProps]] method (if
+     * implemented).
      * @param newProps The new properties that the parent component provides to this component.
      * @returns True if the component should have its render method called and false otherwise.
      */
-    shouldUpdate?(newProps: CompProps<TProps, TChildren>): boolean;
+    shouldUpdate?(newProps: ComponentProps<TProps, TEvents>): boolean;
     /**
      * This method is only used by managed components.
      *
@@ -118,7 +96,7 @@ export interface IComponent<TProps = {}, TChildren = any> {
      * [[shouldUpdate]] method is implemented and whether it returned `true` or `false`.
      * @param newProps The new properties that the parent component provides to this component.
      */
-    updateProps?(newProps: CompProps<TProps, TChildren>): void;
+    updateProps?(newProps: ComponentProps<TProps, TEvents>): void;
     /**
      * Handles an exception that occurred during the rendering of one of the component's children.
      * If this method is not implemented or if it throws an error, the error will be propagated up
@@ -140,15 +118,39 @@ export interface IComponent<TProps = {}, TChildren = any> {
     getUpdateStrategy?(): UpdateStrategy;
 }
 /**
- * Represents component functionality that is implemented by the Mimbl built-in classes that
- * implement component functionality. It contains convenience methods that can be called from the
- * derived classes - regular comoponents and custom element implementations.
+ * Type for the `shadow` property in the [[IComponent]] interface. This can be one of the following:
+ * - boolean - if the value is true, a `<div>` element will be created and shadow root attached to
+ *   it with mode "open".
+ * - string - an element with this name will be created and shadow root attached to
+ *   it with mode "open".
+ * - ShadowRootInit - a `<div>` element will be created and shadow root attached to
+ *   it with the given initialization prameters.
+ * - two-item tuple - the first item is the name of the element to create and attach a shadow
+ *   root to; the second item specifies the shadow root initialization prameters.
  */
-export interface IComponentEx {
+export declare type ComponentShadowOptions = boolean | string | ShadowRootInit | [
+    tag: string,
+    init: ShadowRootInit
+];
+/**
+ * Represents component functionality that is implemented by the Mimbl base classes for
+ * regular components and custom Web element.
+ *
+ * @typeparam TEvents Type that maps event names (a.k.a event types) to either Event-derived
+ * classes (e.g. MouseEvent) or any other type. The latter will be interpreted as a type of the
+ * `detail` property of a CustomEvent.
+ */
+export interface IComponentEx<TEvents extends {} = {}> {
+    /**
+     * Remembered virtual node object through which the component can request services. This
+     * is undefined in the component's costructor but will be defined before the call to the
+     * (optional) willMount method.
+     */
+    vn?: IClassCompVN;
     /**
      * Determines whether the component is currently mounted. If a component has asynchronous
      * functionality (e.g. fetching data from a server), component's code may be executed after
-     * it was alrady unmounted. This property allows the component to handle this situation.
+     * it was already unmounted. This property allows the component to handle this situation.
      */
     readonly isMounted: boolean;
     /**
@@ -225,6 +227,30 @@ export interface IComponentEx {
      * to the event fired when the value is changed.
      */
     subscribeService<K extends keyof IServiceDefinitions>(id: K, defaultValue?: IServiceDefinitions[K], useSelf?: boolean): ISubscription<K>;
+    /**
+     * Retrieves the value for a service with the given ID registered by a closest ancestor
+     * component or the default value if none of the ancestor components registered a service with
+     * this ID. This method doesn't establish a subscription and only reflects the current state.
+     * @param id Unique service identifier
+     * @param defaultValue Default value to return if no publish service is found.
+     * @param useSelf Flag indicating whether the search for the service should start from the
+     * virtual node that calls this method. The default value is `false` meaning the search starts
+     * from the parent virtual node.
+     * @returns Current value of the service or default value if no published service is found.
+     */
+    getService<K extends keyof IServiceDefinitions>(id: K, defaultValue?: IServiceDefinitions[K], useSelf?: boolean): IServiceDefinitions[K];
+    /**
+     * Fires an event of the given type. The `detail` parameter is interpreted differently for
+     * built-in and custom events. For built-in events (that is, events whose type derives from
+     * Event), this is the event object itself. For custom events, it becomes the value of the
+     * `detail` property of the CustomEvent object.
+     * @typeparam K Defines a range of possible values for the `eventType` parameter. K is a key
+     * from the `TEvent` type.
+     * @param eventType Event type name, which is a key from the `TEvents` type
+     * @param detail Event data, whose type is defined by the type mapped to the key
+     * in the `TEvents` type.
+     */
+    fireEvent<K extends string & keyof TEvents>(eventType: K, detail: TEvents[K]): boolean;
 }
 /**
  * The UpdateStrategy object specifies different aspects of update behavior of components and
@@ -244,7 +270,7 @@ export declare type UpdateStrategy = {
      * this can have some adverse effects under cirtain circumstances if certain data is bound
      * to the particular instances of DOM nodes.
      *
-     * The flag's default value is false, that is recycling is enabled.
+     * The flag's default value is false, that is, recycling is enabled.
      */
     disableKeyedNodeRecycling?: boolean;
     /**
@@ -256,7 +282,7 @@ export declare type UpdateStrategy = {
      * old sub-nodes sequentially. Under certain circumstances this may speed up the reconciliation
      * process
      *
-     * The flag's default value is false, that is keys are used for matching the nodes.
+     * The flag's default value is false, that is, keys are used for matching the nodes.
      */
     ignoreKeys?: boolean;
 };
@@ -397,9 +423,9 @@ export declare type ExtendedEvents<T> = {
     [K in keyof T]?: T[K] extends Event ? EventPropType<T[K]> : EventPropType<CustomEvent<T[K]>>;
 };
 /**
- * Represents an HTML or SVG element attributes and events known to Mimbl infrastucture. Each
+ * Represents intrinsic element attributes, events and children known to Mimbl infrastucture. Each
  * built-in or custom element is defined as a JSX intrinsic element using the `ExtendedElement`
- * type by passing the correct attribute and event types.
+ * type by passing the correct attribute, event and children types.
  *
  * @typeparam TRef - Type that can be passed to the `ref` attribute to get a reference to the
  * element.
@@ -409,7 +435,7 @@ export declare type ExtendedEvents<T> = {
  * there are some elements - e.g. <video> - that define additional events. Custom Web elements
  * can also define their own events - in this case, they must be specified here.
  * @typeparam TChildren Type that determines what children are allowed under the element. It
- * defaults to `any` and usually doesn't eed to be specified.
+ * defaults to `any` and usually doesn't need to be specified.
  */
 export declare type ExtendedElement<TRef extends Element = Element, TAttrs extends IElementAttrs = IElementAttrs, TEvents extends IElementEvents = IElementEvents, TChildren = any> = ICommonProps<TRef> & ExtendedAttrs<TAttrs> & ExtendedEvents<TEvents> & {
     /**
@@ -523,8 +549,10 @@ export interface IVNode {
     readonly parent?: IVNode | null;
     /** Level of nesting at which the node resides relative to the root node. */
     readonly depth?: number;
-    /** Component that created this node in its render method (or undefined). */
+    /** Component that created this node. */
     readonly creator?: IComponent | null;
+    /** Component that used this node in its render method. */
+    readonly renderer?: IComponent | null;
     /**
      * Zero-based index of this node in the parent's list of sub-nodes. This is zero for the
      * root nodes that don't have parents.
@@ -832,10 +860,12 @@ export declare type RenderMethodType = (arg?: any) => any;
 /**
  * Properties to be used with the PromiseProxy component.
  */
-export interface PromiseProxyProps extends ICommonProps {
-    /** Promise that will be watch by the waiting node. */
+export interface PromiseProxyProps {
+    /** Promise that will be watched by the waiting node. */
     promise: Promise<any>;
     /** Function that is called if the promise is rejected. */
     errorContentFunc?: (err: any) => any;
+    children?: any;
+    key?: any;
 }
 //# sourceMappingURL=CompTypes.d.ts.map

@@ -1,4 +1,4 @@
-import { CompProps, ICommonProps, IComponent, ICustomWebElements } from "../api/CompTypes";
+import { ICommonProps, IComponent, ICustomWebElements } from "../api/CompTypes";
 import { IHtmlIntrinsicElements } from "../api/HtmlTypes";
 import { ISvgIntrinsicElements } from "../api/SvgTypes";
 /**
@@ -63,5 +63,5 @@ export declare function jsx(tag: any, props: any, ...children: any[]): any;
 
  * @param props
  */
-export declare function Fragment(props: CompProps<{}>): any;
+export declare function Fragment(): any;
 //# sourceMappingURL=mim.d.ts.map

@@ -1134,10 +1134,9 @@ export type Marker_StyleType = "none" | IIDRule;
 
 /**
  * Type for the [[marks]] style property for the `@page` at-rule
- * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marker-start" target="mdn">MDN Page</a>
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marks" target="mdn">MDN Page</a>
  */
-export type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross crop" |
-    ["crop", "cross"?] | ["cross", "crop"?];
+export type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross crop";
 
 
 

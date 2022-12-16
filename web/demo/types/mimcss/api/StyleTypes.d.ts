@@ -765,12 +765,9 @@ export declare type MarginTrim_StyleType = "none" | "in-flow" | "all";
 export declare type Marker_StyleType = "none" | IIDRule;
 /**
  * Type for the [[marks]] style property for the `@page` at-rule
- * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marker-start" target="mdn">MDN Page</a>
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/marks" target="mdn">MDN Page</a>
  */
-export declare type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross crop" | [
-    "crop",
-    "cross"?
-] | ["cross", "crop"?];
+export declare type Marks_StyleType = "none" | "crop" | "cross" | "crop cross" | "cross crop";
 /**
  * Type for the [[maskBorder]] style properties
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/mask-border" target="mdn">MDN Page</a>
