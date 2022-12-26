@@ -93,7 +93,7 @@ let themes = [
 
 
 
-// Define component that displays "Hello World!"
+// Define component that displays "Happy Scheduling!"
 class HelloWorld extends mim.Component
 {
     private prevScheduler: number;
