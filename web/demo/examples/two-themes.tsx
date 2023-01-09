@@ -1,5 +1,5 @@
-﻿// This example demonstrates how to use two themes at the same time on a single page.
-// The example defines two themes and show how to apply them to two different sections
+﻿// This example demonstrates how to use multiple themes at the same time on a single page.
+// The example defines two themes and shows how to apply them to two different sections
 // of the page.
 
 import * as mim from "mimbl";

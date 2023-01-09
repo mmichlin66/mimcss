@@ -3,12 +3,12 @@
 	position: relative;
 }
 
-h6 { font-size: 12px; font-weight: bold; margin-bottom: 6px; }
-h5 { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
-h4 { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
-h3 { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
-h2 { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
-h1 { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+h6 { font-size: 12px; font-weight: bold; margin-bottom: 0; }
+h5 { font-size: 14px; font-weight: bold; margin-bottom: 0; }
+h4 { font-size: 16px; font-weight: bold; margin-bottom: 0; }
+h3 { font-size: 18px; font-weight: bold; margin-bottom: 0; }
+h2 { font-size: 20px; font-weight: bold; margin-bottom: 0; }
+h1 { font-size: 24px; font-weight: bold; margin-bottom: 0; }
 
 html {
 	height: 100%;
@@ -19,6 +19,7 @@ body {
 	margin: 0px;
 	font-family: "Segoe UI", Verdana, Geneva, Tahoma, sans-serif;
 	font-size: 15px;
+	line-height: 1.7;
 }
 
 pre, code, code > span {
@@ -29,12 +30,12 @@ pre, code, code > span {
 }
 
 li {
-	line-height: 1.5;
+	line-height: 1.7;
 }
 
 p {
-	margin-top: 8px;
-	margin-bottom: 8px;
+	margin-top: 0.4em;
+	margin-bottom: 0.4em;
 }
 
 .vbox {

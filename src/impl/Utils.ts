@@ -162,7 +162,7 @@ export type V2SOptions = WKF | AnyToStringFunc |
     // property to override this behavior
     obj?: V2SOptions | P2SOptions;
 
-    // Options to use if value is an object, whcih override the function defined by the symV2S
+    // Options to use if value is an object, which override the function defined by the symV2S
     // symbol
     obj2?: V2SOptions | P2SOptions;
 

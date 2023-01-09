@@ -12,6 +12,9 @@ exec("xcopy ..\\..\\mimurl\\lib\\mimurl.js      lib\\ /i /y /d");
 exec("xcopy ..\\..\\mimbl\\lib\\mimbl.js        lib\\ /i /y /d");
 exec("xcopy ..\\..\\mimcl\\lib\\mimcl.js        lib\\ /i /y /d");
 
+console.log("Copy require.js to " + p.join(ps.cwd(), "demo"));
+exec("xcopy ..\\..\\mimcss\\web\\assets\\require.js demo\\ /i /y /d");
+
 
 // playground
 console.log("Copy libraries to " + p.join(ps.cwd(), "demo"));

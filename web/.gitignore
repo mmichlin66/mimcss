@@ -2,3 +2,6 @@ _site
 .sass-cache
 .jekyll-metadata
 .vs
+demo/types
+demo/*.ttf
+demo/*.js
