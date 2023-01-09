@@ -1,3 +1,13 @@
+# 0.11.17
+
+1. Rename `push/popAdoptionContext` to `push/popRootContext`.
+1. Add `useAdoption` parameter to push/popRootContext.
+1. Implement `stroke` style properties.
+1. Fix bug in updating element's `style` property (previously, didn't remove not-used-anymore properties).
+1. Add `NamedColor` type (instead of using `keyof INamedColors`).
+1. Rename several literal types for style properties by using singular "Keyword" instead of plural "Keywords".
+
+
 # 0.11.16
 
 1. Implement `@scroll-timeline` at-rule and `animation-timeline` style property.
