@@ -2,6 +2,7 @@ import {IStyleDefinition} from "../api/RuleTypes";
 import {SchedulerType, IScheduler} from "../api/SchedulingTypes";
 import {StringStyleset} from "../api/Stylesets";
 import {activateSD, deactivateSD} from "../rules/RuleContainer";
+import { camelToDash } from "./Utils";
 
 
 
@@ -75,6 +76,7 @@ const updateStyleProperty = (ruleOrElm: IObjectWithStyle, name: string | null,
     }
     else if (name)
     {
+        name = camelToDash(name);
         if (value == null)
             ruleOrElm.style.removeProperty( name);
         else
