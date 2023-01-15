@@ -25,9 +25,9 @@ export type Global_StyleType = "inherit" | "initial" | "unset" | "revert" | "rev
  * (e.g. `filter`).
  *
  * Developers don't implement this interface directly; instead, the interfaces derived from this
- * interface are implemented by different Mimcss functions. For example, [[IRawProxy]] interface
- * is implemented by the [[raw]] function, [[IStringProxy]] interface is implemented by the
- * [[attr]], [[counter]] and [[counters]] functions, and so on.
+ * interface are implemented by different Mimcss functions. For example, {@link IRawProxy} interface
+ * is implemented by the {@link raw} function, {@link IStringProxy} interface is implemented by the
+ * {@link attr}, {@link counter} and {@link counters} functions, and so on.
  *
  * @typeParam T String constant that is used to differentiate between proxies used for different
  * purposes. The parameter `p` of this callable interface is of type T but it is not used
@@ -67,7 +67,7 @@ export interface ICssFuncObject
  *
  * In addition, sometimes it can be easier for the developers to specify an already pre-formatted
  * CSS string as property value - maybe because it is obtained from some external source. The
- * `IRawProxy` callabcle interface is returned from the [[raw]] function, which allows by-passing
+ * `IRawProxy` callabcle interface is returned from the {@link raw} function, which allows by-passing
  * the property typing rules and specifying a string directly.
  *
  * Developers can create their own functions that return this callable interface and then invoke
@@ -101,7 +101,7 @@ export interface IRawProxy extends IGenericProxy<"raw"> {}
 
 /**
  * Represents a callable interface that is returned by functions that can be used in string
- * context, such as [[attr]] and [[counter]].
+ * context, such as {@link attr} and {@link counter}.
  */
 export interface IStringProxy extends IGenericProxy<"string"> {}
 
@@ -119,10 +119,10 @@ export type CssString = string | IStringProxy;
  * The `ICustomVar` interface represents a custom property with values of the given type. Every
  * style property can accept a custom CSS property value in the form of the `var()` CSS
  * function. Mimcss also allows defining "constants", which are a more lightweight way to provide
- * values that are used in other rules and properties. See the [[IConstant]] interface.
+ * values that are used in other rules and properties. See the {@link IConstant} interface.
  *
- * The `ICustomVar` interface is extended by the [[IVarRule]] interface that is returned
- * from the [[$var]] function.
+ * The `ICustomVar` interface is extended by the {@link IVarRule} interface that is returned
+ * from the {@link $var} function.
  *
  * @typeparam T Basic type of the value of the custom CSS variable.
  */
@@ -131,7 +131,7 @@ export interface ICustomVar<T = any>
     /**
 	 * Sets new value of this custom CSS property at the global level; that is, under `:root`. To
      * set a value of the CSS custom property under a certain CSS rule, use the
-     * [[IStyleRule.setCustomProp]] method.
+     * {@link IStyleRule.setCustomProp} method.
 	 * @param value New value for the CSS property.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
@@ -147,8 +147,8 @@ export interface ICustomVar<T = any>
  * values that are used in other rules and properties. Every style property can accept a constant
  * value.
  *
- * The `IConstant` interface is extended by the [[IConstRule]] interface that is returned from the
- * [[$const]] function.
+ * The `IConstant` interface is extended by the {@link IConstRule} interface that is returned from the
+ * {@link $const} function.
  *
  * @typeparam T Basic type of the value of the constant.
  */
@@ -163,7 +163,7 @@ export interface IConstant<T = any>
 
 
 /**
- * Type that extends the given type with the [[IRawProxy]] interface that allows specifying raw
+ * Type that extends the given type with the {@link IRawProxy} interface that allows specifying raw
  * string values.
  */
 export type RawExtended<T> = T | IRawProxy;
@@ -180,9 +180,9 @@ export type RawOneOrMany<T> = T | RawExtended<T>[];
 
 /**
  * Type that extends the given type with the following types:
- * - [[ICustomVar]] interface that allows using a CSS custom property rule value.
- * - [[IConstant]] interface that allows using a constant rule value.
- * - [[IRawProxy]] interface that allows specifying a function that returns a raw string value.
+ * - {@link ICustomVar} interface that allows using a CSS custom property rule value.
+ * - {@link IConstant} interface that allows using a constant rule value.
+ * - {@link IRawProxy} interface that allows specifying a function that returns a raw string value.
  *
  * Developers don't usually use this type directly - it is used by Mimcss to define style property
  * types as well as function parameter types.
@@ -248,15 +248,15 @@ export type MultiProp<T> = { "[]": (Extended<T> | ImportantProp<T> | Global_Styl
 
 /**
  * The ExtendedProp extends the given generic type with the following elements:
- * - [[ICustomVar]] interface that allows using a CSS custom property rule value.
- * - [[IConstant]] interface that allows using a constant rule value.
- * - [[IRawProxy]] interface that allows specifying raw string value.
+ * - {@link ICustomVar} interface that allows using a CSS custom property rule value.
+ * - {@link IConstant} interface that allows using a constant rule value.
+ * - {@link IRawProxy} interface that allows specifying raw string value.
  * - Object with a single property "!", which is used to mark a property as "!important".
- * - [[Global_StyleType]], which allows any property to be assigned the global values such as
+ * - {@link Global_StyleType}, which allows any property to be assigned the global values such as
  *   "initial", "inherit", "unset" and "revert".
  *
- *  Developers don't usually use this type directly - it is used by Mimcss to define types
- * of properties in the [[Styleset]] interface.
+ * Developers don't usually use this type directly - it is used by Mimcss to define types
+ * of properties in the {@link Styleset} interface.
  */
 export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | MultiProp<T> | Global_StyleType;
 
@@ -359,7 +359,7 @@ export type OneOrMany<T> = T | Extended<T>[];
 
  /**
  * The `IRuleWithSelector` interface represents an entity that has a selector string. These include
- * all style rules ([[IStyleRule]] interface) and class name rule ([[IClassNameRule]] interface).
+ * all style rules ({@link IStyleRule} interface) and class name rule ({@link IClassNameRule} interface).
  */
 export interface IRuleWithSelector
 {
@@ -371,7 +371,7 @@ export interface IRuleWithSelector
 
 /**
  * The `ISelectorProxy` function returns a CSS selector string. This type is returned from the
- * [[selector]] function.
+ * {@link selector} function.
  */
 export interface ISelectorProxy extends IGenericProxy<"selector"> {};
 
@@ -381,7 +381,7 @@ export interface ISelectorProxy extends IGenericProxy<"selector"> {};
 export type SelectorCombinator = "," | " " | ">" | "+" | "~" | "||";
 
 /**
- * Represents properties used in the [[CombinedStyleset]] which are used to define dependent rules.
+ * Represents properties used in the {@link CombinedStyleset} which are used to define dependent rules.
  * Property values are defined as arrays of two-element tuples each defining a selector and a
  * styleset corresponding to this selector. Selectors can use the ampersand symbol to refer to the
  * parent style selector. If the ampersand symbol is not used, the selector will be simply appended
@@ -461,9 +461,9 @@ export type PageSelector = IPageNameRule | PagePseudoClass | string |
 
 
 /**
- * Represents pseudo classes that can be used as properties in the [[CombinedStyleset]] object to
+ * Represents pseudo classes that can be used as properties in the {@link CombinedStyleset} object to
  * define dependent rules. Note that this type only contains pseudo classes that don't require
- * parameters. For parameterized pseudo classes, see the [[IParameterizedPseudoClass]] interface.
+ * parameters. For parameterized pseudo classes, see the {@link IParameterizedPseudoClass} interface.
  *
  * **Example:**
  *
@@ -488,9 +488,9 @@ export type PseudoClass =
 
 
 /**
- * Represents pseudo elements that can be used as properties in the [[CombinedStyleset]] object to
+ * Represents pseudo elements that can be used as properties in the {@link CombinedStyleset} object to
  * define dependent rules. Note that this type only contains pseudo elements that don't require
- * parameters. For parameterized pseudo elements, see the [[IParameterizedPseudoElement]] interface.
+ * parameters. For parameterized pseudo elements, see the {@link IParameterizedPseudoElement} interface.
  *
  * **Example:**
  *
@@ -563,7 +563,7 @@ export type Direction = "rtl" | "ltr";
 /**
  * The `IParameterizedPseudoClass` interface maps names of pseudo classes that require parameters
  * to the types that are used to specify these parameters. When a parameterized pseudo class is
- * used as a property in the [[CombinedStyleset]] object, the value should be of the type from
+ * used as a property in the {@link CombinedStyleset} object, the value should be of the type from
  * this interface.
  */
 export interface IParameterizedPseudoClass
@@ -587,7 +587,7 @@ export interface IParameterizedPseudoClass
 /**
  * The `IParameterizedPseudoElement` interface maps names of pseudo elements that require parameters
  * to the types that can be used to specify these parameters. When a parameterized pseudo element
- * is used as a property in the [[CombinedStyleset]] object, the value should be of the type from
+ * is used as a property in the {@link CombinedStyleset} object, the value should be of the type from
  * this interface.
  */
 export interface IParameterizedPseudoElement
@@ -599,8 +599,8 @@ export interface IParameterizedPseudoElement
 
 
 /**
- * The `IParameterizedPseudoEntity` interface combines [[IParameterizedPseudoClass]] and
- * [[IParameterizedPseudoElement]] interfaces.
+ * The `IParameterizedPseudoEntity` interface combines {@link IParameterizedPseudoClass} and
+ * {@link IParameterizedPseudoElement} interfaces.
  */
 export interface IParameterizedPseudoEntity extends IParameterizedPseudoClass, IParameterizedPseudoElement {}
 
@@ -608,7 +608,7 @@ export interface IParameterizedPseudoEntity extends IParameterizedPseudoClass, I
 
 /**
  * Represents a selector for one or more namespaced tags; that is, tags accompanied by a namespace
- * prefix. This interface is returned from the [[tagNS]] function.
+ * prefix. This interface is returned from the {@link tagNS} function.
  */
 export interface INSTagFunc extends ICssFuncObject
 {
@@ -670,7 +670,7 @@ export interface IAttrSelectorFunc extends ICssFuncObject
 
     /**
      * Operation that defines the attribute value comparison behavior. The default value is
-     * [[AttrSelectorOperation.Equal]].
+     * {@link AttrSelectorOperation.Equal}.
      */
     op?: AttrComparisonOperation;
 
@@ -685,7 +685,7 @@ export interface IAttrSelectorFunc extends ICssFuncObject
 
 /**
  * Represents a compound selector as an array of selectors. This interface is extended by the
- * [[ISelectorBuilder]] interface, which allows building a compound selector using chain calls.
+ * {@link ISelectorBuilder} interface, which allows building a compound selector using chain calls.
  */
 export interface ISelectorFunc extends ICssFuncObject
 {
@@ -700,7 +700,7 @@ export interface ISelectorFunc extends ICssFuncObject
 /**
  * Provides means to build complex selectors from multiple selector items of all possible kinds
  * including tags, classess, IDs, attributes, pseudo classes and pseudo elements combined with
- * CSS combinators. This interface is returned from the [[sel]] function.
+ * CSS combinators. This interface is returned from the {@link sel} function.
  */
 export interface ISelectorBuilder extends ISelectorFunc
 {
@@ -989,7 +989,7 @@ export interface ISelectorBuilder extends ISelectorFunc
 
     /**
      * Adds the `":host()"` parameterized pseudo class to immediately follow the existing selector.
-     * The method has the dollar-sign in its name to differentiate it from the property [[host]].
+     * The method has the dollar-sign in its name to differentiate it from the property {@link host}.
      *
      * **Example:**
      *
@@ -1440,7 +1440,7 @@ export interface ISelectorBuilder extends ISelectorFunc
 
 /**
  * Type for a CSS selector. This type is used to produce arbitrary complex selectors used by the
- * [[$style]] function. If array is specified, all items are converted to strings and concatenated.
+ * {@link $style} function. If array is specified, all items are converted to strings and concatenated.
  */
 export type CssSelector = ElementTagName | INSTagFunc | PseudoEntity | IRuleWithSelector |
     ISelectorProxy | ISelectorFunc | IAttrSelectorFunc | IParameterizedPseudoEntityFunc<any> |
@@ -1467,7 +1467,7 @@ export type TimingFunctionJumpTerm = "jump-start" | "jump-end" | "jump-none" | "
 
 /**
  * The IStepsFunc interface represents an invocation of the CSS `steps()` function. It is returned
- * from the [[steps]] function.
+ * from the {@link steps} function.
  * @category Transition and Animation
  */
 export interface IStepsFunc extends ICssFuncObject
@@ -1485,7 +1485,7 @@ export interface IStepsFunc extends ICssFuncObject
 
 /**
  * The ICubicBezierFunc interface represents an invocation of the CSS `cubic-bezier()` function.
- * It is returned from the [[cubicBezier]] function.
+ * It is returned from the {@link cubicBezier} function.
  * @category Transition and Animation
  */
 export interface ICubicBezierFunc extends ICssFuncObject
@@ -1510,7 +1510,7 @@ export type TimingFunction = TimingFunctionKeywords | IStepsFunc | ICubicBezierF
 
 /**
  * The IUrlFunc interface represents an invocation of the CSS `url()` function. It is returned from
- * the [[url]] function.
+ * the {@link url} function.
  */
 export interface IUrlFunc extends ICssFuncObject
 {
@@ -1549,7 +1549,7 @@ export interface ICursorFunc extends ICssFuncObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Type representing extent for the [[radialGradient]] or [[ray]] functions.
+ * Type representing extent for the {@link radialGradient} or {@link ray} functions.
  */
 export type ExtentKeyword = "closest-corner" | "closest-side" | "farthest-corner" | "farthest-side";
 
@@ -1570,9 +1570,9 @@ export interface ICssImageFunc extends ICssFuncObject
 
 /**
  * The CssImage type represents a type used for CSS properties that accept the `<image>` type.
- * Image can be specified either using the [[url]] function that returns the [[IUrlFunc]]
- * interface or any of the functions that return the [[IImageProxy]] or [[ICssImageFunc]]
- * interface such as [[linearGradient]] and [[crossFade]].
+ * Image can be specified either using the {@link url} function that returns the {@link IUrlFunc}
+ * interface or any of the functions that return the {@link ICssImageFunc} interface such as
+ * {@link linearGradient} and {@link crossFade}.
  */
 export type CssImage = IUrlFunc | ICssImageFunc;
 

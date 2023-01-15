@@ -39,8 +39,8 @@ import { ExtendedScrollTimeline } from "./ScrollTimelineTypes";
  * The `StyleDefinition` class is a base for all classes that contain defininitions of CSS rules.
  * Style definition classes are regular TypeScript classes and as such can have any fields and
  * methods - both instance and static. Normally, however, they contain instance properties
- * initialized with functions returning style rules and at-rules, such as [[$class]],
- * [[$tag]], [[$media]], [[$counter]] and others.
+ * initialized with functions returning style rules and at-rules, such as {@link $class},
+ * {@link $tag}, {@link $media}, {@link $counter} and others.
  *
  * **Examples**
  *
@@ -99,7 +99,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
     /**
      * Style definition instances are created directly only by the *styled components* - that is,
      * components that use different styles for each instance. Otherwise, style definition
-     * instances are created when either the [[$use]] method or [[activate]] function is called.
+     * instances are created when either the {@link $use} method or {@link activate} function is called.
      * @param parent Reference to the parent style definition class
      */
     public constructor( parent?: P)
@@ -167,7 +167,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * the class. Such class can be later used either in conditional grouping rules or in derived
      * style definition classes.
      *
-     * The returned [[IClassRule]] interface has the `name` property that should be used to assign
+     * The returned {@link IClassRule} interface has the `name` property that should be used to assign
      * the class to an HTML element
      *
      * **Example:**
@@ -243,8 +243,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param classes List of class names specified either as a string or [[IClassRule]] or
-     * [[IClassNameRule]] objects.
+     * @param classes List of class names specified either as a string or {@link IClassRule} or
+     * {@link IClassNameRule} objects.
      * @returns `IClassNameRule` object whose `name` property contains the combined class name, e.g.
      * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
      * `".class1.class2"`.
@@ -263,7 +263,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * parameters just to "declare" the ID. Such ID can be later used either in conditional
      * grouping rules or in derived style definition classes.
      *
-     * The returned [[IIDRule]] interface has the `name` property that should be used to assign
+     * The returned {@link IIDRule} interface has the `name` property that should be used to assign
      * the ID to an HTML element.
      *
      * **Example:**
@@ -345,17 +345,17 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
 
     /**
      * Creates a new style rule with an arbitrary complex selector. Selectors can be specified as
-     * one or array of [[SelectorItem]] objects where each `SelectorItem` is one of the following
+     * one or array of {@link SelectorItem} objects where each `SelectorItem` is one of the following
      * types:
      * - string - allows any content but lacks type-safety checks.
-     * - any style rule, that is a rule that implements the [[IStyleRule]] interface. This allows
+     * - any style rule, that is a rule that implements the {@link IStyleRule} interface. This allows
      *   using prevously defined tag, class, ID and other style rules as selector items
-     * - [[selector]] function - a tag function that allows convenient mixing of free-format strings
+     * - {@link selector} function - a tag function that allows convenient mixing of free-format strings
      *   and strongly typed style rules.
      *
      * When multiple selector items are specified, they will be concatenated into a single string.
      *
-     * Note that although style rules can be used for selecting element tags, the [[$tag]] function would
+     * Note that although style rules can be used for selecting element tags, the {@link $tag} function would
      * be more appropriate because it will catch misspellings of tag names.
      *
      * **Examples:**
@@ -398,7 +398,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * without parameters just to "declare" the animation. Such animation can be later used either
      * in conditional grouping rules or in derived style definition classes.
      *
-     * The returned [[IKeyframesRule]] interface represents an object that should be used when
+     * The returned {@link IKeyframesRule} interface represents an object that should be used when
      * using the keyframes name in the `animation-name` or `animation` style properties.
      *
      * **Example:**
@@ -417,7 +417,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param frames Array of [[AnimationFrame]] objects. Each animation frame contains a waypoint
+     * @param frames Array of {@link AnimationFrame} objects. Each animation frame contains a waypoint
      * and a styleset.
      * @param nameOverride String or another `IKeyframesRule` object that determines the name of the
      * animation. If this optional parameter is defined, the name will override the Mimcss name
@@ -463,7 +463,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * ```
      *
      * @param template Either a name of a style property (in camelCase) or a name of the property from
-     * the [[IVarTemplateStyleset]] interface. The type corresponding to this property defines the type
+     * the {@link IVarTemplateStyleset} interface. The type corresponding to this property defines the type
      * of the second parameter.
      * @param value The value assigned to the property.
      * @param nameOverride String or another `IVarRule` object that determines the name of the
@@ -489,7 +489,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * This variant allows specifying syntax as one of predefined syntax items such as `<number>`
      * or `<color>` optionally accompanied with the multipliers `"#"` or `"+". The type of initial
      * value as well as the type that can be passed to the `setValue` method of the returned
-     * [[IVarRule]] interface will be enforced according to the syntax specified.
+     * {@link IVarRule} interface will be enforced according to the syntax specified.
      *
      * **Example:**
      *
@@ -510,7 +510,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param syntax Name of the property from the [[ISyntaxTypeStyleset]] interface. The type
+     * @param syntax Name of the property from the {@link ISyntaxTypeStyleset} interface. The type
      * corresponding to this property defines the type of the initial value parameter.
      * @param initValue The value to be used as initial value of the property.
      * @param inherits Flag indicating whether the custom property registration inherits by default.
@@ -532,7 +532,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      *
      * This variant allows specifying arbitrary syntax and the developers are responsible to
      * provide correct syntax. The type of initial value as well as the type that can be passed to
-     * the `setValue` method of the returned [[IVarRule]] interface are limited to string. The
+     * the `setValue` method of the returned {@link IVarRule} interface are limited to string. The
      * developers are responsible to pass values that conform to the specified syntax.
      *
      * **Example:**
@@ -581,7 +581,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * Creates a "constant" that can be used anywhere the type defined by the `template` parameter can
      * be used. They are called constants, because they provide a convenient and lightweight way of
      * defining values that are unchanged during the application lifetime. Although constants are
-     * defined very similarly to custom properties (see the [[$var]] function), they cannot participate
+     * defined very similarly to custom properties (see the {@link $var} function), they cannot participate
      * in the cascade and cannot be redefined under style rules. Constant can use any expression that
      * satisfies the type defined by the `template` parameter including other constants, custom
      * properties and functions.
@@ -604,7 +604,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * ```
      *
      * @param template Either a name of a style property (in camelCase) or a name of the property from
-     * the [[IVarTemplateStyleset]] interface. The type corresponding to that property defines the type
+     * the {@link IVarTemplateStyleset} interface. The type corresponding to that property defines the type
      * of the second parameter.
      * @param value The value assigned to the constant.
      * @returns The `IConstRule` object that represents the value of the constant. The value is
@@ -624,7 +624,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      *
      * Counter rules don't create any CSS rules, but they create unique names that can be used
      * for `counter-reset` and `counter-increment` style properties. Counter rules are usually used
-     * in conjunction with the [[counter]] and [[counters]] functions.
+     * in conjunction with the {@link counter} and {@link counters} functions.
      *
      * **Example:**
      *
@@ -747,7 +747,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * can be type-safely referred to from style rules.
      *
      * Every grid area defines two grid line rules in each direction, which can be accessed using the
-     * [[IGridAreaRule.startLine|startLine]] and [[IGridAreaRule.endLine|endLine]] properties.
+     * {@link IGridAreaRule.startLine|startLine} and {@link IGridAreaRule.endLine|endLine} properties.
      *
      * **Example:**
      *
@@ -812,7 +812,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param fontface Object implementing the [[IFontFace]] interface defining the parameter of the
+     * @param fontface Object implementing the {@link IFontFace} interface defining the parameter of the
      * font to use.
      * @returns The `IFontFaceRule` object that represents the `@font-face` at-rule.
      */
@@ -903,7 +903,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param namespace Namespace string - use the [[WebNamespaces]] for well-known namespaces.
+     * @param namespace Namespace string - use the {@link WebNamespaces} for well-known namespaces.
      * @param prefix Prefix string to use for the namespace.
      * @returns The `INamespaceRule` object that represents the namespace rule.
      */
@@ -1283,19 +1283,19 @@ export const embedded = (category: string): ClassDecorator =>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sets the method used to generate names of CSS entities. If the method is [[Optimized]], the
+ * Sets the method used to generate names of CSS entities. If the method is {@link Optimized}, the
  * names will be created by appending a unique number to the given prefix. If the prefix is not
  * specified, the standard prefix `"n"` will be used.
  *
- * By default, the development version of the library (mimcss.dev.js) uses the [[Scoped]]
- * method and the production version (mimcss.js) uses the [[Optimized]] method. This function can
+ * By default, the development version of the library (mimcss.dev.js) uses the {@link Scoped}
+ * method and the production version (mimcss.js) uses the {@link Optimized} method. This function can
  * be called to switch to the alternative method of name generation in either the development or
  * the production builds.
  *
  * @param method Indicates what method to use.
  * @param prefix Optional string that will serve as a prefix to which unique numbers will be added
  * to generate optimized names. Normally ignored if the `method` parameter is anything other than
- * [[NameGenerationMethod.Optimized]]; however can be used in some special circumstances like
+ * {@link NameGenerationMethod.Optimized}; however can be used in some special circumstances like
  * style definitions created using anonymous classes..
  */
 export const configNameGeneration = (method: NameGenerationMethod, prefix?: string): void =>
@@ -1314,7 +1314,7 @@ export const configNameGeneration = (method: NameGenerationMethod, prefix?: stri
  * concatenates the class names corresponding to the monikers form the array into a single string
  * that can be assigned to a `class` property of an HTML element. This can be useful when an
  * element should have multiple classes assigned to it and some of these classes are specified as
- * [[IClassRule]] or [[IClassNameRule]] while others are specified as strings.
+ * {@link IClassRule} or {@link IClassNameRule} while others are specified as strings.
  *
  * @param monikers One or more of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
@@ -1327,13 +1327,13 @@ export const className = (...monikers: ClassMoniker[]): string =>
     );
 
 /**
- * @deprecated Use the [[className]] function.
+ * @deprecated Use the {@link className} function.
  *
  * Returns class name for the given moniker. If the moniker is an array (of other monikers),
  * concatenates the class names corresponding to the monikers form the array into a single string
  * that can be assigned to a `class` property of an HTML element. This can be useful when an
  * element should have multiple classes assigned to it and some of these classes are specified as
- * [[IClassRule]] or [[IClassNameRule]] while others are specified as strings.
+ * {@link IClassRule} or {@link IClassNameRule} while others are specified as strings.
  *
  * @param monikers One or more of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
@@ -1466,10 +1466,6 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
  * }
  * ```
  *
- * If the style definition instance is intended to be used as a *constructable style sheet* and
- * assigned to either a document or a shadow root, then, the instance should not be created using
- * the `new` operator; instead, it should be created using the [[construct]] function.
- *
  * @typeparam T Type of the style definition instance passed to the function. This is
  * also the type, which is returned form the function.
  * @param instOrClass Style definition class or instance to activate.
@@ -1517,9 +1513,9 @@ export const getActiveTheme = <T extends ThemeDefinition>(themeClass: IStyleDefi
  * Establishes an activation context corresponding to the given document or shadow root, so that
  * styles definitions created and activated while this context is active will be "adopted" by the
  * given object. After this function is called and the style definitions are activated, the
- * [[popRootContext]] function must be called.
+ * {@link popRootContext} function must be called.
  *
- * For custom Web elements, the pair of `pushRootContext` and [[popRootContext]] functions
+ * For custom Web elements, the pair of `pushRootContext` and {@link popRootContext} functions
  * is usually called in the `connectedCallback` method; however, they should be called whenever new
  * style definitions are activated or deactivated. For example, they may need to be called when
  * handling events within the custom Web element's code.
@@ -1542,13 +1538,13 @@ export const getActiveTheme = <T extends ThemeDefinition>(themeClass: IStyleDefi
 
  /**
   * Removes the activation context corresponding to the given document or shadow root established
-  * by an earlier call to the [[pushRootContext]] function. Each call to the [[pushRootContext]]
+  * by an earlier call to the {@link pushRootContext} function. Each call to the {@link pushRootContext}
   * function must be eventually paired with the call to the `popRootContext` functions.
   *
   * @param root Document or ShadowRoot object to which style definitions were adopted
   * @param useAdoption Flag indicating that stylesheets should be adopted by instead of
   * created under the shadow root. The flag is ignored if the adoption is not supported. The value
-  * of this flag must be the same as in the counterpart [[pushRootContext]] call.
+  * of this flag must be the same as in the counterpart {@link pushRootContext} call.
   */
  export const popRootContext = (root: DocumentOrShadowRoot, useAdoption = true): void =>
     s_popRoot( root, useAdoption);
@@ -1566,7 +1562,7 @@ export const getActiveTheme = <T extends ThemeDefinition>(themeClass: IStyleDefi
  * definitions that are part of the application are activated.
  *
  * Calling this function causes all activated style definitions to be serialized to a string,
- * which can be retrieved by calling the [[stopSSR]] function.
+ * which can be retrieved by calling the {@link stopSSR} function.
  */
 export const startSSR = (): void => s_startSSR();
 

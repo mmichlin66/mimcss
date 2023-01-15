@@ -114,7 +114,7 @@ export interface IStyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleRule>
 
 /**
  * The `IClassRule` interface represents a style rule where the selector is a single class name.
- * This interface is returned from the [[$class]] method.
+ * This interface is returned from the {@link $class} method.
  */
 export interface IClassRule extends IStyleRule, IPrefixedNamedEntity
 {
@@ -127,7 +127,7 @@ export interface IClassRule extends IStyleRule, IPrefixedNamedEntity
 /**
  * The `IClassNameRule` interface represents a combination of two or more class names. It can be
  * used to make it easier to create elements with more than one CSS class. This interface is
- * returned from the [[$classname]] method.
+ * returned from the {@link $classname} method.
  *
  * Objects implementing the `IClassNameRule` interface have the `name` property that contains the
  * combined class name, e.g. `"class1 class2"`. The `cssClassName` property contains the combined
@@ -145,10 +145,10 @@ export interface IClassNameRule extends IPrefixedNamedEntity, IRuleWithSelector
  * Type for defining the `class` property of HTML elements. It can be expressed in one of the
  * following ways:
  * - as a string.
- * - as a class rule returned form the [[$class]] method.
- * - as a class name rule returned form the [[$classname]] method.
+ * - as a class rule returned form the {@link $class} method.
+ * - as a class name rule returned form the {@link $classname} method.
  * - as an array of the above.
- * @deprecated Use [[ClassMoniker]] type
+ * @deprecated Use {@link ClassMoniker} type
  */
 export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType[];
 
@@ -156,8 +156,8 @@ export type ClassPropType = string | IClassRule | IClassNameRule | ClassPropType
  * Type for specifying a CSS class, which can be used in the `class` property of HTML elements.
  * It can be expressed in one of the following ways:
  * - as a string.
- * - as a class rule returned form the [[$class]] method.
- * - as a class name rule returned form the [[$classname]] method.
+ * - as a class rule returned form the {@link $class} method.
+ * - as a class name rule returned form the {@link $classname} method.
  * - as an array of the above.
  */
 export type ClassMoniker = string | IClassRule | IClassNameRule | ClassMoniker[];
@@ -166,7 +166,7 @@ export type ClassMoniker = string | IClassRule | IClassNameRule | ClassMoniker[]
 
 /**
  * The `IIDRule` interface represents a style rule where the selector is a single element ID.
- * This interface is returned from the [[$id]] method.
+ * This interface is returned from the {@link $id} method.
  */
 export interface IIDRule extends IStyleRule, IPrefixedNamedEntity
 {
@@ -191,7 +191,7 @@ export type AnimationFrame = [AnimationWaypoint, AnimationStyleset | AnimationSt
 
 /**
  * The IKeyframesRule interface represents the `@keyframes` rule.
- * Objects implementing this interface are returned from the [[$keyframes]] method.
+ * Objects implementing this interface are returned from the {@link $keyframes} method.
  */
 export interface IKeyframesRule extends IRule, INamedEntity
 {
@@ -204,7 +204,7 @@ export interface IKeyframesRule extends IRule, INamedEntity
 
 /**
  * The IAnimationRule interface represents the `@keyframes` rule.
- * Objects implementing this interface are returned from the [[$keyframes]] method.
+ * Objects implementing this interface are returned from the {@link $keyframes} method.
  * @deprecated Use the IKeyframesRule interface.
  */
 export interface IAnimationRule extends IKeyframesRule {}
@@ -231,13 +231,13 @@ export interface IAnimationFrameRule extends IKeyframeRule {}
 
 /**
  * The IVarRule interface represents a CSS custom property definition. Objects implementing this
- * interface are returned from the [[$var]] and [[$property]] methods.
+ * interface are returned from the {@link $var} and {@link $property} methods.
  */
 export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedNamedEntity, ICustomVar<VarValue<K>>
 {
 	/**
      * Name of a non-custom CSS property whose type determines the type of the custom property
-     * value. This name is a property of [[IVarTemplateStyleset]] interface; that is, it is either
+     * value. This name is a property of {@link IVarTemplateStyleset} interface; that is, it is either
      * a name of a CSS style property (in camelCase) or a string corresponding to one of basic
      * Mimcss types such as `"CssLength"`, `"CssColor"`, etc.
      */
@@ -251,7 +251,7 @@ export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedName
     /**
 	 * Sets new value of this custom CSS property at the global level; that is, under `:root`. To
      * set a value of the CSS custom property under a certain CSS rule, use the
-     * [[IStyleRule.setCustomProp]] method.
+     * {@link IStyleRule.setCustomProp} method.
 	 * @param value New value for the CSS property.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
@@ -266,10 +266,10 @@ export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedName
  * the `template` parameter can be used. These are called constants, because they provide the
  * convenient and lightweight way of defining values that are unchanged during the application
  * lifetime. Although constants are defined very similarly to custom properties (see the
- * [[IVarRule]] interface), they cannot participate in the cascade and cannot be redefined under
+ * {@link IVarRule} interface), they cannot participate in the cascade and cannot be redefined under
  * elements. Constant can, however, use any expression that satisfies the type defined by the
  * `template` parameter including other constants, custom properties and functions.
- * Objects implementing this interface are returned from the [[$const]] method.
+ * Objects implementing this interface are returned from the {@link $const} method.
  */
 export interface IConstRule<K extends VarTemplateName = any> extends IConstant<VarValue<K>>
 {
@@ -292,13 +292,13 @@ export interface IConstRule<K extends VarTemplateName = any> extends IConstant<V
  * counter objects that can be used in counter-increment, counter-reset and counter-set style
  * properties. No CSS rule is created for counters - they are needed only to provide type-safe
  * counter definitions.
- * Objects implementing this interface are returned from the [[$counter]] method.
+ * Objects implementing this interface are returned from the {@link $counter} method.
  */
 export interface ICounterRule extends INamedEntity
 {
 	/**
      * Name of the counter - this property returns the same value as the `name` property
-     * inherited from the [[INamedEntity]] interface. This property is only needed to distinguish
+     * inherited from the {@link INamedEntity} interface. This property is only needed to distinguish
      * this interface from others.
      * @ignore
      */
@@ -309,7 +309,7 @@ export interface ICounterRule extends INamedEntity
 
 /**
  * The ICounterRule interface represents the `@counter-style` rule.
- * Objects implementing this interface are returned from the [[$counterStyle]] method.
+ * Objects implementing this interface are returned from the {@link $counterStyle} method.
  */
 export interface ICounterStyleRule extends IRule, INamedEntity
 {
@@ -321,7 +321,7 @@ export interface ICounterStyleRule extends IRule, INamedEntity
 
 /**
  * The IImportRule interface represents the CSS `@import` rule.
- * Objects implementing this interface are returned from the [[$import]] method.
+ * Objects implementing this interface are returned from the {@link $import} method.
  */
 export interface IImportRule extends IRule
 {
@@ -333,7 +333,7 @@ export interface IImportRule extends IRule
 
 /**
  * The IFontFaceRule interface represents the CSS `@font-face` rule.
- * Objects implementing this interface are returned from the [[$fontface]] method.
+ * Objects implementing this interface are returned from the {@link $fontface} method.
  */
 export interface IFontFaceRule extends IRule
 {
@@ -345,7 +345,7 @@ export interface IFontFaceRule extends IRule
 
 /**
  * The INamespaceRule interface represents the CSS `@namespace` rule.
- * Objects implementing this interface are returned from the [[$namespace]] method.
+ * Objects implementing this interface are returned from the {@link $namespace} method.
  */
 export interface INamespaceRule extends IRule
 {
@@ -363,7 +363,7 @@ export interface INamespaceRule extends IRule
 
 /**
  * The IPageRule interface represents the CSS `@page` rule.
- * Objects implementing this interface are returned from the [[$page]] method.
+ * Objects implementing this interface are returned from the {@link $page} method.
  */
 export interface IPageRule extends IStyleRule
 {
@@ -376,7 +376,7 @@ export interface IPageRule extends IStyleRule
 /**
  * The IPageNameRule interface represents a definition of a named page that can be later used in
  * the CSS `@page` rule.
- * Objects implementing this interface are returned from the [[$pageName]] method.
+ * Objects implementing this interface are returned from the {@link $pageName} method.
  */
 export interface IPageNameRule extends INamedEntity
 {
@@ -388,8 +388,8 @@ export interface IPageNameRule extends INamedEntity
 
 /**
  * The IGridLineRule interface represents a definition of a named grid line.
- * Objects implementing this interface are returned from the [[$gridline]] method or created
- * when a grid area is defined using the [[$gridarea]] method.
+ * Objects implementing this interface are returned from the {@link $gridline} method or created
+ * when a grid area is defined using the {@link $gridarea} method.
  */
 export interface IGridLineRule extends INamedEntity
 {
@@ -412,7 +412,7 @@ export interface IGridLineRule extends INamedEntity
 /**
  * The IGridAreaRule interface represents a definition of a named grid are. Grid area rule
  * defines two line rules: for its start and end lines.
- * Objects implementing this interface are returned from the [[$gridarea]] method.
+ * Objects implementing this interface are returned from the {@link $gridarea} method.
  */
 export interface IGridAreaRule extends INamedEntity
 {
@@ -427,12 +427,12 @@ export interface IGridAreaRule extends INamedEntity
 
 /**
  * The IColorProfileRule interface represents a `@color-profile` at rule. This rule generates a
- * color profile name, which can be later used in the [[color]] function.
- * Objects implementing this interface are returned from the [[$colorProfile]] method.
+ * color profile name, which can be later used in the {@link color} function.
+ * Objects implementing this interface are returned from the {@link $colorProfile} method.
  */
 export interface IColorProfileRule extends IRule, INamedEntity
 {
-    /** Name of the color profile rule that can be used in the [[color]] function. */
+    /** Name of the color profile rule that can be used in the {@link color} function. */
     readonly profileName: string;
 }
 
@@ -440,12 +440,12 @@ export interface IColorProfileRule extends IRule, INamedEntity
 
 /**
  * The IScrollTimelineRule interface represents a `@scroll-timeline` at rule. This rule generates a
- * timeline name, which can be later used in the [[animationTimeline]] style property.
- * Objects implementing this interface are returned from the [[$scrollTimeline]] method.
+ * timeline name, which can be later used in the {@link animationTimeline} style property.
+ * Objects implementing this interface are returned from the {@link $scrollTimeline} method.
  */
 export interface IScrollTimelineRule extends IRule, INamedEntity
 {
-    /** Name of the scroll timeline rule that can be used in the [[animationTimeline]] style property. */
+    /** Name of the scroll timeline rule that can be used in the {@link animationTimeline} style property. */
     readonly timelineName: string;
 
     // /** CSSOM scroll timeline rule rule (not defined yet) */
@@ -456,7 +456,7 @@ export interface IScrollTimelineRule extends IRule, INamedEntity
 
 /**
  * The `IStyleDefinition` interface represents a class that contain defininitions of CSS rules.
- * This interface is implemented by the [[StyleDefinition]] class and is not intended to be
+ * This interface is implemented by the {@link StyleDefinition} class and is not intended to be
  * implemented by developers
  *
  * @typeparam P Parent style definition class. Parent of a top-level class is null.
@@ -468,8 +468,8 @@ export interface IStyleDefinition<P extends IStyleDefinition = any>
      * definition object in the chain of style definition classes. Through this member, all rules
      * and other members defined in the parent definition class can be accessed. For top-level
      * style definitions, this property is always undefined. It is defined for style definitions
-     * used for grouping rules - those created with [[$supports]] and [[$media]] methods of the
-     * [[StyleDefinition]] class. This property can also be undefined if it was not provided to
+     * used for grouping rules - those created with {@link $supports} and {@link $media} methods of the
+     * {@link StyleDefinition} class. This property can also be undefined if it was not provided to
      * the constructor when creating the style definition class manually.
 	 */
 	readonly $parent?: P;
@@ -508,7 +508,7 @@ export interface IGroupRule<T extends IStyleDefinition = any, R extends CSSGroup
 
 /**
  * The ISupportsRule interface represents the CSS @supports rule.
- * Objects implementing this interface are returned from the [[$supports]] method.
+ * Objects implementing this interface are returned from the {@link $supports} method.
  */
 export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSSupportsRule>
 {
@@ -520,7 +520,7 @@ export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupR
 
 /**
  * The IMediaRule interface represents the CSS @media rule.
- * Objects implementing this interface are returned from the [[$media]] method.
+ * Objects implementing this interface are returned from the {@link $media} method.
  */
 export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSMediaRule>
 {
@@ -537,7 +537,7 @@ export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule
  * The ILayerNameRule interface represents a variant of the `@layer` at-rule, which just declares
  * a name of a layer. This rule generates a layer name, which can be later used in other variants
  * of the `@layer` at-rule or in the `@import` at-rules. Objects implementing this interface are
- * returned from the [[$layerName]] method.
+ * returned from the {@link $layerName} method.
  */
 export interface ILayerNameRule extends IRule, INamedEntity
 {
@@ -550,7 +550,7 @@ export interface ILayerNameRule extends IRule, INamedEntity
 /**
  * The ILayerRule interface represents the CSS `@layer` block at-rule. This rule generates a layer
  * name, which can be later used in other variants of the `@layer` at-rule or in the `@import`
- * at-rules. Objects implementing this interface are returned from the [[$layer]] method.
+ * at-rules. Objects implementing this interface are returned from the {@link $layer} method.
  */
 export interface ILayerBlockRule<T extends IStyleDefinition = any> extends INamedEntity,
     IGroupRule<T,CSSGroupingRule/*CSSLayerBlockRule*/>
@@ -564,8 +564,8 @@ export interface ILayerBlockRule<T extends IStyleDefinition = any> extends IName
 /**
  * The ILayerOrderRule interface contains a list of layer names representing their order. This
  * corresponds to the `@layer` statement at-rule as opposed to the `@layer` block at-rule, which
- * contains stylesheet definition and which is expressed in Mimcss by the [[ILayerRule]] interface.
- * Objects implementing this interface are returned from the [[$layerOrder]] method.
+ * contains stylesheet definition and which is expressed in Mimcss by the {@link ILayerRule} interface.
+ * Objects implementing this interface are returned from the {@link $layerOrder} method.
  */
 export interface ILayerOrderRule extends IRule
 {
@@ -580,7 +580,7 @@ export type LayerMoniker = string | ILayerNameRule | ILayerBlockRule;
 
 
 
-/** Defines options passed to the [[$import]] method defining the `@import` at-rule */
+/** Defines options passed to the {@link $import} method defining the `@import` at-rule */
 export type ImportRuleOptions = {
     /** Optional media statement */
     media?: MediaStatement;
@@ -604,7 +604,7 @@ export type ImportRuleOptions = {
  * Provides values that identify the method used to generate names of CSS named entities (e.g.
  * classes, identifiers, counters, animations, custom properties, etc.). The development version
  * of the Mimcss library uses the `UniqueScoped` method while the production version uses the
- * `Optimized` method. The [[configNameGeneration]] function can be called to change the default
+ * `Optimized` method. The {@link configNameGeneration} function can be called to change the default
  * method.
  */
 export const enum NameGenerationMethod
@@ -634,7 +634,7 @@ export const enum NameGenerationMethod
 
     /**
      * Names are generated using a prefix concatenated with a unique number. The default prefix is
-     * `"n"`, which can be changed using the [[configNameGeneration]] function.
+     * `"n"`, which can be changed using the {@link configNameGeneration} function.
      *
      * This method is used by default in the production version of the Mimcss library.
      *

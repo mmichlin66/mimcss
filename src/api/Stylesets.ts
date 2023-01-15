@@ -109,8 +109,8 @@ export interface IStyleset
     alignmentBaseline?: st.AlignmentBaselineKeyword;
 
     /**
-     * The **all** shorthand CSS property resets all of an element's properties except [[unicodeBidi]],
-     * [[direction]], and CSS Custom Properties. It can set properties to their initial or inherited
+     * The **all** shorthand CSS property resets all of an element's properties except {@link unicodeBidi},
+     * {@link direction}, and CSS Custom Properties. It can set properties to their initial or inherited
      * values, or to the values specified in another stylesheet origin.
      *
      * **See Also:**
@@ -121,12 +121,12 @@ export interface IStyleset
 
     /**
      * The **animation** shorthand CSS property applies an animation between styles. It is a
-     * shorthand for [[animationName]], [[animationDuration]], [[animationTimingFunction]],
-     * [[animationDelay]], [[animationIterationCount]], [[animationDirection]],
-     * [[animationFillMode]], and [[animationPlayState]].
+     * shorthand for {@link animationName}, {@link animationDuration}, {@link animationTimingFunction},
+     * {@link animationDelay}, {@link animationIterationCount}, {@link animationDirection},
+     * {@link animationFillMode}, and {@link animationPlayState}.
      *
      * The values for this property can be either a string or an object of type
-     * [[Animation_Single]] or an array of either strings or [[Animation_Single]] objects.
+     * {@link Animation_Single} or an array of either strings or {@link Animation_Single} objects.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation" target="mdn">MDN Page</a>
@@ -146,7 +146,7 @@ export interface IStyleset
      * animation to an element before beginning to perform the animation. The animation can start
      * later, immediately from its beginning, or immediately and partway through the animation.
      *
-     * In Mimcss, the type of this property is [[CssTime]]. Integer numbers are treated as time in
+     * In Mimcss, the type of this property is {@link CssTime}. Integer numbers are treated as time in
      * milliseconds; floating point numbers are treated as time in seconds.
      *
      * **See Also:**
@@ -183,7 +183,7 @@ export interface IStyleset
      * The **animation-duration** CSS property sets the length of time that an animation takes
      * to complete one cycle.
      *
-     * In Mimcss, the type of this property is [[CssTime]]. Integer numbers are treated as time in
+     * In Mimcss, the type of this property is {@link CssTime}. Integer numbers are treated as time in
      * milliseconds; floating point numbers are treated as time in seconds.
      *
      * **See Also:**
@@ -496,7 +496,7 @@ export interface IStyleset
 
     /**
      * The **background-position** CSS property sets the initial position for each background
-     * image. The position is relative to the position layer set by [[backgroundOrigin]].
+     * image. The position is relative to the position layer set by {@link backgroundOrigin}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-position" target="mdn">MDN Page</a>
@@ -518,7 +518,7 @@ export interface IStyleset
 
     /**
      * The **background-position-x** CSS property sets the initial horizontal position for each
-     * background image. The position is relative to the position layer set by [[backgroundOrigin]].
+     * background image. The position is relative to the position layer set by {@link backgroundOrigin}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-position-x" target="mdn">MDN Page</a>
@@ -539,7 +539,7 @@ export interface IStyleset
 
     /**
      * The **background-position-y** CSS property sets the initial vertical position for each
-     * background image. The position is relative to the position layer set by [[backgroundOrigin]].
+     * background image. The position is relative to the position layer set by {@link backgroundOrigin}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-position-y" target="mdn">MDN Page</a>
@@ -623,8 +623,8 @@ export interface IStyleset
 
     /**
      * The **block-size** CSS property defines the horizontal or vertical size of an element's
-     * block, depending on its writing mode. It corresponds to either the [[width]] or the [[height]]
-     * property, depending on the value of [[writingMode]].
+     * block, depending on its writing mode. It corresponds to either the {@link width} or the {@link height}
+     * property, depending on the value of {@link writingMode}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/block-size" target="mdn">MDN Page</a>
@@ -640,7 +640,7 @@ export interface IStyleset
 
     /**
      * The **border** shorthand CSS property sets an element's border. It sets the values of
-     * [[borderWidth]], [[borderStyle]], and [[borderColor]].
+     * {@link borderWidth}, {@link borderStyle}, and {@link borderColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border" target="mdn">MDN Page</a>
@@ -657,8 +657,8 @@ export interface IStyleset
     /**
      * The **border-block** CSS property is a shorthand property for setting the individual logical
      * block border property values in a single place in the style sheet. It can be used to set the
-     * values for one or more of [[borderBlockWidth]], [[borderBlockStyle]], and
-     * [[borderBlockColor]] setting both the start and end in the block dimension at once.
+     * values for one or more of {@link borderBlockWidth}, {@link borderBlockStyle}, and
+     * {@link borderBlockColor} setting both the start and end in the block dimension at once.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block" target="mdn">MDN Page</a>
@@ -675,9 +675,9 @@ export interface IStyleset
     /**
      * The **border-block-color** CSS property defines the color of the logical block borders
      * of an element, which maps to a physical border color depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]] and
-     * [[borderBottomColor]], or [[borderRightColor]] and [[borderLeftColor]] property depending
-     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopColor} and
+     * {@link borderBottomColor}, or {@link borderRightColor} and {@link borderLeftColor} property depending
+     * on the values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-color" target="mdn">MDN Page</a>
@@ -693,8 +693,8 @@ export interface IStyleset
     /**
      * The **border-block-end** CSS property is a shorthand property for setting the individual
      * logical block-end border property values in a single place in the style sheet. It can be
-     * used to set the values for one or more of [[borderBlockEndWidth]], [[borderBlockEndStyle]],
-     * and [[borderBlockEndColor]].
+     * used to set the values for one or more of {@link borderBlockEndWidth}, {@link borderBlockEndStyle},
+     * and {@link borderBlockEndColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end" target="mdn">MDN Page</a>
@@ -710,9 +710,9 @@ export interface IStyleset
     /**
      * The **border-block-end-color** CSS property defines the color of the logical block-end border
      * of an element, which maps to a physical border color depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
-     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopColor},
+     * {@link borderRightColor}, {@link borderBottomColor}, or {@link borderLeftColor} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-color" target="mdn">MDN Page</a>
@@ -728,9 +728,9 @@ export interface IStyleset
     /**
      * The **border-block-end-style** CSS property defines the style of the logical block-end border
      * of an element, which maps to a physical border style depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
-     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopStyle},
+     * {@link borderRightStyle}, {@link borderBottomStyle}, or {@link borderLeftStyle} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-style" target="mdn">MDN Page</a>
@@ -747,9 +747,9 @@ export interface IStyleset
      * The **border-block-end-width** CSS property defines the width of the logical block-end
      * border of an element, which maps to a physical border width depending on the element's
      * writing mode, directionality, and text orientation. It corresponds to the
-     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
-     * [[textOrientation]].
+     * {@link borderTopWidth}, {@link borderRightWidth}, {@link borderBottomWidth}, or {@link borderLeftWidth}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-width" target="mdn">MDN Page</a>
@@ -765,8 +765,8 @@ export interface IStyleset
     /**
      * The **border-block-start** CSS property is a shorthand property for setting the individual
      * logical block-start border property values in a single place in the style sheet. It can be
-     * used to set the values for one or more of [[borderBlockStartWidth]], [[borderBlockStartStyle]],
-     * and [[borderBlockStartColor]].
+     * used to set the values for one or more of {@link borderBlockStartWidth}, {@link borderBlockStartStyle},
+     * and {@link borderBlockStartColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start" target="mdn">MDN Page</a>
@@ -782,9 +782,9 @@ export interface IStyleset
     /**
      * The **border-block-start-color** CSS property defines the color of the logical block-end border
      * of an element, which maps to a physical border color depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
-     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopColor},
+     * {@link borderRightColor}, {@link borderBottomColor}, or {@link borderLeftColor} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-color" target="mdn">MDN Page</a>
@@ -800,9 +800,9 @@ export interface IStyleset
     /**
      * The **border-block-start-style** CSS property defines the style of the logical block-start border
      * of an element, which maps to a physical border style depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
-     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopStyle},
+     * {@link borderRightStyle}, {@link borderBottomStyle}, or {@link borderLeftStyle} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-style" target="mdn">MDN Page</a>
@@ -819,9 +819,9 @@ export interface IStyleset
      * The **border-block-start-width** CSS property defines the width of the logical block-start
      * border of an element, which maps to a physical border width depending on the element's
      * writing mode, directionality, and text orientation. It corresponds to the
-     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
-     * [[textOrientation]].
+     * {@link borderTopWidth}, {@link borderRightWidth}, {@link borderBottomWidth}, or {@link borderLeftWidth}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-width" target="mdn">MDN Page</a>
@@ -837,9 +837,9 @@ export interface IStyleset
     /**
      * The **border-block-style** CSS property defines the style of the logical block borders of
      * an element, which maps to a physical border style depending on the element's writing mode,
-     * directionality, and text orientation. It corresponds to the [[borderTopStyle]],
-     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on
-     * the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * directionality, and text orientation. It corresponds to the {@link borderTopStyle},
+     * {@link borderRightStyle}, {@link borderBottomStyle}, or {@link borderLeftStyle} property depending on
+     * the values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-style" target="mdn">MDN Page</a>
@@ -855,9 +855,9 @@ export interface IStyleset
     /**
      * The **border-block-width** CSS property defines the width of the logical block borders of
      * an element, which maps to a physical border width depending on the element's writing mode,
-     * directionality, and text orientation. It corresponds to the [[borderTopWidth]] and
-     * [[borderBottomWidth]], or [[borderLeftWidth]], and [[borderRightWidth]] property depending
-     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * directionality, and text orientation. It corresponds to the {@link borderTopWidth} and
+     * {@link borderBottomWidth}, or {@link borderLeftWidth}, and {@link borderRightWidth} property depending
+     * on the values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-width" target="mdn">MDN Page</a>
@@ -872,7 +872,7 @@ export interface IStyleset
 
     /**
      * The **border-bottom** shorthand CSS property sets an element's bottom border. It sets the
-     * values of [[borderBottomWidth]], [[borderBottomStyle]] and [[borderBottomColor]].
+     * values of {@link borderBottomWidth}, {@link borderBottomStyle} and {@link borderBottomColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom" target="mdn">MDN Page</a>
@@ -887,7 +887,7 @@ export interface IStyleset
 
     /**
      * The **border-bottom-color** CSS property sets the color of an element's bottom border. It
-     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderBottom]].
+     * can also be set with the shorthand CSS properties {@link borderColor} or {@link borderBottom}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-color" target="mdn">MDN Page</a>
@@ -1001,8 +1001,8 @@ export interface IStyleset
     /**
      * The **border-inline** CSS property is a shorthand property for setting the individual logical
      * inline border property values in a single place in the style sheet. It can be used to set the
-     * values for one or more of [[borderInlineWidth]], [[borderInlineStyle]], and
-     * [[borderInlineColor]] setting both the start and end in the inline dimension at once.
+     * values for one or more of {@link borderInlineWidth}, {@link borderInlineStyle}, and
+     * {@link borderInlineColor} setting both the start and end in the inline dimension at once.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline" target="mdn">MDN Page</a>
@@ -1019,9 +1019,9 @@ export interface IStyleset
     /**
      * The **border-inline-color** CSS property defines the color of the logical block borders
      * of an element, which maps to a physical border color depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]] and
-     * [[borderBottomColor]], or [[borderRightColor]] and [[borderLeftColor]] property depending
-     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopColor} and
+     * {@link borderBottomColor}, or {@link borderRightColor} and {@link borderLeftColor} property depending
+     * on the values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color" target="mdn">MDN Page</a>
@@ -1037,8 +1037,8 @@ export interface IStyleset
      /**
      * The **border-inline-end** CSS property is a shorthand property for setting the individual
      * logical inline-end border property values in a single place in the style sheet. It can be
-     * used to set the values for one or more of [[borderInlineEndWidth]], [[borderInlineEndStyle]],
-     * and [[borderInlineEndColor]].
+     * used to set the values for one or more of {@link borderInlineEndWidth}, {@link borderInlineEndStyle},
+     * and {@link borderInlineEndColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end" target="mdn">MDN Page</a>
@@ -1054,9 +1054,9 @@ export interface IStyleset
     /**
      * The **border-inline-end-color** CSS property defines the color of the logical inline-end border
      * of an element, which maps to a physical border color depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
-     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopColor},
+     * {@link borderRightColor}, {@link borderBottomColor}, or {@link borderLeftColor} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-color" target="mdn">MDN Page</a>
@@ -1072,9 +1072,9 @@ export interface IStyleset
     /**
      * The **border-inline-end-style** CSS property defines the style of the logical inline-end border
      * of an element, which maps to a physical border style depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
-     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopStyle},
+     * {@link borderRightStyle}, {@link borderBottomStyle}, or {@link borderLeftStyle} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-style" target="mdn">MDN Page</a>
@@ -1091,9 +1091,9 @@ export interface IStyleset
      * The **border-inline-end-width** CSS property defines the width of the logical inline-end
      * border of an element, which maps to a physical border width depending on the element's
      * writing mode, directionality, and text orientation. It corresponds to the
-     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
-     * [[textOrientation]].
+     * {@link borderTopWidth}, {@link borderRightWidth}, {@link borderBottomWidth}, or {@link borderLeftWidth}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-width" target="mdn">MDN Page</a>
@@ -1109,8 +1109,8 @@ export interface IStyleset
     /**
      * The **border-inline-start** CSS property is a shorthand property for setting the individual
      * logical inline-start border property values in a single place in the style sheet. It can be
-     * used to set the values for one or more of [[borderInlineStartWidth]], [[borderInlineStartStyle]],
-     * and [[borderInlineStartColor]].
+     * used to set the values for one or more of {@link borderInlineStartWidth}, {@link borderInlineStartStyle},
+     * and {@link borderInlineStartColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start" target="mdn">MDN Page</a>
@@ -1126,9 +1126,9 @@ export interface IStyleset
     /**
      * The **border-inline-start-color** CSS property defines the color of the logical inline-start border
      * of an element, which maps to a physical border color depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopColor]],
-     * [[borderRightColor]], [[borderBottomColor]], or [[borderLeftColor]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopColor},
+     * {@link borderRightColor}, {@link borderBottomColor}, or {@link borderLeftColor} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-color" target="mdn">MDN Page</a>
@@ -1144,9 +1144,9 @@ export interface IStyleset
     /**
      * The **border-inline-start-style** CSS property defines the style of the logical inline-start border
      * of an element, which maps to a physical border style depending on the element's writing
-     * mode, directionality, and text orientation. It corresponds to the [[borderTopStyle]],
-     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on the
-     * values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * mode, directionality, and text orientation. It corresponds to the {@link borderTopStyle},
+     * {@link borderRightStyle}, {@link borderBottomStyle}, or {@link borderLeftStyle} property depending on the
+     * values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-style" target="mdn">MDN Page</a>
@@ -1163,9 +1163,9 @@ export interface IStyleset
      * The **border-inline-start-width** CSS property defines the width of the logical inline-start
      * border of an element, which maps to a physical border width depending on the element's
      * writing mode, directionality, and text orientation. It corresponds to the
-     * [[borderTopWidth]], [[borderRightWidth]], [[borderBottomWidth]], or [[borderLeftWidth]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
-     * [[textOrientation]].
+     * {@link borderTopWidth}, {@link borderRightWidth}, {@link borderBottomWidth}, or {@link borderLeftWidth}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-width" target="mdn">MDN Page</a>
@@ -1181,9 +1181,9 @@ export interface IStyleset
     /**
      * The **border-inline-style** CSS property defines the style of the logical inline borders of
      * an element, which maps to a physical border style depending on the element's writing mode,
-     * directionality, and text orientation. It corresponds to the [[borderTopStyle]],
-     * [[borderRightStyle]], [[borderBottomStyle]], or [[borderLeftStyle]] property depending on
-     * the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * directionality, and text orientation. It corresponds to the {@link borderTopStyle},
+     * {@link borderRightStyle}, {@link borderBottomStyle}, or {@link borderLeftStyle} property depending on
+     * the values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-style" target="mdn">MDN Page</a>
@@ -1199,9 +1199,9 @@ export interface IStyleset
     /**
      * The **border-inline-width** CSS property defines the width of the logical inline borders of
      * an element, which maps to a physical border width depending on the element's writing mode,
-     * directionality, and text orientation. It corresponds to the [[borderTopWidth]] and
-     * [[borderBottomWidth]], or [[borderLeftWidth]], and [[borderRightWidth]] property depending
-     * on the values defined for [[writingMode]], [[direction]], and [[textOrientation]].
+     * directionality, and text orientation. It corresponds to the {@link borderTopWidth} and
+     * {@link borderBottomWidth}, or {@link borderLeftWidth}, and {@link borderRightWidth} property depending
+     * on the values defined for {@link writingMode}, {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-width" target="mdn">MDN Page</a>
@@ -1216,7 +1216,7 @@ export interface IStyleset
 
     /**
      * The **border-left** shorthand CSS property sets an element's left border. It sets the
-     * values of [[borderLeftWidth]], [[borderLeftStyle]] and [[borderLeftColor]].
+     * values of {@link borderLeftWidth}, {@link borderLeftStyle} and {@link borderLeftColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-left" target="mdn">MDN Page</a>
@@ -1231,7 +1231,7 @@ export interface IStyleset
 
     /**
      * The **border-left-color** CSS property sets the color of an element's left border. It
-     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderLeft]].
+     * can also be set with the shorthand CSS properties {@link borderColor} or {@link borderLeft}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-color" target="mdn">MDN Page</a>
@@ -1280,7 +1280,7 @@ export interface IStyleset
 
     /**
      * The **border-right** shorthand CSS property sets an element's right border. It sets the
-     * values of [[borderRightWidth]], [[borderRightStyle]] and [[borderRightColor]].
+     * values of {@link borderRightWidth}, {@link borderRightStyle} and {@link borderRightColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-right" target="mdn">MDN Page</a>
@@ -1295,7 +1295,7 @@ export interface IStyleset
 
     /**
      * The **border-right-color** CSS property sets the color of an element's right border. It
-     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderLeft]].
+     * can also be set with the shorthand CSS properties {@link borderColor} or {@link borderLeft}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-color" target="mdn">MDN Page</a>
@@ -1369,7 +1369,7 @@ export interface IStyleset
 
     /**
      * The **border-top** shorthand CSS property sets an element's top border. It sets the
-     * values of [[borderTopWidth]], [[borderTopStyle]] and [[borderTopColor]].
+     * values of {@link borderTopWidth}, {@link borderTopStyle} and {@link borderTopColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-top" target="mdn">MDN Page</a>
@@ -1384,7 +1384,7 @@ export interface IStyleset
 
     /**
      * The **border-top-color** CSS property sets the color of an element's top border. It
-     * can also be set with the shorthand CSS properties [[borderColor]] or [[borderLeft]].
+     * can also be set with the shorthand CSS properties {@link borderColor} or {@link borderLeft}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-color" target="mdn">MDN Page</a>
@@ -1503,7 +1503,7 @@ export interface IStyleset
      * make it more noticeable. By default, it is black, but its color can be altered with this
      * property.
      *
-     * The property allows the `"auto"` keyword value in addition to standard [[CssColor]] type.
+     * The property allows the `"auto"` keyword value in addition to standard {@link CssColor} type.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color" target="mdn">MDN Page</a>
@@ -1536,7 +1536,7 @@ export interface IStyleset
      * The **color** CSS property sets the foreground color value of an element's text and text
      * decorations, and sets the `<currentcolor>` value. `currentcolor` may be used as an
      * indirect value on other properties and is the default for other color properties, such
-     * as [[borderColor]].
+     * as {@link borderColor}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color" target="mdn">MDN Page</a>
@@ -2001,7 +2001,7 @@ export interface IStyleset
 
     /**
      * The **height** CSS property specifies the height of an element. By default, the property
-     * defines the height of the content area. If [[boxSizing]] is set to `border-box`, however,
+     * defines the height of the content area. If {@link boxSizing} is set to `border-box`, however,
      * it instead determines the height of the border area.
      *
      * **See Also:**
@@ -2038,8 +2038,8 @@ export interface IStyleset
 
     /**
      * The **inline-size** CSS property defines the horizontal or vertical size of an element's
-     * block, depending on its writing mode. It corresponds to either the [[width]] or the [[height]]
-     * property, depending on the value of [[writingMode]].
+     * block, depending on its writing mode. It corresponds to either the {@link width} or the {@link height}
+     * property, depending on the value of {@link writingMode}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inline-size" target="mdn">MDN Page</a>
@@ -2054,8 +2054,8 @@ export interface IStyleset
     inlineSize?: CssSize;
 
     /**
-     * The inset CSS property is a shorthand that corresponds to the [[top]], [[right]],
-     * [[bottom]], and/or left properties.
+     * The inset CSS property is a shorthand that corresponds to the {@link top}, {@link right},
+     * {@link bottom}, and/or left properties.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inset" target="mdn">MDN Page</a>
@@ -2072,9 +2072,9 @@ export interface IStyleset
     /**
      * The **inset-block** CSS property defines the logical block start and end offsets of an
      * element, which maps to physical offsets depending on the element's writing mode,
-     * directionality, and text orientation. It corresponds to the [[top]] and [[bottom]],
-     * or [[right]] and [[left]] properties depending on the values defined for [[writingMode]],
-     * [[direction]], and [[textOrientation]].
+     * directionality, and text orientation. It corresponds to the {@link top} and {@link bottom},
+     * or {@link right} and {@link left} properties depending on the values defined for {@link writingMode},
+     * {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block" target="mdn">MDN Page</a>
@@ -2091,8 +2091,8 @@ export interface IStyleset
     /**
      * The **inset-block-end** CSS property defines the logical block end offset of an element,
      * which maps to a physical inset depending on the element's writing mode, directionality,
-     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
+     * and text orientation. It corresponds to the {@link top}, {@link right}, {@link bottom}, or {@link left}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
      * [[textOrientation]].
      *
      * **See Also:**
@@ -2110,9 +2110,9 @@ export interface IStyleset
     /**
      * The **inset-block-start** CSS property defines the logical block start offset of an element,
      * which maps to a physical inset depending on the element's writing mode, directionality,
-     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
-     * [[textOrientation]].
+     * and text orientation. It corresponds to the {@link top}, {@link right}, {@link bottom}, or {@link left}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-start" target="mdn">MDN Page</a>
@@ -2129,9 +2129,9 @@ export interface IStyleset
     /**
      * The **inset-inline** CSS property defines the logical inline start and end offsets of an
      * element, which maps to physical offsets depending on the element's writing mode,
-     * directionality, and text orientation. It corresponds to the [[top]] and [[bottom]],
-     * or [[right]] and [[left]] properties depending on the values defined for [[writingMode]],
-     * [[direction]], and [[textOrientation]].
+     * directionality, and text orientation. It corresponds to the {@link top} and {@link bottom},
+     * or {@link right} and {@link left} properties depending on the values defined for {@link writingMode},
+     * {@link direction}, and {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline" target="mdn">MDN Page</a>
@@ -2148,9 +2148,9 @@ export interface IStyleset
     /**
      * The **inset-inline-end** CSS property defines the logical inline end offset of an element,
      * which maps to a physical inset depending on the element's writing mode, directionality,
-     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
-     * [[textOrientation]].
+     * and text orientation. It corresponds to the {@link top}, {@link right}, {@link bottom}, or {@link left}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-end" target="mdn">MDN Page</a>
@@ -2167,9 +2167,9 @@ export interface IStyleset
     /**
      * The **inset-inline-start** CSS property defines the logical inline start offset of an element,
      * which maps to a physical inset depending on the element's writing mode, directionality,
-     * and text orientation. It corresponds to the [[top]], [[right]], [[bottom]], or [[left]]
-     * property depending on the values defined for [[writingMode]], [[direction]], and
-     * [[textOrientation]].
+     * and text orientation. It corresponds to the {@link top}, {@link right}, {@link bottom}, or {@link left}
+     * property depending on the values defined for {@link writingMode}, {@link direction}, and
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inset-inline-start" target="mdn">MDN Page</a>
@@ -2549,7 +2549,7 @@ export interface IStyleset
 
     /**
      * The **max-block-size** CSS property specifies the maximum size of an element in the
-     * direction opposite that of the writing direction as specified by [[writingMode]].
+     * direction opposite that of the writing direction as specified by {@link writingMode}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/max-block-size" target="mdn">MDN Page</a>
@@ -2564,7 +2564,7 @@ export interface IStyleset
 
     /**
      * The **max-height** CSS property sets the maximum height of an element. It prevents the
-     * used value of the [[height]] property from becoming larger than the value specified
+     * used value of the {@link height} property from becoming larger than the value specified
      * for **max-height**.
      *
      * **See Also:**
@@ -2581,8 +2581,8 @@ export interface IStyleset
 
     /**
      * The **max-inline-size** CSS property defines the horizontal or vertical maximum size of an
-     * element's block, depending on its writing mode. It corresponds to either the [[maxWidth]]
-     * or the [[maxHeight]] property, depending on the value of [[writingMode]].
+     * element's block, depending on its writing mode. It corresponds to either the {@link maxWidth}
+     * or the {@link maxHeight} property, depending on the value of {@link writingMode}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/max-inline-size" target="mdn">MDN Page</a>
@@ -2601,7 +2601,7 @@ export interface IStyleset
      */
     /**
      * The **max-width** CSS property sets the maximum width of an element. It prevents the used
-     * value of the [[width]] property from becoming larger than the value specified by **max-width**.
+     * value of the {@link width} property from becoming larger than the value specified by **max-width**.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/max-width" target="mdn">MDN Page</a>
@@ -2617,8 +2617,8 @@ export interface IStyleset
 
     /**
      * The **min-block-size** CSS property defines the minimum horizontal or vertical size of an
-     * element's block, depending on its writing mode. It corresponds to either the [[minWidth]]
-     * or the [[minHeight]] property, depending on the value of [[writingMode]].
+     * element's block, depending on its writing mode. It corresponds to either the {@link minWidth}
+     * or the {@link minHeight} property, depending on the value of {@link writingMode}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/min-block-size" target="mdn">MDN Page</a>
@@ -2633,7 +2633,7 @@ export interface IStyleset
 
     /**
      * The **min-height** CSS property sets the minimum height of an element. It prevents the
-     * used value of the [[height]] property from becoming smaller than the value specified
+     * used value of the {@link height} property from becoming smaller than the value specified
      * for **min-height**.
      *
      * **See Also:**
@@ -2650,8 +2650,8 @@ export interface IStyleset
 
     /**
      * The **min-inline-size** CSS property defines the horizontal or vertical minimal size of an
-     * element's block, depending on its writing mode. It corresponds to either the [[minWidth]]
-     * or the [[minHeight]] property, depending on the value of [[writingMode]].
+     * element's block, depending on its writing mode. It corresponds to either the {@link minWidth}
+     * or the {@link minHeight} property, depending on the value of {@link writingMode}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/min-inline-size" target="mdn">MDN Page</a>
@@ -2666,7 +2666,7 @@ export interface IStyleset
 
     /**
      * The **min-width** CSS property sets the minimum width of an element. It prevents the used
-     * value of the [[width]] property from becoming smaller than the value specified for
+     * value of the {@link width} property from becoming smaller than the value specified for
      * **min-width**.
      *
      * **See Also:**
@@ -2773,7 +2773,7 @@ export interface IStyleset
 
     /**
      * The CSS **outline-width** property sets the thickness of an element's outline. An outline
-     * is a line that is drawn around an element, outside the [[border]].
+     * is a line that is drawn around an element, outside the {@link border}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width" target="mdn">MDN Page</a>
@@ -3317,7 +3317,7 @@ export interface IStyleset
 
     /**
      * The **text-emphasis-color** CSS property sets the color of emphasis marks. This value can
-     * also be set using the [[textEmphasis]] shorthand.
+     * also be set using the {@link textEmphasis} shorthand.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-color" target="mdn">MDN Page</a>
@@ -3343,7 +3343,7 @@ export interface IStyleset
 
     /**
      * The **text-fill-color** CSS property specifies the fill color of characters of text.
-     * If this property is not set, the value of the [[color]] property is used.
+     * If this property is not set, the value of the {@link color} property is used.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-fill-color" target="mdn">MDN Page</a>
@@ -3409,7 +3409,7 @@ export interface IStyleset
 
     /**
      * The **text-stroke-color** CSS property specifies the stroke color of characters of text.
-     * If this property is not set, the value of the [[color]] property is used.
+     * If this property is not set, the value of the {@link color} property is used.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke-color" target="mdn">MDN Page</a>
@@ -3588,9 +3588,9 @@ export interface IStyleset
 
 
 /**
- * The ExtendedBaseStyleset type maps all CSS properties defined in the [[IStyleset]] interface to
+ * The ExtendedBaseStyleset type maps all CSS properties defined in the {@link IStyleset} interface to
  * the "extended" versions of their types. These extended types are defined by adding basic keywords
- * (e.g. "unset", "initial", etc.) as well as [[StringProxy]] and [[ICustomVar]] to the type that
+ * (e.g. "unset", "initial", etc.) as well as {@link IRawProxy} and {@link ICustomVar} to the type that
  * is defined in the IStyleset interface.
  */
 export type ExtendedIStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStyleset[K]> }
@@ -3599,7 +3599,7 @@ export type ExtendedIStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStylese
 
 /**
  * The `ISyntaxTypeStyleset` interface maps CSS syntax names to the types, which can be used for
- * defining custom CSS properties (a.k.a. variables) using the [[$property]] and [[$var]] methods.
+ * defining custom CSS properties (a.k.a. variables) using the {@link $property} and {@link $var} methods.
  *
  * **Example:**
  *
@@ -3676,7 +3676,7 @@ export interface ISyntaxTypeStyleset
 /**
  * The `ICustomTypeStyleset` interface maps template names to the types, which can be used for
  * defining custom CSS properties (a.k.a. variables). This interface complements the
- * [[ISyntaxTypeStyleset]] by adding names that are not of an official syntax values but that
+ * {@link ISyntaxTypeStyleset} by adding names that are not of an official syntax values but that
  * are used in Mimcss properties and functions.
  *
  * **Example:**
@@ -3725,10 +3725,10 @@ export interface ICustomTypeStyleset
  * The `IVarTemplateStyleset` interface maps template names to the types, which can be used for
  * defining custom CSS properties (a.k.a. variables). Normally, variables are defined using the
  * names of the style properties and their type is determined by the type of this property in the
- * [[IStyleset]] interface. Sometimes, however, there is a need to define variables of some other
+ * {@link IStyleset} interface. Sometimes, however, there is a need to define variables of some other
  * types, for which there is no suitable style property. The `IVarTemplateStyleset` interface
  * combines serveral "styleset" interfaces into one thus defining the names and corresponding
- * types that can be used in [[$var]] and [[$property]] methods.
+ * types that can be used in {@link $var} and {@link $property} methods.
  */
 export interface IVarTemplateStyleset extends IStyleset,
     ISyntaxTypeStyleset, ICustomTypeStyleset {}
@@ -3736,7 +3736,7 @@ export interface IVarTemplateStyleset extends IStyleset,
 
 /**
  * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
- * custom CSS properties using the [[$var]] function.
+ * custom CSS properties using the {@link $var} function.
  */
 export type VarTemplateName = keyof IVarTemplateStyleset;
 
@@ -3765,16 +3765,16 @@ export type ExtendedVarValue<K extends VarTemplateName> = ExtendedProp<VarValue<
  * `"--""` property of the Styleset type.
  *
  * `CustomVar_StyleType` objects should be mostly used to override custom properties that have
- * previously been defined at the top-level using the [[$var]] function. That way you can have a
+ * previously been defined at the top-level using the {@link $var} function. That way you can have a
  * "global" value of a custom property and assign a different value to it under a certain CSS
  * selector.
  *
  * The values of the type can be specified as either a two-item or a three-item tuple or as style
  * definition class or style definition object.
  *
- * The two-item tuple is used with a previously defined custom CSS property represented by an [[IVarRule]]
+ * The two-item tuple is used with a previously defined custom CSS property represented by an {@link IVarRule}
  * object:
- * - The first item is the [[IVarRule]] object.
+ * - The first item is the {@link IVarRule} object.
  * - The second item is the value
  *
  * The three-item array allows explicitly specifying the custom CSS property name:
@@ -3837,13 +3837,13 @@ export type CustomVar_StyleType<K extends VarTemplateName = any> =
 /**
  * Type representing a collection of style properties and their values. In addition to the
  * properties representing the standard CSS styles, this type also includes the "--" property,
- * which is an array of [[CustomVar_StyleType]] objects each specifying a value for a single
+ * which is an array of {@link CustomVar_StyleType} objects each specifying a value for a single
  * custom property.
  */
 export type Styleset = ExtendedIStyleset &
     {
         /**
-         * Special property "--" specifies an array that contains [[CustomVar_StyleType]] objects each
+         * Special property "--" specifies an array that contains {@link CustomVar_StyleType} objects each
          * representing a definition of a custom CSS property.
          */
         "--"?: CustomVar_StyleType[];
@@ -3932,7 +3932,7 @@ export interface IPageRuleStyleset
 }
 
 /**
- * Defines type that can be passed to the [[$page]] method that creates a `@page` at-rule. This
+ * Defines type that can be passed to the {@link $page} method that creates a `@page` at-rule. This
  * type allows:
  * - page-relevant style properties
  * - "--" property for specifying custom CSS variables
@@ -3969,7 +3969,7 @@ export type PageRuleStyleset = PageBoxStyleset &
  *   ampersand symbol to refer to the parent style selector. If the ampersand symbol is not used,
  *   the selector will be simply appended to the parent selector.
  *
- * Functions that return style rules (e.g. [[$class]]) accept the `CombinedStyleset` as a parameter,
+ * Functions that return style rules (e.g. {@link $class}) accept the `CombinedStyleset` as a parameter,
  * for example:
  *
  * ```typescript
@@ -4071,14 +4071,14 @@ export type AnimationStyleset = Styleset & { "+"?: IStyleRule | IStyleRule[] };
 
 
 /**
- * Helper type describing keys of the [[ISyntaxTypeStyleset]] interface.
+ * Helper type describing keys of the {@link ISyntaxTypeStyleset} interface.
  */
 export type SyntaxKey = (keyof ISyntaxTypeStyleset) & string;
 
 /**
  * Type that maps a tuple type with syntax keys to a tuple type with corresponding syntax types.
  * For example, it will map type `["<color>", "<length>"]` to type `[CssColor, CssLength]`.
- * This type is used when defining parameters for the [[paint]] CSS function.
+ * This type is used when defining parameters for the {@link paint} CSS function.
  */
 export type MappedSyntaxTypes<T extends SyntaxKey[]> =
     { [i in keyof T]: T[i] extends SyntaxKey ? ISyntaxTypeStyleset[T[i]] : never }

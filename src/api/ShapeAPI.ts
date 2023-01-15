@@ -343,10 +343,10 @@ fdo["image-set"] = [
 
 /**
  * Registers a paint worklet with the given name, optional argument syntax and optional URL of
- * the worklet module. The worklet name should have been added to the [[IPaintWorklets]] interface
+ * the worklet module. The worklet name should have been added to the {@link IPaintWorklets} interface
  * using the module augmentation technique. Although it is possible to use paint worklets without
- * adding them to the [[IPaintWorklets]] interface, this will prevent Mimcss from enforcing the
- * types of arguments when the [[paint]] function is invoked.
+ * adding them to the {@link IPaintWorklets} interface, this will prevent Mimcss from enforcing the
+ * types of arguments when the {@link paint} function is invoked.
  * @param name Worklet name
  * @param syntax Tuple containing syntax definitions for worklet arguments.
  * @param url URL to the worklet module. If specified, the module will be automatically added.
@@ -439,7 +439,7 @@ const filterPercent = (fn: PercentFilterNames, p: Extended<CssPercent>): IPercen
 
 
 /**
- * Returns an [[IPercentFilterFunc]] object representing the `brightness()` CSS function.
+ * Returns an {@link IPercentFilterFunc} object representing the `brightness()` CSS function.
  *
  * **Example**
  *
@@ -464,7 +464,7 @@ export const brightness = (p: Extended<CssPercent>): IPercentFilterFunc => filte
 
 
 /**
- * Returns an [[IPercentFilterFunc]] object representing the `contrast()` CSS function.
+ * Returns an {@link IPercentFilterFunc} object representing the `contrast()` CSS function.
  *
  * **Example**
  *
@@ -489,7 +489,7 @@ export const contrast = (p: Extended<CssPercent>): IPercentFilterFunc => filterP
 
 
 /**
- * Returns an [[IPercentFilterFunc]] object representing the `grayscale()` CSS function.
+ * Returns an {@link IPercentFilterFunc} object representing the `grayscale()` CSS function.
  *
  * **Example**
  *
@@ -514,7 +514,7 @@ export const grayscale = (p: Extended<CssPercent>): IPercentFilterFunc => filter
 
 
 /**
- * Returns an [[IPercentFilterFunc]] object representing the `invert()` CSS function.
+ * Returns an {@link IPercentFilterFunc} object representing the `invert()` CSS function.
  *
  * **Example**
  *
@@ -542,7 +542,7 @@ export const invert = (p: Extended<CssPercent>): IPercentFilterFunc => filterPer
 
 
 /**
- * Returns an [[IPercentFilterFunc]] object representing the `opacity()` CSS function.
+ * Returns an {@link IPercentFilterFunc} object representing the `opacity()` CSS function.
  *
  * **Example**
  *
@@ -564,7 +564,7 @@ export const opacity = (p: Extended<CssPercent>): IPercentFilterFunc => filterPe
 
 
 /**
- * Returns an [[IPercentFilterFunc]] object representing the `saturate()` CSS function.
+ * Returns an {@link IPercentFilterFunc} object representing the `saturate()` CSS function.
  *
  * **Example**
  *
@@ -589,7 +589,7 @@ export const saturate = (p: Extended<CssPercent>): IPercentFilterFunc => filterP
 
 
 /**
- * Returns an [[IPercentFilterFunc]] object representing the `sepia()` CSS function.
+ * Returns an {@link IPercentFilterFunc} object representing the `sepia()` CSS function.
  *
  * **Example**
  *
@@ -614,7 +614,7 @@ fdo.brightness = fdo.contrast = fdo.grayscale = fdo.invert = fdo.opacity = fdo.s
 
 
 /**
- * Returns an [[IBlurFunc]] object representing the `blur()` CSS function parameters.
+ * Returns an {@link IBlurFunc} object representing the `blur()` CSS function parameters.
  *
  * **Example**
  *
@@ -643,7 +643,7 @@ fdo.blur = WKF.Length;
 
 
 /**
- * Returns an [[IDropShadowFunc]] object representing the `dropShadow()` CSS function parameters.
+ * Returns an {@link IDropShadowFunc} object representing the `dropShadow()` CSS function parameters.
  *
  * **Example**
  *
@@ -682,7 +682,7 @@ fdo["drop-shadow"] = {
 
 
 /**
- * Returns an [[IHueRotateFunc]] object representing the `hue-rotate()` CSS function parameters.
+ * Returns an {@link IHueRotateFunc} object representing the `hue-rotate()` CSS function parameters.
  *
  * **Example**
  *

@@ -16,7 +16,7 @@ import { virtMerge } from "../impl/Virt";
 /**
  * Registers the given function to be used for converting values of the given style property to
  * string. The `registerStyleProperty` function must be used after adding the property to the
- * [[IStyleset]] interface via the module augmentation technique if the conversion to string
+ * {@link IStyleset} interface via the module augmentation technique if the conversion to string
  * requires non-standard operations. This function should not be called for propeties whose
  * values only include numbers, strings, functions returning a string, objects whose `toString`
  * method produces the necessary string or arrays of the above types.
@@ -57,39 +57,48 @@ export function getStylePropValue(name: string, value: any): string
 
 
 
-// Sets style property on HTML or SVG element
-const setElementStyleProp = <K extends keyof IStyleset>( elm: ElementCSSInlineStyle, name: K,
-    value: ExtendedIStyleset[K], schedulerType?: number): void =>
-    getActivator(schedulerType).updateStyle( elm, name, sp2s( name, value), false);
+/**
+ * Sets, updates or removes the given style property for the given DOM element.
+ *
+ * @typeparam K A key in the {@link IStyleset} interface, whcih defines the property name.
+ * @param elm DOM element whose styles will be set.
+ * @param name Name of the style property. This can be either dash-case or camelCase name.
+ * @param value New value for the style property. The value can be of any type allowed for the
+ * property in the {@link IStyleset} interface. If the value is `null` or `undefined`, the style property
+ * is removed from the element's style object.
+ */
+export const setElementStyleProp = <K extends keyof IStyleset>(elm: ElementCSSInlineStyle, name: K,
+        value: ExtendedIStyleset[K] | null | undefined, schedulerType?: number): void =>
+    getActivator(schedulerType).updateStyle(elm, name, sp2s(name, value), false);
 
 
 
 /**
- * Sets values of the style properties from the given Styleset object to the `style` attribute
- * of the given HTML element.
- * @param elm HTML/SVG element whose styles will be set.
+ * Sets, updates or removes values of the style properties from the given Styleset object to the `style` attribute
+ * of the given DOM element.
+ * @param elm DOM element whose styles will be set.
  * @param styleset Styleset object which provides values for style properties.
  */
 export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset | null | undefined,
-	schedulerType?: number): void =>
-    setElementStringStyle( elm, styleset ? stylesetToStringStyleset(styleset) : null, schedulerType);
+        schedulerType?: number): void =>
+    setElementStringStyle(elm, styleset ? s2ss(styleset) : null, schedulerType);
 
 
 
 /**
  * Sets values of the style properties from the given StringStyleset object to the `style` attribute
- * of the given HTML element.
- * @param elm HTML/SVG element whose styles will be set.
- * @param styleset [[StringStyleset]] object which provides values for style properties.
+ * of the given DOM element.
+ * @param elm DOM element whose styles will be set.
+ * @param styleset {@link StringStyleset} object which provides values for style properties.
  */
 export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
-	schedulerType?: number): void =>
-    getActivator(schedulerType).updateStyle( elm, null, styleset, false);
+        schedulerType?: number): void =>
+    getActivator(schedulerType).updateStyle(elm, null, styleset, false);
 
 
 
 /**
- * Serializes the given [[Styleset]] to a string.
+ * Serializes the given {@link Styleset} to a string.
  * @param styleset
  */
 export const stylesetToString = (styleset: Styleset): string => s2s( styleset);
@@ -97,7 +106,7 @@ export const stylesetToString = (styleset: Styleset): string => s2s( styleset);
 
 
 /**
- * Converts the given [[Styleset]] object into an object, where each Styleset's property is
+ * Converts the given {@link Styleset} object into an object, where each Styleset's property is
  * converted to its string value.
  * @param styleset
  */
@@ -253,7 +262,7 @@ HTMLElement.prototype.setStyleset = SVGElement.prototype.setStyleset =
 
 /**
  * Converts the given media query value to the CSS media query string. This function can be used
- * by libraries that allow specifying [[MediaStatement]] for the `media` attribute of elements
+ * by libraries that allow specifying {@link MediaStatement} for the `media` attribute of elements
  * such as `<link>`, `<style>` and `<source>`
  */
 export const mediaToString = (query: MediaStatement): string => query ? media2s( query) : "";

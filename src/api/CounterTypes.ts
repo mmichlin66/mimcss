@@ -5,7 +5,7 @@ import {ListStyleType_StyleType} from "./StyleTypes";
 
 
 /**
- * Type for specifying counter [[system]] property.
+ * Type for specifying counter {@link system} property.
  */
 export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic" | "additive" | "fixed" |
     number | [ListStyleType_StyleType | IRawProxy];
@@ -13,56 +13,56 @@ export type System_CounterType = "cyclic" | "numeric" | "alphabetic" | "symbolic
 
 
 /**
- * Type for specifying counter [[negative]] property.
+ * Type for specifying counter {@link negative} property.
  */
 export type Negative_CounterType = string | [RawExtended<string>,  RawExtended<string>?];
 
 
 
 /**
- * Type for specifying counter [[prefix]] and [[suffix]] properties.
+ * Type for specifying counter {@link prefix} and {@link suffix} properties.
  */
 export type PrefixSuffix_CounterType = string | CssImage;
 
 
 
 /**
- * Type for specifying counter [[range]] property.
+ * Type for specifying counter {@link range} property.
  */
 export type Range_CounterType = "auto" | RawOneOrMany<["infinite" | number, "infinite" | number]>;
 
 
 
 /**
- * Type for specifying counter [[pad]] property.
+ * Type for specifying counter {@link pad} property.
  */
 export type Pad_CounterType = [number, string];
 
 
 
 /**
- * Type for specifying counter [[fallback]] property.
+ * Type for specifying counter {@link ICounterStyleset.fallback} property.
  */
 export type Fallback_CounterType = ListStyleType_StyleType;
 
 
 
 /**
- * Type for specifying counter [[symbols]] property.
+ * Type for specifying counter {@link symbols} property.
  */
 export type Symbols_CounterType = RawOneOrMany<string>;
 
 
 
 /**
- * Type for specifying counter [[additiveSymbols]] property.
+ * Type for specifying counter {@link additiveSymbols} property.
  */
 export type AdditiveSymbols_CounterType = RawOneOrMany<[string | CssImage, number] | [number, string | CssImage]>;
 
 
 
 /**
- * Type for specifying counter [[speakAs]] property.
+ * Type for specifying counter {@link speakAs} property.
  */
 export type SpeakAs_CounterType = "auto" | "bullets" | "numbers" | "words" | "spell-out" | ICounterStyleRule;
 
@@ -129,9 +129,9 @@ export interface ICounterStyleset
 
 
 /**
- * The ExtendedCounterStyleset type maps all `@counter-style` properties defined in the [[ICounterStyleset]]
+ * The ExtendedCounterStyleset type maps all `@counter-style` properties defined in the {@link ICounterStyleset}
  * interface to the "extended" versions of their types. These extended types are defined using the
- * [[RawExtended]] generic type, which adds [[IRawProxy]] to the type that is defined in the
+ * {@link RawExtended} generic type, which adds {@link IRawProxy} to the type that is defined in the
  * ICounterStyleset interface.
  */
 export type ExtendedCounterStyleset = { [K in keyof ICounterStyleset]: RawExtended<ICounterStyleset[K]> }

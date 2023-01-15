@@ -22,8 +22,8 @@ import {a2s, camelToDash, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
 /**
  * Returns a string representation of a selector. This function is a tag function and must be
  * invoked with the template string without parentheses. This function can be used wherever the
- * [[CssSelector]] types are allowed. The parameters embedded into the string
- * must conform to the [[CssSelector]] type.
+ * {@link CssSelector} types are allowed. The parameters embedded into the string
+ * must conform to the {@link CssSelector} type.
  *
  * **Example:**
  *
@@ -264,7 +264,7 @@ const pseudoCamelTodDash = (prefix: ":" | "::", name: string) => prefix + camelT
 /**
  * Creates selector builder object that provides means to build complex selectors from multiple
  * selector items of all possible kinds including tags, classess, IDs, attributes, pseudo classes
- * and pseudo elements combined with CSS combinators. This function returns the [[ISelectorBuilder]]
+ * and pseudo elements combined with CSS combinators. This function returns the {@link ISelectorBuilder}
  * interface, which has methods and properties for all selector items.
  *
  * **Example:**
@@ -378,7 +378,7 @@ fdo["cubic-bezier"] = ["n1", "n2", "n3", "n4"]
 /**
  * Tag function that represents a media query. This function allows expressing media queries in
  * a natural string form while embedding media feature values in type safe manner. The string can
- * contain any media expressions while the embedded objects must be of type [[IMediaFeatureset]].
+ * contain any media expressions while the embedded objects must be of type {@link IMediaFeatureset}.
  * Multiple features in the feature set will be expanded into clauses combined with the "and"
  * operator.
  *
@@ -484,7 +484,7 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
 
 
 /**
- * Returns a function representing the `attr()` CSS function. It returns [[IStringProxy]] and
+ * Returns a function representing the `attr()` CSS function. It returns {@link IStringProxy} and
  * theoretically can be used in any style property wherever the CSS `<string>` type is accepted;
  * however, its use by browsers is currently limited to the `content` property. Also not all
  * browsers currently support type, units or fallback values.
@@ -531,7 +531,7 @@ export const counters = (counterObj: Extended<CssCounter>,
  * Returns a function representing the invocation of the `var()` CSS function for the given custom
  * CSS property with optional fallbacks. Usually, when you want to refer to a custom CSS property
  * in style rules, it is enough to just refer to the style definition property created using the
- * [[$var]] function; however, if you want to provide a fallback value, you must use this function.
+ * {@link $var} function; however, if you want to provide a fallback value, you must use this function.
  *
  * **Example:**
  *
@@ -549,9 +549,9 @@ export const counters = (counterObj: Extended<CssCounter>,
  * }
  * ```
  *
- * @typeparam K Key of the [[IVarTemplateStyleset]] interface that determines the type of the
+ * @typeparam K Key of the {@link IVarTemplateStyleset} interface that determines the type of the
  * custom CSS property and of the fallback value.
- * @param varObj Custom CSS property object created using the [[$var]] function.
+ * @param varObj Custom CSS property object created using the {@link $var} function.
  * @param fallback Fallback value that will be used if the custom CSS property isnt set.
  * @returns The `IRawProxy` callable interface, which allows the `usevar` function to be called
  * in any context.

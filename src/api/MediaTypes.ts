@@ -18,7 +18,7 @@ export type OneOrRange<T> = T | [RawExtended<T>, RawExtended<T>?];
 
 
 /**
- * Representing the type of objects used to create media queries in the [[StyleDefinition.$media]]
+ * Representing the type of objects used to create media queries in the {@link StyleDefinition.$media}
  * method.
  */
 export interface IMediaFeatureset
@@ -69,17 +69,17 @@ export interface IMediaFeatureset
 
 
 /**
- * The `ExtendedMediaFeatureset` type maps all media features defined in the [[IMediaFeatureset]]
+ * The `ExtendedMediaFeatureset` type maps all media features defined in the {@link IMediaFeatureset}
  * interface to the "extended" versions of their types. These extended types are defined by
- * allowing [[StringProxy]] and [[IConstant]] interfaces to the type that is defined in the
- * [[IMediaFeatureset]] interface.
+ * allowing {@link IRawProxy} interface to the type that is defined in the
+ * {@link IMediaFeatureset} interface.
  */
 export type ExtendedMediaFeatureset = { [K in keyof IMediaFeatureset]?: RawExtended<IMediaFeatureset[K]> }
 
 
 
 /**
- * Represents media query returned from the [[media]] function.
+ * Represents media query returned from the {@link media} function.
  */
 export interface IMediaQueryProxy extends IGenericProxy<"media-query"> {}
 
@@ -129,7 +129,7 @@ export type MediaStatement = MediaQuery | MediaQuery[];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Represents supports query returned from the [[supports]] function.
+ * Represents supports query returned from the {@link supports} function.
  */
 export interface ISupportsQueryProxy extends IGenericProxy<"supports-query"> {}
 

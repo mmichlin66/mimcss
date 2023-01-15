@@ -17,8 +17,8 @@ const toUnitsProxy = ( n: number, unit: string): IGenericProxy => () => n + unit
 
 /**
  * The `Num` object contains methods that implement CSS mathematic functions on the `<number>`
- * CSS type. It implements the [[INumericMath]] interface and thus allows using the methods such
- * as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the [[CssNumber]] type.
+ * CSS type. It implements the {@link INumericMath} interface and thus allows using the methods such
+ * as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the {@link CssNumber} type.
  *
  * **Example:**
  *
@@ -42,9 +42,9 @@ export const Num: INumberMath = NumberMath;
 
 /**
  * The `Percent` object contains methods that implement CSS mathematic functions on the
- * `<percentage>` CSS type. It implements the [[INumericMath]] interface and thus allows using
- * the methods such as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the
- * [[CssPercent]] type.
+ * `<percentage>` CSS type. It implements the {@link INumericMath} interface and thus allows using
+ * the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the
+ * {@link CssPercent} type.
  *
  * **Example:**
  *
@@ -73,9 +73,9 @@ export const percent = (n: number): IPercentProxy => toUnitsProxy( n, "%");
 
 /**
  * The `Len` object contains methods that implement CSS mathematic functions on the
- * `<length> | <percentage>` CSS type. It implements the [[INumericMath]] interface and thus
- * allows using the methods such as [[min]], [[max]], [[calc]] and [[clamp]] with parameters
- * of the [[CssLength]] type.
+ * `<length> | <percentage>` CSS type. It implements the {@link INumericMath} interface and thus
+ * allows using the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters
+ * of the {@link CssLength} type.
  *
  * **Example:**
  *
@@ -227,9 +227,9 @@ export const fr = (n: number): ILengthProxy => toUnitsProxy( n, "fr");
 
 /**
  * The `Angle` object contains methods that implement CSS mathematic functions on the
- * `<angle> | <percentage>` CSS type. It implements the [[INumericMath]] interface and thus
- * allows using the methods such as [[min]], [[max]], [[calc]] and [[clamp]] with parameters
- * of the [[CssAngle]] type.
+ * `<angle> | <percentage>` CSS type. It implements the {@link INumericMath} interface and thus
+ * allows using the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters
+ * of the {@link CssAngle} type.
  */
 export const Angle: IAngleMath = AngleMath;
 
@@ -261,8 +261,8 @@ export const turn = (n: number): IAngleProxy => toUnitsProxy( n, "turn");
 
 /**
  * The `Time` object contains methods that implement CSS mathematic functions on the `<time>`
- * CSS type. It implements the [[INumericMath]] interface and thus allows using the methods such
- * as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the [[CssTime]] type.
+ * CSS type. It implements the {@link INumericMath} interface and thus allows using the methods such
+ * as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the {@link CssTime} type.
  */
  export const Time: ITimeMath = TimeMath;
 
@@ -282,9 +282,9 @@ export const s = (n: number): ITimeProxy => toUnitsProxy( n, "s");
 
 /**
  * The `Resolution` object contains methods that implement CSS mathematic functions on the
- * `<resolution>` CSS type. It implements the [[INumericMath]] interface and thus allows using
- * the methods such as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the
- * [[CssResolution]] type.
+ * `<resolution>` CSS type. It implements the {@link INumericMath} interface and thus allows using
+ * the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the
+ * {@link CssResolution} type.
  */
  export const Resolution: IResolutionMath = ResolutionMath;
 
@@ -316,8 +316,8 @@ export const x = (n: number): IResolutionProxy => toUnitsProxy( n, "x");
 
 /**
  * The `Frequency` object contains methods that implement CSS mathematic functions on the `<frequency>`
- * CSS type. It implements the [[INumericMath]] interface and thus allows using the methods such
- * as [[min]], [[max]], [[calc]] and [[clamp]] with parameters of the [[CssFrequency]] type.
+ * CSS type. It implements the {@link INumericMath} interface and thus allows using the methods such
+ * as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the {@link CssFrequency} type.
  */
  export const Frequency: IFrequencyMath = FrequencyMath;
 
@@ -342,7 +342,7 @@ export const khz = (n: number): IFrequencyProxy => toUnitsProxy( n, "khz");
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an [[IFitContentProxy]] function representing the `fit-content()` CSS function
+ * Returns an {@link IFitContentProxy} function representing the `fit-content()` CSS function
  * (<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content()" target="mdn">MDN Page</a>).
  */
 export const fitContent = (size: Extended<CssLength>): IFitContentProxy =>
@@ -351,14 +351,14 @@ export const fitContent = (size: Extended<CssLength>): IFitContentProxy =>
 
 
 /**
- * Returns an [[IAspectRatioProxy]] function representing the `<ratio>` CSS type.
+ * Returns an {@link IAspectRatioProxy} function representing the `<ratio>` CSS type.
  */
 export const ratio = (w: CssNumber, h?: CssNumber): IAspectRatioProxy => () => [w,h].join("/");
 
 
 
 /**
- * Returns an [[IRectProxy]] function representing the `rect()` CSS function used for the `clip`
+ * Returns an {@link IRectProxy} function representing the `rect()` CSS function used for the `clip`
  * style property.
  * @deprecated The CSS `clip` property and `rect()` function are deprecated.
  */
