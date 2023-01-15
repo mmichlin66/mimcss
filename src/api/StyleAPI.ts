@@ -1,9 +1,10 @@
 ﻿import {MediaStatement, SupportsStatement} from "./MediaTypes";
 import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Stylesets"
-import {sp2s, s_registerSP, s2ss, s2s} from "../impl/StyleImpl"
+import {sp2s, s_registerSP, s2ss, s2s, updateStyleProperty} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import { virtMerge } from "../impl/Virt";
+import { camelToDash } from "../impl/Utils";
 
 
 
@@ -69,19 +70,23 @@ export function getStylePropValue(name: string, value: any): string
  */
 export const setElementStyleProp = <K extends keyof IStyleset>(elm: ElementCSSInlineStyle, name: K,
         value: ExtendedIStyleset[K] | null | undefined, schedulerType?: number): void =>
-    getActivator(schedulerType).updateStyle(elm, name, sp2s(name, value), false);
+    getActivator(schedulerType).doAction(() => updateStyleProperty(elm, camelToDash(name), sp2s(name, value), false));
 
 
 
 /**
- * Sets, updates or removes values of the style properties from the given Styleset object to the `style` attribute
- * of the given DOM element.
+ * Sets, updates or removes values of the style properties from the given Styleset object to the
+ * `style` attribute of the given DOM element.
  * @param elm DOM element whose styles will be set.
  * @param styleset Styleset object which provides values for style properties.
+ * @param merge Flag indicating whether the new styleset should completely replace the
+ * existing element styles with the new styles (false) or merge the new styles with the
+ * existing ones (true). The default value is false.
+ * @param schedulerType Scheduler identifier. If omitted, the current default scheduler will be used.
  */
 export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset | null | undefined,
-        schedulerType?: number): void =>
-    setElementStringStyle(elm, styleset ? s2ss(styleset) : null, schedulerType);
+        merge?: boolean, schedulerType?: number): void =>
+    setElementStringStyle(elm, styleset ? s2ss(styleset) : null, merge, schedulerType);
 
 
 
@@ -90,10 +95,14 @@ export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset |
  * of the given DOM element.
  * @param elm DOM element whose styles will be set.
  * @param styleset {@link StringStyleset} object which provides values for style properties.
+ * @param merge Flag indicating whether the new styleset should completely replace the
+ * existing element styles with the new styles (false) or merge the new styles with the
+ * existing ones (true). The default value is false.
+ * @param schedulerType Scheduler identifier. If omitted, the current default scheduler will be used.
  */
 export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
-        schedulerType?: number): void =>
-    getActivator(schedulerType).updateStyle(elm, null, styleset, false);
+        merge?: boolean, schedulerType?: number): void =>
+    getActivator(schedulerType).doAction(() => updateStyleProperty(elm, null, styleset, false));
 
 
 
@@ -215,7 +224,8 @@ declare global
     interface ElementCSSInlineStyle
     {
         /**
-         * Set the given value to the given style property of the element.
+         * Sets, updates or removes the given value to the given style property of the element.
+         * This method schedules the update of an individual property in the nextMimbl tick.
          * @param name Property name
          * @param value New property value to set.
          * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
@@ -225,15 +235,16 @@ declare global
             schedulerType?: number): void;
 
         /**
-         * Merges or replaces the element's styles with the given styleset.
-         * @param styleset Styleset to set or replace
-         * @param replace Flag indicating whether the new styleset should completely replace the
-         * existing element styles with the new styles (true) or merge the new styles with the
-         * existing ones (false). The default value is false.
+         * Replaces or merges the element's styles with the given styleset. This method schedules
+         * the style update in the next Mimbl tick.
+         * @param styleset Styleset to merge or replace
+         * @param merge Flag indicating whether the new styleset should completely replace the
+         * existing element styles with the new styles (false) or merge the new styles with the
+         * existing ones (true). The default value is false.
          * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
          * will be used.
          */
-        setStyleset( styleset: Styleset, schedulerType?: number): void;
+        setStyleset( styleset: Styleset, merge?: boolean, schedulerType?: number): void;
     }
 }
 
@@ -242,14 +253,14 @@ HTMLElement.prototype.setStyleProp = SVGElement.prototype.setStyleProp =
     function <K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K],
         schedulerType?: number): void
 {
-    setElementStyleProp( this, name, value, schedulerType);
+    setElementStyleProp(this, name, value, schedulerType);
 }
 
 // Sets styleset on HTML or SVG element
 HTMLElement.prototype.setStyleset = SVGElement.prototype.setStyleset =
-    function( styleset: Styleset, schedulerType?: number): void
+    function( styleset: Styleset, merge?: boolean, schedulerType?: number): void
 {
-    setElementStyle( this, styleset, schedulerType);
+    setElementStyle(this, styleset, merge, schedulerType);
 }
 
 

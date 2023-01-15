@@ -98,7 +98,7 @@ export interface IStyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleRule>
 		important?: boolean, schedulerType?: number): void;
 
 	/**
-	 * Adds/replaces/removes the value of the given custmom CSS property in this rule.
+	 * Adds/replaces/removes the value of the given custom CSS property in this rule.
 	 * @param customVar IVarRule object defining a custom CSS property.
 	 * @param value New value of the custom CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.

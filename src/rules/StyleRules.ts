@@ -11,7 +11,7 @@ import {
 import {CssSelector, IParameterizedPseudoEntityFunc, PageSelector} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
 import {camelToDash, fdo2s, symV2S, v2s, WKF, wkf} from "../impl/Utils";
-import {s2s, sp2s} from "../impl/StyleImpl"
+import {s2s, sp2s, updateStyleProperty} from "../impl/StyleImpl"
 import {getActivator} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
 
@@ -253,8 +253,8 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-		    getActivator(schedulerType).updateStyle( this.cssRule, camelToDash( name),
-                value == null ? null : sp2s( name, value), important);
+		    getActivator(schedulerType).doAction(() => updateStyleProperty(this.cssRule,
+                camelToDash( name), value == null ? null : sp2s( name, value), important));
         }
 	}
 
@@ -299,9 +299,8 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-            getActivator(schedulerType).updateStyle( this.cssRule, varObj.cssName,
-                value == null ? null : sp2s( varObj.template, value),
-                important);
+            getActivator(schedulerType).doAction(() => updateStyleProperty(this.cssRule, varObj.cssName,
+                value == null ? null : sp2s( varObj.template, value), important));
         }
 	}
 

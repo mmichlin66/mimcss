@@ -11,6 +11,7 @@ import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
 import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
 import { IPropVirtController, virtProp } from "../impl/Virt"
+import { updateStyleProperty } from "../impl/StyleImpl"
 
 
 
@@ -228,7 +229,7 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
 	public setVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
 		if (this.varRootRule)
-            getActivator(schedulerType).updateStyle( this.varRootRule, name, value, important);
+            getActivator(schedulerType).doAction(() => updateStyleProperty( this.varRootRule!, name, value, important));
 	}
 
 
@@ -726,9 +727,12 @@ export const s_activate = <T extends IStyleDefinition>( instOrClass: T | IStyleD
     // when we schedule activation. Thus, when the activateSD function is invoked, we will not
     // call the adopt method.
     let sd = processSD( instOrClass) as T;
-    getActivator(schedulerType).activate( sd, isAdoptionSupported ? getCurrentRoot() : undefined);
+    let root = isAdoptionSupported ? getCurrentRoot() : undefined;
+    getActivator(schedulerType).doAction(() => activateSD(sd, root));
     return sd;
 }
+
+
 
 /**
  * Processes the given style definition instance or class and schedules its activation. If the root
@@ -737,10 +741,13 @@ export const s_activate = <T extends IStyleDefinition>( instOrClass: T | IStyleD
  * style sheet will be adopted by the given root.
  */
 export const s_deactivate = <T extends IStyleDefinition>( sd: T, schedulerType?: number): void =>
+{
     // if style sheet adoption is not supported, we want to pass undefined in the root parameter
     // when we schedule activation. Thus, when the deactivateSD function is invoked, we will not
     // call the unadopt method.
-    getActivator(schedulerType).deactivate( sd, isAdoptionSupported ? getCurrentRoot() : undefined);
+    let root = isAdoptionSupported ? getCurrentRoot() : undefined;
+    getActivator(schedulerType).doAction(() => deactivateSD(sd, root));
+}
 
 
 

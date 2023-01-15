@@ -1,20 +1,4 @@
-import {IStyleDefinition} from "../api/RuleTypes";
 import {SchedulerType, IScheduler} from "../api/SchedulingTypes";
-import {StringStyleset} from "../api/Stylesets";
-import {activateSD, deactivateSD} from "../rules/RuleContainer";
-import { camelToDash } from "./Utils";
-
-
-
-/**
- * The IObjectWithStyle interface represents an object which has the style property of the
- * CSSStyleDeclaration type. This interface shape is implemented by CSSStyleRule,
- * CSSPageRule and ElementCSSInlineStyle
- */
-export interface IObjectWithStyle
-{
-    readonly style: CSSStyleDeclaration;
-}
 
 
 
@@ -24,24 +8,10 @@ export interface IObjectWithStyle
  */
 export interface IStyleActivator
 {
-	/**
-	 * Instructs to activate the given style definition instance. This method is called when the
-	 * activate function is called for this activation mechanism.
-	 */
-	activate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void;
-
-	/**
-	 * Instructs to deactivate the given style definition instance. This method is called when the
-	 * deactivate function is called for this activation mechanism.
-	 */
-	deactivate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void;
-
-	/**
-	 * Instructs to set the value of either a single property or a set of properties in the given
-     * CSS style object.
-	 */
-    updateStyle( ruleOrElm: IObjectWithStyle, name: string | null,
-        value?: string | StringStyleset | null, important?: boolean): void;
+    /**
+     * Performs or schedules the given action (a simple function).
+     */
+    doAction(action: () => void): void;
 
 	/**
 	 * Performs activation/deactivation for all style definitions accumulated since the last
@@ -61,74 +31,18 @@ export interface IStyleActivator
 
 
 /**
- * Set the value of either a single property or a set of properties in the given
- * CSS style object.
- */
-const updateStyleProperty = (ruleOrElm: IObjectWithStyle, name: string | null,
-    value?: string | StringStyleset | null, important?: boolean): void =>
-{
-    if (!name && value == null)
-    {
-        if (ruleOrElm instanceof CSSRule)
-            ruleOrElm.cssText = "";
-        else
-            (ruleOrElm as any as Element).removeAttribute( "style");
-    }
-    else if (name)
-    {
-        name = camelToDash(name);
-        if (value == null)
-            ruleOrElm.style.removeProperty( name);
-        else
-            ruleOrElm.style.setProperty( name, value as string, important ? "important" : undefined);
-    }
-    else
-    {
-        // remove previous style properties (if any)
-        ruleOrElm.style.cssText = "";
-        let styleset = value as StringStyleset;
-        for( let propName in styleset)
-            ruleOrElm.style[propName] = styleset[propName];
-    }
-}
-
-
-
-/**
  * The SynchronousActivator class represents the synchronous activation mechanism, which writes
  * style changes to the DOM when the activate and deactivate functions are called.
  */
 class SynchronousActivator implements IStyleActivator
 {
-	/**
-	 * Instructs to activate the given style definition instance. This method is called when the
-	 * activate function is called for this activation mechanism.
-	 * @param definition
-	 */
-	public activate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
-	{
-		activateSD( definition, root);
-	}
-
-	/**
-	 * Instructs to deactivate the given style definition instance. This method is called when the
-	 * deactivate function is called for this activation mechanism.
-	 * @param definition
-	 */
-	public deactivate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
-	{
-		deactivateSD( definition, root);
-	}
-
-	/**
-	 * Instructs to set the value of either a single property or a set of properties in the given
-     * CSS style object.
-	 */
-    public updateStyle( ruleOrElm: IObjectWithStyle, name: string | null,
-        value?: string | StringStyleset | null, important?: boolean): void
-	{
-        updateStyleProperty( ruleOrElm, name, value, important);
-	}
+    /**
+     * Executes the given action right away.
+     */
+    doAction(action: () => void): void
+    {
+        action();
+    }
 
 	/**
 	 * Performs activation/deactivation for all style definitions accumulated since the last
@@ -162,8 +76,6 @@ class SchedulingActivator implements IStyleActivator
     // optional scheduler object
     private scheduler?: IScheduler;
 
-
-
     constructor( scheduler?: IScheduler)
     {
         if (scheduler)
@@ -173,50 +85,18 @@ class SchedulingActivator implements IStyleActivator
         }
     }
 
-
-
-	/**
-	 * Instructs to activate the given style definition instance.
-	 */
-	public activate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
-	{
-        if (this.isSchedulingNeeded)
-            this.scheduler!.scheduleDOMUpdate();
-
-        this.actions.push( () => activateSD( definition, root));
-	}
-
-
-
-	/**
-	 * Instructs to deactivate the given style definition instance.
-	 */
-	public deactivate( definition: IStyleDefinition, root?: DocumentOrShadowRoot): void
-	{
-        if (this.isSchedulingNeeded)
-            this.scheduler!.scheduleDOMUpdate();
-
-        this.actions.push( () => deactivateSD( definition, root));
-	}
-
-
-
-	/**
-	 * Instructs to set the value of either a single property or a set of properties in the given
-     * CSS style object.
-	 */
-    public updateStyle( ruleOrElm: IObjectWithStyle, name: string | null,
-        value?: string | StringStyleset | null, important?: boolean): void
-	{
+    /**
+     * Schedules the given action to be execeuted by the scheduler.
+     */
+    doAction(action: () => void): void
+    {
 		if (this.isSchedulingNeeded)
             this.scheduler!.scheduleDOMUpdate();
 
-		this.actions.push( () => updateStyleProperty( ruleOrElm, name, value, important));
-	}
+		this.actions.push(action);
+    }
 
-
-
-	/**
+    /**
 	 * Performs activation/deactivation for all style definitions in our internal map.
 	 */
 	public forceDOMUpdate(): void
@@ -224,11 +104,12 @@ class SchedulingActivator implements IStyleActivator
 		if (this.actions.length > 0)
 		{
             this.doDOMUpdate();
-            this.scheduler && this.scheduler.cancelDOMUpdate();
+
+            // since we were forced to perform update now, we need to cancel a scheduled
+            // update (if any).
+            this.scheduler?.cancelDOMUpdate();
 		}
 	}
-
-
 
 	/**
 	 * Cancels activation/deactivation for all style definitions accumulated since the last
@@ -239,18 +120,14 @@ class SchedulingActivator implements IStyleActivator
 		if (this.actions.length > 0)
 		{
 			this.actions = [];
-            this.scheduler && this.scheduler.cancelDOMUpdate();
+            this.scheduler?.cancelDOMUpdate();
 		}
 	}
-
-
 
 	private get isSchedulingNeeded(): boolean
     {
 		return !!this.scheduler && !this.actions.length;
     }
-
-
 
     /**
 	 * Performs activation/deactivation and property set operations accumulated internally. This
@@ -278,7 +155,6 @@ class AnimationFrameScheduler implements IScheduler
 
     // Callback to call to write changes to the DOM.
 	private cb: () => void;
-
 
     /**
      * Initializes the scheduler object and provides the callback that should be invoked when the
@@ -308,7 +184,6 @@ class AnimationFrameScheduler implements IScheduler
 			this.h = 0;
 		}
     }
-
 
 	/**
 	 * Is invoked when animation frame should be executed.

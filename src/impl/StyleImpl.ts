@@ -181,7 +181,7 @@ wkf[WKF.Marker] = (val: Extended<Marker_StyleType>): string =>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Functions for handling Stylesets.
+// Functions for handling Stylesets and Style properties.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -272,6 +272,52 @@ export const s2ss = (styleset: Styleset): StringStyleset =>
     let res: StringStyleset = {};
     forAllPropsInStylset( styleset, (name: string, value: string): void => {res[name] = value});
     return res;
+}
+
+
+
+/**
+ * The IObjectWithStyle interface represents an object which has the style property of the
+ * CSSStyleDeclaration type. This interface shape is implemented by ElementCSSInlineStyle (which
+ * is extended by all DOM elements) as well as several CSS rule objects: CSSStyleRule, CSSPageRule,
+ * CSSKeyframeRule, CSSFontFaceRule.
+ */
+export interface IObjectWithStyle
+{
+    readonly style: CSSStyleDeclaration;
+}
+
+
+
+/**
+ * Sets the value of either a single property or a set of properties in the given
+ * CSS style object.
+ */
+export const updateStyleProperty = (ruleOrElm: IObjectWithStyle, name: string | null,
+    value?: string | StringStyleset | null, important?: boolean): void =>
+{
+    if (!name && value == null)
+    {
+        if (ruleOrElm instanceof CSSRule)
+            ruleOrElm.cssText = "";
+        else
+            (ruleOrElm as any as Element).removeAttribute( "style");
+    }
+    else if (name)
+    {
+        if (value == null)
+            ruleOrElm.style.removeProperty( name);
+        else
+            ruleOrElm.style.setProperty( name, value as string, important ? "important" : undefined);
+    }
+    else
+    {
+        // remove previous style properties (if any)
+        ruleOrElm.style.cssText = "";
+        let styleset = value as StringStyleset;
+        for( let propName in styleset)
+            ruleOrElm.style[propName] = styleset[propName];
+    }
 }
 
 
