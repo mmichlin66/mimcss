@@ -9,9 +9,9 @@ import {
 } from "./Rule"
 import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
-import {getActivator, setDefaultScheduler} from "../impl/SchedulingImpl";
+import {scheduleAction, setDefaultScheduler} from "../impl/SchedulingImpl";
 import { IPropVirtController, virtProp } from "../impl/Virt"
-import { updateStyleProperty } from "../impl/StyleImpl"
+import { sp2elm } from "../impl/StyleImpl"
 
 
 
@@ -229,7 +229,7 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
 	public setVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
 	{
 		if (this.varRootRule)
-            getActivator(schedulerType).doAction(() => updateStyleProperty( this.varRootRule!, name, value, important));
+            scheduleAction(() => sp2elm(this.varRootRule!, name, value, important), schedulerType);
 	}
 
 
@@ -728,7 +728,7 @@ export const s_activate = <T extends IStyleDefinition>( instOrClass: T | IStyleD
     // call the adopt method.
     let sd = processSD( instOrClass) as T;
     let root = isAdoptionSupported ? getCurrentRoot() : undefined;
-    getActivator(schedulerType).doAction(() => activateSD(sd, root));
+    scheduleAction(() => activateSD(sd, root), schedulerType);
     return sd;
 }
 
@@ -746,7 +746,7 @@ export const s_deactivate = <T extends IStyleDefinition>( sd: T, schedulerType?:
     // when we schedule activation. Thus, when the deactivateSD function is invoked, we will not
     // call the unadopt method.
     let root = isAdoptionSupported ? getCurrentRoot() : undefined;
-    getActivator(schedulerType).doAction(() => deactivateSD(sd, root));
+    scheduleAction(() => deactivateSD(sd, root), schedulerType);
 }
 
 

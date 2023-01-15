@@ -198,12 +198,22 @@ class AnimationFrameScheduler implements IScheduler
 
 
 /**
+ * Schedules the given action (function) for execution using the given or default scheduler.
+ */
+export const scheduleAction = (action: () => void, schedulerType?: number): void =>
+    getActivator(schedulerType).doAction(action);
+
+
+
+/**
  * Returns the activator for the given scheduler type. If scheduler type is not specified returns
  * the activator currently set as default. If, for some reason, the default activator is not set,
  * returns the synchronous activator.
  */
 export const getActivator = (schedulerType?: number): IStyleActivator =>
-	(schedulerType == null ? s_defaultActivator : s_registeredActivators.get( schedulerType)) ?? s_synchronousActivator;
+	(schedulerType == null
+        ? s_defaultActivator
+        : s_registeredActivators.get( schedulerType)) ?? s_synchronousActivator;
 
 
 

@@ -1,7 +1,7 @@
 ﻿import {MediaStatement, SupportsStatement} from "./MediaTypes";
 import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Stylesets"
-import {sp2s, s_registerSP, s2ss, s2s, updateStyleProperty} from "../impl/StyleImpl"
-import {getActivator} from "../impl/SchedulingImpl";
+import {sp2s, s_registerSP, s2ss, s2s, sp2elm, ss2elm} from "../impl/StyleImpl"
+import {scheduleAction} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import { virtMerge } from "../impl/Virt";
 import { camelToDash } from "../impl/Utils";
@@ -70,7 +70,7 @@ export function getStylePropValue(name: string, value: any): string
  */
 export const setElementStyleProp = <K extends keyof IStyleset>(elm: ElementCSSInlineStyle, name: K,
         value: ExtendedIStyleset[K] | null | undefined, schedulerType?: number): void =>
-    getActivator(schedulerType).doAction(() => updateStyleProperty(elm, camelToDash(name), sp2s(name, value), false));
+    scheduleAction(() => sp2elm(elm, camelToDash(name), sp2s(name, value), false), schedulerType);
 
 
 
@@ -102,7 +102,7 @@ export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset |
  */
 export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
         merge?: boolean, schedulerType?: number): void =>
-    getActivator(schedulerType).doAction(() => updateStyleProperty(elm, null, styleset, false));
+    scheduleAction(() => ss2elm(elm, styleset, merge), schedulerType);
 
 
 

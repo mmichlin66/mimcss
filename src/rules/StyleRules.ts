@@ -1,8 +1,6 @@
 import {
     IStyleRule, IVarRule, DependentRules, INamedEntity, IClassRule, IIDRule, IStyleDefinition,
-    IPageRule,
-    IPrefixedNamedEntity,
-    ClassMoniker
+    IPageRule, IPrefixedNamedEntity, ClassMoniker
 } from "../api/RuleTypes";
 import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
@@ -11,8 +9,8 @@ import {
 import {CssSelector, IParameterizedPseudoEntityFunc, PageSelector} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
 import {camelToDash, fdo2s, symV2S, v2s, WKF, wkf} from "../impl/Utils";
-import {s2s, sp2s, updateStyleProperty} from "../impl/StyleImpl"
-import {getActivator} from "../impl/SchedulingImpl";
+import {s2s, sp2elm, sp2s} from "../impl/StyleImpl"
+import {scheduleAction} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
 
 
@@ -253,8 +251,8 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-		    getActivator(schedulerType).doAction(() => updateStyleProperty(this.cssRule,
-                camelToDash( name), value == null ? null : sp2s( name, value), important));
+		    scheduleAction(() => sp2elm(this.cssRule, camelToDash(name),
+                value == null ? null : sp2s( name, value), important), schedulerType);
         }
 	}
 
@@ -299,8 +297,8 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
         {
-            getActivator(schedulerType).doAction(() => updateStyleProperty(this.cssRule, varObj.cssName,
-                value == null ? null : sp2s( varObj.template, value), important));
+            scheduleAction(() => sp2elm(this.cssRule, varObj.cssName,
+                value == null ? null : sp2s(varObj.template, value), important), schedulerType);
         }
 	}
 

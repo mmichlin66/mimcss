@@ -290,33 +290,37 @@ export interface IObjectWithStyle
 
 
 /**
- * Sets the value of either a single property or a set of properties in the given
- * CSS style object.
+ * Sets the value of a single property  to the given DOM element or CSS rule.
  */
-export const updateStyleProperty = (ruleOrElm: IObjectWithStyle, name: string | null,
-    value?: string | StringStyleset | null, important?: boolean): void =>
+export function sp2elm(ruleOrElm: IObjectWithStyle, name: string,
+    value: string | null | undefined, important?: boolean): void
 {
-    if (!name && value == null)
-    {
-        if (ruleOrElm instanceof CSSRule)
-            ruleOrElm.cssText = "";
-        else
-            (ruleOrElm as any as Element).removeAttribute( "style");
-    }
-    else if (name)
-    {
-        if (value == null)
-            ruleOrElm.style.removeProperty( name);
-        else
-            ruleOrElm.style.setProperty( name, value as string, important ? "important" : undefined);
-    }
+    if (value == null)
+        ruleOrElm.style.removeProperty(name);
+    else
+        ruleOrElm.style.setProperty(name, value, important ? "important" : undefined);
+}
+
+
+
+/**
+ * Replaces or merges style property values from the StringStyleset given object to the given
+ * DOM element or CSS rule.
+ */
+export function ss2elm(ruleOrElm: IObjectWithStyle, value: StringStyleset | null | undefined,
+    merge?: boolean): void
+{
+    if (value == null)
+        ruleOrElm.style.cssText = "";
     else
     {
-        // remove previous style properties (if any)
-        ruleOrElm.style.cssText = "";
+        // if we are completely replacing styles (as opposed to merging) remove all previous styles
+        if (!merge)
+            ruleOrElm.style.cssText = "";
+
         let styleset = value as StringStyleset;
-        for( let propName in styleset)
-            ruleOrElm.style[propName] = styleset[propName];
+        for( let [name, val] of Object.entries(styleset))
+            ruleOrElm.style[name] = val;
     }
 }
 
