@@ -154,22 +154,85 @@ declare global
          * will be used.
          */
         setStyleset( styleset: Styleset, merge?: boolean, schedulerType?: number): void;
+
+        /**
+         * The styleset property exposes an object through which individual style properties can
+         * be set with their IStyleset-defined types. It is a lso possible to assign a Styleset
+         * object to this property, which will replace all existing styles for the element. As
+         * opposed to {@link setStyleProp} and {@link setStyleset} methods, assigning to the
+         * `styleset` property or assigning individual style properties throught it works
+         * immediately - without any scheduling.
+         */
+        styleset: Styleset;
     }
 }
 
-// Sets style property on HTML or SVG element
-HTMLElement.prototype.setStyleProp = SVGElement.prototype.setStyleProp =
-    function <K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K],
-        schedulerType?: number): void
+// Just for size optimization
+const HTMLElementPrototype = HTMLElement.prototype;
+const SVGElementPrototype = SVGElement.prototype;
+const MathMLElementPrototype = MathMLElement.prototype;
+
+// Sets style property on DOM element
+HTMLElementPrototype.setStyleProp = SVGElementPrototype.setStyleProp = MathMLElementPrototype.setStyleProp =
+    function <K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K], schedulerType?: number): void
+    {
+        setElementStyleProp(this, name, value, schedulerType);
+    }
+
+
+
+// Sets styleset on DOM element
+HTMLElementPrototype.setStyleset = SVGElementPrototype.setStyleset = MathMLElementPrototype.setStyleset =
+    function( styleset: Styleset, merge?: boolean, schedulerType?: number): void
+    {
+        setElementStyle(this, styleset, merge, schedulerType);
+    }
+
+
+
+// Define styleset property on DOM elements, which will return a proxy on its style object
+// with overridden set() method.
+const stylesetPropDescr: PropertyDescriptor = {
+    get(): Styleset { return ensureStylesetProxyHandler(this).proxy as Styleset; },
+    set(ss: Styleset): void { ss2elm(this, ss); }
+};
+
+Object.defineProperty(HTMLElementPrototype, "styleset", stylesetPropDescr);
+Object.defineProperty(SVGElementPrototype, "styleset", stylesetPropDescr);
+Object.defineProperty(MathMLElementPrototype, "styleset", stylesetPropDescr);
+
+/** Symbol under which we keep Styleset proxy object on DOM element prototypes */
+const symElmStyleset = Symbol("styleset");
+
+/** Creates new or gets existing proxy handler for Styleset object on a given element */
+function ensureStylesetProxyHandler(elm: ElementCSSInlineStyle): StylesetProxyHandler
 {
-    setElementStyleProp(this, name, value, schedulerType);
+    let handler = elm[symElmStyleset] as StylesetProxyHandler;
+    if (!handler)
+    {
+        elm[symElmStyleset] = handler = new StylesetProxyHandler();
+        handler.elm = elm;
+        handler.proxy = new Proxy(elm.style, handler);
+    }
+    return handler;
 }
 
-// Sets styleset on HTML or SVG element
-HTMLElement.prototype.setStyleset = SVGElement.prototype.setStyleset =
-    function( styleset: Styleset, merge?: boolean, schedulerType?: number): void
+/**
+ * Proxy handler for the Styleset object on DOM elements. It only overrides the set() method
+ */
+class StylesetProxyHandler implements ProxyHandler<Styleset>
 {
-    setElementStyle(this, styleset, merge, schedulerType);
+    /** Keeps the proxy object for which this is the handler */
+    public proxy: any;
+
+    /** Keeps the element for whose style object this is a proxy handler */
+    public elm: ElementCSSInlineStyle;
+
+    public set(target: any, prop: PropertyKey, value: any, receiver: any): boolean
+    {
+        sp2elm(this.elm, prop as string, value);
+        return true;
+    }
 }
 
 
