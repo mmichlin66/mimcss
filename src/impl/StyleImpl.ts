@@ -4,7 +4,7 @@ import {
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
     BoxShadow_StyleType, BoxShadow,
 } from "../api/StyleTypes";
-import { CustomVar_StyleType, IStyleset, StringStyleset, Styleset} from "../api/Stylesets";
+import { CustomVar_StyleType, IStyleset, Styleset} from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
 import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 import {getVarsFromSD} from "../rules/RuleContainer";
@@ -191,8 +191,23 @@ wkf[WKF.Marker] = (val: Extended<Marker_StyleType>): string =>
  */
 export const sp2s = (propName: string, propVal: any): string =>
 {
-    if (!propName)
+    let si = sp2si(propName, propVal);
+    if (!si)
         return "";
+
+    return si[0] + (si[1] ? " !important" : "");
+}
+
+
+
+/**
+ * Converts the given style property to the tuple containing the CSS style string and the
+ * "important" flag. Property name can be in either dash or camel form.
+ */
+export const sp2si = (propName: string, propVal: any): [string, boolean] | null =>
+{
+    if (!propName || propVal == null)
+        return null;
 
     // handle special properties "!" and "[]"
     let impFlag = false;
@@ -211,10 +226,10 @@ export const sp2s = (propName: string, propVal: any): string =>
             // value from this property's array.
             let arr = propVal["[]"] as any[];
             if (!arr || arr.length === 0)
-                return "";
+                return null;
 
             // recurse with the last value from the array
-            return sp2s( propName, arr[arr.length-1]);
+            return sp2si(propName, arr[arr.length-1]);
         }
     }
 
@@ -226,52 +241,37 @@ export const sp2s = (propName: string, propVal: any): string =>
         options = stylePropertyInfos[dashToCamel(propName)];
 
     // convert the value to string based on the information object for the property (if defined)
-    let stringValue = v2s( propVal, options);
+    let stringValue = v2s(propVal, options);
     if (!stringValue)
-        return "";
+        return null;
 
-    if (impFlag)
-        stringValue += " !important";
-
-    return stringValue;
+    return [stringValue, impFlag];
 }
 
 
 
 /** Converts the given styleset to its string representation */
-export const s2s = (styleset: Styleset): string =>
+export const ss2s = (styleset: Styleset): string =>
 {
-    if (!styleset)
-        return "";
-
     let s = "";
 
     // enumerate all styleset properties retrieving also vendor-prefixed variants
 	forAllPropsInStylset(
         styleset,
-        (name: string, value: string | undefined | null, isCustom: boolean, isPrefixed: boolean): void =>
+        (name, value, isImportant, isCustom, isPrefixed): void =>
         {
             s += isCustom
-                ? `${name}:${value};`
-                : `${isPrefixed ? "-" : ""}${camelToDash(name)}:${value};`;
+                ? `${name}:${value}`
+                : `${isPrefixed ? "-" : ""}${camelToDash(name)}:${value}`;
+
+            if (isImportant)
+                s += " !important";
+
+            s += ";"
         }
     );
 
     return s;
-}
-
-
-
-/**
- * Converts the given Styleset object into a StringStyleset object, where each Styleset's property
- * is converted to its string value.
- */
-export const s2ss = (styleset: Styleset): StringStyleset =>
-{
-    // enumerate all styleset properties without retrieving vendor-prefixed variants
-    let res: StringStyleset = {};
-    forAllPropsInStylset( styleset, (name: string, value: string): void => {res[name] = value});
-    return res;
 }
 
 
@@ -290,37 +290,51 @@ export interface IObjectWithStyle
 
 
 /**
- * Sets the value of a single property  to the given DOM element or CSS rule.
+ * Sets the value of a single property with the given priority flag to the given DOM element
+ * or CSS rule.
  */
-export function sp2elm(ruleOrElm: IObjectWithStyle, name: string,
-    value: string | null | undefined, important?: boolean): void
+export const sp2elm = (ruleOrElm: IObjectWithStyle, name: string, value: any): void =>
+    spOrVar2elm(ruleOrElm, camelToDash(name), sp2si(name, value));
+
+
+
+/**
+ * Sets the value of a single custom CSS property to the given DOM element or CSS rule.
+ */
+export const var2elm = (ruleOrElm: IObjectWithStyle, name: string, template: string, value: any): void =>
+    spOrVar2elm(ruleOrElm, name, sp2si(template, value));
+
+
+
+/**
+ * Helper function that sets the value of a single regular or custom CSS property to the given
+ * DOM element or CSS rule.
+ */
+function spOrVar2elm(ruleOrElm: IObjectWithStyle, name: string,
+    si: [value: string | null | undefined, impFlag?: boolean] | null): void
 {
-    if (value == null)
-        ruleOrElm.style.removeProperty(name);
+    if (si?.[0])
+        ruleOrElm.style.setProperty(name, si[0], si[1] ? "important" : undefined);
     else
-        ruleOrElm.style.setProperty(name, value, important ? "important" : undefined);
+        ruleOrElm.style.removeProperty(name);
 }
 
 
 
 /**
- * Replaces or merges style property values from the StringStyleset given object to the given
+ * Replaces or merges style property values from the given Styleset object to the given
  * DOM element or CSS rule.
  */
-export function ss2elm(ruleOrElm: IObjectWithStyle, value: StringStyleset | null | undefined,
-    merge?: boolean): void
+export function ss2elm(ruleOrElm: IObjectWithStyle, ss: Styleset | null | undefined, merge?: boolean): void
 {
-    if (value == null)
+    // if we are completely replacing styles (as opposed to merging) remove all previous styles
+    if (!merge)
         ruleOrElm.style.cssText = "";
-    else
-    {
-        // if we are completely replacing styles (as opposed to merging) remove all previous styles
-        if (!merge)
-            ruleOrElm.style.cssText = "";
 
-        let styleset = value as StringStyleset;
-        for( let [name, val] of Object.entries(styleset))
-            ruleOrElm.style[name] = val;
+    if (ss)
+    {
+        forAllPropsInStylset( ss, (name, value, isImportant, isCustom): void =>
+            spOrVar2elm(ruleOrElm, isCustom ? name : camelToDash(name), [value, isImportant]));
     }
 }
 
@@ -335,7 +349,7 @@ type PropPrefixVariant = [string, string];
 
 
 /** Tuple that contains name, template and optional value of a custom CSS property VarRule */
-type VarNTV = [string, string, string?];
+type VarNTVI = [name: string, template: string, value?: string, isImportant?: boolean];
 
 
 
@@ -343,7 +357,7 @@ type VarNTV = [string, string, string?];
  * Extracts name, template and string tuples from the given custom CSS property definition.
  * @param customVars
  */
-const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
+const getVarsNTVIs = (customVars: CustomVar_StyleType): VarNTVI[] =>
 {
     if (Array.isArray(customVars))
     {
@@ -369,13 +383,16 @@ const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
         if (!varName.startsWith("--"))
             varName = "--" + varName;
 
-        return [[varName, template, sp2s( template, value)]];
+        let si = sp2si( template, value);
+        return [[varName, template, si?.[0], si?.[1]]];
     }
     else
     {
         let varRules = getVarsFromSD(customVars);
-        return varRules.map( varRule => [varRule.cssName, varRule.template,
-            sp2s( varRule.template, varRule.getValue())]);
+        return varRules.map( varRule => {
+            let si = sp2si( varRule.template, varRule.getValue());
+            return [varRule.cssName, varRule.template, si?.[0], si?.[1]];
+        });
     }
 }
 
@@ -385,7 +402,7 @@ const getVarsNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
  * Callback signature for enumerating Styleset properties converted to strings
  */
 type StylesetPropEnumCallback = (name: string, val: string | undefined | null,
-    isCustom: boolean, isPrefixed: boolean) => void;
+    isImportant?: boolean, isCustom?: boolean, isPrefixed?: boolean) => void;
 
 
 
@@ -394,11 +411,13 @@ type StylesetPropEnumCallback = (name: string, val: string | undefined | null,
  * function that gets the property name and the value converted to string.
  * @param styleset
  * @param callback
- * @param getPrefixedVariants Flag indicating whether we need to retrieve property variants with
  * vendor prefixes
  */
-const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCallback) =>
+const forAllPropsInStylset = (styleset: Styleset | null | undefined, callback: StylesetPropEnumCallback) =>
 {
+    if (!styleset)
+        return;
+
 	for( let propName in styleset)
 	{
         // special handling of the "--" property, which is an array where each item is
@@ -413,9 +432,9 @@ const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCall
 
                 // in each tuple, the first element is var name, the second is template property and
                 // the third is the value;
-                let ntvs: VarNTV[] = getVarsNTVs( customVar);
-                for( let ntv of ntvs)
-                    callback( ntv[0], ntv[2], true, false);
+                let ntvis: VarNTVI[] = getVarsNTVIs( customVar);
+                for( let ntvi of ntvis)
+                    callback( ntvi[0], ntvi[2], ntvi[3], true);
             }
         }
         else
@@ -435,21 +454,21 @@ const forAllPropsInStylset = (styleset: Styleset, callback: StylesetPropEnumCall
                 for( let propVal of propArray)
                 {
                     // get the string representation of the property value
-                    let propString = sp2s( propName, propVal);
-                    if (!propString)
+                    let si = sp2si( propName, propVal);
+                    if (!si)
                         continue;
 
                     // get vendor-prefixed variants
-                    let variants = getPrefixVariants( propName as keyof IStyleset, propString);
+                    let variants = getPrefixVariants( propName as keyof IStyleset, si[0]);
                     if (variants)
                     {
                         for( let variant of variants)
-                            callback( variant[0], variant[1], false, variant[0] !== propName);
+                            callback( variant[0], variant[1], si[1], false, variant[0] !== propName);
                     }
 
                     // invoke the callback for the originally found prop name and with (perhaps updated)
                     // value
-                    callback( propName, propString, false, false);
+                    callback( propName, si[0], si[1]);
                 }
             }
         }

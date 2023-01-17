@@ -82,8 +82,8 @@ export interface IRuleContainer extends IMimcssContainer
 	/** Clears all CSS rule objects defined in this container. */
 	clear(): void;
 
-    /** Sets the given value for the custom CSS roperty with the given name. */
-	setVarValue( name: string, value: string | null, important?: boolean, schedulerType?: number): void;
+    /** Retrieves the `:root` style rule where the container-level custom CSS properties are defined. */
+	readonly varRootRule: CSSStyleRule | undefined;
 }
 
 

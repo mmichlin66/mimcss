@@ -11,7 +11,6 @@ import {VarRule} from "./VarRule"
 import {ImportRule, NamespaceRule} from "./MiscRules"
 import {scheduleAction, setDefaultScheduler} from "../impl/SchedulingImpl";
 import { IPropVirtController, virtProp } from "../impl/Virt"
-import { sp2elm } from "../impl/StyleImpl"
 
 
 
@@ -222,15 +221,6 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
         else if (val instanceof StyleDefinition)
             this.refs.delete( ruleName);
     }
-
-
-
-	/** Sets the given value for the custom CSS roperty with the given name. */
-	public setVarValue( name: string, value: string, important?: boolean, schedulerType?: number): void
-	{
-		if (this.varRootRule)
-            scheduleAction(() => sp2elm(this.varRootRule!, name, value, important), schedulerType);
-	}
 
 
 
@@ -487,6 +477,9 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
      */
 	public ec?: EmbeddingContainer;
 
+	/** ":root" rule where all custom CSS properties defined in this container are defined. */
+	public varRootRule: CSSStyleRule | undefined;
+
 	/** Flag indicating whether this style defnition is a theme definition. */
 	private isTheme?: boolean;
 
@@ -533,9 +526,6 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
      * List of rules that are not imports, namespaces, custom vars, references or grouping rules.
      */
 	private rules = new Map<string,Rule>();
-
-	/** ":root" rule where all custom CSS properties defined in this container are defined. */
-	private varRootRule: CSSStyleRule | undefined;
 
     /** Activation reference count. */
 	private actCount = 0;

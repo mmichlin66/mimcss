@@ -8,8 +8,8 @@ import {
 } from "../api/Stylesets"
 import {CssSelector, IParameterizedPseudoEntityFunc, PageSelector} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
-import {camelToDash, fdo2s, symV2S, v2s, WKF, wkf} from "../impl/Utils";
-import {s2s, sp2elm, sp2s} from "../impl/StyleImpl"
+import {fdo2s, symV2S, v2s, WKF, wkf} from "../impl/Utils";
+import {ss2s, sp2elm, var2elm} from "../impl/StyleImpl"
 import {scheduleAction} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
 
@@ -137,7 +137,7 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 	// Converts the rule to CSS string representing the rule.
 	public toCss(): string
 	{
-		return `${this.selectorText}{${s2s(this.styleset)}${this.getAux()}}`;
+		return `${this.selectorText}{${ss2s(this.styleset)}${this.getAux()}}`;
 	}
 
 
@@ -235,25 +235,21 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 	 * Adds/replaces the value of the given CSS property in this rule.
 	 * @param name Name of the CSS property.
 	 * @param value New value of the CSS property.
-	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
     public setProp<K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K] | null,
-        important?: boolean, schedulerType?: number): void
+        schedulerType?: number): void
 	{
 		// first set/remove the value in our internal styleset object
 		if (value == null)
 			delete this.styleset[name];
 		else
-			this.styleset[name] = important ? { "!": value as any } : value as any;
+			this.styleset[name] = value;
 
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
-        {
-		    scheduleAction(() => sp2elm(this.cssRule, camelToDash(name),
-                value == null ? null : sp2s( name, value), important), schedulerType);
-        }
+		    scheduleAction(() => sp2elm(this.cssRule, name, value), schedulerType);
 	}
 
 
@@ -262,12 +258,11 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 	 * Adds/replaces the value of the given custom CSS property in this rule.
 	 * @param varObj IVarRule object defining a custom CSS property.
 	 * @param varValue New value of the custom CSS property.
-	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
 	public setCustomProp<K extends VarTemplateName>( varObj: IVarRule<K>, value: ExtendedVarValue<K> | null,
-		important?: boolean, schedulerType?: number): void
+		schedulerType?: number): void
 	{
 		if (!varObj)
 			return;
@@ -296,10 +291,7 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
-        {
-            scheduleAction(() => sp2elm(this.cssRule, varObj.cssName,
-                value == null ? null : sp2s(varObj.template, value), important), schedulerType);
-        }
+            scheduleAction(() => var2elm(this.cssRule, varObj.cssName, varObj.template, value), schedulerType);
 	}
 
 
@@ -602,7 +594,7 @@ export class PageRule extends StyleRule<CSSPageRule> implements IPageRule
 	protected getAux(): string
     {
         let s = "";
-        this.marginBoxes.forEach( (boxStyleset, boxName) => s += `${boxName}{${s2s(boxStyleset)}}`);
+        this.marginBoxes.forEach( (boxStyleset, boxName) => s += `${boxName}{${ss2s(boxStyleset)}}`);
         return s;
     }
 

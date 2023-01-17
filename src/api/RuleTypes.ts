@@ -90,24 +90,22 @@ export interface IStyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleRule>
 	 * @param name Name of the CSS property.
 	 * @param value New value of the CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
-	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
 	setProp<K extends keyof IStyleset>( name: K, value?: ExtendedIStyleset[K] | null,
-		important?: boolean, schedulerType?: number): void;
+		schedulerType?: number): void;
 
 	/**
 	 * Adds/replaces/removes the value of the given custom CSS property in this rule.
 	 * @param customVar IVarRule object defining a custom CSS property.
 	 * @param value New value of the custom CSS property. If this value is undefined or null, the property
 	 * is removed from the rule's styleset.
-	 * @param important Flag indicating whether to set the "!important" flag on the property value.
 	 * @param schedulerType ID of a registered scheduler type that is used to write the property
 	 * value to the DOM. If undefined, the current default scheduler will be used.
 	 */
 	setCustomProp<K extends VarTemplateName>( customVar: IVarRule<K>, value: ExtendedVarValue<K>,
-		important?: boolean, schedulerType?: number): void;
+		schedulerType?: number): void;
 }
 
 

@@ -1,10 +1,9 @@
 ﻿import {MediaStatement, SupportsStatement} from "./MediaTypes";
-import {Styleset, ExtendedIStyleset, StringStyleset, IStyleset} from "./Stylesets"
-import {sp2s, s_registerSP, s2ss, s2s, sp2elm, ss2elm} from "../impl/StyleImpl"
+import {Styleset, ExtendedIStyleset, IStyleset} from "./Stylesets"
+import {sp2s, s_registerSP, ss2s, sp2elm, ss2elm} from "../impl/StyleImpl"
 import {scheduleAction} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import { virtMerge } from "../impl/Virt";
-import { camelToDash } from "../impl/Utils";
 
 
 
@@ -70,7 +69,7 @@ export function getStylePropValue(name: string, value: any): string
  */
 export const setElementStyleProp = <K extends keyof IStyleset>(elm: ElementCSSInlineStyle, name: K,
         value: ExtendedIStyleset[K] | null | undefined, schedulerType?: number): void =>
-    scheduleAction(() => sp2elm(elm, camelToDash(name), sp2s(name, value), false), schedulerType);
+    scheduleAction(() => sp2elm(elm, name, value), schedulerType);
 
 
 
@@ -86,22 +85,6 @@ export const setElementStyleProp = <K extends keyof IStyleset>(elm: ElementCSSIn
  */
 export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset | null | undefined,
         merge?: boolean, schedulerType?: number): void =>
-    setElementStringStyle(elm, styleset ? s2ss(styleset) : null, merge, schedulerType);
-
-
-
-/**
- * Sets values of the style properties from the given StringStyleset object to the `style` attribute
- * of the given DOM element.
- * @param elm DOM element whose styles will be set.
- * @param styleset {@link StringStyleset} object which provides values for style properties.
- * @param merge Flag indicating whether the new styleset should completely replace the
- * existing element styles with the new styles (false) or merge the new styles with the
- * existing ones (true). The default value is false.
- * @param schedulerType Scheduler identifier. If omitted, the current default scheduler will be used.
- */
-export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: StringStyleset | null | undefined,
-        merge?: boolean, schedulerType?: number): void =>
     scheduleAction(() => ss2elm(elm, styleset, merge), schedulerType);
 
 
@@ -110,81 +93,7 @@ export const setElementStringStyle = (elm: ElementCSSInlineStyle, styleset: Stri
  * Serializes the given {@link Styleset} to a string.
  * @param styleset
  */
-export const stylesetToString = (styleset: Styleset): string => s2s( styleset);
-
-
-
-/**
- * Converts the given {@link Styleset} object into an object, where each Styleset's property is
- * converted to its string value.
- * @param styleset
- */
-export const stylesetToStringStyleset = (styleset: Styleset): StringStyleset => s2ss( styleset);
-
-
-
-/**
- * Compares two Styleset objects by converting style properties to strings and returns an object
- * that contains string values of properties that were new or have different values in the new
- * styleset and undefined values for properties that exist in the old styleset but don't exist
- * in the new one.
- * @param oldStyleset
- * @param newStyleset
- * @returns StringStyleset object with properties that have different values in the old and new
- * stylesets. Properties that existed in the old but don't exist in the new styleset, will have
- * their values set to `"unset"`. If there is no differences between the two stylesets null is
- * returned.
- */
-export const diffStylesets = (oldStyleset: Styleset, newStyleset: Styleset): StringStyleset | null =>
-{
-	if (!oldStyleset && !newStyleset)
-		return null;
-	else if (!oldStyleset)
-		return s2ss( newStyleset);
-	else if (!newStyleset)
-		return s2ss( oldStyleset);
-
-	// first convert both stylesets to their string versions
-	let oldStringStyleset =	s2ss( oldStyleset);
-	let newStringStyleset =	s2ss( newStyleset);
-
-	let updateVal: StringStyleset | null = null;
-
-	// loop over keys in the old style object and find those that are not in the new one. These
-	// will be removed.
-	for( let key in oldStringStyleset)
-	{
-		let newStringVal = newStringStyleset[key];
-		if (newStringVal == null)
-		{
-			updateVal = updateVal || {};
-			updateVal[key] = "unset";
-		}
-		else
-		{
-			let oldStringVal = oldStringStyleset[key];
-			if (oldStringVal !== newStringVal)
-			{
-				updateVal = updateVal || {};
-				updateVal[key] = newStringVal;
-			}
-		}
-	}
-
-	// loop over keys in the new style object and find those that are not in the old one. These
-	// will be added.
-	for( let key in newStringStyleset)
-	{
-		let oldStringVal = oldStringStyleset[key];
-		if (oldStringVal == null)
-		{
-			updateVal = updateVal || {};
-			updateVal[key] = newStringStyleset[key];
-		}
-	}
-
-	return updateVal;
-}
+export const stylesetToString = (styleset: Styleset): string => ss2s( styleset);
 
 
 

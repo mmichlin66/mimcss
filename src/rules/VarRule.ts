@@ -1,6 +1,7 @@
 import {IVarRule, IConstRule, IStyleDefinition} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue, ISyntaxTypeStyleset} from "../api/Stylesets"
-import {sp2s} from "../impl/StyleImpl"
+import { scheduleAction } from "../impl/SchedulingImpl";
+import {sp2s, var2elm} from "../impl/StyleImpl"
 import {IMimcssRuleBag, Rule, RuleLike} from "./Rule";
 
 
@@ -49,23 +50,11 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
      * @param schedulerType ID of a registered scheduler type that is used to write the property
      * value to the DOM. If undefined, the current default scheduler will be used.
      */
-    public setValue( value: ExtendedVarValue<K>, schedulerType?: number): void
+    public setValue(value: ExtendedVarValue<K>, schedulerType?: number): void
     {
         this.value = value;
-        if (this.rc)
-        {
-            let important = false;
-            if (value != null && typeof value === "object" && "!" in (value as any))
-            {
-                important = true;
-                value = value["!"];
-            }
-
-            this.rc.setVarValue( this.cssName,
-                value == null
-                    ? null
-                    : sp2s( this.template, value), important, schedulerType)
-        }
+        if (this.rc?.varRootRule)
+            scheduleAction(() => var2elm(this.rc.varRootRule!, this.cssName, this.template, value), schedulerType);
     }
 
 

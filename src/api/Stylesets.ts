@@ -3851,13 +3851,6 @@ export type Styleset = ExtendedIStyleset &
 
 
 
-/**
- * The StringStyleset type maps CSS properties including custom properties to the string values.
- */
-export type StringStyleset = { [K: string]: string | null | undefined }
-
-
-
 /** Type listing names of style properties that are allowed in the page boxes */
 export type PageBoxProperties =
     "direction" |
