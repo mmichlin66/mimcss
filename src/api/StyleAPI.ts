@@ -1,6 +1,10 @@
-﻿import {MediaStatement, SupportsStatement} from "./MediaTypes";
-import {Styleset, ExtendedIStyleset, IStyleset} from "./Stylesets"
-import {sp2s, s_registerSP, ss2s, sp2elm, ss2elm} from "../impl/StyleImpl"
+﻿import { IObjectWithStyle } from "./Stylesets";
+import {
+    Styleset, ExtendedIStyleset, IStyleset, IVarTemplateStyleset, ExtendedVarValue, VarTemplateName
+} from "./Stylesets"
+import {MediaStatement, SupportsStatement} from "./MediaTypes";
+import { IVarRule } from "./RuleTypes";
+import {sp2s, s_registerSP, ss2s, sp2elm, var2elm, ss2elm} from "../impl/StyleImpl"
 import {scheduleAction} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import { virtMerge } from "../impl/Virt";
@@ -67,9 +71,26 @@ export function getStylePropValue(name: string, value: any): string
  * property in the {@link IStyleset} interface. If the value is `null` or `undefined`, the style property
  * is removed from the element's style object.
  */
-export const setElementStyleProp = <K extends keyof IStyleset>(elm: ElementCSSInlineStyle, name: K,
+export const updateStyleProp = <K extends keyof IStyleset>(objWithStyle: IObjectWithStyle, name: K,
         value: ExtendedIStyleset[K] | null | undefined, schedulerType?: number): void =>
-    scheduleAction(() => sp2elm(elm, name, value), schedulerType);
+    scheduleAction(() => sp2elm(objWithStyle, name, value), schedulerType);
+
+
+
+/**
+ * Sets, updates or removes the given custom CSS property for the given DOM element.
+ *
+ * @typeparam K Key of the {@link IVarTemplateStyleset} interface that determines the type of the
+ * custom CSS property and of the fallback value.
+ * @param elm DOM element whose styles will be set.
+ * @param varObj Custom CSS property object created using the {@link $var} function.
+ * @param value New value for the custom CSS property. The value can be of any type allowed for the
+ * property in the {@link IIVarTemplateStyleset} interface. If the value is `null` or `undefined`,
+ * the custom property is removed from the element's style object.
+ */
+export const updateVar = <K extends VarTemplateName>(objWithStyle: IObjectWithStyle, varObj: IVarRule<K>,
+        value: ExtendedVarValue<K> | null | undefined, schedulerType?: number): void =>
+    scheduleAction(() => var2elm(objWithStyle, varObj.cssName, varObj.template, value), schedulerType);
 
 
 
@@ -78,14 +99,14 @@ export const setElementStyleProp = <K extends keyof IStyleset>(elm: ElementCSSIn
  * `style` attribute of the given DOM element.
  * @param elm DOM element whose styles will be set.
  * @param styleset Styleset object which provides values for style properties.
- * @param merge Flag indicating whether the new styleset should completely replace the
- * existing element styles with the new styles (false) or merge the new styles with the
- * existing ones (true). The default value is false.
+ * @param replace Flag indicating whether the new styleset should completely replace the
+ * existing element styles with the new styles (true) or merge the new styles with the
+ * existing ones (false). The default value is false - that is, the styles are merged.
  * @param schedulerType Scheduler identifier. If omitted, the current default scheduler will be used.
  */
-export const setElementStyle = (elm: ElementCSSInlineStyle, styleset: Styleset | null | undefined,
-        merge?: boolean, schedulerType?: number): void =>
-    scheduleAction(() => ss2elm(elm, styleset, merge), schedulerType);
+export const updateStyleset = (objWithStyle: IObjectWithStyle, styleset: Styleset | null | undefined,
+        replace?: boolean, schedulerType?: number): void =>
+    scheduleAction(() => ss2elm(objWithStyle, styleset, replace), schedulerType);
 
 
 
@@ -128,64 +149,59 @@ export const mergeStylesheets = (target: any, ...objects: any[]): any => virtMer
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-declare global
-{
-    interface ElementCSSInlineStyle
-    {
-        /**
-         * Sets, updates or removes the given value to the given style property of the element.
-         * This method schedules the update of an individual property in the nextMimbl tick.
-         * @param name Property name
-         * @param value New property value to set.
-         * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
-         * will be used.
-         */
-        setStyleProp<K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K],
-            schedulerType?: number): void;
-
-        /**
-         * Replaces or merges the element's styles with the given styleset. This method schedules
-         * the style update in the next Mimbl tick.
-         * @param styleset Styleset to merge or replace
-         * @param merge Flag indicating whether the new styleset should completely replace the
-         * existing element styles with the new styles (false) or merge the new styles with the
-         * existing ones (true). The default value is false.
-         * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
-         * will be used.
-         */
-        setStyleset( styleset: Styleset, merge?: boolean, schedulerType?: number): void;
-
-        /**
-         * The styleset property exposes an object through which individual style properties can
-         * be set with their IStyleset-defined types. It is a lso possible to assign a Styleset
-         * object to this property, which will replace all existing styles for the element. As
-         * opposed to {@link setStyleProp} and {@link setStyleset} methods, assigning to the
-         * `styleset` property or assigning individual style properties throught it works
-         * immediately - without any scheduling.
-         */
-        styleset: Styleset;
-    }
-}
-
 // Just for size optimization
 const HTMLElementPrototype = HTMLElement.prototype;
 const SVGElementPrototype = SVGElement.prototype;
 const MathMLElementPrototype = MathMLElement.prototype;
+const CSSStyleRulePrototype = CSSStyleRule.prototype;
+const CSSPageRulePrototype = CSSPageRule.prototype;
+const CSSKeyframeRulePrototype = CSSKeyframeRule.prototype;
+const CSSFontFaceRulePrototype = CSSFontFaceRule.prototype;
+
+
 
 // Sets style property on DOM element
-HTMLElementPrototype.setStyleProp = SVGElementPrototype.setStyleProp = MathMLElementPrototype.setStyleProp =
-    function <K extends keyof IStyleset>( name: K, value: ExtendedIStyleset[K], schedulerType?: number): void
+HTMLElementPrototype.updateStyleProp =
+SVGElementPrototype.updateStyleProp =
+MathMLElementPrototype.updateStyleProp =
+CSSStyleRulePrototype.updateStyleProp =
+CSSPageRulePrototype.updateStyleProp =
+CSSKeyframeRulePrototype.updateStyleProp =
+CSSFontFaceRulePrototype.updateStyleProp =
+    function <K extends keyof IStyleset>(name: K, value: ExtendedIStyleset[K], schedulerType?: number): void
     {
-        setElementStyleProp(this, name, value, schedulerType);
+        updateStyleProp(this, name, value, schedulerType);
+    }
+
+
+
+// Sets, updates or removes the given custom CSS property for the given DOM element.
+HTMLElementPrototype.updateVar =
+SVGElementPrototype.updateVar =
+MathMLElementPrototype.updateVar =
+CSSStyleRulePrototype.updateVar =
+CSSPageRulePrototype.updateVar =
+CSSKeyframeRulePrototype.updateVar =
+CSSFontFaceRulePrototype.updateVar =
+    function <K extends VarTemplateName>(varObj: IVarRule<K>, value: ExtendedVarValue<K> | null | undefined,
+        schedulerType?: number): void
+    {
+        updateVar(this, varObj, value, schedulerType);
     }
 
 
 
 // Sets styleset on DOM element
-HTMLElementPrototype.setStyleset = SVGElementPrototype.setStyleset = MathMLElementPrototype.setStyleset =
-    function( styleset: Styleset, merge?: boolean, schedulerType?: number): void
+HTMLElementPrototype.updateStyleset =
+SVGElementPrototype.updateStyleset =
+MathMLElementPrototype.updateStyleset =
+CSSStyleRulePrototype.updateStyleset =
+CSSPageRulePrototype.updateStyleset =
+CSSKeyframeRulePrototype.updateStyleset =
+CSSFontFaceRulePrototype.updateStyleset =
+    function(styleset: Styleset, replace?: boolean, schedulerType?: number): void
     {
-        setElementStyle(this, styleset, merge, schedulerType);
+        updateStyleset(this, styleset, replace, schedulerType);
     }
 
 
@@ -194,12 +210,16 @@ HTMLElementPrototype.setStyleset = SVGElementPrototype.setStyleset = MathMLEleme
 // with overridden set() method.
 const stylesetPropDescr: PropertyDescriptor = {
     get(): Styleset { return ensureStylesetProxyHandler(this).proxy as Styleset; },
-    set(ss: Styleset): void { ss2elm(this, ss); }
+    set(ss: Styleset): void { ss2elm(this, ss, true); }
 };
 
 Object.defineProperty(HTMLElementPrototype, "styleset", stylesetPropDescr);
 Object.defineProperty(SVGElementPrototype, "styleset", stylesetPropDescr);
 Object.defineProperty(MathMLElementPrototype, "styleset", stylesetPropDescr);
+Object.defineProperty(CSSStyleRulePrototype, "styleset", stylesetPropDescr);
+Object.defineProperty(CSSPageRulePrototype, "styleset", stylesetPropDescr);
+Object.defineProperty(CSSKeyframeRulePrototype, "styleset", stylesetPropDescr);
+Object.defineProperty(CSSFontFaceRulePrototype, "styleset", stylesetPropDescr);
 
 /** Symbol under which we keep Styleset proxy object on DOM element prototypes */
 const symElmStyleset = Symbol("styleset");

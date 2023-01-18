@@ -4,7 +4,7 @@ import {
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
     BoxShadow_StyleType, BoxShadow,
 } from "../api/StyleTypes";
-import { CustomVar_StyleType, IStyleset, Styleset} from "../api/Stylesets";
+import { CustomVar_StyleType, IObjectWithStyle, IStyleset, Styleset} from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
 import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 import {getVarsFromSD} from "../rules/RuleContainer";
@@ -277,19 +277,6 @@ export const ss2s = (styleset: Styleset): string =>
 
 
 /**
- * The IObjectWithStyle interface represents an object which has the style property of the
- * CSSStyleDeclaration type. This interface shape is implemented by ElementCSSInlineStyle (which
- * is extended by all DOM elements) as well as several CSS rule objects: CSSStyleRule, CSSPageRule,
- * CSSKeyframeRule, CSSFontFaceRule.
- */
-export interface IObjectWithStyle
-{
-    readonly style: CSSStyleDeclaration;
-}
-
-
-
-/**
  * Sets the value of a single property with the given priority flag to the given DOM element
  * or CSS rule.
  */
@@ -325,10 +312,10 @@ function spOrVar2elm(ruleOrElm: IObjectWithStyle, name: string,
  * Replaces or merges style property values from the given Styleset object to the given
  * DOM element or CSS rule.
  */
-export function ss2elm(ruleOrElm: IObjectWithStyle, ss: Styleset | null | undefined, merge?: boolean): void
+export function ss2elm(ruleOrElm: IObjectWithStyle, ss: Styleset | null | undefined, replace?: boolean): void
 {
     // if we are completely replacing styles (as opposed to merging) remove all previous styles
-    if (!merge)
+    if (replace)
         ruleOrElm.style.cssText = "";
 
     if (ss)

@@ -4078,3 +4078,87 @@ export type MappedSyntaxTypes<T extends SyntaxKey[]> =
 
 
 
+/**
+ * The IObjectWithStyle interface represents an object which has the style property of the
+ * CSSStyleDeclaration type. This interface shape is implemented by ElementCSSInlineStyle (which
+ * is extended by all DOM elements) as well as several CSS rule objects: CSSStyleRule, CSSPageRule,
+ * CSSKeyframeRule, CSSFontFaceRule.
+ */
+export interface IObjectWithStyle
+{
+    /** Style declaration */
+    readonly style: CSSStyleDeclaration;
+}
+
+
+
+/**
+ * The IAugmentedObjectWithStyle interface represents addtional methods that Mimcss implements for
+ * the objects that contain style declaration.
+ */
+export interface IAugmentedObjectWithStyle
+{
+    /**
+     * Sets, updates or removes the given value to the given style property of the element.
+     * This method schedules the update of an individual property in the nextMimbl tick.
+     * @param name Property name
+     * @param value New property value to set.
+     * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
+     * will be used.
+     */
+    updateStyleProp<K extends keyof IStyleset>(name: K, value: ExtendedIStyleset[K],
+        schedulerType?: number): void;
+
+    /**
+     * Sets, updates or removes the given custom CSS property of the element.
+     *
+     * @typeparam K Key of the {@link IVarTemplateStyleset} interface that determines the type of the
+     * custom CSS property and of the fallback value.
+     * @param varObj Custom CSS property object created using the {@link $var} function.
+     * @param value New value for the custom CSS property. The value can be of any type allowed for the
+     * property in the {@link IIVarTemplateStyleset} interface. If the value is `null` or `undefined`,
+     * the custom property is removed from the element's style object.
+     */
+    updateVar<K extends VarTemplateName>(varObj: IVarRule<K>, value: ExtendedVarValue<K> | null | undefined,
+        schedulerType?: number): void;
+
+    /**
+     * Replaces or merges the element's styles with the given styleset. This method schedules
+     * the style update in the next Mimbl tick.
+     * @param styleset Styleset to merge or replace
+     * @param replace Flag indicating whether the new styleset should completely replace the
+     * existing element styles with the new styles (true) or merge the new styles with the
+     * existing ones (false). The default value is false - that is, the styles are merged.
+     * @param schedulerType Scheduler identifier. If omitted, the current default scheduler
+     * will be used.
+     */
+    updateStyleset(styleset: Styleset, replace?: boolean, schedulerType?: number): void;
+
+    /**
+     * The styleset property exposes an object through which individual style properties can
+     * be set with their IStyleset-defined types. It is a lso possible to assign a Styleset
+     * object to this property, which will replace all existing styles for the element. As
+     * opposed to {@link updateStyleProp} and {@link setStyleset} methods, assigning to the
+     * `styleset` property or assigning individual style properties throught it works
+     * immediately - without any scheduling.
+     */
+    styleset: Styleset;
+}
+
+
+
+declare global
+{
+    /**
+     * This interface covers HTMLElement, SVGElement, MathMLElement
+     */
+    interface ElementCSSInlineStyle extends IAugmentedObjectWithStyle {}
+
+    interface CSSStyleRule extends IAugmentedObjectWithStyle {}
+    interface CSSPageRule extends IAugmentedObjectWithStyle {}
+    interface CSSKeyframeRule extends IAugmentedObjectWithStyle {}
+    interface CSSFontFaceRule extends IAugmentedObjectWithStyle {}
+}
+
+
+
