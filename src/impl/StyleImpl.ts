@@ -4,7 +4,7 @@ import {
     GridTemplateAreaDefinition, GridTrack, GridTemplateAxis_StyleType, Marker_StyleType,
     BoxShadow_StyleType, BoxShadow,
 } from "../api/StyleTypes";
-import { CustomVar_StyleType, IObjectWithStyle, IStyleset, Styleset} from "../api/Stylesets";
+import { CustomVar_StyleType, IStyleset, Styleset} from "../api/Stylesets";
 import {IIDRule} from "../api/RuleTypes";
 import {v2s, V2SOptions, o2s, WKF, a2s, wkf, camelToDash, dashToCamel, AnyToStringFunc} from "./Utils";
 import {getVarsFromSD} from "../rules/RuleContainer";
@@ -280,31 +280,16 @@ export const ss2s = (styleset: Styleset): string =>
  * Sets the value of a single property with the given priority flag to the given DOM element
  * or CSS rule.
  */
-export const sp2elm = (ruleOrElm: IObjectWithStyle, name: string, value: any): void =>
-    spOrVar2elm(ruleOrElm, camelToDash(name), sp2si(name, value));
+export const sp2style = (style: CSSStyleDeclaration, name: string, value: any): void =>
+    spOrVar2style(style, camelToDash(name), sp2si(name, value));
 
 
 
 /**
  * Sets the value of a single custom CSS property to the given DOM element or CSS rule.
  */
-export const var2elm = (ruleOrElm: IObjectWithStyle, name: string, template: string, value: any): void =>
-    spOrVar2elm(ruleOrElm, name, sp2si(template, value));
-
-
-
-/**
- * Helper function that sets the value of a single regular or custom CSS property to the given
- * DOM element or CSS rule.
- */
-function spOrVar2elm(ruleOrElm: IObjectWithStyle, name: string,
-    si: [value: string | null | undefined, impFlag?: boolean] | null): void
-{
-    if (si?.[0])
-        ruleOrElm.style.setProperty(name, si[0], si[1] ? "important" : undefined);
-    else
-        ruleOrElm.style.removeProperty(name);
-}
+export const var2style = (style: CSSStyleDeclaration, name: string, template: string, value: any): void =>
+    spOrVar2style(style, name, sp2si(template, value));
 
 
 
@@ -312,17 +297,32 @@ function spOrVar2elm(ruleOrElm: IObjectWithStyle, name: string,
  * Replaces or merges style property values from the given Styleset object to the given
  * DOM element or CSS rule.
  */
-export function ss2elm(ruleOrElm: IObjectWithStyle, ss: Styleset | null | undefined, replace?: boolean): void
+export function ss2style(style: CSSStyleDeclaration, ss: Styleset | null | undefined, replace?: boolean): void
 {
     // if we are completely replacing styles (as opposed to merging) remove all previous styles
     if (replace)
-        ruleOrElm.style.cssText = "";
+        style.cssText = "";
 
     if (ss)
     {
         forAllPropsInStylset( ss, (name, value, isImportant, isCustom): void =>
-            spOrVar2elm(ruleOrElm, isCustom ? name : camelToDash(name), [value, isImportant]));
+            spOrVar2style(style, isCustom ? name : camelToDash(name), [value, isImportant]));
     }
+}
+
+
+
+/**
+ * Helper function that sets the value of a single regular or custom CSS property to the given
+ * DOM element or CSS rule.
+ */
+function spOrVar2style(style: CSSStyleDeclaration, name: string,
+    si: [value: string | null | undefined, impFlag?: boolean] | null): void
+{
+    if (si?.[0])
+        style.setProperty(name, si[0], si[1] ? "important" : undefined);
+    else
+        style.removeProperty(name);
 }
 
 
@@ -335,8 +335,8 @@ export function ss2elm(ruleOrElm: IObjectWithStyle, ss: Styleset | null | undefi
 type PropPrefixVariant = [string, string];
 
 
-/** Tuple that contains name, template and optional value of a custom CSS property VarRule */
-type VarNTVI = [name: string, template: string, value?: string, isImportant?: boolean];
+/** Tuple that contains name, template and value of a custom CSS property VarRule */
+type VarNTV = [name: string, template: string, value: any];
 
 
 
@@ -344,43 +344,18 @@ type VarNTVI = [name: string, template: string, value?: string, isImportant?: bo
  * Extracts name, template and string tuples from the given custom CSS property definition.
  * @param customVars
  */
-const getVarsNTVIs = (customVars: CustomVar_StyleType): VarNTVI[] =>
+const getVarNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
 {
     if (Array.isArray(customVars))
     {
-        let varName: string;
-        let template: string;
-        let value: any;
         if (customVars.length === 2)
-        {
-            varName = customVars[0].name;
-            template = customVars[0].template;
-            value = customVars[1]
-        }
+            return [[customVars[0].cssName, customVars[0].template, customVars[1]]];
         else
-        {
-            varName = customVars[0];
-            template = customVars[1];
-            value = customVars[2];
-        }
-
-        if (!varName || !template)
-            return [];
-
-        if (!varName.startsWith("--"))
-            varName = "--" + varName;
-
-        let si = sp2si( template, value);
-        return [[varName, template, si?.[0], si?.[1]]];
+            return [customVars];
     }
     else
-    {
-        let varRules = getVarsFromSD(customVars);
-        return varRules.map( varRule => {
-            let si = sp2si( varRule.template, varRule.getValue());
-            return [varRule.cssName, varRule.template, si?.[0], si?.[1]];
-        });
-    }
+        return getVarsFromSD(customVars).map( varRule =>
+            [varRule.cssName, varRule.template, varRule.getValue()]);
 }
 
 
@@ -394,11 +369,9 @@ type StylesetPropEnumCallback = (name: string, val: string | undefined | null,
 
 
 /**
- * For each property - regular and custom - in the given styleset invokes the appropriate
- * function that gets the property name and the value converted to string.
- * @param styleset
- * @param callback
- * vendor prefixes
+ * For each property - regular and custom - in the given styleset invokes the given callback
+ * function that receives the property name, the value converted to string and some additional
+ * flags.
  */
 const forAllPropsInStylset = (styleset: Styleset | null | undefined, callback: StylesetPropEnumCallback) =>
 {
@@ -411,17 +384,16 @@ const forAllPropsInStylset = (styleset: Styleset | null | undefined, callback: S
         // a two-item or three-item array
 		if (propName === "--")
         {
-            let customVars = styleset[propName] as CustomVar_StyleType[];
-            for( let customVar of customVars)
+            for( let customVar of styleset[propName] as CustomVar_StyleType[])
             {
-                if (!customVar)
-                    continue;
-
                 // in each tuple, the first element is var name, the second is template property and
                 // the third is the value;
-                let ntvis: VarNTVI[] = getVarsNTVIs( customVar);
-                for( let ntvi of ntvis)
-                    callback( ntvi[0], ntvi[2], ntvi[3], true);
+                let ntvs: VarNTV[] = getVarNTVs(customVar);
+                for( let ntv of ntvs)
+                {
+                    let si = sp2si(ntv[1], ntv[2]);
+                    callback(ntv[0], si?.[0], si?.[1], true);
+                }
             }
         }
         else
@@ -1092,6 +1064,66 @@ const propPrefixInfos: { [K in keyof IStyleset]?: string | number | PropPrefixIn
         {p: VendorPrefix.webkit, vals: [{val: "none", mode: ValuePrefixMode.PropertyOnly}]}
     ],
     width: sizePrefixInfos,
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Add the `$` property to CSSStyleDeclaration prototype to allow setting IStyleset values.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+Object.defineProperty(CSSStyleDeclaration.prototype, "$", {
+    get(): Styleset { return ensureStylesetProxyHandler(this).proxy as Styleset; },
+    set(ss: Styleset): void { ss2style(this, ss); }
+});
+
+/** Symbol under which we keep Styleset proxy object on CSSStyleDeclaration prototypes */
+const symStyleset = Symbol("styleset");
+
+/** Creates new or gets existing proxy handler for Styleset object on a given element */
+function ensureStylesetProxyHandler(style: CSSStyleDeclaration): StylesetProxyHandler
+{
+    let handler = style[symStyleset] as StylesetProxyHandler;
+    if (!handler)
+    {
+        style[symStyleset] = handler = new StylesetProxyHandler();
+        handler.style = style;
+        handler.proxy = new Proxy(style, handler);
+    }
+    return handler;
+}
+
+/**
+ * Proxy handler for the Styleset object on DOM elements. It only overrides the set() method
+ */
+class StylesetProxyHandler implements ProxyHandler<Styleset>
+{
+    /** Keeps the proxy object for which this is the handler */
+    public proxy: any;
+
+    /** Keeps the style object for which this is the proxy handler */
+    public style: CSSStyleDeclaration;
+
+    public set(target: any, prop: PropertyKey, value: any, receiver: any): boolean
+    {
+        if (prop === "--")
+        {
+            for( let customVar of value as CustomVar_StyleType[])
+            {
+                // in each tuple, the first element is var name, the second is template property and
+                // the third is the value;
+                let ntvs = getVarNTVs(customVar);
+                for( let ntv of ntvs)
+                    var2style(this.style, ...ntv);
+            }
+        }
+        else
+            sp2style(this.style, prop as string, value);
+
+        return true;
+    }
 }
 
 

@@ -1,7 +1,7 @@
 import {IVarRule, IConstRule, IStyleDefinition} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue, ISyntaxTypeStyleset} from "../api/Stylesets"
 import { scheduleAction } from "../impl/SchedulingImpl";
-import {sp2s, var2elm} from "../impl/StyleImpl"
+import {sp2s, var2style} from "../impl/StyleImpl"
 import {IMimcssRuleBag, Rule, RuleLike} from "./Rule";
 
 
@@ -54,7 +54,7 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     {
         this.value = value;
         if (this.rc?.varRootRule)
-            scheduleAction(() => var2elm(this.rc.varRootRule!, this.cssName, this.template, value), schedulerType);
+            scheduleAction(() => var2style(this.rc.varRootRule!.style, this.cssName, this.template, value), schedulerType);
     }
 
 

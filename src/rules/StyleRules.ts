@@ -9,7 +9,7 @@ import {
 import {CssSelector, IParameterizedPseudoEntityFunc, PageSelector} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
 import {fdo2s, symV2S, v2s, WKF, wkf} from "../impl/Utils";
-import {ss2s, sp2elm, var2elm} from "../impl/StyleImpl"
+import {ss2s, sp2style, var2style} from "../impl/StyleImpl"
 import {scheduleAction} from "../impl/SchedulingImpl";
 import {selector2s} from "../impl/CoreImpl";
 
@@ -249,7 +249,7 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
-		    scheduleAction(() => sp2elm(this.cssRule, name, value), schedulerType);
+		    scheduleAction(() => sp2style(this.cssRule.style, name, value), schedulerType);
 	}
 
 
@@ -291,7 +291,7 @@ export abstract class StyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleR
 
 		// second, if CSSRule alredy exists, set/remove the property value there
 		if (this.cssRule)
-            scheduleAction(() => var2elm(this.cssRule, varObj.cssName, varObj.template, value), schedulerType);
+            scheduleAction(() => var2style(this.cssRule.style, varObj.cssName, varObj.template, value), schedulerType);
 	}
 
 
