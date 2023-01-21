@@ -1,3 +1,11 @@
+# 0.12.1
+
+1. Remove `StringStyleset` type.
+1. Use `$` property on CSSStyleDeclaration prototype to allow changing styles with Mimcss syntax.
+1. Allow changing and suppressing default units when converting numbers to strings.
+1. Add style properties cx, cy, r, rx, ry.
+
+
 # 0.11.17
 
 1. Rename `push/popAdoptionContext` to `push/popRootContext`.
