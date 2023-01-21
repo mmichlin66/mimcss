@@ -1,8 +1,8 @@
-﻿import {Extended, IGenericProxy, OneOrMany} from "../api/CoreTypes";
+﻿import {Extended, OneOrMany} from "../api/CoreTypes";
 import {
     INumericMath, CssLength, CssAngle, CssTime, CssResolution,
     CssFrequency, CssPosition, LengthUnits, PercentUnits, AngleUnits, TimeUnits,
-    ResolutionUnits, FrequencyUnits, CssNumber, CssPercent, CssRadius, BorderRadius
+    ResolutionUnits, FrequencyUnits, CssNumber, CssPercent, CssRadius, BorderRadius, NumericString
 } from "../api/NumericTypes";
 import {NumberToStringFunc, tag2s, v2s, V2SOptions, wkf, WKF} from "./Utils";
 
@@ -113,36 +113,38 @@ export class NumericMath<T = any, U extends string = any> implements INumericMat
         });
     }
 
-    /** Creates CssLength value from the number and the given unit. */
-    public units( n: number, unit: U): IGenericProxy<U>
+    public units( n: number, unit: U): NumericString<U>
     {
-        return () => n + unit;
+        return (n + unit) as NumericString<U>;
     }
 
-    public min( ...params: Extended<T>[]): IGenericProxy<U>
+    public min( ...params: Extended<T>[]): NumericString<U>
     {
-        return () => this.m( "min", params);
+        return this.m("min", params);
     }
 
-    public max( ...params: Extended<T>[]): IGenericProxy<U>
+    public max( ...params: Extended<T>[]): NumericString<U>
     {
-        return () => this.m( "max", params);
+        return this.m("max", params);
     }
 
-    public clamp( min: Extended<T>, pref: Extended<T>, max: Extended<T>): IGenericProxy<U>
+    public clamp( min: Extended<T>, pref: Extended<T>, max: Extended<T>): NumericString<U>
     {
-        // return () => mathFunc( "clamp", [min, pref, max], this.n2s);
-        return () => this.m( "clamp", [min, pref, max]);
+        return this.m("clamp", [min, pref, max]);
     }
 
-    public calc( formulaParts: TemplateStringsArray, ...params: Extended<T>[]): IGenericProxy<U>
+    public calc(formulaParts: TemplateStringsArray, ...params: Extended<T>[]): NumericString<U>
     {
-        return () => `calc(${tag2s( formulaParts, params, (v: Extended<T>) => this.v2s(v))})`;
+        return `calc(${tag2s( formulaParts, params, (v: Extended<T>) => this.v2s(v))})` as NumericString<U>;
     }
 
-    private m( name: string, params: Extended<T>[]): string
+    /**
+     * Helper method returning string representation of a numeric CSS function accepting multiple
+     * parameters
+     */
+    private m(funcName: string, params: Extended<T>[]): NumericString<U>
     {
-        return `${name}(${this.mv2s( params, ",")})`;
+        return `${funcName}(${this.mv2s( params, ",")})` as NumericString<U>;
     }
 }
 

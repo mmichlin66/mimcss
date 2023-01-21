@@ -1,5 +1,5 @@
 ﻿import {CssImage, Extended, ExtentKeyword, ICssFuncObject, ICssImageFunc} from "./CoreTypes";
-import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, IResolutionProxy} from "./NumericTypes";
+import {BorderRadius, CssAngle, CssLength, CssNumber, CssPercent, CssPoint, CssPosition, ResolutionString} from "./NumericTypes";
 import {CssColor} from "./ColorTypes";
 import {GridLineCountOrName, GridTrack, GridTrackSize} from "./StyleTypes";
 import { SyntaxKey } from "./Stylesets";
@@ -358,7 +358,7 @@ export type ImageSetImage = Exclude<CssImage,IImageSetFunc> | string;
  * number, in which case it will use the "x" units, or any other resolution specification, e.g.
  * {@link dpi} function.
  */
-export type ImageSetResolution = number | IResolutionProxy;
+export type ImageSetResolution = number | ResolutionString;
 
 /**
  * Type of single item that can be specified in the {@link imageSet} function. This can be either an

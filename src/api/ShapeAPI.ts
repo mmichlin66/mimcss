@@ -323,6 +323,11 @@ const imageResolutionToString = (val: Extended<ImageSetResolution>): string => v
     num: v => v + "x"
 });
 
+const resolutionAsStringRegEx = /^[0-9]+(dpi|dpcm|dppx|x)$/;
+
+const imageTypeOrResolutionToString = (val: string): string =>
+    resolutionAsStringRegEx.test(val) ? val : imageTypeToString(val);
+
 fdo["image-set"] = [
     [
         "items", {
@@ -330,7 +335,7 @@ fdo["image-set"] = [
                 str: WKF.Quoted,
                 arr: {
                     1: [WKF.Quoted],
-                    2: [WKF.Quoted, {str: imageTypeToString, num: imageResolutionToString}],
+                    2: [WKF.Quoted, {str: imageTypeOrResolutionToString, num: imageResolutionToString}],
                     3: [WKF.Quoted, imageTypeToString, imageResolutionToString],
                 }
             },

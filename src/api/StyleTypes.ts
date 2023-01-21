@@ -3,8 +3,8 @@
 } from "./CoreTypes"
 import {
     CssNumber, CssPosition, CssTime, CssLength, CssAngle, CssPercent, HorizontalPositionKeyword,
-    VerticalPositionKeyword, IFitContentProxy, ILengthProxy, CssAspectRatio, CssLengthOrAuto,
-    AngleUnits, FrequencyUnits, LengthUnits, PercentUnits, ResolutionUnits, TimeUnits
+    VerticalPositionKeyword, IFitContentProxy, CssAspectRatio, CssLengthOrAuto,
+    AngleUnits, FrequencyUnits, LengthUnits, PercentUnits, ResolutionUnits, TimeUnits, LengthString
 } from "./NumericTypes"
 import {CssColor, CssNonNumericColor} from "./ColorTypes";
 import {FontStretchKeyword, FontStyle, FontWeight, SystemFont} from "./FontTypes";
@@ -341,7 +341,7 @@ export type BorderImage_StyleType = CssImage | BorderImage_Object | string;
  * border-image-outset can be specified as a unitless number.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-outset" target="mdn">MDN Page</a>
  */
-export type BorderImageOutset_StyleType = OneOrBox<CssNumber | ILengthProxy>;
+export type BorderImageOutset_StyleType = OneOrBox<CssNumber | LengthString>;
 
 /**
  * Type for border-image-repeat keywords
@@ -375,7 +375,7 @@ export type BorderImageSource_StyleType = CssImage | "none";
  * border-image-width can be specified as a unitless number.
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-width" target="mdn">MDN Page</a>
  */
-export type BorderImageWidth_StyleType = OneOrBox<CssNumber | ILengthProxy | "auto">;
+export type BorderImageWidth_StyleType = OneOrBox<CssNumber | LengthString | "auto">;
 
 
 
@@ -1067,7 +1067,7 @@ export type LineClamp_StyleType = "none" | CssNumber | [Extended<CssNumber>, Ext
  * Type for {@link IStyleset.lineHeight|lineHeight} style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/line-height" target="mdn">MDN Page</a>
  */
-export type LineHeight_StyleType = CssNumber | ILengthProxy;
+export type LineHeight_StyleType = CssNumber | LengthString;
 
 
 
@@ -1554,7 +1554,7 @@ export type StrokeLinejoin_StyleType = "arcs" | "bevel" | "miter" | "miter-clip"
  * Type for the {@link tabSize} style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size" target="mdn">MDN Page</a>
  */
-export type TabSize_StyleType = CssNumber | ILengthProxy;
+export type TabSize_StyleType = CssNumber | LengthString;
 
 /**
  * Type for the {@link tableLayout} style property

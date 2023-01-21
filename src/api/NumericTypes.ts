@@ -3,6 +3,13 @@
 
 
 /**
+ * String representing numeric values with the given unit type
+ */
+export type NumericString<U extends string> = `${number}${U}`;
+
+
+
+/**
  * The `INumberBaseMath` interface contains methods that implement CSS mathematical functions on the
  * numeric CSS types. This interface is extended by dimension-specific interfaces such as
  * {@link INumberMath}, {@link ILengthMath}, {@link IAngleMath}, etc.
@@ -42,11 +49,10 @@ export interface INumericMath<T, U extends string>
      *
      * @param n Numeric value.
      * @param unit Unit to append to the numeric value.
-     * @returns Function implementing the `IGenericProxy<U>` callable interface. This allows the
-     * result of the `units` method to be assigned only to the properties of compatible numeric
-     * type.
+     * @returns Numeric string of the proper unit type. This allows the result of the `calc` method
+     * to be assigned only to the properties of a compatible numeric type.
      */
-    units( n: number, unit: U): IGenericProxy<U>;
+    units(n: number, unit: U): NumericString<U>;
 
     /**
      * Creates property value using the CSS `min()` function. Parameters are of the type
@@ -54,9 +60,8 @@ export interface INumericMath<T, U extends string>
      * or constant of type `T`.
      *
      * @param params One or more values to choose the minimum from.
-     * @returns Function implementing the `IGenericProxy<U>` callable interface. This allows the
-     * result of the `min` method to be assigned only to the properties of a compatible numeric
-     * type.
+     * @returns Numeric string of the proper unit type. This allows the result of the `calc` method
+     * to be assigned only to the properties of a compatible numeric type.
      *
      * **Example:**
      *
@@ -70,7 +75,7 @@ export interface INumericMath<T, U extends string>
      * }
      * ```
      */
-    min( ...params: Extended<T>[]): IGenericProxy<U>;
+    min(...params: Extended<T>[]): NumericString<U>;
 
     /**
      * Creates property value using the CSS `max()` function. Parameters are of the type
@@ -78,9 +83,8 @@ export interface INumericMath<T, U extends string>
      * or constant of type `T`.
      *
      * @param params One or more values to choose the maximum from.
-     * @returns Function implementing the `IGenericProxy<U>` callable interface. This allows the
-     * result of the `max` method to be assigned only to the properties of a compatible numeric
-     * type.
+     * @returns Numeric string of the proper unit type. This allows the result of the `calc` method
+     * to be assigned only to the properties of a compatible numeric type.
      *
      * **Example:**
      *
@@ -94,7 +98,7 @@ export interface INumericMath<T, U extends string>
      * }
      * ```
      */
-    max( ...params: Extended<T>[]): IGenericProxy<U>;
+    max(...params: Extended<T>[]): NumericString<U>;
 
     /**
      * Creates property value using the CSS `clamp()` function. Parameters are of the type
@@ -104,9 +108,8 @@ export interface INumericMath<T, U extends string>
      * @param min Lower bound for the return value.
      * @param pref Preferred value.
      * @param max Upper bound for the return value.
-     * @returns Function implementing the `IGenericProxy<U>` callable interface. This allows the
-     * result of the `clamp` method to be assigned only to the properties of a compatible numeric
-     * type.
+     * @returns Numeric string of the proper unit type. This allows the result of the `calc` method
+     * to be assigned only to the properties of a compatible numeric type.
      *
      * **Example:**
      *
@@ -120,7 +123,7 @@ export interface INumericMath<T, U extends string>
      * }
      * ```
      */
-    clamp( min: Extended<T>, pref: Extended<T>, max: Extended<T>): IGenericProxy<U>;
+    clamp(min: Extended<T>, pref: Extended<T>, max: Extended<T>): NumericString<U>;
 
     /**
      * Creates property value using the CSS `calc()` function. This method is a tag function and must
@@ -131,9 +134,8 @@ export interface INumericMath<T, U extends string>
      * @param formularParts Array of strings, which are part of the template string and which are
      * not parameters.
      * @param params Array of parameters from the template string.
-     * @returns Function implementing the `IGenericProxy<U>` callable interface. This allows the
-     * result of the `calc` method to be assigned only to the properties of a compatible numeric
-     * type.
+     * @returns Numeric string of the proper unit type. This allows the result of the `calc` method
+     * to be assigned only to the properties of a compatible numeric type.
      *
      * **Example:**
      *
@@ -149,7 +151,7 @@ export interface INumericMath<T, U extends string>
      * }
      * ```
      */
-    calc( formulaParts: TemplateStringsArray, ...params: Extended<T>[]): IGenericProxy<U>;
+    calc(formulaParts: TemplateStringsArray, ...params: Extended<T>[]): NumericString<U>;
 }
 
 
@@ -160,11 +162,11 @@ export interface INumericMath<T, U extends string>
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** Proxy interface that represents values of the `<percent>` CSS type */
-export interface INumberProxy extends IGenericProxy<""> {};
+/** String representing unitless number values */
+export type NumberString = NumericString<"">;
 
 /** Type for a value of the `<number>` CSS type */
-export type CssNumber = number | IGenericProxy<"">;
+export type CssNumber = number | NumberString;
 
 /**
  * The `INumberMath` interface contains methods that implement CSS mathematic functions on the
@@ -176,15 +178,15 @@ export interface INumberMath extends INumericMath<CssNumber,""> {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Percent
+// CSS `<percentage>` type.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Units of percent */
 export type PercentUnits = "%";
 
-/** Proxy interface that represents values of the `<percent>` CSS type */
-export interface IPercentProxy extends IGenericProxy<PercentUnits> {};
+/** String representing percent values */
+export type PercentString = NumericString<PercentUnits>;
 
 /**
  * Type for style properties of the `<percentage>` CSS type. Values of this type can be specifed as:
@@ -194,7 +196,7 @@ export interface IPercentProxy extends IGenericProxy<PercentUnits> {};
  *   - if the number is an integer, it is taken as is and a percent sign is appended to it
  *   - if the number is a floating point, it is multiplied by 100 and a percent sign is appended to it
  */
-export type CssPercent = number | IPercentProxy | `${number}${PercentUnits}`;
+export type CssPercent = number | PercentString;
 
 /**
  * The `IPercentMath` interface contains methods that implement CSS mathematic functions on the
@@ -208,7 +210,7 @@ export interface IPercentMath extends INumericMath<CssPercent, PercentUnits>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// CSS `<length>` type.
+// CSS `<length> | <percentage>` type.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -216,8 +218,8 @@ export interface IPercentMath extends INumericMath<CssPercent, PercentUnits>
 export type LengthUnits = PercentUnits | "Q" | "ch" | "cm" | "em" | "ex" | "ic" | "in" | "lh" |
     "mm" | "pc" | "pt" | "px" | "vb" | "vh" | "vi" | "vw" | "rem" | "rlh" | "vmax" | "vmin" | "fr";
 
-/** Proxy interface that represents values of the `<length>` CSS type */
-export interface ILengthProxy extends IGenericProxy<LengthUnits> {};
+/** String representing length values */
+export type LengthString = NumericString<LengthUnits>;
 
 /**
  * Type for single style property of the `<length> | <percentage>` CSS type. Values of this type
@@ -228,7 +230,7 @@ export interface ILengthProxy extends IGenericProxy<LengthUnits> {};
  *   - if the number is an integer, it is interpreted as `"px"` units
  *   - if the number is a floating point, it is interpreted as `"em"` units
  */
-export type CssLength = CssPercent | ILengthProxy | `${number}${LengthUnits}`;
+export type CssLength = CssPercent | LengthString;
 
 /**
  * Type that combines {@link CssLength} and the string literal `"auto"`. This type is often used when a
@@ -249,18 +251,18 @@ export interface ILengthMath extends INumericMath<CssLength, LengthUnits>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// CSS `<angle>` type.
+// CSS `<angle> | <percentage>` type.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Units of angle */
 export type AngleUnits = PercentUnits | "deg" | "rad" | "grad" | "turn";
 
-/** Proxy interface that represents values of the `<angle>` CSS type */
-export interface IAngleProxy extends IGenericProxy<AngleUnits> {};
+/** String representing angle values */
+export type AngleString = NumericString<AngleUnits>;
 
 /** Type for single style property of the `<angle>` CSS type */
-export type CssAngle = number | IAngleProxy | `${number}${AngleUnits}`;
+export type CssAngle = number | AngleString;
 
 /**
  * The `IAngleMath` interface contains methods that implement CSS mathematic functions on the
@@ -288,11 +290,11 @@ export interface IAngleMath extends INumericMath<CssAngle, AngleUnits>
 /** Units of time */
 export type TimeUnits = "s" | "ms";
 
-/** Proxy interface that represents values of the `<time>` CSS type*/
-export interface ITimeProxy extends IGenericProxy<TimeUnits> {};
+/** String representing time values */
+export type TimeString = NumericString<TimeUnits>;
 
 /** Type for single style property of the `<time>` CSS type */
-export type CssTime = number | ITimeProxy | `${number}${TimeUnits}`;
+export type CssTime = number | TimeString;
 
 /**
  * The `ITimeMath` interface contains methods that implement CSS mathematic functions on the
@@ -313,11 +315,11 @@ export interface ITimeMath extends INumericMath<CssTime, TimeUnits>
 /** Units of resolution */
 export type ResolutionUnits = "dpi" | "dpcm" | "dppx" | "x";
 
-/** Proxy interface that represents values of the `<resolution>` CSS type */
-export interface IResolutionProxy extends IGenericProxy<ResolutionUnits> {};
+/** String representing resolution values */
+export type ResolutionString = NumericString<ResolutionUnits>;
 
 /** Type for single style property of the `<resolution>` CSS type */
-export type CssResolution = number | IResolutionProxy | `${number}${ResolutionUnits}`;
+export type CssResolution = number | ResolutionString;
 
 /**
  * The `IResolutionMath` interface contains methods that implement CSS mathematic functions on the
@@ -338,11 +340,11 @@ export interface IResolutionMath extends INumericMath<CssResolution, ResolutionU
 /** Units of frequency */
 export type FrequencyUnits = "Hz" | "kHz";
 
-/** Proxy interface that represents values of the `<frequency>` CSS type */
-export interface IFrequencyProxy extends IGenericProxy<FrequencyUnits> {};
+/** String representing frequency values */
+export type FrequencyString = NumericString<FrequencyUnits>;
 
 /** Type for single style property of the `<frequency>` CSS type */
-export type CssFrequency = number | IFrequencyProxy | `${number}${FrequencyUnits}`;
+export type CssFrequency = number | FrequencyString;
 
 /**
  * The `IFrequencyMath` interface contains methods that implement CSS mathematic functions on the
