@@ -46,6 +46,7 @@
                 "api/ElementTypes.d.ts",
                 "api/HtmlTypes.d.ts",
                 "api/SvgTypes.d.ts",
+                "api/MathmlTypes.d.ts",
                 "jsx/mim.d.ts"
             ],
             "rootPath": "types/mimbl/"

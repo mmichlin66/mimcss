@@ -14,6 +14,28 @@
  */
 export interface INumericMath<T, U extends string>
 {
+    /** Returns the current unit used for converting integer numbers to strings */
+    getIntUnit(): U | "";
+
+    /**
+     * Sets the unit to use for converting integer numbers to strings and returns the old unit.
+     *
+     * @param newUnit New unit to use or empty string (no unit will be appended)
+     * @returns Old unit value
+     */
+    setIntUnit(newUnit: U | ""): U | "";
+
+    /** Returns the current unit used for converting floating point numbers to strings */
+    getFloatUnit(): U | "";
+
+    /**
+     * Sets the unit to use for converting floating point numbers to strings and returns the old unit.
+     *
+     * @param newUnit New unit to use or empty string (no unit will be appended)
+     * @returns Old unit value
+     */
+    setFloatUnit(newUnit: U | ""): U | "";
+
     /**
      * Creates value from the given number and unit. This method can be used to dynamically
      * construct the needed dimension.
