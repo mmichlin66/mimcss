@@ -1677,6 +1677,16 @@ export interface IStyleset
     cursor?: st.Cursor_StyleType;
 
     /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cx" target="mdn">MDN Page</a>
+     */
+    cx?: CssLength;
+
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cy" target="mdn">MDN Page</a>
+     */
+    cy?: CssLength;
+
+    /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d" target="mdn">MDN Page</a>
      */
     d?: "none" | IPathBuilder;
@@ -3007,6 +3017,21 @@ export interface IStyleset
     rubyPosition?: st.DefaultStyleType;
 
     /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r" target="mdn">MDN Page</a>
+     */
+    r?: CssLength;
+
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/rx" target="mdn">MDN Page</a>
+     */
+    rx?: CssLength;
+
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ry" target="mdn">MDN Page</a>
+     */
+    ry?: CssLength;
+
+    /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/scale" target="mdn">MDN Page</a>
      */
     scale?: st.Scale_StyleType;
@@ -3572,6 +3597,16 @@ export interface IStyleset
      */
     writingMode?: st.WritingMode_StyleType;
 
+
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/rx" target="mdn">MDN Page</a>
+     */
+    x?: CssLength;
+
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ry" target="mdn">MDN Page</a>
+     */
+    y?: CssLength;
 
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/z-index" target="mdn">MDN Page</a>

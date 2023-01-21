@@ -571,6 +571,8 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
         item: WKF.Quoted
     },
     cursor: WKF.OneOrManyWithComma,
+    cx: WKF.Length,
+    cy: WKF.Length,
 
     fill: WKF.Color,
     fillOpacity: WKF.Percent,
@@ -717,6 +719,9 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
         }
     },
     rowGap: WKF.Length,
+    r: WKF.Length,
+    rx: WKF.Length,
+    ry: WKF.Length,
 
     scrollbarColor: WKF.Color,
     scrollMargin: WKF.MultiLengthWithSpace,
@@ -797,6 +802,10 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
         str: camelToDash
     },
     wordSpacing: WKF.Length,
+
+    x: WKF.Length,
+
+    y: WKF.Length,
 
     zoom: WKF.Percent,
 
