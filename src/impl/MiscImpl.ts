@@ -1,7 +1,7 @@
-﻿import {ExtendedFontFace, IFontFace} from "../api/FontTypes"
+﻿import {ExtendedFontFace, ExtendedFontPaletteValues, IFontFace, IFontPaletteValues, OverrideColors_FontPaletteValuesType} from "../api/FontTypes"
 import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatement} from "../api/MediaTypes";
 import {sp2s} from "./StyleImpl";
-import {camelToDash, v2s, a2s, WKF, V2SOptions, dashToCamel, wkf, propSet2s} from "./Utils";
+import {camelToDash, v2s, a2s, WKF, V2SOptions, wkf, propSet2s} from "./Utils";
 import {ExtendedCounterStyleset, ICounterStyleset} from "../api/CounterTypes";
 import { ExtendedScrollTimeline, IScrollTimeline } from "../api/ScrollTimelineTypes";
 import { IIDRule } from "../api/RuleTypes";
@@ -153,12 +153,42 @@ const fontFacePropertyInfos: { [K in keyof IFontFace]?: V2SOptions } =
                 ["format", {
                     any: v => `format(\"${v}\")`,
                     sep: ","
+                }],
+                ["tech", {
+                    any: v => `tech(${v})`,
+                    sep: ","
                 }]
             ]
         },
         sep: ","
     },
     sizeAdjust: WKF.Percent,
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSS @font-palette-values rule.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts the given font face object to the CSS style string.
+ */
+export const fontPaletteValues2s = (fontPaletteValues: ExtendedFontPaletteValues): string =>
+    propSet2s( fontPaletteValues, fontPaletteValuesPropertyInfos);
+
+
+
+/**
+ * Map of property names to the V2SOptions objects describing custom actions necessary to
+ * convert the property value to the CSS-compliant string.
+ */
+const fontPaletteValuesPropertyInfos: { [K in keyof IFontPaletteValues]?: V2SOptions } =
+{
+    overrideColors: (v: OverrideColors_FontPaletteValuesType) =>
+        Object.entries(v).map(entry => `${entry[0]} ${wkf[WKF.Color](entry[1])}`).join(",")
 }
 
 

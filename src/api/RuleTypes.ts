@@ -1,6 +1,6 @@
 ﻿import {
     ICustomVar, PseudoEntity, IParameterizedPseudoEntity,
-    DependentRuleCombinator, IConstant, IRuleWithSelector
+    DependentRuleCombinator, IConstant, IRuleWithSelector, DashedIdent, DotIdent, PoundIdent, DotPrefix, PoundPrefix, DashedPrefix
 } from "./CoreTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes";
 import {ExtendedIStyleset, VarTemplateName, VarValue, ExtendedVarValue, AnimationStyleset, IStyleset} from "./Stylesets";
@@ -38,19 +38,19 @@ export interface INamedEntity
  * The IPrefixedNamedEntity interface is a base interface implemented by rules that use prefix to
  * refer to the rule name within CSS.
  */
-export interface IPrefixedNamedEntity extends INamedEntity
+export interface IPrefixedNamedEntity<P extends DotPrefix | PoundPrefix | DashedPrefix> extends INamedEntity
 {
 	/**
 	 * Prefix used to create the CSS name.
 	 */
-	readonly prefix: "." | "#" | "--";
+	readonly prefix: P;
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastructure. This name
 	 * has the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
-	readonly cssName: string;
+	readonly cssName: `${P}${string}`;
 }
 
 
@@ -114,10 +114,8 @@ export interface IStyleRule<R extends CSSStyleRule | CSSPageRule = CSSStyleRule>
  * The `IClassRule` interface represents a style rule where the selector is a single class name.
  * This interface is returned from the {@link $class} method.
  */
-export interface IClassRule extends IStyleRule, IPrefixedNamedEntity
+export interface IClassRule extends IStyleRule, IPrefixedNamedEntity<DotPrefix>
 {
-	// Prefix for CSS classes.
-	prefix: ".";
 }
 
 
@@ -131,10 +129,8 @@ export interface IClassRule extends IStyleRule, IPrefixedNamedEntity
  * combined class name, e.g. `"class1 class2"`. The `cssClassName` property contains the combined
  * selector, e.g. `"".class1.class2"`.
  */
-export interface IClassNameRule extends IPrefixedNamedEntity, IRuleWithSelector
+export interface IClassNameRule extends IPrefixedNamedEntity<DotPrefix>, IRuleWithSelector
 {
-	// Prefix for CSS classes.
-	prefix: ".";
 }
 
 
@@ -166,10 +162,8 @@ export type ClassMoniker = string | IClassRule | IClassNameRule | ClassMoniker[]
  * The `IIDRule` interface represents a style rule where the selector is a single element ID.
  * This interface is returned from the {@link $id} method.
  */
-export interface IIDRule extends IStyleRule, IPrefixedNamedEntity
+export interface IIDRule extends IStyleRule, IPrefixedNamedEntity<PoundPrefix>
 {
-	// Prefix for CSS element identifiers.
-	prefix: "#";
 }
 
 
@@ -231,7 +225,7 @@ export interface IAnimationFrameRule extends IKeyframeRule {}
  * The IVarRule interface represents a CSS custom property definition. Objects implementing this
  * interface are returned from the {@link $var} and {@link $property} methods.
  */
-export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedNamedEntity, ICustomVar<VarValue<K>>
+export interface IVarRule<K extends VarTemplateName = any> extends IPrefixedNamedEntity<DashedPrefix>, ICustomVar<VarValue<K>>
 {
 	/**
      * Name of a non-custom CSS property whose type determines the type of the custom property
@@ -424,20 +418,32 @@ export interface IGridAreaRule extends INamedEntity
 
 
 /**
- * The IColorProfileRule interface represents a `@color-profile` at rule. This rule generates a
+ * The IColorProfileRule interface represents a `@color-profile` at-rule. This rule generates a
  * color profile name, which can be later used in the {@link color} function.
  * Objects implementing this interface are returned from the {@link $colorProfile} method.
  */
 export interface IColorProfileRule extends IRule, INamedEntity
 {
     /** Name of the color profile rule that can be used in the {@link color} function. */
-    readonly profileName: string;
+    readonly profileName: DashedIdent;
 }
 
 
 
 /**
- * The IScrollTimelineRule interface represents a `@scroll-timeline` at rule. This rule generates a
+ * The IFontPaletteValuesRule interface represents a `@font-palette-values` at-rule.
+ * Objects implementing this interface are returned from the {@link $fontPaletteValues} method.
+ */
+export interface IFontPaletteValuesRule extends IRule, INamedEntity
+{
+    /** Name of the `@font-palette-values` rule that can be used in the {@link fontPalette} property. */
+    readonly fontPaletteName: DashedIdent;
+}
+
+
+
+/**
+ * The IScrollTimelineRule interface represents a `@scroll-timeline` at-rule. This rule generates a
  * timeline name, which can be later used in the {@link animationTimeline} style property.
  * Objects implementing this interface are returned from the {@link $scrollTimeline} method.
  */

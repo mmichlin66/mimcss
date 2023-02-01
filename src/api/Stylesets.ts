@@ -10,8 +10,8 @@ import {BorderRadius, CssAngle, CssAspectRatio, CssFrequency, CssLength, CssLeng
 import * as st from "./StyleTypes";
 import {FillRule, IPathBuilder, TransformFuncs} from "./ShapeTypes";
 import {
-    FontKerning, FontOpticalSizing, FontSize, FontStretch, FontStyle, FontSynthesis,
-    FontVariantCaps, FontVariantPosition
+    FontKerning, FontOpticalSizing, FontPalette, FontSize, FontStretch, FontStyle, FontSynthesis,
+    FontVariantCaps, FontVariantEmoji, FontVariantPosition
 } from "./FontTypes";
 import {
     ClassMoniker, IStyleDefinition, IStyleDefinitionClass, IStyleRule, IVarRule
@@ -1827,13 +1827,17 @@ export interface IStyleset
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-language-override" target="mdn">MDN Page</a>
      */
-     fontLanguageOverride?: st.DefaultStyleType;
+    fontLanguageOverride?: st.DefaultStyleType;
 
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-optical-sizing" target="mdn">MDN Page</a>
      */
     fontOpticalSizing?: FontOpticalSizing;
 
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-palette" target="mdn">MDN Page</a>
+     */
+    fontPalette?: FontPalette;
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size" target="mdn">MDN Page</a>
      */
@@ -1878,6 +1882,11 @@ export interface IStyleset
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-east-asian" target="mdn">MDN Page</a>
      */
     fontVariantEastAsian?: st.DefaultStyleType;
+
+   /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-east-asian" target="mdn">MDN Page</a>
+     */
+    fontVariantEmoji?: FontVariantEmoji;
 
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-ligatures" target="mdn">MDN Page</a>

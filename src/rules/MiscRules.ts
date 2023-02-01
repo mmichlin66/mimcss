@@ -1,15 +1,16 @@
 import {
     IFontFaceRule, IImportRule, INamespaceRule, IClassNameRule, IClassRule, IStyleDefinition,
     IColorProfileRule, IPageNameRule, ILayerNameRule, ILayerBlockRule, ILayerOrderRule, LayerMoniker,
-    ImportRuleOptions, IScrollTimelineRule
+    ImportRuleOptions, IScrollTimelineRule, IFontPaletteValuesRule
 } from "../api/RuleTypes";
-import {ExtendedFontFace} from "../api/FontTypes"
+import { DashedIdent, DotIdent } from "../api/CoreTypes";
+import {ExtendedFontFace, ExtendedFontPaletteValues} from "../api/FontTypes"
 import {ColorProfileRenderingIntent} from "../api/ColorTypes";
-import {fontFace2s, scrollTimeline2s} from "../impl/MiscImpl"
+import { ExtendedScrollTimeline } from "../api/ScrollTimelineTypes";
+import {fontFace2s, fontPaletteValues2s, scrollTimeline2s} from "../impl/MiscImpl"
 import {Rule, IMimcssRuleBag, NamedRuleLike} from "./Rule";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {a2s, symV2S, v2s} from "../impl/Utils";
-import { ExtendedScrollTimeline } from "../api/ScrollTimelineTypes";
 
 
 
@@ -170,11 +171,11 @@ export class ClassNameRule extends NamedRuleLike implements IClassNameRule
 	public process( ruleName: string | null): void
 	{
         this.name = this.classes.map( v => typeof v === "string" ? v : v.name).join(" ");
-        this.cssName = "." + this.name.replace( / /g, ".");
+        this.cssName = ("." + this.name.replace( / /g, ".")) as DotIdent;
     }
 
     /** All class CSS names (with dots) concatenated together */
-    public cssName: string;
+    public cssName: DotIdent;
 
     private classes: (IClassRule | IClassNameRule | string)[];
 }
@@ -187,7 +188,7 @@ export class ClassNameRule extends NamedRuleLike implements IClassNameRule
 export class ColorProfileRule extends MiscRule<CSSRule> implements IColorProfileRule
 {
 	public constructor( sd: IStyleDefinition, url: string, intent?: ColorProfileRenderingIntent,
-        nameOverride?: IColorProfileRule | string)
+        nameOverride?: IColorProfileRule | DashedIdent)
 	{
 		super(sd);
 		this.url = url;
@@ -200,7 +201,7 @@ export class ColorProfileRule extends MiscRule<CSSRule> implements IColorProfile
 	// Processes the given rule.
 	public process( ruleName: string | null): void
 	{
-        this.name = "--" + this.rc.getScopedName( ruleName, this.nameOverride);
+        this.name = this.rc.getScopedName( ruleName, this.nameOverride, "--") as DashedIdent;
     }
 
 	// Inserts this rule into the given parent rule or stylesheet.
@@ -214,20 +215,62 @@ export class ColorProfileRule extends MiscRule<CSSRule> implements IColorProfile
 	public toString(): string { return this.name; }
 
     /** Name of the color profile rule that can be used in the [[color]] function. */
-    public get profileName(): string { return this.name; }
+    public get profileName(): DashedIdent { return this.name; }
 
     /** Profile name */
-    public name: string;
+    public name: DashedIdent;
 
     private url: string;
     private intent?: ColorProfileRenderingIntent;
-    private nameOverride?: IColorProfileRule | string;
+    private nameOverride?: IColorProfileRule | DashedIdent;
 }
 
 
 
 /**
- * The FontFaceRule class describes a @font-face CSS rule.
+ * The FontPaletteValuesRule class represents the CSS @font-palette-values rule.
+ */
+export class FontPaletteValuesRule extends MiscRule<CSSRule> implements IFontPaletteValuesRule
+{
+	public constructor( sd: IStyleDefinition, fontPaletteValues?: ExtendedFontPaletteValues,
+        nameOverride?: IFontPaletteValuesRule | DashedIdent)
+	{
+		super(sd);
+		this.values = fontPaletteValues;
+        this.nameOverride = nameOverride;
+	}
+
+
+
+	// Processes the given rule.
+	public process(ruleName: string | null): void
+	{
+        this.name = this.rc.getScopedName( ruleName, this.nameOverride, "--") as DashedIdent;
+    }
+
+	// Inserts this rule into the given parent rule or stylesheet.
+	public toCss(): string
+	{
+		return `@font-palette-values ${this.name} {${this.values ? fontPaletteValues2s(this.values) : ""}}`;
+	}
+
+    // Implementation of the toString method returns the profile name.
+	public toString(): string { return this.name; }
+
+    /** Name of the color profile rule that can be used in the [[color]] function. */
+    public get fontPaletteName(): DashedIdent { return this.name; }
+
+    /** Profile name */
+    public name: DashedIdent;
+
+    private values?: ExtendedFontPaletteValues;
+    private nameOverride?: IFontPaletteValuesRule | DashedIdent;
+}
+
+
+
+/**
+ * The ScrollTimelineRule class describes a @font-face CSS rule.
  */
 export class ScrollTimelineRule extends MiscRule<CSSRule/*CSSScrollTimelineRule*/> implements IScrollTimelineRule
 {

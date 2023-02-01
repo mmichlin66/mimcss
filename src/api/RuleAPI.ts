@@ -1,13 +1,13 @@
-﻿import {CssSelector, ElementTagName, ExtendedProp, PageSelector} from "./CoreTypes";
+﻿import {CssSelector, DashedIdent, DotIdent, ElementTagName, ExtendedProp, PageSelector, PoundIdent} from "./CoreTypes";
 import {
     IStyleRule, IClassRule, IIDRule, AnimationFrame, IKeyframesRule, IVarRule,
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker,
     NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule,
-    ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions, IScrollTimelineRule
+    ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions, IScrollTimelineRule, IFontPaletteValuesRule
 } from "./RuleTypes";
 import {MediaStatement, SupportsStatement} from "./MediaTypes"
-import {ExtendedFontFace} from "./FontTypes";
+import {ExtendedFontFace, ExtendedFontPaletteValues} from "./FontTypes";
 import {ColorProfileRenderingIntent} from "./ColorTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
 import {
@@ -27,7 +27,7 @@ import {CounterRule, CounterStyleRule} from "../rules/CounterRules";
 import {GridLineRule, GridAreaRule} from "../rules/GridRules";
 import {
     FontFaceRule, ImportRule, NamespaceRule, ClassNameRule, ColorProfileRule, PageNameRule,
-    LayerNameRule, LayerOrderRule, ScrollTimelineRule
+    LayerNameRule, LayerOrderRule, ScrollTimelineRule, FontPaletteValuesRule
 } from "../rules/MiscRules"
 import {SupportsRule, MediaRule, LayerBlockRule} from "../rules/GroupRules"
 import {a2s} from "../impl/Utils";
@@ -203,7 +203,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * the style properties if needed.
      */
     public $class( styleset?: CombinedClassStyleset | CombinedClassStyleset[],
-        nameOverride?: string | IClassRule): IClassRule
+        nameOverride?: DotIdent | IClassRule): IClassRule
     {
         return new ClassRule( this, styleset, nameOverride);
     }
@@ -249,7 +249,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
      * `".class1.class2"`.
      */
-    public $classname( ...classes: (IClassRule | IClassNameRule | string)[]): IClassNameRule
+    public $classname( ...classes: (IClassRule | IClassNameRule | DotIdent)[]): IClassNameRule
     {
         return new ClassNameRule( this, classes);
     }
@@ -297,7 +297,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IIDRule` object that should be used for getting the ID name and for accessing
      * the style properties if needed.
      */
-    public $id( styleset?: CombinedStyleset | CombinedStyleset[], nameOverride?: string | IIDRule): IIDRule
+    public $id( styleset?: CombinedStyleset | CombinedStyleset[], nameOverride?: PoundIdent | IIDRule): IIDRule
     {
         return new IDRule( this, styleset, nameOverride);
     }
@@ -474,7 +474,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * style properties or function parameters is substituted by the `var()` CSS function invocation.
      */
     public $var<K extends VarTemplateName>( template: K, value?: ExtendedVarValue<K>,
-                    nameOverride?: string | IVarRule<K>): IVarRule<K>
+                    nameOverride?: DashedIdent | IVarRule<K>): IVarRule<K>
     {
         return new VarRule( this, template, value, nameOverride);
     }
@@ -523,7 +523,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      */
     public $property<K extends keyof ISyntaxTypeStyleset>(
         syntax: K, initValue: ExtendedVarValue<K>, inherits: boolean,
-        nameOverride?: string | IVarRule<K>): IVarRule<K>
+        nameOverride?: DashedIdent | IVarRule<K>): IVarRule<K>
 
     /**
      * Creates a new `@property` at-rule. The property name will be created when the rule is processed
@@ -565,12 +565,12 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * style properties or function parameters is substituted by the `var()` CSS function invocation.
      */
     public $property( syntax: [string], initValue: ExtendedProp<string>, inherits: boolean,
-        nameOverride?: string | IVarRule<"*">): IVarRule<"*">;
+        nameOverride?: DashedIdent | IVarRule<"*">): IVarRule<"*">;
 
     // implementation
     $property<K extends keyof ISyntaxTypeStyleset = any, T extends K | [string] = any>(
         syntax: T, initValue: ExtendedVarValue<K>, inherits = true,
-        nameOverride?: string | IVarRule<K>): IVarRule<K>
+        nameOverride?: DashedIdent | IVarRule<K>): IVarRule<K>
     {
         return new PropertyRule( this, syntax, initValue, inherits, nameOverride);
     }
@@ -1003,9 +1003,45 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * @returns `IColorProfileRule` object representing the `@color-profile` at-rule.
      */
     public $colorProfile( url: string, intent?: ColorProfileRenderingIntent,
-        nameOverride?: IColorProfileRule | string): IColorProfileRule
+        nameOverride?: IColorProfileRule | DashedIdent): IColorProfileRule
     {
         return new ColorProfileRule( this, url, intent, nameOverride);
+    }
+
+    /**
+     * Creates a new `@font-palette-values` at-rule.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     // deefine font palette
+     *     greenish = this.$fontPaletteValues({
+     *         fontFamily: "Handover Sans",
+     *         basePalette: 3,
+     *         overrideColors: {
+     *             1: css.rgb(43, 12, 9),
+     *             3: "lime"
+     *         }
+     *     })
+     *
+     *     // use font palette name in the `font-palette` CSS style property
+     *     cls = this.$class({ fontPalette: this.greenish})
+     * }
+     * ```
+     *
+     * @param fontPaletteValues values defining the font and overriding colors in it
+     * @param nameOverride String or another `IFontPaletteValuesRule` object that determines the name of the
+     * font palette. If this optional parameter is defined, the name will override the Mimcss name
+     * assignment mechanism. This might be useful if there is a need for the name to match a name of
+     * another font palette.
+     * @returns `IFontPaletteValuesRule` object representing the `@font-palette-values` at-rule.
+     */
+    public $fontPaletteValues(fontPaletteValues?: ExtendedFontPaletteValues,
+        nameOverride?: IFontPaletteValuesRule | DashedIdent): IFontPaletteValuesRule
+    {
+        return new FontPaletteValuesRule( this, fontPaletteValues, nameOverride);
     }
 
     /**

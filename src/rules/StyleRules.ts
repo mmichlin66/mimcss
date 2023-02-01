@@ -6,7 +6,7 @@ import {
     ExtendedIStyleset, Styleset, VarTemplateName, CustomVar_StyleType, ExtendedVarValue,
     CombinedStyleset, IStyleset, PageRuleStyleset
 } from "../api/Stylesets"
-import {CssSelector, IParameterizedPseudoEntityFunc, PageSelector} from "../api/CoreTypes"
+import {CssSelector, DotIdent, DotPrefix, IParameterizedPseudoEntityFunc, PageSelector, PoundPrefix} from "../api/CoreTypes"
 import {Rule, IMimcssRuleBag} from "./Rule";
 import {fdo2s, symV2S, v2s, WKF, wkf} from "../impl/Utils";
 import {ss2s, sp2style, var2style} from "../impl/StyleImpl"
@@ -417,7 +417,7 @@ export class AbstractRule extends StyleRule
  * The NamedStyleRule class is a base for style rule classes that are also named entities - such
  * as class rule and ID rule.
  */
-abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
+abstract class NamedStyleRule<P extends DotPrefix | PoundPrefix> extends StyleRule implements IPrefixedNamedEntity<P>
 {
 	public constructor( sd: IStyleDefinition, styleset?: CombinedStyleset | CombinedStyleset[],
         nameOverride?: string | INamedEntity)
@@ -431,8 +431,8 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 	{
 		super.process( ruleName);
 
-		this.name = this.rc.getScopedName( ruleName, this.nameOverride);
-        this.cssName = this.prefix + this.name;
+		this.cssName = this.rc.getScopedName(ruleName, this.nameOverride, this.prefix) as `${P}${string}`;
+        this.name = this.cssName.substring(1);
 	}
 
 	// Returns the selector part of the style rule.
@@ -449,7 +449,7 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 
 	// Returns prefix that is put before the entity name to create a CSS name used in style rule
 	// selectors.
-	public abstract get prefix(): "." | "#";
+	public abstract get prefix(): P;
 
 	/**
 	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
@@ -463,7 +463,7 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
 	 * `name` property.
 	 */
-	public cssName: string;
+	public cssName: `${P}${string}`;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
@@ -475,10 +475,10 @@ abstract class NamedStyleRule extends StyleRule implements IPrefixedNamedEntity
 /**
  * The ClassRule class describes a styleset that applies to elements identified by a CSS class.
  */
-export class ClassRule extends NamedStyleRule implements IClassRule
+export class ClassRule extends NamedStyleRule<DotPrefix> implements IClassRule
 {
 	// Prefix for CSS classes.
-	public get prefix(): "." { return "."; }
+	public get prefix(): DotPrefix { return "."; }
 
 	// Processes the given rule.
 	public process( ruleName: string | null): void
@@ -491,7 +491,7 @@ export class ClassRule extends NamedStyleRule implements IClassRule
         if (this.parents)
         {
             this.name += " " + this.parents.map( v => typeof v === "string" ? v : wkf[WKF.ClassMoniker](v)).join(" ");
-            this.cssName = "." + this.name.replace( / /g, ".");
+            this.cssName = ("." + this.name.replace( / /g, ".")) as DotIdent;
         }
 	}
 
@@ -520,10 +520,10 @@ export class ClassRule extends NamedStyleRule implements IClassRule
 /**
  * The IDRule class describes a styleset that applies to elements identified by an ID.
  */
-export class IDRule extends NamedStyleRule implements IIDRule
+export class IDRule extends NamedStyleRule<PoundPrefix> implements IIDRule
 {
 	// Prefix for CSS element identifiers.
-	public get prefix(): "#" { return "#"; }
+	public get prefix(): PoundPrefix { return "#"; }
 }
 
 

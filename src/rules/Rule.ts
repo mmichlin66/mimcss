@@ -74,7 +74,7 @@ export interface IMimcssContainer
 export interface IRuleContainer extends IMimcssContainer
 {
 	/** Generates a name, which will be unique in this stylesheet */
-	getScopedName( ruleName: string | null, nameOverride?: string | INamedEntity): string;
+	getScopedName( ruleName: string | null, nameOverride?: string | INamedEntity, prefix?: string): string;
 
 	/** Inserts all rules defined in this container to either the style sheet or grouping rule. */
 	insert( ruleBag: IMimcssRuleBag): void;

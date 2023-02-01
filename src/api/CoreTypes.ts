@@ -107,6 +107,37 @@ export interface IStringProxy extends IGenericProxy<"string"> {}
 
 
 
+/** Prefix `"."` is used for CSS class names */
+export type DotPrefix = ".";
+
+/** Prefix `"#"` is used in CSS for HTML element identifiers */
+export type PoundPrefix = "#";
+
+/**
+ * Prefix `"--"` is used in CSS for custom properties and names in several at-rules such as
+ * `@color-progile` and `@font-palette`.
+ */
+export type DashedPrefix = "--";
+
+/**
+ * Represents the type used in CSS for class names.
+ */
+export type DotIdent = `${DotPrefix}${string}`;
+
+/**
+ * Represents the type used in CSS for HTML element identifiers.
+ */
+export type PoundIdent = `${PoundPrefix}${string}`;
+
+/**
+ * Represents the `<dashed-ident>` CSS type, which is a user-defined identifier that starts with
+ * two dashes. This is used for CSS custom properties as well as for names in several CSS
+ * at-rules, such as `@color-progile` and `@font-palette`.
+ */
+export type DashedIdent = `${DashedPrefix}${string}`;
+
+
+
 /**
  * Represents the `<string>` CSS type, which is either a quated string or functions that can be
  * used in string context, such as `attr()` and `counter()`

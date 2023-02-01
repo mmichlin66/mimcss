@@ -216,7 +216,7 @@ describe("activation", () =>
 
             class Derived extends Base
             {
-                red = this.$class({ fontWeight: 700 }, "name_override")
+                red = this.$class({ fontWeight: 700 }, ".name_override")
             }
 
             let sd = css.activate(Derived);

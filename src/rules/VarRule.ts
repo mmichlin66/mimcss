@@ -1,3 +1,4 @@
+import { DashedIdent } from "../api/CoreTypes";
 import {IVarRule, IConstRule, IStyleDefinition} from "../api/RuleTypes"
 import {VarTemplateName, ExtendedVarValue, ISyntaxTypeStyleset} from "../api/Stylesets"
 import { scheduleAction } from "../impl/SchedulingImpl";
@@ -13,7 +14,7 @@ import {IMimcssRuleBag, Rule, RuleLike} from "./Rule";
  */
 abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule implements IVarRule<K>
 {
-    public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>, nameOverride?: string | IVarRule<K>)
+    public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>, nameOverride?: DashedIdent | IVarRule<K>)
     {
         super(sd);
         this.template = template;
@@ -32,8 +33,8 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     // Processes the given rule.
     public process( ruleName: string | null): void
     {
-        this.name = this.rc.getScopedName( ruleName, this.nameOverride);
-        this.cssName = "--" + this.name;
+        this.cssName = this.rc.getScopedName(ruleName, this.nameOverride, "--") as DashedIdent;
+        this.name = this.cssName.substring(2);
     }
 
     /**
@@ -75,14 +76,14 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
     /**
      * Custom CSS property name prefixed with `"--"`.
      */
-    public cssName: string;
+    public cssName: DashedIdent;
 
     // Value of the custom CSS property.
     protected value?: ExtendedVarValue<K>;
 
     // Name or named object that should be used to create a name for this rule. If this property
     // is not defined, the name will be uniquely generated.
-    protected nameOverride?: string | IVarRule<K>;
+    protected nameOverride?: DashedIdent | IVarRule<K>;
 }
 
 
@@ -96,7 +97,7 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
 export class VarRule<K extends VarTemplateName = any> extends VarBaseRule<K>
 {
 	public constructor( sd: IStyleDefinition, template: K, value?: ExtendedVarValue<K>,
-        nameOverride?: string | IVarRule<K>)
+        nameOverride?: DashedIdent | IVarRule<K>)
 	{
         super( sd, template, value, nameOverride);
 	}
@@ -123,7 +124,7 @@ export class VarRule<K extends VarTemplateName = any> extends VarBaseRule<K>
 export class PropertyRule<K extends keyof ISyntaxTypeStyleset = any, T extends K | [string] = any> extends VarBaseRule<K>
 {
     public constructor( sd: IStyleDefinition, syntax: T, initValue?: ExtendedVarValue<K>, inherits: boolean = true,
-        nameOverride?: string | IVarRule<K>)
+        nameOverride?: DashedIdent | IVarRule<K>)
     {
         if (Array.isArray(syntax))
         {

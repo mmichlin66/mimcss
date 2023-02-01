@@ -1,5 +1,7 @@
-﻿import {RawExtended} from "./CoreTypes";
+﻿import { CssColor } from "./ColorTypes";
+import {DashedIdent, Extended, RawExtended} from "./CoreTypes";
 import {CssAngle, CssLength, CssNumber, CssPercent} from "./NumericTypes";
+import { IFontPaletteValuesRule } from "./RuleTypes";
 
 
 
@@ -62,6 +64,11 @@ export type FontOpticalSizing = "auto" | "none";
 
 
 
+/** Type for {@link IStyleset.fontPalette} style property */
+export type FontPalette = "normal" | "light" | "dark" | DashedIdent | IFontPaletteValuesRule;
+
+
+
 /**
  * Type for specfying keywords {@link IStyleset.fontSize} properties.
  */
@@ -84,6 +91,11 @@ export type FontVariantCaps = "normal" | "small-caps" | "all-small-caps" |
 
 
 
+/** Type for {@link IStyleset.fontVariantCaps} style property */
+export type FontVariantEmoji = "normal" | "text" | "emoji" | "unicode";
+
+
+
 /** Type for {@link IStyleset.fontVariantPosition} style property */
 export type FontVariantPosition = "normal" | "sub" | "super";
 
@@ -94,41 +106,52 @@ export type FontDisplay_FontFaceType = "auto" | "block" | "swap" | "fallback" | 
 
 
 
-/** Type of {@link IFontFace.fontStretch} property */
+/** Type of {@link IFontFace.fontStretch} desciptor */
 export type FontStretch_FontFaceType = FontStretch |
     [RawExtended<FontStretch>, RawExtended<FontStretch>];
 
 
 
-/** Type of {@link IFontFace.fontStyle} property */
+/** Type of {@link IFontFace.fontStyle} desciptor */
 export type FontStyle_FontFaceType = FontStyle |
     [RawExtended<CssAngle>, RawExtended<CssAngle>];
 
 
 
-/** Type of {@link IFontFace.fontWeight} property */
+/** Type of {@link IFontFace.fontWeight} desciptor */
 export type FontWeight_FontFaceType = FontWeight |
     [RawExtended<FontWeight>, RawExtended<FontWeight>];
 
 
 
-/** Possible named values for format part of the {@link IFontFace.src} property */
-export type FontSrcFormat = "woff" | "woff2" | "truetype" | "opentype" | "embedded-opentype" | "svg";
+/** Possible named values for format part of the {@link IFontFace.src} desciptor */
+export type FontSrcFormat = "woff" | "woff2" | "truetype" | "opentype" | "embedded-opentype" | "svg" | "collection";
 
-/** Type of a single part of the {@link IFontFace.src} property */
+/** Possible named values for format part of the {@link IFontFace.src} desciptor */
+export type FontSrcTech = "feature-opentype" | "feature-aat" | "feature-graphite" |
+    "color-COLRv0" | "color-COLRv1" | "color-SVG" | "color-sbix" | "color-CBDT" |
+    "variations" | "palettes" | "incremental";
+
+/** Type of a single part of the {@link IFontFace.src} desciptor */
 export type FontSrc = string | { local: RawExtended<string> } |
     {
         url: RawExtended<string>,
         format?: RawExtended<FontSrcFormat | FontSrcFormat[]>
+        tech?: RawExtended<FontSrcTech | FontSrcTech[]>
     };
 
-/** Type of {@link IFontFace.src} property */
+/** Type of {@link IFontFace.src} desciptor */
 export type FontSrc_FontFaceType = FontSrc | FontSrc[];
 
 
 
+/** Type of {@link IFontPaletteValues.overrideColors} descriptor */
+export type OverrideColors_FontPaletteValuesType = { [Index: number]: CssColor };
+
+
+
 /**
- * Interface representing the properties of the `@font-face` CSS rule.
+ * Interface representing the descriptors of the `@font-face` CSS rule.
  *
  * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face" target="mdn">MDN Page</a>
  */
@@ -214,6 +237,42 @@ export interface IFontFace
  * that is defined in the {@link IFontFace} interface.
  */
 export type ExtendedFontFace = { [K in keyof IFontFace]: RawExtended<IFontFace[K]> }
+
+
+
+/**
+ * Represents the descriptors of the `@font-palette-values` CSS rule.
+ *
+ * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-palette-values" target="mdn">MDN Page</a>
+ */
+export interface IFontPaletteValues
+{
+    /**
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-palette-values/font-family" target="mdn">MDN Page</a>
+     */
+    fontFamily?: string;
+
+    /**
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-palette-values/base-palette" target="mdn">MDN Page</a>
+     */
+    basePalette?: "light" | "dark" | number;
+
+    /**
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-palette-values/override-colors" target="mdn">MDN Page</a>
+     */
+    overrideColors?: OverrideColors_FontPaletteValuesType;
+
+}
+
+
+
+/**
+ * Maps all `@font-palette-values` descriptors defined in the {@link IFontPaletteValues}
+ * interface to the "extended" versions of their types. These extended types are defined using the
+ * {@link Extended} generic type, which adds {@link IRawProxy}, {@link ICustomVar} and
+ * {@link IConstant} to the type that is defined in the {@link IFontPaletteValues} interface.
+ */
+export type ExtendedFontPaletteValues = { [K in keyof IFontPaletteValues]: Extended<IFontPaletteValues[K]> }
 
 
 

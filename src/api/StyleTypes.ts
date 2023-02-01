@@ -669,7 +669,7 @@ export type Columns_StyleType = "auto" | CssNumber | Exclude<CssLength,number> |
  * Keywords that can be combined in the {@link IStyleset.contain|contain} style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/contain" target="mdn">MDN Page</a>
  */
-export type ContainAtomKeyword = "size" | "layout" | "style" | "paint";
+export type ContainAtomKeyword = "size" | "inline-size" | "layout" | "style" | "paint";
 
 /**
  * Keywords that can be only used as a sole value of the {@link IStyleset.contain|contain} style property

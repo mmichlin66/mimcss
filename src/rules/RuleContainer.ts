@@ -228,7 +228,7 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
 	 * Generates a globally unique CSS name for the given rule name unless this rule name already
 	 * exists either in a base class or in the chain of parent grouping rules.
 	 */
-	public getScopedName( ruleName: string, nameOverride?: string | INamedEntity): string
+	public getScopedName( ruleName: string, nameOverride?: string | INamedEntity, prefix?: string): string
 	{
         let name: string | undefined;
 
@@ -243,28 +243,31 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
             {
                 name = (sdc[symRuleNames] as Map<string,string>).get( ruleName);
                 if (name)
-                    return name;
+                    break;
             }
         }
 
-        if (nameOverride)
-            name = typeof nameOverride === "string" ? nameOverride : nameOverride.name;
-        else if (this.pc)
+        if (!name)
         {
-            // sub-rules of grouping rules (these are the style definitions with parents) always
-            // get their name from the top-level class.
-            name = this.pc.getScopedName( ruleName);
+            if (nameOverride)
+                name = typeof nameOverride === "string" ? nameOverride : nameOverride.name;
+            else if (this.pc)
+            {
+                // sub-rules of grouping rules (these are the style definitions with parents) always
+                // get their name from the top-level class.
+                name = this.pc.getScopedName( ruleName);
+            }
+            else
+                name = generateName( this.name, ruleName);
+
+            // if the style definition was created from processClass() function (as opposed to directly
+            // via new), remember the created name in the class's map of rule names to generated unique
+            // names.
+            if (this.fromClass)
+                (this.sdc[symRuleNames] as Map<string,string>).set( ruleName, name!);
         }
-        else
-            name = generateName( this.name, ruleName);
 
-        // if the style definition was created from processClass() function (as opposed to directly
-        // via new), remember the created name in the class's map of rule names to generated unique
-        // names.
-        if (this.fromClass)
-            (this.sdc[symRuleNames] as Map<string,string>).set( ruleName, name!);
-
-        return name!;
+        return !prefix || name.startsWith(prefix) ? name : prefix + name;
 	}
 
 
