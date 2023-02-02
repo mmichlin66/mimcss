@@ -1,8 +1,8 @@
 import {
     IStyleDefinitionClass, IStyleDefinition, IGroupRule, IMediaRule, ISupportsRule,
-    ILayerBlockRule, LayerMoniker
+    ILayerBlockRule, LayerMoniker, IContainerRule
 } from "../api/RuleTypes"
-import {MediaStatement, SupportsStatement} from "../api/MediaTypes";
+import {ContainerStatement, MediaStatement, SupportsStatement} from "../api/MediaTypes";
 import {processSD} from "./RuleContainer"
 import {IRuleContainer, Rule, symRC, IMimcssRuleBag} from "./Rule"
 import {media2s, supports2s} from "../impl/MiscImpl";
@@ -166,6 +166,55 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T,CSSMediaR
 
 
 /**
+ * The ContainerRule class describes a CSS @media rule.
+ */
+export class ContainerRule<T extends IStyleDefinition> extends GroupRule<T,CSSMediaRule> implements IContainerRule<T>
+{
+	public constructor(sd: IStyleDefinition, statement: ContainerStatement, instOrClass: T | IStyleDefinitionClass<T>,
+        nameOverride?: string | IContainerRule)
+	{
+		super( sd, "container", instOrClass);
+		this.stmt = statement;
+        this.nameOverride = nameOverride;
+	}
+
+	// Processes the given rule.
+	public process( ruleName: string | null): void
+	{
+		super.process( ruleName);
+        this.name = this.nameOverride ? this.rc.getScopedName(ruleName, this.nameOverride) : "";
+	}
+
+	// Returns the condition string of this grouping rule.
+	protected getCond(): string | null
+    {
+        return `${this.name} ${media2s( this.stmt as MediaStatement)}`;
+    }
+
+    /** Optional name of the container. */
+    public get containerName(): string { return this.name; }
+
+
+
+	// media statement for this rule.
+	private stmt: ContainerStatement;
+
+    /**
+	 * Rule's name - this is a unique name that is assigned by the Mimcss infrastucture. This name
+	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
+	 * properties (--).
+	 */
+	public name: string;
+
+	/**
+	 * String or another container rule object used to create the name of this layer.
+	 */
+	private nameOverride?: string | IContainerRule;
+}
+
+
+
+/**
  * The LayerRule class describes a layer definition.
  */
 export class LayerBlockRule<T extends IStyleDefinition> extends GroupRule<T,CSSGroupingRule>
@@ -208,7 +257,7 @@ export class LayerBlockRule<T extends IStyleDefinition> extends GroupRule<T,CSSG
 	public name: string;
 
 	/**
-	 * Layer name or layer object used to create the name of this layer.
+	 * String or another layer rule object used to create the name of this layer.
 	 */
 	private nameOverride: undefined | LayerMoniker;
 }

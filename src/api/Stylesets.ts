@@ -126,7 +126,7 @@ export interface IStyleset
      * {@link animationFillMode}, and {@link animationPlayState}.
      *
      * The values for this property can be either a string or an object of type
-     * {@link Animation_Single} or an array of either strings or {@link Animation_Single} objects.
+     * {@link StyleTypes!Animation_Single} or an array of either strings or {@link StyleTypes!Animation_Single} objects.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation" target="mdn">MDN Page</a>
@@ -146,7 +146,7 @@ export interface IStyleset
      * animation to an element before beginning to perform the animation. The animation can start
      * later, immediately from its beginning, or immediately and partway through the animation.
      *
-     * In Mimcss, the type of this property is {@link CssTime}. Integer numbers are treated as time in
+     * In Mimcss, the type of this property is {@link NumericTypes!CssTime}. Integer numbers are treated as time in
      * milliseconds; floating point numbers are treated as time in seconds.
      *
      * **See Also:**
@@ -183,7 +183,7 @@ export interface IStyleset
      * The **animation-duration** CSS property sets the length of time that an animation takes
      * to complete one cycle.
      *
-     * In Mimcss, the type of this property is {@link CssTime}. Integer numbers are treated as time in
+     * In Mimcss, the type of this property is {@link NumericTypes!CssTime}. Integer numbers are treated as time in
      * milliseconds; floating point numbers are treated as time in seconds.
      *
      * **See Also:**
@@ -575,7 +575,7 @@ export interface IStyleset
      * Thus ["round","space"] will be interpreted as "round, space" and not "round space"; that is, it will
      * define values for two images instead of values fro X and Y axes for one image. If you need
      * to specify values fro both axes you must use array within array - even for a single size:
-     * [["round","space"]] will be interpreted as "round space".
+     * `[["round","space"]]` will be interpreted as "round space".
      *
      * ```typescript
      * [[include: styleProps/b/backgroundRepeat.ts]]
@@ -600,7 +600,7 @@ export interface IStyleset
      * Thus [100,200] will be interpreted as "100px, 200px" and not "100px 200px"; that is, it will
      * define two sizes each with a width instead of one size with both width and height. If you need
      * to specify both width and height you must use array within array - even for a single size:
-     * [[100,200]] will be interpreted as "100px 200px".
+     * `[[100,200]]` will be interpreted as "100px 200px".
      *
      * ```typescript
      * [[include: styleProps/b/backgroundSize.ts]]
@@ -1503,7 +1503,7 @@ export interface IStyleset
      * make it more noticeable. By default, it is black, but its color can be altered with this
      * property.
      *
-     * The property allows the `"auto"` keyword value in addition to standard {@link CssColor} type.
+     * The property allows the `"auto"` keyword value in addition to standard {@link ColorTypes!CssColor} type.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color" target="mdn">MDN Page</a>
@@ -2112,7 +2112,7 @@ export interface IStyleset
      * which maps to a physical inset depending on the element's writing mode, directionality,
      * and text orientation. It corresponds to the {@link top}, {@link right}, {@link bottom}, or {@link left}
      * property depending on the values defined for {@link writingMode}, {@link direction}, and
-     * [[textOrientation]].
+     * {@link textOrientation}.
      *
      * **See Also:**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/inset-block-end" target="mdn">MDN Page</a>
@@ -3634,7 +3634,7 @@ export interface IStyleset
 /**
  * The ExtendedBaseStyleset type maps all CSS properties defined in the {@link IStyleset} interface to
  * the "extended" versions of their types. These extended types are defined by adding basic keywords
- * (e.g. "unset", "initial", etc.) as well as {@link IRawProxy} and {@link ICustomVar} to the type that
+ * (e.g. "unset", "initial", etc.) as well as {@link CoreTypes!IRawProxy} and {@link CoreTypes!ICustomVar} to the type that
  * is defined in the IStyleset interface.
  */
 export type ExtendedIStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStyleset[K]> }
@@ -3643,7 +3643,8 @@ export type ExtendedIStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStylese
 
 /**
  * The `ISyntaxTypeStyleset` interface maps CSS syntax names to the types, which can be used for
- * defining custom CSS properties (a.k.a. variables) using the {@link $property} and {@link $var} methods.
+ * defining custom CSS properties (a.k.a. variables) using the {@link RuleAPI!StyleDefinition.$property}
+ * and {@link RuleAPI!StyleDefinition.$var} methods.
  *
  * **Example:**
  *
@@ -3772,7 +3773,7 @@ export interface ICustomTypeStyleset
  * {@link IStyleset} interface. Sometimes, however, there is a need to define variables of some other
  * types, for which there is no suitable style property. The `IVarTemplateStyleset` interface
  * combines serveral "styleset" interfaces into one thus defining the names and corresponding
- * types that can be used in {@link $var} and {@link $property} methods.
+ * types that can be used in {@link RuleAPI!StyleDefinition.$var} and {@link RuleAPI!StyleDefinition.$property} methods.
  */
 export interface IVarTemplateStyleset extends IStyleset,
     ISyntaxTypeStyleset, ICustomTypeStyleset {}
@@ -3780,7 +3781,7 @@ export interface IVarTemplateStyleset extends IStyleset,
 
 /**
  * The VarTemplateName type defines the keys (strings) that can be used as templates for defining
- * custom CSS properties using the {@link $var} function.
+ * custom CSS properties using the {@link RuleAPI!StyleDefinition.$var} function.
  */
 export type VarTemplateName = keyof IVarTemplateStyleset;
 
@@ -3809,16 +3810,16 @@ export type ExtendedVarValue<K extends VarTemplateName> = ExtendedProp<VarValue<
  * `"--""` property of the Styleset type.
  *
  * `CustomVar_StyleType` objects should be mostly used to override custom properties that have
- * previously been defined at the top-level using the {@link $var} function. That way you can have a
+ * previously been defined at the top-level using the {@link RuleAPI!StyleDefinition.$var} function. That way you can have a
  * "global" value of a custom property and assign a different value to it under a certain CSS
  * selector.
  *
  * The values of the type can be specified as either a two-item or a three-item tuple or as style
  * definition class or style definition object.
  *
- * The two-item tuple is used with a previously defined custom CSS property represented by an {@link IVarRule}
- * object:
- * - The first item is the {@link IVarRule} object.
+ * The two-item tuple is used with a previously defined custom CSS property represented by an
+ * {@link RuleTypes!IVarRule} object:
+ * - The first item is the {@link RuleTypes!IVarRule} object.
  * - The second item is the value
  *
  * The three-item array allows explicitly specifying the custom CSS property name:
@@ -3969,7 +3970,7 @@ export interface IPageRuleStyleset
 }
 
 /**
- * Defines type that can be passed to the {@link $page} method that creates a `@page` at-rule. This
+ * Defines type that can be passed to the {@link RuleAPI!StyleDefinition.$page} method that creates a `@page` at-rule. This
  * type allows:
  * - page-relevant style properties
  * - "--" property for specifying custom CSS variables
@@ -4006,7 +4007,7 @@ export type PageRuleStyleset = PageBoxStyleset &
  *   ampersand symbol to refer to the parent style selector. If the ampersand symbol is not used,
  *   the selector will be simply appended to the parent selector.
  *
- * Functions that return style rules (e.g. {@link $class}) accept the `CombinedStyleset` as a parameter,
+ * Functions that return style rules (e.g. {@link RuleAPI!StyleDefinition.$class}) accept the `CombinedStyleset` as a parameter,
  * for example:
  *
  * ```typescript
@@ -4115,7 +4116,7 @@ export type SyntaxKey = (keyof ISyntaxTypeStyleset) & string;
 /**
  * Type that maps a tuple type with syntax keys to a tuple type with corresponding syntax types.
  * For example, it will map type `["<color>", "<length>"]` to type `[CssColor, CssLength]`.
- * This type is used when defining parameters for the {@link paint} CSS function.
+ * This type is used when defining parameters for the {@link ShapeAPI!.paint} CSS function.
  */
 export type MappedSyntaxTypes<T extends SyntaxKey[]> =
     { [i in keyof T]: T[i] extends SyntaxKey ? ISyntaxTypeStyleset[T[i]] : never }
@@ -4133,7 +4134,7 @@ declare global
          * The `$` property exposes an object through which individual style properties can
          * be set with their IStyleset-defined types. It is a lso possible to assign a Styleset
          * object to this property, which will merge with existing styles for the element. As
-         * opposed to {@link updateStyleProp}, {@link updateVar} and {@link updateStyleset} methods, assigning to the
+         * opposed to {@link StyleAPI!updateStyleProp}, {@link StyleAPI!updateVar} and {@link StyleAPI!updateStyleset} methods, assigning to the
          * `styleset` property or assigning individual style properties throught it works
          * immediately - without any scheduling.
          */

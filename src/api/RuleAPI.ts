@@ -4,9 +4,9 @@ import {
     ICounterRule, IGridLineRule, IGridAreaRule, IImportRule, IFontFaceRule, INamespaceRule, IPageRule,
     IStyleDefinitionClass, ISupportsRule, IMediaRule, IClassNameRule, IConstRule, ClassMoniker,
     NameGenerationMethod, ICounterStyleRule, IStyleDefinition, IColorProfileRule, IPageNameRule,
-    ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions, IScrollTimelineRule, IFontPaletteValuesRule
+    ILayerBlockRule, ILayerNameRule, LayerMoniker, ILayerOrderRule, ImportRuleOptions, IScrollTimelineRule, IFontPaletteValuesRule, IContainerRule
 } from "./RuleTypes";
-import {MediaStatement, SupportsStatement} from "./MediaTypes"
+import {ContainerStatement, MediaStatement, SupportsStatement} from "./MediaTypes"
 import {ExtendedFontFace, ExtendedFontPaletteValues} from "./FontTypes";
 import {ColorProfileRenderingIntent} from "./ColorTypes";
 import {ExtendedCounterStyleset} from "./CounterTypes";
@@ -14,6 +14,7 @@ import {
     VarTemplateName, ExtendedVarValue, CombinedStyleset, CombinedClassStyleset,
     ISyntaxTypeStyleset, PageRuleStyleset
 } from "./Stylesets";
+import { ExtendedScrollTimeline } from "./ScrollTimelineTypes";
 import {symRC} from "../rules/Rule";
 import {
     embeddedDecorator, getCurrentTheme, processSD, configNames, RuleContainer,
@@ -29,9 +30,8 @@ import {
     FontFaceRule, ImportRule, NamespaceRule, ClassNameRule, ColorProfileRule, PageNameRule,
     LayerNameRule, LayerOrderRule, ScrollTimelineRule, FontPaletteValuesRule
 } from "../rules/MiscRules"
-import {SupportsRule, MediaRule, LayerBlockRule} from "../rules/GroupRules"
+import {SupportsRule, MediaRule, LayerBlockRule, ContainerRule} from "../rules/GroupRules"
 import {a2s} from "../impl/Utils";
-import { ExtendedScrollTimeline } from "./ScrollTimelineTypes";
 
 
 
@@ -167,7 +167,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * the class. Such class can be later used either in conditional grouping rules or in derived
      * style definition classes.
      *
-     * The returned {@link IClassRule} interface has the `name` property that should be used to assign
+     * The returned {@link RuleTypes!IClassRule} interface has the `name` property that should be used to assign
      * the class to an HTML element
      *
      * **Example:**
@@ -243,8 +243,8 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param classes List of class names specified either as a string or {@link IClassRule} or
-     * {@link IClassNameRule} objects.
+     * @param classes List of class names specified either as a string or {@link RuleTypes!IClassRule} or
+     * {@link RuleTypes!IClassNameRule} objects.
      * @returns `IClassNameRule` object whose `name` property contains the combined class name, e.g.
      * `"class1 class2"`. The `cssClassName` property contains the combined selector, e.g.
      * `".class1.class2"`.
@@ -263,7 +263,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * parameters just to "declare" the ID. Such ID can be later used either in conditional
      * grouping rules or in derived style definition classes.
      *
-     * The returned {@link IIDRule} interface has the `name` property that should be used to assign
+     * The returned {@link RuleTypes!IIDRule} interface has the `name` property that should be used to assign
      * the ID to an HTML element.
      *
      * **Example:**
@@ -345,12 +345,12 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
 
     /**
      * Creates a new style rule with an arbitrary complex selector. Selectors can be specified as
-     * one or array of {@link SelectorItem} objects where each `SelectorItem` is one of the following
+     * one or array of {@link CoreTypes!CssSelector} objects where each `CssSelector` is one of the following
      * types:
      * - string - allows any content but lacks type-safety checks.
-     * - any style rule, that is a rule that implements the {@link IStyleRule} interface. This allows
+     * - any style rule, that is a rule that implements the {@link RuleTypes!IStyleRule} interface. This allows
      *   using prevously defined tag, class, ID and other style rules as selector items
-     * - {@link selector} function - a tag function that allows convenient mixing of free-format strings
+     * - {@link CoreAPI!selector} function - a tag function that allows convenient mixing of free-format strings
      *   and strongly typed style rules.
      *
      * When multiple selector items are specified, they will be concatenated into a single string.
@@ -398,7 +398,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * without parameters just to "declare" the animation. Such animation can be later used either
      * in conditional grouping rules or in derived style definition classes.
      *
-     * The returned {@link IKeyframesRule} interface represents an object that should be used when
+     * The returned {@link RuleTypes!IKeyframesRule} interface represents an object that should be used when
      * using the keyframes name in the `animation-name` or `animation` style properties.
      *
      * **Example:**
@@ -417,7 +417,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param frames Array of {@link AnimationFrame} objects. Each animation frame contains a waypoint
+     * @param frames Array of {@link RuleTypes!AnimationFrame} objects. Each animation frame contains a waypoint
      * and a styleset.
      * @param nameOverride String or another `IKeyframesRule` object that determines the name of the
      * animation. If this optional parameter is defined, the name will override the Mimcss name
@@ -463,7 +463,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * ```
      *
      * @param template Either a name of a style property (in camelCase) or a name of the property from
-     * the {@link IVarTemplateStyleset} interface. The type corresponding to this property defines the type
+     * the {@link Stylesets!IVarTemplateStyleset} interface. The type corresponding to this property defines the type
      * of the second parameter.
      * @param value The value assigned to the property.
      * @param nameOverride String or another `IVarRule` object that determines the name of the
@@ -487,9 +487,9 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * an explicit name or another custom variable rule.
      *
      * This variant allows specifying syntax as one of predefined syntax items such as `<number>`
-     * or `<color>` optionally accompanied with the multipliers `"#"` or `"+". The type of initial
+     * or `<color>` optionally accompanied with the multipliers `"#"` or `"+"`. The type of initial
      * value as well as the type that can be passed to the `setValue` method of the returned
-     * {@link IVarRule} interface will be enforced according to the syntax specified.
+     * {@link RuleTypes!IVarRule} interface will be enforced according to the syntax specified.
      *
      * **Example:**
      *
@@ -510,7 +510,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param syntax Name of the property from the {@link ISyntaxTypeStyleset} interface. The type
+     * @param syntax Name of the property from the {@link Stylesets!ISyntaxTypeStyleset} interface. The type
      * corresponding to this property defines the type of the initial value parameter.
      * @param initValue The value to be used as initial value of the property.
      * @param inherits Flag indicating whether the custom property registration inherits by default.
@@ -532,7 +532,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      *
      * This variant allows specifying arbitrary syntax and the developers are responsible to
      * provide correct syntax. The type of initial value as well as the type that can be passed to
-     * the `setValue` method of the returned {@link IVarRule} interface are limited to string. The
+     * the `setValue` method of the returned {@link RuleTypes!IVarRule} interface are limited to string. The
      * developers are responsible to pass values that conform to the specified syntax.
      *
      * **Example:**
@@ -604,7 +604,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * ```
      *
      * @param template Either a name of a style property (in camelCase) or a name of the property from
-     * the {@link IVarTemplateStyleset} interface. The type corresponding to that property defines the type
+     * the {@link Stylesets!IVarTemplateStyleset} interface. The type corresponding to that property defines the type
      * of the second parameter.
      * @param value The value assigned to the constant.
      * @returns The `IConstRule` object that represents the value of the constant. The value is
@@ -624,7 +624,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      *
      * Counter rules don't create any CSS rules, but they create unique names that can be used
      * for `counter-reset` and `counter-increment` style properties. Counter rules are usually used
-     * in conjunction with the {@link counter} and {@link counters} functions.
+     * in conjunction with the {@link CoreAPI!counter} and {@link CoreAPI!counters} functions.
      *
      * **Example:**
      *
@@ -747,7 +747,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * can be type-safely referred to from style rules.
      *
      * Every grid area defines two grid line rules in each direction, which can be accessed using the
-     * {@link IGridAreaRule.startLine|startLine} and {@link IGridAreaRule.endLine|endLine} properties.
+     * {@link RuleTypes!IGridAreaRule.startLine} and {@link RuleTypes!IGridAreaRule.endLine} properties.
      *
      * **Example:**
      *
@@ -812,7 +812,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param fontface Object implementing the {@link IFontFace} interface defining the parameter of the
+     * @param fontface Object implementing the {@link FontTypes!IFontFace} interface defining the parameter of the
      * font to use.
      * @returns The `IFontFaceRule` object that represents the `@font-face` at-rule.
      */
@@ -903,7 +903,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
      * }
      * ```
      *
-     * @param namespace Namespace string - use the {@link WebNamespaces} for well-known namespaces.
+     * @param namespace Namespace string - use the {@link CoreTypes!WebNamespaces} for well-known namespaces.
      * @param prefix Prefix string to use for the namespace.
      * @returns The `INamespaceRule` object that represents the namespace rule.
      */
@@ -1153,6 +1153,37 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
 
 
     /**
+     * Creates a new `@media` at-rule.
+     *
+     * **Example:**
+     *
+     * ```typescript
+     * class MyStyles extends css.StyleDefinition
+     * {
+     *     cls = this.$class({ color: "red"})
+     *
+     *     ifNarrowScreen = this.$media( { maxWidth: 800 },
+     *         class extends css.StyleDefinition<MyStyles>
+     *         {
+     *             cls = this.$class({ color: "pink"})
+     *         }
+     *     )
+     * }
+     * ```
+     *
+     * @param statement Media statement containing one or more media queries.
+     * @param instOrClass Either style definition class or an instance of a style defintion class.
+     * @returns `IMediaRule` object representing the media rule
+     */
+    public $container<T extends StyleDefinition<StyleDefinition<P>>>(statement: ContainerStatement,
+        instOrClass: T | IStyleDefinitionClass<T>, nameOverride?: string | IContainerRule): IContainerRule<T>
+    {
+        return new ContainerRule( this, statement, instOrClass, nameOverride);
+    }
+
+
+
+    /**
      * Creates a new `@layer` name at-rule. The layer name will be created when the rule is processed as
      * part of the style definition class. The name can be also overridden by providing either an
      * explicit name or another layer rule.
@@ -1319,19 +1350,21 @@ export const embedded = (category: string): ClassDecorator =>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sets the method used to generate names of CSS entities. If the method is {@link Optimized}, the
+ * Sets the method used to generate names of CSS entities. If the method is
+ * {@link RuleTypes!NameGenerationMethod.Optimized}, the
  * names will be created by appending a unique number to the given prefix. If the prefix is not
  * specified, the standard prefix `"n"` will be used.
  *
- * By default, the development version of the library (mimcss.dev.js) uses the {@link Scoped}
- * method and the production version (mimcss.js) uses the {@link Optimized} method. This function can
+ * By default, the development version of the library (mimcss.dev.js) uses the
+ * {@link RuleTypes!NameGenerationMethod.Scoped} method and the production version (mimcss.js) uses
+ * the {@link RuleTypes!NameGenerationMethod.Optimized} method. This function can
  * be called to switch to the alternative method of name generation in either the development or
  * the production builds.
  *
  * @param method Indicates what method to use.
  * @param prefix Optional string that will serve as a prefix to which unique numbers will be added
  * to generate optimized names. Normally ignored if the `method` parameter is anything other than
- * {@link NameGenerationMethod.Optimized}; however can be used in some special circumstances like
+ * {@link RuleTypes!NameGenerationMethod.Optimized}; however can be used in some special circumstances like
  * style definitions created using anonymous classes..
  */
 export const configNameGeneration = (method: NameGenerationMethod, prefix?: string): void =>
@@ -1350,7 +1383,7 @@ export const configNameGeneration = (method: NameGenerationMethod, prefix?: stri
  * concatenates the class names corresponding to the monikers form the array into a single string
  * that can be assigned to a `class` property of an HTML element. This can be useful when an
  * element should have multiple classes assigned to it and some of these classes are specified as
- * {@link IClassRule} or {@link IClassNameRule} while others are specified as strings.
+ * {@link RuleTypes!IClassRule} or {@link RuleTypes!IClassNameRule} while others are specified as strings.
  *
  * @param monikers One or more of either class names or class rule objects.
  * @returns The string that combines all class names (separated with space) from the input array.
@@ -1361,20 +1394,6 @@ export const className = (...monikers: ClassMoniker[]): string =>
         Array.isArray(moniker) ? className( ...moniker) :
         moniker && moniker.name
     );
-
-/**
- * @deprecated Use the {@link className} function.
- *
- * Returns class name for the given moniker. If the moniker is an array (of other monikers),
- * concatenates the class names corresponding to the monikers form the array into a single string
- * that can be assigned to a `class` property of an HTML element. This can be useful when an
- * element should have multiple classes assigned to it and some of these classes are specified as
- * {@link IClassRule} or {@link IClassNameRule} while others are specified as strings.
- *
- * @param monikers One or more of either class names or class rule objects.
- * @returns The string that combines all class names (separated with space) from the input array.
- */
-export const classes = className;
 
 /**
  * Chooses the first non-empty name from the given list of classes. This is useful when an element
@@ -1405,30 +1424,9 @@ export const chooseClass = (...monikers: ClassMoniker[]): string =>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Rule virtualization and theming.
+// Theming.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @deprecated This decorator is deprecated as all rules defined in style definition classes are
- * always virtualized.
- *
- * Decorator that should be applied to a rule if it is defined and used in the same style
- * definition class but then is overridden in a derived style definition class. The problem
- * this solves is this: when a rule is defined in a base class and then overridden in a derived
- * class, when an instance of the derived class is created, the rules that are created in the
- * base and derived classes see different values of the rule. Since our rules are defined as
- * part of the constructor, the base class constructor's code only sees the value assigned in that
- * code. If another rule in the base class uses this first rule, this value is remembered.
- *
- * The `@virtual` decorator creates a Proxy object for the rule with the handler that keeps the
- * most recent value set. Thus when a rule in the base class's constructor uses a virtualized
- * rule, the first rule will see the overridden value of the rule when accessed in the
- * post-constructor code.
- */
-export const virtual = (target: any, name: string): void => {};
-
-
 
 /**
  * The `ThemeDefinition` class is a base for all classes that define themes. In addition to

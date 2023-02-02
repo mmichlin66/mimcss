@@ -19,7 +19,7 @@ import { virtMerge } from "../impl/Virt";
 /**
  * Registers the given function to be used for converting values of the given style property to
  * string. The `registerStyleProperty` function must be used after adding the property to the
- * {@link IStyleset} interface via the module augmentation technique if the conversion to string
+ * {@link Stylesets!IStyleset} interface via the module augmentation technique if the conversion to string
  * requires non-standard operations. This function should not be called for propeties whose
  * values only include numbers, strings, functions returning a string, objects whose `toString`
  * method produces the necessary string or arrays of the above types.
@@ -68,11 +68,11 @@ export function getStylePropValue(name: string, value: any): string
 /**
  * Sets, updates or removes the given style property for the given DOM element.
  *
- * @typeparam K A key in the {@link IStyleset} interface, which defines the property name.
+ * @typeparam K A key in the {@link Stylesets!IStyleset} interface, which defines the property name.
  * @param elm DOM element whose styles will be set.
  * @param name Name of the style property. This can be either dash-case or camelCase name.
  * @param value New value for the style property. The value can be of any type allowed for the
- * property in the {@link IStyleset} interface. If the value is `null` or `undefined`, the style property
+ * property in the {@link Stylesets!IStyleset} interface. If the value is `null` or `undefined`, the style property
  * is removed from the element's style object.
  */
 export const updateStyleProp = <K extends keyof IStyleset>(style: CSSStyleDeclaration, name: K,
@@ -84,12 +84,12 @@ export const updateStyleProp = <K extends keyof IStyleset>(style: CSSStyleDeclar
 /**
  * Sets, updates or removes the given custom CSS property for the given DOM element.
  *
- * @typeparam K Key of the {@link IVarTemplateStyleset} interface that determines the type of the
+ * @typeparam K Key of the {@link Stylesets!IVarTemplateStyleset} interface that determines the type of the
  * custom CSS property and of the fallback value.
  * @param elm DOM element whose styles will be set.
- * @param varObj Custom CSS property object created using the {@link $var} function.
+ * @param varObj Custom CSS property object created using the {@link RuleAPI.StyleDefinition.$var} function.
  * @param value New value for the custom CSS property. The value can be of any type allowed for the
- * property in the {@link IIVarTemplateStyleset} interface. If the value is `null` or `undefined`,
+ * property in the {@link Stylesets!IVarTemplateStyleset} interface. If the value is `null` or `undefined`,
  * the custom property is removed from the element's style object.
  */
 export const updateVar = <K extends VarTemplateName>(style: CSSStyleDeclaration, varObj: IVarRule<K>,
@@ -115,7 +115,7 @@ export const updateStyleset = (style: CSSStyleDeclaration, styleset: Styleset | 
 
 
 /**
- * Serializes the given {@link Styleset} to a string.
+ * Serializes the given {@link Stylesets!Styleset} to a string.
  * @param styleset
  */
 export const stylesetToString = (styleset: Styleset): string => ss2s( styleset);
@@ -155,7 +155,7 @@ export const mergeStylesheets = (target: any, ...objects: any[]): any => virtMer
 
 /**
  * Converts the given media query value to the CSS media query string. This function can be used
- * by libraries that allow specifying {@link MediaStatement} for the `media` attribute of elements
+ * by libraries that allow specifying {@link MediaTypes!MediaStatement} for the `media` attribute of elements
  * such as `<link>`, `<style>` and `<source>`
  */
 export const mediaToString = (query: MediaStatement): string => query ? media2s( query) : "";

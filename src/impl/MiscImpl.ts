@@ -1,5 +1,5 @@
 ﻿import {ExtendedFontFace, ExtendedFontPaletteValues, IFontFace, IFontPaletteValues, OverrideColors_FontPaletteValuesType} from "../api/FontTypes"
-import {IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatement} from "../api/MediaTypes";
+import {IContainerFeatureset, IMediaFeatureset, MediaQuery, MediaStatement, SupportsQuery, SupportsStatement} from "../api/MediaTypes";
 import {sp2s} from "./StyleImpl";
 import {camelToDash, v2s, a2s, WKF, V2SOptions, wkf, propSet2s} from "./Utils";
 import {ExtendedCounterStyleset, ICounterStyleset} from "../api/CounterTypes";
@@ -15,7 +15,7 @@ import { IIDRule } from "../api/RuleTypes";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts the given media query object to the CSS media query string
+ * Converts the given media statement object to the CSS media query string
  */
 export const media2s = (statement?: MediaStatement): string =>
     v2s( statement, {
@@ -59,7 +59,7 @@ const mediaFeature2s = (dashName: string, camelName: string, val: any, options: 
 
 
 
-const mediaFeatureInfos: { [K in keyof IMediaFeatureset]?: V2SOptions } =
+const mediaFeatureInfos: { [K in keyof (IMediaFeatureset & IContainerFeatureset)]?: V2SOptions } =
 {
     aspectRatio: {
         num: (v: number) => v + "/1"
@@ -73,6 +73,12 @@ const mediaFeatureInfos: { [K in keyof IMediaFeatureset]?: V2SOptions } =
     width: WKF.Length,
     minWidth: WKF.Length,
     maxWidth: WKF.Length,
+    blockSize: WKF.Length,
+    minBlockSize: WKF.Length,
+    maxBlockSize: WKF.Length,
+    inlineSize: WKF.Length,
+    minInlineSize: WKF.Length,
+    maxInlineSize: WKF.Length,
 };
 
 // Set of media features that allow range of values

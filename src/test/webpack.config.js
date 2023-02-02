@@ -9,6 +9,7 @@ module.exports = [
             "./lib/test/specs/testBackgrounds.js",
             "./lib/test/specs/testBorders.js",
             "./lib/test/specs/testColors.js",
+            "./lib/test/specs/testConditionalRules.js",
             "./lib/test/specs/testCounters.js",
             "./lib/test/specs/testImages.js",
             "./lib/test/specs/testPageRules.js",

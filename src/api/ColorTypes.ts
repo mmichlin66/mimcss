@@ -7,7 +7,7 @@ import { CssAngle, CssPercent } from "./NumericTypes";
 /**
  * The `INamedColors` interface lists the names of standard Web colors. It is needed to allow developers
  * to add new named colors through module augmentation technique. This interface is implemented by the
- * {@link Colors} object, which provides numeric values for the standard Web colors.
+ * {@link ColorAPI!Colors} object, which provides numeric values for the standard Web colors.
  */
 export interface INamedColors
 {
@@ -214,8 +214,9 @@ export type ColorKeyword = NamedColor | "transparent" | "currentcolor" | SystemC
  *     ignored.
  *   - floating point part of the number is treated as percents of alpha channel. If there is no
  *     floating part, alpha is 1.
- * - functions: {@link rgb}, {@link hsl}, {@link hwb}, {@link lab}, {@link lch}, {@link colorMix},
- *   {@link colorContrast}, {@link color}, {@link alpha}.
+ * - functions: {@link ColorAPI!rgb}, {@link ColorAPI!hsl}, {@link ColorAPI!hwb}, {@link ColorAPI!lab},
+ *   {@link ColorAPI!lch}, {@link ColorAPI!colorMix}, {@link ColorAPI!colorContrast},
+ *   {@link ColorAPI!color}, {@link ColorAPI!alpha}.
  *
  * **Examples:**
  *
@@ -259,10 +260,11 @@ export type CssColor = number | ColorKeyword | IRgbFunc | IHslFunc | IHwbFunc | 
 * the following types:
 * - keywords: any string that is a name of a property in the {@link INamedColors} interface or of the
 *   {@link SystemColor} type.
-* - functions: {@link rgb}, {@link hsl}, {@link alpha} as well as any function that returns the IColorProxy type.
+* - functions: {@link ColorAPI!rgb}, {@link ColorAPI!hsl}, {@link ColorAPI!alpha} as well as any
+*   function that returns the IColorProxy type.
 *
 * Non-numeric representation of color is sometimes required where it can conflict with numeric
-* representations of other style properties. For example, the {@link border} property allows specifying
+* representations of other style properties. For example, the {@link Stylesets!IStyleset.border} property allows specifying
 * border width, style and color in any order. In this case a numeric representation of color could
 * come into conflict with a numeric representation of width. Therefore, for the `border` property,
 * only non-numeric color representation is allowed.
@@ -273,7 +275,7 @@ export type CssNonNumericColor = Exclude<CssColor,number>;
 
 /**
  * Represents an invocation of the CSS `rgb()/rgba()` function. This interface is returned from the
- * {@link rgb} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!rgb} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface IRgbFunc extends ICssColorFunc
 {
@@ -296,7 +298,7 @@ export interface IRgbFunc extends ICssColorFunc
 
 /**
  * Represents an invocation of the CSS `hsl()/hsla()` function. This interface is returned from the
- * {@link hsl} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!hsl} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface IHslFunc extends ICssColorFunc
 {
@@ -319,7 +321,7 @@ export interface IHslFunc extends ICssColorFunc
 
 /**
  * Represents an invocation of the CSS `hwb()` function. This interface is returned from the
- * {@link hwb} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!hwb} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface IHwbFunc extends ICssColorFunc
 {
@@ -342,7 +344,7 @@ export interface IHwbFunc extends ICssColorFunc
 
 /**
  * Represents an invocation of the CSS `lch()` function. This interface is returned from the
- * {@link lch} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!lch} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface ILchFunc extends ICssColorFunc
 {
@@ -365,7 +367,7 @@ export interface ILchFunc extends ICssColorFunc
 
 /**
  * Represents an invocation of the CSS `lab()` function. This interface is returned from the
- * {@link lab} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!lab} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface ILabFunc extends ICssColorFunc
 {
@@ -388,7 +390,7 @@ export interface ILabFunc extends ICssColorFunc
 
 /**
  * Represents an invocation of the CSS `color-contrast()` function. This interface is returned from the
- * {@link colorContrast} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!colorContrast} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface IColorContrastFunc extends ICssColorFunc
 {
@@ -412,7 +414,7 @@ export type ColorSpace = "srgb" | "hsl" | "hwb" | "xyz" | "lab" | "lch" | "oklab
 
 /**
  * Represents an invocation of the CSS `color-mix()` function. This interface is returned from the
- * {@link colorMix} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!colorMix} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface IColorMixFunc extends ICssColorFunc
 {
@@ -464,7 +466,7 @@ export type ColorProfile = "srgb" | "srgb-linear" | "display-p3" | "a98-rgb" | "
 
 /**
  * Represents an invocation of the CSS `color()` function. This interface is returned from the
- * {@link color} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link ColorAPI!color} function. Developers can use this structure wherever {@link CssColor} is accepted.
  */
 export interface IColorFunc extends ICssColorFunc
 {
@@ -483,7 +485,7 @@ export interface IColorFunc extends ICssColorFunc
 
 
 /**
- * Represents an invocation of the {@link alpha} function. Developers can use this structure wherever
+ * Represents an invocation of the {@link ColorAPI!alpha} function. Developers can use this structure wherever
  * CssColor is accepted.
  */
 export interface IAlphaFunc extends ICssColorFunc

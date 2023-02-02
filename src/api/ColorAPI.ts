@@ -11,7 +11,7 @@ import {a2s, fdo, mv2s, v2s, wkf, WKF} from "../impl/Utils";
 /**
  * Object whose property names are the well-known Web color names while values correspond to the
  * hexadecimal representation of the RGB separations (without an alpha mask). The properties of
- * this object can be used wherever the {@link CssColor} type can be used. Since the properties are
+ * this object can be used wherever the {@link ColorTypes!CssColor} type can be used. Since the properties are
  * of the `number` type, they can be used for manipulating the color value.
 */
 export const Colors: INamedColors =
@@ -178,7 +178,7 @@ const customColors: { [P: string]: number } = {};
 
 /**
  * Registers a new custom color or changes the value of the existing custom color. The name of the
- * custom color should have been already added to the {@link INamedColors} interface using the module
+ * custom color should have been already added to the {@link ColorTypes!INamedColors} interface using the module
  * augmentation technique. Note that values of standard Web colors cannot be changed.
  *
  * @param name Color name. This name cannot be a name of the standard Web color.
@@ -465,7 +465,7 @@ fdo["color-contrast"] = {
 
 /**
  * Represents an invocation of the CSS `color-mix()` function. This interface is returned from the
- * {@link colorMix} function. Developers can use this structure wherever {@link CssColor} is accepted.
+ * {@link colorMix} function. Developers can use this structure wherever {@link ColorTypes!CssColor} is accepted.
  */
 class ColorMixFunc implements IColorMixBuilder
 {
@@ -557,7 +557,7 @@ fdo.color = {
  * Converts the given color and the alpha mask to the CSS Color representation. This
  * method should be used when defining CSS color values in styleset properties.
  *
- * The color can be specified as a numeric value or as a color name from the {@link INamedColors}
+ * The color can be specified as a numeric value or as a color name from the {@link ColorTypes!INamedColors}
  * interface - including colors added using the module augmentation technique.
  *
  * The alpha mask is specified as a number:

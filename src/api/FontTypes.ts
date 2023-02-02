@@ -6,44 +6,45 @@ import { IFontPaletteValuesRule } from "./RuleTypes";
 
 
 /**
- * Type of the {@link ascentOverride}, {@link descentOverride} and {@link lineGapOverride} properties.
+ * Type of the {@link IFontFace.ascentOverride}, {@link IFontFace.descentOverride} and
+ * {@link IFontFace.lineGapOverride} properties.
  */
 export type FontFaceMetricOverride = "normal" | CssPercent;
 
 
 
 /**
- * Type for specfying keywords {@link IStyleset.fontStretch} properties.
+ * Type for specfying keywords {@link Stylesets!IStyleset.fontStretch} properties.
  */
 export type FontStretchKeyword = "normal" | "ultra-condensed" | "extra-condensed" | "condensed" |
     "semi-condensed" | "semi-expanded" | "expanded" | "extra-expanded" | "ultra-expanded";
 
 /**
- * Type for specfying {@link IStyleset.fontStretch} properties.
+ * Type for specfying {@link Stylesets!IStyleset.fontStretch} properties.
  */
 export type FontStretch = FontStretchKeyword | CssPercent;
 
 
 
 /**
- * Type for specfying keywords {@link IStyleset.fontStyle} properties.
+ * Type for specfying keywords {@link Stylesets!IStyleset.fontStyle} properties.
  */
 export type FontStyleKeyword = "normal" | "italic" | "oblique";
 
 /**
- * Type for specfying {@link IStyleset.fontStyle} properties.
+ * Type for specfying {@link Stylesets!IStyleset.fontStyle} properties.
  */
 export type FontStyle = FontStyleKeyword | CssAngle;
 
 
 
 /**
- * Type for specfying keywords {@link IStyleset.fontWeight} properties.
+ * Type for specfying keywords {@link Stylesets!IStyleset.fontWeight} properties.
  */
 export type FontWeightKeyword = "normal" | "bold";
 
 /**
- * Type for specfying {@link IStyleset.fontWeight} properties.
+ * Type for specfying {@link Stylesets!IStyleset.fontWeight} properties.
  */
 export type FontWeight = FontWeightKeyword | CssNumber;
 
@@ -54,49 +55,49 @@ export type SystemFont = "caption" | "icon" | "menu" | "message-box" | "small-ca
 
 
 
-/** Type for {@link IStyleset.fontKerning} style property */
+/** Type for {@link Stylesets!IStyleset.fontKerning} style property */
 export type FontKerning = "auto" | "normal" | "none";
 
 
 
-/** Type for {@link IStyleset.fontOpticalSizing} style property */
+/** Type for {@link Stylesets!IStyleset.fontOpticalSizing} style property */
 export type FontOpticalSizing = "auto" | "none";
 
 
 
-/** Type for {@link IStyleset.fontPalette} style property */
+/** Type for {@link Stylesets!IStyleset.fontPalette} style property */
 export type FontPalette = "normal" | "light" | "dark" | DashedIdent | IFontPaletteValuesRule;
 
 
 
 /**
- * Type for specfying keywords {@link IStyleset.fontSize} properties.
+ * Type for specfying keywords {@link Stylesets!IStyleset.fontSize} properties.
  */
 export type FontSizeKeyword = "xx-small" | "x-small" | "small" | "medium" | "large" |
     "x-large" | "xx-large" | "xxx-large" | "larger" | "smaller";
 
-/** Type for {@link IStyleset.fontSize} style property */
+/** Type for {@link Stylesets!IStyleset.fontSize} style property */
 export type FontSize = FontSizeKeyword | CssLength;
 
 
 
-/** Type for {@link IStyleset.fontSynthesis} style property */
+/** Type for {@link Stylesets!IStyleset.fontSynthesis} style property */
 export type FontSynthesis = "none" | "weight" | "style" | "weight style";
 
 
 
-/** Type for {@link IStyleset.fontVariantCaps} style property */
+/** Type for {@link Stylesets!IStyleset.fontVariantCaps} style property */
 export type FontVariantCaps = "normal" | "small-caps" | "all-small-caps" |
     "petite-caps" | "all-petite-caps" | "unicase" | "titling-caps";
 
 
 
-/** Type for {@link IStyleset.fontVariantCaps} style property */
+/** Type for {@link Stylesets!IStyleset.fontVariantEmoji} style property */
 export type FontVariantEmoji = "normal" | "text" | "emoji" | "unicode";
 
 
 
-/** Type for {@link IStyleset.fontVariantPosition} style property */
+/** Type for {@link Stylesets!IStyleset.fontVariantPosition} style property */
 export type FontVariantPosition = "normal" | "sub" | "super";
 
 
@@ -233,7 +234,7 @@ export interface IFontFace
 /**
  * The `ExtendedFontFace` type maps all @font-face properties defined in the {@link IFontFace}
  * interface to the "extended" versions of their types. These extended types are defined using the
- * {@link RawExtended} generic type, which adds {@link IRawProxy} to the type
+ * {@link CoreTypes!RawExtended} generic type, which adds {@link CoreTypes!IRawProxy} to the type
  * that is defined in the {@link IFontFace} interface.
  */
 export type ExtendedFontFace = { [K in keyof IFontFace]: RawExtended<IFontFace[K]> }
@@ -269,8 +270,8 @@ export interface IFontPaletteValues
 /**
  * Maps all `@font-palette-values` descriptors defined in the {@link IFontPaletteValues}
  * interface to the "extended" versions of their types. These extended types are defined using the
- * {@link Extended} generic type, which adds {@link IRawProxy}, {@link ICustomVar} and
- * {@link IConstant} to the type that is defined in the {@link IFontPaletteValues} interface.
+ * {@link CoreTypes!Extended} generic type, which adds {@link CoreTypes!IRawProxy}, {@link CoreTypes!ICustomVar} and
+ * {@link CoreTypes!IConstant} to the type that is defined in the {@link IFontPaletteValues} interface.
  */
 export type ExtendedFontPaletteValues = { [K in keyof IFontPaletteValues]: Extended<IFontPaletteValues[K]> }
 

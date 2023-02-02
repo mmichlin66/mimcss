@@ -22,8 +22,9 @@ function toUnits<U extends string>(this: U, n: number): NumericString<U>
 
 /**
  * The `Num` object contains methods that implement CSS mathematic functions on the `<number>`
- * CSS type. It implements the {@link INumericMath} interface and thus allows using the methods such
- * as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the {@link CssNumber} type.
+ * CSS type. It implements the {@link NumericTypes!INumericMath} interface and thus allows using the methods such
+ * as {@link NumericTypes!INumberMath.min}, {@link NumericTypes!INumberMath.max}, {@link NumericTypes!INumberMath.calc}
+ * and {@link NumericTypes!INumberMath.clamp} with parameters of the {@link NumericTypes!CssNumber} type.
  *
  * **Example:**
  *
@@ -47,9 +48,10 @@ export const Num: INumberMath = NumberMath;
 
 /**
  * The `Percent` object contains methods that implement CSS mathematic functions on the
- * `<percentage>` CSS type. It implements the {@link INumericMath} interface and thus allows using
- * the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the
- * {@link CssPercent} type.
+ * `<percentage>` CSS type. It implements the {@link NumericTypes!INumericMath} interface and thus allows using
+ * the methods such as {@link NumericTypes!INumberMath.min}, {@link NumericTypes!INumberMath.max},
+ * {@link NumericTypes!INumberMath.calc} and {@link NumericTypes!INumberMath.clamp} with parameters of the
+ * {@link NumericTypes!CssPercent} type.
  *
  * **Example:**
  *
@@ -78,9 +80,10 @@ export const percent = toUnits.bind("%") as (n: number) => PercentString;
 
 /**
  * The `Len` object contains methods that implement CSS mathematic functions on the
- * `<length> | <percentage>` CSS type. It implements the {@link INumericMath} interface and thus
- * allows using the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters
- * of the {@link CssLength} type.
+ * `<length> | <percentage>` CSS type. It implements the {@link NumericTypes!INumericMath} interface and thus
+ * allows using the methods such as {@link NumericTypes!INumberMath.min}, {@link NumericTypes!INumberMath.max},
+ * {@link NumericTypes!INumberMath.calc} and {@link NumericTypes!INumberMath.clamp} with parameters
+ * of the {@link NumericTypes!CssLength} type.
  *
  * **Example:**
  *
@@ -232,9 +235,10 @@ export const fr = toUnits.bind("fr") as (n: number) => LengthString;
 
 /**
  * The `Angle` object contains methods that implement CSS mathematic functions on the
- * `<angle> | <percentage>` CSS type. It implements the {@link INumericMath} interface and thus
- * allows using the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters
- * of the {@link CssAngle} type.
+ * `<angle> | <percentage>` CSS type. It implements the {@link NumericTypes!INumericMath} interface and thus
+ * allows using the methods such as {@link NumericTypes!INumberMath.min}, {@link NumericTypes!INumberMath.max},
+ * {@link NumericTypes!INumberMath.calc} and {@link NumericTypes!INumberMath.clamp} with parameters
+ * of the {@link NumericTypes!CssAngle} type.
  */
 export const Angle: IAngleMath = AngleMath;
 
@@ -267,8 +271,9 @@ export const turn = toUnits.bind("turn") as (n: number) => AngleString;
 
 /**
  * The `Time` object contains methods that implement CSS mathematic functions on the `<time>`
- * CSS type. It implements the {@link INumericMath} interface and thus allows using the methods such
- * as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the {@link CssTime} type.
+ * CSS type. It implements the {@link NumericTypes!INumericMath} interface and thus allows using the methods such
+ * as {@link NumericTypes!INumberMath.min}, {@link NumericTypes!INumberMath.max}, {@link NumericTypes!INumberMath.calc}
+ * and {@link NumericTypes!INumberMath.clamp} with parameters of the {@link NumericTypes!CssTime} type.
  */
  export const Time: ITimeMath = TimeMath;
 
@@ -288,9 +293,10 @@ export const s = toUnits.bind("s") as (n: number) => TimeString;
 
 /**
  * The `Resolution` object contains methods that implement CSS mathematic functions on the
- * `<resolution>` CSS type. It implements the {@link INumericMath} interface and thus allows using
- * the methods such as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the
- * {@link CssResolution} type.
+ * `<resolution>` CSS type. It implements the {@link NumericTypes!INumericMath} interface and thus allows using
+ * the methods such as {@link NumericTypes!INumberMath.min}, {@link NumericTypes!INumberMath.max},
+ * {@link NumericTypes!INumberMath.calc} and {@link NumericTypes!INumberMath.clamp} with parameters of the
+ * {@link NumericTypes!CssResolution} type.
  */
  export const Resolution: IResolutionMath = ResolutionMath;
 
@@ -322,8 +328,9 @@ export const x = toUnits.bind("x") as (n: number) => ResolutionString;
 
 /**
  * The `Frequency` object contains methods that implement CSS mathematic functions on the `<frequency>`
- * CSS type. It implements the {@link INumericMath} interface and thus allows using the methods such
- * as {@link min}, {@link max}, {@link calc} and {@link clamp} with parameters of the {@link CssFrequency} type.
+ * CSS type. It implements the {@link NumericTypes!INumericMath} interface and thus allows using the methods such
+ * as {@link NumericTypes!INumberMath.min}, {@link NumericTypes!INumberMath.max}, {@link NumericTypes!INumberMath.calc}
+ * and {@link NumericTypes!INumberMath.clamp} with parameters of the {@link NumericTypes!CssFrequency} type.
  */
  export const Frequency: IFrequencyMath = FrequencyMath;
 
@@ -348,7 +355,7 @@ export const khz = toUnits.bind("kHz") as (n: number) => FrequencyString;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns an {@link IFitContentProxy} function representing the `fit-content()` CSS function
+ * Returns an {@link NumericTypes!IFitContentProxy} function representing the `fit-content()` CSS function
  * (<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content()" target="mdn">MDN Page</a>).
  */
 export const fitContent = (size: Extended<CssLength>): IFitContentProxy =>
@@ -357,14 +364,14 @@ export const fitContent = (size: Extended<CssLength>): IFitContentProxy =>
 
 
 /**
- * Returns an {@link IAspectRatioProxy} function representing the `<ratio>` CSS type.
+ * Returns an {@link NumericTypes!IAspectRatioProxy} function representing the `<ratio>` CSS type.
  */
 export const ratio = (w: CssNumber, h?: CssNumber): IAspectRatioProxy => () => [w,h].join("/");
 
 
 
 /**
- * Returns an {@link IRectProxy} function representing the `rect()` CSS function used for the `clip`
+ * Returns an {@link NumericTypes!IRectProxy} function representing the `rect()` CSS function used for the `clip`
  * style property.
  * @deprecated The CSS `clip` property and `rect()` function are deprecated.
  */

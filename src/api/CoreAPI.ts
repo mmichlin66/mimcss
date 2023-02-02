@@ -6,7 +6,10 @@
 import {IIDRule, INamespaceRule, IVarRule} from "./RuleTypes";
 import {AttrTypeKeyword, AttrUnitKeyword, CssCounter, ListStyleType_StyleType} from "./StyleTypes";
 import {ExtendedVarValue, Styleset, VarTemplateName} from "./Stylesets";
-import {ExtendedMediaFeatureset, IMediaQueryProxy, ISupportsQueryProxy} from "./MediaTypes";
+import {
+    ContainerQuery, ContainerStatement, IContainerQueryProxy, IContainerStyleQueryProxy, IMediaQueryProxy, ISupportsQueryProxy,
+    MediaStatement, SupportsStatement
+} from "./MediaTypes";
 import {sp2s} from "../impl/StyleImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import {a2s, camelToDash, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
@@ -22,8 +25,8 @@ import {a2s, camelToDash, f2s, fdo, mv2s, tag2s, WKF} from "../impl/Utils";
 /**
  * Returns a string representation of a selector. This function is a tag function and must be
  * invoked with the template string without parentheses. This function can be used wherever the
- * {@link CssSelector} types are allowed. The parameters embedded into the string
- * must conform to the {@link CssSelector} type.
+ * {@link CoreTypes!CssSelector} types are allowed. The parameters embedded into the string
+ * must conform to the {@link CoreTypes!CssSelector} type.
  *
  * **Example:**
  *
@@ -264,7 +267,7 @@ const pseudoCamelTodDash = (prefix: ":" | "::", name: string) => prefix + camelT
 /**
  * Creates selector builder object that provides means to build complex selectors from multiple
  * selector items of all possible kinds including tags, classess, IDs, attributes, pseudo classes
- * and pseudo elements combined with CSS combinators. This function returns the {@link ISelectorBuilder}
+ * and pseudo elements combined with CSS combinators. This function returns the {@link CoreTypes!ISelectorBuilder}
  * interface, which has methods and properties for all selector items.
  *
  * **Example:**
@@ -371,14 +374,14 @@ fdo["cubic-bezier"] = ["n1", "n2", "n3", "n4"]
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// @media and @supports queries.
+// @media, @container and @supports queries.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Tag function that represents a media query. This function allows expressing media queries in
  * a natural string form while embedding media feature values in type safe manner. The string can
- * contain any media expressions while the embedded objects must be of type {@link IMediaFeatureset}.
+ * contain any media expressions while the embedded objects must be of type {@link MediaTypes!IMediaFeatureset}.
  * Multiple features in the feature set will be expanded into clauses combined with the "and"
  * operator.
  *
@@ -393,8 +396,8 @@ fdo["cubic-bezier"] = ["n1", "n2", "n3", "n4"]
  * }
  * ```
  */
-export const media = (parts: TemplateStringsArray, ...params: ExtendedMediaFeatureset[]): IMediaQueryProxy =>
-    () => tag2s( parts, params, v => typeof v === "string" ? v : media2s(v));
+export const media = (parts: TemplateStringsArray, ...params: MediaStatement[]): IMediaQueryProxy =>
+    () => tag2s(parts, params, media2s);
 
 
 
@@ -416,8 +419,47 @@ export const media = (parts: TemplateStringsArray, ...params: ExtendedMediaFeatu
  * }
  * ```
  */
-export const supports = (parts: TemplateStringsArray, ...params: Styleset[]): ISupportsQueryProxy =>
-    () => tag2s( parts, params, v => typeof v === "string" ? v : supports2s(v));
+export const supports = (parts: TemplateStringsArray, ...params: SupportsStatement[]): ISupportsQueryProxy =>
+    () => tag2s(parts, params, supports2s);
+
+
+
+/**
+ * Tag function that represents a container query. This function allows expressing container queries in
+ * a natural string form while embedding container feature values in type safe manner. The string can
+ * contain any container expressions while the embedded objects must be of type {@link MediaTypes!IContainerFeatureset}.
+ * Multiple features in the feature set will be expanded into clauses combined with the "and" operator.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // not (width > 400px) or (height < 600px)
+ *     ifNarrow = this.$container(
+ *         css.container`not ${{minWidth: 400}} or maxHeight: 600}}`, ...)
+ * }
+ * ```
+ */
+export const container = media as any as (parts: TemplateStringsArray, ...params: ContainerStatement[]) => IContainerQueryProxy
+
+
+
+/**
+ * Tag function that represents a container style query expressed as the CSS `style()` function.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends StyleDefinition
+ * {
+ *     // @container style(background-colr: blue)
+ *     ifBlue = this.$container(css.style({bacgroundColor: "blue"}), ...)
+ * }
+ * ```
+ */
+export const style = (styleset: Styleset): IContainerStyleQueryProxy =>
+    () => `style${supports2s(styleset)}`;
 
 
 
@@ -484,7 +526,7 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
 
 
 /**
- * Returns a function representing the `attr()` CSS function. It returns {@link IStringProxy} and
+ * Returns a function representing the `attr()` CSS function. It returns {@link CoreTypes!IStringProxy} and
  * theoretically can be used in any style property wherever the CSS `<string>` type is accepted;
  * however, its use by browsers is currently limited to the `content` property. Also not all
  * browsers currently support type, units or fallback values.
@@ -531,7 +573,7 @@ export const counters = (counterObj: Extended<CssCounter>,
  * Returns a function representing the invocation of the `var()` CSS function for the given custom
  * CSS property with optional fallbacks. Usually, when you want to refer to a custom CSS property
  * in style rules, it is enough to just refer to the style definition property created using the
- * {@link $var} function; however, if you want to provide a fallback value, you must use this function.
+ * {@link RuleAPI!StyleDefinition.$var} function; however, if you want to provide a fallback value, you must use this function.
  *
  * **Example:**
  *
@@ -549,9 +591,9 @@ export const counters = (counterObj: Extended<CssCounter>,
  * }
  * ```
  *
- * @typeparam K Key of the {@link IVarTemplateStyleset} interface that determines the type of the
+ * @typeparam K Key of the {@link Stylesets!IVarTemplateStyleset} interface that determines the type of the
  * custom CSS property and of the fallback value.
- * @param varObj Custom CSS property object created using the {@link $var} function.
+ * @param varObj Custom CSS property object created using the {@link RuleAPI!StyleDefinition.$var} function.
  * @param fallback Fallback value that will be used if the custom CSS property isnt set.
  * @returns The `IRawProxy` callable interface, which allows the `usevar` function to be called
  * in any context.

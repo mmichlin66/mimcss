@@ -22,8 +22,8 @@ import { SyntaxKey } from "./Stylesets";
  * Although hint is a single number, it must be enclosed in an array to distinguish it from color
  * values because any numeric values in the gradient functions are interpreted as colors.
  *
- * For linear and radial gradients numeric values are of type {@link CssLength}; for conic gradients,
- * these are of type {@link CssAngle}. Percents can be used for all types of gradients.
+ * For linear and radial gradients numeric values are of type {@link NumericTypes!CssLength}; for conic gradients,
+ * these are of type {@link NumericTypes!CssAngle}. Percents can be used for all types of gradients.
  *
  * **Examples:**
  *
@@ -45,8 +45,8 @@ export type GradientStopOrHint<T extends (CssLength | CssAngle)> =
 
 
 /**
- * Type that enumerates possible values of the side-or-corner for the {@link linearGradient} function.
- * These values can be specified in lieu of the angle in the {@link ILinearGradientBuilder.to|to} method of
+ * Type that enumerates possible values of the side-or-corner for the {@link ShapeAPI!linearGradient} function.
+ * These values can be specified in lieu of the angle in the {@link ILinearGradientBuilder.to} method of
  * the {@link ILinearGradientBuilder} interface.
  *
  * **Examples:**
@@ -62,8 +62,8 @@ export type SideOrCorner = "bottom" | "left" | "top" | "right" |
 
 
 /**
- * Type that represents the angle of the {@link linearGradient} CSS function. These values can be
- * specified in lieu of the angle in the {@link ILinearGradientBuilder.to|to} method of the
+ * Type that represents the angle of the {@link ShapeAPI!linearGradient} CSS function. These values can be
+ * specified in lieu of the angle in the {@link ILinearGradientBuilder.to} method of the
  * {@link ILinearGradientBuilder} interface.
  *
  * **Examples:**
@@ -347,21 +347,21 @@ export interface ICrossFadeBuilder extends ICrossFadeFunc
 
 
 /**
- * Type of an image that can be specified in the {@link imageSet} function. Since the `image-set()`
+ * Type of an image that can be specified in the {@link ShapeAPI!imageSet} function. Since the `image-set()`
  * CSS function doesn't allow using `image-set()` recursively, this type excludes it. An image
  * can also be specified just as a URL string.
  */
 export type ImageSetImage = Exclude<CssImage,IImageSetFunc> | string;
 
 /**
- * Type for specifying a resolution in the {@link imageSet} function. It can be specified either as a
+ * Type for specifying a resolution in the {@link ShapeAPI!imageSet} function. It can be specified either as a
  * number, in which case it will use the "x" units, or any other resolution specification, e.g.
- * {@link dpi} function.
+ * {@link NumericAPI!dpi} function.
  */
 export type ImageSetResolution = number | ResolutionString;
 
 /**
- * Type of single item that can be specified in the {@link imageSet} function. This can be either an
+ * Type of single item that can be specified in the {@link ShapeAPI!imageSet} function. This can be either an
  * image or a tuple that contains an image and additional parameters. The following tuple
  * structures are allowed:
  *   1. Two-element tuple with image and resolution.
@@ -391,9 +391,9 @@ export interface IImageSetFunc extends ICssImageFunc
 
 /**
  * Maps names of paint worklets to tuple types defining the arguments that are passed to the
- * {@link paint} function. This interface is intended to be extended using the module augmentation
+ * {@link ShapeAPI!paint} function. This interface is intended to be extended using the module augmentation
  * technique. After a worklet is defined as part of this interface, it also has to be registered
- * using the {@link registerPaintWorklet} function.
+ * using the {@link ShapeAPI!registerPaintWorklet} function.
  *
  * **Example**
  *
@@ -483,7 +483,7 @@ export type PercentFilterNames = "brightness" | "contrast" | "grayscale" | "inve
 /**
  * The IBlurFunc interface represents the parameters of the `blur()` CSS function. It can
  * be directly assigned to a style property that accepts filter values (e.g. filter). It is
- * returned from the {@link blur} function.
+ * returned from the {@link ShapeAPI!blur} function.
  * @category Filter
  */
  export interface IBlurFunc extends ICssFuncObject
@@ -499,7 +499,7 @@ export type PercentFilterNames = "brightness" | "contrast" | "grayscale" | "inve
 /**
  * The IDropShadowFunc interface represents the parameters of the `drop-shadow()` CSS function.
  * It can be directly assigned to a style property that accepts filter values (e.g. filter). It is
- * returned from the {@link dropShadow} function.
+ * returned from the {@link ShapeAPI!dropShadow} function.
  * @category Filter
  */
  export interface IDropShadowFunc extends ICssFuncObject
@@ -524,7 +524,7 @@ export type PercentFilterNames = "brightness" | "contrast" | "grayscale" | "inve
 /**
  * The IHueRotateFunc interface represents the parameters of the `hue-rotate()` CSS function.
  * It can be directly assigned to a style property that accepts filter values (e.g. filter). It is
- * returned from the {@link hueRotate} function.
+ * returned from the {@link ShapeAPI!hueRotate} function.
  * @category Filter
  */
  export interface IHueRotateFunc extends ICssFuncObject
@@ -553,7 +553,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IMatrixFunc interface represents the parameters of the `matrix()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link matrix} function.
+ * returned from the {@link ShapeAPI!matrix} function.
  * @category Transform
  */
  export interface IMatrixFunc extends ICssFuncObject
@@ -573,7 +573,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IMatrix3dFunc interface represents the parameters of the `matrix3d()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link matrix3d} function.
+ * returned from the {@link ShapeAPI!matrix3d} function.
  * @category Transform
  */
  export interface IMatrix3dFunc extends ICssFuncObject
@@ -591,7 +591,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IPerspectiveFunc interface represents the parameters of the `perspective()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link perspective} function.
+ * returned from the {@link ShapeAPI!perspective} function.
  * @category Transform
  */
  export interface IPerspectiveFunc extends ICssFuncObject
@@ -606,7 +606,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IRotateFunc interface represents the parameters of the `rotate()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link rotate} function.
+ * returned from the {@link ShapeAPI!rotate} function.
  * @category Transform
  */
  export interface IRotateFunc extends ICssFuncObject
@@ -621,7 +621,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IRotate3dFunc interface represents the parameters of the `rotate3d()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link rotate3d} function.
+ * returned from the {@link ShapeAPI!rotate3d} function.
  * @category Transform
  */
  export interface IRotate3dFunc extends ICssFuncObject
@@ -639,7 +639,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IScale1dFunc interface represents the parameters of the `scaleX()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link scaleX} function.
+ * returned from the {@link ShapeAPI!scaleX} function.
  * @category Transform
  */
  export interface IScale1dFunc extends ICssFuncObject
@@ -654,7 +654,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IScaleFunc interface represents the parameters of the `scale()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link scale} function.
+ * returned from the {@link ShapeAPI!scale} function.
  * @category Transform
  */
  export interface IScaleFunc extends ICssFuncObject
@@ -670,7 +670,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The IScale3dFunc interface represents the parameters of the `scale3d()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link scale3d} function.
+ * returned from the {@link ShapeAPI!scale3d} function.
  * @category Transform
  */
  export interface IScale3dFunc extends ICssFuncObject
@@ -687,7 +687,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The ISkew1dFunc interface represents the parameters of the `skewX()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link skewX} function.
+ * returned from the {@link ShapeAPI!skewX} function.
  * @category Transform
  */
  export interface ISkew1dFunc extends ICssFuncObject
@@ -702,7 +702,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The ISkewFunc interface represents the parameters of the `skew()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link skew} function.
+ * returned from the {@link ShapeAPI!skew} function.
  * @category Transform
  */
  export interface ISkewFunc extends ICssFuncObject
@@ -718,7 +718,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The ITranslate1dFunc interface represents the parameters of the `translateX()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link translateX} function.
+ * returned from the {@link ShapeAPI!translateX} function.
  * @category Transform
  */
  export interface ITranslate1dFunc extends ICssFuncObject
@@ -733,7 +733,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The ITranslateFunc interface represents the parameters of the `translate()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link translate} function.
+ * returned from the {@link ShapeAPI!translate} function.
  * @category Transform
  */
  export interface ITranslateFunc extends ICssFuncObject
@@ -749,7 +749,7 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 /**
  * The ITranslate3dFunc interface represents the parameters of the `translate3d()` CSS function. It can
  * be directly assigned to a style property that accepts transform values (e.g. transform). It is
- * returned from the {@link translate3d} function.
+ * returned from the {@link ShapeAPI!translate3d} function.
  * @category Transform
  */
  export interface ITranslate3dFunc extends ICssFuncObject
@@ -816,7 +816,7 @@ export type FillRule = "nonzero" | "evenodd";
 /**
  * The IInsetBuilder interface extends the {@link IInsetFunc} interface and adds the `round` method that
  * can be called to specify the border radius of the inset rectangle. It is the result of invoking
- * the {@link inset} function.
+ * the {@link ShapeAPI!inset} function.
  * @category Basic Shape
  */
  export interface IInsetBuilder extends IInsetFunc
@@ -846,7 +846,7 @@ export interface ICircleFunc extends ICssFuncObject
 /**
  * The ICircleBuilder interface extends the {@link ICircleFunc} interface and adds the `at` method that
  * can be called to specify the position of the circle's center. It is the result of invoking
- * the {@link circle} function.
+ * the {@link ShapeAPI!circle} function.
  * @category Basic Shape
  */
 export interface ICircleBuilder extends ICircleFunc
@@ -879,7 +879,7 @@ export interface ICircleBuilder extends ICircleFunc
 /**
  * The IEllipseBuilder interface extends the {@link IEllipseFunc} interface and adds the `at` method that
  * can be called to specify the position of the ellipse's center. It is the result of invoking
- * the {@link ellipse} function.
+ * the {@link ShapeAPI!ellipse} function.
  * @category Basic Shape
  */
  export interface IEllipseBuilder extends IEllipseFunc
@@ -911,7 +911,7 @@ export interface ICircleBuilder extends ICircleFunc
 
 /**
  * The IPolygonBuilder interface extends the {@link IPolygonFunc} interface and adds several methods that
- * allow changing the polygon parameters. It is the result of invoking the {@link polygon} function.
+ * allow changing the polygon parameters. It is the result of invoking the {@link ShapeAPI!polygon} function.
  * @category Basic Shape
  */
  export interface IPolygonBuilder extends IPolygonFunc
@@ -960,7 +960,7 @@ export interface IPathFunc extends ICssFuncObject
 
 /**
  * The IPathBuilder interface extends the {@link IPathFunc} interface and adds several methods that allow
- * adding path commands. It is the result of invoking the {@link path} function. The methods in this
+ * adding path commands. It is the result of invoking the {@link ShapeAPI!path} function. The methods in this
  * interface mimic the SVG path commands described in MDN:
  * <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands" target="mdn">Path Commands</a>
  * @category Basic Shape
@@ -1032,7 +1032,8 @@ export interface IPathBuilder extends IPathFunc
 
 /**
  * The BasicShapeType represents an invocation of one the CSS `<basic-shape>` functions such as
- * {@link inset}, {@link circle}, {@link ellipse}, {@link polygon}, {@link path}.
+ * {@link ShapeAPI!inset}, {@link ShapeAPI!circle}, {@link ShapeAPI!ellipse},
+ * {@link ShapeAPI!polygon}, {@link ShapeAPI!path}.
  */
 export type BasicShape = IInsetFunc | ICircleFunc | IEllipseFunc | IPolygonFunc | IPathBuilder;
 
@@ -1066,7 +1067,7 @@ export interface IRayFunc extends ICssFuncObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The IMinMaxFunc interface represents an invocation of the {@link minmax} function.
+ * The IMinMaxFunc interface represents an invocation of the {@link ShapeAPI!minmax} function.
  * @category Grid
  */
 export interface IMinMaxFunc extends ICssFuncObject
@@ -1083,7 +1084,7 @@ export interface IMinMaxFunc extends ICssFuncObject
 
 
 /**
- * The IRepeatFunc interface represents an invocation of the {@link repeat} function.
+ * The IRepeatFunc interface represents an invocation of the {@link ShapeAPI!repeat} function.
  * @category Grid
  */
 export interface IRepeatFunc extends ICssFuncObject
@@ -1101,7 +1102,7 @@ export interface IRepeatFunc extends ICssFuncObject
 
 /**
  * The IGridSpanFunc interface represents a span expression for grid layouts. It is returned from
- * the {@link span} function.
+ * the {@link ShapeAPI!span} function.
  * @category Grid
  */
 export interface IGridSpanFunc extends ICssFuncObject

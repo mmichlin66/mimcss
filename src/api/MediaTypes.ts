@@ -17,8 +17,14 @@ export type OneOrRange<T> = T | [RawExtended<T>, RawExtended<T>?];
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Media query types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Representing the type of objects used to create media queries in the {@link StyleDefinition.$media}
+ * Representing the type of objects used to create media queries in the {@link RuleAPI!StyleDefinition.$media}
  * method.
  */
 export interface IMediaFeatureset
@@ -36,6 +42,7 @@ export interface IMediaFeatureset
     minColorIndex?: CssNumber;
     maxColorIndex?: CssNumber;
     displayMode?: "fullscreen" | "standalone" | "minimal-ui" | "browser";
+    dynamicRange?: "standard" | "high";
     forcedColors?: "none" | "active";
     grid?: boolean;
     height?: OneOrRange<CssLength>;
@@ -61,6 +68,7 @@ export interface IMediaFeatureset
     scan?: "interlace" | "progressive";
     scripting?: "none" | "initial-only" | "enabled";
     update?: "none" | "slow" | "fast";
+    videoDynamicRange?: "standard" | "high";
     width?: OneOrRange<CssLength>;
     minWidth?: CssLength;
     maxWidth?: CssLength;
@@ -71,7 +79,7 @@ export interface IMediaFeatureset
 /**
  * The `ExtendedMediaFeatureset` type maps all media features defined in the {@link IMediaFeatureset}
  * interface to the "extended" versions of their types. These extended types are defined by
- * allowing {@link IRawProxy} interface to the type that is defined in the
+ * allowing {@link CoreTypes!IRawProxy} interface to the type that is defined in the
  * {@link IMediaFeatureset} interface.
  */
 export type ExtendedMediaFeatureset = { [K in keyof IMediaFeatureset]?: RawExtended<IMediaFeatureset[K]> }
@@ -79,7 +87,7 @@ export type ExtendedMediaFeatureset = { [K in keyof IMediaFeatureset]?: RawExten
 
 
 /**
- * Represents media query returned from the {@link media} function.
+ * Represents media query returned from the {@link CoreAPI!media} function.
  */
 export interface IMediaQueryProxy extends IGenericProxy<"media-query"> {}
 
@@ -114,7 +122,7 @@ export type MediaQuery = string | ExtendedMediaFeatureset | IMediaQueryProxy;
  * class MyStyles extends css.StyleDefinition
  * {
  *     // css: @media (min-width: 1000px), (min-height: 1000px) {...}
- *     ifWideOrTall = this.$media( [{minWidth: 1000}, {minHeight: 1000}], ...)
+ *     ifWideOrTall = this.$media( [{minWidth: 1000}, {minHeight: 1000}], {...})
  * }
  * ```
  */
@@ -129,7 +137,7 @@ export type MediaStatement = MediaQuery | MediaQuery[];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Represents supports query returned from the {@link supports} function.
+ * Represents supports query returned from the {@link CoreAPI!supports} function.
  */
 export interface ISupportsQueryProxy extends IGenericProxy<"supports-query"> {}
 
@@ -149,6 +157,93 @@ export interface ISupportsQueryProxy extends IGenericProxy<"supports-query"> {}
   * the "and" operator.
   */
  export type SupportsStatement = SupportsQuery | SupportsQuery[];
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Container query types.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Representing the type of objects used to create container queries in the
+ * {@link RuleAPI!StyleDefinition.$container} method.
+ */
+export type IContainerFeatureset = Pick<IMediaFeatureset,
+    "aspectRatio" | "minAspectRatio" | "maxAspectRatio" |
+    "height" | "minHeight" | "maxHeight" |
+    "orientation" |
+    "width" | "minWidth" | "maxWidth"> &
+{
+    blockSize?: OneOrRange<CssLength>;
+    minBlockSize?: CssLength;
+    maxBlockSize?: CssLength;
+    inlineSize?: OneOrRange<CssLength>;
+    minInlineSize?: CssLength;
+    maxInlineSize?: CssLength;
+}
+
+
+
+/**
+ * The `ExtendedContainerFeatureset` type maps all container features defined in the {@link IContainerFeatureset}
+ * interface to the "extended" versions of their types. These extended types are defined by
+ * allowing {@link CoreTypes!IRawProxy} interface to the type that is defined in the
+ * {@link IContainerFeatureset} interface.
+ */
+export type ExtendedContainerFeatureset = { [K in keyof IContainerFeatureset]?: RawExtended<IContainerFeatureset[K]> }
+
+
+
+/**
+ * Represents container query returned from the {@link CoreAPI!container} function.
+ */
+export interface IContainerQueryProxy extends IGenericProxy<"container-query"> {}
+
+
+
+/**
+ * Represents container style query returned from the {@link CoreAPI!style} function.
+ */
+export interface IContainerStyleQueryProxy extends IGenericProxy<"container-style-query"> {}
+
+
+
+/**
+ * Type representing a single query as part of the`@container` rule. The features within each
+ * feature-set are combined with the "and" operator.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // css: @container (max-width: 400px) and (max-height: 400px) {...}
+ *     ifNarrowAndShort = this.$container( {maxWidth: 400, maxHeight: 400}, ...)
+ * }
+ * ```
+ */
+export type ContainerQuery = string | ExtendedContainerFeatureset | IContainerQueryProxy | IContainerStyleQueryProxy;
+
+
+
+/**
+ * Type representing one or more queries as part of the `@container` rule. While multiple queries in
+ * an array are combined with the "," operator, the styles within each feature-set are combined with
+ * the "and" operator.
+ *
+ * **Example:**
+ *
+ * ```typescript
+ * class MyStyles extends css.StyleDefinition
+ * {
+ *     // css: @container (min-width: 1000px), (min-height: 1000px) {...}
+ *     ifWideOrTall = this.$container( [{minWidth: 1000}, {minHeight: 1000}], ...)
+ * }
+ * ```
+ */
+export type ContainerStatement = ContainerQuery | ContainerQuery[];
 
 
 
