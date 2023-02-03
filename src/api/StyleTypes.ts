@@ -9,11 +9,11 @@ import {
 import {CssColor, CssNonNumericColor} from "./ColorTypes";
 import {FontStretchKeyword, FontStyle, FontWeight, SystemFont} from "./FontTypes";
 import {
-    BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFuncs,
-    IRayFunc, TransformFuncs
+    BasicShape, IMinMaxFunc, IRepeatFunc, IGridSpanFunc, FilterFunc,
+    IRayFunc, TransformFunc
 } from "./ShapeTypes";
 import {
-    IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule, IScrollTimelineRule
+    IVarRule, IKeyframesRule, ICounterRule, IIDRule, IGridLineRule, IGridAreaRule, ICounterStyleRule, IScrollTimelineRule, IContainerRule
 } from "./RuleTypes";
 import {IStyleset} from "./Stylesets";
 import { IPageNameRule } from "..";
@@ -679,6 +679,22 @@ export type Contain_StyleType = ContainSoleKeyword | OneOrMany<ContainAtomKeywor
 
 
 /**
+ * Type for {@link Stylesets!IStyleset.containerName} style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/container-name" target="mdn">MDN Page</a>
+ */
+export type ContainerName_StyleType = OneOrMany<string | IContainerRule>;
+
+
+
+/**
+ * Type for {@link Stylesets!IStyleset.containerType} style property
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/container-type" target="mdn">MDN Page</a>
+ */
+export type ContainerType_StyleType = "normal" | "size" | "inline-size";
+
+
+
+/**
  * Type for {@link Stylesets!IStyleset.content} style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/content" target="mdn">MDN Page</a>
  */
@@ -729,7 +745,8 @@ export type CursorKeyword = "auto" | "default" | "none" | "context-menu" | "help
  * Type for {@link Stylesets!IStyleset.cursor} style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/cursor" target="mdn">MDN Page</a>
  */
-export type Cursor_StyleType = OneOrMany<CursorKeyword | IUrlFunc | ICursorFunc>;
+export type Cursor_StyleType = CursorKeyword | IUrlFunc | ICursorFunc |
+    [...(IUrlFunc | ICursorFunc)[], CursorKeyword];
 
 
 
@@ -769,7 +786,7 @@ export type EmptyCells_StyleType = "show" | "hide";
  * Type for {@link Stylesets!IStyleset.filter} and {@link Stylesets!IStyleset.backdropFilter} style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/filter" target="mdn">MDN Page</a>
  */
-export type Filter_StyleType = "none" | OneOrMany<IUrlFunc | FilterFuncs>;
+export type Filter_StyleType = "none" | OneOrMany<IUrlFunc | FilterFunc>;
 
 
 
@@ -1793,7 +1810,7 @@ export type TouchAction_StyleType = "auto" | "none" | "manipulation" |
  * Type for {@link Stylesets!IStyleset.transform} style property
  * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform" target="mdn">MDN Page</a>
  */
-export type Transform_StyleType = "none" | OneOrMany<TransformFuncs>;
+export type Transform_StyleType = "none" | OneOrMany<TransformFunc>;
 
 
 

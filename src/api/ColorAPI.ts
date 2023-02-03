@@ -287,7 +287,7 @@ wkf[WKF.ColorSeparation] = (c: Extended<number>): string =>
  *     rounded. Numbers beyond this range will be clamped.
  *   - The sign of alpha is ignored; that is, only the absolute value is considered.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb" target="mdn">MDN Page</a>
  *
  * @param r Red separation value.
  * @param g Green separation value.
@@ -327,7 +327,7 @@ fdo.rgb = {
  *     rounded. Numbers beyond this range will be clamped.
  *   - The sign of alpha is ignored; that is, only the absolute value is considered.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl" target="mdn">MDN Page</a>
  *
  * @param h Hue component as an angle value.
  * @param s Saturation component as a percentage value.
@@ -367,7 +367,7 @@ fdo.hsl = {
  *     rounded. Numbers beyond this range will be clamped.
  *   - The sign of alpha is ignored; that is, only the absolute value is considered.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl" target="mdn">MDN Page</a>
  *
  * @param h Hue component as an angle value.
  * @param w Whiteness coponent as a percentage value.
@@ -393,7 +393,7 @@ fdo.hwb = {
  * mask to a CSS color representation. This method should be used when defining CSS color
  * values in styleset properties.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lab()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lab" target="mdn">MDN Page</a>
  *
  * @param l CIE Lightness component
  * @param da Distance along the a axis in the Lab colorspace
@@ -419,7 +419,7 @@ fdo.lab = {
  * mask to a CSS color representation. This method should be used when defining CSS color
  * values in styleset properties.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lch()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lch" target="mdn">MDN Page</a>
  *
  * @param l CIE Lightness component
  * @param c Chroma component
@@ -443,7 +443,7 @@ fdo.lch = {
 /**
  * Implements the `color-contrast()` CSS property.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-contrast()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-contrast" target="mdn">MDN Page</a>
  *
  * @param c Color to which the list of colors in the `vs` property will be compared
  * @param vs List of colors from which to select the most contrasting to the base color.
@@ -484,7 +484,7 @@ class ColorMixFunc implements IColorMixBuilder
 /**
  * Implements the `color-mix()` CSS property.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix" target="mdn">MDN Page</a>
  *
  * **Examples**
  *
@@ -520,7 +520,7 @@ fdo["color-mix"] = [
  * Creates color representation in the given color profile. This method should be used when
  * defining CSS color values in styleset properties.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color()
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color" target="mdn">MDN Page</a>
  *
  * **Examples**
  *

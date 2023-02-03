@@ -71,57 +71,57 @@ export type SpeakAs_CounterType = "auto" | "bullets" | "numbers" | "words" | "sp
 /**
  * Interface representing the properties of the `@counter-style` CSS rule.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style" target="mdn">MDN Page</a>
  */
 export interface ICounterStyleset
 {
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/system
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/system" target="mdn">MDN Page</a>
      */
     system?: System_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/negative
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/negative" target="mdn">MDN Page</a>
      */
     negative?: Negative_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/prefix
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/prefix" target="mdn">MDN Page</a>
      */
     prefix?: PrefixSuffix_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/suffix
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/suffix" target="mdn">MDN Page</a>
      */
     suffix?: PrefixSuffix_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/range
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/range" target="mdn">MDN Page</a>
      */
     range?: Range_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/pad
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/pad" target="mdn">MDN Page</a>
      */
     pad?: Pad_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/fallback
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/fallback" target="mdn">MDN Page</a>
      */
     fallback?: Fallback_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/symbols
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/symbols" target="mdn">MDN Page</a>
      */
     symbols?: Symbols_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/additive-symbols
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/additive-symbols" target="mdn">MDN Page</a>
      */
     additiveSymbols?: AdditiveSymbols_CounterType;
 
     /**
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/speak-as
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@counter-style/speak-as" target="mdn">MDN Page</a>
      */
     speakAs?: SpeakAs_CounterType;
 }

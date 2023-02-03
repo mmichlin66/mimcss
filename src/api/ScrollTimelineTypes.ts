@@ -41,28 +41,28 @@ export type ScrollOffsets_ScrollTimelineType = "none" | ("auto" | CssLength | Sc
 /**
  * Interface representing the descriptors of the `@scroll-timeline` CSS rule.
  *
- * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline" target="mdn">MDN Page</a>
  */
 export interface IScrollTimeline
 {
     /**
      * The scrollable element whose scrolling position drives the progress of the timeline.
      *
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline" target="mdn">MDN Page</a>
      */
     source?: Source_ScrollTimelineType;
 
     /**
      * The scroll timeline's orientation.
      *
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline" target="mdn">MDN Page</a>
      */
     orientation?: Orientation_ScrollTimelineType;
 
     /**
      * Determines the scroll timeline's scroll offsets.
      *
-     * - MDN: https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scroll-timeline" target="mdn">MDN Page</a>
      */
     scrollOffsets?: ScrollOffsets_ScrollTimelineType;
 }

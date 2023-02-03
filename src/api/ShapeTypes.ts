@@ -538,9 +538,9 @@ export type PercentFilterNames = "brightness" | "contrast" | "grayscale" | "inve
 
 
 /**
- * The FilterFuncs interface represents the result of invoking one of the CSS `<filter>` functions.
+ * Represents the result of invoking one of the CSS `<filter>` functions.
  */
-export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHueRotateFunc;
+export type FilterFunc = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHueRotateFunc;
 
 
 
@@ -764,9 +764,9 @@ export type FilterFuncs = IPercentFilterFunc | IBlurFunc | IDropShadowFunc | IHu
 
 
 /**
- * The TransformFuncs interface represents the result of invoking one of the CSS `<transform>` functions.
+ * Represents the result of invoking one of the CSS `<transform>` functions.
  */
-export type TransformFuncs = IMatrixFunc | IMatrix3dFunc | IPerspectiveFunc |
+export type TransformFunc = IMatrixFunc | IMatrix3dFunc | IPerspectiveFunc |
     IRotateFunc | IRotate3dFunc | IScale1dFunc | IScaleFunc | IScale3dFunc |
     ISkew1dFunc | ISkewFunc | ITranslate1dFunc | ITranslateFunc | ITranslate3dFunc;
 

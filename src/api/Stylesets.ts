@@ -8,7 +8,7 @@ import {BorderRadius, CssAngle, CssAspectRatio, CssFrequency, CssLength, CssLeng
     CssMultiPosition, CssMultiPositionX, CssMultiPositionY, CssNumber, CssPercent, CssPoint,
     CssPosition, CssRadius, CssResolution, CssSize, CssTime} from "./NumericTypes";
 import * as st from "./StyleTypes";
-import {FillRule, IPathBuilder, TransformFuncs} from "./ShapeTypes";
+import {FillRule, IPathBuilder, TransformFunc} from "./ShapeTypes";
 import {
     FontKerning, FontOpticalSizing, FontPalette, FontSize, FontStretch, FontStyle, FontSynthesis,
     FontVariantCaps, FontVariantEmoji, FontVariantPosition
@@ -1645,6 +1645,16 @@ export interface IStyleset
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/contain" target="mdn">MDN Page</a>
      */
     contain?: st.Contain_StyleType;
+
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/container-type" target="mdn">MDN Page</a>
+     */
+    containerName?: st.ContainerName_StyleType;
+
+    /**
+     * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/container-type" target="mdn">MDN Page</a>
+     */
+    containerType?: st.ContainerType_StyleType;
 
     /**
      * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/content" target="mdn">MDN Page</a>
@@ -3712,8 +3722,8 @@ export interface ISyntaxTypeStyleset
     "<custom-ident>#"?: OneOrMany<string>;
 
     /** Allows having CSS variables and constants that accept a `<transform-function>` value */
-    "<transform-function>"?: TransformFuncs;
-    "<transform-list>"?: OneOrMany<TransformFuncs>;
+    "<transform-function>"?: TransformFunc;
+    "<transform-list>"?: OneOrMany<TransformFunc>;
 }
 
 

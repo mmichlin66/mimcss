@@ -1548,7 +1548,7 @@ export interface IUrlFunc extends ICssFuncObject
     fn: "url";
 
     /** URL or reference to the ID rule identifying an SVG element */
-    p: Extended<string | IIDRule>;
+    p: Extended<string> | IIDRule;
 }
 
 
@@ -1562,13 +1562,13 @@ export interface ICursorFunc extends ICssFuncObject
     fn: "cursor";
 
     /** Cursor URL or reference to the ID rule identifying an SVG element */
-    url: Extended<string | IIDRule>;
+    url: Extended<string> | IIDRule;
 
     /** X-coordinate of the cursor hotspot */
-    x?: number;
+    x?: Extended<number>;
 
     /** Y-coordinate of the cursor hotspot */
-    y?: number;
+    y?: Extended<number>;
 }
 
 

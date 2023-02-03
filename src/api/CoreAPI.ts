@@ -497,26 +497,45 @@ export const raw = (parts: TemplateStringsArray, ...params: any[]): IRawProxy =>
  * Returns a function representing the CSS `url()` function. The string parameter
  * will be wrapped in a `url()` invocation. The function can also accept the IIDRule object to
  * create url(#element) invocation, which is often used to address SVG elements by their IDs.
+ *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/url" target="mdn">MDN Page</a>
+ *
+ * @param p URL path or IIDRule object
+ * @returns
  */
-export const url = (p: Extended<string | IIDRule>): IUrlFunc => ({ fn: "url", p });
+export const url = (p: Extended<string> | IIDRule): IUrlFunc => ({ fn: "url", p });
 
 fdo.url = [ ["p", {str: WKF.Quoted} ]]
 
 
 
 /**
- * Returns a function representing the CSS `url()` function.
+ * Returns a function representing the CSS `url()` function, which can be used in the
+ * {@link Stylesets!IStyleset.cursor} style property.
+ *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/cursor" target="mdn">MDN Page</a>
+ *
+ * @param p Path to the cursor image file
+ * @returns Plain object with cursor parameters
  */
 export function cursor( p: Extended<string | IIDRule>): ICursorFunc;
 
 /**
  * Returns a function representing the CSS `url()` function followed by two numbers
- * indicating the cursor hotspot.
+ * indicating the cursor hotspot. This can be used in the {@link Stylesets!IStyleset.cursor}
+ * style property
+ *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/cursor" target="mdn">MDN Page</a>
+ *
+ * @param p Path to the cursor image file
+ * @param x X-coordinate of the cursor hot spot
+ * @param y Y-coordinate of the cursor hot spot
+ * @returns Plain object with cursor parameters
  */
-export function cursor( p: Extended<string | IIDRule>, x: number, y: number): ICursorFunc;
+export function cursor( p: Extended<string> | IIDRule, x: number, y: number): ICursorFunc;
 
 // Implementation
-export function cursor( url: Extended<string | IIDRule>, x?: number, y?: number): ICursorFunc
+export function cursor( url: Extended<string> | IIDRule, x?: Extended<number>, y?: Extended<number>): ICursorFunc
 {
     return { fn: "cursor", url, x, y };
 }
@@ -530,6 +549,8 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
  * theoretically can be used in any style property wherever the CSS `<string>` type is accepted;
  * however, its use by browsers is currently limited to the `content` property. Also not all
  * browsers currently support type, units or fallback values.
+ *
+ * - <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/attr" target="mdn">MDN Page</a>
  *
  * @param attrName Name of the attribute whose value should be returned.
  * @param typeOrUnit Optional type or unit keyword that determines the returned CSS type.
