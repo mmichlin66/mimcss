@@ -1,6 +1,6 @@
 {
     "name": "mimcss",
-    "version": "0.12.1",
+    "version": "0.12.2",
     "description": "Authoring CSS in TypeScript",
     "homepage": "https://mimcss.com",
     "repository": "github:mmichlin66/mimcss",
@@ -35,27 +35,10 @@
         "webpack-cli": "^5.0.1"
     },
     "files": [
+        "CHANGELOG.md",
         "lib/mimcss.js",
         "lib/mimcss.dev.js",
         "lib/index.d.ts",
-        "lib/api/CoreTypes.d.ts",
-        "lib/api/CoreAPI.d.ts",
-        "lib/api/NumericTypes.d.ts",
-        "lib/api/NumericAPI.d.ts",
-        "lib/api/ColorTypes.d.ts",
-        "lib/api/ColorAPI.d.ts",
-        "lib/api/FontTypes.d.ts",
-        "lib/api/CounterTypes.d.ts",
-        "lib/api/ShapeTypes.d.ts",
-        "lib/api/ShapeAPI.d.ts",
-        "lib/api/MediaTypes.d.ts",
-        "lib/api/RuleTypes.d.ts",
-        "lib/api/RuleAPI.d.ts",
-        "lib/api/SchedulingTypes.d.ts",
-        "lib/api/SchedulingAPI.d.ts",
-        "lib/api/ScrollTimelineTypes.d.ts",
-        "lib/api/StyleTypes.d.ts",
-        "lib/api/Stylesets.d.ts",
-        "lib/api/StyleAPI.d.ts"
+        "lib/api/**/*.d.ts"
     ]
 }

@@ -1,3 +1,10 @@
+# 0.12.2
+
+1. Implement `@font-palette-values` at-rule.
+1. Implement `@container` at-rule.
+1. Implement `container-type` and `container-name` style properties.
+
+
 # 0.12.1
 
 1. Remove `StringStyleset` type.
