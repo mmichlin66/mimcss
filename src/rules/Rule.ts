@@ -159,7 +159,7 @@ export abstract class NamedRuleLike extends RuleLike implements INamedEntity
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
-	public name: string;
+	public name!: string;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
@@ -185,7 +185,7 @@ export abstract class Rule extends RuleLike implements IRule
 
 	// CSSRule-derived object corresponding to the actuall CSS rule inserted into
 	// the styles sheet or the parent rule.
-	public cssRule: CSSRule | null;
+	public cssRule!: CSSRule | null;
 }
 
 

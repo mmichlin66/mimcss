@@ -70,10 +70,10 @@ export class KeyframesRule extends Rule implements IKeyframesRule
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
-	public name: string;
+	public name!: string;
 
 	/** List of style rules representing animation frames */
-	public frameRules: KeyframeRule[];
+	public frameRules?: KeyframeRule[];
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

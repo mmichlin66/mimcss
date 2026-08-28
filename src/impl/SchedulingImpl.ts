@@ -154,7 +154,7 @@ class AnimationFrameScheduler implements IScheduler
 	private h = 0;
 
     // Callback to call to write changes to the DOM.
-	private cb: () => void;
+	private cb?: () => void;
 
     /**
      * Initializes the scheduler object and provides the callback that should be invoked when the
@@ -191,7 +191,7 @@ class AnimationFrameScheduler implements IScheduler
 	private onFrame = (): void =>
 	{
 		this.h = 0;
-		this.cb();
+		this.cb?.();
 	}
 }
 

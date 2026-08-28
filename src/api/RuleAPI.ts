@@ -1339,7 +1339,7 @@ export abstract class StyleDefinition<P extends StyleDefinition = any> implement
  */
 export const embedded = (category: string): ClassDecorator =>
     // we return the function that is the actual decorator.
-    embeddedDecorator.bind( undefined, category);
+    target => embeddedDecorator(category, target as unknown as IStyleDefinitionClass);
 
 
 

@@ -78,7 +78,7 @@ export abstract class GroupRule<T extends IStyleDefinition, R extends CSSGroupin
 
 
 	/** Instance of the style definition class defining the rules under this grouping rule */
-	public gsd: T;
+	public gsd!: T;
 
 	/** SOM supports rule */
 	declare public cssRule: R | null;
@@ -92,10 +92,10 @@ export abstract class GroupRule<T extends IStyleDefinition, R extends CSSGroupin
 	/**
      * Group Rule Container - this container contains rules for the group definition instance.
      */
-	private grc: IRuleContainer;
+	private grc!: IRuleContainer;
 
 	/** Condition of this grouping rule. */
-	private _cond: string | null;
+	private _cond!: string | null;
 }
 
 
@@ -168,7 +168,7 @@ export class MediaRule<T extends IStyleDefinition> extends GroupRule<T,CSSMediaR
 /**
  * The ContainerRule class describes a CSS @media rule.
  */
-export class ContainerRule<T extends IStyleDefinition> extends GroupRule<T,CSSMediaRule> implements IContainerRule<T>
+export class ContainerRule<T extends IStyleDefinition> extends GroupRule<T,CSSContainerRule> implements IContainerRule<T>
 {
 	public constructor(sd: IStyleDefinition, statement: ContainerStatement, instOrClass: T | IStyleDefinitionClass<T>,
         nameOverride?: string | IContainerRule)
@@ -204,7 +204,7 @@ export class ContainerRule<T extends IStyleDefinition> extends GroupRule<T,CSSMe
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
-	public name: string;
+	public name!: string;
 
 	/**
 	 * String or another container rule object used to create the name of this layer.
@@ -254,7 +254,7 @@ export class LayerBlockRule<T extends IStyleDefinition> extends GroupRule<T,CSSG
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
-	public name: string;
+	public name!: string;
 
 	/**
 	 * String or another layer rule object used to create the name of this layer.

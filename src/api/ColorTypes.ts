@@ -427,7 +427,7 @@ export interface IColorMixFunc extends ICssColorFunc
     c1: [Extended<CssColor>, Extended<CssPercent>?];
 
     /** Second color and optional percentage to include in the mix */
-    c2: [Extended<CssColor>, Extended<CssPercent>?];
+    c2?: [Extended<CssColor>, Extended<CssPercent>?];
 }
 
 

@@ -510,7 +510,7 @@ export class RuleContainer implements ProxyHandler<StyleDefinition>, IRuleContai
      * (as for styled components) but from the processClass function. This affects whether the rule
      * names are remembered in the class and are used by other processClass-created instances.
      */
-    private fromClass: boolean;
+    private fromClass?: boolean;
 
      /** List of references to other style definitions creaed via the $use function. */
 	private refs = new Map<string,StyleDefinition>();
@@ -1288,7 +1288,7 @@ const addDomRule = (ruleText: string, parent: CSSStyleSheet | CSSGroupingRule): 
     catch(x)
     {
         /// #if DEBUG
-        console.error( `'insertRule' failed for rule '${ruleText}'. Error = ${x.message}` );
+        console.error( `'insertRule' failed for rule '${ruleText}'. Error = ${(x as Error).message}` );
         /// #endif
         return null;
     }
@@ -1531,10 +1531,13 @@ const onShadowRootRemoved = (records: MutationRecord[], observer: MutationObserv
 {
     for( let record of records)
     {
-        record.removedNodes?.forEach( (elm: Element) => {
-            let shadow = elm.shadowRoot;
-            if (shadow && shadow instanceof ShadowRoot)
-                clientContextsForRoots.delete( shadow);
+        record.removedNodes?.forEach( (elm) => {
+            if (elm instanceof HTMLElement)
+            {
+                let shadow = elm.shadowRoot;
+                if (shadow && shadow instanceof ShadowRoot)
+                    clientContextsForRoots.delete( shadow);
+            }
         });
     }
 

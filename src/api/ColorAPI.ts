@@ -473,7 +473,7 @@ class ColorMixFunc implements IColorMixBuilder
 
     cs?: Extended<ColorSpace>;
     c1: [Extended<CssColor>, Extended<CssPercent>?];
-    c2: [Extended<CssColor>, Extended<CssPercent>?];
+    c2?: [Extended<CssColor>, Extended<CssPercent>?];
 
     constructor( c: Extended<CssColor>, p?: Extended<CssPercent>) { this.c1 = [c, p]; }
 

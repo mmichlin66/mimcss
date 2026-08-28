@@ -175,7 +175,7 @@ export class ClassNameRule extends NamedRuleLike implements IClassNameRule
     }
 
     /** All class CSS names (with dots) concatenated together */
-    public cssName: DotIdent;
+    public cssName!: DotIdent;
 
     private classes: (IClassRule | IClassNameRule | string)[];
 }
@@ -218,7 +218,7 @@ export class ColorProfileRule extends MiscRule<CSSRule> implements IColorProfile
     public get profileName(): DashedIdent { return this.name; }
 
     /** Profile name */
-    public name: DashedIdent;
+    public name!: DashedIdent;
 
     private url: string;
     private intent?: ColorProfileRenderingIntent;
@@ -261,7 +261,7 @@ export class FontPaletteValuesRule extends MiscRule<CSSRule> implements IFontPal
     public get fontPaletteName(): DashedIdent { return this.name; }
 
     /** Profile name */
-    public name: DashedIdent;
+    public name!: DashedIdent;
 
     private values?: ExtendedFontPaletteValues;
     private nameOverride?: IFontPaletteValuesRule | DashedIdent;
@@ -301,7 +301,7 @@ export class ScrollTimelineRule extends MiscRule<CSSRule/*CSSScrollTimelineRule*
     public get timelineName(): string { return this.name; }
 
     /** Scroll timeline name */
-    public name: string;
+    public name!: string;
 
 	/** Object defining scroll timeline properties. */
 	private timeline: ExtendedScrollTimeline;
@@ -367,7 +367,7 @@ export class LayerNameRule extends MiscRule<CSSRule/*CSSLayerStatementRule*/> im
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
-	public name: string;
+	public name!: string;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.

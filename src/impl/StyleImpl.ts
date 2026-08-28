@@ -280,7 +280,7 @@ export const ss2s = (styleset: Styleset): string =>
  * Sets the value of a single property with the given priority flag to the given DOM element
  * or CSS rule.
  */
-export const sp2style = (style: CSSStyleDeclaration, name: string, value: any): void =>
+export const sp2style = (style: CSSStyleDeclaration | CSSPageDescriptors, name: string, value: any): void =>
     spOrVar2style(style, camelToDash(name), sp2si(name, value));
 
 
@@ -288,7 +288,7 @@ export const sp2style = (style: CSSStyleDeclaration, name: string, value: any): 
 /**
  * Sets the value of a single custom CSS property to the given DOM element or CSS rule.
  */
-export const var2style = (style: CSSStyleDeclaration, name: string, template: string, value: any): void =>
+export const var2style = (style: CSSStyleDeclaration | CSSPageDescriptors, name: string, template: string, value: any): void =>
     spOrVar2style(style, name, sp2si(template, value));
 
 
@@ -316,7 +316,7 @@ export function ss2style(style: CSSStyleDeclaration, ss: Styleset | null | undef
  * Helper function that sets the value of a single regular or custom CSS property to the given
  * DOM element or CSS rule.
  */
-function spOrVar2style(style: CSSStyleDeclaration, name: string,
+function spOrVar2style(style: CSSStyleDeclaration | CSSPageDescriptors, name: string,
     si: [value: string | null | undefined, impFlag?: boolean] | null): void
 {
     if (si?.[0])
@@ -1113,7 +1113,7 @@ class StylesetProxyHandler implements ProxyHandler<Styleset>
     public proxy: any;
 
     /** Keeps the style object for which this is the proxy handler */
-    public style: CSSStyleDeclaration;
+    public style!: CSSStyleDeclaration;
 
     public set(target: any, prop: PropertyKey, value: any, receiver: any): boolean
     {

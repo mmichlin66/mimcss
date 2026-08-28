@@ -71,12 +71,12 @@ abstract class VarBaseRule<K extends VarTemplateName = any> extends Rule impleme
      * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
      * properties (--).
      */
-    public name: string;
+    public name!: string;
 
     /**
      * Custom CSS property name prefixed with `"--"`.
      */
-    public cssName: DashedIdent;
+    public cssName!: DashedIdent;
 
     // Value of the custom CSS property.
     protected value?: ExtendedVarValue<K>;

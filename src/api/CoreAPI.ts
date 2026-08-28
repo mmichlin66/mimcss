@@ -518,7 +518,7 @@ fdo.url = [ ["p", {str: WKF.Quoted} ]]
  * @param p Path to the cursor image file
  * @returns Plain object with cursor parameters
  */
-export function cursor( p: Extended<string | IIDRule>): ICursorFunc;
+export function cursor( p: Extended<string> | IIDRule): ICursorFunc;
 
 /**
  * Returns a function representing the CSS `url()` function followed by two numbers

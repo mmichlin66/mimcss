@@ -138,7 +138,7 @@ fdo["conic-gradient"] = {
  */
 abstract class GradientBuilder<T extends (CssLength | CssAngle)> implements IGradientBuilder<T>
 {
-    fn: "linear-gradient" | "radial-gradient" | "conic-gradient";
+    fn!: "linear-gradient" | "radial-gradient" | "conic-gradient";
 
     repeat?: boolean;
     stops: GradientStopOrHint<T>[];
@@ -409,7 +409,7 @@ let addedPaintWorkletModules = new Set<string>();
  *
  * @category Image
  *
- * @ts-expect-error: Erroneously reports TS2370 although the rest's type is an array (a tuple) */
+ */
 export const paint = <K extends keyof IPaintWorklets>( name: K, ...args: MappedSyntaxTypes<IPaintWorklets[K]>): IPaintFunc =>
     ({ fn: "paint", name: name as string, args: args as any as string[] })
 

@@ -180,7 +180,7 @@ export interface IKeyframesRule extends IRule, INamedEntity
 	readonly cssRule: CSSKeyframesRule | null;
 
 	/** List of style rules representing animation frames */
-	readonly frameRules: IKeyframeRule[];
+	readonly frameRules?: IKeyframeRule[];
 }
 
 /**
@@ -333,7 +333,7 @@ export interface INamespaceRule extends IRule
  * The IPageRule interface represents the CSS `@page` rule.
  * Objects implementing this interface are returned from the {@link RuleAPI!StyleDefinition.$page} method.
  */
-export interface IPageRule extends IStyleRule
+export interface IPageRule extends IStyleRule<CSSPageRule>
 {
 	/** CSSOM page rule */
 	readonly cssRule: CSSPageRule | null;

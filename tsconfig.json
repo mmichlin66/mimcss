@@ -15,16 +15,16 @@
         "noEmitOnError": true,
         "useDefineForClassFields": false,
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "esModuleInterop": true,
 		"target": "esnext",
 		"lib": [ "esnext", "dom" ],
 		"rootDir": "src",
 		"outDir": "./lib",
-        "baseUrl": ".",
         "paths": {
-            "mimcss": ["src/index.ts"]
-        }
+            "mimcss": ["./src/index.ts"]
+        },
+        "types": ["jasmine"]
 	},
 
 	"include": [

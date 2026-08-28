@@ -456,14 +456,14 @@ abstract class NamedStyleRule<P extends DotPrefix | PoundPrefix> extends StyleRu
 	 * doesn't have the prefix that is used when referring to classes (.), IDs (#) and custom CSS
 	 * properties (--).
 	 */
-	public name: string;
+	public name!: string;
 
 	/**
 	 * Rule's name - this is a name that has the prefix that is used when referring to classes (.),
 	 * IDs (#) and custom CSS properties (--). For animations, this name is the same as in the
 	 * `name` property.
 	 */
-	public cssName: `${P}${string}`;
+	public cssName!: `${P}${string}`;
 
 	// Name or named object that should be used to create a name for this rule. If this property
 	// is not defined, the name will be uniquely generated.
