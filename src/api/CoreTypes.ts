@@ -155,7 +155,7 @@ export type CssString = string | IStringProxy;
  * The `ICustomVar` interface is extended by the {@link RuleTypes!IVarRule} interface that is returned
  * from the {@link RuleAPI!StyleDefinition.$var} function.
  *
- * @typeparam T Basic type of the value of the custom CSS variable.
+ * @typeParam T Basic type of the value of the custom CSS variable.
  */
 export interface ICustomVar<T = any>
 {
@@ -181,7 +181,7 @@ export interface ICustomVar<T = any>
  * The `IConstant` interface is extended by the {@link RuleTypes!IConstRule} interface that is returned from the
  * {@link RuleAPI!StyleDefinition.$const} function.
  *
- * @typeparam T Basic type of the value of the constant.
+ * @typeParam T Basic type of the value of the constant.
  */
 export interface IConstant<T = any>
 {
@@ -305,7 +305,7 @@ export type ExtendedProp<T> = Extended<T> | ImportantProp<T> | MultiProp<T> | Gl
  * single value, in which case it applies to both dimensions. For example, it is used by style
  * properties such as `overflow`, `border-radius`, `background-repeat` and others.
  *
- * @typeparam T Type of the values
+ * @typeParam T Type of the values
  *
  * **Examples:**
  *
@@ -328,7 +328,7 @@ export type OneOrPair<T> = T | [Extended<T>, Extended<T>?];
  * specifying 1, 2 or 3 values determine the values applied to all four sides. For example, it is
  * used by style properties such as `margin`, `padding`, `border-color` and others.
  *
- * @typeparam T Type of the values
+ * @typeParam T Type of the values
  *
  * **Examples:**
  *
@@ -356,7 +356,7 @@ export type OneOrBox<T> = T | [Extended<T>, Extended<T>?, Extended<T>?, Extended
  * properties such as `animation` and all its longhands, `background` and all its longhands,
  * `transition` and all its longhands, `box-shadow`, `transform`, `filter` and others.
  *
- * @typeparam T Type of the values
+ * @typeParam T Type of the values
  *
  * **Examples:**
  *

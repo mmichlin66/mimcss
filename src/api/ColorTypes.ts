@@ -448,8 +448,7 @@ export interface IColorMixBuilder extends IColorMixFunc
     /**
      * Sets the color space in which to mix the colors
      *
-     * @param c First color to be mixed
-     * @param p Percentage of the first color to include in the mix
+     * @param cs Color space in which to mix the colors
      */
     in( cs: Extended<ColorSpace>): this;
 }
@@ -499,7 +498,7 @@ export interface IAlphaFunc extends ICssColorFunc
 
 
 /**
- * Rendering intent that can be specified in the color profile and indicated in the @color-profile
+ * Rendering intent that can be specified in the color profile and indicated in the `@color-profile`
  * at-rule.
  */
 export type ColorProfileRenderingIntent = "relative-colorimetric" | "absolute-colorimetric" |

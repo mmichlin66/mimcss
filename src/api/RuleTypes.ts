@@ -439,7 +439,7 @@ export interface IScrollTimelineRule extends IRule, INamedEntity
  * This interface is implemented by the {@link RuleAPI!StyleDefinition} class and is not intended to be
  * implemented by developers
  *
- * @typeparam P Parent style definition class. Parent of a top-level class is null.
+ * @typeParam P Parent style definition class. Parent of a top-level class is null.
  */
 export interface IStyleDefinition<P extends IStyleDefinition = any>
 {
@@ -488,7 +488,7 @@ export interface IGroupRule<T extends IStyleDefinition = any, R extends CSSGroup
 
 
 /**
- * The ISupportsRule interface represents the CSS @supports rule.
+ * The ISupportsRule interface represents the CSS `@supports` rule.
  * Objects implementing this interface are returned from the {@link RuleAPI!StyleDefinition.$supports} method.
  */
 export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSSupportsRule>
@@ -500,7 +500,7 @@ export interface ISupportsRule<T extends IStyleDefinition = any> extends IGroupR
 
 
 /**
- * The IMediaRule interface represents the CSS @media rule.
+ * The IMediaRule interface represents the CSS `@media` rule.
  * Objects implementing this interface are returned from the {@link RuleAPI!StyleDefinition.$media} method.
  */
 export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSMediaRule>
@@ -515,7 +515,7 @@ export interface IMediaRule<T extends IStyleDefinition = any> extends IGroupRule
 
 
 /**
- * The IContainerRule interface represents the CSS @container rule.
+ * The IContainerRule interface represents the CSS `@container` rule.
  * Objects implementing this interface are returned from the {@link RuleAPI!StyleDefinition.$container} method.
  */
 export interface IContainerRule<T extends IStyleDefinition = any> extends IGroupRule<T,CSSContainerRule>, INamedEntity

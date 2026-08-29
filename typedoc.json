@@ -7,10 +7,14 @@
     "disableSources": true,
     "hideGenerator": true,
     "includeVersion": true,
-	"includes": "./src/typedoc",
+	"projectDocuments": ["./src/typedoc"],
 	"out": "./web/reference",
     "entryPointStrategy": "expand",
 	"entryPoints": [
 		"./src/api/"
-	]
+	],
+    "exclude": [
+        "src/web/**/*",
+        "src/typedoc/**/*"
+    ]
 }

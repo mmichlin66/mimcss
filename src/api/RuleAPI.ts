@@ -60,7 +60,7 @@ import {a2s} from "../impl/Utils";
  * }
  * ```
  *
- * @typeparam P Parent style definition class. Parent of a top-level class is null.
+ * @typeParam P Parent style definition class. Parent of a top-level class is null.
  */
 export abstract class StyleDefinition<P extends StyleDefinition = any> implements IStyleDefinition<P>
 {
@@ -1433,7 +1433,7 @@ export const chooseClass = (...monikers: ClassMoniker[]): string =>
  * being a style definition class, themes provide some extra capabilities related to style
  * inheritance and theme activation.
  *
- * @typeparam P Parent style definition class. Parent of a top-level class is null.
+ * @typeParam P Parent style definition class. Parent of a top-level class is null.
  */
 export abstract class ThemeDefinition<P extends StyleDefinition = any> extends StyleDefinition<P>
 {
@@ -1500,13 +1500,9 @@ export abstract class ThemeDefinition<P extends StyleDefinition = any> extends S
  * }
  * ```
  *
- * @typeparam T Type of the style definition instance passed to the function. This is
+ * @typeParam T Type of the style definition instance passed to the function. This is
  * also the type, which is returned form the function.
  * @param instOrClass Style definition class or instance to activate.
- * @param root Optional document or shadow root object. If the root parameter is specified and
- * the browser supports constructable style sheets, then the style definition will be adopted
- * by the given root. If the browser does not supports constructable style sheets, the style
- * definition will create a `<style>` element in the document's `<head>` or in the shadow root.
  * @param schedulerType Identifier of a pre-defined or registered scheduler. If not specified, the
  * scheduler set as default will be used.
  * @returns The same style definition instance that was passed in.

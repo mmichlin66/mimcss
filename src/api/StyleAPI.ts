@@ -68,8 +68,8 @@ export function getStylePropValue(name: string, value: any): string
 /**
  * Sets, updates or removes the given style property for the given DOM element.
  *
- * @typeparam K A key in the {@link Stylesets!IStyleset} interface, which defines the property name.
- * @param elm DOM element whose styles will be set.
+ * @typeParam K A key in the {@link Stylesets!IStyleset} interface, which defines the property name.
+ * @param style Style declaration object in which the property will be set.
  * @param name Name of the style property. This can be either dash-case or camelCase name.
  * @param value New value for the style property. The value can be of any type allowed for the
  * property in the {@link Stylesets!IStyleset} interface. If the value is `null` or `undefined`, the style property
@@ -84,9 +84,9 @@ export const updateStyleProp = <K extends keyof IStyleset>(style: CSSStyleDeclar
 /**
  * Sets, updates or removes the given custom CSS property for the given DOM element.
  *
- * @typeparam K Key of the {@link Stylesets!IVarTemplateStyleset} interface that determines the type of the
+ * @typeParam K Key of the {@link Stylesets!IVarTemplateStyleset} interface that determines the type of the
  * custom CSS property and of the fallback value.
- * @param elm DOM element whose styles will be set.
+ * @param style Style declaration object in which the property will be set.
  * @param varObj Custom CSS property object created using the {@link RuleAPI.StyleDefinition.$var} function.
  * @param value New value for the custom CSS property. The value can be of any type allowed for the
  * property in the {@link Stylesets!IVarTemplateStyleset} interface. If the value is `null` or `undefined`,
@@ -101,7 +101,7 @@ export const updateVar = <K extends VarTemplateName>(style: CSSStyleDeclaration,
 /**
  * Sets, updates or removes values of the style properties from the given Styleset object to the
  * `style` attribute of the given DOM element.
- * @param elm DOM element whose styles will be set.
+ * @param style Style declaration object in which the properties will be set.
  * @param styleset Styleset object which provides values for style properties.
  * @param replace Flag indicating whether the new styleset should completely replace the
  * existing element styles with the new styles (true) or merge the new styles with the

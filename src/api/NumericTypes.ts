@@ -14,9 +14,9 @@ export type NumericString<U extends string> = `${number}${U}`;
  * numeric CSS types. This interface is extended by dimension-specific interfaces such as
  * {@link INumberMath}, {@link ILengthMath}, {@link IAngleMath}, etc.
  *
- * @typeparam T Type of values participating in the mathematical functions. For example, the
+ * @typeParam T Type of values participating in the mathematical functions. For example, the
  * {@link ILengthMath} interface specifies it as {@link CssLength}.
- * @typeparam U Type that contains string literals defining units available for the given numeric
+ * @typeParam U Type that contains string literals defining units available for the given numeric
  * type.
  */
 export interface INumericMath<T, U extends string>
@@ -131,7 +131,7 @@ export interface INumericMath<T, U extends string>
      * are of the type `Extended<T>`; that is, they can be either of the generic type `T`, or a
      * CSS custom variable or constant of type `T`.
      *
-     * @param formularParts Array of strings, which are part of the template string and which are
+     * @param formulaParts Array of strings, which are part of the template string and which are
      * not parameters.
      * @param params Array of parameters from the template string.
      * @returns Numeric string of the proper unit type. This allows the result of the `calc` method

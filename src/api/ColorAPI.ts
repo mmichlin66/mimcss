@@ -503,7 +503,8 @@ class ColorMixFunc implements IColorMixBuilder
  * }
  * ```
  *
- * @param cs Color space. Default is "lch".
+ * @param c Initial color to start the mixing process.
+ * @param p Percentage of the initial color to start the mixing process.
  * @returns The `IColorMixBuilder` object that allows adding colors and optional percentages to mix
  */
 export const colorMix = (c: Extended<CssColor>, p?: Extended<CssPercent>): IColorMixBuilder => new ColorMixFunc( c, p);

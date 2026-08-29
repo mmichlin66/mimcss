@@ -4142,7 +4142,7 @@ declare global
     {
         /**
          * The `$` property exposes an object through which individual style properties can
-         * be set with their IStyleset-defined types. It is a lso possible to assign a Styleset
+         * be set with their IStyleset-defined types. It is also possible to assign a Styleset
          * object to this property, which will merge with existing styles for the element. As
          * opposed to {@link StyleAPI!updateStyleProp}, {@link StyleAPI!updateVar} and {@link StyleAPI!updateStyleset} methods, assigning to the
          * `styleset` property or assigning individual style properties throught it works

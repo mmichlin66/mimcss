@@ -566,7 +566,8 @@ fdo.cursor = (v: ICursorFunc) => mv2s( [url(v.url), v.x, v.y])
 /**
  * Returns a representation of the CSS `counter()` function with an optional counter style.
  *
- * @param c Counter name or counter rule object
+ * @param counterObj Counter name or counter rule object
+ * @param style Counter style
  * @returns ICounterFunc object representing the invocation of the `counter()` CSS function
  */
  export const counter = (counterObj: Extended<CssCounter>,
@@ -612,7 +613,7 @@ export const counters = (counterObj: Extended<CssCounter>,
  * }
  * ```
  *
- * @typeparam K Key of the {@link Stylesets!IVarTemplateStyleset} interface that determines the type of the
+ * @typeParam K Key of the {@link Stylesets!IVarTemplateStyleset} interface that determines the type of the
  * custom CSS property and of the fallback value.
  * @param varObj Custom CSS property object created using the {@link RuleAPI!StyleDefinition.$var} function.
  * @param fallback Fallback value that will be used if the custom CSS property isnt set.

@@ -37,7 +37,7 @@ import { SyntaxKey } from "./Stylesets";
  * // conic gradient with a second color starting at 0.4turn and stopping at 0.6turn
  * conicGradient( "red", ["blue", 0.4, 0.6], "yellow")
  * ```
- * @typeparam T Type of numeric values used for hints and color stops.
+ * @typeParam T Type of numeric values used for hints and color stops.
  */
 export type GradientStopOrHint<T extends (CssLength | CssAngle)> =
     Extended<CssColor> | [Extended<CssColor>, Extended<T>, Extended<T>?] | [Extended<T>];
@@ -82,7 +82,7 @@ export type LinearGradientAngle = Extended<CssAngle> | SideOrCorner;
 
 /**
  * Base class for gradients
- * @typeparam T Type of numeric values used for hints and color stops.
+ * @typeParam T Type of numeric values used for hints and color stops.
  * @category Image
  */
 export interface IGradientFunc<T extends (CssLength | CssAngle)> extends ICssImageFunc
@@ -98,14 +98,14 @@ export interface IGradientFunc<T extends (CssLength | CssAngle)> extends ICssIma
 
 /**
  * Base class for gradient builders.
- * @typeparam T Type of numeric values used for hints and color stops.
+ * @typeParam T Type of numeric values used for hints and color stops.
  * @category Image
  */
 export interface IGradientBuilder<T extends (CssLength | CssAngle)> extends IGradientFunc<T>
 {
     /**
      * Sets the flag indicating whether the gradient is repeating.
-     * @param repeatFflag indicating whether to set the gradient as repeating; the default value
+     * @param repeat Flag indicating whether to set the gradient as repeating; the default value
      * is true.
      */
     repeating( repeat?: boolean): this;
@@ -205,7 +205,7 @@ export interface IRadialGradientBuilder extends IRadialGradientFunc, IGradientBu
 
     /**
      * Sets the shape of the gradient to circle with the given extent.
-     * @param eExtent Circle extent keyword.
+     * @param extent Circle extent keyword.
      */
 	circle( extent?: Extended<ExtentKeyword>): this;
 
@@ -339,7 +339,7 @@ export interface ICrossFadeBuilder extends ICrossFadeFunc
 
     /**
      * Sets the color that can be used in place of the last image.
-     * @param pos Position value
+     * @param c Color value to be used in place of the last image.
      */
 	color( c: Extended<CssColor>): this;
 }

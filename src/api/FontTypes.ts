@@ -232,7 +232,7 @@ export interface IFontFace
 
 
 /**
- * The `ExtendedFontFace` type maps all @font-face properties defined in the {@link IFontFace}
+ * The `ExtendedFontFace` type maps all `@font-face` properties defined in the {@link IFontFace}
  * interface to the "extended" versions of their types. These extended types are defined using the
  * {@link CoreTypes!RawExtended} generic type, which adds {@link CoreTypes!IRawProxy} to the type
  * that is defined in the {@link IFontFace} interface.
