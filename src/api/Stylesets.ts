@@ -14,7 +14,7 @@ import {
     FontVariantCaps, FontVariantEmoji, FontVariantPosition
 } from "./FontTypes";
 import {
-    ClassMoniker, IStyleDefinition, IStyleDefinitionClass, IStyleRule, IVarRule
+    ClassMoniker, IPageRule, IStyleDefinition, IStyleDefinitionClass, IStyleRule, IVarRule
 } from "./RuleTypes";
 
 
@@ -3950,7 +3950,7 @@ export type PageBoxProperties =
 export type PageBoxStyleset =
     { [K in PageBoxProperties]?: ExtendedProp<IStyleset[K]> } &
     { "--"?: CustomVar_StyleType[] } &
-    { "+"?: IStyleRule | IStyleRule[] };
+    { "+"?: IPageRule | IPageRule[] };
 
 /**
  * The `IPageRuleStyleset` interface defines properties that can be used in the `@page` at-rule in

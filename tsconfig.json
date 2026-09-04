@@ -6,6 +6,7 @@
 		"sourceMap": true,
 		"declarationMap": true,
 		"strictNullChecks": true,
+        "strictFunctionTypes": false,
 		"noImplicitAny": false,
 		"noImplicitReturns": true,
 		"noUnusedLocals": false,
