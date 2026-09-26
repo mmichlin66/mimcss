@@ -17,7 +17,7 @@
         "module": "esnext",
         "moduleResolution": "bundler",
         "esModuleInterop": true,
-        "useDefineForClassFields": true,
+        "useDefineForClassFields": false,
         "removeComments": false,
 		"target": "ES2022",
 		"lib": [ "ES2022", "dom" ],
