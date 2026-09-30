@@ -3,7 +3,7 @@
 } from "./Stylesets"
 import {MediaStatement, SupportsStatement} from "./MediaTypes";
 import { IVarRule } from "./RuleTypes";
-import {sp2s, s_registerSP, ss2s, sp2style, var2style, ss2style} from "../impl/StyleImpl"
+import {sp2s, s_registerSP, ss2s, sp2style, var2style, ss2style, ss2r} from "../impl/StyleImpl"
 import {scheduleAction} from "../impl/SchedulingImpl";
 import {media2s, supports2s} from "../impl/MiscImpl";
 import { virtMerge } from "../impl/Virt";
@@ -144,6 +144,16 @@ export const stylesetToString = (styleset: Styleset): string => ss2s( styleset);
  * @returns The target object with merged properties.
  */
 export const mergeStylesheets = (target: any, ...objects: any[]): any => virtMerge( target, ...objects);
+
+
+
+/**
+ * Converts the given {@link Stylesets!Styleset} to an object where each style property (including
+ * custom ones) has its string value.
+ * @param styleset
+ * @returns A record object with string values of all style properties from the given styleset.
+ */
+export const stylesetToRecord = ss2r;
 
 
 

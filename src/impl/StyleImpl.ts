@@ -250,6 +250,28 @@ export const sp2si = (propName: string, propVal: any): [string, boolean] | null 
 
 
 
+/**
+ * Converts the given {@link Stylesets!Styleset} to an object where each style property (including
+ * custom ones) has its string value.
+ * @param styleset
+ * @returns A record object with string values of all style properties from the given styleset.
+ */
+export const ss2r = (styleset: Styleset): Record<string,string> =>
+{
+    let r: Record<string,string> = {};
+
+    // enumerate all styleset properties retrieving also vendor-prefixed variants
+	forAllPropsInStylset(
+        styleset,
+        (name, value, isImportant) =>
+            r[name] = value + (isImportant ? " !important" : "")
+    );
+
+    return r;
+}
+
+
+
 /** Converts the given styleset to its string representation */
 export const ss2s = (styleset: Styleset): string =>
 {
@@ -392,7 +414,10 @@ const forAllPropsInStylset = (styleset: Styleset | null | undefined, callback: S
                 for( let ntv of ntvs)
                 {
                     let si = sp2si(ntv[1], ntv[2]);
-                    callback(ntv[0], si?.[0], si?.[1], true);
+                    let name = ntv[0];
+                    if (!name.startsWith("--"))
+                        name = "--" + name;
+                    callback(name, si?.[0], si?.[1], true);
                 }
             }
         }
