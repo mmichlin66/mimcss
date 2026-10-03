@@ -28,7 +28,6 @@ The goal of the Mimcss library is to support all CSS features in a type-safe and
 - Support for theming via style definition class inheritance.
 - Support for server-side rendering.
 - All CSS rule types are supported including style rules and at-rules.
-- Automatic support for vendor prefixes.
 - Custom CSS properties are supported in a type safe manner.
 - Style rules can be nested and can extend other style rules.
 - All pseudo styles and pseudo elements are supported using convenient and compact notation.

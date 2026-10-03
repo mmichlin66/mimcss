@@ -3646,6 +3646,7 @@ export interface IStyleset
  * the "extended" versions of their types. These extended types are defined by adding basic keywords
  * (e.g. "unset", "initial", etc.) as well as {@link CoreTypes!IRawProxy} and {@link CoreTypes!ICustomVar} to the type that
  * is defined in the IStyleset interface.
+ * It also allows adding `-webkit-` prefixed styles
  */
 export type ExtendedIStyleset = { [K in keyof IStyleset]?: ExtendedProp<IStyleset[K]> }
 
@@ -3902,8 +3903,9 @@ export type Styleset = ExtendedIStyleset &
          * representing a definition of a custom CSS property.
          */
         "--"?: CustomVar_StyleType[];
-    };
-
+    }
+    // } &
+    // { [K in `-webkit-${string}`]?: ExtendedProp<string> };
 
 
 /** Type listing names of style properties that are allowed in the page boxes */

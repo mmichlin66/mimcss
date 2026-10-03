@@ -22,7 +22,6 @@ module.exports = [
             "./lib/test/specs/testSSR.js",
             "./lib/test/specs/testStyleDefinition.js",
             "./lib/test/specs/testStyleRules.js",
-            "./lib/test/specs/testVendorPrefixes.js",
             "./lib/test/specs/testVirt.js",
         ],
 

@@ -260,7 +260,7 @@ export const ss2r = (styleset: Styleset): Record<string,string> =>
 {
     let r: Record<string,string> = {};
 
-    // enumerate all styleset properties retrieving also vendor-prefixed variants
+    // enumerate all styleset properties
 	forAllPropsInStylset(
         styleset,
         (name, value, isImportant) =>
@@ -277,14 +277,14 @@ export const ss2s = (styleset: Styleset): string =>
 {
     let s = "";
 
-    // enumerate all styleset properties retrieving also vendor-prefixed variants
+    // enumerate all styleset properties
 	forAllPropsInStylset(
         styleset,
-        (name, value, isImportant, isCustom, isPrefixed): void =>
+        (name, value, isImportant, isCustom): void =>
         {
             s += isCustom
                 ? `${name}:${value}`
-                : `${isPrefixed ? "-" : ""}${camelToDash(name)}:${value}`;
+                : `${camelToDash(name)}:${value}`;
 
             if (isImportant)
                 s += " !important";
@@ -349,14 +349,6 @@ function spOrVar2style(style: CSSStyleDeclaration | CSSPageDescriptors, name: st
 
 
 
-/**
- * The tuple that contains the result of applying vendor prefixing on a property.
- * - property name (that may or may not be prefixed).
- * - property value (that may or may not have prefixed items)
- */
-type PropPrefixVariant = [string, string];
-
-
 /** Tuple that contains name, template and value of a custom CSS property VarRule */
 type VarNTV = [name: string, template: string, value: any];
 
@@ -386,7 +378,7 @@ const getVarNTVs = (customVars: CustomVar_StyleType): VarNTV[] =>
  * Callback signature for enumerating Styleset properties converted to strings
  */
 type StylesetPropEnumCallback = (name: string, val: string | undefined | null,
-    isImportant?: boolean, isCustom?: boolean, isPrefixed?: boolean) => void;
+    isImportant?: boolean, isCustom?: boolean) => void;
 
 
 
@@ -441,14 +433,6 @@ const forAllPropsInStylset = (styleset: Styleset | null | undefined, callback: S
                     let si = sp2si( propName, propVal);
                     if (!si)
                         continue;
-
-                    // get vendor-prefixed variants
-                    let variants = getPrefixVariants( propName as keyof IStyleset, si[0]);
-                    if (variants)
-                    {
-                        for( let variant of variants)
-                            callback( variant[0], variant[1], si[1], false, variant[0] !== propName);
-                    }
 
                     // invoke the callback for the originally found prop name and with (perhaps updated)
                     // value
@@ -878,227 +862,6 @@ const stylePropertyInfos: { [K: string]: V2SOptions } =
     "<multi-position>": WKF.MultiPosition,
     "<radius>": WKF.Radius,
 };
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Vendor prefix support
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-const enum VendorPrefix
-{
-    webkit = 1,
-    moz = 2,
-    ms = 3,
-}
-
-// Vendor prefixes with indexes from the VendorPrefix enumeration. The first one is only here to
-// allow the first enumeration value to be 1 and not zero.
-const vendorPrefixStrings = ["", "webkit", "moz", "ms"];
-
-
-// Mode indicating to what entity the prefix should be added if a certain value is found in the
-// property.
-const enum ValuePrefixMode
-{
-    // Both the value and the property name are prefixed.
-    Both = 0,
-
-    // Only the value is prefixed
-    ValueOnly = 1,
-
-    // Only the property name is prefixed
-    PropertyOnly = 2,
-}
-
-
-
-/**
- * Type defining a value which should be prefixed or which indicates that the property should be
- * prefixed.
- */
-type ValuePrefixInfo =
-    {
-        // Value which should be prefixed or which indicates that the property should be prefixed.
-        val: string;
-
-        // Flag indicating whether value or property or both should be prefixed. Default is Both.
-        mode?: ValuePrefixMode;
-
-        // Alternative name for the value (sometimes a value is not just prefixed, but gets
-        // wholly different name).
-        alt?: string;
-    };
-
-/**
- * Type defining a property which should be prefixed or whose values should be prefixed.
- *   - string - specifies the new name of the property
- *   - number - specifies the single supported vendor prefix
- */
-type PropPrefixInfo = string | number |
-    {
-        // Prefix index
-        p: VendorPrefix;
-
-        // Alternative name for the property (sometimes a property is not just prefixed, but gets
-        // wholly different name).
-        alt?: string;
-
-        // Flag indicating whether the property is always prefixed or only if it
-        // contains special values specified by the `vals` property.
-        valsOnly?: boolean;
-
-        // Array of objects providing infomation about values which should be prefixed or
-        // which indicates that the property should be prefixed.
-        vals?: ValuePrefixInfo[];
-    };
-
-
-
-const getPrefixVariants = (name: keyof IStyleset, value: string): PropPrefixVariant[] | null =>
-{
-    let info = propPrefixInfos[name];
-    if (!info)
-        return null;
-
-    if (typeof info === "string")
-        return [[info, value]];
-
-    if (typeof info === "number")
-        return [[dashToCamel(`${vendorPrefixStrings[info]}-${name}`), value]];
-
-    let variants: PropPrefixVariant[] = [];
-    for( let item of info)
-    {
-        if (typeof item === "string")
-            variants.push( [item, value]);
-        else if (typeof item === "number")
-            variants.push( [dashToCamel(`${vendorPrefixStrings[item]}-${name}`), value]);
-        else
-        {
-            let prefixString = vendorPrefixStrings[item.p];
-
-            // determine whether the property name should be prefixed. Note that even if we decide
-            // here that it should not be prefixed, it can change when we go over property values.
-            let shouldPrefixProperty = !item.valsOnly;
-
-            // if property values are defined, try to replace them with prefixed versions. Note that
-            // this can also set the flag indicating that the property name should be prefixed too.
-            let newPropValue = "";
-            if (value && item.vals)
-            {
-                for( let valueInfo of item.vals)
-                {
-                    let valueToSearch = valueInfo.val;
-                    if (value.indexOf( valueToSearch) < 0)
-                        continue;
-
-                    if (valueInfo.mode !== ValuePrefixMode.PropertyOnly)
-                    {
-                        newPropValue = value.split(valueToSearch).join(
-                            valueInfo.alt ? valueInfo.alt : `-${prefixString}-${valueToSearch}`);
-                        value = newPropValue;
-                    }
-
-                    if (valueInfo.mode !== ValuePrefixMode.ValueOnly)
-                        shouldPrefixProperty = true;
-                }
-            }
-
-            let newPropName = "";
-            if (shouldPrefixProperty)
-                newPropName = item.alt ? item.alt : dashToCamel(`${prefixString}-${name}`);
-
-            if (newPropName || newPropValue)
-                variants.push( [newPropName || name, newPropValue || value]);
-        }
-    }
-
-    return variants.length > 0 ? variants : null;
-}
-
-
-
-// Prefix information for size-like properties that accept "stretch" value
-const sizePrefixInfos: PropPrefixInfo[] = [
-    {p: VendorPrefix.webkit, valsOnly: true, vals: [{val: "stretch", mode: ValuePrefixMode.ValueOnly, alt: "-webkit-fill-available"}]},
-];
-
-// Prefix information for properties that accept "cross-fade" and "image-set" functions (that is, images)
-const imageFuncsPrefixInfo: PropPrefixInfo = {
-    p: VendorPrefix.webkit, valsOnly: true, vals: [
-        {val: "cross-fade", mode: ValuePrefixMode.ValueOnly },
-        {val: "image-set", mode: ValuePrefixMode.ValueOnly }
-    ]
-};
-
-const imageFuncsPrefixInfos: PropPrefixInfo[] = [imageFuncsPrefixInfo];
-
-
-const propPrefixInfos: { [K in keyof IStyleset]?: string | number | PropPrefixInfo[] } =
-{
-    appearance: [ VendorPrefix.webkit, VendorPrefix.moz ],
-    backgroundClip: [
-        {p: VendorPrefix.webkit, valsOnly: true, vals: [{val: "text", mode: ValuePrefixMode.PropertyOnly}]}
-    ],
-    blockSize: sizePrefixInfos,
-    boxDecorationBreak: VendorPrefix.webkit,
-    background: imageFuncsPrefixInfos,
-    backgroundImage: imageFuncsPrefixInfos,
-    borderImage: imageFuncsPrefixInfos,
-    borderImageSource: imageFuncsPrefixInfos,
-    clipPath: VendorPrefix.webkit,
-    colorAdjust: "webkitPrintColorAdjust",
-    content: imageFuncsPrefixInfos,
-    height: sizePrefixInfos,
-    hyphens: [ VendorPrefix.webkit, VendorPrefix.moz, VendorPrefix.ms ],
-    initialLetter: VendorPrefix.webkit,
-    inlineSize: sizePrefixInfos,
-    lineClamp: VendorPrefix.webkit,
-    mask: VendorPrefix.webkit,
-    maskBorder: ["webkitMaskBoxImage", imageFuncsPrefixInfo],
-    maskBorderOutset: "webkitMaskBoxImageOutset",
-    maskBorderRepeat: "webkitMaskBoxImageRepeat",
-    maskBorderSlice: "webkitMaskBoxImageSlice",
-    maskBorderSource: "webkitMaskBoxImageSource",
-    maskBorderWidth: "webkitMaskBoxImageWidth",
-    maskClip: VendorPrefix.webkit,
-    maskComposite: VendorPrefix.webkit,
-    maskImage: [VendorPrefix.webkit, imageFuncsPrefixInfo],
-    maskMode: VendorPrefix.webkit,
-    maskOrigin: VendorPrefix.webkit,
-    maskPosition: VendorPrefix.webkit,
-    maskRepeat: VendorPrefix.webkit,
-    maskSize: VendorPrefix.webkit,
-    maskType: VendorPrefix.webkit,
-    maxBlockSize: sizePrefixInfos,
-    maxHeight: sizePrefixInfos,
-    maxInlineSize: sizePrefixInfos,
-    maxWidth: sizePrefixInfos,
-    minBlockSize: sizePrefixInfos,
-    minHeight: sizePrefixInfos,
-    minInlineSize: sizePrefixInfos,
-    minWidth: sizePrefixInfos,
-    shapeOutside: imageFuncsPrefixInfos,
-    scrollbarColor: VendorPrefix.webkit,
-    scrollbarWidth: VendorPrefix.webkit,
-    textEmphasis: VendorPrefix.webkit,
-    textEmphasisColor: VendorPrefix.webkit,
-    textEmphasisPosition: VendorPrefix.webkit,
-    textEmphasisStyle: VendorPrefix.webkit,
-    textFillColor: VendorPrefix.webkit,
-    textOrientation: VendorPrefix.webkit,
-    textSizeAdjust: [ VendorPrefix.webkit, VendorPrefix.moz, VendorPrefix.ms ],
-    textStroke: VendorPrefix.webkit,
-    textStrokeColor: VendorPrefix.webkit,
-    textStrokeWidth: VendorPrefix.webkit,
-    userSelect: [
-        {p: VendorPrefix.webkit, vals: [{val: "none", mode: ValuePrefixMode.PropertyOnly}]}
-    ],
-    width: sizePrefixInfos,
-}
 
 
 

@@ -1,3 +1,8 @@
+# 0.13.1
+
+1. Remove handling of vendor prefixes.
+
+
 # 0.12.2
 
 1. Implement `@font-palette-values` at-rule.
